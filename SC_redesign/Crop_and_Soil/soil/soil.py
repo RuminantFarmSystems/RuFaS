@@ -1,6 +1,6 @@
+from __future__ import annotations
 from itertools import groupby
 
-from __future__ import annotations
 
 class Soil:
     def __init__(self):

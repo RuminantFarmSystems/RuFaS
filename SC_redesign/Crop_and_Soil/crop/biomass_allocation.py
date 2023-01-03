@@ -99,6 +99,8 @@ def calc_above_ground_biomass(root_frac: float, biomass: float) -> float:  # pse
     """
     Description: calculates above ground plant biomass.
 
+    SWAT Reference: 5:2.4.4
+
     Args:
         root_frac: fraction of biomass stored in roots
         biomass: the current total biomass of the plant

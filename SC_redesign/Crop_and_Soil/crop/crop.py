@@ -5,6 +5,7 @@ from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
+from SC_redesign.Crop_and_Soil.crop.yields import Yields
 
 from __future__ import annotations
 
@@ -13,12 +14,17 @@ from typing import List
 # TODO: Should use an ENUM class to represent the supported species??
 
 class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex,
-           RootDevelopment):
-    def __init__(self, species: str):
+           RootDevelopment, Yields):
+    def __init__(self):
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
         NitrogenIncorporation.__init__(self)
+        HeatUnits.__init__(self)
+        LeafAreaIndex.__init__(self)
+        RootDevelopment.__init__(self)
+        Yields.__init__(self)
+
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
@@ -85,15 +91,82 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         """list all variables used by Crop"""
         return vars(self)  # TODO: check for duplicates or conflicts among parents
 
+    # TODO: implement cut() and kill() methods - GitHub Issue #248
+    #   the old versions are pasted in the comment blocks below.
+    #   these method (or a similar harvest method) will eventually need to call obtain_yields()
+    def cut(self, fraction: float, mass=None) -> None:
+        """remove biomass from the plant (via cutting)"""
+        pass
 
+    def kill(self) -> None:
+        """kill the plant, preventing it from growing"""
+        pass
 
-
-# class CropSoilInterface:
-#     def __init__(self):
-#         self.layer_nitrates = [8.3, 6.4, 12.1]  # arbitrary
-#         self.depths = [1, 5, 20]  # arbitrary
-#         self.soil_water_factor = 0.5  # arbitrary
-#     def get_soil_variables_needed_by_crop(self, soil: Soil):
-#         self.layer_nitrates = soil.nitrates
-#         self.depths = soil.depths
-#         self.soil_water_factor = self.water_factor
+# ---- Old versions of cut() and kill()
+# def kill(crop_type, field_management, time):
+#     """
+#     Description:
+#         Kills the crop.
+#         NOTE: Any day-of-yield values reset here will be reported to the output
+#         handler as 0. To reset after reporting see crop.daily_reset()
+#         "pseudocode_crop" C.10.H.4
+#
+#     Args:
+#         crop_type: an instance of a crop class
+#         field_management: an instance of the FieldManagement class
+#         time: an instance of the Time class as specified in classes.py
+#     """
+#     crop_type.accumulated_HU = 0
+#     crop_type.prev_accumulated_HU = 0
+#
+#     crop_type.fr_PHU = 0
+#     crop_type.prev_fr_PHU = 0
+#
+#     crop_type.LAI_actual = 0
+#     crop_type.fr_LAI_max = 0
+#
+#     crop_type.biomass_actual = 0
+#     crop_type.prev_biomass_actual = 0
+#     crop_type.bio_AG = 0
+#
+#     crop_type.z_root = 0
+#     crop_type.fr_root = 0
+#
+#     crop_type.bio_P = 0
+#     crop_type.bio_N = 0
+#
+#     crop_type.ET_annual = 0
+#
+#     crop_type.planted = False
+#     crop_type.growing = False
+#     crop_type.killed = True
+#
+#     # FM.2.2
+#     till_management = field_management.managed_applications['tillage']
+#     if (time.calendar_year, -1) in till_management.applications:
+#         till_management.schedule_application(time)
+#
+#
+# def cut(crop_type, bio_frac):
+#     """
+#     Description:
+#         Cuts the crop without killing it
+#         "pseudocode_crop" C.10.H.2/3
+#
+#     Args:
+#         crop_type: an instance of a crop class
+#         bio_frac: fraction of biomass removed during the cut
+#     """
+#
+#     crop_type.accumulated_HU = crop_type.accumulated_HU * (1 - bio_frac)
+#     crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
+#
+#     crop_type.LAI_actual = crop_type.LAI_actual * (1 - bio_frac)
+#     crop_type.fr_LAI_max = 0
+#
+#     crop_type.biomass_actual -= crop_type.yield_actual
+#
+#     crop_type.bio_P = crop_type.bio_P * (1 - bio_frac)
+#     crop_type.bio_N = crop_type.bio_N * (1 - bio_frac)
+#
+#     crop_type.ET_annual = 0

@@ -18,6 +18,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from collections import deque
@@ -26,6 +27,7 @@ from typing import Tuple
 from statistics import mean
 
 om = OutputManager()
+
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -40,6 +42,7 @@ def daily_animal_routine(animal_management, feed, weather, time):
         weather: instance of the Weather class as defined in classes.py
         time: instance of the Time class as defined in classes.py
     """
+
     animal_management.daily_updates(feed, weather, time)
 
 
@@ -50,70 +53,6 @@ class AnimalManagement:
     well as an instance of the LifeCycleManager class in order to update the
     animals' life cycles.
     """
-    # list of all the animals in the simulation
-    calves = []
-    heiferIs = []
-    heiferIIs = []
-    heiferIIIs = []
-    cows = []
-    heifers_sold = []
-    cows_culled = []
-
-    # list of all the pens on the farm
-    all_pens = []
-
-    # simulation length, days
-    sim_length = -1
-
-    # instance of LifeCycleManager class
-    life_cycle_manager = None
-
-    # housing type: barn or pasture
-    housing = ""
-
-    # concentrate supplementation when farming type is "pasture", kg
-    pasture_concentrate = -1
-
-    ration_user_input = False
-
-    # how often a ration is calculated, days
-    formulation_interval = 0
-
-    # day in the simulation
-    simulation_day = 1
-
-    # if False, there are no animals being simulated on the farm
-    simulate_animals = False
-
-    # dictionary: key is animal ID, value is the pen ID that animal is in
-    id_pen = {}
-
-    # queue: pens from which animals have been removed in the order in which
-    # they have had animals removed. Elements (pen ids) will be added to the
-    # right of the queue and popped off the left. Pen ids are popped off the
-    # queue when animals are added (i.e. calves are born or animals are
-    # purchased from the replacement herd), and those new animals are placed in
-    # the popped pen.
-    pens_needing_animals = deque([])
-
-    # dictionary for keeping track of what animal types each pen is holding
-    # (value of the dictionaries are lists of pen objects)
-    pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
-                                  Pen.AnimalCombination.CLOSE_UP: [], Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-                                  Pen.AnimalCombination.LAC_COW: []}
-
-    # these variables are the P compositions of each class of animal. They
-    # are calculated daily and are used when an animal is added to the
-    # herd, whether by birth or replacement herd purchase. They are calculated
-    # in calc_all_p_comp() and are the total body weight of the animals in the
-    # respective class divided by the total P in the animals of the class
-    p_comp = {
-        'calf': 0,
-        'heiferI': 0,
-        'heiferII': 0,
-        'heiferIII': 0,
-        'cow': 0
-    }
 
     @staticmethod
     def get_animal_config(data):
@@ -142,106 +81,134 @@ class AnimalManagement:
             feed: instance of the Feed class
         """
 
+        # simulation length, days
         self.sim_length = config.sim_length
+
+        # day in the simulation
+        self.simulation_day = 1
+
         animal_config = self.get_animal_config(data['animal_config'])
+
+        # instance of LifeCycleManager class
         self.life_cycle_manager = LifeCycleManager(animal_config)
+
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
-        self.init_pens(data['pen_information'], data['herd_information'])
-        self.init_animals(data['herd_information'], self.all_pens, weather, time, config, feed)
+
+        # if False, there are no animals being simulated on the farm
+        self.simulate_animals = config.simulate_animals
+
+        # list of all the animals in the simulation
+        self.calves = []
+        self.heiferIs = []
+        self.heiferIIs = []
+        self.heiferIIIs = []
+        self.cows = []
+        self.heifers_sold = []
+        self.cows_culled = []
+
+        # list of all the pens on the farm
+        self.all_pens = []
+
+        # dictionary: key is animal ID, value is the pen ID that animal is in
+        self.id_pen = {}
+
+        # dictionary for keeping track of what animal types each pen is holding
+        # (value of the dictionaries are lists of pen objects)
+        self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
+                                           Pen.AnimalCombination.CLOSE_UP: [],
+                                           Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
+                                           Pen.AnimalCombination.LAC_COW: []}
+
+        # these variables are the P concentrations of each class of animal. They
+        # are calculated daily and are used when an animal is added to the
+        # herd, whether by birth or replacement herd purchase. They are calculated
+        # in calc_all_p_conc() and are calculated by dividing the total P in the animals
+        # of the class by the total body weight of the animals, on a per-animal basis
+        self.p_conc = {
+            'calf': 0,
+            'heiferI': 0,
+            'heiferII': 0,
+            'heiferIII': 0,
+            'cow': 0
+        }
+
+        # housing type: barn or pasture
         self.housing = data['housing']
+
+        # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
+
         self.ration_user_input = data['ration']['user_input']
+
+        # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
+
         self.methane_model = data['methane_model']
 
-    def init_pens(self, all_pens_data, herd_data):
+        # Minimum number of pens in the simulation (for default pen initialization)
+        self.MIN_NUM_PENS = 3
+
+        self.init_pens(data['pen_information'], data['herd_information'])
+
+        if self.simulate_animals:
+            self.init_animals(data['herd_information'], config)
+
+            self.init_nutrient_rqmts(weather, time, feed)
+
+            self.allocate_all_pens()
+
+        self._print_animal_num_warnings(data['herd_information'])
+
+    def init_pens(self, all_pen_data, herd_data):
         """
         Populates the list of pens with the information from the input json file.
         Args:
-            all_pens_data: dictionary containing information about the pens
+            all_pen_data: dictionary containing information about the pens
             herd_data: dictionary containing information about the herd
         """
 
-        for pen_name in all_pens_data:
-            pen_data = all_pens_data[pen_name]
-            pen_id = pen_data['id']
-            # animal_groups = pen_data['animal_groups']
+        # Initialize pens from all_pen_data
+        for pen_data in all_pen_data.values():
+            pen_data['pen_id'] = pen_data.pop('id')
+            pen_data['animal_combination'] = Pen.AnimalCombination[pen_data.pop('animal_combination')]
 
-            animal_combination = Pen.AnimalCombination[pen_data['animal_combination']]
-
-            max_stocking_density = pen_data['max_stocking_density']
-            vertical_dist_to_parlor = \
-                pen_data['vertical_dist_to_milking_parlor']
-            horizontal_dist_to_parlor = \
-                pen_data['horizontal_dist_to_milking_parlor']
-            num_stalls = pen_data['number_of_stalls']
-            housing_type = pen_data['housing_type']
-            bedding_type = pen_data['bedding_type']
-            pen_type = pen_data['pen_type']
-
-            manure_handling = pen_data['manure_handling']
-            manure_separator = pen_data['manure_separator']
-            manure_storage = pen_data['manure_storage']
-            pen = Pen(pen_id, vertical_dist_to_parlor, horizontal_dist_to_parlor,
-                      num_stalls, housing_type, bedding_type, pen_type, manure_handling,
-                      manure_separator, manure_storage, animal_combination,
-                      max_stocking_density)
+            pen = Pen(**pen_data)
 
             self.all_pens.append(pen)
 
-        herd_num = herd_data['herd_num']
+        self._init_default_pens(herd_data['herd_num'])
 
-        manure_handling = "manual_scraping"
-        manure_separator = "sedimentation"
-        manure_storage = "storage_pit"
-        animal_combination = None
-        info_map = {"class": self.__class__.__name__, 
+    def _init_default_pens(self, herd_num):
+        """
+            Initializes default pens if not enough exist in the simulation.
+            Args:
+                herd_num: number of animals in the herd
+            """
+
+        num_pens = len(self.all_pens)
+        num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
+
+        info_map = {"class": self.__class__.__name__,
                     "function": self.init_pens.__name__,
-                    "all_pens_data": all_pens_data,
-                    "herd_data": herd_data,
-                    "all_pens": self.all_pens,}
-        if (len(self.all_pens) == 0) and (herd_num > 0):
-            om.add_warning("invalid_pen_num_warning", 
-                            "Warning: herd_num > 0, but pen_num = 0."
-                            + " Initilizing 3 default pens.",
-                             info_map)
-            pen_1 = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
-                        animal_combination, 1.2)
-            pen_2 = Pen(1, 0.1, 1.6, 200, 'open air barn', 'sawdust', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
-                        animal_combination, 1.2)
-            pen_3 = Pen(2, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
-                        animal_combination, 1.2)
-            self.all_pens.append(pen_1)
-            self.all_pens.append(pen_2)
-            self.all_pens.append(pen_3)
-        elif (len(self.all_pens) == 1) and (herd_num > 0):
-            om.add_warning("invalid_pen_num_warning", 
-                            "Warning: herd_num > 0, but pen_num = 1."
-                            + " Initilizing 2 default pens.",
-                             info_map)
-            pen_2 = Pen(1, 0.1, 1.6, 300, 'open air barn', 'sawdust', 'freestall',
-                        manure_handling, manure_separator, manure_storage,
-                        animal_combination, 1.2)
-            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
-                        manure_handling, manure_separator, manure_storage,
-                        animal_combination, 1.2)
-            self.all_pens.append(pen_2)
-            self.all_pens.append(pen_3)
-        elif (len(self.all_pens) == 2) and (herd_num > 0):
-            om.add_warning("invalid_pen_num_warning", 
-                            "Warning: herd_num > 0, but pen_num = 2." 
-                            + " Initilizing 1 default pen.",
-                             info_map)
-            pen_3 = Pen(2, 0.1, 1.6, 300, 'open air barn', 'straw', 'tiestall',
-                        manure_handling, manure_separator, manure_storage,
-                        animal_combination, 1.2)
-            self.all_pens.append(pen_3)
+                    "MIN_NUM_PENS": self.MIN_NUM_PENS,
+                    "num_pens": num_pens,
+                    "num_additional_pens_needed": num_additional_pens_needed
+                    }
 
-    def init_animals(self, herd_data, pen_data, weather, time, config, feed):
+        # Check if any default pens need to be added
+        if num_additional_pens_needed > 0 and herd_num > 0:
+            om.add_warning("invalid_pen_num_warning",
+                           f"Warning: herd_num > 0, but num_pens = {num_pens}."
+                           + f" Initializing {num_additional_pens_needed} additional pens.",
+                           info_map)
+            for i in range(num_additional_pens_needed):
+                new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
+                                      "manual_scraping", "sedimentation", "storage_pit",
+                                      Pen.AnimalCombination.NONE, 1.2)
+                self.all_pens.append(new_default_pen)
+
+    def init_animals(self, herd_data, config):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -251,80 +218,48 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
-            feed: an instance of the Feed class defined in feed.py
             config: an instance of the Config class defined in classes.py
                 contains model configuration information
             herd_data: dictionary containing information about the herd
-            pen_data: dictionary containing information about the pens
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
         """
-        info_map = {"class": self.__class__.__name__, 
-                    "function": self.init_animals.__name__,
-                    "herd_data": herd_data,
-                    "pen_data": pen_data,
-                    "weather": weather,
-                    "time": time,
-                    "config": config,
-                    "feed": feed,}
-        calf_num = herd_data['calf_num']
-        heiferI_num = herd_data['heiferI_num']
-        heiferII_num = herd_data['heiferII_num']
-        heiferIII_num = herd_data['heiferIII_num']
-        cow_num = herd_data['cow_num']
-        replace_num = herd_data['replace_num']
-        herd_num = herd_data['herd_num']
-        breed = herd_data['breed']
 
-        if herd_num == 0:
-            self.simulate_animals = False
-            if not calf_num == 0:
-                om.add_warning("invalid_calf_num_warning", 
-                                "Warning: herd_num is 0, but calf_num is not."
-                                + " Setting calf_num = 0.", 
-                                info_map)
-                calf_num = 0
-            if not heiferI_num == 0:
-                om.add_warning("invalid_heiferI_num_warning", 
-                                "Warning: herd_num is 0, but heiferI_num is not."
-                                + " Setting heiferI_num = 0.", 
-                                info_map)
-                heiferI_num = 0
-            if not heiferII_num == 0:
-                om.add_warning("invalid_heiferII_num_warning", 
-                                "Warning: herd_num is 0, but heiferII_num is not."
-                                + " Setting heiferII_num = 0.", 
-                                info_map)
-                heiferII_num = 0
-            if not heiferIII_num == 0:
-                om.add_warning("invalid_heiferIII_num_warning", 
-                                "Warning: herd_num is 0, but heiferIII_num is not."
-                                + " Setting heiferII_num = 0.", 
-                                info_map)
-                heiferIII_num = 0
-            if not cow_num == 0:
+        herd_data['config'] = config
+        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
+            = self.life_cycle_manager.initialize_herd(**herd_data)
 
-                om.add_warning("invalid_cow_num_warning", 
-                                "Warning: herd_num is 0, but cow_num is not."
-                                + " Setting cow_num = 0.", 
-                                info_map)
-                cow_num = 0
+    def _print_animal_num_warnings(self, herd_data):
+        """
+        If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
+            and logs how many warnings were generated
+        Otherwise, if simulate_animals is true, logs that it is true
+
+        Args:
+            herd_data: dictionary containing information about the herd
+        """
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._print_animal_num_warnings.__name__,
+            "herd_data": herd_data
+        }
+
+        counter = 0
+
+        if not self.simulate_animals:
+            animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+            for key in animal_keys:
+                if herd_data[key] != 0:
+                    om.add_warning(f"invalid_{key}_warning",
+                                   f"Warning: herd_num is 0, but {key} is not.",
+                                   info_map)
+                    counter += 1
+            om.add_log("num_warnings_associated_with_simulate_animals",
+                       f"{counter} warnings were associated with simulate_animals",
+                       info_map)
         else:
-            self.simulate_animals = True
-
-        herd_init = herd_data['herd_init']
-
-        if self.simulate_animals:
-            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-                = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
-                                                          heiferI_num, heiferII_num,
-                                                          heiferIII_num, cow_num,
-                                                          replace_num, herd_init,
-                                                          breed, config)
-
-        if len(pen_data) > 0:
-            self.init_nutrient_rqmts(weather, time, feed)
-            self.pen_allocation()
+            om.add_log("simulate_animals_flag",
+                       "simulate_animals is true",
+                       info_map)
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """
@@ -426,7 +361,7 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
 
-        # stratefying the pens that lost animals by animal group
+        # stratifying the pens that lost animals by animal group
         # (values are dictionaries of pen IDs, with values being the number of animals removed)
         grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
                               Pen.AnimalCombination.CLOSE_UP: {}, Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {},
@@ -448,27 +383,27 @@ class AnimalManagement:
 
         for animal in animals_added:
             if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.p_comp['calf']
+                animal_p_conc = self.p_conc['calf']
                 self.calves.append(animal)
                 group = Pen.AnimalCombination.CALF
             elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.p_comp['heiferI']
+                animal_p_conc = self.p_conc['heiferI']
                 self.heiferIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.p_comp['heiferII']
+                animal_p_conc = self.p_conc['heiferII']
                 self.heiferIIs.append(animal)
                 group = Pen.AnimalCombination.GROWING
             elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.p_comp['heiferIII']
+                animal_p_conc = self.p_conc['heiferIII']
                 self.heiferIIIs.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             elif not animal.milking:
-                animal_p_conc = self.p_comp['cow']
+                animal_p_conc = self.p_conc['cow']
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.CLOSE_UP
             else:  # animal is of class Cow
-                animal_p_conc = self.p_comp['cow']
+                animal_p_conc = self.p_conc['cow']
                 # self.all_pens[pen].animals_in_pen.append(animal)
                 self.cows.append(animal)
                 group = Pen.AnimalCombination.LAC_COW
@@ -540,7 +475,7 @@ class AnimalManagement:
                                                     feed, temp, pen_population_before_additions[pen.id])
             # self.all_pens[pen].animals_in_pen.append(calf)
 
-    def pen_allocation(self):
+    def allocate_all_pens(self):
         # TODO: Refactor this function, currently nearly 200 lines long
         # TODO
         # -mark pens after grouping
@@ -604,10 +539,10 @@ class AnimalManagement:
                                            Pen.AnimalCombination.CLOSE_UP, Pen.AnimalCombination.LAC_COW]
                 else:
                     mixed_types[pen.id] = pen.animal_combination
-        # organzing pens by class and ensuring sufficeint storage
-        info_map = {"class": self.__class__.__name__, 
-                    "function": self.pen_allocation.__name__,
-                    "all_pens": self.all_pens,}
+        # organizing pens by class and ensuring sufficient storage
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.allocate_all_pens.__name__,
+                    "all_pens": self.all_pens, }
         while True:
             max_value = max(stall_shortage.values())
             if max_value > 0:
@@ -622,11 +557,11 @@ class AnimalManagement:
                         stalls = pen.num_stalls
                 # if no available pens for this group in mixed types
                 if pen is None:
-                    om.add_warning("pen_shortage_warning", 
-                                    f"Warning: shortage of {max_key[0].name} pens," 
-                                    + " initializing new pen,", 
-                                    info_map)
-                    # initalizing a default pen to be used for any class
+                    om.add_warning("pen_shortage_warning",
+                                   f"Warning: shortage of {max_key[0].name} pens,"
+                                   + " initializing new pen,",
+                                   info_map)
+                    # initializing a default pen to be used for any class
                     pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
                               'sedimentation', 'storage_pit', max_key[0], 1.2)
@@ -659,6 +594,7 @@ class AnimalManagement:
         ###########################
         # Assigning animals (sans Lactating Cows) to appropriate pens
         ###########################
+
         # Calf pen allocation
         stalls = [pen.num_stalls for pen in calf_pens]
         # density per-pen for even distribution across pens for calves
@@ -726,9 +662,7 @@ class AnimalManagement:
         # final pen for this class
         close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
 
-        #####################
-        # Pen Allocation for lactating cows
-        #####################
+        # Lactating Cow Pen Allocation
         stalls = [pen.num_stalls for pen in lac_cow_pens]
         # density per-pen for even distribution
         density = len(lactating_cows) / sum(stalls)
@@ -738,6 +672,7 @@ class AnimalManagement:
         for key in pen_grouping:
             lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
             lac_cow_pens.remove(lac_cow_pens[0])
+        #####################
 
         self.fully_update_id_pen()
 
@@ -790,59 +725,57 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_avg_growth()
 
+    def gather_cow_class_history(self, cow_class):
+        """
+        Gathers all the pen history data for a given cow class type. Checks the current pen
+        and pen composition of all animals of a given cow class, before then update the
+        pen history for that class using the update_pen_history() method
+
+        Args:
+            cow_class: instance of whatever cow type's pen history is being gathered
+        """
+        for cow in cow_class:
+            current_pen = self.id_pen[cow.id]
+            classes_in_pen = self.all_pens[current_pen].classes_in_pen
+            cow.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
+
     def record_pen_history(self):
         """
         Records the pen history of all of the animals.
         """
-        for calf in self.calves:
-            curr_pen = self.id_pen[calf.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            calf.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferI in self.heiferIs:
-            curr_pen = self.id_pen[heiferI.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferI.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferII in self.heiferIIs:
-            curr_pen = self.id_pen[heiferII.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for heiferIII in self.heiferIIIs:
-            curr_pen = self.id_pen[heiferIII.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            heiferIII.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
-
-        for cow in self.cows:
-            curr_pen = self.id_pen[cow.id]
-            classes_in_pen = self.all_pens[curr_pen].classes_in_pen
-            cow.update_pen_history(curr_pen, self.simulation_day, classes_in_pen)
+        self.gather_cow_class_history(self.calves)
+        self.gather_cow_class_history(self.heiferIs)
+        self.gather_cow_class_history(self.heiferIIs)
+        self.gather_cow_class_history(self.heiferIIIs)
+        self.gather_cow_class_history(self.cows)
 
     @staticmethod
-    def _calc_p_comp(animals):
+    def _calc_p_conc(animals):
         """
         Args:
-            animals: the list of animals for which the P composition should be
+            animals: the list of animals for which the P concentration should be
                 calculated
         Returns:
-            p_comp: the P composition of @animals
+            p_conc: the P concentration of @animals
         """
 
         if len(animals) == 0:
             return 0
         else:
-            return sum(a.p_animal for a in animals) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(a.body_weight for a in animals)
 
-    def calc_all_p_comp(self):
+    def calc_all_p_conc(self):
         """
         Calculates each animal class's P concentration.
         """
+
         # TODO: see if there is a better way to do this using dictionary comprehension
-        self.p_comp['calf'] = self._calc_p_comp(self.calves)
-        self.p_comp['heiferI'] = self._calc_p_comp(self.heiferIs)
-        self.p_comp['heiferII'] = self._calc_p_comp(self.heiferIIs)
-        self.p_comp['cow'] = self._calc_p_comp(self.heiferIIIs)
+        self.p_conc['calf'] = self._calc_p_conc(self.calves)
+        self.p_conc['heiferI'] = self._calc_p_conc(self.heiferIs)
+        self.p_conc['heiferII'] = self._calc_p_conc(self.heiferIIs)
+        self.p_conc['cow'] = self._calc_p_conc(self.heiferIIIs)
+        # TODO check if this is set up correctly. Currently p_comp for the cow class is
+        # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
 
     def calc_p_rqmts(self):
         """
@@ -899,7 +832,7 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                self.pen_allocation()
+                self.allocate_all_pens()
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
 
@@ -908,7 +841,7 @@ class AnimalManagement:
 
             # phosphorus updates
             self.daily_p_update()  # per animal
-            self.calc_all_p_comp()  # per animal
+            self.calc_all_p_conc()  # per animal
 
             self.record_pen_history()
 
@@ -984,7 +917,7 @@ class AnimalManagement:
                 [pen_hist.__dict__ for pen_hist in animal.pen_history],
             'event_history': animal.events.events,
             'CI_avg': CI_avg
-        } 
+        }
 
     def get_life_cycle_output(self, num_animals):
         """
@@ -1001,26 +934,24 @@ class AnimalManagement:
 
         Returns: a dictionary which contains the individual life cycle output
         """
-
-        
         minimum_num = min(len(self.calves), len(self.heiferIs),
                           len(self.heiferIIs), len(self.heiferIIIs),
                           len(self.cows),
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
 
-        info_map = {"class": self.__class__.__name__, 
+        info_map = {"class": self.__class__.__name__,
                     "function": self.get_life_cycle_output.__name__,
                     "num_animals": num_animals,
-                    "minimum_num": minimum_num,}
+                    "minimum_num": minimum_num, }
 
         if num_animals > minimum_num:
-            om.add_warning("invalid_animal_list_size", 
-                            f"The smallest animal list is of size {minimum_num}"
-                            + f" so {num_animals} of each animal class cannot be" 
-                            + f" in the life cycle output. Only {minimum_num} of" 
-                            + " each animal type will be in the life cycle output.",
-                            info_map)
+            om.add_warning("invalid_animal_list_size",
+                           f"The smallest animal list is of size {minimum_num}"
+                           + f" so {num_animals} of each animal class cannot be"
+                           + f" in the life cycle output. Only {minimum_num} of"
+                           + " each animal type will be in the life cycle output.",
+                           info_map)
             num_animals = minimum_num
 
         output = {
