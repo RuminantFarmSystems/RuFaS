@@ -60,14 +60,6 @@ def init_heat(**kwargs):
     return heat
 
 
-@pytest.mark.parametrize("yes", [True, False])
-def test_decide_to_use_heat_unit_temperature(yes):
-    """check that the flag to use alternative heat unit accumulation method is correctly set"""
-    heat = init_heat()
-    heat.decide_to_use_heat_unit_temperature(yes)
-    assert heat.use_heat_unit_temperature == yes
-
-
 @pytest.mark.parametrize("use_alt,meant,min_t,max_t", [
     (False, None, 18, 20),
     (True, 13.6, None, None),

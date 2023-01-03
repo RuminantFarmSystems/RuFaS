@@ -5,7 +5,8 @@ class HeatUnits:
         self.potential_heat_units = 800
         self.accumulated_heat_units = 0  # accumulator
         self.is_growing = True  # TODO: not currently using; SWAT 5:2.1.4
-        self.use_heat_unit_temperature = use_heat_unit_temperature
+        self.use_heat_unit_temperature: bool = use_heat_unit_temperature
+        """determines if heat unit temperature will be used for heat unit accumulation."""
         # self.heat_unit_scheduling = True
 
         self.new_heat_units = None
@@ -46,16 +47,6 @@ class HeatUnits:
         self.previous_heat_fraction = self.heat_fraction
         self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
 
-    def decide_to_use_heat_unit_temperature(self, use_heat_unit_temperature: bool) -> None:
-        """sets the boolean that determines if heat unit temperature will be used for heat unit accumulation.
-
-        Details: This function will primarily be used outside this class during when
-            If use_heat_unit_temperature is False, the average daily temperature will be used to accumulate heat
-            units. If use_heat_unit_temperature is True, then an alternative heat unit temperature is used to determine
-            accumulated heat units.
-        """
-        self.use_heat_unit_temperature = use_heat_unit_temperature
-
     # TODO: add these warnings to output manager at a later date.
     def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
                                             min_air_temperature: float = None,
@@ -86,7 +77,7 @@ class HeatUnits:
             above the minimum threshold), the alternative method is context dependent:
                 1. if the minimum and maximum air temperature are both **higher** than the crop's minimum and maximum
                 growth temperatures, then accumulation will be greater than with the main method
-                2. if the minimum and maximum air temperatures are both **lower** than the crop's miniimum and maximum
+                2. if the minimum and maximum air temperatures are both **lower** than the crop's minimum and maximum
                 temperatures, then accumulation will be greater than with the main method
                 3. if the air temperature window is entirely contained within the crop temperature window
                 (i.e., crop mint < air mint < air maxt < crop maxt), then accumulation will be equal to the middle of
