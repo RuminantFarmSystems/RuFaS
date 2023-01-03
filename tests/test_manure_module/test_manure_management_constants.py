@@ -1,22 +1,7 @@
 from pytest import approx
 
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-
-
-def test_general_constants() -> None:
-    """Tests the general constants in file general_constants.py."""
-    constants = GeneralConstants
-    assert constants.GRAMS_TO_KG == approx(0.001)
-    assert constants.LITERS_TO_CUBIC_METERS == approx(0.001)
-    assert constants.KG_TO_CUBIC_METERS == approx(0.001)
-    assert constants.DAYS_PER_YEAR == 365
-    assert constants.SECONDS_PER_DAY == 86400
-    assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
-    assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
-
-
 def test_manure_constants() -> None:
     """Tests the manure constants in file manure_constants.py."""
     constants = ManureConstants

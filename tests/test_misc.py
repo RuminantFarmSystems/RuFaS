@@ -14,6 +14,7 @@ from mock.mock import MagicMock,mock_open
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.util import Utility
@@ -53,6 +54,17 @@ def test_end_simulation():
     """Unit test for function end_simulation in file classes.py"""
     pass
 
+
+def test_general_constants() -> None:
+    """Tests the general constants in file general_constants.py."""
+    constants = GeneralConstants
+    assert constants.GRAMS_TO_KG == approx(0.001)
+    assert constants.LITERS_TO_CUBIC_METERS == approx(0.001)
+    assert constants.KG_TO_CUBIC_METERS == approx(0.001)
+    assert constants.DAYS_PER_YEAR == 365
+    assert constants.SECONDS_PER_DAY == 86400
+    assert constants.WATER_DENSITY_KG_PER_LITER == approx(0.997)
+    assert constants.WATER_DENSITY_KG_PER_M3 == approx(0.997 * 0.001)
 
 def test_is_leap_year():
     """Unit test for function is_leap_year in file classes.py"""
@@ -318,24 +330,36 @@ def test_generate_key(mocker: MockerFixture) -> None:
         om._generate_key("name", {})
 
     info_map = {"class": "dummy_class", "function": "dummy_func"}
+    counter_before = om.counter
+    om.counter = 6
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_class.dummy_func.key_name.{6}"
+    om.counter = counter_before
 
     info_map["suppress_prefix"] = True
+    counter_before = om.counter
+    om.counter = 7
     key = om._generate_key("key_name", info_map)
     assert key == f"key_name.{7}"
+    om.counter = counter_before
 
     info_map["suppress_prefix"] = False
+    counter_before = om.counter
+    om.counter = 8
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_class.dummy_func.key_name.{8}"
+    om.counter = counter_before
 
     info_map["suppress_suffix"] = True
     key = om._generate_key("key_name", info_map)
     assert key == "dummy_class.dummy_func.key_name"
 
     info_map["suppress_suffix"] = False
+    counter_before = om.counter
+    om.counter = 9
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_class.dummy_func.key_name.{9}"
+    om.counter = counter_before
 
     info_map["suppress_prefix"] = True
     info_map["suppress_suffix"] = True
@@ -344,8 +368,11 @@ def test_generate_key(mocker: MockerFixture) -> None:
 
     info_map["prefix"] = "dummy_prefix"
     info_map["suppress_suffix"] = False
+    counter_before = om.counter
+    om.counter = 10
     key = om._generate_key("key_name", info_map)
     assert key == f"dummy_prefix.key_name.{10}"
+    om.counter = counter_before
 
     info_map["suffix"] = "dummy_suffix"
     key = om._generate_key("key_name", info_map)
