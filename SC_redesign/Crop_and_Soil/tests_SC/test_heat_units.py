@@ -142,6 +142,7 @@ def test_absorb_heat_units(mean, min, max, use_heat_unit_temp):
     heat = init_heat(use_heat_unit_temperature=use_heat_unit_temp)
     heat.absorb_heat_units(mean, min, max)
     assert heat.use_heat_unit_temperature == use_heat_unit_temp
+
     if use_heat_unit_temp:
         expect_max_heat_unit_temp = HeatUnits.determine_maximum_heat_unit_temperature(max, 38)
         assert expect_max_heat_unit_temp == heat.maximum_heat_unit_temperature
@@ -149,15 +150,18 @@ def test_absorb_heat_units(mean, min, max, use_heat_unit_temp):
         assert expect_min_heat_unit_temp == heat.minimum_heat_unit_temperature
         expect_heat_unit_temp = (expect_min_heat_unit_temp / 2) + (expect_max_heat_unit_temp / 2)
         assert expect_heat_unit_temp == heat.heat_unit_temperature
+
     if use_heat_unit_temp or mean is None:
         use_temp = expect_heat_unit_temp
     else:
         use_temp = mean
+
     if 20 <= use_temp <= 38:
         expect_is_growing = True
     else:
         expect_is_growing = False
     assert expect_is_growing == heat.is_growing
+
     if use_heat_unit_temp or (mean is None):
         expect_new_heat_units = HeatUnits.determine_new_heat_units(expect_heat_unit_temp, 20)
     else:
@@ -167,4 +171,3 @@ def test_absorb_heat_units(mean, min, max, use_heat_unit_temp):
     assert heat.previous_heat_fraction is None
     expect_heat_fraction = expect_new_heat_units / 800
     assert expect_heat_fraction == heat.heat_fraction
-    assert heat.is_mature == (expect_heat_fraction >= 1)

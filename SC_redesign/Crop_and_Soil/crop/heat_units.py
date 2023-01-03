@@ -5,7 +5,6 @@ class HeatUnits:
         self.potential_heat_units = 800
         self.accumulated_heat_units = 0  # accumulator
         self.is_growing = True  # TODO: not currently using; SWAT 5:2.1.4
-        self.is_mature = False  # TODO: not currently using; SWAT 5:2.1.4
         self.use_heat_unit_temperature: bool = use_heat_unit_temperature
         """determines if heat unit temperature will be used for heat unit accumulation."""
         # self.heat_unit_scheduling = True
@@ -47,7 +46,6 @@ class HeatUnits:
         self.accumulate_heat_units(mean_air_temperature)
         self.previous_heat_fraction = self.heat_fraction
         self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
-        self.is_mature = self.heat_fraction >= 1.0
 
     # TODO: add these warnings to output manager at a later date.
     def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
@@ -105,10 +103,10 @@ class HeatUnits:
     def determine_new_heat_units(temperature: float, min_temperature: float) -> float:
         """calculates the heat units that will be accumulated during a day
 
-            Args:
-                temperature: the temperature to be compared to min_temp for accumulating heat units (C)
-                min_temperature: the minimum temperature below which a crop cannot grow (C)
-            """
+        Args:
+            temperature: the temperature to be compared to min_temp for accumulating heat units (C)
+            min_temperature: the minimum temperature below which a crop cannot grow (C)
+        """
         return max(temperature - min_temperature, 0)  # from SWAT:
 
     @staticmethod
