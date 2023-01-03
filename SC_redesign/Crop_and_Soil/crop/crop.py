@@ -13,9 +13,22 @@ from typing import List
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex,
+class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
+           NitrogenIncorporation, HeatUnits, LeafAreaIndex,
            RootDevelopment, Yields):
-    def __init__(self):
+    def __init__(self, cropConfig = None):
+        # config = cropConfig or CropConfig()  # default crop config if none given
+
+        # TODO: Loi recommended that a composition pattern might fit better
+        #  than multiple inheritance: A crop "has" a Growth constraint (system)
+        #  but is not itself a growth constraint. This pattern might be worth
+        #  looking into in the future. One problem I foresee is that because
+        #  individual attributes occur in multiple process classes
+        #  (e.g., nitrogen in GrowthConstraints and NitrogenIncorporation), a
+        #  composite design would require interdependence such that these
+        #  common attributes remain in-sync.
+
+        # TODO: add config as argument to each process class giving start state.
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
@@ -26,38 +39,48 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         Yields.__init__(self)
 
 
-    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
+    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
+                  soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
                   incoming_light: float,
-                  evaporation: float, transpiration: float, max_evapotranspiration: float,
-                  mean_air_temperature: float, min_air_temperature: float, max_air_temperature: float) -> None:
+                  evaporation: float, transpiration: float,
+                  max_evapotranspiration: float,
+                  mean_air_temperature: float, min_air_temperature: float,
+                  max_air_temperature: float) -> None:
         """main function for growing the crop on a daily basis
 
         Args:
-            layer_nitrates: nitrates present in each layer of the soil profile (kg/ha)
+            layer_nitrates: nitrates present in each layer of the soil profile
+                (kg/ha)
             layer_depths: the maximum depth of each soil layer
             soil_water_factor: the soil water factor
 
-            max_transpiration: maximum amount of transpiration possible (mm), as determined by soil, on this day
+            max_transpiration: maximum amount of transpiration possible (mm),
+                as determined by soil, on this day
             air_temperature: current air temperature (C)
 
             incoming_light: incoming light radiation energy (MJ/m)
 
-            evaporation: total evaporation occurring (mm) as determined by soil, on a given day
-            transpiration: total transpiration occurring (mm) as determined by soil, on a given day
-            max_evapotranspiration: maximum amount of evapotranspiration possible (mm), as determined by soil
-                on a given day.
+            evaporation: total evaporation occurring (mm) as determined by soil,
+                on a given day
+            transpiration: total transpiration occurring (mm) as determined by
+                soil, on a given day
+            max_evapotranspiration: maximum amount of evapotranspiration
+                possible (mm), as determined by soil on a given day.
 
-            mean_air_temperature:
-            min_air_temperature:
-            max_air_temperature:
+            mean_air_temperature: average air temperature for the day (C)
+            min_air_temperature: minimum air temperature for the day (C)
+            max_air_temperature: maximum air temperature for the day (C)
 
-        Details: grow_crop is a wrapper function for all the Crop growth process sub-routines. It should be called
-        every day that the crop is alive and growing in the simulation
+        Details: grow_crop is a wrapper function for all the Crop growth
+            process sub-routines. It should be called every day that the crop
+            is alive and growing in the simulation
         """
-        self.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
+        self.absorb_heat_units(mean_air_temperature, min_air_temperature,
+                               max_air_temperature)
         self.develop_roots()
-        self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
+        self.incorporate_nitrogen(layer_nitrates, layer_depths,
+                                  soil_water_factor)
         #
         # phosphorus_uptake.update_all()
         #
@@ -93,7 +116,8 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
 
     # TODO: implement cut() and kill() methods - GitHub Issue #248
     #   the old versions are pasted in the comment blocks below.
-    #   these method (or a similar harvest method) will eventually need to call obtain_yields()
+    #   these method (or a similar harvest method) will eventually need to call
+    #   obtain_yields()
     def cut(self, fraction: float, mass=None) -> None:
         """remove biomass from the plant (via cutting)"""
         pass
@@ -107,8 +131,8 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
 #     """
 #     Description:
 #         Kills the crop.
-#         NOTE: Any day-of-yield values reset here will be reported to the output
-#         handler as 0. To reset after reporting see crop.daily_reset()
+#         NOTE: Any day-of-yield values reset here will be reported to the
+#         output handler as 0. To reset after reporting see crop.daily_reset()
 #         "pseudocode_crop" C.10.H.4
 #
 #     Args:
