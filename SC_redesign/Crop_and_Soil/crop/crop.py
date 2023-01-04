@@ -33,7 +33,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         #  individual attributes occur in multiple process classes
         #  (e.g., nitrogen in GrowthConstraints and NitrogenIncorporation), a
         #  composite design would require interdependence such that these
-        #  common attributes remain in-sync.
+        #  common attributes remain in-sync. - GitHub Issue #255
 
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],

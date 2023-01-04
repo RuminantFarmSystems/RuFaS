@@ -1,8 +1,12 @@
 from math import exp
-
+from typing import Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 class BiomassAllocation:
-    def __init__(self):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         self.light_extinction = 0.65
         self.leaf_area_index = 1.2
         self.light_conversion = 20
