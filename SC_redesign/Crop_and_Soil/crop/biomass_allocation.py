@@ -1,6 +1,6 @@
 from math import exp
 
-
+# TODO - Refactor this class to match others - GitHub Issue #257
 class BiomassAllocation:
     def __init__(self):
         self.light_extinction = 0.65
