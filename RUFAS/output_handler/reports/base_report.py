@@ -8,6 +8,7 @@ Author(s): William Donovan wmdonovan@wisc.edu
 import csv
 from pathlib import Path
 
+import config.global_variables
 from .. import graphics
 
 
@@ -15,6 +16,7 @@ class BaseReport:
     """
     Interface for report handlers
     """
+
     def __init__(self, data):
         """Sets the properties of each report handler initialized.
 
@@ -23,7 +25,7 @@ class BaseReport:
         """
 
         self.produce_csv = data['produce_csv']
-        self.produce_graphics = data['produce_graphics']
+        self.produce_graphics = data['produce_graphics'] if config.global_variables.PRODUCE_GRAPHICS else False
         self.report_name = data['report_name']
         self.file_name = self.report_name + '.csv'
         self.annual_file_name = self.report_name + '_annual.csv'
@@ -66,8 +68,10 @@ class BaseReport:
             writer.writerow(units)
 
     def initialize(self):
-        self.write_headers(Path(str(self.csv_dir) + '/' + self.file_name), self.daily_variables)
-        self.write_headers(Path(str(self.csv_dir) + '/' + self.annual_file_name), self.annual_variables)
+        self.write_headers(Path(str(self.csv_dir) + '/' +
+                           self.file_name), self.daily_variables)
+        self.write_headers(Path(str(self.csv_dir) + '/' +
+                           self.annual_file_name), self.annual_variables)
 
     # stores specified daily values. NOTE: the eval() method is limited
     # to the scope of variables. If a specified output is not a soil
@@ -99,20 +103,22 @@ class BaseReport:
     #
     def write_annual_report(self):
 
-        mode = 'a+' if Path(str(self.csv_dir) + '/' + self.file_name).exists() else 'w+'
+
+        mode = 'a+' if Path(str(self.csv_dir) + '/' +
+                            self.file_name).exists() else 'w+'
 
         with Path(str(self.csv_dir) + '/' + self.file_name).open(mode) as csv_file:
             # Write data day by day
             writer = csv.DictWriter(csv_file, fieldnames=self.daily_variables.keys(),
                                     lineterminator='\n')
-
             for day in range(len(self.daily_variables['j_day'][2])):
                 row = {}
                 for variable in self.daily_variables:
                     row[variable] = self.daily_variables[variable][2][day]
                 writer.writerow(row)
 
-        mode = 'a+' if Path(str(self.csv_dir) + '/' + self.annual_file_name).exists() else 'w+'
+        mode = 'a+' if Path(str(self.csv_dir) + '/' +
+                            self.annual_file_name).exists() else 'w+'
 
         with Path(str(self.csv_dir) + '/' + self.annual_file_name).open(mode) as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.annual_variables.keys(),

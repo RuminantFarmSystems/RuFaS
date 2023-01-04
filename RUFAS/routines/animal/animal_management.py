@@ -14,15 +14,20 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from collections import deque
 import random
 from typing import Tuple
 from statistics import mean
+
+om = OutputManager()
+
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -91,7 +96,7 @@ class AnimalManagement:
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
 
         # if False, there are no animals being simulated on the farm
-        self.simulate_animals = False
+        self.simulate_animals = config.simulate_animals
 
         # list of all the animals in the simulation
         self.calves = []
@@ -118,8 +123,8 @@ class AnimalManagement:
         # these variables are the P concentrations of each class of animal. They
         # are calculated daily and are used when an animal is added to the
         # herd, whether by birth or replacement herd purchase. They are calculated
-        # in calc_all_p_conc() and are calculated by dividing the total P in the animals of the class
-        # by the total body weight of the animals, on a per-animal basis
+        # in calc_all_p_conc() and are calculated by dividing the total P in the animals
+        # of the class by the total body weight of the animals, on a per-animal basis
         self.p_conc = {
             'calf': 0,
             'heiferI': 0,
@@ -141,9 +146,19 @@ class AnimalManagement:
 
         self.methane_model = data['methane_model']
 
+        # Minimum number of pens in the simulation (for default pen initialization)
+        self.MIN_NUM_PENS = 3
+
         self.init_pens(data['pen_information'], data['herd_information'])
 
-        self.init_animals(data['herd_information'], self.all_pens_ids, weather, time, config, feed)
+        if self.simulate_animals:
+            self.init_animals(data['herd_information'], config)
+
+            self.init_nutrient_rqmts(weather, time, feed)
+
+            self.allocate_all_pens()
+
+        self._print_animal_num_warnings(data['herd_information'])
 
     def init_pens(self, all_pen_data, herd_data):
         """
@@ -162,33 +177,38 @@ class AnimalManagement:
 
             self.all_pens_ids.append(pen)
 
-        self.init_default_pens(herd_data['herd_num'])
+        self._init_default_pens(herd_data['herd_num'])
 
-    def init_default_pens(self, herd_num):
-        # TODO: add unit test
+    def _init_default_pens(self, herd_num):
         """
             Initializes default pens if not enough exist in the simulation.
             Args:
                 herd_num: number of animals in the herd
             """
 
-        # Minimum number of pens in the simulation
-        MIN_NUM_PENS = 3
+        num_pens = len(self.all_pens)
+        num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
 
-        num_pens_needed = MIN_NUM_PENS - len(self.all_pens_ids)
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.init_pens.__name__,
+                    "MIN_NUM_PENS": self.MIN_NUM_PENS,
+                    "num_pens": num_pens,
+                    "num_additional_pens_needed": num_additional_pens_needed
+                    }
 
         # Check if any default pens need to be added
-        if num_pens_needed > 0 and herd_num > 0:
-            self.init_default_pens(num_pens_needed)
-            print('Warning: herd_num > 0, but num_pens =', len(self.all_pens_ids), '. Initilizing', num_pens_needed,
-                  'default pens.')
-            for i in range(num_pens_needed):
+        if num_additional_pens_needed > 0 and herd_num > 0:
+            om.add_warning("invalid_pen_num_warning",
+                           f"Warning: herd_num > 0, but num_pens = {num_pens}."
+                           + f" Initializing {num_additional_pens_needed} additional pens.",
+                           info_map)
+            for i in range(num_additional_pens_needed):
                 new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sand', 'freestall',
                                       "manual_scraping", "sedimentation", "storage_pit",
                                       Pen.AnimalCombination.NONE, 1.2)
                 self.all_pens_ids.append(new_default_pen)
 
-    def init_animals(self, herd_data, pen_data, weather, time, config, feed):
+    def init_animals(self, herd_data, config):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -198,80 +218,48 @@ class AnimalManagement:
         are calculated and the animals are allocated to pens.
 
         Args:
-            feed: an instance of the Feed class defined in feed.py
             config: an instance of the Config class defined in classes.py
                 contains model configuration information
             herd_data: dictionary containing information about the herd
-            pen_data: dictionary containing information about the pens
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
         """
 
-        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-        animal_nums = dict()
+        herd_data['config'] = config
+        self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
+            = self.life_cycle_manager.initialize_herd(**herd_data)
 
-        for key in animal_keys:
-            animal_nums[key] = herd_data[key]
+    def _print_animal_num_warnings(self, herd_data):
+        """
+        If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
+            and logs how many warnings were generated
+        Otherwise, if simulate_animals is true, logs that it is true
 
-        calf_num = herd_data['calf_num']
-        heiferI_num = herd_data['heiferI_num']
-        heiferII_num = herd_data['heiferII_num']
-        heiferIII_num = herd_data['heiferIII_num']
-        cow_num = herd_data['cow_num']
-        replace_num = herd_data['replace_num']
-        herd_num = herd_data['herd_num']
-        breed = herd_data['breed']
+        Args:
+            herd_data: dictionary containing information about the herd
+        """
 
-        # QUESTION: what do calf_num, heifer_num, etc do?
-        # if herd_num ==
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._print_animal_num_warnings.__name__,
+            "herd_data": herd_data
+        }
 
-        # QUESTION: what is the point of simulate_animals?
+        counter = 0
 
-        if herd_num == 0:
-            self.simulate_animals = False
-            if not calf_num == 0:
-                print("Warning: herd_num is 0, but calf_num is not. "
-                      "Setting calf_num = 0.")
-                calf_num = 0
-            if not heiferI_num == 0:
-                print("Warning: herd_num is 0, but heiferI_num is not. "
-                      "Setting heiferI_num = 0.")
-                heiferI_num = 0
-            if not heiferII_num == 0:
-                print("Warning: herd_num is 0, but heiferII_num is not. "
-                      "Setting heiferII_num = 0.")
-                heiferII_num = 0
-            if not heiferIII_num == 0:
-                print("Warning: herd_num is 0, but heiferIII_num is not. "
-                      "Setting heiferIII_num = 0.")
-                heiferIII_num = 0
-            if not cow_num == 0:
-                print("Warning: herd_num is 0, but cow_num is not. "
-                      "Setting cow_num = 0.")
-                cow_num = 0
+        if not self.simulate_animals:
+            animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+            for key in animal_keys:
+                if herd_data[key] != 0:
+                    om.add_warning(f"invalid_{key}_warning",
+                                   f"Warning: herd_num is 0, but {key} is not.",
+                                   info_map)
+                    counter += 1
+            om.add_log("num_warnings_associated_with_simulate_animals",
+                       f"{counter} warnings were associated with simulate_animals",
+                       info_map)
         else:
-            self.simulate_animals = True
-
-        herd_init = herd_data['herd_init']
-
-        if self.simulate_animals:
-            self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-                = self.life_cycle_manager.initialize_herd(herd_num, calf_num,
-                                                          heiferI_num, heiferII_num,
-                                                          heiferIII_num, cow_num,
-                                                          replace_num, herd_init,
-                                                          breed, config)
-
-        # QUESTION: Should this be moved to init_pens?
-        if len(pen_data) > 0:
-            self.init_nutrient_rqmts(weather, time, feed)
-            self.allocate_all_pens()
-
-    @staticmethod
-    def print_animal_num_warnings(animal_keys, herd_data):
-        for key in animal_keys:
-            if herd_data[key] == 0:
-                print("Warning: herd_num = 0, but", key, "!= 0.")
+            om.add_log("simulate_animals_flag",
+                       "simulate_animals is true",
+                       info_map)
 
     def init_nutrient_rqmts(self, weather, time, feed):
         """
@@ -317,8 +305,8 @@ class AnimalManagement:
             average horizontal distance from milking parlor)
         """
 
-        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens_ids), mean(
-            pen.horizontal_dist_to_parlor for pen in self.all_pens_ids)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
+               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -789,17 +777,20 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            return sum(a.p_animal for a in animals) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
         Calculates each animal class's P concentration.
         """
+
         # TODO: see if there is a better way to do this using dictionary comprehension
         self.p_conc['calf'] = self._calc_p_conc(self.calves)
         self.p_conc['heiferI'] = self._calc_p_conc(self.heiferIs)
         self.p_conc['heiferII'] = self._calc_p_conc(self.heiferIIs)
         self.p_conc['cow'] = self._calc_p_conc(self.heiferIIIs)
+        # TODO check if this is set up correctly. Currently p_comp for the cow class is
+        # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
 
     def calc_p_rqmts(self):
         """
@@ -963,11 +954,19 @@ class AnimalManagement:
                           len(self.cows),
                           len(self.life_cycle_manager.sold_heifers),
                           len(self.life_cycle_manager.culled_cows))
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.get_life_cycle_output.__name__,
+                    "num_animals": num_animals,
+                    "minimum_num": minimum_num, }
+
         if num_animals > minimum_num:
-            print('\nThe smallest animal list is of size ' + str(minimum_num) +
-                  ' so ' + str(num_animals) + ' of each animal class cannot ' +
-                  'be in the life cycle output. Only ' + str(minimum_num) +
-                  ' of each animal type will be in the life cycle output.')
+            om.add_warning("invalid_animal_list_size",
+                           f"The smallest animal list is of size {minimum_num}"
+                           + f" so {num_animals} of each animal class cannot be"
+                           + f" in the life cycle output. Only {minimum_num} of"
+                           + " each animal type will be in the life cycle output.",
+                           info_map)
             num_animals = minimum_num
 
         output = {

@@ -13,10 +13,15 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 import csv
 
 from RUFAS import errors
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Fields, Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
+
+
+om = OutputManager()
 
 
 class State:
@@ -45,11 +50,13 @@ class State:
         """
         self.fields = Fields(data['fields'], time)
         input_dir = Utility.get_base_dir() / 'input'
-        self.feed = Feed(Utility.read_json_file(input_dir / 'feed' / data['feed']))
+        self.feed = Feed(Utility.read_json_file(
+            input_dir / 'feed' / data['feed']))
         self.animal_management = AnimalManagement(
             Utility.read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
 
         self.manure_storage = ManureStorage(self.animal_management)
+        self.manure_management = ManureManagement(self.animal_management)
 
     def annual_reset(self):
         """
@@ -80,6 +87,11 @@ class Config:
             weather_file: path to the weather file specified in the json file
         """
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "data": data,
+                    "weather_file_path": weather_file, }
+
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
         self.start_full_date = data['start_date'].split(':')
@@ -92,6 +104,9 @@ class Config:
         # set seed attributes
         self.set_seed = data['set_seed']
         self.seed = data['seed']
+
+        # TODO: remove conditional once all json files have simulate_animals field
+        self.simulate_animals = data['simulate_animals'] if 'simulate_animals' in data else True
 
         year_length = 365
         leap_year_length = 366
@@ -141,13 +156,21 @@ class Config:
 
             # compares actual size of the file to expected size
             if file_line - 1 != expected_w_file_size + 1:
-                print("Start and end dates of the Weather CSV file do not match the size.")
+                dates_not_matching_size = "Start and end dates of the Weather CSV file" \
+                    " do not match the size."
+                om.add_warning("dates_not_matching_size", dates_not_matching_size,
+                               info_map)
                 if file_line - 1 > expected_w_file_size + 1:
-                    print("There may be duplicate days in: " + weather_full_path.name)
+                    info_map["weather_full_path.name"] = weather_full_path.name
+                    duplicate_days = f"There may be duplicate days in {weather_full_path.name}"
+                    om.add_warning("duplicate_days", duplicate_days, info_map)
                 else:
-                    print("There may be missing days in: " + weather_full_path.name)
-                print("\tWeather File Size: " + str(file_line - 1)
-                      + "\n\tExpected size: " + str(expected_w_file_size + 1) + "\n")
+                    missing_days = f"There may be missing days in: {weather_full_path.name}"
+                    om.add_warning("missing_days", missing_days, info_map)
+                expected_weather_file_size = f"Weather File Size: {file_line - 1}\n" \
+                                             f" Expected size: {expected_w_file_size + 1}"
+                om.add_log("expected_weather_file_size", expected_weather_file_size,
+                           info_map)
 
         self.w_start_year = w_start_year
         self.w_start_day = w_start_day
@@ -158,55 +181,80 @@ class Config:
         # special error statements for start and end years
         if self.start_year == w_start_year and self.start_day < w_start_day \
                 or self.start_year < w_start_year:
-            print("Start date invalid. Starting simulation on "
-                  + str(w_start_year) + ":" + str(w_start_day))
+            start_date_warning = "Start date invalid. Starting simulation on " \
+                f"{w_start_year}:{w_start_day}"
+            om.add_warning("invalid_start_date", start_date_warning, info_map)
             self.start_day = w_start_day
+            om.add_variable("start_day", self.start_day, info_map)
             self.start_year = w_start_year
+            om.add_variable("start_year", self.start_year, info_map)
+
         if self.end_year == w_end_year and self.end_day > w_end_day \
                 or self.end_year > w_end_year:
-            print("End date invalid. Ending simulation on "
-                  + str(w_end_year) + ":" + str(w_end_day))
+            end_date_warning = "End date invalid. Ending simulation on " \
+                f"{w_end_year}:{w_end_day}"
+            om.add_warning("invalid_end_date", end_date_warning, info_map)
             self.end_day = w_end_day
+            om.add_variable("end_day", self.end_day, info_map)
             self.end_year = w_end_year
+            om.add_variable("end_year", self.end_year, info_map)
 
         # start date errors if the simulation starts before day 1 or after
         # the last possible day of the year
         if self.start_day < 1:
-            print("Start date invalid. Starting simulation on "
-                  + str(self.start_year) + ":" + str(1))
+            start_date_warning_2 = "Start date invalid. Starting simulation on " \
+                f"{self.start_year}:1"
+            om.add_warning("invalid_start_date_2", start_date_warning_2, info_map)
             self.start_day = 1
+            om.add_variable("start_day", self.start_day, info_map)
         if not is_leap_year(self.start_year):
             if self.start_day > year_length:
-                print("Start date invalid. Starting simulation on "
-                      + str(self.start_year) + ":" + str(year_length))
+                start_date_warning_3 = "Start date invalid. Starting simulation on " \
+                    f"{self.start_year}:{year_length}"
+                om.add_warning("invalid_start_date_3",
+                             start_date_warning_3, info_map)
                 self.start_day = year_length
+                om.add_variable("start_day", self.start_day, info_map)
         else:
             if self.start_day > leap_year_length:
-                print("Start date invalid. Starting simulation on "
-                      + str(self.start_year) + ":" + str(leap_year_length))
+                start_date_warning_4 = "Start date invalid. Starting simulation on " \
+                    f"{self.start_year}:{leap_year_length}"
+                om.add_warning("invalid_start_date_4",
+                             start_date_warning_4, info_map)
                 self.start_day = leap_year_length
+                om.add_variable("start_day", self.start_day, info_map)
 
         # end date errors if the simulation ends before day 1 or after
         # the last possible day of the year
         if self.end_day < 1:
-            print("End date invalid. Ending simulation on "
-                  + str(self.end_year) + ":" + str(1))
+            end_date_warning_2 = "End date invalid. Ending simulation on " \
+                f"{self.end_year}:1"
+            om.add_warning("invalid_end_date_2", end_date_warning_2, info_map)
             self.end_day = 1
+            om.add_variable("end_day", self.end_day, info_map)
         if not is_leap_year(self.end_year):
             if self.end_day > year_length:
-                print("End date invalid. Ending simulation on "
-                      + str(self.end_year) + ":" + str(year_length))
+                end_date_warning_3 = "End date invalid. Ending simulation on " \
+                    f"{self.end_year}:{year_length}"
+                om.add_warning("invalid_end_date_3", end_date_warning_3, info_map)
                 self.end_day = year_length
+                om.add_variable("end_day", self.end_day, info_map)
         else:
             if self.end_day > leap_year_length:
-                print("End date invalid. Ending simulation on "
-                      + str(self.end_year) + ":" + str(leap_year_length))
+                end_date_warning_4 = "End date invalid. Ending simulation on " \
+                    f"{self.end_year}:{leap_year_length}"
+                om.add_warning("invalid_end_date_4", end_date_warning_4, info_map)
                 self.end_day = leap_year_length
+                om.add_variable("end_day", self.end_day, info_map)
 
         # checks that start date is not after end date
         if self.start_year > self.end_year \
                 or (self.start_year == self.end_year and self.start_day > self.end_day):
-            raise errors.JSONfileData("CONFIG", "\tThe start date must be before the end date")
+            # TODO determine if this below raised error should be rewritten to reassign 
+            # either the the start or end year to then allow the simulation to continue 
+            # instead of crashing.
+            raise errors.JSONfileData(
+                "CONFIG", "\tThe start date must be before the end date")
 
         # constructs a calendar (years[]) of julian days and years, accounting for leap
         # years and mid-year start/end dates
@@ -226,7 +274,8 @@ class Config:
             elif year == self.start_year:
                 days = [None for _ in range(1, self.start_day)]
                 if is_leap_year(year):
-                    days += (_ for _ in range(self.start_day, leap_year_length + 1))
+                    days += (_ for _ in range(self.start_day,
+                             leap_year_length + 1))
                 else:
                     days += (_ for _ in range(self.start_day, year_length + 1))
             elif year == self.end_year:
@@ -281,6 +330,11 @@ class Weather:
             config: instance of the Config class containing information necessary
                 to initialize the Weather object
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "weather_file": weather_file,
+                    "config": config, }
 
         years = config.years
         w_start_year = config.w_start_year
@@ -379,14 +433,21 @@ class Weather:
                         self.T_avg[year][day - offset] = float(row[5])
                         self.radiation[year][day - offset] = float(row[6])
                         self.irrigation[year][day - offset] = float(row[7])
-                    except(IndexError, ValueError):
+                    except (IndexError, ValueError):
                         # prints out each problematic row in the weather CSV file
                         skips += 1
                         if skips == 1:
-                            print("Weather CSV file has invalid data in: " + weather_full_path.name
-                                  + "\nInvalid rows that are skipped:")
+                            weather_csv_error = "Weather CSV file has invalid data in:" \
+                                f" {weather_full_path.name}. \nInvalid rows that are skipped:"
+                            om.add_error("weather_csv_error",
+                                         weather_csv_error,
+                                         info_map)
                         if skips <= 5:
-                            print("Row: " + str(current_row + skips + days_to_start) + "")
+                            weather_csv_error_pt2 = f"Row: {current_row}" \
+                                f" {skips} {days_to_start}"
+                            om.add_error("weather_csv_error_pt2",
+                                         weather_csv_error_pt2,
+                                         info_map)
                         continue
 
                     # iterate year counter accounting for leap years
@@ -401,8 +462,10 @@ class Weather:
             # prints if there are more than 5 skipped lines in order to
             # prevent console clutter
             if skips > 5:
-                print("Only printing first 5 invalid rows, there are " + str(skips)
-                      + " total invalid rows")
+                weather_csv_error_pt3 = "Only printing first 5 invalid rows, there are" \
+                    f" {skips} total invalid rows."
+                om.add_error("weather_csv_error_pt3",
+                             weather_csv_error_pt3, info_map)
 
             # calculates T_avg_annual for each year
             for i in range(len(years)):
@@ -411,10 +474,10 @@ class Weather:
 
             if len(years) > 2:
                 T_avg = sum([self.T_avg_annual[j] for j in range(1, len(self.T_avg_annual) - 1)]) \
-                        / (len(self.T_avg_annual) - 2)
+                    / (len(self.T_avg_annual) - 2)
             else:
                 T_avg = sum([self.T_avg_annual[j] for j in range(len(self.T_avg_annual))]) \
-                        / len(self.T_avg_annual)
+                    / len(self.T_avg_annual)
 
             self.T_avg_annual[0] = T_avg
             self.T_avg_annual[len(self.T_avg_annual) - 1] = T_avg

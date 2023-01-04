@@ -7,7 +7,10 @@ Description: Driver for the manure storage model
 
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
+
+om = OutputManager()
 
 
 def daily_manure_storage_routine(manure_storage, animal_management):
@@ -149,7 +152,8 @@ class ManureStorage:
 
         for pen in animal_management.all_pens_ids:
             if not self.separators.keys().__contains__(pen.manure_separator):
-                self.separators[pen.manure_separator] = (ManureStorage.Separator(pen))
+                self.separators[pen.manure_separator] = (
+                    ManureStorage.Separator(pen))
 
     def initialize_storage(self, animal_management):
         """
@@ -211,10 +215,12 @@ class ManureStorage:
         manure = self.TS + self.TS_liquid
         self.manure_delta = manure - self.initial_manure
         self.initial_manure = manure
-        self.manure_calc = self.manure_delta + self.TS + self.TS_liquid + self.TS_DM_effluent
+        self.manure_calc = self.manure_delta + \
+            self.TS + self.TS_liquid + self.TS_DM_effluent
         self.manure_storage_balance_difference = self.raw_manure - self.manure_calc
         self.other_solids = self.TS - (self.VS + self.N + self.P + self.K)
-        self.other_liquids = self.TS_liquid - (self.VS_liquid + self.N_liquid + self.P_liquid + self.K_liquid)
+        self.other_liquids = self.TS_liquid - \
+            (self.VS_liquid + self.N_liquid + self.P_liquid + self.K_liquid)
 
     def reset_daily_variables(self):
         self.CH4_emissions = 0.0
@@ -234,7 +240,8 @@ class ManureStorage:
         self.other_solids = 0.0
         self.other_liquids = 0.0
 
-        [separator.reset_daily_variables() for separator in self.separators.values()]
+        [separator.reset_daily_variables()
+         for separator in self.separators.values()]
 
     def summarize_annual_variables(self):
         self.raw_manure_annual += self.raw_manure
@@ -266,9 +273,10 @@ class ManureStorage:
         self.manure_delta_annual = manure - self.initial_manure_annual
         self.initial_manure_annual = manure
         self.manure_calc_annual = self.manure_delta_annual + self.TS_annual + \
-                                  self.TS_liquid_annual + self.TS_DM_effluent_annual + \
-                                  self.manure_applied_annual
-        self.manure_storage_balance_difference_annual = self.raw_manure_annual - self.manure_calc_annual
+            self.TS_liquid_annual + self.TS_DM_effluent_annual + \
+            self.manure_applied_annual
+        self.manure_storage_balance_difference_annual = self.raw_manure_annual - \
+            self.manure_calc_annual
 
     class Pen:
         def __init__(self, pen):
@@ -346,6 +354,9 @@ class ManureStorage:
                 "pseudocode_manure_storage" MS.2
             """
 
+            info_map = {"class": self.__class__.__name__,
+                        "function": self.calibrate_water_use.__name__, }
+
             if self.handling_system.startswith("flush_system"):
                 self.water_use_rate = 500
             elif self.handling_system.startswith("manual_scraping"):
@@ -353,8 +364,11 @@ class ManureStorage:
             elif self.handling_system.startswith("automatic_alley_scrapers"):
                 self.water_use_rate = 100
             else:
-                print(self.handling_system, 'is not currently implemented as a handling method. '
-                                            'Setting to flush system')
+                info_map["handling_system"] = self.handling_system
+                handling_system_log = f"{self.handling_system} is not currently implemented" \
+                    " as a handling method."
+                " Setting to flush system."
+                om.add_log("handling_system", handling_system_log, info_map)
                 self.handling_system = "flush_system"
                 self.calibrate_water_use()
 
@@ -366,6 +380,9 @@ class ManureStorage:
                 "pseudocode_manure_storage" MS.2
             """
 
+            info_map = {"class": self.__class__.__name__,
+                        "function": self.calibrate_bedding.__name__, }
+
             if self.bedding.startswith("organic"):
                 self.bedding_added = 11.8
                 self.bedding_dry_matter = 0.9
@@ -375,8 +392,10 @@ class ManureStorage:
                 self.bedding_dry_matter = 0.9
                 self.bedding_washed_perc = 0.8
             else:
-                print(self.bedding, 'is not currently implemented as a bedding type for manure storage. '
-                                    'Setting to organic bedding')
+                info_map["bedding"] = self.bedding
+                bedding_log = f"{self.bedding}, is not currently implemented as a bedding type"
+                " for manure storage. Setting to organic bedding."
+                om.add_log("bedding", bedding_log, info_map)
                 self.bedding = "organic"
                 self.calibrate_bedding()
 
@@ -452,6 +471,9 @@ class ManureStorage:
                 "pseudocode_manure_storage" MS.2
             """
 
+            info_map = {"class": self.__class__.__name__,
+                        "function": self.calibrate_separator.__name__, }
+
             # TODO these are the options in the spreadsheet but there is no difference (not implemented yet)
             if self.separator.startswith("sedimentation"):
                 self.TS_removal_efficiency = 0.3
@@ -518,7 +540,10 @@ class ManureStorage:
                 self.TS_DM_effluent_rate = 0.2
 
             else:
-                print(self.separator, 'is not currently implemented as a separator. Setting to sedimentation')
+                info_map["separator"] = self.separator
+                separator_log = f"{self.separator} is not currently implemented as a separator." \
+                    " Setting to sedimentation."
+                om.add_log("separator", separator_log, info_map)
                 self.separator = "sedimentation"
                 self.calibrate_separator()
 

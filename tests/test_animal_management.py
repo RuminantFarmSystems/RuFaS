@@ -7,10 +7,15 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 
 import pytest
 from unittest.mock import MagicMock, patch
+from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.output_manager import OutputManager
 
 from typing import List, Dict, Union
+
+import io
+import sys
 
 
 def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
@@ -48,7 +53,7 @@ def mock_pens() -> List[MagicMock]:
 
 
 @pytest.fixture
-def pen_information() -> Dict[str, Dict[str, Union[str, float, int]]]:
+def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
     return {
         "pen0": {
             "id": 0,
@@ -110,7 +115,7 @@ def pen_information() -> Dict[str, Dict[str, Union[str, float, int]]]:
 
 
 @pytest.fixture
-def herd_information() -> Dict[str, Union[str, int, bool]]:
+def mock_herd_data() -> Dict[str, Union[str, int, bool]]:
     return {
         "calf_num": 80,
         "heiferI_num": 440,
@@ -128,9 +133,13 @@ def herd_information() -> Dict[str, Union[str, int, bool]]:
 def animal_management() -> AnimalManagement:
     init_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_pens')
     init_animals_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_animals')
+    init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts')
+    init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
 
     init_pens_patch.start()
     init_animals_patch.start()
+    init_nutrient_rqmts_patch.start()
+    init_allocate_all_pens_patch.start()
 
     data = MagicMock()
     config = MagicMock()
@@ -142,6 +151,8 @@ def animal_management() -> AnimalManagement:
 
     init_pens_patch.stop()
     init_animals_patch.stop()
+    init_nutrient_rqmts_patch.stop()
+    init_allocate_all_pens_patch.stop()
 
     return animal_management
 
@@ -163,30 +174,88 @@ def test_get_animal_config():
     pass
 
 
-def test_init_pens(animal_management: AnimalManagement, pen_information: Dict[str, Dict[str, Union[str, float, int]]],
-                   herd_information: Dict[str, Union[str, int, bool]]) -> None:
+def test_init_pens(animal_management: AnimalManagement, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
+                   mock_herd_data: Dict[str, Union[str, int, bool]], mocker: MockerFixture) -> None:
     """Unit test for function init_pens in file routines/animal/animal_management.py"""
 
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._init_default_pens')
+
     # More than the minimum num of pens - 4 pens
-    animal_management.init_pens(pen_information, herd_information)
+    animal_management.init_pens(mock_pen_data, mock_herd_data)
 
     actual = len(animal_management.all_pens_ids)
     expected = 4
     assert actual == expected
 
+    animal_management._init_default_pens.assert_called_once()
+
+
+def test_init_default_pens(animal_management: AnimalManagement) -> None:
     # Less than the minimum num of pens - 0 pens
-    # 3 default pens should be created
+    # MIN_NUM_PENS default pens should be created
+
     animal_management.all_pens_ids = []
-    animal_management.init_pens({}, herd_information)
+    animal_management._init_default_pens(1)
 
     actual = len(animal_management.all_pens_ids)
-    expected = 3
+    expected = animal_management.MIN_NUM_PENS
     assert actual == expected
 
 
-def test_init_animals():
+def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture):
     """Unit test for function init_animals in file routines/animal/animal_management.py"""
-    pass
+
+    mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager.initialize_herd',
+                 return_value=[None, None, None, None, None])
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._print_animal_num_warnings')
+
+    herd_data = MagicMock()
+    config = MagicMock()
+
+    animal_management.init_animals(herd_data, config)
+
+    animal_management.life_cycle_manager.initialize_herd.assert_called_once()
+
+
+def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: MockerFixture):
+    """Unit test for function _print_animal_num_warnings in file routines/animal/animal_management.py"""
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
+            patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+        herd_data = dict()
+
+        expected_info_map = {
+            "class": "AnimalManagement",
+            "function": "_print_animal_num_warnings",
+            "herd_data": herd_data
+        }
+
+        # test for simulate_animals = True
+        animal_management.simulate_animals = True
+        animal_management._print_animal_num_warnings(herd_data)
+        add_log.assert_called_once_with("simulate_animals_flag",
+                                        "simulate_animals is true",
+                                        expected_info_map)
+
+        # test for warnings for every animal key and simulate_animals = False
+        animal_management.simulate_animals = False
+        for key in animal_keys:
+            herd_data[key] = 1
+        animal_management._print_animal_num_warnings(herd_data)
+
+        for key in animal_keys:
+            add_warning.assert_any_call(f"invalid_{key}_warning",
+                                        f"Warning: herd_num is 0, but {key} is not.",
+                                        expected_info_map)
+
+        # question: how to reset assert_called_once with
+        add_log.assert_any_call("num_warnings_associated_with_simulate_animals",
+                                f"{len(animal_keys)} warnings were associated with simulate_animals",
+                                expected_info_map)
+
+        assert add_warning.call_count == len(animal_keys)
+        assert add_log.call_count == 2
 
 
 def test_init_nutrient_rqmts():
@@ -289,7 +358,7 @@ def test_calc_p_conc(mock_animals: List[MagicMock]) -> None:
     assert actual == expected
 
     actual = AnimalManagement._calc_p_conc(mock_animals)
-    expected = (16.0 / 8.0)
+    expected = (16.0 / 8.0) / 1000.0
 
     assert actual == pytest.approx(expected)
 
