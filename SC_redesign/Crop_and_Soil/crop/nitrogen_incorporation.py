@@ -6,6 +6,7 @@ from typing import List
 This module is based upon the 'Nitrogen Uptake" section of of the SWAT model documentation 
 """
 
+# TODO - Refactor this class to match others - GitHub Issue #257
 class NitrogenIncorporation:
     def __init__(self):
         # constant declarations with defaults (unchanged during simulations)
