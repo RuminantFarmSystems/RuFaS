@@ -1,35 +1,47 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from typing import Optional, List
 
 
 class Field:
     def __init__(self):
         # soil attributes
-        self.soil = None
+        self.soil: Optional[Soil] = None
         """the soil of the field"""
-        self.is_amendment_day = False
+        self.is_amendment_day: bool = False
         """should nutrients be added to the soil today?"""
-        self.is_tillage_day = False
+        self.is_tillage_day: bool = False
         """should the soil be tilled today?"""
 
         # crop attributes
-        self.crops = []  # empty crop list
+        self.crops: Optional[List[Crop]] = None  # empty crop list
         """crops currently in the field"""
-        self.crop_proportions = []  # empty composition list
+        self.crop_proportions: Optional[List[float]] = None  # empty comp list
         """proportion of the field's area that each crop occupies"""
-        self.priorities = []
-        """the priorities of each crop for obtaining nutrients from a given soil layer"""
-        self.is_planting_day = False
+        self.priorities: Optional[List[float]] = None
+        """the priorities of each crop for obtaining nutrients from a given 
+        soil layer"""
+        self.is_planting_day: bool = False
         """is today the day to plant new crops?"""
-        self.is_cutting_day = False
+        self.is_cutting_day: bool = False
         """is today the day to cut crops in the field?"""
-        self.harvest_proportion = 1
-        """the proportion of cut crop biomass that will be removed from the field"""
+        self.harvest_proportion: float = 1
+        """the proportion of cut crop biomass that will be removed from the 
+        field"""
 
-    def manage_field(self) -> None:
-        """main Field function, runs all field routines based on current attribute configuration
+    def manage_field(self, day, year, currentWeather) -> None:
+        """main Field function, runs all field routines based on current
+        attribute configuration
+
                 **All the logic will go in this function**
         """
+        # Do soil stuff ...
+
+        if self.crops is None:  # empty crop list, early return (or similar)
+            return
+
+        # Do crop stuff ...
+
         pass
 
     # ---- Soil Management ----
@@ -54,7 +66,8 @@ class Field:
         #     self.add_crop(sp)
         pass
 
-    def add_crop(self, species: str, field_cover: float = 1.0, priority: int = 1) -> None:
+    def add_crop(self, species: str, field_cover: float = 1.0,
+                 priority: int = 1) -> None:
         """add a crop to the field"""
         if sum(self.crop_proportions) + field_cover > 1:
             ValueError("Desired proportion of field not available")
@@ -63,13 +76,15 @@ class Field:
         self.priorities.append(priority)
 
     def grow_crops(self) -> None:
-        """grow crops in the field. Resources will be transferred from the soil to the crops"""
+        """grow crops in the field. Resources will be transferred from the soil
+        to the crops"""
         # [c.grow_crop(...) for c in self.crops]
         pass
 
     def cut_crops(self):
-        """cut all crops in the field, either removing the cut biomass as harvest
-        or leaving it in the field as residue to be incorporated into the soil depending upon 'harvest_percent'
+        """cut all crops in the field, either removing the cut biomass as
+        harvest or leaving it in the field as residue to be incorporated into
+        the soil depending upon 'harvest_percent'
         """
         cuttings = [c.cut() for c in self.crops]
         if self.harvest_proportion > 0:
@@ -78,6 +93,7 @@ class Field:
         else:
             # ... leave cut biomass in field as residue
             pass
+
         # ... kill crops if not perennial
         pass
 

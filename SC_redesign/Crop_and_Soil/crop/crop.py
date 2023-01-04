@@ -1,3 +1,4 @@
+from __future__ import annotations
 from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
@@ -7,7 +8,6 @@ from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
 from SC_redesign.Crop_and_Soil.crop.yields import Yields
 
-from __future__ import annotations
 
 from typing import List
 
@@ -16,19 +16,8 @@ from typing import List
 class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
            NitrogenIncorporation, HeatUnits, LeafAreaIndex,
            RootDevelopment, Yields):
-    def __init__(self, cropConfig = None):
-        # config = cropConfig or CropConfig()  # default crop config if none given
-
-        # TODO: Loi recommended that a composition pattern might fit better
-        #  than multiple inheritance: A crop "has" a Growth constraint (system)
-        #  but is not itself a growth constraint. This pattern might be worth
-        #  looking into in the future. One problem I foresee is that because
-        #  individual attributes occur in multiple process classes
-        #  (e.g., nitrogen in GrowthConstraints and NitrogenIncorporation), a
-        #  composite design would require interdependence such that these
-        #  common attributes remain in-sync.
-
-        # TODO: add config as argument to each process class giving start state.
+    def __init__(self):
+        # Initialize inherited classes
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
         WaterDynamics.__init__(self)
@@ -37,6 +26,14 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         LeafAreaIndex.__init__(self)
         RootDevelopment.__init__(self)
         Yields.__init__(self)
+        # TODO: Loi recommended that a composition pattern might fit better
+        #  than multiple inheritance: A crop "has" a Growth constraint (system)
+        #  but is not itself a growth constraint. This pattern might be worth
+        #  looking into in the future. One problem I foresee is that because
+        #  individual attributes occur in multiple process classes
+        #  (e.g., nitrogen in GrowthConstraints and NitrogenIncorporation), a
+        #  composite design would require interdependence such that these
+        #  common attributes remain in-sync.
 
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
@@ -91,28 +88,13 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
 
     @classmethod
     def plant_species(cls, species) -> Crop:
-        return cls(species)
+        """creates a crop instance with attributes determined by the species of
+        the crop.
 
-    def cut(self):
-        """cuts the crop and return the cut biomass"""
+        Details: species attributes are read from species configuration
+        files/classes
+        """
         pass
-
-    def harvest(self):
-        """harvests the crop's yield"""
-        pass
-
-    def reset_perennial(self):
-        """resets some attributes for perennial crops at the start of the new growing season"""
-        pass
-
-    def kill(self):
-        """kills the crop - Destructor class. This prevents the crop from growing after harvest
-        (i.e., for annual crops)"""
-        pass
-
-    def _list_all_parent_var_names(self):
-        """list all variables used by Crop"""
-        return vars(self)  # TODO: check for duplicates or conflicts among parents
 
     # TODO: implement cut() and kill() methods - GitHub Issue #248
     #   the old versions are pasted in the comment blocks below.
@@ -125,6 +107,24 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
     def kill(self) -> None:
         """kill the plant, preventing it from growing"""
         pass
+
+    def harvest(self):
+        """harvests the crop's cut yield biomass"""
+        pass
+
+    def reset_perennial(self):
+        """resets some attributes for perennial crops at the start of the
+        new growing season"""
+        pass
+
+    def destroy(self):  # Needed?
+        """destoys the crop - Destructor class. This removes the crop instance
+        from existance"""
+        pass
+
+    def _list_all_parent_var_names(self):
+        """list all variables used by Crop"""
+        return vars(self)  # TODO: check for duplicates or conflicts among parents
 
 # ---- Old versions of cut() and kill()
 # def kill(crop_type, field_management, time):
