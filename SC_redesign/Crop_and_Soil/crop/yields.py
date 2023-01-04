@@ -1,11 +1,16 @@
 from math import exp
+from typing import Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 """
 This module is based upon the "Crop Yield" section of the SWAT model (5:2.4)
 """
 
 class Yields():
-    def __init__(self):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         # constant attributes
         self.optimal_harvest_index = 3.5
         self.min_harvest_index = 0.2

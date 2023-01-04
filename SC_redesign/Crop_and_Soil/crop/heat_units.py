@@ -1,5 +1,12 @@
+from typing import Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+
 class HeatUnits:
-    def __init__(self, use_heat_unit_temperature: bool = False):
+    def __init__(self, crop_data: Optional[CropData] = None,
+                 use_heat_unit_temperature: bool = False):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         self.minimum_temperature = 20
         self.maximum_temperature = 38
         self.potential_heat_units = 800

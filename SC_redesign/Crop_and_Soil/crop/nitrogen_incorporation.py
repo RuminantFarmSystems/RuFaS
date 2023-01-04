@@ -1,13 +1,17 @@
 from math import log, exp
 from bisect import bisect
-from typing import List
+from typing import List, Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 """
 This module is based upon the 'Nitrogen Uptake" section of of the SWAT model documentation 
 """
 
 class NitrogenIncorporation:
-    def __init__(self):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         # constant declarations with defaults (unchanged during simulations)
         self.half_mature_heat_fraction = 0.5
         self.mature_heat_fraction = 1.0

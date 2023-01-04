@@ -1,8 +1,13 @@
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from typing import Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 
 class WaterDynamics:
-    def __init__(self):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         self.evaporation = None
         self.transpiration = None
         self.evapotranspiration = None

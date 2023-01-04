@@ -1,5 +1,7 @@
 from math import exp, log, sqrt
-from typing import List
+from typing import List, Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+
 
 """
 This module is based off of the 'Canopy Cover and Height' section of SWAT
@@ -7,7 +9,10 @@ This module is based off of the 'Canopy Cover and Height' section of SWAT
 
 
 class LeafAreaIndex:
-    def __init__(self):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         # fixed attributes (unchanged during simulations)
         self.first_heat_fraction_point = 0.15
         self.second_heat_fraction_point = 0.50

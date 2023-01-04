@@ -1,10 +1,15 @@
+from typing import Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+
 """
 This module is based upon the "Root Development" section of the SWAT model (5.2.1.3)
 """
 
-
 class RootDevelopment:
-    def __init__(self):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData()  # initialize with defaults, if not given
+        # TODO replace attributes with reference to data - GitHub Issue #255
+        #  in various methods
         self.heat_fraction = 1 / 3
         self.max_root_depth = 20
         self.is_perennial = True
