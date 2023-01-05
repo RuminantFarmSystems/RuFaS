@@ -4,7 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import *
 from pytest_mock import MockerFixture
 
 
-# --- helper function tests ----
+# --- static function tests ----
 @pytest.mark.parametrize("halfheat,heatfrac,emerge,half,near,mature", [
     (0.5, 1.0, 0.8, 0.6, 0.3, 0.2),  # start
     (0.99, 1.0, 0.8, 0.6, 0.3, 0.2),  # half_heat close to mature heat
@@ -105,79 +105,23 @@ def test_determine_potential_nitrogen_uptake(optimal, previous, mature, max_grow
     assert expect == observe
 
 
-@pytest.mark.parametrize("demand,potential,nitrate", [
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.6, 0.6]),  # use nitrogen
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # use nitrogen, then nitrate, then nitrogen
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # increased demand
-    ([0.01, 0.01, 0.01], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # decreased demand
-    ([25, 8.33, 2.05, 12.99, 0.5], [22.5, 15.98, 2.22, 35.4, 0.001], [15.5, 20.99, 8, 5.5, 0.1])  # arbitrary
+@pytest.mark.parametrize("root,depths,expect", [
+    (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
+    (2.7, [0, 1, 2, 3], 4),  # 4th layer
+    (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
+    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
 ])
-def test_determine_layer_nitrogen_uptake(demand, potential, nitrate):
-    """test that actual nitrogen uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()"""
-    observe = NitrogenIncorporation.determine_layer_nitrogen_uptake(demand, potential, nitrate)
-    expect = []
-    for d, p, n in zip(demand, potential, nitrate):
-        uptake = min(p + d, n)
-        expect.append(uptake)
-    assert observe == expect
+def test_determine_deepest_accessible_layer(root, depths, expect):
+    assert NitrogenIncorporation.determine_deepest_accessible_layer(root, depths) == expect
 
 
-@pytest.mark.parametrize("pots,avails", [
-    ([0.5, 0.25, 0.05], [0.3, 0.2, 0.01]),
-    ([0.5, 0.25, 0.05], [0.6, 0.3, 0.06]),  # abundant nitrates
-    ([0.5, 0.25, 0.05], [0, 0, 0]),  # no nitrates
-    ([0.5, 0.25, 0.05, .01], [0.3, 0.2, 0.01, 0.01]),  # 4 layers
-    ([0.5, 0.25, 0.05], [0.5, 0.25, 0.05]),  # exactly met demands
-    ([112.3, 50.44, 17, 12.99], [50.33, 15.10, 8.05, 6.66]),  # arbitrary
+@pytest.mark.parametrize("root,depths", [
+    (-1, [0, 1, 2, 3]),  # root < 0
+    (0, [0, 1, 2, 3]),  # root = 0
 ])
-def test_determine_layer_nitrogen_demands(pots, avails):
-    """test that nitrogen demand is correctly calculated for each layer by determine_layer_nitrogen_demand()"""
-    observe = NitrogenIncorporation.determine_layer_nitrogen_demands(pots, avails)
-    # starting values
-    no3_sum = 0
-    up_sum = 0
-    demand_list = []
-    # loop over layers
-    for pot_up, no3 in zip(pots, avails):
-        demand = up_sum - no3_sum  # difference between potential and available
-        demand = max(demand, 0)  # constrain to zero
-        demand_list.append(demand)
-        up_sum += pot_up
-        no3_sum += no3
-    assert demand_list == pytest.approx(observe, rel=0.00001)
-
-
-@pytest.mark.parametrize("demand,depth,root_depth,ndistro", [
-    (1, 1, 1, 1),  # all 1
-    (0, 1, 1, 1),  # no demand
-    (1, 0, 1, 1),  # surface only
-    (1, 1, 0, 1),  # no root depth
-    (1, 1, 1, -1),  # negative distribution coefficient
-    (98.63, 20.2, 32.28, 0.38),  # arbitrary
-    (98.63, 20.2, 32.28, 1.21),  # coefficient > 1
-    (98.63, 20.2, 32.28, -0.38),  # coefficient < 0
-    (98.63, 20.2, 12.28, 0.38),  # depth > root depth
-])
-def test_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
-    """check that nitrogen uptake is correctly calculated by determine_surface_nitrogen_uptake()"""
-    observe = NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
-    if root_depth <= 0:
-        expect = 0
-    else:
-        expect = (demand / (1 - exp(-ndistro))) * (1 - exp(-ndistro * (depth / root_depth)))
-    assert observe == expect
-
-
-@pytest.mark.parametrize("demand,depth,root_depth,ndistro", [
-    (1, 1, 1, 0),  # no coefficient (error)
-    (0, 0, 0, 0),  # all 0
-    (0.3, 0.28, 0.11, 0)
-])
-def test_error_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
-    """"check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
-    with pytest.raises(Exception):
-        NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
+def test_error_determine_deepest_accessible_layer(root, depths):
+    with pytest.raises(ValueError):
+        NitrogenIncorporation.determine_deepest_accessible_layer(root, depths)
 
 
 @pytest.mark.parametrize("bounds,demand,root_depth,ndistro", [
@@ -224,6 +168,96 @@ def test_error_determine_layer_nitrogen_uptake_potential(bounds, demand, root_de
         NitrogenIncorporation.determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro)
 
 
+@pytest.mark.parametrize("demand,depth,root_depth,ndistro", [
+    (1, 1, 1, 1),  # all 1
+    (0, 1, 1, 1),  # no demand
+    (1, 0, 1, 1),  # surface only
+    (1, 1, 0, 1),  # no root depth
+    (1, 1, 1, -1),  # negative distribution coefficient
+    (98.63, 20.2, 32.28, 0.38),  # arbitrary
+    (98.63, 20.2, 32.28, 1.21),  # coefficient > 1
+    (98.63, 20.2, 32.28, -0.38),  # coefficient < 0
+    (98.63, 20.2, 12.28, 0.38),  # depth > root depth
+])
+def test_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
+    """check that nitrogen uptake is correctly calculated by determine_surface_nitrogen_uptake()"""
+    observe = NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
+    if root_depth <= 0:
+        expect = 0
+    else:
+        expect = (demand / (1 - exp(-ndistro))) * (1 - exp(-ndistro * (depth / root_depth)))
+    assert observe == expect
+
+
+@pytest.mark.parametrize("demand,depth,root_depth,ndistro", [
+    (1, 1, 1, 0),  # no coefficient (error)
+    (0, 0, 0, 0),  # all 0
+    (0.3, 0.28, 0.11, 0)
+])
+def test_error_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
+    """"check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
+    with pytest.raises(Exception):
+        NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
+
+
+@pytest.mark.parametrize("pots,avails", [
+    ([0.5, 0.25, 0.05], [0.3, 0.2, 0.01]),
+    ([0.5, 0.25, 0.05], [0.6, 0.3, 0.06]),  # abundant nitrates
+    ([0.5, 0.25, 0.05], [0, 0, 0]),  # no nitrates
+    ([0.5, 0.25, 0.05, .01], [0.3, 0.2, 0.01, 0.01]),  # 4 layers
+    ([0.5, 0.25, 0.05], [0.5, 0.25, 0.05]),  # exactly met demands
+    ([112.3, 50.44, 17, 12.99], [50.33, 15.10, 8.05, 6.66]),  # arbitrary
+])
+def test_determine_layer_nitrogen_demands(pots, avails):
+    """test that nitrogen demand is correctly calculated for each layer by determine_layer_nitrogen_demand()"""
+    observe = NitrogenIncorporation.determine_layer_nitrogen_demands(pots, avails)
+    # starting values
+    no3_sum = 0
+    up_sum = 0
+    demand_list = []
+    # loop over layers
+    for pot_up, no3 in zip(pots, avails):
+        demand = up_sum - no3_sum  # difference between potential and available
+        demand = max(demand, 0)  # constrain to zero
+        demand_list.append(demand)
+        up_sum += pot_up
+        no3_sum += no3
+    assert demand_list == pytest.approx(observe, rel=0.00001)
+
+
+@pytest.mark.parametrize("demand,potential,nitrate", [
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.6, 0.6]),  # use nitrogen
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # use nitrogen, then nitrate, then nitrogen
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # increased demand
+    ([0.01, 0.01, 0.01], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # decreased demand
+    ([25, 8.33, 2.05, 12.99, 0.5], [22.5, 15.98, 2.22, 35.4, 0.001], [15.5, 20.99, 8, 5.5, 0.1])  # arbitrary
+])
+def test_determine_layer_nitrogen_uptake(demand, potential, nitrate):
+    """test that actual nitrogen uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()"""
+    observe = NitrogenIncorporation.determine_layer_nitrogen_uptake(demand, potential, nitrate)
+    expect = []
+    for d, p, n in zip(demand, potential, nitrate):
+        uptake = min(p + d, n)
+        expect.append(uptake)
+    assert observe == expect
+
+
+@pytest.mark.parametrize("reqs,srcs", [
+    ([0, 0], [1, 1]),  # no requests
+    ([0.5, 0], [1, 1]),  # request from first layer
+    ([0, 0.5], [1, 1]),  # request from second layer
+    ([0.5, 0.5], [1, 1]),  # request from both
+    ([18.66, 33.74], [20.30, 19.93])  # arbitrary
+])
+def test_determine_layer_extracted_resource(reqs, srcs):
+    """ensure that extracted nitrogen is correctly calculated for each layer"""
+    draws = []
+    for i in range(len(reqs)):
+        draws.append(NitrogenIncorporation.determine_extracted_resource(reqs[i], srcs[i]))
+    assert draws == NitrogenIncorporation.determine_layer_extracted_resource(reqs, srcs)
+
+
 @pytest.mark.parametrize("requested,available", [
     (0, 1),  # no request
     (0.5, 1),  # request < avaialble
@@ -242,33 +276,36 @@ def test_determine_extracted_resource(requested, available):
     assert drawn == NitrogenIncorporation.determine_extracted_resource(requested, available)
 
 
-@pytest.mark.parametrize("reqs,srcs", [
-    ([0, 0], [1, 1]),  # no requests
-    ([0.5, 0], [1, 1]),  # request from first layer
-    ([0, 0.5], [1, 1]),  # request from second layer
-    ([0.5, 0.5], [1, 1]),  # request from both
-    ([18.66, 33.74], [20.30, 19.93])  # arbitrary
+@pytest.mark.parametrize("nitrates,expect", [
+    (0, 1),  # A
+    (13.2, 1),  # arbitrary A
+    (100, 1),  # A edge
+    (100.1, 1.5 - 5e-4 * 100.1),  # B
+    (200, 1.5 - 5e-4 * 200),  # B
+    (300, 1.5 - 5e-4 * 300),  # B
+    (300.1, 0),  # C
+    (450, 0)  # C
 ])
-def test_determine_layer_extracted_resource(reqs, srcs):
-    """ensure that extracted nitrogen is correctly calculated for each layer"""
-    draws = []
-    for i in range(len(reqs)):
-        draws.append(NitrogenIncorporation.determine_extracted_resource(reqs[i], srcs[i]))
-    assert draws == NitrogenIncorporation.determine_layer_extracted_resource(reqs, srcs)
+def test_determine_nitrate_factor(nitrates, expect):
+    assert NitrogenIncorporation.determine_nitrate_factor(nitrates) == expect
 
 
-@pytest.mark.parametrize("prev,new,fix", [
-    (1, 1, 1),  # all 1
-    (1, 1, 0),  # no fixation
-    (1, 0, 1),  # no new nitrogen
-    (0, 1, 1),  # no previous nitrogen
-    (0, 0, 0),  # all 0
-    (50.39, 10.55, 3.05)  # arbitrary
+@pytest.mark.parametrize("heatfrac,expect", [
+    (-1.0, 0.0),  # piece A
+    (0.00, 0.0),
+    (0.05, 0.0),
+    (0.15, 0.0),
+    (0.22, 6.67 * 0.22 - 1),  # piece B
+    (0.30, 6.67 * 0.30 - 1),
+    (0.43, 1.0),  # piece C
+    (0.55, 1.0),
+    (0.67, 3.75 - 5 * 0.67),  # piece D
+    (0.75, 3.75 - 5 * 0.75),
+    (0.76, 0.0),  # piece E
+    (1.39, 0.0)
 ])
-def test_determine_stored_nitrogen(prev, new, fix):
-    """test the stored nitrogen is properly calculated by determine_stored_nitrogen()"""
-    observe = NitrogenIncorporation.determine_stored_nitrogen(new, prev, fix)
-    assert observe == prev + new + fix
+def test_determine_fixation_stage_factor(heatfrac, expect):
+    assert NitrogenIncorporation.determine_fixation_stage_factor(heatfrac) == expect
 
 
 @pytest.mark.parametrize("demand,stage,water,nitrate,expect", [
@@ -297,56 +334,18 @@ def test_error_determine_fixed_nitrogen(demand, stage, water, nitrate):
         NitrogenIncorporation.determine_fixed_nitrogen(demand, stage, water, nitrate)
 
 
-@pytest.mark.parametrize("heatfrac,expect", [
-    (-1.0, 0.0),  # piece A
-    (0.00, 0.0),
-    (0.05, 0.0),
-    (0.15, 0.0),
-    (0.22, 6.67 * 0.22 - 1),  # piece B
-    (0.30, 6.67 * 0.30 - 1),
-    (0.43, 1.0),  # piece C
-    (0.55, 1.0),
-    (0.67, 3.75 - 5 * 0.67),  # piece D
-    (0.75, 3.75 - 5 * 0.75),
-    (0.76, 0.0),  # piece E
-    (1.39, 0.0)
+@pytest.mark.parametrize("prev,new,fix", [
+    (1, 1, 1),  # all 1
+    (1, 1, 0),  # no fixation
+    (1, 0, 1),  # no new nitrogen
+    (0, 1, 1),  # no previous nitrogen
+    (0, 0, 0),  # all 0
+    (50.39, 10.55, 3.05)  # arbitrary
 ])
-def test_determine_fixation_stage_factor(heatfrac, expect):
-    assert NitrogenIncorporation.determine_fixation_stage_factor(heatfrac) == expect
-
-
-@pytest.mark.parametrize("nitrates,expect", [
-    (0, 1),  # A
-    (13.2, 1),  # arbitrary A
-    (100, 1),  # A edge
-    (100.1, 1.5 - 5e-4 * 100.1),  # B
-    (200, 1.5 - 5e-4 * 200),  # B
-    (300, 1.5 - 5e-4 * 300),  # B
-    (300.1, 0),  # C
-    (450, 0)  # C
-])
-def test_determine_nitrate_factor(nitrates, expect):
-    assert NitrogenIncorporation.determine_nitrate_factor(nitrates) == expect
-
-
-@pytest.mark.parametrize("root,depths,expect", [
-    (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
-    (2.7, [0, 1, 2, 3], 4),  # 4th layer
-    (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
-    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
-])
-def test_determine_deepest_accessible_layer(root, depths, expect):
-    assert NitrogenIncorporation.determine_deepest_accessible_layer(root, depths) == expect
-
-
-@pytest.mark.parametrize("root,depths", [
-    (-1, [0, 1, 2, 3]),  # root < 0
-    (0, [0, 1, 2, 3]),  # root = 0
-])
-def test_error_determine_deepest_accessible_layer(root, depths):
-    with pytest.raises(ValueError):
-        NitrogenIncorporation.determine_deepest_accessible_layer(root, depths)
-
+def test_determine_stored_nitrogen(prev, new, fix):
+    """test the stored nitrogen is properly calculated by determine_stored_nitrogen()"""
+    observe = NitrogenIncorporation.determine_stored_nitrogen(new, prev, fix)
+    assert observe == prev + new + fix
 
 # ---- initialization functions (reusable) ----
 def init_incorp(**kwargs):
@@ -358,6 +357,14 @@ def init_incorp(**kwargs):
 
 
 # ---- member function tests ----
+def test_incorporate_nitrogen():
+    assert False
+
+
+def test_uptake_nitrogen():
+    assert False
+
+
 @pytest.mark.parametrize("old,new", [
     (None, 1),  # no start
     (0, 1),  # start = 0
@@ -371,92 +378,16 @@ def test_shift_nitrogen_time(old, new):
     assert incorp.previous_nitrogen == new
 
 
-# TODO: will be incorporated into incorporate_nitrogen() integration test
-# @pytest.mark.parametrize("half_heat,mat_heat,emerge,half,near,mature", [
-#     (0.5, 1.0, 0.8, 0.6, 0.3, 0.2),  # start
-#     (0.99, 1.0, 0.8, 0.6, 0.3, 0.2),  # half_heat close to mature heat
-#     (0.01, 1.0, 0.8, 0.6, 0.3, 0.2),  # small half_heat
-#     (0.5, 1.0, 0.8, 0.6, 0.20001, 0.2),  # near very close to mature
-#     (0.286, 0.54, 0.522, 0.4, 0.1, 0.08),  # arbitrary
-# ])
-# def test_determine_nitrogen_shape_parameters(half_heat, mat_heat, emerge, half, near, mature):
-#     incorp = init_incorp(half_mature_heat_fraction=half_heat, mature_heat_fraction=mat_heat,
-#                          emergence_nitrogen_fraction=emerge, half_mature_nitrogen_fraction=half,
-#                          near_mature_nitrogen_fraction=near, mature_nitrogen_fraction=mature)
-#     incorp.determine_nitrogen_shape_parameters()
-#     assert incorp.shapes_nitrogen_uptake == NitrogenIncorporation.determine_nitrogen_shape_parameters(half_heat,
-#                                                                                                       mat_heat,
-#                                                                                                       emerge, half,
-#                                                                                                       near, mature)
-
-# TODO: will be incorporated into incorporate_nitrogen() integration test
-# @pytest.mark.parametrize("heatfrac,emerge,mature,s1,s2", [
-#     (0.6, 0.8, 0.25, 1, 1),  # start
-#     (0.6, 0.8, 0.25, 0.5, 1),  # reduced s1
-#     (0.6, 0.8, 0.25, 1, 0.2),  # reduced s2
-#     (0.6, 0.8, 0.25, 0.5, 0.2),  # both shapes reduced
-#     (0.6, 0.6, 0.25, 1, 1),  # heatfrac = emergence nfrac
-#     (0.6, 0.5, 0.25, 1, 1),  # heafrac < emergence nfrac
-#     (0.6, 0.25, 0.25, 1, 1),  # emergence nfrac = mature
-#     (0.6, 0.2, 0.25, 1, 1),  # emergence nfrac < mature
-#     (0.512, 0.73, 0.59, 0.83, 0.33)  # arbitrary
-# ])
-# def test_determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, s1, s2):
-#     """test that nitrogen fraction is properly updated by determine_optimal_nitrogen_fraction()"""
-#     incorp = init_incorp(heat_fraction=heatfrac, emergence_nitrogen_fraction=emerge,
-#                          mature_nitrogen_fraction=mature, shapes_nitrogen_uptake=[s1, s2])
-#     incorp.determine_optimal_nitrogen_fraction()
-#     assert incorp.optimal_nitrogen_fraction == calc_optimal_nitrogen_fraction(heatfrac, emerge, mature, s1, s2)
-
-# TODO: will be incorporated into incorporate_nitrogen() integration test
-# @pytest.mark.parametrize("nfrac, biomass", [
-#     (1, 1),  # all 1
-#     (1, 0),  # no biomass
-#     (0, 1),  # no nitrogen
-#     (0, 0),  # neither
-#     (.18, 1192.112),  # arbitrary
-#     (.83, 526.7),  # arbitrary
-# ])
-# def test_determine_optimal_nitrogen(nfrac, biomass):
-#     """test that a plant's optimal nitrogen is correctly updated by update_optimal_nitrogen()"""
-#     incorp = init_incorp(biomass=biomass, optimal_nitrogen_fraction=nfrac)
-#     incorp.determine_optimal_nitrogen()
-#     assert incorp.optimal_nitrogen == calc_mass_from_fraction(nfrac, biomass)
-
-# TODO: will be incorporated into incorporate_nitrogen() integration test
-# @pytest.mark.parametrize("opt_n,prev_n,mat_nfrac,grow_max", [
-#     (1, 1, 1, 1),  # all 1
-#     (0, 1, 1, 1),  # optimal N = 0
-#     (1, 0, 1, 1),  # previous N = 0
-#     (1, 1, 0, 1),  # mature N fraction = 0
-#     (1, 1, 1, 0),  # maximum growth = 0
-#     (0, 0, 0, 0),  # all 0
-#     (189.4, 105.01, 0.355, 233.59),  # arbitrary (first route) min(84, 331)
-#     (189.4, 105.01, 0.355, 23.359),  # arbitrary (second route) min(84, 33.1)
-#     (189.4, 189.4, 0.355, 23.359),  # opt_n = prev_n
-# ])
-# def test_determine_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
-#     """check that potential nitrogen uptake is correctly updated for a plant by update_max_nitrogen_uptake()"""
-#     incorp = init_incorp(optimal_nitrogen=opt_n, previous_nitrogen=prev_n,
-#                          mature_nitrogen_fraction=mat_nfrac, biomass_growth_max=grow_max)
-#     incorp.determine_potential_nitrogen_uptake()
-#     if opt_n - prev_n < 0:
-#         expect = 0
-#     else:
-#         expect = calc_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max)
-#     assert incorp.potential_nitrogen_uptake == expect
-
-
 @pytest.mark.parametrize("root_depth,depths,expect", [
     (1.5, [0, 1, 2, 3], [4, 1]),
     (2.6, [0, 1, 2, 3], [4, 0]),
     (0.3, [0, 0.5, 1, 2, 3], [5, 3]),
     (28.4, [18.2, 21.6, 100.4], [3, 0])
 ])
-def test_determine_deepest_accessible_soil_layer(root_depth, depths, expect):
+def test_find_deepest_accessible_soil_layer(root_depth, depths, expect):
     """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
     crop = init_incorp(root_depth=root_depth)
-    crop.determine_deepest_accessible_soil_layer(depths)
+    crop.find_deepest_accessible_soil_layer(depths)
     assert crop.total_soil_layers == expect[0]
     assert crop.accessible_soil_layers == NitrogenIncorporation.determine_deepest_accessible_layer(root_depth, depths)
     assert crop.inaccessible_soil_layers == expect[1]
@@ -473,66 +404,6 @@ def test_access_layers(deepest, layers):
     """check that soil layers are accessed correctly with access_layers()"""
     crop = init_incorp(accessible_soil_layers=deepest)
     assert crop.access_layers(layers) == layers[slice(deepest)]
-
-
-# TODO: will be incorporated into uptake_nitrogen() integration test
-# @pytest.mark.parametrize("bounds,desire,depth,ndistro", [
-#     ([.25, .5, .75, 1], 100, 0.7, 1),  # start: roots in 3rd layer
-#     ([.25, .5, .75, 1], 100, 0.4, 1),  # roots in 2nd layer
-#     ([.25, .5, .75, 1], 100, 0.5, 1),  # roots at 2nd boundary
-#     ([.25, .5, .75, 1], 100, 0.7, 0.4),  # reduced distro parameter
-#     ([.25, .5, .75, 1], 80, 0.7, 1),  # reduced desire
-#     ([1/3, 2/3, 1], 100, 0.7, 1),  # reduced layers
-#     ([15.3, 16.9, 30.30, 102.0], 862.5, 22.4, 0.833),  # arbitrary
-# ])
-# def test_stratify_potential_nitrogen_uptake(bounds, desire, depth, ndistro):
-#     incorp = init_incorp(potential_nitrogen_uptake=desire, root_depth=depth, nitrogen_distro_param=ndistro)
-#     incorp.stratify_potential_nitrogen_uptake(bounds)
-#     assert incorp.layer_nitrogen_potentials == calc_layer_nitrogen_uptake_potential(bounds, desire, depth, ndistro)
-
-# TODO: will be incorporated into uptake_nitrogen() integration test
-# @pytest.mark.parametrize("potentials, nitrates", [
-#     ([0.8], [1]),  # start, 1 layer
-#     ([1], [1]),  # potential = nitrates
-#     ([1], [0]),  # no nitrate
-#     ([0.8, 0.5, 0.2], [1, 0.5, 0.1]),  # differential availability
-#     ([33.65, 20.2, 12], [22.0, 30.1, 7.9]),  # arbitrary
-# ])
-# def test_stratify_nitrogen_demand(potentials, nitrates):
-#     incorp = init_incorp(layer_nitrogen_potentials=potentials)
-#     incorp.stratify_unmet_nitrogen_demand(nitrates)
-#     assert incorp.unmet_nitrogen_demands == calc_layer_nitrogen_demands(potentials, nitrates)
-
-
-# TODO: will be incorporated into uptake_nitrogen() integration test
-# @pytest.mark.parametrize("demands,potentials,nitrates", [
-#     ([0.5, 0.5], [1, 1], [0.5, 0.3]),  # start
-#     ([0.5, 1.2], [1, 1], [0.5, 0.3]),  # demand > potential
-#     ([0.5, 0.5], [.8, 1], [0.5, 0.3]),  # reduced potential
-#     ([0.5, 0.5], [1, 1], [2, 2]),  # abundant nitrates
-#     ([0.5, 0.5], [1, 1], [0.1, 0.1]),  # scarce nitrates
-#     ([75.3, 30.66, 12.9], [100, 50.5, 8.33], [80.5, 10.44, 12.7]),  # arbitrary
-# ])
-# def test_stratify_nitrogen_uptake_requests(demands, potentials, nitrates):
-#     incorp = init_incorp(unmet_nitrogen_demands=demands, layer_nitrogen_potentials=potentials)
-#     incorp.stratify_nitrogen_uptake_requests(nitrates)
-#     assert incorp.nitrogen_requests == calc_layer_nitrogen_uptake(demands, potentials, nitrates)
-
-# TODO: will be incorporated into uptake_nitrogen() integration test
-# @pytest.mark.parametrize("requests,nitrates", [
-#     ([1], [1]),  # start
-#     ([1], [0]),  # no nitrates
-#     ([0], [1]),  # no requests
-#     ([0.5], [1]),  # requests < nitrates
-#     ([1.2], [1]),  # requests > nitrates
-#     ([37.9, 40.2, 18.3], [100.5, 83.3, 30.7]),  # arbitrary - abundant nitrates
-#     ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
-# ])
-# def test_determine_actual_nitrogen_uptakes(requests, nitrates):
-#     incorp = init_incorp(nitrogen_requests=requests)
-#     incorp.determine_actual_nitrogen_uptake(nitrates)
-#     expect = NitrogenIncorporation.determine_layer_extracted_resource(requests, nitrates)
-#     assert incorp.actual_nitrogen_uptakes == expect
 
 
 @pytest.mark.parametrize("missed,uptakes,expect", [
@@ -622,23 +493,6 @@ def test_update_fixation_attributes(mocker: MockerFixture):
     patch_determine_nitrate_factor.assert_called_once()
     patch_determine_determine_fixation_stage_factor.assert_called_once()
 
-
-# TODO: will be incorporated into update_fixation_attributes() test
-# @pytest.mark.parametrize("nitrates", [0, 0.5, 100, -1])
-# def test_determine_nitrate_factor(nitrates):
-#     """check that nitrate factor is set properly by determine_nitrate_factor"""
-#     crop = init_incorp()
-#     crop.determine_nitrate_factor(nitrates)
-#     assert crop.nitrate_factor == calc_nitrate_factor(nitrates)
-
-# TODO: will be incorporated into update_fixation_attributes() test
-# @pytest.mark.parametrize("heatfrac", [0, 0.5, 1, -1])
-# def test_determine_fixation_stage_factor(heatfrac):
-#     """check that fixation stage factor is properly set by determine_fixation_stage_factor()"""
-#     crop = init_incorp(heat_fraction=heatfrac)
-#     crop.determine_fixation_stage_factor()
-#     assert crop.fixation_stage_factor == calc_fixation_stage_factor(heatfrac)
-
 @pytest.mark.parametrize("uptake,demand,water,fixfact,nitrate", [
     (0, 10, 0.5, 0.25, 0.3),  # unmet demand, water > nitrate > fix
     (10, 10, 0.5, 0.25, 0.3),  # no unmet demand, water > nitrate > fix
@@ -656,6 +510,158 @@ def test_fix_nitrogen(uptake, demand, water, fixfact, nitrate):
                                                                                      nitrate)
     else:
         assert crop.fixed_nitrogen == 0
+
+## ---- OLD ----
+
+# TODO: will be incorporated into incorporate_nitrogen() integration test
+# @pytest.mark.parametrize("half_heat,mat_heat,emerge,half,near,mature", [
+#     (0.5, 1.0, 0.8, 0.6, 0.3, 0.2),  # start
+#     (0.99, 1.0, 0.8, 0.6, 0.3, 0.2),  # half_heat close to mature heat
+#     (0.01, 1.0, 0.8, 0.6, 0.3, 0.2),  # small half_heat
+#     (0.5, 1.0, 0.8, 0.6, 0.20001, 0.2),  # near very close to mature
+#     (0.286, 0.54, 0.522, 0.4, 0.1, 0.08),  # arbitrary
+# ])
+# def test_determine_nitrogen_shape_parameters(half_heat, mat_heat, emerge, half, near, mature):
+#     incorp = init_incorp(half_mature_heat_fraction=half_heat, mature_heat_fraction=mat_heat,
+#                          emergence_nitrogen_fraction=emerge, half_mature_nitrogen_fraction=half,
+#                          near_mature_nitrogen_fraction=near, mature_nitrogen_fraction=mature)
+#     incorp.determine_nitrogen_shape_parameters()
+#     assert incorp.shapes_nitrogen_uptake == NitrogenIncorporation.determine_nitrogen_shape_parameters(half_heat,
+#                                                                                                       mat_heat,
+#                                                                                                       emerge, half,
+#                                                                                                       near, mature)
+
+# TODO: will be incorporated into incorporate_nitrogen() integration test
+# @pytest.mark.parametrize("heatfrac,emerge,mature,s1,s2", [
+#     (0.6, 0.8, 0.25, 1, 1),  # start
+#     (0.6, 0.8, 0.25, 0.5, 1),  # reduced s1
+#     (0.6, 0.8, 0.25, 1, 0.2),  # reduced s2
+#     (0.6, 0.8, 0.25, 0.5, 0.2),  # both shapes reduced
+#     (0.6, 0.6, 0.25, 1, 1),  # heatfrac = emergence nfrac
+#     (0.6, 0.5, 0.25, 1, 1),  # heafrac < emergence nfrac
+#     (0.6, 0.25, 0.25, 1, 1),  # emergence nfrac = mature
+#     (0.6, 0.2, 0.25, 1, 1),  # emergence nfrac < mature
+#     (0.512, 0.73, 0.59, 0.83, 0.33)  # arbitrary
+# ])
+# def test_determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, s1, s2):
+#     """test that nitrogen fraction is properly updated by determine_optimal_nitrogen_fraction()"""
+#     incorp = init_incorp(heat_fraction=heatfrac, emergence_nitrogen_fraction=emerge,
+#                          mature_nitrogen_fraction=mature, shapes_nitrogen_uptake=[s1, s2])
+#     incorp.determine_optimal_nitrogen_fraction()
+#     assert incorp.optimal_nitrogen_fraction == calc_optimal_nitrogen_fraction(heatfrac, emerge, mature, s1, s2)
+
+# TODO: will be incorporated into incorporate_nitrogen() integration test
+# @pytest.mark.parametrize("nfrac, biomass", [
+#     (1, 1),  # all 1
+#     (1, 0),  # no biomass
+#     (0, 1),  # no nitrogen
+#     (0, 0),  # neither
+#     (.18, 1192.112),  # arbitrary
+#     (.83, 526.7),  # arbitrary
+# ])
+# def test_determine_optimal_nitrogen(nfrac, biomass):
+#     """test that a plant's optimal nitrogen is correctly updated by update_optimal_nitrogen()"""
+#     incorp = init_incorp(biomass=biomass, optimal_nitrogen_fraction=nfrac)
+#     incorp.determine_optimal_nitrogen()
+#     assert incorp.optimal_nitrogen == calc_mass_from_fraction(nfrac, biomass)
+
+# TODO: will be incorporated into incorporate_nitrogen() integration test
+# @pytest.mark.parametrize("opt_n,prev_n,mat_nfrac,grow_max", [
+#     (1, 1, 1, 1),  # all 1
+#     (0, 1, 1, 1),  # optimal N = 0
+#     (1, 0, 1, 1),  # previous N = 0
+#     (1, 1, 0, 1),  # mature N fraction = 0
+#     (1, 1, 1, 0),  # maximum growth = 0
+#     (0, 0, 0, 0),  # all 0
+#     (189.4, 105.01, 0.355, 233.59),  # arbitrary (first route) min(84, 331)
+#     (189.4, 105.01, 0.355, 23.359),  # arbitrary (second route) min(84, 33.1)
+#     (189.4, 189.4, 0.355, 23.359),  # opt_n = prev_n
+# ])
+# def test_determine_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max):
+#     """check that potential nitrogen uptake is correctly updated for a plant by update_max_nitrogen_uptake()"""
+#     incorp = init_incorp(optimal_nitrogen=opt_n, previous_nitrogen=prev_n,
+#                          mature_nitrogen_fraction=mat_nfrac, biomass_growth_max=grow_max)
+#     incorp.determine_potential_nitrogen_uptake()
+#     if opt_n - prev_n < 0:
+#         expect = 0
+#     else:
+#         expect = calc_potential_nitrogen_uptake(opt_n, prev_n, mat_nfrac, grow_max)
+#     assert incorp.potential_nitrogen_uptake == expect
+
+# TODO: will be incorporated into uptake_nitrogen() integration test
+# @pytest.mark.parametrize("bounds,desire,depth,ndistro", [
+#     ([.25, .5, .75, 1], 100, 0.7, 1),  # start: roots in 3rd layer
+#     ([.25, .5, .75, 1], 100, 0.4, 1),  # roots in 2nd layer
+#     ([.25, .5, .75, 1], 100, 0.5, 1),  # roots at 2nd boundary
+#     ([.25, .5, .75, 1], 100, 0.7, 0.4),  # reduced distro parameter
+#     ([.25, .5, .75, 1], 80, 0.7, 1),  # reduced desire
+#     ([1/3, 2/3, 1], 100, 0.7, 1),  # reduced layers
+#     ([15.3, 16.9, 30.30, 102.0], 862.5, 22.4, 0.833),  # arbitrary
+# ])
+# def test_stratify_potential_nitrogen_uptake(bounds, desire, depth, ndistro):
+#     incorp = init_incorp(potential_nitrogen_uptake=desire, root_depth=depth, nitrogen_distro_param=ndistro)
+#     incorp.stratify_potential_nitrogen_uptake(bounds)
+#     assert incorp.layer_nitrogen_potentials == calc_layer_nitrogen_uptake_potential(bounds, desire, depth, ndistro)
+
+# TODO: will be incorporated into uptake_nitrogen() integration test
+# @pytest.mark.parametrize("potentials, nitrates", [
+#     ([0.8], [1]),  # start, 1 layer
+#     ([1], [1]),  # potential = nitrates
+#     ([1], [0]),  # no nitrate
+#     ([0.8, 0.5, 0.2], [1, 0.5, 0.1]),  # differential availability
+#     ([33.65, 20.2, 12], [22.0, 30.1, 7.9]),  # arbitrary
+# ])
+# def test_stratify_nitrogen_demand(potentials, nitrates):
+#     incorp = init_incorp(layer_nitrogen_potentials=potentials)
+#     incorp.stratify_unmet_nitrogen_demand(nitrates)
+#     assert incorp.unmet_nitrogen_demands == calc_layer_nitrogen_demands(potentials, nitrates)
+
+
+# TODO: will be incorporated into uptake_nitrogen() integration test
+# @pytest.mark.parametrize("demands,potentials,nitrates", [
+#     ([0.5, 0.5], [1, 1], [0.5, 0.3]),  # start
+#     ([0.5, 1.2], [1, 1], [0.5, 0.3]),  # demand > potential
+#     ([0.5, 0.5], [.8, 1], [0.5, 0.3]),  # reduced potential
+#     ([0.5, 0.5], [1, 1], [2, 2]),  # abundant nitrates
+#     ([0.5, 0.5], [1, 1], [0.1, 0.1]),  # scarce nitrates
+#     ([75.3, 30.66, 12.9], [100, 50.5, 8.33], [80.5, 10.44, 12.7]),  # arbitrary
+# ])
+# def test_stratify_nitrogen_uptake_requests(demands, potentials, nitrates):
+#     incorp = init_incorp(unmet_nitrogen_demands=demands, layer_nitrogen_potentials=potentials)
+#     incorp.stratify_nitrogen_uptake_requests(nitrates)
+#     assert incorp.nitrogen_requests == calc_layer_nitrogen_uptake(demands, potentials, nitrates)
+
+# TODO: will be incorporated into uptake_nitrogen() integration test
+# @pytest.mark.parametrize("requests,nitrates", [
+#     ([1], [1]),  # start
+#     ([1], [0]),  # no nitrates
+#     ([0], [1]),  # no requests
+#     ([0.5], [1]),  # requests < nitrates
+#     ([1.2], [1]),  # requests > nitrates
+#     ([37.9, 40.2, 18.3], [100.5, 83.3, 30.7]),  # arbitrary - abundant nitrates
+#     ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
+# ])
+# def test_determine_actual_nitrogen_uptakes(requests, nitrates):
+#     incorp = init_incorp(nitrogen_requests=requests)
+#     incorp.determine_actual_nitrogen_uptake(nitrates)
+#     expect = NitrogenIncorporation.determine_layer_extracted_resource(requests, nitrates)
+#     assert incorp.actual_nitrogen_uptakes == expect
+
+# TODO: will be incorporated into update_fixation_attributes() test
+# @pytest.mark.parametrize("nitrates", [0, 0.5, 100, -1])
+# def test_determine_nitrate_factor(nitrates):
+#     """check that nitrate factor is set properly by determine_nitrate_factor"""
+#     crop = init_incorp()
+#     crop.determine_nitrate_factor(nitrates)
+#     assert crop.nitrate_factor == calc_nitrate_factor(nitrates)
+
+# TODO: will be incorporated into update_fixation_attributes() test
+# @pytest.mark.parametrize("heatfrac", [0, 0.5, 1, -1])
+# def test_determine_fixation_stage_factor(heatfrac):
+#     """check that fixation stage factor is properly set by determine_fixation_stage_factor()"""
+#     crop = init_incorp(heat_fraction=heatfrac)
+#     crop.determine_fixation_stage_factor()
+#     assert crop.fixation_stage_factor == calc_fixation_stage_factor(heatfrac)
 
 # TODO: will be incorporated into incorporate_nitrogen() integration test
 # @pytest.mark.parametrize("up,nitro,fix", [
