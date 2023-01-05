@@ -8,6 +8,7 @@ class Yields():
     def __init__(self):
         # constant attributes
         self.optimal_harvest_index = 3.5
+        """potential harvest for the plant at maturity given ideal growing conditions (unitless)"""
         self.min_harvest_index = 0.2
         self.is_residue_added = False
         self.harvest_efficiency = 1.0
