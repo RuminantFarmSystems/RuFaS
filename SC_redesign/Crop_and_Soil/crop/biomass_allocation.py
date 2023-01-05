@@ -1,6 +1,6 @@
 from math import exp
 
-
+# TODO - Refactor this class to match others - GitHub Issue #257
 class BiomassAllocation:
     def __init__(self):
         self.light_extinction = 0.65
@@ -98,6 +98,8 @@ def calc_biomass_accumulation(growth_factor: float, max_growth: float) -> float:
 def calc_above_ground_biomass(root_frac: float, biomass: float) -> float:  # pseudocode: C.9.B.1
     """
     Description: calculates above ground plant biomass.
+
+    SWAT Reference: 5:2.4.4
 
     Args:
         root_frac: fraction of biomass stored in roots
