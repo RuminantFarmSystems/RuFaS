@@ -8,15 +8,17 @@ from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
 from SC_redesign.Crop_and_Soil.crop.yields import Yields
 
-
-from typing import List
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
 class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
-           NitrogenIncorporation, HeatUnits, LeafAreaIndex,
-           RootDevelopment, Yields):
-    def __init__(self):
+           NitrogenIncorporation, HeatUnits, LeafAreaIndex, Yields):
+    def __init__(self, crop_data: Optional[CropData] = None):
+        data = crop_data or CropData() # defaults if not given
+
+
         # Initialize inherited classes
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
@@ -24,7 +26,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         NitrogenIncorporation.__init__(self)
         HeatUnits.__init__(self)
         LeafAreaIndex.__init__(self)
-        RootDevelopment.__init__(self)
+        # RootDevelopment.__init__(self)
         Yields.__init__(self)
         # TODO: Loi recommended that a composition pattern might fit better
         #  than multiple inheritance: A crop "has" a Growth constraint (system)
@@ -75,7 +77,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         """
         self.absorb_heat_units(mean_air_temperature, min_air_temperature,
                                max_air_temperature)
-        self.develop_roots()
+        self.develop_roots(self.data)
         self.incorporate_nitrogen(layer_nitrates, layer_depths,
                                   soil_water_factor)
         #
