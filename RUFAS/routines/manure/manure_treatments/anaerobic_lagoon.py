@@ -71,7 +71,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_output.accumulated_sludge_volume = self._accumulated_sludge_output.sludge_manure_daily_volume
         daily_output.accumulated_final_manure_volume = self._accumulated_output.final_manure_volume
 
-    def calc_CH4_emission(self, accumulated_VS_total: float, accumulated_TS: float) -> Tuple[float, float]:
+    def calc_methane_emission(self, accumulated_VS_total: float, accumulated_TS: float) -> Tuple[float, float]:
         """Calculates CH4 emission from the anaerobic lagoon.
 
         Args:
@@ -87,9 +87,9 @@ class AnaerobicLagoon(BaseManureTreatment):
         new_accumulated_TS = max(accumulated_TS - CH4_loss, 0.0)
         return CH4_loss, new_accumulated_TS
 
-    def calc_NH3_emission(self, num_animals: int, barn_area: float,
-                          accumulated_manure_volume: float,
-                          accumulated_TAN: float) -> Tuple[float, float]:
+    def calc_ammonia_emission(self, num_animals: int, barn_area: float,
+                              accumulated_manure_volume: float,
+                              accumulated_TAN: float) -> Tuple[float, float]:
         """Calculates NH3 emission from the anaerobic lagoon.
 
         Args:
@@ -132,13 +132,13 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_sludge_output = self._create_daily_sludge_output(self._current_manure_treatment_daily_input)
         self._accumulate_daily_sludge_output(daily_sludge_output)
 
-        CH4_loss, new_accumulated_TS = self.calc_CH4_emission(
+        CH4_loss, new_accumulated_TS = self.calc_methane_emission(
                 self._accumulated_output.liquid_manure_total_volatile_solids,
                 self._accumulated_output.liquid_manure_total_solids)
         daily_output.storage_methane = CH4_loss
         self._accumulated_output.TS = new_accumulated_TS
 
-        NH3_loss, new_accumulated_TAN = self.calc_NH3_emission(
+        NH3_loss, new_accumulated_TAN = self.calc_ammonia_emission(
                 num_animals=self._current_pen.num_animals,
                 barn_area=self._current_pen.barn_area_from_pen_type,
                 accumulated_manure_volume=self._accumulated_output.final_manure_volume,

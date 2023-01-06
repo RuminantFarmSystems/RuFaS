@@ -1,3 +1,5 @@
+from typing import Type
+
 import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
@@ -219,7 +221,7 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
         ])
 def test_manure_handler_factory_get_instance(manure_handler_type_name: str,
                                              custom_manure_handler_config: ManureHandlerConfig,
-                                             expected_manure_handler_class: BaseManureHandler,
+                                             expected_manure_handler_class: Type[BaseManureHandler],
                                              expected_manure_handler_config: ManureHandlerConfig,
                                              mocker: MockerFixture) \
         -> None:

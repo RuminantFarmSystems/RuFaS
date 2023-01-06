@@ -111,7 +111,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         input_energy_heating = (self._calc_specific_input_energy(avg_tempC, moisture_content) *
                                 final_manure_volume *
                                 GeneralConstants.LITERS_TO_CUBIC_METERS)
-        # MS.3.B.7
+        # MS.3.B.7R
         methane_generation_volume = GasEmissions.calc_methane_volume_via_Chen_equation(
                 manure_total_volatile_solids=self._manure_handler_daily_output.liquid_manure_total_volatile_solids,
                 hydraulic_retention_time=self.config.hydraulic_retention_time

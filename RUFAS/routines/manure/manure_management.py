@@ -251,4 +251,5 @@ def simulate_daily_manure_management(manure_management: ManureManagement, animal
 
     """
 
-    manure_management.update(animal_management)
+    # manure_management.update(animal_management)
+    pass
