@@ -14,12 +14,11 @@ import csv
 
 from RUFAS import errors
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines import Fields, Feed
+from RUFAS.routines import Feed, Fields
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
-
 
 om = OutputManager()
 

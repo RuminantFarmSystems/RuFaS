@@ -10,11 +10,13 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import exp, log
-from . import infiltration, evapotranspiration, percolation, soil_temp, soil_erosion, soil_water
+
 from ..crop import transpiration
+from . import (evapotranspiration, infiltration, percolation, soil_erosion,
+               soil_temp, soil_water)
+from .carbon_cycling import carbon_cycle
 from .nitrogen_cycling import nitrogen_cycling
 from .phosphorus_cycling import phosphorus_cycling
-from .carbon_cycling import carbon_cycle
 
 
 def daily_soil_routine(soil, crop, field_management, weather, time):

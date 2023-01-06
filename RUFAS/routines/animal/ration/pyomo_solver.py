@@ -9,6 +9,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 
 import pyomo.environ as pyo
+
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()

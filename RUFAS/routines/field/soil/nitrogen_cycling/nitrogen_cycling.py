@@ -13,8 +13,9 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
 from math import exp
-from . import denitrification, humus_mineralization, mineralization_decomp, \
-    leaching_runoff_erosion, nitrification_volatilization
+
+from . import (denitrification, humus_mineralization, leaching_runoff_erosion,
+               mineralization_decomp, nitrification_volatilization)
 
 
 def update_all(soil, field_management):

@@ -7,19 +7,14 @@ from pytest_mock import MockerFixture
 
 import config.global_variables
 from config import global_variables
-from main import execute_simulations_from_files
-from main import parse_gnu_args
-from main import run_rufas
-from main import set_global_variables
-from RUFAS import errors
-from RUFAS import SimulationEngine
+from main import (execute_simulations_from_files, parse_gnu_args, run_rufas,
+                  set_global_variables)
+from RUFAS import SimulationEngine, errors
 from RUFAS.output_manager import OutputManager
-from RUFAS.user_prompt import convert_json_path_to_list
-from RUFAS.user_prompt import convert_path_string_to_list
-from RUFAS.user_prompt import get_json_list_from_dir
-from RUFAS.user_prompt import obtain_file_list
-from RUFAS.user_prompt import prompt_user_for_input
-from RUFAS.user_prompt import user_prompt
+from RUFAS.user_prompt import (convert_json_path_to_list,
+                               convert_path_string_to_list,
+                               get_json_list_from_dir, obtain_file_list,
+                               prompt_user_for_input, user_prompt)
 
 dir_path = os.path.join(global_variables.ROOT_DIR, "input")
 file_path = os.path.join(dir_path, "input/ARL.json")

@@ -5,11 +5,13 @@ Description: Report for the life cycle submodule.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
             Katrina Wang, kw433@cornell.edu
 """
+import json
+
+from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+
 from .. import graphics
 from .base_report import BaseReport
 from .base_report_driver import BaseReportDriver
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-import json
 
 
 class LifeCycleReport(BaseReportDriver):

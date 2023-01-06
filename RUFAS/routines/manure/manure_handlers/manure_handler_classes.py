@@ -11,14 +11,13 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict
-from typing import Optional
-from typing import Type
+from typing import Dict, Optional, Type
 
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import \
+    ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 

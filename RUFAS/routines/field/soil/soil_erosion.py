@@ -12,7 +12,7 @@ Description: This module contains the necessary functions for calculating and
              functions within this file.
 """
 
-from math import exp, log, atan, sin
+from math import atan, exp, log, sin
 
 
 def update_all(soil, crop, weather, time):

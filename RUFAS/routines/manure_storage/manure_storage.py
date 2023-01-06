@@ -8,7 +8,8 @@ Description: Driver for the manure storage model
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.manure_storage import manure_emissions, manure_handling, manure_separator
+from RUFAS.routines.manure_storage import (manure_emissions, manure_handling,
+                                           manure_separator)
 
 om = OutputManager()
 

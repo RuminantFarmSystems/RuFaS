@@ -11,13 +11,13 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict
-from typing import Optional
-from typing import Type
+from typing import Dict, Optional, Type
 
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import \
+    ManureSeparatorDailyOutput
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import \
+    LiquidManurePortionProtocol
 
 
 class ManureSeparatorType(DefaultEnum):

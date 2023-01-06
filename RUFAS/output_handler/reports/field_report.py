@@ -4,9 +4,9 @@ File name: field_report.py
 Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
+from .. import graphics
 from .base_report import BaseReport
 from .base_report_driver import BaseReportDriver
-from .. import graphics
 
 
 class FieldsReport(BaseReportDriver):

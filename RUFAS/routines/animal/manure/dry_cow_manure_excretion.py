@@ -6,11 +6,12 @@ Description: Determines manure excretion with information from the ration
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+import math
 from typing import Any, Union
 
-from .general_manure import phosphorus_excreted
 from RUFAS.routines.animal.ration.ration_driver import ration_report
-import math
+
+from .general_manure import phosphorus_excreted
 
 
 def manure_calculations(ration_formulation, feed, bw, milk_prod, p_feces_excrt,

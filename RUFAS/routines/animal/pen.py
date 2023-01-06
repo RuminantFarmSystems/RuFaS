@@ -9,13 +9,14 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
-from RUFAS.routines.animal.ration import animal_requirements as req
-from RUFAS import util, errors
 from enum import Enum
+
+from RUFAS import errors, util
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
 om = OutputManager()
 

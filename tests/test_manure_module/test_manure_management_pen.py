@@ -3,8 +3,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
 def test_manure_management_pen_init(mocker: MockerFixture) -> None:

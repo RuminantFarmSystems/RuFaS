@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict
-from typing import Optional
-from typing import Type
+from typing import Dict, Optional, Type
 
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 

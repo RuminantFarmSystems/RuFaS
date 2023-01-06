@@ -9,9 +9,10 @@ import shutil
 import sys
 from pathlib import Path
 
-from .reports import *
-from ..util import Utility
 from RUFAS.output_manager import OutputManager
+
+from ..util import Utility
+from .reports import *
 
 om = OutputManager()
 

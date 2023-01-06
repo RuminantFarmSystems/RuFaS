@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import List
 
 import config.global_variables
+from RUFAS.output_manager import OutputManager
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.user_prompt import obtain_file_list
-from RUFAS.output_manager import OutputManager
 
 
 def run_rufas(input_path=None, make_graphs=True, verbose=True):

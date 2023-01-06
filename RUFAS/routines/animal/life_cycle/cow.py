@@ -17,17 +17,19 @@ Description: This file updates the cow form first calving to leaving the herd.
 """
 
 import math
+from random import random
+
 import numpy as np
 from scipy.stats import truncnorm
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
-    manure_calculations as lactating_manure_calculations
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
     manure_calculations as dry_manure_calculations
+from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
+    manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
-from random import random
-from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 
 class MilkProductionHistory:

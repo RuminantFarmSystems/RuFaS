@@ -1,5 +1,6 @@
-from .base_crop import BaseCrop
 from RUFAS.output_manager import OutputManager
+
+from .base_crop import BaseCrop
 
 om = OutputManager()
 

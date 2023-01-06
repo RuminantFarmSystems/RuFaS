@@ -6,8 +6,8 @@ Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
 from .. import graphics
-from .base_report_driver import BaseReportDriver
 from .base_report import BaseReport
+from .base_report_driver import BaseReportDriver
 
 
 class MassBalanceReport(BaseReportDriver):

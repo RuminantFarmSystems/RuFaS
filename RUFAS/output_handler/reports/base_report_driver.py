@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()

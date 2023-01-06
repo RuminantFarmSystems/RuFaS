@@ -47,7 +47,8 @@ CropType values updated by calling update_all():
     bio_N
 """
 
-from math import log, exp
+from math import exp, log
+
 from .nitrogen_fixation import calc_N_fixation
 
 

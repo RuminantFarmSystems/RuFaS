@@ -1,7 +1,8 @@
 import math
 
-from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.constants.gas_emission_constants import \
+    GasEmissionConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 

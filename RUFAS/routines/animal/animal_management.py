@@ -14,17 +14,18 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.clustering_pen_grouping import grouping
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from collections import deque
 import random
-from typing import Tuple
+from collections import deque
 from statistics import mean
+from typing import Tuple
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.clustering_pen_grouping import grouping
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 om = OutputManager()
 

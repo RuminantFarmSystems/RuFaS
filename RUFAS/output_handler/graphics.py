@@ -10,10 +10,10 @@ Author(s): Jacob Johnson, jacob8399@gmail.com
 
 import csv
 import datetime as dt
+import random
 from pathlib import Path
 
 import matplotlib.pyplot as mp
-import random
 from pandas.plotting import register_matplotlib_converters
 
 

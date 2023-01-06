@@ -12,17 +12,19 @@ Description: This file updates the heifer form breeding to close to calving.
             Preg check follows AI for three times.
 """
 
+import math
+from random import random
+
 import numpy as np
 from scipy.stats import truncnorm
+
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
-from random import random
-import math
-from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
 

@@ -7,7 +7,7 @@ Author(s):  Jacob Johnson jacob8399@gmail.com
             William Donovan wmdonovan@wisc.edu
 """
 
-from . import fert_leach, manure_leach, P_mineralization, soluble_P, erosion
+from . import P_mineralization, erosion, fert_leach, manure_leach, soluble_P
 
 
 def update_all(soil, field_management, weather, time):

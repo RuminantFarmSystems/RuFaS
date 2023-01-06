@@ -1,13 +1,9 @@
 import pytest
 from pytest import approx
 
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
-from RUFAS.routines.manure.beddings.bedding_classes import DefaultBeddingConfigFactory
-from RUFAS.routines.manure.beddings.bedding_classes import ManureSolidsBedding
-from RUFAS.routines.manure.beddings.bedding_classes import SandBedding
-from RUFAS.routines.manure.beddings.bedding_classes import SawdustBedding
+from RUFAS.routines.manure.beddings.bedding_classes import (
+    BeddingConfig, BeddingFactory, BeddingType, DefaultBeddingConfigFactory,
+    ManureSolidsBedding, SandBedding, SawdustBedding)
 
 
 @pytest.mark.parametrize(

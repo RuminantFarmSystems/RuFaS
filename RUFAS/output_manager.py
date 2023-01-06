@@ -1,8 +1,8 @@
 # !/usr/bin/env python3
 
-from typing import Any, Dict, List, Union
 import os
 import time
+from typing import Any, Dict, List, Union
 
 
 class OutputManager (object):

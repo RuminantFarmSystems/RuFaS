@@ -1,21 +1,21 @@
 # !/usr/bin/env python3
 
+import random
 import sys
 import time as timer
 from pathlib import Path
-
-import config.global_variables
-from RUFAS import routines, errors
-from RUFAS.classes import Config, State, Weather, Time
-from RUFAS.output_handler import OutputHandler
-from RUFAS.output_manager import OutputManager
-import random
-import numpy
 from typing import Optional
 
-from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
-from RUFAS.util import Utility
+import numpy
 
+import config.global_variables
+from RUFAS import errors, routines
+from RUFAS.classes import Config, State, Time, Weather
+from RUFAS.output_handler import OutputHandler
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.manure.manure_management import \
+    simulate_daily_manure_management
+from RUFAS.util import Utility
 
 om = OutputManager()
 

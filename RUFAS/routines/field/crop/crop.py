@@ -8,11 +8,14 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
            Jacob Johnson, jacob8399@gmail.com
 """
 
-from math import acos, asin, sin, tan, pi
+from math import acos, asin, pi, sin, tan
+
 from RUFAS.output_manager import OutputManager
-from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato, sugar_beet, spring_wheat
-from . import heat_units, leaf_area_index, root_development, biomass, yields, \
-    phosphorus_uptake, nitrogen_uptake, growth_constraints
+
+from . import (biomass, growth_constraints, heat_units, leaf_area_index,
+               nitrogen_uptake, phosphorus_uptake, root_development, yields)
+from .crop_types import (alfalfa, base_crop, corn, potato, soybean,
+                         spring_barley, spring_wheat, sugar_beet, tall_fescue)
 
 om = OutputManager()
 

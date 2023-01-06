@@ -15,10 +15,11 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com,
            Chris Vankerkhove, cjv47@cornell.edu
 """
 
-from ...database_reader import DatabaseReader
 from RUFAS.output_handler.reports.feed_storage_report import StorageReport
-from . import nitrogen_loss, carbon_loss, protein_degradation
+
+from ...database_reader import DatabaseReader
 from ..animal.pen import Pen
+from . import carbon_loss, nitrogen_loss, protein_degradation
 
 
 def daily_feed_routine(feed, fields, animal_management, feed_report):

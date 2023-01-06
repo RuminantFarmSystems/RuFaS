@@ -5,17 +5,16 @@ Description: Implements test cases for the AnimalManagement class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
-import pytest
-from unittest.mock import MagicMock, patch
-from pytest_mock.plugin import MockerFixture
-
-from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.output_manager import OutputManager
-
-from typing import List, Dict, Union
-
 import io
 import sys
+from typing import Dict, List, Union
+from unittest.mock import MagicMock, patch
+
+import pytest
+from pytest_mock.plugin import MockerFixture
+
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_management import AnimalManagement
 
 
 def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:

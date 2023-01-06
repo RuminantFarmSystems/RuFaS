@@ -2,23 +2,18 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.classes import Time
-from RUFAS.classes import Weather
-from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
+from RUFAS.classes import Time, Weather
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManualScraping
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerConfig
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    AlleyScraper, BaseManureHandler, DefaultManureHandlerConfigFactory,
+    FlushSystem, ManualScraping, ManureHandlerConfig, ManureHandlerFactory,
+    ManureHandlerType)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import \
+    ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-
 
 # Test ManureHandlerDailyOutput
 # ============================

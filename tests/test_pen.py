@@ -5,10 +5,11 @@ Description: Implements test cases for the Pen class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
-import pytest
-from unittest.mock import MagicMock
-from typing import Set, List, Dict, Tuple
 from statistics import mean
+from typing import Dict, List, Set, Tuple
+from unittest.mock import MagicMock
+
+import pytest
 from pytest_lazyfixture import lazy_fixture
 
 from RUFAS.routines.animal.pen import Pen

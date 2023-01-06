@@ -1,11 +1,12 @@
 import pytest
 from pytest import approx
 
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
+    DefaultManureTreatmentConfigFactory, ManureTreatmentConfig)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import \
+    ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import \
+    ManureTreatmentType
 
 # Test ManureTreatmentDailyOutput
 # ===============================

@@ -6,11 +6,10 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
 import os
-from typing import Callable
-from typing import Dict
+from typing import Callable, Dict
 
 import pytest
-from mock.mock import MagicMock,mock_open
+from mock.mock import MagicMock, mock_open
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 

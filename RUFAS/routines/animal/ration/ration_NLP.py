@@ -8,8 +8,9 @@ Description: Calculates the ration for animals using a Non-Linear
 Author(s):
     Chris VanKerkhove, cjv47@cornell.edu
 """
-import numpy as np
 import random
+
+import numpy as np
 from scipy.optimize import minimize
 
 

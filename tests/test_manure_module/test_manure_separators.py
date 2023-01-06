@@ -1,26 +1,17 @@
 from typing import Type
 
 import pytest
-from pytest import approx
-from pytest import fixture
+from pytest import approx, fixture
 from pytest_mock import MockFixture
 
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import BeltPress
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import DecantingCentrifuge
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import DefaultManureSeparatorConfigFactory
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorConfig
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorType
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import MechanicalSandSeparator
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import MovingDiscPress
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import RotaryScreen
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import SandLaneSystem
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import ScrewPress
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import SlopeScreen
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
-
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
+    BaseManureSeparator, BeltPress, DecantingCentrifuge,
+    DefaultManureSeparatorConfigFactory, ManureSeparatorConfig,
+    ManureSeparatorFactory, ManureSeparatorType, MechanicalSandSeparator,
+    MovingDiscPress, RotaryScreen, SandLaneSystem, ScrewPress, SlopeScreen)
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import \
+    ManureSeparatorDailyOutput
 
 # Test ManureSeparatorDailyOutput
 # ===============================

@@ -10,15 +10,17 @@ Sold or keep decision made by user input,
 Body weight gain with user input calf average daily gain.
 """
 
-import numpy as np
 from random import random
+
+import numpy as np
 from scipy.stats import truncnorm
+
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 from RUFAS.routines.animal.manure.calf_manure_excretion import \
     manure_calculations
-from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.ration.calf_ration import calc_requirements
 
 om = OutputManager()
 

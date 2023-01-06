@@ -10,12 +10,12 @@ Description: This file updates the heifer form wean to start breeding.
 ###############################################################################
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
     manure_calculations
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
-from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
 

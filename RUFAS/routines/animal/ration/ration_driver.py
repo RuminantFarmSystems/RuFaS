@@ -8,11 +8,12 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
-from RUFAS.routines.animal.ration import animal_requirements
-from RUFAS.routines.animal.ration import ration_NLP as NLP
-from RUFAS.routines.animal.ration import pyomo_solver as pslv
-import statistics as stat
 import math
+import statistics as stat
+
+from RUFAS.routines.animal.ration import animal_requirements
+from RUFAS.routines.animal.ration import pyomo_solver as pslv
+from RUFAS.routines.animal.ration import ration_NLP as NLP
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type):

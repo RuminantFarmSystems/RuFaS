@@ -10,9 +10,9 @@ Description: This file's main function is grouping(list, pens) (line 44) which
     Jorge Barrientos (jab924@cornell.edu).
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
+import numpy as np
 ################################################################################
 import pandas as pd
-import numpy as np
 from scipy.stats import percentileofscore
 
 

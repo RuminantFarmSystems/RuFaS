@@ -6,10 +6,11 @@ Author(s): William Donovan, wmdonovan@wisc.edu
            Jacob Johnson, jacob8399@gmail.com
 """
 
-from .crop.crop import *
-from .soil.soil import *
-from .field_management.field_management import *
 from ...util import Utility
+from .crop.crop import *
+from .field_management.field_management import *
+from .soil.soil import *
+
 
 def daily_fields_routine(fields, manure_storage, weather, time):
     for field in fields.fields.values():

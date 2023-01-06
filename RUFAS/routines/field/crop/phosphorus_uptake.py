@@ -50,7 +50,7 @@ CropType values updated by calling update_all():
     bio_P
 """
 
-from math import log, exp
+from math import exp, log
 
 
 def update_all(soil, crop_type):
