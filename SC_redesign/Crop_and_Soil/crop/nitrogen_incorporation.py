@@ -104,7 +104,8 @@ class NitrogenIncorporation:
             self.root_depth,
             self.nitrogen_distro_param)
         self.unmet_nitrogen_demands = NitrogenIncorporation.determine_layer_nitrogen_demands(
-            self.layer_nitrogen_potentials, accessible_nitrates)
+            self.layer_nitrogen_potentials, accessible_nitrates
+        )
         self.nitrogen_requests = NitrogenIncorporation.determine_layer_nitrogen_uptake(self.unmet_nitrogen_demands,
                                                                                        self.layer_nitrogen_potentials,
                                                                                        accessible_nitrates)

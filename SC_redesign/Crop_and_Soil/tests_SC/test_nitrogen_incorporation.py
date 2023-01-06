@@ -2,7 +2,8 @@ import pytest
 
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import *
 from pytest_mock import MockerFixture
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
+
 
 # --- static function tests ----
 @pytest.mark.parametrize("halfheat,heatfrac,emerge,half,near,mature", [
@@ -138,7 +139,8 @@ def test_error_determine_deepest_accessible_layer(root, depths):
 ])
 def test_determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro):
     """
-    ensure potential nitrogen uptake is calculated correctly for each soil layer with determine_layer_nitrogen_potential()
+    ensure potential nitrogen uptake is calculated correctly for each soil layer with
+    determine_layer_nitrogen_potential()
     """
     layer_nitrogen = []  # empty list to fill
     upper_nitrogen = 0  # nitrogen in the top boundary (soil surface) is 0
@@ -347,6 +349,7 @@ def test_determine_stored_nitrogen(prev, new, fix):
     observe = NitrogenIncorporation.determine_stored_nitrogen(new, prev, fix)
     assert observe == prev + new + fix
 
+
 # ---- initialization functions (reusable) ----
 def init_incorp(**kwargs):
     """helper function to create GrowthConstraint instance, with specified attributes"""
@@ -504,71 +507,49 @@ def test_fix_nitrogen(uptake, demand, water, fixfact, nitrate):
         assert crop.fixed_nitrogen == 0
 
 
-@pytest.mark.parametrize("depths,nitrates",[
+@pytest.mark.parametrize("depths,nitrates", [
     ([.5, 1, 10, 20], [0.5, 0.8, 5, 10])
 ])
-def test_uptake_nitrogen(depths, nitrates, mocker: MockerFixture):
-    """ensure that uptake_nitrogen() calls all its sub-functions"""
-    # TODO - rewrite to follow test_incorporate_nitrogen()
-    # patch relevant functions
-    patch_f1 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.find_deepest_accessible_soil_layer")
-    patch_f2 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.access_layers")
-    patch_f3 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation." +
-        "NitrogenIncorporation.determine_layer_nitrogen_uptake_potential")
-    patch_f3.return_value = [6, 3.9]  # arbitrary return
-    patch_f4 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.determine_layer_nitrogen_demands")
-    patch_f4.return_value = [.5, .3]  # arbitrary return
-    patch_f5 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.determine_layer_nitrogen_uptake")
-    patch_f5.return_value = [5.3, 6.2]  # arbitrary return
-    patch_f6 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation." +
-        "NitrogenIncorporation.determine_layer_extracted_resource")
-    patch_f6.return_value = [4.2, 3.3]  # arbitrary return
-    patch_f7 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation." +
-        "NitrogenIncorporation.extend_nitrate_uptakes_to_full_profile")
-    patch_f8 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation." +
-        "NitrogenIncorporation.extract_nitrogen_from_soil_layers")
-    patch_f9 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.tally_total_nitrogen_uptake")
-
-
+def test_uptake_nitrogen(depths, nitrates):
     # initialize crop and run method
-    crop = init_incorp()
+    crop = init_incorp(potential_nitrogen_uptake=17.5, root_depth=35.0, nitrogen_distro_param=0.32)
+
+    # Mock functions
+    crop.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
+    crop.access_layers = MagicMock(return_value=[1, 2, 3])
+    NitrogenIncorporation.determine_layer_nitrogen_uptake_potential = MagicMock(return_value=[3.25, 6.33, 7.10])
+    NitrogenIncorporation.determine_layer_nitrogen_demands = MagicMock(return_value=[12, 15, 17])
+    NitrogenIncorporation.determine_layer_nitrogen_uptake = MagicMock(return_value=[8.9, 9.9, 13.12])
+    NitrogenIncorporation.determine_layer_extracted_resource = MagicMock(return_value=[5.0, 4.0, 2.0])
+    crop.extend_nitrate_uptakes_to_full_profile = MagicMock()
+    crop.extract_nitrogen_from_soil_layers = MagicMock()
+    crop.tally_total_nitrogen_uptake = MagicMock()
+
+    # run function
     crop.uptake_nitrogen(nitrates, depths)
 
     # check assertions
-    patch_f1.assert_called_once_with(depths)
-    ## patch_f2.assert_called_with(depths) ## first call not stored
-    patch_f2.assert_called_with(nitrates)
-    patch_f3.assert_called_once()
-    assert crop.layer_nitrogen_potentials == [6, 3.9]
-    patch_f4.assert_called_once()
-    assert crop.unmet_nitrogen_demands == [0.5, 0.3]
-    patch_f5.assert_called_once()
-    assert crop.nitrogen_requests == [5.3, 6.2]
-    patch_f6.assert_called_once()
-    assert crop.actual_nitrogen_uptakes == [4.2, 3.3]
-    patch_f7.assert_called_once()
-    patch_f8.assert_called_once_with(nitrates)
-    patch_f9.assert_called_once()
+    crop.find_deepest_accessible_soil_layer.assert_called_once_with(depths)
+    NitrogenIncorporation.determine_layer_nitrogen_uptake_potential.assert_called_once_with([1, 2, 3],
+                                                                                            17.5, 35.0, 0.32)
+    assert crop.layer_nitrogen_potentials == [3.25, 6.33, 7.10]
+    NitrogenIncorporation.determine_layer_nitrogen_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
+    assert crop.unmet_nitrogen_demands == [12, 15, 17]
+    NitrogenIncorporation.determine_layer_nitrogen_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10],
+                                                                                  [1, 2, 3])
+    assert crop.nitrogen_requests == [8.9, 9.9, 13.12]
+    NitrogenIncorporation.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
+    assert crop.actual_nitrogen_uptakes == [5.0, 4.0, 2.0]
+    crop.extend_nitrate_uptakes_to_full_profile.assert_called_once()
+    crop.extract_nitrogen_from_soil_layers.assert_called_once()
+    crop.tally_total_nitrogen_uptake.assert_called_once()
 
 
 @pytest.mark.parametrize("nitrates,depths,water_factor,gate", [
     ([.5, .3, .2], [1, 2, 5], .692, True),
     ([.5, .3, .2], [1, 2, 5], .692, False)
 ])
-def test_incorporate_nitrogen(nitrates, depths, water_factor, gate, mocker: MockerFixture):
-    # patch functions
-    patch_f1 =     patch_f1 = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.shift_nitrogen_time")
-
+def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
     # initialize object
     crop = init_incorp(heat_fraction=0.38, half_mature_heat_fraction=.54, mature_heat_fraction=0.99,
                        emergence_nitrogen_fraction=0.71, half_mature_nitrogen_fraction=0.68,
@@ -585,13 +566,12 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate, mocker: Mock
         crop.determine_optimal_nitrogen = MagicMock(return_value=268)
     crop.determine_potential_nitrogen_uptake = MagicMock(return_value=123.1)
     crop.uptake_nitrogen = MagicMock(return_value=None)  # TODO - don't know how to mock attribute updates
-    crop.access_layers = MagicMock(return_value = [5, 10, 15.3])
+    crop.access_layers = MagicMock(return_value=[5, 10, 15.3])
     crop.try_fixation = MagicMock(return_value=None)
     NitrogenIncorporation.determine_stored_nitrogen = MagicMock(return_value=99.3)
 
     # run method
     crop.incorporate_nitrogen(nitrates, depths, water_factor)
-
 
     # assertions
     crop.shift_nitrogen_time.assert_called_once()
@@ -610,5 +590,5 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate, mocker: Mock
         assert crop.potential_nitrogen_uptake == 123.1
     crop.uptake_nitrogen.assert_called_once_with(nitrates, depths)
     crop.try_fixation.assert_called_once_with(5+10+15.3, water_factor)
-    NitrogenIncorporation.determine_stored_nitrogen.assert_called_once()  # should be called_once_with() once updated attr mocked
+    NitrogenIncorporation.determine_stored_nitrogen.assert_called_once()  # should be called_once_with() w/ attr mocked
     assert crop.nitrogen == 99.3
