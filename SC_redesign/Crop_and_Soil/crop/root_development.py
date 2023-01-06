@@ -21,9 +21,9 @@ class RootDevelopment:
         self.root_fraction = self.determine_root_fraction(self.heat_fraction)
         # update root depth
         if self.is_perennial:
-            self.root_depth = self.determine_root_depth(self.max_root_depth, self.heat_fraction)
-        else:
             self.root_depth = self.max_root_depth  # TODO: assumption by SWAT - valid perhaps after 1st year?
+        else:
+            self.root_depth = self.determine_root_depth(self.max_root_depth, self.heat_fraction)
 
     @staticmethod
     def determine_root_fraction(heat_fraction: float) -> float:
