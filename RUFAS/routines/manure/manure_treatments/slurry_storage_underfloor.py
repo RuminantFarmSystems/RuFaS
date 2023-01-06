@@ -63,7 +63,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             num_animals: Number of animals in the pen, animals.
             barn_area: Area of the barn per animal, m^2/animal.
             accumulated_manure_volume: Accumulated manure volume in the treatment system, m^3.
-            accumulated_manure_total_ammoniacal_nitrogen: Accumulated TAN in the treatment system, kg.
+            accumulated_manure_total_ammoniacal_nitrogen: Accumulated total ammoniacal nitrogen in the treatment
+            system, kg.
 
         Returns:
             ammonia_loss: ammonia emission from the underfloor slurry storage, kg.

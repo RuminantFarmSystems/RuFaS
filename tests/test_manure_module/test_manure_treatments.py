@@ -300,33 +300,6 @@ def test_anaerobic_lagoon_default_config() -> None:
     assert anaerobic_lagoon_config.freeboard_input == approx(0.3048)
 
 
-def test_anaerobic_digestion_and_lagoon_config() -> None:
-    # Act
-    anaerobic_digestion_and_lagoon_config = DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG
-
-    # Assert
-    assert anaerobic_digestion_and_lagoon_config.total_solids_removal_efficiency_for_treatment == approx(0.45)
-    assert anaerobic_digestion_and_lagoon_config.volatile_solids_removal_efficiency_for_treatment == approx(0.40)
-    assert anaerobic_digestion_and_lagoon_config.nitrogen_removal_efficiency_for_treatment == approx(0.0)
-    assert anaerobic_digestion_and_lagoon_config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment == \
-           approx(0.1)
-    assert anaerobic_digestion_and_lagoon_config.phosphorus_removal_efficiency_for_treatment == approx(0.0)
-    assert anaerobic_digestion_and_lagoon_config.potassium_removal_efficiency_for_treatment == approx(0.0)
-
-    assert anaerobic_digestion_and_lagoon_config.storage_time_period == 365
-    assert anaerobic_digestion_and_lagoon_config.freeboard_input == approx(0.3048)
-    assert anaerobic_digestion_and_lagoon_config.hydraulic_retention_time == 25
-    assert anaerobic_digestion_and_lagoon_config.sludge_accumulation_period == 1.0
-    assert anaerobic_digestion_and_lagoon_config.sludge_accumulation_volume_fraction == approx(0.03)
-
-    assert anaerobic_digestion_and_lagoon_config.top_cover_volume_fraction == approx(0.2)
-    assert anaerobic_digestion_and_lagoon_config.biogas_generation_ratio == approx(0.38)
-    assert anaerobic_digestion_and_lagoon_config.methane_generation_ratio == approx(0.65)
-    assert anaerobic_digestion_and_lagoon_config.evaporation_fraction == approx(0.02)
-    assert anaerobic_digestion_and_lagoon_config.anaerobic_digestion_temperature_set_point == approx(37.5)
-    assert anaerobic_digestion_and_lagoon_config.anaerobic_digestion_temperature_celsius == approx(37.5)
-
-
 @pytest.mark.parametrize(
         "manure_treatment_type, expected_manure_treatment_config",
         [
@@ -336,10 +309,6 @@ def test_anaerobic_digestion_and_lagoon_config() -> None:
              DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG),
             (ManureTreatmentType.ANAEROBIC_DIGESTION, DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG),
             (ManureTreatmentType.ANAEROBIC_LAGOON, DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG),
-            (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-             DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG),
-            (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT,
-             DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG),
         ])
 def test_default_manure_treatment_config_factory_get_instance(manure_treatment_type: ManureTreatmentType,
                                                               expected_manure_treatment_config:

@@ -119,27 +119,6 @@ class DefaultManureTreatmentConfigFactory:
             freeboard_input=0.3048
     )
 
-    # TODO: Reuse the other two configs, fix the config handler, and the combo treatment class
-    ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG = ManureTreatmentConfig(
-            total_solids_removal_efficiency_for_treatment=0.45,
-            volatile_solids_removal_efficiency_for_treatment=0.40,
-            nitrogen_removal_efficiency_for_treatment=0.0,
-            total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
-            phosphorus_removal_efficiency_for_treatment=0.0,
-            potassium_removal_efficiency_for_treatment=0.0,
-            storage_time_period=365,
-            freeboard_input=0.3048,
-            hydraulic_retention_time=25,
-            sludge_accumulation_period=1.0,
-            sludge_accumulation_volume_fraction=0.03,
-            top_cover_volume_fraction=0.2,
-            biogas_generation_ratio=0.38,
-            methane_generation_ratio=0.65,
-            evaporation_fraction=0.02,
-            anaerobic_digestion_temperature_set_point=37.5,
-            anaerobic_digestion_temperature_celsius=37.5
-    )
-
     @classmethod
     def get_instance(cls, treatment_type: ManureTreatmentType) -> ManureTreatmentConfig:
         """Return a default manure treatment configuration data instance for the given treatment type.
@@ -156,7 +135,5 @@ class DefaultManureTreatmentConfigFactory:
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: cls.SLURRY_STORAGE_OUTDOOR_CONFIG,
             ManureTreatmentType.ANAEROBIC_DIGESTION: cls.ANAEROBIC_DIGESTION_CONFIG,
             ManureTreatmentType.ANAEROBIC_LAGOON: cls.ANAEROBIC_LAGOON_CONFIG,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: cls.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: cls.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG
         }
         return manure_treatment_config_by_type[treatment_type]
