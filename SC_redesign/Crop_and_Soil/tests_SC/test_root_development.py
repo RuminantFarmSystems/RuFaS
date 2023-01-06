@@ -53,7 +53,7 @@ def init_rootdev(**kwargs):
 ])
 def test_develop_roots(maxd, heatfrac):
     """integration test for main root development function develop_roots()"""
-    rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
+    rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=False)
     rd.develop_roots()
     assert rd.root_fraction == RootDevelopment.determine_root_fraction(heatfrac)
     assert rd.root_depth == RootDevelopment.determine_root_depth(maxd, heatfrac)
