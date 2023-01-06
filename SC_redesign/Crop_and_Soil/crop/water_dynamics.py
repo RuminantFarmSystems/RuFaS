@@ -8,11 +8,11 @@ class WaterDynamics:
         data = crop_data or CropData()  # initialize with defaults, if not given
         # TODO replace attributes with reference to data - GitHub Issue #255
         #  in various methods
-        self.evaporation = None
-        self.transpiration = None
-        self.evapotranspiration = None
-        self.evapotranspiration_max = None
-        self.water_deficiency = None
+        # self.evaporation = None
+        # self.transpiration = None
+        # self.evapotranspiration = None
+        # self.evapotranspiration_max = None
+        # self.water_deficiency = None
 
     def cycle_water(self, evaporation: float, transpiration: float, max_evapotranspiration: float) -> None:
         self.evaporation = evaporation
