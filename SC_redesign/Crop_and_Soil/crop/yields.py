@@ -1,4 +1,5 @@
 from math import exp
+from typing import Optional
 
 """
 This module is based upon the "Crop Yield" section of the SWAT model (5:2.4)
@@ -7,39 +8,57 @@ This module is based upon the "Crop Yield" section of the SWAT model (5:2.4)
 class Yields():
     def __init__(self):
         # constant attributes
-        self.optimal_harvest_index = 3.5
-        self.min_harvest_index = 0.2
-        self.is_residue_added = False
-        self.harvest_efficiency = 1.0
-        self.yield_nitrogen_fraction = 0.15
-        """crop-specific expected fraction of nitrogen in yield"""
-        self.yield_phosphorus_fraction = 0.08
-        """crop-specific expected fraction of phosphorus in yield"""
-
+        self.optimal_harvest_index: float = 3.5
+        """potential harvest index for the plant at maturity under ideal growing conditions (unitless)"""
+        self.min_harvest_index: float = 0.2
+        """harvest index for the plant in drought conditions; represents minimum harvest index allowed for the plant
+        (unitless)"""
+        self.harvest_efficiency: float = 1.0
+        """efficiency of the harvest operation: the proportion of the yield that will be extracted from the field 
+        [0, 1]"""
+        self.yield_nitrogen_fraction: float = 0.15
+        """crop-specific expected fraction of nitrogen in yield (unitless)"""
+        self.yield_phosphorus_fraction: float = 0.08
+        """crop-specific expected fraction of phosphorus in yield (unitless)"""
         # temporally variable attributes
-        self.heat_fraction = 0.6  # also in root_development.py
-        self.water_deficiency = 0.2  # also in water_dynamics.py
-        self.above_ground_biomass = 15  # kg
-        self.biomass = 25  # kg
-        self.dry_down_percent = 0.2
-        self.nitrogen = 15  # kg
-        self.phosphorus = 8  # kg
-        self.biomass = 100  # kg
-        self.optimal_nitrogen_fraction = 0.162  # from nitrogen_incorporation
-        self.optimal_phosphorus_fraction = 0.073
+        self.heat_fraction: float = 0.6  # also in root_development.py
+        """fraction of a plant's potential heat units accumulated to date (unitless)"""
+        self.water_deficiency: float = 0.2  # also in water_dynamics.py
+        """water deficiency factor for the plant (unitless)"""
+        self.above_ground_biomass: float = 15
+        """plant biomass excluding roots; shoot biomass (kg/ha)"""
+        self.biomass: float = 25  # kg
+        """plant biomass (kg/ha)"""
+        self.dry_down_fraction: float = 0.2
+        """proportion of plant biomass that is lost to dry-down [0, 1]"""
+        self.nitrogen: float = 15  # kg
+        """nitrogen stored in plant biomass (kg/ha)"""
+        self.phosphorus: float = 8  # kg
+        """phosphorus stored in plant biomass (kg/ha)"""
+        self.optimal_nitrogen_fraction: float = 0.162  # from nitrogen_incorporation
+        """optimal fraction of nitrogen in the plant biomass for current growth stage (unitless)"""
+        self.optimal_phosphorus_fraction: float = 0.073
+        """optimal fraction of phosphorus in the plant biomass for current growth stage (unitless)"""
+
 
         # Empty declarations
-        self.user_harvest_index = None  # TODO: handle user input for this. - GitHub Issue #246
-        self.potential_harvest_index = None
-        self.harvest_index = None
-        self.crop_yield = None
-        """total amount (kg/ha) of the desired crop product"""
-        self.yield_collected = None
-        """amount (kg/ha) of the desired crop product to be removed from the field"""
-        self.residue_created = None
-        """amount (kg/ha) of residue created (yield left in field)"""
-        self.collected_nitrogen = None
-        self.collected_phosphorus = None
+        self.user_harvest_index: Optional[float] = None  # TODO: handle user input for this. - GitHub Issue #246
+        """a user-specified harvest index (unitless); if given, 'harvest-index-override' is triggered"""
+        self.potential_harvest_index: Optional[float] = None
+        """potential harvest index for a given day (unitless)"""
+        self.harvest_index: Optional[float] = None
+        """harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
+        (unitless)"""
+        self.crop_yield: Optional[float] = None
+        """total amount of the desired crop product (kg/ha)"""
+        self.yield_collected: Optional[float] = None
+        """amount of the desired crop product to be removed from the field (kg/ha)"""
+        self.yield_residue: Optional[float] = None
+        """amount of residue created; unharvested yield (kg/ha)"""
+        self.collected_nitrogen: Optional[float] = None
+        """nitrogen contained in the harvested yield (kg/ha)"""
+        self.collected_phosphorus: Optional[float] = None
+        """phosphorus contained in the harvested yield (kg/ha)"""
 
     # ---- Properties ----
     @property
@@ -48,7 +67,7 @@ class Yields():
         return self.heat_fraction >= 1.0
 
     @property
-    def given_harvest_index(self) -> bool:
+    def has_given_harvest_index(self) -> bool:
         """was a user-defined harvest index is given? This triggers a harvest index override"""
         return self.user_harvest_index is not None
 
@@ -71,7 +90,7 @@ class Yields():
             parameters are used in the calculations (as in SWAT).
         """
         # Harvest Index
-        if self.given_harvest_index:
+        if self.has_given_harvest_index:
             self.harvest_index = self.user_harvest_index
         else:
             self.potential_harvest_index = self.determine_potential_harvest_index(self.heat_fraction,
@@ -81,7 +100,7 @@ class Yields():
         # Dry down
         if self.is_mature:
             self.above_ground_biomass = self.adjust_biomass_for_dry_down(self.above_ground_biomass,
-                                                                         self.dry_down_percent)
+                                                                         self.dry_down_fraction)
         # Yield
         if self.harvest_index <= 1.0:
             self.crop_yield = self.determine_yield_from_shoot_biomass(self.above_ground_biomass, self.harvest_index)
@@ -92,7 +111,7 @@ class Yields():
         self.yield_collected = self.determine_extracted_yield(self.crop_yield, self.harvest_efficiency)
 
         # Yield nutrient makeup
-        if self.given_harvest_index:
+        if self.has_given_harvest_index:
             self.collected_nitrogen = self.optimal_nitrogen_fraction * self.yield_collected  # SWAT 5:2.4.7
             self.collected_phosphorus = self.optimal_phosphorus_fraction * self.yield_collected  # SWAT 5:2.4.8
         else:
@@ -100,17 +119,17 @@ class Yields():
             self.collected_phosphorus = self.yield_phosphorus_fraction * self.yield_collected  # SWAT 5:2.4.6
 
         # Yield Not extracted
-        self.residue_created = self.determine_unextracted_yield(self.crop_yield, self.harvest_efficiency)
+        self.yield_residue = self.determine_unextracted_yield(self.crop_yield, self.harvest_efficiency)
 
         # Biomass update
 
-        # TODO: residue also needs to be accumulated in the soil (via Soil class) - GitHub Issue #245
+        # TODO: total residue also needs to be calculated and accumulated in the soil (Soil class) - GitHub Issue #245
 
         # TODO: are above- and below-ground lignin residue (percent) needed?
         #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
 
-    # ---- Sub-Methods ----
-    # TBD
+        # TODO: Need to make sure that harvest (SWAT 6:1.2), grazing (6:1.3), and harvest and kill (6:1.4), and
+        #  Kill/end of growing season (6:1.5) operations are implemented in the Crop (or Field) class.
 
     # ---- Other Methods ----
     def assess_grown_feed_quality(self):
