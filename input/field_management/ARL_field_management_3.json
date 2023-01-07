@@ -34,8 +34,8 @@
         "repeat": 0,
         "year": [1989],
         "day": [305],
-        "percent_incorporated": [disk+chisel],
-        "percent_mixed": [disk+chisel],
-        "depth": [disk+chisel]
+        "percent_incorporated": [],
+        "percent_mixed": [],
+        "depth": []
     }
 }
