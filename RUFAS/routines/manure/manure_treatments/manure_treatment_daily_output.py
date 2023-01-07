@@ -43,6 +43,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     sludge_manure_potassium: float = 0.0
     sludge_manure_daily_volume: float = 0.0
 
+    # TODO: To be removed eventually
     # Temporary variables used for making plots
     accumulated_sludge_volume: float = 0.0
     accumulated_final_manure_volume: float = 0.0
@@ -65,5 +66,45 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
             raise TypeError('Other must be of type ManureTreatmentDailyOutput.')
 
         return ManureTreatmentDailyOutput(*[
+            attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
+        ])
+
+
+@dataclass
+class AnaerobicDigestionOutput:
+    biogas: float = 0.0  # biogas production per day (m3/day)
+    biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
+    methane_generation_volume: float = 0.0
+    input_energy_heating: float = 0.0
+    evaporated_water: float = 0.0
+    minimum_digester_volume: float = 0.0
+    top_cover_volume: float = 0.0
+
+
+@dataclass
+class SludgeOutput:
+    """Description: This class is for tracking sludge accumulated properties.
+    """
+    sludge_manure_total_solids: float = 0.0
+    sludge_manure_total_volatile_solids: float = 0.0
+    sludge_manure_nitrogen: float = 0.0
+    sludge_manure_phosphorus: float = 0.0
+    sludge_manure_potassium: float = 0.0
+    sludge_manure_daily_volume: float = 0.0
+
+    def __add__(self, other: SludgeOutput) -> SludgeOutput:
+        """Adds corresponding attributes between this output and another.
+
+        Args:
+            other: SludgeOutput object to add.
+
+        Returns:
+            SludgeOutput with corresponding attributes summed.
+
+        """
+        if not isinstance(other, SludgeOutput):
+            raise TypeError('Other must be of type SludgeOutput.')
+
+        return SludgeOutput(*[
             attr1 + attr2 for attr1, attr2 in zip(astuple(self), astuple(other))
         ])
