@@ -452,7 +452,7 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['m5dCGP_conception_rate']
+            self.conception_rate = AnimalBase.config['m5dCG2P_conception_rate']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
