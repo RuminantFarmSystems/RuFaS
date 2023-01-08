@@ -115,7 +115,7 @@ class PenReport(BaseReportDriver):
             self.manure_info = {}
 
     class RationReport(BasePenReport):
-        def __init__(self, data, feed, individual_pen, pen_id):
+        def __init__(self, data, feed, pen_id):
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
