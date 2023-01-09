@@ -130,14 +130,6 @@ def test_error_determine_unextracted_yield(crop_yield, harvest_efficiency):
 
 
 # ---- Test Member functions
-def init_yields(**kwargs):
-    """helper function to initialize Yields object, with specified attributes"""
-    yld = Yields()
-    for key, val in kwargs.items():
-        setattr(yld, key, val)
-    return yld
-
-
 @pytest.mark.parametrize("frac,expect", [
     (0, False),
     (0.5, False),
@@ -146,8 +138,8 @@ def init_yields(**kwargs):
 ])
 def test_is_mature_property(frac, expect):
     """check that the is_mature property is properly assigning maturity by heat fraction"""
-    ylds = init_yields(heat_fraction=frac)
-    assert ylds.is_mature == expect
+    data = CropData(heat_fraction=frac)
+    assert data.is_mature == expect
 
 @pytest.mark.parametrize("usr_index, expect", [
     (1.0, True),
@@ -155,8 +147,9 @@ def test_is_mature_property(frac, expect):
 ])
 def test_given_harvest_index_property(usr_index, expect):
     """test the class knows if harvest index override is specified"""
-    ylds = init_yields(user_harvest_index=usr_index)
-    assert ylds.has_given_harvest_index == expect
+    data = CropData(user_harvest_index=usr_index)
+    ylds = Yields(data)
+    assert data.has_given_harvest_index == expect
 
 
 @pytest.mark.parametrize("usr_index,heat_frac,harv_eff", [
@@ -182,11 +175,12 @@ def test_given_harvest_index_property(usr_index, expect):
 def test_obtain_yields(usr_index, heat_frac, harv_eff):
     """integration test for obtain_yields()"""
     # Observe
-    ylds = init_yields(user_harvest_index=usr_index, heat_fraction=heat_frac, harvest_efficiency=harv_eff,
-                       optimal_harvest_index=2.63, min_harvest_index=0.186, water_deficiency=0.337,
-                       above_ground_biomass=138.4, dry_down_fraction=0.22, biomass=278.41,
-                       optimal_nitrogen_fraction=0.33, optimal_phosphorus_fraction=0.077,
-                       yield_nitrogen_fraction=0.281, yield_phosphorus_fraction=0.106)
+    data = CropData(user_harvest_index=usr_index, heat_fraction=heat_frac, harvest_efficiency=harv_eff,
+                    optimal_harvest_index=2.63, min_harvest_index=0.186, water_deficiency=0.337,
+                    above_ground_biomass=138.4, dry_down_fraction=0.22, biomass=278.41,
+                    optimal_nitrogen_fraction=0.33, optimal_phosphorus_fraction=0.077,
+                    yield_nitrogen_fraction=0.281, yield_phosphorus_fraction=0.106)
+    ylds = Yields(data)
     ylds.obtain_yields()
 
     # expect
@@ -194,28 +188,28 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
         harv_indx = Yields.determine_potential_harvest_index(heat_frac, 2.63)
         harv_indx = Yields.adjust_harvest_index(harv_indx, 0.186, 0.337)
     else:
-        assert ylds.harvest_index == usr_index
+        assert data.harvest_index == usr_index
         harv_indx = usr_index
 
-    assert ylds.harvest_index == harv_indx
+    assert data.harvest_index == harv_indx
 
     if heat_frac >= 1.0:
-        assert ylds.is_mature == True
+        assert data.is_mature == True
         shoot_mass = Yields.adjust_biomass_for_dry_down(138.4, 0.22)
     else:
-        assert ylds.is_mature == False
+        assert data.is_mature == False
         shoot_mass = 138.4
-    assert ylds.above_ground_biomass == shoot_mass
+    assert data.above_ground_biomass == shoot_mass
 
     if harv_indx > 1.0:
         yld_mass = Yields.determine_yield_from_total_biomass(278.41, harv_indx)
-        assert ylds.crop_yield == yld_mass
+        assert data.crop_yield == yld_mass
     else:
         yld_mass = Yields.determine_yield_from_shoot_biomass(shoot_mass, harv_indx)
-        assert ylds.crop_yield == yld_mass
+        assert data.crop_yield == yld_mass
 
     collected = Yields.determine_extracted_yield(yld_mass, harv_eff)
-    assert ylds.yield_collected == collected
+    assert data.yield_collected == collected
 
     if usr_index is None:
         nitro = 0.281 * collected
@@ -223,6 +217,6 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
     else:
         nitro = 0.33 * collected
         phos = 0.077 * collected
-    assert ylds.collected_nitrogen == nitro
-    assert ylds.collected_phosphorus == phos
-    assert ylds.yield_residue == Yields.determine_unextracted_yield(yld_mass, harv_eff)
+    assert data.collected_nitrogen == nitro
+    assert data.collected_phosphorus == phos
+    assert data.yield_residue == Yields.determine_unextracted_yield(yld_mass, harv_eff)
