@@ -26,6 +26,8 @@ N/A
 
 [Doc String Reference](https://numpydoc.readthedocs.io/en/latest/format.html)
 
+[Doc String Guide](https://realpython.com/documenting-python-code/)
+
 [Pseudocode Guidelines](https://docs.google.com/document/d/1e5gM7fuT06iQYDKvwUAB-jVaLjw3iZizXAdSnOEDco0/edit?usp=sharing)
 
 [2023 Fixathon tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
