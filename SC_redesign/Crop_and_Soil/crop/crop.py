@@ -13,7 +13,7 @@ from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
+class Crop(GrowthConstraints, BiomassAllocation,
            NitrogenIncorporation, HeatUnits, LeafAreaIndex, Yields):
     def __init__(self, crop_data: Optional[CropData] = None):
         data = crop_data or CropData() # defaults if not given
@@ -22,11 +22,11 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         # Initialize inherited classes
         GrowthConstraints.__init__(self)
         BiomassAllocation.__init__(self)
-        WaterDynamics.__init__(self)
+        self.water_dynamics = WaterDynamics(data)
         NitrogenIncorporation.__init__(self)
         HeatUnits.__init__(self)
         LeafAreaIndex.__init__(self)
-        # RootDevelopment.__init__(self)
+        self.root_development = RootDevelopment(data)
         Yields.__init__(self)
         # TODO: Loi recommended that a composition pattern might fit better
         #  than multiple inheritance: A crop "has" a Growth constraint (system)
@@ -77,7 +77,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         """
         self.absorb_heat_units(mean_air_temperature, min_air_temperature,
                                max_air_temperature)
-        self.develop_roots(self.data)
+        self.root_development.develop_roots()
         self.incorporate_nitrogen(layer_nitrates, layer_depths,
                                   soil_water_factor)
         #
@@ -86,7 +86,7 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics,
         self.constrain_growth(max_transpiration, air_temperature)
         self.grow_canopy()
         self.allocate_biomass(incoming_light)
-        self.cycle_water(evaporation, transpiration, max_evapotranspiration)
+        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
     @classmethod
     def plant_species(cls, species) -> Crop:

@@ -37,24 +37,6 @@ def test_determine_water_deficiency(et, max_et):
         expect = 100 * (et / max_et)
     assert WaterDynamics.determine_water_deficiency(et, max_et) == expect
 
-
-# ---- initialization functions (reusable) ----
-def init_soil(**kwargs):
-    """helper function to create GrowthConstraint instance, with specified attributes"""
-    soil = Soil()
-    for key, val in kwargs.items():
-        setattr(soil, key, val)
-    return soil
-
-
-def init_water_dyn(**kwargs):
-    """helper function to create GrowthConstraint instance, with specified attributes"""
-    water_dyn = WaterDynamics()
-    for key, val in kwargs.items():
-        setattr(water_dyn, key, val)
-    return water_dyn
-
-
 # ---- member function tests ----
 
 @pytest.mark.parametrize("evap,trans,et_max", [
@@ -67,9 +49,9 @@ def init_water_dyn(**kwargs):
 ])
 def test_cycle_water(evap, trans, et_max):
     """integration test to check that water cycling routines are properly carried out"""
-    water_dyn = init_water_dyn()
+    water_dyn = WaterDynamics()
     water_dyn.cycle_water(evap, trans, et_max)
-    expected = [water_dyn.evaporation, water_dyn.transpiration, water_dyn.evapotranspiration,
-                water_dyn.evapotranspiration_max, water_dyn.water_deficiency]
+    expected = [water_dyn.data.evaporation, water_dyn.data.transpiration, water_dyn.data.evapotranspiration,
+                water_dyn.data.evapotranspiration_max, water_dyn.data.water_deficiency]
     observed = [evap, trans, evap + trans, et_max, WaterDynamics.determine_water_deficiency(evap + trans, et_max)]
     assert expected == observed

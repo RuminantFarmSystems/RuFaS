@@ -6,20 +6,16 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 class WaterDynamics:
     def __init__(self, crop_data: Optional[CropData] = None):
         data = crop_data or CropData()  # initialize with defaults, if not given
-        # TODO replace attributes with reference to data - GitHub Issue #255
-        #  in various methods
-        # self.evaporation = None
-        # self.transpiration = None
-        # self.evapotranspiration = None
-        # self.evapotranspiration_max = None
-        # self.water_deficiency = None
+        self.data = crop_data or CropData()
 
     def cycle_water(self, evaporation: float, transpiration: float, max_evapotranspiration: float) -> None:
-        self.evaporation = evaporation
-        self.transpiration = transpiration
-        self.evapotranspiration_max = max_evapotranspiration
-        self.evapotranspiration = self.determine_evapotranspiration(self.evaporation, self.transpiration)
-        self.water_deficiency = self.determine_water_deficiency(self.evapotranspiration, self.evapotranspiration_max)
+        self.data.evaporation = evaporation
+        self.data.transpiration = transpiration
+        self.data.evapotranspiration_max = max_evapotranspiration
+        self.data.evapotranspiration = self.determine_evapotranspiration(self.data.evaporation,
+                                                                         self.data.transpiration)
+        self.data.water_deficiency = self.determine_water_deficiency(self.data.evapotranspiration,
+                                                                     self.data.evapotranspiration_max)
 
     @staticmethod
     def determine_evapotranspiration(evaporation: float, transpiration: float) -> float:  # TODO: belongs in Soil class?
