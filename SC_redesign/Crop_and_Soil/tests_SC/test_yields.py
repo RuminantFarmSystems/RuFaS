@@ -156,7 +156,7 @@ def test_is_mature_property(frac, expect):
 def test_given_harvest_index_property(usr_index, expect):
     """test the class knows if harvest index override is specified"""
     ylds = init_yields(user_harvest_index=usr_index)
-    assert ylds.given_harvest_index == expect
+    assert ylds.has_given_harvest_index == expect
 
 
 @pytest.mark.parametrize("usr_index,heat_frac,harv_eff", [
@@ -184,7 +184,7 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
     # Observe
     ylds = init_yields(user_harvest_index=usr_index, heat_fraction=heat_frac, harvest_efficiency=harv_eff,
                        optimal_harvest_index=2.63, min_harvest_index=0.186, water_deficiency=0.337,
-                       above_ground_biomass=138.4, dry_down_percent=0.22, biomass=278.41,
+                       above_ground_biomass=138.4, dry_down_fraction=0.22, biomass=278.41,
                        optimal_nitrogen_fraction=0.33, optimal_phosphorus_fraction=0.077,
                        yield_nitrogen_fraction=0.281, yield_phosphorus_fraction=0.106)
     ylds.obtain_yields()
@@ -225,4 +225,4 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
         phos = 0.077 * collected
     assert ylds.collected_nitrogen == nitro
     assert ylds.collected_phosphorus == phos
-    assert ylds.residue_created == Yields.determine_unextracted_yield(yld_mass, harv_eff)
+    assert ylds.yield_residue == Yields.determine_unextracted_yield(yld_mass, harv_eff)

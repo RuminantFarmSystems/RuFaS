@@ -1,9 +1,9 @@
 from math import exp
-
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 
+# TODO - Refactor this class to match others - GitHub Issue #257
 class GrowthConstraints:
     """crop process class pertaining to growth constraints"""
     def __init__(self, crop_data: Optional[CropData] = None):
