@@ -4,6 +4,7 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 
+from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
@@ -37,7 +38,7 @@ class ManureTreatmentFactory:
         manure_treatment_class_by_type: Dict[ManureTreatmentType, Type[BaseManureTreatment]] = {
             ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: SlurryStorageUnderfloor,
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
-            # ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
+            ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
             # ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
             # ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
             # ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon
