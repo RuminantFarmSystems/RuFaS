@@ -75,7 +75,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_output.sludge_manure_potassium = daily_sludge_output.sludge_manure_potassium
         daily_output.sludge_volume = daily_sludge_output.sludge_manure_daily_volume
         daily_output.accumulated_sludge_volume = self._accumulated_sludge_output.sludge_manure_daily_volume
-        daily_output.accumulated_final_manure_volume = self._accumulated_output.final_manure_volume
+        daily_output.accumulated_final_manure_volume = self._accumulated_output.daily_final_manure_volume
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the anaerobic digestion model for a single day."""
@@ -87,7 +87,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         self._accumulate_daily_sludge_output(daily_sludge_output)
 
         anaerobic_digestion_daily_output = self._create_anaerobic_digestion_daily_output(
-                daily_output.final_manure_volume)
+                daily_output.daily_final_manure_volume)
         self.all_ad_output.append(anaerobic_digestion_daily_output)
 
         self._assign_extra_output_variables(daily_output, daily_sludge_output)
