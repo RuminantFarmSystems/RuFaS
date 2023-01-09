@@ -11,6 +11,7 @@ class CropData:
     biomass: float = 0
     growth_factor: float = 1.0
     root_fraction: float = 1 / 3
+    """the proportion of a plant's biomass that is stored below ground in roots (unitless)"""
     usable_light: Optional[float] = None
     biomass_growth_max: Optional[float] = None
     biomass_growth: Optional[float] = None
@@ -43,6 +44,7 @@ class CropData:
     accumulation."""
     new_heat_units: Optional[float] = None
     heat_fraction: Optional[float] = None
+    """fraction of potential heat units accumulated to date (unitless)"""
     minimum_heat_unit_temperature: Optional[float] = None
     maximum_heat_unit_temperature: Optional[float] = None
     heat_unit_temperature: Optional[float] = None
@@ -87,6 +89,7 @@ class CropData:
     ##biomass = 12.5  # duplicate
     ##biomass_growth_max = 100  # duplicate
     root_depth: float = 1  # arbitrary
+    """the current depth of the plant roots"""
     # empty declarations
     previous_nitrogen: Optional[float] = None
     shapes_nitrogen_uptake: Optional[float] = None
@@ -108,7 +111,9 @@ class CropData:
     # ---- root development
     ##heat_fraction = 1 / 3 #duplicate
     max_root_depth: float = 20
+    """maximum depth of root development in the soil (mm)"""
     is_perennial: bool = True
+    """is the plant perennial?"""
     ##root_depth = None # duplicate
     ##root_fraction = None #duplicate
     
