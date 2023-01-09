@@ -2,6 +2,7 @@ from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
+# TODO - Refactor this class to match others - GitHub Issue #257
 class BiomassAllocation:
     def __init__(self, crop_data: Optional[CropData] = None):
         data = crop_data or CropData()  # initialize with defaults, if not given
