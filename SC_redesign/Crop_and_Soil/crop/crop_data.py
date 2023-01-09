@@ -11,6 +11,7 @@ class CropData:
     biomass: float = 0
     growth_factor: float = 1.0
     root_fraction: float = 1 / 3
+    """proportion of plant biomass that is stored below ground in roots (unitless)"""
     usable_light: Optional[float] = None
     biomass_growth_max: Optional[float] = None
     biomass_growth: Optional[float] = None
@@ -74,6 +75,7 @@ class CropData:
     # constant declarations with defaults (unchanged during simulations)
     half_mature_heat_fraction: float = 0.5
     mature_heat_fraction: float = 1.0
+    """fraction of potential heat units accumulated for the plant to date (unitless)"""
     emergence_nitrogen_fraction: float = 0.04
     half_mature_nitrogen_fraction: float = 0.03
     near_mature_nitrogen_fraction: float = 0.02
@@ -87,6 +89,7 @@ class CropData:
     ##biomass = 12.5  # duplicate
     ##biomass_growth_max = 100  # duplicate
     root_depth: float = 1  # arbitrary
+    """current depth of the plant roots in the soil (mm)"""
     # empty declarations
     previous_nitrogen: Optional[float] = None
     shapes_nitrogen_uptake: Optional[float] = None
@@ -108,7 +111,9 @@ class CropData:
     # ---- root development
     ##heat_fraction = 1 / 3 #duplicate
     max_root_depth: float = 20
+    """maximum depth of roots in the soil (mm)"""
     is_perennial: bool = True
+    """is the plant perennial?"""
     ##root_depth = None # duplicate
     ##root_fraction = None #duplicate
     
