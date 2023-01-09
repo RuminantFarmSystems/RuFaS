@@ -30,7 +30,7 @@ class Yields():
         self.biomass: float = 25  # kg
         """plant biomass (kg/ha)"""
         self.dry_down_fraction: float = 0.2
-        """proportion of plant biomass that is lost to dry-down [0, 1]"""
+        """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
         self.nitrogen: float = 15  # kg
         """nitrogen stored in plant biomass (kg/ha)"""
         self.phosphorus: float = 8  # kg
