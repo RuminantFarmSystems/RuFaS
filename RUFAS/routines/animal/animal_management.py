@@ -109,7 +109,6 @@ class AnimalManagement:
 
         # list of all the pens on the farm
         self.all_pens_ids = []
-
         # dictionary: key is animal ID, value is the pen ID that animal is in
         self.animal_to_pen_id_map = {}
 
@@ -186,8 +185,8 @@ class AnimalManagement:
                 herd_num: number of animals in the herd
             """
 
-        num_pens = len(self.all_pens)
-        num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
+        num_pens = len(self.all_pens_ids)
+        num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens_ids)
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.init_pens.__name__,
@@ -339,22 +338,27 @@ class AnimalManagement:
         for pen in self.all_pens_ids:
             animals_in_pen = pen.animals_in_pen
             for animal in animals_in_pen:
+                if animal.id == 378168:
+                    print("fully update hit")
                 self.animal_to_pen_id_map[animal.id] = pen.id
 
-    def remove_animal_from_herd(self, ids_removed):
+    def remove_animal_from_herd(self, animals_removed):
         """
         Removes the animal IDs from the animal_to_pen_id_map dictionary pertaining to the
         animals that have been removed from the herd, and updates the stocking density
         of the pens they were in. This function is void.
 
         Args:
-            ids_removed: list of animal IDs that are to be removed from the herd
+            animals_removed: list of animal IDs that are to be removed from the herd
         """
 
         # Loops through ids_removed, which is a list of the animals IDs that have been removed from the herd.
-        for id in ids_removed:
+        for animal in animals_removed:
             # If the given animal ID is in the animal ID/pen ID dictionary
             # Here, we are looping through the keys of a dictionary pertaining to animal IDs
+            id = animal.id
+            if animal.id == 378168:
+                print("removal hit")
             if id in self.animal_to_pen_id_map:
                 # Creates a "pen" variable that grabs the current pen of the animal removed
                 pen = self.all_pens_ids[self.animal_to_pen_id_map[id]]
@@ -402,7 +406,7 @@ class AnimalManagement:
                     pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * \
                                       len(pen.animals_in_pen)
 
-    def daily_update_id_pen(self, animals_added, ids_removed, calves_born, feed, temp):
+    def daily_update_id_pen(self, animals_added, animals_removed, calves_born, feed, temp):
         """
         For animals removed from the herd in daily animal updates, the ids of
         the pens from which they were removed are stored in the
@@ -415,8 +419,8 @@ class AnimalManagement:
         they were assigned.
 
         Args:
-            animals_added: list of animal IDs that have been added to the herd
-            ids_removed: list of animal IDs that have been removed from the herd
+            animals_added: list of animal objects that have been added to the herd
+            animals_removed: list of animal objects that have been removed from the herd
             calves_born: list of Calf objects that have been added to the herd
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
@@ -425,19 +429,20 @@ class AnimalManagement:
         # _____________________________________________________________________________________________
         # Calf preprocessing logic
         # _____________________________________________________________________________________________
-
-        # calf_ids = []
-        # for calf in calves_born:
-        #     calf_ids.append(calf.id)
-        # animals_added.extend(calf_ids)
-        # print(type(animals_added[0]))
+        # IS THIS EXTENSION ONLY SUPPOSED TO HAPPEN ONCE?
+        print("^" * 77)
+        for calf in calves_born:
+            if calf in animals_added:
+                print("duplicate")
+                print(calf)
+        # animals_added.extend(calves_born)
         print(len(animals_added))
-
-        animals_added.extend(calves_born)
+        print(animals_added[len(animals_added)-4:])
+        print(calves_born)
         # _____________________________________________________________________________________________
         # Animal removal logic
         # _____________________________________________________________________________________________
-        self.remove_animal_from_herd(ids_removed)
+        self.remove_animal_from_herd(animals_removed)
         # From Doctor Reed: redesign how we assign new animals to a pen
 
         # _____________________________________________________________________________________________
@@ -463,7 +468,12 @@ class AnimalManagement:
                         'animal_group': Pen.AnimalCombination.CLOSE_UP}}
 
         for animal in animals_added:
+            if animal.id == 378168:
+                print("daily update id pen addition hit")
             animal_class = type(animal).__name__
+            if animal.id == 378168:
+                print(animal_class)
+                print(calves_born[0].id)
 
             if animal_class == 'Cow':
                 if animal.milking:
@@ -471,10 +481,10 @@ class AnimalManagement:
                 else:
                     animal_class = 'Dry_Cow'
 
-            animal_p_conc = (animal_type_mapping_dict.get(animal_class))
+            animal_p_conc = (animal_type_mapping_dict.get(animal_class)['p_conc'])
             # print(animal_class)
-            print(type(animal))
-            print(animal_p_conc)
+            # print(type(animal))
+            # print(animal_p_conc)
             # animal_conc_access = animal_p_conc['p_conc']
             animal_type_mapping_dict.get(animal_class)['animal_list'].append(animal)
             group = animal_type_mapping_dict.get(animal_class)['animal_group']
@@ -483,6 +493,9 @@ class AnimalManagement:
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
         self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
+        if animal.id == 378168:
+            print('reached')
+            print(self.animal_to_pen_id_map[animal.id])
         self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
                                                                original_pen_populations[pen_for_insert.id])
 
@@ -498,20 +511,31 @@ class AnimalManagement:
         # -adding new animals to pens with lowest stocking density
 
         # separate into lactating and dry cow pens
+
+        # initialize list for lactating cow objects
         lactating_cows = []
+        # initialize list for dry cow objects
         dry_cows = []
+        # loop through the list of cows in the herd
         for cow in self.cows:
+            # append the lactating cows to the appropriate list
             if cow.milking:
                 lactating_cows.append(cow)
+            # append the dry cows to the appropriate list
             else:
                 dry_cows.append(cow)
         # lists for sorting the type of pen types
         # TODO: change these lists to a dictionary instead
+
+        # initialize lists pertaining to pens for each one of the cow types
+        # first one should be cows in general? where do dry cows get stored?
         lac_cow_pens = []
         close_up_pens = []
         growing_pens = []
         calf_pens = []
 
+        # initialization of the pen combination dictionary that contains the lists of the pens holding certain
+        # animal combinations
         self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
                                            Pen.AnimalCombination.CLOSE_UP: [],
                                            Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
@@ -587,6 +611,7 @@ class AnimalManagement:
                 else:
                     del mixed_type_pens[pen.id]
                     del mixed_types[pen.id]
+
 
                 # Assigning pen to relevant pen list
                 if max_key[0].name == 'CALF':
@@ -743,16 +768,21 @@ class AnimalManagement:
     def gather_cow_class_history(self, cow_class):
         """
         Gathers all the pen history data for a given cow class type. Checks the current pen
-        and pen composition of all animals of a given cow class, before then update the
+        and pen composition of all animals of a given cow class, before then updating the
         pen history for that class using the update_pen_history() method
 
         Args:
-            cow_class: instance of whatever cow type's pen history is being gathered
+            cow_class: list of instances of whatever cow type's pen history is being gathered
         """
         for cow in cow_class:
-            current_pen = self.animal_to_pen_id_map[cow_class.id]
+            # print(cow)
+            # print(";" * 50)
+            # print(cow.id)
+            # print(";" * 50)
+            # print(self.animal_to_pen_id_map)
+            current_pen = self.animal_to_pen_id_map[cow.id]
             classes_in_pen = self.all_pens_ids[current_pen].classes_in_pen
-            cow_class.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
+            cow.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
 
     def record_pen_history(self):
         """
@@ -831,15 +861,21 @@ class AnimalManagement:
             for pen in self.all_pens_ids:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
-            animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
+            animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
             self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
+            # print("&" * 30)
+            # print(animals_added)
+            # print("^" * 30)
+            # print(ids_removed)
+            # print("-" * 30)
+            # print(calves_born)
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
+            self.daily_update_id_pen(animals_added, animals_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts()  # per animal

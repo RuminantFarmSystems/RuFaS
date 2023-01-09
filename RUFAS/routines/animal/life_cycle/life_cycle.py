@@ -226,7 +226,7 @@ class LifeCycleManager:
 
         Returns:
             animals_added: list of animals added from replacement herd
-            ids_removed: list of animal ids that were removed during this day
+            animals_removed: list of animals  that were removed during this day
             calves_born: list of calves that were born during this day
             calves: updated list of calves
             heiferIs: updated list of heiferIs
@@ -235,7 +235,7 @@ class LifeCycleManager:
             cows: updated list of cows
 
         """
-        ids_removed = []
+        animals_removed = []
         animals_added = []
         calves_born = []
 
@@ -416,7 +416,7 @@ class LifeCycleManager:
         # those as replacement
         while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
             removed = heiferIIIs.pop()
-            ids_removed.append(removed.id)
+            animals_removed.append(removed.id)
             self.sold_heifers.append(removed)
             self.sold_heifer_num += 1
 
@@ -430,8 +430,8 @@ class LifeCycleManager:
             self.replacement_market[0].set_p_purchased()
             # print("-----"*50)
             animals_added.append(self.replacement_market[0])
-            print("+"*55)
-            print(type(self.replacement_market[0]))
+            # print("+"*55)
+            # print(type(self.replacement_market[0]))
             self.bought_heifer_num += 1
             del self.replacement_market[0]
 
@@ -458,7 +458,7 @@ class LifeCycleManager:
                                       self.avg_cow_culling_age, cow.days_born)
 
                 # print(len(culled_cows))
-                ids_removed.append(cow.id)
+                animals_removed.append(cow)
                 del cows[index]
 
             else:
@@ -623,7 +623,7 @@ class LifeCycleManager:
                 self.percent_cow_for_parity[parity] = \
                     self.num_cow_for_parity[parity] / self.cow_num * 100
 
-        return animals_added, ids_removed, calves_born, calves, heiferIs, \
+        return animals_added, animals_removed, calves_born, calves, heiferIs, \
             heiferIIs, heiferIIIs, cows
 
     @staticmethod

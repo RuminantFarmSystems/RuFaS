@@ -3,9 +3,9 @@
 		"calf_num": 80,
 		"heiferI_num": 440,
 		"heiferII_num": 380,
-		"heiferIII_num": 0,
+		"heiferIII_num": 50,
 		"cow_num": 1000,
-		"replace_num": 5000,
+		"replace_num": 50,
 		"herd_num": 2000,
 		"herd_init": false,
 		"breed": "HO"
