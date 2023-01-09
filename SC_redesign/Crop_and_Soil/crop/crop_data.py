@@ -22,8 +22,10 @@ class CropData:
     # ---- growth constraints
     water_uptake: float = 18
     nitrogen: float = 35
+    """nitrogen stored in plant biomass (kg/ha)"""
     optimal_nitrogen: float = 100
     phosphorus: float = 20
+    """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
     minimum_temperature: float = 15
     optimal_temperature: float = 22
@@ -94,6 +96,7 @@ class CropData:
     previous_nitrogen: Optional[float] = None
     shapes_nitrogen_uptake: Optional[float] = None
     optimal_nitrogen_fraction: Optional[float] = None
+    """"""
     ##optimal_nitrogen = None # duplicate
     potential_nitrogen_uptake: Optional[float] = None
     total_soil_layers: Optional[float] = None
@@ -127,9 +130,15 @@ class CropData:
     # ---- yields
     # constant attributes
     optimal_harvest_index: float = 3.5
+    """expected species-specific optimal harvest index for the plant at maturity under ideal
+     growth conditions (unitless)"""
     min_harvest_index: float = 0.2
-    is_residue_added: bool = False
+    """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
+    allowed for the plant"""
+    # is_residue_added: bool = False ## not needed?
     harvest_efficiency: float = 1.0
+    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field (unitless; 
+    [0, 1])"""
     yield_nitrogen_fraction: float = 0.15
     """crop-specific expected fraction of nitrogen in yield"""
     yield_phosphorus_fraction: float = 0.08
@@ -139,8 +148,10 @@ class CropData:
     ##heat_fraction = 0.6  # duplicate
     ##water_deficiency = 0.2  # duplicate
     above_ground_biomass: float = 15  # kg
+    """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     ##biomass = 25  # duplicate
     dry_down_percent: float = 0.2
+    """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
     ##nitrogen = 15  # duplicate
     ##phosphorus = 8  # duplicate
     ##biomass = 100  # duplicate
