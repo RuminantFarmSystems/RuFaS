@@ -1,6 +1,7 @@
-## Summary
+## Crop Yields
 
-The `Yields` class contains the methods that determine the amount and composition of harvestable crop production. 
+Crop yields in `RuFaS` are calculated by the `Yields` class.  `Yields` contains the methods that 
+determine the amount and composition of harvestable crop production. 
 Its main method function `obtain_yields()` executes all routines to determine production at the time of harvest. As 
 such, this function is only called once throughout a crop's growing season. This is typically done at cut/harvest time.
 
