@@ -5,22 +5,24 @@ Description:
 Author(s): William Donovan, wmdonovan@wisc.edu
 """
 
+# from RUFAS.routines.feed.feed import Feed
 from .base_report_driver import BaseReportDriver
 from .base_report import BaseReport
 from .. import graphics
+from typing import Any, Dict
 
 
 class PensReport(BaseReportDriver):
-    def __init__(self, data, state):
+    def __init__(self, data: Dict[Any, Any], state) -> None:
         super().__init__(data)
         for pen in state.animal_management.all_pens:
-            self.reports[f'pen_{pen.id}'] = PenReport(data, state.feed, pen, pen.id)
+            self.reports[f'pen_{pen.id}'] = PenReport(data, state.feed, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
 
 
 class PensSummary(BaseReport):
-    def __init__(self, data):
+    def __init__(self, data: Dict[Any, Any]) -> None:
         super().__init__(data)
 
         self.daily_variables = {
@@ -34,7 +36,7 @@ class PensSummary(BaseReport):
 
 
 class PenReport(BaseReportDriver):
-    def __init__(self, data, feed, individual_pen, pen_id):
+    def __init__(self, data: Dict[Any, Any], feed, pen_id: int) -> None:
         super().__init__(data)
         self.pen_id = pen_id
         self.report_name = 'pen_' + str(pen_id)
@@ -45,11 +47,11 @@ class PenReport(BaseReportDriver):
         }
 
     class BasePenReport(BaseReport):
-        def __init__(self, data, pen_id):
+        def __init__(self, data: Dict[Any, Any], pen_id: int) -> None:
             super().__init__(data)
             self.pen_id = pen_id
 
-        def daily_update(self, state, weather, time):
+        def daily_update(self, state, weather, time) -> None:
             animal_management = state.animal_management
             feed = state.feed
             pen = state.animal_management.all_pens[self.pen_id]
@@ -60,7 +62,7 @@ class PenReport(BaseReportDriver):
                 self.daily_variables[variable][2].append(
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
-        def annual_update(self, state, weather, time):
+        def annual_update(self, state, weather, time) -> None:
             animal_management = state.animal_management
             feed = state.feed
             pen = state.animal_management.all_pens[self.pen_id]
@@ -73,7 +75,7 @@ class PenReport(BaseReportDriver):
                          [0], globals(), locals())
 
     class GrowthReport(BasePenReport):
-        def __init__(self, data, pen_id):
+        def __init__(self, data: Dict[Any, Any], pen_id: int) -> None:
             super().__init__(data, pen_id)
 
             self.daily_variables = {'year': ['time.calendar_year', '', []],
@@ -89,7 +91,7 @@ class PenReport(BaseReportDriver):
                                      }
 
     class ManureReport(BasePenReport):
-        def __init__(self, data, pen_id):
+        def __init__(self, data: Dict[Any, Any], pen_id: int) -> None:
             super().__init__(data, pen_id)
 
             self.daily_variables = {'year': ['time.calendar_year', '', []],
@@ -115,7 +117,7 @@ class PenReport(BaseReportDriver):
             self.manure_info = {}
 
     class RationReport(BasePenReport):
-        def __init__(self, data, feed, pen_id):
+        def __init__(self, data: Dict[Any, Any], feed, pen_id: int) -> None:
             super().__init__(data, pen_id)
             self.ration_interval = data['ration_interval']
 
