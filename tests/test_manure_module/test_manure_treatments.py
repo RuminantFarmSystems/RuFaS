@@ -1377,3 +1377,88 @@ def test_calc_daily_sludge_output(mocker: MockFixture) -> None:
     assert actual_daily_output.sludge_manure_phosphorus == approx(expected_sludge_manure_phosphorus)
     assert actual_daily_output.sludge_manure_potassium == approx(expected_sludge_manure_potassium)
     assert actual_daily_output.sludge_manure_daily_volume == approx(expected_sludge_manure_daily_volume)
+
+
+def test_anaerobic_lagoon_calc_methane_emission(mocker: MockFixture) -> None:
+    """Unit test for calc_methane_emission() in anaerobic_lagoon.py."""
+    # Arrange
+    anaerobic_lagoon = AnaerobicLagoon(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=mocker.MagicMock()
+    )
+    accumulated_liquid_manure_total_volatile_solids = 10.0
+    expected_methane_loss = 2.0
+    patch_for_calc_methane_emission_for_anaerobic_lagoon = mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.'
+            'GasEmissions.calc_methane_emission_for_anaerobic_lagoon',
+            return_value=expected_methane_loss
+    )
+    accumulated_liquid_manure_total_solids = 20.0
+    expected_new_accumulated_liquid_manure_total_solids = max(
+            accumulated_liquid_manure_total_solids - expected_methane_loss, 0.0)
+
+    # Act
+    actual_methane_loss, actual_new_accumulated_liquid_manure_total_solids = \
+        anaerobic_lagoon.calc_methane_emission(
+                accumulated_liquid_manure_total_volatile_solids=accumulated_liquid_manure_total_volatile_solids,
+                accumulated_liquid_manure_total_solids=accumulated_liquid_manure_total_solids
+        )
+
+    # Assert
+    patch_for_calc_methane_emission_for_anaerobic_lagoon.assert_called_once_with(
+            manure_volatile_solids=accumulated_liquid_manure_total_volatile_solids
+    )
+    assert actual_methane_loss == expected_methane_loss
+    assert actual_new_accumulated_liquid_manure_total_solids == \
+           approx(expected_new_accumulated_liquid_manure_total_solids)
+
+
+def test_anaerobic_lagoon_calc_ammonia_emission(mocker: MockFixture) -> None:
+    """Unit test for calc_ammonia_emission() in anaerobic_lagoon.py."""
+    # Arrange
+    anaerobic_lagoon = AnaerobicLagoon(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=mocker.MagicMock()
+    )
+
+    num_animals = 100
+    barn_area = 1000.0
+    accumulated_manure_volume = 200.0
+    accumulated_manure_total_ammoniacal_nitrogen = 20.0
+    temperature_celsius = 20.0
+    patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
+            anaerobic_lagoon, '_get_current_day_average_temperature_celsius',
+            return_value=temperature_celsius
+    )
+    expected_ammonia_loss = 2.0
+    patch_for_calc_ammonia_emission_for_anaerobic_lagoon = mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.'
+            'GasEmissions.calc_ammonia_emission',
+            return_value=expected_ammonia_loss
+    )
+    expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
+            accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0)
+
+    # Act
+    actual_ammonia_loss, actual_new_accumulated_manure_total_ammoniacal_nitrogen = \
+        anaerobic_lagoon.calc_ammonia_emission(
+                num_animals=num_animals,
+                barn_area=barn_area,
+                accumulated_manure_volume=accumulated_manure_volume,
+                accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
+        )
+
+    # Assert
+    patch_for_get_current_day_average_temperature_celsius.assert_called_once()
+    patch_for_calc_ammonia_emission_for_anaerobic_lagoon.assert_called_once_with(
+            num_animals=num_animals,
+            barn_area=barn_area,
+            manure_urine_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+            manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+            temperature_celsius=temperature_celsius
+    )
+    assert actual_ammonia_loss == expected_ammonia_loss
+    assert actual_new_accumulated_manure_total_ammoniacal_nitrogen == \
+           expected_new_accumulated_manure_total_ammoniacal_nitrogen
