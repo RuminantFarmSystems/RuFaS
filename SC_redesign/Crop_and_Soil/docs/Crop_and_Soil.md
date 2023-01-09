@@ -2,16 +2,18 @@
 # Crop and Soil
 
 The **Crop and Soil** submodule of the **RuFaS** whole-farm system model simulates agricultural fields, the soils they
-contain, the crops grown in them, and utilization by animals 
-(i.e., grazing). <!-- TODO: grazing not yet implemented --> The simulations represent real biogeophysical 
+contain, the crops grown in them, utilization by animals (i.e., grazing), <!-- TODO: grazing not yet implemented --> 
+and environmental impacts (e.g., emissions). The simulations represent real biogeophysical 
 processes that occur on farms and can assist growers in making decisions about their systems and management 
 practices.
 
 Users define farms that contain a number of fields. Each field contains soil whose structure and composition will
 change throughout the course of the simulation: nutrients can be added to the soil through amendments and tillage; 
 water and nutrients cycle through the system, affected by weather; soils can erode and compact depending on their
-usage. A field can be planted with crops (one or multiple species), which photosynthesize and exchange resources with
-the soil to grow. 
+usage. A field can be planted with crops (one or multiple species, annual or perennial), which photosynthesize and 
+exchange resources with the soil to grow. 
+
+![Field System Conceptual Design](./images/SC-temporal-model-diagram.jpg)
 
 The field systems and their driving processes are simulated on a daily basis. This fine-scale temporal
 resolution allows for systems that can rapidly respond to external changes (i.e., weather and management). Users can 
