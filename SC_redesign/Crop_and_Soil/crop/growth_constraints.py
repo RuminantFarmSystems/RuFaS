@@ -7,22 +7,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 class GrowthConstraints:
     """crop process class pertaining to growth constraints"""
     def __init__(self, crop_data: Optional[CropData] = None):
-        data = crop_data or CropData()  # initialize with defaults, if not given
-        # TODO replace attributes with reference to data - GitHub Issue #255
-        #  in various methods
-        self.water_uptake = 18
-        self.nitrogen = 35
-        self.optimal_nitrogen = 100
-        self.phosphorus = 20
-        self.optimal_phosphorus = 80
-        self.minimum_temperature = 15
-        self.optimal_temperature = 22
-
-        self.growth_factor = 1.0
-        self.water_stress = None
-        self.temp_stress = None
-        self.nitrogen_stress = None
-        self.phosphorus_stress = None
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def constrain_growth(self, max_trans: float, temp: float) -> None:
         """
@@ -40,20 +25,21 @@ class GrowthConstraints:
 
     def assess_water_stress(self, max_transpiration: float) -> None:
         #  TODO: plant transpiration should be an attribute of the crop (in addition to the soil?)
-        self.water_stress = calc_water_stress(self.water_uptake, max_transpiration)
+        self.data.water_stress = calc_water_stress(self.data.water_uptake, max_transpiration)
 
     def assess_temp_stress(self, temperature: float) -> None:
-        self.temp_stress = calc_temperature_stress(temperature, self.minimum_temperature, self.optimal_temperature)
+        self.data.temp_stress = calc_temperature_stress(temperature, self.data.minimum_temperature,
+                                                        self.data.optimal_temperature)
 
     def assess_nitrogen_stress(self) -> None:
-        self.nitrogen_stress = calc_nutrient_stress(self.nitrogen, self.optimal_nitrogen)
+        self.data.nitrogen_stress = calc_nutrient_stress(self.data.nitrogen, self.data.optimal_nitrogen)
 
     def assess_phosphorus_stress(self) -> None:
-        self.phosphorus_stress = calc_nutrient_stress(self.phosphorus, self.optimal_phosphorus)
+        self.data.phosphorus_stress = calc_nutrient_stress(self.data.phosphorus, self.data.optimal_phosphorus)
 
     def determine_growth_factor(self) -> None:
-        self.growth_factor = calc_growth_factor(self.water_stress, self.temp_stress, self.nitrogen_stress,
-                                                self.phosphorus_stress)
+        self.data.growth_factor = calc_growth_factor(self.data.water_stress, self.data.temp_stress,
+                                                     self.data.nitrogen_stress, self.data.phosphorus_stress)
 
 
 def calc_growth_factor(water_stress: float, temperature_stress: float, nitrogen_stress: float,
