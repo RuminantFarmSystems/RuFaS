@@ -122,10 +122,14 @@ class CropData:
     ##root_fraction = None #duplicate
     
     # ---- water dynamics
-    evaporation: Optional[float] = None
-    transpiration: Optional[float] = None
-    evapotranspiration: Optional[float] = None
-    evapotranspiration_max: Optional[float] = None
+    cumulative_evaporation: Optional[float] = None
+    """total water lost to evaporation by the plant during the growing season (mm)"""
+    cumulative_transpiration: Optional[float] = None
+    """total water lost to transpiration by the plant during the growing season (mm)"""
+    cumulative_evapotranspiration: Optional[float] = None
+    """total water lost to evapotranspiration by the plant during the growing season (mm)"""
+    max_cumulative_evapotranspiration: Optional[float] = None
+    """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
     """water deficiency factor for the plant (unitless)"""
     

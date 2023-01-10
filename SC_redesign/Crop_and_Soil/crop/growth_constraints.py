@@ -80,6 +80,8 @@ def calc_water_stress(water_uptake: float, max_transpiration: float) -> float:  
         water_uptake: the water taken up by the plant from the soil
         max_transpiration: the maximum plant transpiration on a given day
 
+    SWAT Reference: 5:3.1.1
+
     Returns: the plant's water stress
     """
     if max_transpiration == 0:  # avoid division by zero

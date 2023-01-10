@@ -51,7 +51,7 @@ def test_cycle_water(evap, trans, et_max):
     """integration test to check that water cycling routines are properly carried out"""
     water_dyn = WaterDynamics()
     water_dyn.cycle_water(evap, trans, et_max)
-    expected = [water_dyn.data.evaporation, water_dyn.data.transpiration, water_dyn.data.evapotranspiration,
-                water_dyn.data.evapotranspiration_max, water_dyn.data.water_deficiency]
+    expected = [water_dyn.data.cumulative_evaporation, water_dyn.data.cumulative_transpiration, water_dyn.data.cumulative_evapotranspiration,
+                water_dyn.data.max_cumulative_evapotranspiration, water_dyn.data.water_deficiency]
     observed = [evap, trans, evap + trans, et_max, WaterDynamics.determine_water_deficiency(evap + trans, et_max)]
     assert expected == observed

@@ -9,13 +9,13 @@ class WaterDynamics:
         self.data = crop_data or CropData()
 
     def cycle_water(self, evaporation: float, transpiration: float, max_evapotranspiration: float) -> None:
-        self.data.evaporation = evaporation
-        self.data.transpiration = transpiration
-        self.data.evapotranspiration_max = max_evapotranspiration
-        self.data.evapotranspiration = self.determine_evapotranspiration(self.data.evaporation,
-                                                                         self.data.transpiration)
-        self.data.water_deficiency = self.determine_water_deficiency(self.data.evapotranspiration,
-                                                                     self.data.evapotranspiration_max)
+        self.data.cumulative_evaporation = evaporation
+        self.data.cumulative_transpiration = transpiration
+        self.data.max_cumulative_evapotranspiration = max_evapotranspiration
+        self.data.cumulative_evapotranspiration = self.determine_evapotranspiration(self.data.cumulative_evaporation,
+                                                                                    self.data.cumulative_transpiration)
+        self.data.water_deficiency = self.determine_water_deficiency(self.data.cumulative_evapotranspiration,
+                                                                     self.data.max_cumulative_evapotranspiration)
 
     @staticmethod
     def determine_evapotranspiration(evaporation: float, transpiration: float) -> float:  # TODO: belongs in Soil class?
