@@ -239,7 +239,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             self.calc_ammonia_emission(
                     num_animals=self._current_pen.num_animals,
                     barn_area=self._current_pen.barn_area_from_pen_type,
-                    accumulated_manure_volume=self._accumulated_output.final_manure_volume,
+                    accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
                     accumulated_manure_total_ammoniacal_nitrogen=(
                         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen),
             )
