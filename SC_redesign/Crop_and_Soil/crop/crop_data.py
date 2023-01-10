@@ -22,19 +22,28 @@ class CropData:
     
     # ---- growth constraints
     water_uptake: float = 18
+    """water taken up by the plant for the day (mm)"""
     nitrogen: float = 35
     """nitrogen stored in plant biomass (kg/ha)"""
     optimal_nitrogen: float = 100
+    """optimal amount of nitrogen stored in the plant for the current growth stage (kg/ha)"""
     phosphorus: float = 20
     """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
+    """optimal amount of phosphorus stored in the plant for the curent growth stage (kg/ha)"""
     minimum_temperature: float = 15
+    """minumum temperature below which plant growth cannot occur (Celsius)"""
     optimal_temperature: float = 22
+    """ideal temperature for maximum plant growth (Celsius)"""
     ##growth_factor: float = 1.0  # duplicate
     water_stress: Optional[float] = None
+    """water stress for the day (unitless; [0, 1])"""
     temp_stress: Optional[float] = None
+    """temperature stress for the day (unitless; [0, 1])"""
     nitrogen_stress: Optional[float] = None
+    """nitrogen stress for the day (unitless; [0, 1])"""
     phosphorus_stress: Optional[float] = None
+    """phosphorus stress for the day (unitless; [0, 1])"""
     
     # ---- heat_units
     ##minimum_temperature: float = 20 # duplicate
