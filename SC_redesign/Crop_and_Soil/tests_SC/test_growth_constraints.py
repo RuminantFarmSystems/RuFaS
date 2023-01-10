@@ -102,15 +102,6 @@ def test_calc_growth_factor(w_stress, t_stress, n_stress, p_stress):
                               nitrogen_stress=n_stress, phosphorus_stress=p_stress) == expect
 
 
-# ---- initialization functions (reusable)
-def init_gc(**kwargs):
-    """helper function to create GrowthConstraint instance, with specified attributes"""
-    gc = GrowthConstraints()
-    for key, val in kwargs.items():
-        setattr(gc, key, val)
-    return gc
-
-
 # ---- member function tests ----
 @pytest.mark.parametrize("uptake,trans", [
     (1, 1),  # all 1
@@ -124,9 +115,10 @@ def init_gc(**kwargs):
 ])
 def test_assess_water_stress(uptake, trans):
     """test that water stress is correctly updated"""
-    gc = init_gc(water_uptake=uptake)
+    data = CropData(water_uptake=uptake)
+    gc = GrowthConstraints(data)
     gc.assess_water_stress(trans)
-    assert gc.water_stress == calc_water_stress(uptake, trans)
+    assert data.water_stress == calc_water_stress(uptake, trans)
 
 
 @pytest.mark.parametrize("stored,opt", [
@@ -142,9 +134,10 @@ def test_assess_water_stress(uptake, trans):
 ])
 def test_assess_nitrogen_stress(stored, opt):
     """test that nitrogen stress is correctly updated"""
-    gc = init_gc(nitrogen=stored, optimal_nitrogen=opt)
+    data = CropData(nitrogen=stored, optimal_nitrogen=opt)
+    gc = GrowthConstraints(data)
     gc.assess_nitrogen_stress()
-    assert gc.nitrogen_stress == calc_nutrient_stress(stored, opt)
+    assert data.nitrogen_stress == calc_nutrient_stress(stored, opt)
 
 
 @pytest.mark.parametrize("stored,opt", [
@@ -160,9 +153,10 @@ def test_assess_nitrogen_stress(stored, opt):
 ])
 def test_assess_phosphorus_stress(stored, opt):
     """test that phosphorus stress is correctly updated"""
-    gc = init_gc(phosphorus=stored, optimal_phosphorus=opt)
+    data = CropData(phosphorus=stored, optimal_phosphorus=opt)
+    gc = GrowthConstraints(data)
     gc.assess_phosphorus_stress()
-    assert gc.phosphorus_stress == calc_nutrient_stress(stored, opt)
+    assert data.phosphorus_stress == calc_nutrient_stress(stored, opt)
 
 
 @pytest.mark.parametrize("w_stress,t_stress,n_stress,p_stress", [
@@ -176,10 +170,11 @@ def test_assess_phosphorus_stress(stored, opt):
 ])
 def test_determine_growth_factor(w_stress, t_stress, n_stress, p_stress):
     """check that the growth factor is properly updated"""
-    gc = init_gc(water_stress=w_stress, temp_stress=t_stress, nitrogen_stress=n_stress,
-                 phosphorus_stress=p_stress)
+    data = CropData(water_stress=w_stress, temp_stress=t_stress, nitrogen_stress=n_stress,
+                    phosphorus_stress=p_stress)
+    gc = GrowthConstraints(data)
     gc.determine_growth_factor()
-    assert gc.growth_factor == calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
+    assert data.growth_factor == calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
 
 
 @pytest.mark.parametrize("trans,temp", [
@@ -192,13 +187,14 @@ def test_determine_growth_factor(w_stress, t_stress, n_stress, p_stress):
 def test_constrain_growth(trans, temp):
     """integration test: check that the growth factor is properly determined"""
     # initialize with arbitrary crop values
-    gc = init_gc(water_uptake=22.33, nitrogen=38.7, optimal_nitrogen=77.1,
-                 phosphorus=12.9, optimal_phosphorus=31.2, minimum_temp=12.8,
-                 optimal_temp=24.0)
+    data = CropData(water_uptake=22.33, nitrogen=38.7, optimal_nitrogen=77.1,
+                    phosphorus=12.9, optimal_phosphorus=31.2, minimum_temperature=12.8,
+                    optimal_temperature=24.0)
+    gc = GrowthConstraints(data)
     gc.constrain_growth(trans, temp)
 
     w_stress = calc_water_stress(22.33, trans)
     t_stress = calc_temperature_stress(temp, 12.8, 24.0)
     n_stress = calc_nutrient_stress(38.7, 77.1)
     p_stress = calc_nutrient_stress(12.9, 31.2)
-    assert gc.growth_factor == calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
+    assert data.growth_factor == calc_growth_factor(w_stress, t_stress, n_stress, p_stress)
