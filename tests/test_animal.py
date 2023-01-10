@@ -14,6 +14,14 @@ from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.simulation_engine import SimulationEngine
 
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
+
+
+
+
+
+
 @pytest.fixture
 def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     """Returns a mocked SimulationEngine"""
@@ -30,9 +38,8 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     return sim_eng
 
 
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 @pytest.fixture
-def patch_animal_object(mocker:MockerFixture)->AnimalBase:
+def patch_animal_object_v0(mocker:MockerFixture)->AnimalBase:
     """returns a mocked AnimalBase"""
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__")
@@ -48,9 +55,35 @@ def patch_animal_object(mocker:MockerFixture)->AnimalBase:
         semen_used =  MagicMock(),
         
         body_weight = MagicMock(),
-        body_weight_history = [],
-        pen_history = MagicMock()
+        body_weight_history = MagicMock(),
+        pen_history = MagicMock(),
+        simulation_day = MagicMock()
         )
+    return animobj
+
+@pytest.fixture
+def patch_animal_object(mocker:MockerFixture)->AnimalBase:
+    """returns a mocked AnimalBase"""
+    mockerinit = patch(
+        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__")
+    ####mocker.patch(
+    ####    "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
+    #animobj = AnimalBase()
+    ### note: init didn't work with the below
+    mockerinit.start()
+    animobj = AnimalBase.__init__(
+        id = MagicMock(),
+        breed = MagicMock(),
+        birth_date =  MagicMock(),
+        days_born = MagicMock(),
+        semen_used =  MagicMock(),
+        
+        body_weight = MagicMock(),
+        body_weight_history = MagicMock(),
+        pen_history = MagicMock(),
+        simulation_day = MagicMock()
+        )
+    mockerinit.stop()
     return animobj
 
 
@@ -83,6 +116,21 @@ def patch_animal_object(mocker:MockerFixture)->AnimalBase:
 #     bwhistobj.body_weight = patch_animal_object.body_weight
     
 #     return bwhistobj
+
+
+from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
+@pytest.fixture
+def patch_BodyWeightHistory(mocker:MockerFixture)->BodyWeightHistory:
+    """returns a mocked BodyWeightHistory"""
+    mocker.patch(
+        "RUFAS.routines.animal.life_cycle.animal_base.BodyWeightHistory.__init__")
+    bwhistobj = BodyWeightHistory(
+    simulation_day = MagicMock(),
+    days_born = MagicMock(),
+    body_weight = MagicMock()
+    )
+    return bwhistobj
+
 
 from RUFAS.routines.animal.life_cycle.animal_base import PenHistory
 @pytest.fixture
@@ -269,16 +317,17 @@ def test_update_body_weight_history(
     # patch_simulation_engine.state.animal_management.simulation_day = 1
     # assert patch_simulation_engine.state.animal_management.simulation_day == 1
     patch_animal_object.simulation_day = 1
-    assert patch_animal_object.simulation_day == 1
     patch_animal_object.days_born = 200
-    assert patch_animal_object.days_born == 200
     patch_animal_object.body_weight = 600
+    assert patch_animal_object.simulation_day == 1
+    assert patch_animal_object.days_born == 200
     assert patch_animal_object.body_weight == 600
     ############## patch_simulation_engine._advance_time(True)
     ############## assert patch_simulation_engine.state.animal_management.simulation_day == 2
     patch_animal_object.body_weight = 601
     assert patch_animal_object.body_weight == 601
     patch_animal_object.body_weight_history = []
+    assert patch_animal_object.body_weight_history == []
     # update hist with new vals, using the time and the obj itself
     ####patch_animal_object.update_body_weight_history(patch_animal_object, \
     ####    patch_simulation_engine.state.animal_management.simulation_day)
