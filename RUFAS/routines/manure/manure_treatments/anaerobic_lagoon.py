@@ -125,7 +125,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         return daily_output
 
-    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float):
+    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
         """Adjusts the final manure volume to account for the precipitation and the storage time period.
 
         Args:
