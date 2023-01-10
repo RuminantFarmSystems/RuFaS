@@ -20,10 +20,10 @@ from unittest.mock import MagicMock
 ])
 def test_determine_nitrogen_shape_parameters(halfheat, heatfrac, emerge, half, near, mature):
     """check that the shape parameters are correctly calculated by determine_nshapes()"""
-    observe = NitrogenIncorporation.determine_nitrogen_shape_parameters(halfheat, heatfrac, emerge, half, near, mature)
-    expect_2 = (NitrogenIncorporation.determine_shape_log(halfheat, half, mature, emerge) -
-                NitrogenIncorporation.determine_shape_log(heatfrac, near, mature, emerge)) / (heatfrac - halfheat)
-    expect_1 = NitrogenIncorporation.determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
+    observe = NitrogenIncorporation._determine_nitrogen_shape_parameters(halfheat, heatfrac, emerge, half, near, mature)
+    expect_2 = (NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) -
+                NitrogenIncorporation._determine_shape_log(heatfrac, near, mature, emerge)) / (heatfrac - halfheat)
+    expect_1 = NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
     assert observe == [expect_1, expect_2]
 
 
@@ -34,7 +34,7 @@ def test_determine_nitrogen_shape_parameters(halfheat, heatfrac, emerge, half, n
 ])
 def test_determine_shape_log(heatfrac, current, mature, emergence):
     """check that determine_shape_log() calculates correct output"""
-    observe = NitrogenIncorporation.determine_shape_log(heatfrac, current, mature, emergence)
+    observe = NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
     bottom = 1 - ((current - mature) / (emergence - mature))
     inside = (heatfrac / bottom) - heatfrac
     expect = log(inside)
@@ -58,7 +58,7 @@ def test_determine_shape_log(heatfrac, current, mature, emergence):
 def test_error_determine_shape_log(heatfrac, current, mature, emergence):
     """check that determine_shape_log() throws errors when appropriate"""
     with pytest.raises(Exception):
-        NitrogenIncorporation.determine_shape_log(heatfrac, current, mature, emergence)
+        NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
 
 
 @pytest.mark.parametrize("heatfrac,emerge,mature,shape1,shape2", [
@@ -71,7 +71,7 @@ def test_error_determine_shape_log(heatfrac, current, mature, emergence):
 ])
 def test_determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, shape1, shape2):
     """ensure that nitrogen fraction is correctly calculated by determine_optimal_nitrogen_fraction()"""
-    observe = NitrogenIncorporation.determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, shape1, shape2)
+    observe = NitrogenIncorporation._determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, shape1, shape2)
     expect = (emerge - mature) * (1 - (heatfrac / (heatfrac + exp(shape1 + shape2 * heatfrac)))) + mature
     assert observe == expect
 
@@ -86,7 +86,7 @@ def test_determine_optimal_nitrogen_fraction(heatfrac, emerge, mature, shape1, s
 ])
 def test_determine_optimal_nitrogen(nfrac, biomass):
     """test that optimal nitrogen is correctly calculated by determine_optimal_nitrogen()"""
-    assert NitrogenIncorporation.determine_optimal_nitrogen(nfrac, biomass) == nfrac * biomass
+    assert NitrogenIncorporation._determine_optimal_nitrogen(nfrac, biomass) == nfrac * biomass
 
 
 @pytest.mark.parametrize("optimal,previous,mature,max_growth", [
@@ -102,7 +102,7 @@ def test_determine_optimal_nitrogen(nfrac, biomass):
 def test_determine_potential_nitrogen_uptake(optimal, previous, mature, max_growth):
     """test that potential nitrogen uptake is correctly calculated by determine_max_nitrogen_uptake()"""
     expect = min(optimal - previous, 4 * mature * max_growth)
-    observe = NitrogenIncorporation.determine_potential_nitrogen_uptake(optimal, previous, mature, max_growth)
+    observe = NitrogenIncorporation._determine_potential_nitrogen_uptake(optimal, previous, mature, max_growth)
     assert expect == observe
 
 
@@ -113,7 +113,7 @@ def test_determine_potential_nitrogen_uptake(optimal, previous, mature, max_grow
     (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
 ])
 def test_determine_deepest_accessible_layer(root, depths, expect):
-    assert NitrogenIncorporation.determine_deepest_accessible_layer(root, depths) == expect
+    assert NitrogenIncorporation._determine_deepest_accessible_layer(root, depths) == expect
 
 
 @pytest.mark.parametrize("root,depths", [
@@ -122,7 +122,7 @@ def test_determine_deepest_accessible_layer(root, depths, expect):
 ])
 def test_error_determine_deepest_accessible_layer(root, depths):
     with pytest.raises(ValueError):
-        NitrogenIncorporation.determine_deepest_accessible_layer(root, depths)
+        NitrogenIncorporation._determine_deepest_accessible_layer(root, depths)
 
 
 @pytest.mark.parametrize("bounds,demand,root_depth,ndistro", [
@@ -145,12 +145,12 @@ def test_determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, n
     layer_nitrogen = []  # empty list to fill
     upper_nitrogen = 0  # nitrogen in the top boundary (soil surface) is 0
     for i in range(len(bounds)):
-        lower_nitrogen = NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, bounds[i], root_depth,
-                                                                                  ndistro)
+        lower_nitrogen = NitrogenIncorporation._determine_nitrogen_uptake_to_depth(demand, bounds[i], root_depth,
+                                                                                   ndistro)
         layer_nitrogen.append(lower_nitrogen - upper_nitrogen)
         upper_nitrogen = lower_nitrogen
     expect = layer_nitrogen
-    observe = NitrogenIncorporation.determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro)
+    observe = NitrogenIncorporation._determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro)
     assert expect == observe
 
 
@@ -167,7 +167,7 @@ def test_determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, n
 def test_error_determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro):
     """check that determine_layer_nitrogen_potential throws an error when soil boundaries are not properly ordered"""
     with pytest.raises(Exception):
-        NitrogenIncorporation.determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro)
+        NitrogenIncorporation._determine_layer_nitrogen_uptake_potential(bounds, demand, root_depth, ndistro)
 
 
 @pytest.mark.parametrize("demand,depth,root_depth,ndistro", [
@@ -183,7 +183,7 @@ def test_error_determine_layer_nitrogen_uptake_potential(bounds, demand, root_de
 ])
 def test_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
     """check that nitrogen uptake is correctly calculated by determine_surface_nitrogen_uptake()"""
-    observe = NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
+    observe = NitrogenIncorporation._determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
     if root_depth <= 0:
         expect = 0
     else:
@@ -199,7 +199,7 @@ def test_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
 def test_error_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro):
     """"check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
     with pytest.raises(Exception):
-        NitrogenIncorporation.determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
+        NitrogenIncorporation._determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
 
 
 @pytest.mark.parametrize("pots,avails", [
@@ -212,7 +212,7 @@ def test_error_determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndi
 ])
 def test_determine_layer_nitrogen_demands(pots, avails):
     """test that nitrogen demand is correctly calculated for each layer by determine_layer_nitrogen_demand()"""
-    observe = NitrogenIncorporation.determine_layer_nitrogen_demands(pots, avails)
+    observe = NitrogenIncorporation._determine_layer_nitrogen_demands(pots, avails)
     # starting values
     no3_sum = 0
     up_sum = 0
@@ -237,7 +237,7 @@ def test_determine_layer_nitrogen_demands(pots, avails):
 ])
 def test_determine_layer_nitrogen_uptake(demand, potential, nitrate):
     """test that actual nitrogen uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()"""
-    observe = NitrogenIncorporation.determine_layer_nitrogen_uptake(demand, potential, nitrate)
+    observe = NitrogenIncorporation._determine_layer_nitrogen_uptake(demand, potential, nitrate)
     expect = []
     for d, p, n in zip(demand, potential, nitrate):
         uptake = min(p + d, n)
@@ -256,8 +256,8 @@ def test_determine_layer_extracted_resource(reqs, srcs):
     """ensure that extracted nitrogen is correctly calculated for each layer"""
     draws = []
     for i in range(len(reqs)):
-        draws.append(NitrogenIncorporation.determine_extracted_resource(reqs[i], srcs[i]))
-    assert draws == NitrogenIncorporation.determine_layer_extracted_resource(reqs, srcs)
+        draws.append(NitrogenIncorporation._determine_extracted_resource(reqs[i], srcs[i]))
+    assert draws == NitrogenIncorporation._determine_layer_extracted_resource(reqs, srcs)
 
 
 @pytest.mark.parametrize("requested,available", [
@@ -275,7 +275,7 @@ def test_determine_extracted_resource(requested, available):
         drawn = available
     else:
         drawn = requested
-    assert drawn == NitrogenIncorporation.determine_extracted_resource(requested, available)
+    assert drawn == NitrogenIncorporation._determine_extracted_resource(requested, available)
 
 
 @pytest.mark.parametrize("nitrates,expect", [
@@ -289,7 +289,7 @@ def test_determine_extracted_resource(requested, available):
     (450, 0)  # C
 ])
 def test_determine_nitrate_factor(nitrates, expect):
-    assert NitrogenIncorporation.determine_nitrate_factor(nitrates) == expect
+    assert NitrogenIncorporation._determine_nitrate_factor(nitrates) == expect
 
 
 @pytest.mark.parametrize("heatfrac,expect", [
@@ -307,7 +307,7 @@ def test_determine_nitrate_factor(nitrates, expect):
     (1.39, 0.0)
 ])
 def test_determine_fixation_stage_factor(heatfrac, expect):
-    assert NitrogenIncorporation.determine_fixation_stage_factor(heatfrac) == expect
+    assert NitrogenIncorporation._determine_fixation_stage_factor(heatfrac) == expect
 
 
 @pytest.mark.parametrize("demand,stage,water,nitrate,expect", [
@@ -320,7 +320,7 @@ def test_determine_fixation_stage_factor(heatfrac, expect):
 ])
 def test_determine_fixed_nitrogen(demand, stage, water, nitrate, expect):
     """check that nitrogen values are calculated as expected with determine_fixed_nitrogen()"""
-    assert NitrogenIncorporation.determine_fixed_nitrogen(demand, stage, water, nitrate) == expect
+    assert NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate) == expect
 
 
 @pytest.mark.parametrize("demand,stage,water,nitrate", [
@@ -333,7 +333,7 @@ def test_determine_fixed_nitrogen(demand, stage, water, nitrate, expect):
 ])
 def test_error_determine_fixed_nitrogen(demand, stage, water, nitrate):
     with pytest.raises(ValueError):
-        NitrogenIncorporation.determine_fixed_nitrogen(demand, stage, water, nitrate)
+        NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate)
 
 
 @pytest.mark.parametrize("prev,new,fix", [
@@ -346,7 +346,7 @@ def test_error_determine_fixed_nitrogen(demand, stage, water, nitrate):
 ])
 def test_determine_stored_nitrogen(prev, new, fix):
     """test the stored nitrogen is properly calculated by determine_stored_nitrogen()"""
-    observe = NitrogenIncorporation.determine_stored_nitrogen(new, prev, fix)
+    observe = NitrogenIncorporation._determine_stored_nitrogen(new, prev, fix)
     assert observe == prev + new + fix
 
 
@@ -384,7 +384,7 @@ def test_find_deepest_accessible_soil_layer(root_depth, depths, expect):
     crop = init_incorp(root_depth=root_depth)
     crop.find_deepest_accessible_soil_layer(depths)
     assert crop.total_soil_layers == expect[0]
-    assert crop.accessible_soil_layers == NitrogenIncorporation.determine_deepest_accessible_layer(root_depth, depths)
+    assert crop.accessible_soil_layers == NitrogenIncorporation._determine_deepest_accessible_layer(root_depth, depths)
     assert crop.inaccessible_soil_layers == expect[1]
 
 
@@ -479,9 +479,9 @@ def test_try_fixation(fixer, nitrates, water, mocker: MockerFixture):
 def test_update_fixation_attributes(mocker: MockerFixture):
     """"check that update_nitrate_attributes calls both its sub-functions"""
     patch_determine_nitrate_factor = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.determine_nitrate_factor")
+        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation._determine_nitrate_factor")
     patch_determine_determine_fixation_stage_factor = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.determine_fixation_stage_factor")
+        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation._determine_fixation_stage_factor")
     crop = init_incorp()
     crop.update_fixation_attributes(100)
     patch_determine_nitrate_factor.assert_called_once()
@@ -501,8 +501,8 @@ def test_fix_nitrogen(uptake, demand, water, fixfact, nitrate):
                        nitrate_factor=nitrate)
     crop.fix_nitrogen(water)
     if (demand - uptake) > 0:
-        assert crop.fixed_nitrogen == NitrogenIncorporation.determine_fixed_nitrogen(demand - uptake, fixfact, water,
-                                                                                     nitrate)
+        assert crop.fixed_nitrogen == NitrogenIncorporation._determine_fixed_nitrogen(demand - uptake, fixfact, water,
+                                                                                      nitrate)
     else:
         assert crop.fixed_nitrogen == 0
 
@@ -517,10 +517,10 @@ def test_uptake_nitrogen(depths, nitrates):
     # Mock functions
     crop.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
     crop.access_layers = MagicMock(return_value=[1, 2, 3])
-    NitrogenIncorporation.determine_layer_nitrogen_uptake_potential = MagicMock(return_value=[3.25, 6.33, 7.10])
-    NitrogenIncorporation.determine_layer_nitrogen_demands = MagicMock(return_value=[12, 15, 17])
-    NitrogenIncorporation.determine_layer_nitrogen_uptake = MagicMock(return_value=[8.9, 9.9, 13.12])
-    NitrogenIncorporation.determine_layer_extracted_resource = MagicMock(return_value=[5.0, 4.0, 2.0])
+    NitrogenIncorporation._determine_layer_nitrogen_uptake_potential = MagicMock(return_value=[3.25, 6.33, 7.10])
+    NitrogenIncorporation._determine_layer_nitrogen_demands = MagicMock(return_value=[12, 15, 17])
+    NitrogenIncorporation._determine_layer_nitrogen_uptake = MagicMock(return_value=[8.9, 9.9, 13.12])
+    NitrogenIncorporation._determine_layer_extracted_resource = MagicMock(return_value=[5.0, 4.0, 2.0])
     crop.extend_nitrate_uptakes_to_full_profile = MagicMock()
     crop.extract_nitrogen_from_soil_layers = MagicMock()
     crop.tally_total_nitrogen_uptake = MagicMock()
@@ -530,15 +530,15 @@ def test_uptake_nitrogen(depths, nitrates):
 
     # check assertions
     crop.find_deepest_accessible_soil_layer.assert_called_once_with(depths)
-    NitrogenIncorporation.determine_layer_nitrogen_uptake_potential.assert_called_once_with([1, 2, 3],
-                                                                                            17.5, 35.0, 0.32)
+    NitrogenIncorporation._determine_layer_nitrogen_uptake_potential.assert_called_once_with([1, 2, 3],
+                                                                                             17.5, 35.0, 0.32)
     assert crop.layer_nitrogen_potentials == [3.25, 6.33, 7.10]
-    NitrogenIncorporation.determine_layer_nitrogen_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
+    NitrogenIncorporation._determine_layer_nitrogen_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
     assert crop.unmet_nitrogen_demands == [12, 15, 17]
-    NitrogenIncorporation.determine_layer_nitrogen_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10],
-                                                                                  [1, 2, 3])
+    NitrogenIncorporation._determine_layer_nitrogen_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10],
+                                                                                   [1, 2, 3])
     assert crop.nitrogen_requests == [8.9, 9.9, 13.12]
-    NitrogenIncorporation.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
+    NitrogenIncorporation._determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
     assert crop.actual_nitrogen_uptakes == [5.0, 4.0, 2.0]
     crop.extend_nitrate_uptakes_to_full_profile.assert_called_once()
     crop.extract_nitrogen_from_soil_layers.assert_called_once()
@@ -558,37 +558,37 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
 
     # mock intermediate functions
     crop.shift_nitrogen_time = MagicMock(return_value=None)
-    crop.determine_nitrogen_shape_parameters = MagicMock(return_value=[1.2, 0.8])
-    crop.determine_optimal_nitrogen_fraction = MagicMock(return_value=0.75)
+    crop._determine_nitrogen_shape_parameters = MagicMock(return_value=[1.2, 0.8])
+    crop._determine_optimal_nitrogen_fraction = MagicMock(return_value=0.75)
     if gate:
-        crop.determine_optimal_nitrogen = MagicMock(return_value=-268)
+        crop._determine_optimal_nitrogen = MagicMock(return_value=-268)
     else:
-        crop.determine_optimal_nitrogen = MagicMock(return_value=268)
-    crop.determine_potential_nitrogen_uptake = MagicMock(return_value=123.1)
+        crop._determine_optimal_nitrogen = MagicMock(return_value=268)
+    crop._determine_potential_nitrogen_uptake = MagicMock(return_value=123.1)
     crop.uptake_nitrogen = MagicMock(return_value=None)  # TODO - don't know how to mock attribute updates
     crop.access_layers = MagicMock(return_value=[5, 10, 15.3])
     crop.try_fixation = MagicMock(return_value=None)
-    NitrogenIncorporation.determine_stored_nitrogen = MagicMock(return_value=99.3)
+    NitrogenIncorporation._determine_stored_nitrogen = MagicMock(return_value=99.3)
 
     # run method
     crop.incorporate_nitrogen(nitrates, depths, water_factor)
 
     # assertions
     crop.shift_nitrogen_time.assert_called_once()
-    crop.determine_nitrogen_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.62, 0.60)
+    crop._determine_nitrogen_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.62, 0.60)
     assert crop._nitrogen_shapes == [1.2, 0.8]
-    crop.determine_optimal_nitrogen_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
+    crop._determine_optimal_nitrogen_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
     assert crop.optimal_nitrogen_fraction == 0.75
     if gate:
-        crop.determine_optimal_nitrogen.assert_called_once_with(0.75, 122.8)
+        crop._determine_optimal_nitrogen.assert_called_once_with(0.75, 122.8)
         assert crop.optimal_nitrogen == -268
-        crop.determine_potential_nitrogen_uptake.assert_not_called()
+        crop._determine_potential_nitrogen_uptake.assert_not_called()
         assert crop.potential_nitrogen_uptake == 0
     else:
         assert crop.optimal_nitrogen == 268
-        crop.determine_potential_nitrogen_uptake.assert_called_once_with(268, 0, 0.60, 999)
+        crop._determine_potential_nitrogen_uptake.assert_called_once_with(268, 0, 0.60, 999)
         assert crop.potential_nitrogen_uptake == 123.1
     crop.uptake_nitrogen.assert_called_once_with(nitrates, depths)
     crop.try_fixation.assert_called_once_with(5+10+15.3, water_factor)
-    NitrogenIncorporation.determine_stored_nitrogen.assert_called_once()  # should be called_once_with() w/ attr mocked
+    NitrogenIncorporation._determine_stored_nitrogen.assert_called_once()  # should be called_once_with() w/ attr mocked
     assert crop.nitrogen == 99.3

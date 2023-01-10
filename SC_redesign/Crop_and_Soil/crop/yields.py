@@ -35,24 +35,24 @@ class Yields():
         if self.data.has_given_harvest_index:
             self.data.harvest_index = self.data.user_harvest_index
         else:
-            self.data.potential_harvest_index = self.determine_potential_harvest_index(self.data.heat_fraction,
-                                                                                       self.data.optimal_harvest_index)
-            self.data.harvest_index = self.adjust_harvest_index(self.data.potential_harvest_index,
-                                                                self.data.min_harvest_index,
-                                                                self.data.water_deficiency)
+            self.data.potential_harvest_index = self._determine_potential_harvest_index(self.data.heat_fraction,
+                                                                                        self.data.optimal_harvest_index)
+            self.data.harvest_index = self._adjust_harvest_index(self.data.potential_harvest_index,
+                                                                 self.data.min_harvest_index,
+                                                                 self.data.water_deficiency)
         # Dry down
         if self.data.is_mature:
-            self.data.above_ground_biomass = self.adjust_biomass_for_dry_down(self.data.above_ground_biomass,
-                                                                              self.data.dry_down_fraction)
+            self.data.above_ground_biomass = self._adjust_biomass_for_dry_down(self.data.above_ground_biomass,
+                                                                               self.data.dry_down_fraction)
         # Yield
         if self.data.harvest_index <= 1.0:
-            self.data.crop_yield = self.determine_yield_from_shoot_biomass(self.data.above_ground_biomass,
-                                                                           self.data.harvest_index)
+            self.data.crop_yield = self._determine_yield_from_shoot_biomass(self.data.above_ground_biomass,
+                                                                            self.data.harvest_index)
         else:
-            self.data.crop_yield = self.determine_yield_from_total_biomass(self.data.biomass, self.data.harvest_index)
+            self.data.crop_yield = self._determine_yield_from_total_biomass(self.data.biomass, self.data.harvest_index)
 
         # Yield extraction
-        self.data.yield_collected = self.determine_extracted_yield(self.data.crop_yield, self.data.harvest_efficiency)
+        self.data.yield_collected = self._determine_extracted_yield(self.data.crop_yield, self.data.harvest_efficiency)
 
         # Yield nutrient makeup
         if self.data.has_given_harvest_index:
@@ -63,7 +63,7 @@ class Yields():
             self.data.collected_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.6
 
         # Yield Not extracted
-        self.data.yield_residue = self.determine_unextracted_yield(self.data.crop_yield, self.data.harvest_efficiency)
+        self.data.yield_residue = self._determine_unextracted_yield(self.data.crop_yield, self.data.harvest_efficiency)
 
         # Biomass update
 
@@ -87,7 +87,7 @@ class Yields():
     # ---- Static Methods ----
 
     @staticmethod
-    def determine_potential_harvest_index(heat_fraction: float, optimal_harvest_index: float) -> float:
+    def _determine_potential_harvest_index(heat_fraction: float, optimal_harvest_index: float) -> float:
         """calculates the potential harvest index for a plant on a given day
 
         Args:
@@ -105,7 +105,7 @@ class Yields():
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
 
     @staticmethod
-    def adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
+    def _adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
         """calculates the actual harvest index for a given day, adjusted for water deficiency
 
         Args:
@@ -129,7 +129,7 @@ class Yields():
         return max(adj_harvest_index, 0)  # bounded at zero
 
     @staticmethod
-    def adjust_biomass_for_dry_down(above_ground_biomass: float, dry_down_percent: float) -> float:
+    def _adjust_biomass_for_dry_down(above_ground_biomass: float, dry_down_percent: float) -> float:
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
         """ calculates the above ground biomass after water mass is lost in dry-down
 
@@ -142,7 +142,7 @@ class Yields():
         return above_ground_biomass - (above_ground_biomass * dry_down_percent)
 
     @staticmethod
-    def determine_yield_from_shoot_biomass(above_ground_biomass: float, harvest_index: float) -> float:
+    def _determine_yield_from_shoot_biomass(above_ground_biomass: float, harvest_index: float) -> float:
         """Calculates maximum crop yield at harvest (in ideal conditions), when harvest index is <= 1.
 
         SWAT Reference: 5:2.4.2
@@ -158,7 +158,7 @@ class Yields():
         return above_ground_biomass * harvest_index
 
     @staticmethod
-    def determine_yield_from_total_biomass(biomass: float, harvest_index: float) -> float:
+    def _determine_yield_from_total_biomass(biomass: float, harvest_index: float) -> float:
         """Calculates maximum crop yield at harvest (in ideal conditions), when harvest index is > 1.
 
         SWAT Reference: 5:2.4.3
@@ -174,7 +174,7 @@ class Yields():
         return biomass * (1 - (1 / (1 + harvest_index)))
 
     @staticmethod
-    def determine_extracted_yield(crop_yield: float, harvest_efficiency: float) -> float:
+    def _determine_extracted_yield(crop_yield: float, harvest_efficiency: float) -> float:
         """calculates crop yield extracted at harvest, adjusted for harvest efficiency
 
         SWAT Reference: 5:3.3.4
@@ -192,7 +192,7 @@ class Yields():
         return crop_yield * harvest_efficiency
 
     @staticmethod
-    def determine_unextracted_yield(crop_yield: float, harvest_efficiency: float) -> float:
+    def _determine_unextracted_yield(crop_yield: float, harvest_efficiency: float) -> float:
         """calculates crop yield not extracted at harvest
 
         SWAT Reference: 5:3.3.5
