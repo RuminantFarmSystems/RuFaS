@@ -47,6 +47,14 @@ def test_manure_treatment_daily_output() -> None:
             sludge_manure_phosphorus=16.0,
             sludge_manure_potassium=17.0,
             sludge_manure_daily_volume=18.0,
+
+            biogas=19.0,
+            biogas_energy_content=20.0,
+            methane_generation_volume=21.0,
+            input_energy_heating=22.0,
+            evaporated_water=23.0,
+            minimum_digester_volume=24.0,
+            top_cover_volume=25.0,
     )
 
     # Assert
@@ -72,6 +80,15 @@ def test_manure_treatment_daily_output() -> None:
     assert manure_treatment_daily_output.sludge_manure_phosphorus == approx(16.0)
     assert manure_treatment_daily_output.sludge_manure_potassium == approx(17.0)
     assert manure_treatment_daily_output.sludge_manure_daily_volume == approx(18.0)
+
+    assert manure_treatment_daily_output.biogas == approx(19.0)
+    assert manure_treatment_daily_output.biogas_energy_content == approx(20.0)
+    assert manure_treatment_daily_output.methane_generation_volume == approx(21.0)
+    assert manure_treatment_daily_output.input_energy_heating == approx(22.0)
+    assert manure_treatment_daily_output.evaporated_water == approx(23.0)
+    assert manure_treatment_daily_output.minimum_digester_volume == approx(24.0)
+    assert manure_treatment_daily_output.top_cover_volume == approx(25.0)
+
 
 
 def test_manure_treatment_daily_output_add() -> None:
@@ -110,6 +127,13 @@ def test_manure_treatment_daily_output_add() -> None:
             sludge_manure_phosphorus=16.0,
             sludge_manure_potassium=17.0,
             sludge_manure_daily_volume=18.0,
+            biogas=19.0,
+            biogas_energy_content=20.0,
+            methane_generation_volume=21.0,
+            input_energy_heating=22.0,
+            evaporated_water=23.0,
+            minimum_digester_volume=24.0,
+            top_cover_volume=25.0,
     )
 
     manure_treatment_daily_output_2 = ManureTreatmentDailyOutput(
@@ -131,6 +155,13 @@ def test_manure_treatment_daily_output_add() -> None:
             sludge_manure_phosphorus=34.0,
             sludge_manure_potassium=35.0,
             sludge_manure_daily_volume=36.0,
+            biogas=37.0,
+            biogas_energy_content=38.0,
+            methane_generation_volume=39.0,
+            input_energy_heating=40.0,
+            evaporated_water=41.0,
+            minimum_digester_volume=42.0,
+            top_cover_volume=43.0,
     )
 
     # Act
@@ -203,6 +234,13 @@ def test_manure_treatment_daily_output_clone() -> None:
             sludge_manure_phosphorus=16.0,
             sludge_manure_potassium=17.0,
             sludge_manure_daily_volume=18.0,
+            biogas=19.0,
+            biogas_energy_content=20.0,
+            methane_generation_volume=21.0,
+            input_energy_heating=22.0,
+            evaporated_water=23.0,
+            minimum_digester_volume=24.0,
+            top_cover_volume=25.0,
     )
 
     # Act
