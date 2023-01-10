@@ -39,9 +39,9 @@ class HeatUnits:
 
         if self.use_heat_unit_temperature:
             self.maximum_heat_unit_temperature = \
-                HeatUnits.determine_maximum_heat_unit_temperature(max_air_temperature, self.maximum_temperature)
+                HeatUnits._determine_maximum_heat_unit_temperature(max_air_temperature, self.maximum_temperature)
             self.minimum_heat_unit_temperature = \
-                HeatUnits.determine_minimum_heat_unit_temperature(min_air_temperature, self.minimum_temperature)
+                HeatUnits._determine_minimum_heat_unit_temperature(min_air_temperature, self.minimum_temperature)
             self.heat_unit_temperature = \
                 (self.minimum_heat_unit_temperature + self.maximum_heat_unit_temperature) / 2
 
@@ -98,16 +98,16 @@ class HeatUnits:
     def assign_new_heat_units(self, air_temperature: float = None) -> None:
         """assign new heat units based on if the alternative accumulation method is to be used"""
         if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            self.new_heat_units = self.determine_new_heat_units(self.heat_unit_temperature, self.minimum_temperature)
+            self.new_heat_units = self._determine_new_heat_units(self.heat_unit_temperature, self.minimum_temperature)
         else:  # main method
-            self.new_heat_units = self.determine_new_heat_units(air_temperature, self.minimum_temperature)
+            self.new_heat_units = self._determine_new_heat_units(air_temperature, self.minimum_temperature)
 
     def add_heat_units(self) -> None:
         """add newly acquired heat units to accumulated heat units"""
         self.accumulated_heat_units += self.new_heat_units
 
     @staticmethod
-    def determine_new_heat_units(temperature: float, min_temperature: float) -> float:
+    def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
         """calculates the heat units that will be accumulated during a day
 
         Args:
@@ -117,7 +117,7 @@ class HeatUnits:
         return max(temperature - min_temperature, 0)  # from SWAT:
 
     @staticmethod
-    def determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:
+    def _determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:
         """ calculates minimum heat unit temperature on current day.
 
         Args:
@@ -130,7 +130,7 @@ class HeatUnits:
         return max(min_air_temp, min_growth_temp)
 
     @staticmethod
-    def determine_maximum_heat_unit_temperature(max_air_temp: float, max_growth_temp: float) -> float:
+    def _determine_maximum_heat_unit_temperature(max_air_temp: float, max_growth_temp: float) -> float:
         """calculates maximum heat unit temperature on current day.
             "pseudocode_crop" C.2.A.4
 

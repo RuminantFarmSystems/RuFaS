@@ -20,7 +20,7 @@ def test_determine_new_heat_units(temp, min_t):
         expect = 0
     else:
         expect = diff
-    assert HeatUnits.determine_new_heat_units(temp, min_t) == expect
+    assert HeatUnits._determine_new_heat_units(temp, min_t) == expect
 
 
 @pytest.mark.parametrize("air,plant", [
@@ -34,7 +34,7 @@ def test_determine_minimum_heat_unit_temperature(air, plant):
         expect = plant
     else:
         expect = air
-    assert HeatUnits.determine_minimum_heat_unit_temperature(air, plant) == expect
+    assert HeatUnits._determine_minimum_heat_unit_temperature(air, plant) == expect
 
 
 @pytest.mark.parametrize("air,plant", [
@@ -48,7 +48,7 @@ def test_determine_maximum_heat_unit_temperature(air, plant):
         expect = plant
     else:
         expect = air
-    assert HeatUnits.determine_maximum_heat_unit_temperature(air, plant) == expect
+    assert HeatUnits._determine_maximum_heat_unit_temperature(air, plant) == expect
 
 
 # ---- initializer function ----
@@ -106,9 +106,9 @@ def test_assign_new_heat_units(use_alt, temp):
                      minimum_temperature=15)
     heat.assign_new_heat_units(temp)
     if use_alt or (temp is None):
-        assert heat.new_heat_units == HeatUnits.determine_new_heat_units(25, 15)
+        assert heat.new_heat_units == HeatUnits._determine_new_heat_units(25, 15)
     else:
-        assert heat.new_heat_units == HeatUnits.determine_new_heat_units(temp, 15)
+        assert heat.new_heat_units == HeatUnits._determine_new_heat_units(temp, 15)
 
 
 @pytest.mark.parametrize("start,new", [
@@ -144,9 +144,9 @@ def test_absorb_heat_units(mean, min, max, use_heat_unit_temp):
     assert heat.use_heat_unit_temperature == use_heat_unit_temp
 
     if use_heat_unit_temp:
-        expect_max_heat_unit_temp = HeatUnits.determine_maximum_heat_unit_temperature(max, 38)
+        expect_max_heat_unit_temp = HeatUnits._determine_maximum_heat_unit_temperature(max, 38)
         assert expect_max_heat_unit_temp == heat.maximum_heat_unit_temperature
-        expect_min_heat_unit_temp = HeatUnits.determine_minimum_heat_unit_temperature(min, 20)
+        expect_min_heat_unit_temp = HeatUnits._determine_minimum_heat_unit_temperature(min, 20)
         assert expect_min_heat_unit_temp == heat.minimum_heat_unit_temperature
         expect_heat_unit_temp = (expect_min_heat_unit_temp / 2) + (expect_max_heat_unit_temp / 2)
         assert expect_heat_unit_temp == heat.heat_unit_temperature
@@ -163,9 +163,9 @@ def test_absorb_heat_units(mean, min, max, use_heat_unit_temp):
     assert expect_is_growing == heat.is_growing
 
     if use_heat_unit_temp or (mean is None):
-        expect_new_heat_units = HeatUnits.determine_new_heat_units(expect_heat_unit_temp, 20)
+        expect_new_heat_units = HeatUnits._determine_new_heat_units(expect_heat_unit_temp, 20)
     else:
-        expect_new_heat_units = HeatUnits.determine_new_heat_units(mean, 20)
+        expect_new_heat_units = HeatUnits._determine_new_heat_units(mean, 20)
     assert heat.use_heat_unit_temperature == use_heat_unit_temp
     assert expect_new_heat_units == heat.accumulated_heat_units
     assert heat.previous_heat_fraction is None

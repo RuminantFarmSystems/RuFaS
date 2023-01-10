@@ -11,7 +11,7 @@ class RootDevelopment:
         # data reference
         self.data = crop_data or CropData()  # defaults if not given
 
-    def develop_roots(self) -> None:
+    def _develop_roots(self) -> None:
         """main root development function
 
         Details: updates the root_fraction and root_depth attributes.
@@ -20,16 +20,16 @@ class RootDevelopment:
         """
         # update root fraction
         self.data.root_fraction = \
-            self.determine_root_fraction(self.data.heat_fraction)
+            self._determine_root_fraction(self.data.heat_fraction)
 
         # update root depth
         if self.data.is_perennial:
-            self.data.root_depth = self.determine_root_depth(self.data.max_root_depth, self.data.heat_fraction)
+            self.data.root_depth = self._determine_root_depth(self.data.max_root_depth, self.data.heat_fraction)
         else:
             self.data.root_depth = self.data.max_root_depth  # TODO: assumption by SWAT - valid perhaps after 1st year?
 
     @staticmethod
-    def determine_root_fraction(heat_fraction: float) -> float:
+    def _determine_root_fraction(heat_fraction: float) -> float:
         """calculates root fraction, as a function of plant maturity
 
         Args:
@@ -47,7 +47,7 @@ class RootDevelopment:
             return 0.4 - 0.2 * heat_fraction
 
     @staticmethod
-    def determine_root_depth(max_depth: float, heat_fraction: float) -> float:
+    def _determine_root_depth(max_depth: float, heat_fraction: float) -> float:
         """calculates a plant's root depth on a given day
 
         Args:

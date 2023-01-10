@@ -17,7 +17,7 @@ def test_determine_potential_harvest_index(heatfrac, optimal_index):
     top = 100 * heatfrac
     bottom = (100 * heatfrac) + exp(11.1 - (10 * heatfrac))
     expect = optimal_index * (top / bottom)
-    assert Yields.determine_potential_harvest_index(heatfrac, optimal_index) == expect
+    assert Yields._determine_potential_harvest_index(heatfrac, optimal_index) == expect
 
 
 @pytest.mark.parametrize("idx,min_index,deficiency", [
@@ -48,7 +48,7 @@ def test_adjust_harvest_index(idx, min_index, deficiency):
     expect = diff * deficiency / bottom + adj_min
     if expect < 0:
         expect = 0
-    assert Yields.adjust_harvest_index(idx, min_index, deficiency) == expect
+    assert Yields._adjust_harvest_index(idx, min_index, deficiency) == expect
 
 
 @pytest.mark.parametrize("start,percent,expect", [
@@ -58,7 +58,7 @@ def test_adjust_harvest_index(idx, min_index, deficiency):
 ])
 def test_adjust_biomass_for_dry_down(start, percent, expect):
     """ensure that dry-down is properly calculated by adjust_biomass_for_drydown()"""
-    assert Yields.adjust_biomass_for_dry_down(start, percent) == pytest.approx(expect)
+    assert Yields._adjust_biomass_for_dry_down(start, percent) == pytest.approx(expect)
 
 
 @pytest.mark.parametrize("ag_biomass,harv_ind", [
@@ -71,7 +71,7 @@ def test_adjust_biomass_for_dry_down(start, percent, expect):
 def test_determine_yield_from_shoot_biomass(ag_biomass, harv_ind):
     """ensure that yield is correctly calculated by determine_yield_from_shoot_biomass()"""
     expect = ag_biomass * harv_ind
-    assert Yields.determine_yield_from_shoot_biomass(ag_biomass, harv_ind) == expect
+    assert Yields._determine_yield_from_shoot_biomass(ag_biomass, harv_ind) == expect
 
 
 @pytest.mark.parametrize("bmass,harv_ind", [
@@ -83,7 +83,7 @@ def test_determine_yield_from_shoot_biomass(ag_biomass, harv_ind):
 def test_determine_yield_from_total_biomass(bmass, harv_ind):
     """ensure that yield is correctly calculated by determine_yield_from_total_biomass()"""
     frac = 1 / (1 + harv_ind)
-    assert Yields.determine_yield_from_total_biomass(bmass, harv_ind) == bmass * (1 - frac)
+    assert Yields._determine_yield_from_total_biomass(bmass, harv_ind) == bmass * (1 - frac)
 
 
 @pytest.mark.parametrize("crop_yield,harvest_efficiency", [
@@ -95,7 +95,7 @@ def test_determine_yield_from_total_biomass(bmass, harv_ind):
 def test_determine_extracted_yield(crop_yield, harvest_efficiency):
     """ensure that extracted yield is correctly calculated with determine_extracted_yield()"""
     expect = crop_yield * harvest_efficiency
-    assert Yields.determine_extracted_yield(crop_yield, harvest_efficiency) == expect
+    assert Yields._determine_extracted_yield(crop_yield, harvest_efficiency) == expect
 
 
 @pytest.mark.parametrize("crop_yield,harvest_efficiency", [
@@ -105,7 +105,7 @@ def test_determine_extracted_yield(crop_yield, harvest_efficiency):
 def test_error_determine_extracted_yield(crop_yield, harvest_efficiency):
     """ensure that determine_exctracted_yield() throws errors when harvest_efficiency is out of bounds"""
     with pytest.raises(ValueError):
-        Yields.determine_extracted_yield(crop_yield, harvest_efficiency)
+        Yields._determine_extracted_yield(crop_yield, harvest_efficiency)
 
 
 @pytest.mark.parametrize("crop_yield,harvest_efficiency", [
@@ -116,7 +116,7 @@ def test_error_determine_extracted_yield(crop_yield, harvest_efficiency):
 ])
 def test_determine_unextracted_yield(crop_yield, harvest_efficiency):
     """check that un-removed yield is properly calculated"""
-    assert Yields.determine_unextracted_yield(crop_yield, harvest_efficiency) == crop_yield*(1-harvest_efficiency)
+    assert Yields._determine_unextracted_yield(crop_yield, harvest_efficiency) == crop_yield * (1 - harvest_efficiency)
 
 
 @pytest.mark.parametrize("crop_yield,harvest_efficiency", [
@@ -126,7 +126,7 @@ def test_determine_unextracted_yield(crop_yield, harvest_efficiency):
 def test_error_determine_unextracted_yield(crop_yield, harvest_efficiency):
     """ensure that determine_exctracted_yield() throws errors when harvest_efficiency is out of bounds"""
     with pytest.raises(ValueError):
-        Yields.determine_unextracted_yield(crop_yield, harvest_efficiency)
+        Yields._determine_unextracted_yield(crop_yield, harvest_efficiency)
 
 
 # ---- Test Member functions
@@ -185,8 +185,8 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
 
     # expect
     if usr_index is None:
-        harv_indx = Yields.determine_potential_harvest_index(heat_frac, 2.63)
-        harv_indx = Yields.adjust_harvest_index(harv_indx, 0.186, 0.337)
+        harv_indx = Yields._determine_potential_harvest_index(heat_frac, 2.63)
+        harv_indx = Yields._adjust_harvest_index(harv_indx, 0.186, 0.337)
     else:
         assert data.harvest_index == usr_index
         harv_indx = usr_index
@@ -195,20 +195,20 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
 
     if heat_frac >= 1.0:
         assert data.is_mature == True
-        shoot_mass = Yields.adjust_biomass_for_dry_down(138.4, 0.22)
+        shoot_mass = Yields._adjust_biomass_for_dry_down(138.4, 0.22)
     else:
         assert data.is_mature == False
         shoot_mass = 138.4
     assert data.above_ground_biomass == shoot_mass
 
     if harv_indx > 1.0:
-        yld_mass = Yields.determine_yield_from_total_biomass(278.41, harv_indx)
+        yld_mass = Yields._determine_yield_from_total_biomass(278.41, harv_indx)
         assert data.crop_yield == yld_mass
     else:
-        yld_mass = Yields.determine_yield_from_shoot_biomass(shoot_mass, harv_indx)
+        yld_mass = Yields._determine_yield_from_shoot_biomass(shoot_mass, harv_indx)
         assert data.crop_yield == yld_mass
 
-    collected = Yields.determine_extracted_yield(yld_mass, harv_eff)
+    collected = Yields._determine_extracted_yield(yld_mass, harv_eff)
     assert data.yield_collected == collected
 
     if usr_index is None:
@@ -219,4 +219,4 @@ def test_obtain_yields(usr_index, heat_frac, harv_eff):
         phos = 0.077 * collected
     assert data.collected_nitrogen == nitro
     assert data.collected_phosphorus == phos
-    assert data.yield_residue == Yields.determine_unextracted_yield(yld_mass, harv_eff)
+    assert data.yield_residue == Yields._determine_unextracted_yield(yld_mass, harv_eff)
