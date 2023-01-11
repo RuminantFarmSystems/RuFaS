@@ -473,9 +473,9 @@ class HeiferII(HeiferI):
             self.determine_tai_program_day(
                 AnimalBase.config['breeding_start_day_h'])
 
-        if self.tai_method_h == '5dCG2P':
+        if self.tai_method_h == 'd5CG2P':
             self.d5CG2P_update(sim_day)
-        elif self.tai_method_h == '5dCGP':
+        elif self.tai_method_h == 'd5CGP':
             self.d5CGP_update(sim_day)
         elif self.tai_method_h == 'user_defined':
             self.user_defined_update()
