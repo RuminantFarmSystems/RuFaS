@@ -59,7 +59,10 @@ class BaseManureHandler:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._get_current_day_average_temperature_in_celsius.__name__,
+                    "function": self.__init__.__name__,
+                    "weather": vars(weather),
+                    "time": vars(time),
+                    "config": vars(manure_handler_config),
                     }
 
         self.weather = weather
@@ -67,11 +70,7 @@ class BaseManureHandler:
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
 
-        om.add_variable("weather", self.weather, info_map)
-        om.add_variable("time", self.time, info_map)
-        om.add_variable("config", vars(self.config), info_map)
-        om.add_variable("milking_parlor",
-                        vars(self.milking_parlor), info_map)
+        om.add_variable("milking_parlor", vars(self.milking_parlor), info_map)
 
     def _get_current_day_average_temperature_in_celsius(self) -> float:
         """Gets the average temperature of the day, in Celsius.
@@ -80,7 +79,16 @@ class BaseManureHandler:
             The average temperature of the day, in Celsius.
         """
 
-        return self.weather.T_avg[self.time.year - 1][self.time.day - 1]
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._get_current_day_average_temperature_in_celsius.__name__,
+                    }
+
+        avg_temp = self.weather.T_avg[self.time.year - 1][self.time.day - 1]
+
+        om.add_variable(
+            "current_day_average_temperature_in_celsius", avg_temp, info_map)
+
+        return avg_temp
 
     def daily_update(self,
                      pen: ManureManagementPen,
@@ -151,7 +159,17 @@ class BaseManureHandler:
             Volume of cleaning water needed for the given pen, L.
 
         """
-        return num_animals * self.config.cleaning_water_use_rate
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
+                    }
+
+        clean_water_volume = num_animals * self.config.cleaning_water_use_rate
+
+        om.add_variable(
+            "cleaning_water_volume_in_main_barn", clean_water_volume, info_map)
+
+        return clean_water_volume
 
 
 class FlushSystem(BaseManureHandler):
@@ -223,15 +241,15 @@ class DefaultManureHandlerConfigFactory:
             A default ManureHandlerConfig object for the given manure handler type.
 
         """
+        info_map = {"class": cls.__name__,
+                    "function": cls.get_instance.__name__,
+                    }
+
         manure_handler_config_by_type = {
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
             ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG
         }
-
-        info_map = {"class": cls.__name__,
-                    "function": cls.get_instance.__name__,
-                    }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
         om.add_variable("manure_handler_config",
@@ -278,7 +296,7 @@ class ManureHandlerFactory:
         manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
         om.add_variable("manure_handler_type",
-                        manure_handler_type, info_map)
+                        manure_handler_type.value, info_map)
         om.add_variable("manure_handler_class",
                         manure_handler_class.__name__, info_map)
 
