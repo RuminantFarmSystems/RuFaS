@@ -6,19 +6,29 @@ from typing import Optional
 class CropData:
     # ---- biomass allocation
     light_extinction: float = 0.65
+    """the light extinction coefficient (unitless)"""
     leaf_area_index: float = 1.2
+    """leaf area index of the plant (unitless)"""
     light_conversion: float = 20
+    """light use efficiency of the plant (dg/MJ)"""
     biomass: float = 0
     """total plant biomass (kg/ha)"""
     growth_factor: float = 1.0
+    """growth factor multiplier for the plant (unitless; [0, 1])"""
     root_fraction: float = 1 / 3
     """proportion of plant biomass that is stored below ground in roots (unitless)"""
     usable_light: Optional[float] = None
+    """solar radiation captured for photosynthesis during the day (MJ/m^2)"""
     biomass_growth_max: Optional[float] = None
+    """upper-limit of biomass accumulation for the day (kg/ha)"""
     biomass_growth: Optional[float] = None
+    """biomass accumulated by the plant during the day (kg/ha)"""
     previous_biomass: Optional[float] = None
-    green_biomass: Optional[float] = None
+    """biomass accumulated by the plant on the previous day (kg/ha)"""
+    above_ground_biomass: Optional[float] = None
+    """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     root_biomass: Optional[float] = None
+    """biomass stored in roots (kg/ha)"""
     
     # ---- growth constraints
     water_uptake: float = 18
@@ -162,8 +172,7 @@ class CropData:
     # temporally variable attributes
     ##heat_fraction = 0.6  # duplicate
     ##water_deficiency = 0.2  # duplicate
-    above_ground_biomass: float = 15  # kg
-    """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
+    ##above_ground_biomass: float = 15  # kg
     ##biomass = 25  # duplicate
     dry_down_fraction: float = 0.2
     """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
