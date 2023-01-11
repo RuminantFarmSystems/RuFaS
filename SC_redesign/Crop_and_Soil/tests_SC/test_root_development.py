@@ -60,7 +60,7 @@ def test_develop_roots(maxd, heatfrac):
     # rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
     data = CropData(heat_fraction=heatfrac, max_root_depth=maxd)
     rd = RootDevelopment(data)
-    rd._develop_roots()
+    rd.develop_roots()
     assert data.root_fraction == \
            RootDevelopment._determine_root_fraction(heatfrac)
     assert data.root_depth == \
