@@ -3,8 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+
+om = OutputManager()
 
 
 @dataclass
@@ -36,6 +39,7 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
         Used for satisfying the LiquidManurePortionProtocol.
 
     """
+
     pen_id: int = -1
     simulation_day: int = -1
     total_daily_manure_volume: float = 0.0
@@ -56,10 +60,25 @@ class ManureSeparatorDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_potassium: float = 0.0
 
     final_daily_volume: float = field(init=False)
-    liquid_manure_daily_volume: float = field(init=False)  # To satisfy the LiquidManurePortionProtocol
+    # To satisfy the LiquidManurePortionProtocol
+    liquid_manure_daily_volume: float = field(init=False)
 
     def __post_init__(self):
         """Calculates the final daily volume and the final solids wet mass volume."""
-        self.final_solids_wet_mass_volume = self.final_solids_wet_mass / ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
-        self.final_daily_volume = self.total_daily_manure_volume - self.final_solids_wet_mass_volume
+        info_map = {
+            'class': self.__class__.__name__,
+            'function': self.__post_init__.__name__,
+        }
+
+        self.final_solids_wet_mass_volume = self.final_solids_wet_mass / \
+            ManureConstants.MANURE_SOLIDS_BEDDING_DENSITY
+        self.final_daily_volume = self.total_daily_manure_volume - \
+            self.final_solids_wet_mass_volume
         self.liquid_manure_daily_volume = self.final_daily_volume
+
+        om.add_variable("final_solids_wet_mass_volume",
+                        self.final_solids_wet_mass_volume, info_map)
+        om.add_variable("final_daily_volume",
+                        self.final_daily_volume, info_map)
+        om.add_variable("liquid_manure_daily_volume",
+                        self.liquid_manure_daily_volume, info_map)

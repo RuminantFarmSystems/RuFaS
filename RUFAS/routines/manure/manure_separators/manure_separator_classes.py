@@ -15,9 +15,12 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+
+om = OutputManager()
 
 
 class ManureSeparatorType(DefaultEnum):
@@ -38,8 +41,16 @@ class ManureSeparatorType(DefaultEnum):
     @classmethod
     def get_default_type(cls, bedding_type='ORGANIC') -> DefaultEnum:
         """Returns the default manure separator type for the given bedding type."""
+        info_map = {
+            'class': cls.__name__,
+            'function': cls.get_default_type.__name__,
+        }
+
         if bedding_type == 'ORGANIC':
+            om.add_variable("default_type", cls.DEFAULT_ORGANIC, info_map)
             return cls.DEFAULT_ORGANIC
+
+        om.add_variable("default_type", cls.DEFAULT_SAND, info_map)
         return cls.DEFAULT_SAND
 
 
@@ -59,6 +70,11 @@ class BaseManureSeparator:
                 configuration for the manure separator.
 
         """
+        info_map = {
+            'class': self.__class__.__name__,
+            'function': self.__init__.__name__,
+        }
+        om.add_variable("config", vars(manure_separator_config), info_map)
         self.config = manure_separator_config
 
     def daily_update(self, manure_separator_daily_input: LiquidManurePortionProtocol) -> ManureSeparatorDailyOutput:
@@ -75,51 +91,58 @@ class BaseManureSeparator:
             ManureSeparatorDailyOutput object containing the daily output of the manure separator.
 
         """
+        info_map = {
+            'class': self.__class__.__name__,
+            'function': self.daily_update.__name__,
+        }
+
         daily_output = ManureSeparatorDailyOutput(
-                simulation_day=manure_separator_daily_input.simulation_day,
-                pen_id=manure_separator_daily_input.pen_id,
-                total_daily_manure_volume=manure_separator_daily_input.liquid_manure_daily_volume,
-                final_solids_wet_mass=(
-                        manure_separator_daily_input.liquid_manure_total_solids *
-                        self.config.total_solids_removal_efficiency_for_separator /
-                        self.config.percent_dry_solids
-                ),
+            simulation_day=manure_separator_daily_input.simulation_day,
+            pen_id=manure_separator_daily_input.pen_id,
+            total_daily_manure_volume=manure_separator_daily_input.liquid_manure_daily_volume,
+            final_solids_wet_mass=(
+                manure_separator_daily_input.liquid_manure_total_solids *
+                self.config.total_solids_removal_efficiency_for_separator /
+                self.config.percent_dry_solids
+            ),
 
-                solid_manure_total_solids=(
-                        manure_separator_daily_input.liquid_manure_total_solids *
-                        self.config.total_solids_removal_efficiency_for_separator),
-                solid_manure_total_volatile_solids=(
-                        manure_separator_daily_input.liquid_manure_total_volatile_solids *
-                        self.config.volatile_solids_removal_efficiency_for_separator),
-                solid_manure_nitrogen=(
-                        manure_separator_daily_input.liquid_manure_nitrogen *
-                        self.config.nitrogen_removal_efficiency_for_separator),
-                solid_manure_phosphorus=(
-                        manure_separator_daily_input.liquid_manure_phosphorus *
-                        self.config.phosphorus_removal_efficiency_for_separator),
-                solid_manure_potassium=(
-                        manure_separator_daily_input.liquid_manure_potassium *
-                        self.config.potassium_removal_efficiency_for_separator),
+            solid_manure_total_solids=(
+                manure_separator_daily_input.liquid_manure_total_solids *
+                self.config.total_solids_removal_efficiency_for_separator),
+            solid_manure_total_volatile_solids=(
+                manure_separator_daily_input.liquid_manure_total_volatile_solids *
+                self.config.volatile_solids_removal_efficiency_for_separator),
+            solid_manure_nitrogen=(
+                manure_separator_daily_input.liquid_manure_nitrogen *
+                self.config.nitrogen_removal_efficiency_for_separator),
+            solid_manure_phosphorus=(
+                manure_separator_daily_input.liquid_manure_phosphorus *
+                self.config.phosphorus_removal_efficiency_for_separator),
+            solid_manure_potassium=(
+                manure_separator_daily_input.liquid_manure_potassium *
+                self.config.potassium_removal_efficiency_for_separator),
 
-                liquid_manure_total_solids=(
-                        manure_separator_daily_input.liquid_manure_total_solids *
-                        (1 - self.config.total_solids_removal_efficiency_for_separator)),
-                liquid_manure_total_volatile_solids=(
-                        manure_separator_daily_input.liquid_manure_total_volatile_solids *
-                        (1 - self.config.volatile_solids_removal_efficiency_for_separator)),
-                liquid_manure_nitrogen=(
-                        manure_separator_daily_input.liquid_manure_nitrogen *
-                        (1 - self.config.nitrogen_removal_efficiency_for_separator)),
-                liquid_manure_total_ammoniacal_nitrogen=(
-                        manure_separator_daily_input.liquid_manure_total_ammoniacal_nitrogen *
-                        (1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_separator)),
-                liquid_manure_phosphorus=(
-                        manure_separator_daily_input.liquid_manure_phosphorus *
-                        (1 - self.config.phosphorus_removal_efficiency_for_separator)),
-                liquid_manure_potassium=(
-                        manure_separator_daily_input.liquid_manure_potassium *
-                        (1 - self.config.potassium_removal_efficiency_for_separator)),
+            liquid_manure_total_solids=(
+                manure_separator_daily_input.liquid_manure_total_solids *
+                (1 - self.config.total_solids_removal_efficiency_for_separator)),
+            liquid_manure_total_volatile_solids=(
+                manure_separator_daily_input.liquid_manure_total_volatile_solids *
+                (1 - self.config.volatile_solids_removal_efficiency_for_separator)),
+            liquid_manure_nitrogen=(
+                manure_separator_daily_input.liquid_manure_nitrogen *
+                (1 - self.config.nitrogen_removal_efficiency_for_separator)),
+            liquid_manure_total_ammoniacal_nitrogen=(
+                manure_separator_daily_input.liquid_manure_total_ammoniacal_nitrogen *
+                (1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_separator)),
+            liquid_manure_phosphorus=(
+                manure_separator_daily_input.liquid_manure_phosphorus *
+                (1 - self.config.phosphorus_removal_efficiency_for_separator)),
+            liquid_manure_potassium=(
+                manure_separator_daily_input.liquid_manure_potassium *
+                (1 - self.config.potassium_removal_efficiency_for_separator)),
         )
+
+        om.add_variable("daily_output", vars(daily_output), info_map)
         return daily_output
 
 
@@ -251,22 +274,22 @@ class DefaultManureSeparatorConfigFactory:
     """Class for creating default manure separator configuration data."""
 
     ROTARY_SCREEN_CONFIG = ManureSeparatorConfig(
-            percent_dry_solids=0.2,
-            total_solids_removal_efficiency_for_separator=0.35,
-            volatile_solids_removal_efficiency_for_separator=0.40,
-            nitrogen_removal_efficiency_for_separator=0.3,
-            total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,
-            phosphorus_removal_efficiency_for_separator=0.4,
-            potassium_removal_efficiency_for_separator=0.15,
+        percent_dry_solids=0.2,
+        total_solids_removal_efficiency_for_separator=0.35,
+        volatile_solids_removal_efficiency_for_separator=0.40,
+        nitrogen_removal_efficiency_for_separator=0.3,
+        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.15,
+        phosphorus_removal_efficiency_for_separator=0.4,
+        potassium_removal_efficiency_for_separator=0.15,
     )
     SCREW_PRESS_CONFIG = ManureSeparatorConfig(
-            percent_dry_solids=0.35,
-            total_solids_removal_efficiency_for_separator=0.25,
-            volatile_solids_removal_efficiency_for_separator=0.30,
-            nitrogen_removal_efficiency_for_separator=0.3,
-            total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.10,
-            phosphorus_removal_efficiency_for_separator=0.2,
-            potassium_removal_efficiency_for_separator=0.23,
+        percent_dry_solids=0.35,
+        total_solids_removal_efficiency_for_separator=0.25,
+        volatile_solids_removal_efficiency_for_separator=0.30,
+        nitrogen_removal_efficiency_for_separator=0.3,
+        total_ammoniacal_nitrogen_removal_efficiency_for_separator=0.10,
+        phosphorus_removal_efficiency_for_separator=0.2,
+        potassium_removal_efficiency_for_separator=0.23,
     )
 
     @classmethod
@@ -280,12 +303,21 @@ class DefaultManureSeparatorConfigFactory:
             A default ManureSeparatorConfig object for the given manure separator type.
 
         """
+        info_map = {
+            'class': cls.__name__,
+            'function': cls.get_instance.__name__,
+        }
 
         manure_separator_config_by_type: Dict[ManureSeparatorType, ManureSeparatorConfig] = {
             ManureSeparatorType.ROTARY_SCREEN: cls.ROTARY_SCREEN_CONFIG,
             ManureSeparatorType.SCREW_PRESS: cls.SCREW_PRESS_CONFIG
         }
-        return manure_separator_config_by_type.get(manure_separator_type, ManureSeparatorConfig())
+        manure_separator_config = manure_separator_config_by_type.get(
+            manure_separator_type, ManureSeparatorConfig())
+
+        om.add_variable("default_manure_separator_config",
+                        vars(manure_separator_config), info_map)
+        return manure_separator_config
 
 
 class ManureSeparatorFactory:
@@ -307,6 +339,10 @@ class ManureSeparatorFactory:
             An instance of a specific subtype of BaseManureSeparator.
 
         """
+        info_map = {
+            'class': cls.__name__,
+            'function': cls.get_instance.__name__,
+        }
         manure_separator_class_by_type: Dict[ManureSeparatorType, Type[BaseManureSeparator]] = {
             ManureSeparatorType.BELT_PRESS: BeltPress,
             ManureSeparatorType.DECANTING_CENTRIFUGE: DecantingCentrifuge,
@@ -318,11 +354,34 @@ class ManureSeparatorFactory:
             ManureSeparatorType.SAND_LANE_MANURE_SEPARATION: SandLaneSystem
         }
 
-        manure_separator_type = ManureSeparatorType.get_type(manure_separator_type_name)
+        manure_separator_type = ManureSeparatorType.get_type(
+            manure_separator_type_name)
         manure_separator_class = manure_separator_class_by_type[manure_separator_type]
 
+        om.add_variable("manure_separator_type",
+                        manure_separator_type.value, info_map)
+        om.add_variable("manure_separator_class",
+                        vars(manure_separator_class), info_map)
+
         if custom_manure_separator_config:
-            return manure_separator_class(custom_manure_separator_config)
+            separator_subtype = manure_separator_class(
+                custom_manure_separator_config)
+
+            om.add_variable("custom_manure_separator_config", vars(
+                custom_manure_separator_config), info_map)
+            om.add_variable("separator_subtype", vars(
+                separator_subtype), info_map)
+
+            return separator_subtype
         else:
-            default_manure_separator_config = DefaultManureSeparatorConfigFactory.get_instance(manure_separator_type)
-            return manure_separator_class(default_manure_separator_config)
+            default_manure_separator_config = DefaultManureSeparatorConfigFactory.get_instance(
+                manure_separator_type)
+            separator_subtype = manure_separator_class(
+                default_manure_separator_config)
+
+            om.add_variable("default_manure_separator_config", vars(
+                default_manure_separator_config), info_map)
+            om.add_variable("separator_subtype", vars(
+                separator_subtype), info_map)
+
+            return separator_subtype
