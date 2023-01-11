@@ -291,7 +291,7 @@ def calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI
         Average daily gain (grams per day)
     EQSBW : float
         Equivalent shrunk body weight (kilograms)
- 
+
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx, pp. xx-xx, 2001.
@@ -619,8 +619,8 @@ def calculate_NRC_protein_requirements(BW, MW, CW, DOP, animal_type, Milk, TP_Mi
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-    Chapter xx "xxxxx", pp. xx-xx, 2001.
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
+    National Academic Press, Chapter 5 "Protein and Amino acids",pp. 67-69. 2001;
 
     """
 
@@ -723,10 +723,10 @@ def calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrU
     NPEndUrin = 53*6.25 * BW * 0.001
     NDF_conc = 0.3
     # TODO get the correct NDF_conc
-        # In pen.py, cow.py, heiferI, II, III, ration_driver. add the variable to the calc_rqmts call each time
-        # something like:
-        # NDF_conc = conc['NDF']
-        # amount, conc = ration_report(self.ration, feed.available_feeds)
+    # In pen.py, cow.py, heiferI, II, III, ration_driver. add the variable to the calc_rqmts call each time
+    # something like:
+    # NDF_conc = conc['NDF']
+    # amount, conc = ration_report(self.ration, feed.available_feeds)
     CPMFP = (11.62+0.134*NDF_conc)*DMIest
     NPMFP = CPMFP*0.73
     NPGrowth = Frame_Weight_Gain_g*0.11*0.86
@@ -778,7 +778,7 @@ def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG,
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-    Chapter xx "xxxxx", pp. xx-xx, 2001.
+    Chapter 6 "Minerals",pp. 106-109. 2001
 
     """
 
@@ -910,7 +910,7 @@ def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-    Chapter xx "xxxxx", pp. xx-xx, 2001.
+    Chapter 6 "Minerals",pp. 109-118. 2001
     """
     P_growth = (1.2 + 4.635 * MW ** 0.22 * BW ** (-0.22)) * (ADG / 0.96)
     if DOP == None:
