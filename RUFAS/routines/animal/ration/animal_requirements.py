@@ -165,7 +165,6 @@ def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
 
     Parameters
     ----------
-    # TODO Please check if the type for the following objects is correct.
     BW : float
         Body weight (kilograms)
     MW : float
@@ -504,7 +503,6 @@ def calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, 
 
     Parameters
     ----------
-    # TODO Please check if the type for the following objects is correct.
     animal_type : str
         Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     Fat_Milk : float
@@ -885,8 +883,6 @@ def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
 
     Parameters
     ----------
-    # TODO Please check if the type for the following objects is correct.
-
     BW : float
         Body weight (kilograms)
     MW : float
@@ -940,10 +936,6 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Mil
 
     Parameters
     ----------
-    # TODO Please check if the type for the following objects is correct.
-    # TODO Please note that in the code below "animal_type" is included where it is not for NRC (2001)
-    # Usually that is the opposite (it applies for NRC instead of NASEM formulas).
-
     BW : float
         Body weight (kilograms)
     MW : float
