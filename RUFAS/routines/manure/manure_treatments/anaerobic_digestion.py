@@ -65,7 +65,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         daily_final_manure_volume = manure_treatment_daily_output.daily_final_manure_volume
         new_daily_output = manure_treatment_daily_output.clone()
 
-        moisture_content = self._get_moisture_content(
+        moisture_content = self._calc_moisture_content(
                 total_daily_mass=daily_final_manure_volume,
                 liquid_manure_total_solids=self._manure_handler_daily_output.liquid_manure_total_solids
         )
@@ -93,7 +93,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         return new_daily_output
 
     @classmethod
-    def _get_moisture_content(cls, total_daily_mass: float, liquid_manure_total_solids: float) -> float:
+    def _calc_moisture_content(cls, total_daily_mass: float, liquid_manure_total_solids: float) -> float:
         """Returns moisture_content of influent as decimal (0-1).
 
         Args:
@@ -104,7 +104,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             Moisture content of influent as decimal (0-1).
 
         """
-        if total_daily_mass > 0.0:
+        if total_daily_mass > 0:
             return 1 - (liquid_manure_total_solids / total_daily_mass)
         return 0.0
 
@@ -125,9 +125,9 @@ class AnaerobicDigestion(BaseManureTreatment):
                 self.config.anaerobic_digestion_temperature_set_point,
                 moisture_content)
         average_manure_heat_capacity = (influent_heat_capacity + anaerobic_digestion_heat_capacity) / 2
-        input_energy_heating = (average_manure_heat_capacity *
+        heating_input_energy = (average_manure_heat_capacity *
                                 (self.config.anaerobic_digestion_temperature_set_point - effluent_temperature))
-        return input_energy_heating
+        return heating_input_energy
 
     @classmethod
     def _bound_influent_temperature(cls, average_temperature_celsius: float) -> float:
@@ -137,7 +137,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             average_temperature_celsius: Average daily temperature, C.
 
         """
-        return max(average_temperature_celsius, 4)
+        return max(average_temperature_celsius, 4.0)  # TODO: Use constants instead
 
     @classmethod
     def _calc_manure_heat_capacity(cls, average_temperature_celsius: float, moisture_content: float) -> float:
