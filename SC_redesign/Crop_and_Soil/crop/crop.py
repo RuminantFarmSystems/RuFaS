@@ -77,7 +77,7 @@ class Crop(GrowthConstraints, BiomassAllocation,
         """
         self.absorb_heat_units(mean_air_temperature, min_air_temperature,
                                max_air_temperature)
-        self.root_development._develop_roots()
+        self.root_development.develop_roots()
         self.incorporate_nitrogen(layer_nitrates, layer_depths,
                                   soil_water_factor)
         #
