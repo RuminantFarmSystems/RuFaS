@@ -11,7 +11,7 @@ class RootDevelopment:
         # data reference
         self.data = crop_data or CropData()  # defaults if not given
 
-    def _develop_roots(self) -> None:
+    def develop_roots(self) -> None:
         """main root development function
 
         Details: updates the root_fraction and root_depth attributes.
