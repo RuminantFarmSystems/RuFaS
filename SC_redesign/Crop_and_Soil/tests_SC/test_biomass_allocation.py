@@ -14,7 +14,7 @@ from SC_redesign.Crop_and_Soil.crop.biomass_allocation import *
 def test_calc_intercepted_radiation(rad, ext, lai):
     """ensure that intercepted radiation is correctly calculated by calc_intercepted_radiation()"""
     h_photo = 0.5 * rad * (1 - exp(-ext * lai))
-    result = BiomassAllocation.calc_intercepted_radiation(rad, ext, lai)
+    result = BiomassAllocation._intercept_radiation(rad, ext, lai)
     assert result == h_photo
 
 
@@ -30,7 +30,7 @@ def test_calc_intercepted_radiation(rad, ext, lai):
 ])
 def test_calc_max_accumulation(rad, eff, expected):
     """test that maximum biomass accumulation is properly calculated with calc_max_accumulation()"""
-    assert BiomassAllocation.calc_max_accumulation(rad, eff) == expected
+    assert BiomassAllocation._determine_max_accumulation(rad, eff) == expected
 
 
 @pytest.mark.parametrize("factor,max_growth", [
@@ -43,7 +43,7 @@ def test_calc_max_accumulation(rad, eff, expected):
 ])
 def test_calc_biomass_accumulation(factor, max_growth):
     """ensure that biomass growth is correctly calculated by calc_biomass_accumulation()"""
-    assert BiomassAllocation.calc_biomass_accumulation(factor, max_growth) == max_growth * factor
+    assert BiomassAllocation._determine_accumulated_biomass(factor, max_growth) == max_growth * factor
 
 
 @pytest.mark.parametrize("frac,bmass", [
@@ -60,7 +60,7 @@ def test_calc_biomass_accumulation(factor, max_growth):
 def test_calc_above_ground_biomass(frac, bmass):
     """ensure that above ground biomass is correctly calculated"""
     expect = bmass * (1 - frac)
-    assert BiomassAllocation.calc_above_ground_biomass(frac, bmass) == expect
+    assert BiomassAllocation._determine_above_ground_biomass(frac, bmass) == expect
 
 
 @pytest.mark.parametrize("frac,bmass", [
@@ -76,71 +76,9 @@ def test_calc_above_ground_biomass(frac, bmass):
 ])
 def test_calc_below_ground_biomass(frac, bmass):
     """ensure that below ground biomass is correctly calculated"""
-    assert BiomassAllocation.calc_below_ground_biomass(frac, bmass) == bmass * frac
-
-
-# ---- initialization functions (reusable) ----
-def init_bioal(**kwargs):
-    """helper function to create BiomassAllocation instance, with specified attributes"""
-    bioal = BiomassAllocation()
-    for key, val in kwargs.items():
-        setattr(bioal, key, val)
-    return bioal
-
+    assert BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
 
 # ---- member function tests ----
-@pytest.mark.parametrize("rad,ext,lai", [
-    (1, 1, 1),
-    (0, 0, 0),
-    (1, 0, 1),
-    (.6, -.42, 0.35),
-    (.26, .28, 0.44)
-])
-def test_intercept_radiation(rad, ext, lai):
-    """check that usable_light is properly updated"""
-    data = CropData(light_extinction=ext, leaf_area_index=lai)
-    bioal = BiomassAllocation(data)
-    bioal.intercept_radiation(rad)
-    assert data.usable_light == BiomassAllocation.calc_intercepted_radiation(rad, ext, lai)
-
-
-@pytest.mark.parametrize("rad, eff", [
-    (0, 1),
-    (1, 0),
-    (1, 1),
-    (1350.86, 15.21),  # arbitrary rad >> eff
-    (20.7, 15.3),  # rad near eff
-    (12.86, 20.37)  # rad < eff
-])
-def test_determine_max_growth(rad, eff):
-    """ensure that max_evapotranspiration growth is properly updated"""
-    data = CropData(light_conversion=eff, usable_light=rad)
-    bioal = BiomassAllocation(data)
-    bioal.determine_max_growth()
-    assert data.biomass_growth_max == BiomassAllocation.calc_max_accumulation(rad, eff)
-
-
-@pytest.mark.parametrize("start,factor,gmax", [
-    (10, 1, 1000),
-    (.8, 1, 1000),
-    (10, .8, 1000),
-    (8, .75, 1000),
-    (8, .75, 833.9),
-    (8, 1.2, 833.9)
-])
-def test_accumulate_biomass(start, factor, gmax):
-    """check that biomass attributes are correctly updated by accumulate_biomass()"""
-    data = CropData(biomass=start, growth_factor=factor, biomass_growth_max=gmax)
-    bioal = BiomassAllocation(data)
-    bioal.accumulate_biomass()
-    expect_growth = BiomassAllocation.calc_biomass_accumulation(factor, gmax)
-    expect_end = start + expect_growth
-
-    assert data.previous_biomass == start
-    assert data.biomass == expect_end
-    assert data.biomass_growth == expect_growth
-
-
 @pytest.mark.parametrize("light,ext,conv,gfact,rfrac", [
     (1000, 0.7, 20, 1, 1/3),  # start
     (1000, 0.7, 20, 1, 0.66),  # increased root proportion
@@ -158,13 +96,14 @@ def test_allocate_biomass(light, ext, conv, gfact, rfrac):
     bioal.allocate_biomass(light)
 
     # photosynthesize
-    energy = BiomassAllocation.calc_intercepted_radiation(light, ext, lai=1.87)
-    max_growth = BiomassAllocation.calc_max_accumulation(energy, conv)
-    growth = BiomassAllocation.calc_biomass_accumulation(gfact, max_growth)
+    energy = BiomassAllocation._intercept_radiation(light, ext, lai=1.87)
+    max_growth = BiomassAllocation._determine_max_accumulation(energy, conv)
+    growth = BiomassAllocation._determine_accumulated_biomass(gfact, max_growth)
     mass = 89.0 + growth
+    # TODO: test photosynthesize() and partition_biomass() separately?
     # partition_biomass
-    green = BiomassAllocation.calc_above_ground_biomass(rfrac, mass)
-    root = BiomassAllocation.calc_below_ground_biomass(rfrac, mass)
+    green = BiomassAllocation._determine_above_ground_biomass(rfrac, mass)
+    root = BiomassAllocation._determine_below_ground_biomass(rfrac, mass)
 
     assert data.usable_light == energy
     assert data.biomass_growth_max == max_growth

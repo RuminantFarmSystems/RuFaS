@@ -13,34 +13,29 @@ class BiomassAllocation:
         self.partition_biomass()
 
     def photosynthesize(self, light):
-        """convert the day's incoming light energy into plant biomass"""
-        self.intercept_radiation(light)
-        self.determine_max_growth()
-        self.accumulate_biomass()
+        """convert the day's incoming light energy into plant biomass
 
-    def intercept_radiation(self, light):
-        """capture usable energy from the day's incoming solar radiation (light)"""
-        self.data.usable_light = self.calc_intercepted_radiation(light, self.data.light_extinction,
-                                                                 self.data.leaf_area_index)
+        Args: total available solar radiation for the day (MJ/m^2)
+        """
 
-    def determine_max_growth(self):
-        """determine how much the plant can grow_crop under ideal circumstance, from the light captured"""
-        self.data.biomass_growth_max = self.calc_max_accumulation(self.data.usable_light, self.data.light_conversion)
-
-    def accumulate_biomass(self):
-        """accumulate plant biomass during the day's growth"""
+        # intercept light
+        self.data.usable_light = self._intercept_radiation(light, self.data.light_extinction, self.data.leaf_area_index)
+        # accumulate biomass
+        self.data.biomass_growth_max = self._determine_max_accumulation(self.data.usable_light,
+                                                                        self.data.light_conversion)
         self.data.previous_biomass = self.data.biomass
-        self.data.biomass_growth = self.calc_biomass_accumulation(self.data.growth_factor,
-                                                                  self.data.biomass_growth_max)
+        self.data.biomass_growth = self._determine_accumulated_biomass(self.data.growth_factor,
+                                                                       self.data.biomass_growth_max)
         self.data.biomass += self.data.biomass_growth
 
     def partition_biomass(self):
         """partition the accumulated biomass into above ground and below grown portions"""
-        self.data.above_ground_biomass = self.calc_above_ground_biomass(self.data.root_fraction, self.data.biomass)
-        self.data.root_biomass = self.calc_below_ground_biomass(self.data.root_fraction, self.data.biomass)
+        self.data.above_ground_biomass = self._determine_above_ground_biomass(self.data.root_fraction,
+                                                                              self.data.biomass)
+        self.data.root_biomass = self._determine_below_ground_biomass(self.data.root_fraction, self.data.biomass)
 
     @staticmethod
-    def calc_intercepted_radiation(radiation: float, extinction: float, lai: float) -> float:  # pseudocode: C.9.A.1
+    def _intercept_radiation(radiation: float, extinction: float, lai: float) -> float:  # pseudocode: C.9.A.1
         """
         Description:
             calculates amount of solar radiation intercepted for photosynthesis during the day
@@ -57,7 +52,7 @@ class BiomassAllocation:
         return intercepted_radiation
 
     @staticmethod
-    def calc_max_accumulation(energy: float, efficiency: float) -> float:  # pseudocode: C.9.A.2
+    def _determine_max_accumulation(energy: float, efficiency: float) -> float:  # pseudocode: C.9.A.2
         """
         Description: calculates the upper-limit to biomass accumulation during a day
 
@@ -70,7 +65,7 @@ class BiomassAllocation:
         return energy * efficiency
 
     @staticmethod
-    def calc_biomass_accumulation(growth_factor: float, max_growth: float) -> float:  # pseudocode: C.9.A.3
+    def _determine_accumulated_biomass(growth_factor: float, max_growth: float) -> float:  # pseudocode: C.9.A.3
         """
         Description:
             Calculates the biomass accumulated during the day
@@ -87,7 +82,7 @@ class BiomassAllocation:
         return growth
 
     @staticmethod
-    def calc_above_ground_biomass(root_frac: float, biomass: float) -> float:  # pseudocode: C.9.B.1
+    def _determine_above_ground_biomass(root_frac: float, biomass: float) -> float:  # pseudocode: C.9.B.1
         """
         Description: calculates above ground plant biomass.
 
@@ -103,7 +98,7 @@ class BiomassAllocation:
 
 
     @staticmethod
-    def calc_below_ground_biomass(root_frac: float, biomass: float) -> float:
+    def _determine_below_ground_biomass(root_frac: float, biomass: float) -> float:
         """Description: calculates below ground plant biomass
 
         Args:
