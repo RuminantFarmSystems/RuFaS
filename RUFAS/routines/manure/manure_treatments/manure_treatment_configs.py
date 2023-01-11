@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+
+om = OutputManager()
 
 
 @dataclass
@@ -62,82 +65,83 @@ class DefaultManureTreatmentConfigFactory:
     """Class for creating default manure treatment configuration data."""
 
     SLURRY_STORAGE_UNDERFLOOR_CONFIG = ManureTreatmentConfig(
-            total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
-            volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
-            nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
-            total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
-            phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
-            potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
-            storage_time_period=120,
+        total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
+        volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
+        nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
+        total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
+        phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
+        potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
+        storage_time_period=120,
     )
 
     SLURRY_STORAGE_OUTDOOR_CONFIG = ManureTreatmentConfig(
-            total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
-            volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
-            nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
-            total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
-            phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
-            potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
-            storage_time_period=120,
-            freeboard_input=0.3048
+        total_solids_removal_efficiency_for_treatment=0.10,  # Between 10-30%
+        volatile_solids_removal_efficiency_for_treatment=0.20,  # Between 20-40%
+        nitrogen_removal_efficiency_for_treatment=0.10,  # # Between 10-30%
+        total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.45,  # Between 61-80%
+        phosphorus_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
+        potassium_removal_efficiency_for_treatment=0.05,  # # Between 5-30%
+        storage_time_period=120,
+        freeboard_input=0.3048
     )
 
     ANAEROBIC_DIGESTION_CONFIG = ManureTreatmentConfig(
-            total_solids_removal_efficiency_for_treatment=0.45,
-            volatile_solids_removal_efficiency_for_treatment=0.40,
-            nitrogen_removal_efficiency_for_treatment=0.0,  # 0-5% N fraction
-            phosphorus_removal_efficiency_for_treatment=0.0,  # 0-5% P fraction
-            potassium_removal_efficiency_for_treatment=0.0,  # 0-5% K fraction
-            total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
+        total_solids_removal_efficiency_for_treatment=0.45,
+        volatile_solids_removal_efficiency_for_treatment=0.40,
+        nitrogen_removal_efficiency_for_treatment=0.0,  # 0-5% N fraction
+        phosphorus_removal_efficiency_for_treatment=0.0,  # 0-5% P fraction
+        potassium_removal_efficiency_for_treatment=0.0,  # 0-5% K fraction
+        total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
 
-            hydraulic_retention_time=25,  # 25 -30 days
-            sludge_accumulation_period=1.0,  # Sludge accumulation period 1-5 years
-            sludge_accumulation_volume_fraction=0.03,  # Sludge Accumulation volume fraction 2-4% of VS loaded
-            top_cover_volume_fraction=0.2,  # Should be between 10-30%
-            biogas_generation_ratio=0.38,  # 0.23 to 0.39 kg CH4/kg VS
-            methane_generation_ratio=0.65,  # 0.5-0.65 according to spreadsheet
+        hydraulic_retention_time=25,  # 25 -30 days
+        sludge_accumulation_period=1.0,  # Sludge accumulation period 1-5 years
+        # Sludge Accumulation volume fraction 2-4% of VS loaded
+        sludge_accumulation_volume_fraction=0.03,
+        top_cover_volume_fraction=0.2,  # Should be between 10-30%
+        biogas_generation_ratio=0.38,  # 0.23 to 0.39 kg CH4/kg VS
+        methane_generation_ratio=0.65,  # 0.5-0.65 according to spreadsheet
 
-            evaporation_fraction=0.02,  # 2-5% of Wastewater Volume
-            anaerobic_digestion_temperature_set_point=37.5,
-            anaerobic_digestion_temperature_celsius=37.5
+        evaporation_fraction=0.02,  # 2-5% of Wastewater Volume
+        anaerobic_digestion_temperature_set_point=37.5,
+        anaerobic_digestion_temperature_celsius=37.5
     )
 
     ANAEROBIC_LAGOON_CONFIG = ManureTreatmentConfig(
-            total_solids_removal_efficiency_for_treatment=0.75,  # Between 70-85%
-            volatile_solids_removal_efficiency_for_treatment=0.85,  # Between 80-90%
-            nitrogen_removal_efficiency_for_treatment=0.65,  # Between 60-80%
-            total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.7,  # Between 61-80%
-            phosphorus_removal_efficiency_for_treatment=0.6,  # Between 60-70%
-            potassium_removal_efficiency_for_treatment=0.2,  # Between 20-30%
+        total_solids_removal_efficiency_for_treatment=0.75,  # Between 70-85%
+        volatile_solids_removal_efficiency_for_treatment=0.85,  # Between 80-90%
+        nitrogen_removal_efficiency_for_treatment=0.65,  # Between 60-80%
+        total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.7,  # Between 61-80%
+        phosphorus_removal_efficiency_for_treatment=0.6,  # Between 60-70%
+        potassium_removal_efficiency_for_treatment=0.2,  # Between 20-30%
 
-            hydraulic_retention_time=365,  # 180 - 365 days
-            sludge_accumulation_period=10.0,  # Sludge accumulation period 5-20 years
-            sludge_accumulation_volume_fraction=0.00251,
-            # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
+        hydraulic_retention_time=365,  # 180 - 365 days
+        sludge_accumulation_period=10.0,  # Sludge accumulation period 5-20 years
+        sludge_accumulation_volume_fraction=0.00251,
+        # Sludge Accumulation volume fraction 0.00274-0.00455 of VS loaded
 
-            storage_time_period=365,
-            freeboard_input=0.3048
+        storage_time_period=365,
+        freeboard_input=0.3048
     )
 
     # TODO: Reuse the other two configs, fix the config handler, and the combo treatment class
     ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG = ManureTreatmentConfig(
-            total_solids_removal_efficiency_for_treatment=0.45,
-            volatile_solids_removal_efficiency_for_treatment=0.40,
-            nitrogen_removal_efficiency_for_treatment=0.0,
-            total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
-            phosphorus_removal_efficiency_for_treatment=0.0,
-            potassium_removal_efficiency_for_treatment=0.0,
-            storage_time_period=365,
-            freeboard_input=0.3048,
-            hydraulic_retention_time=25,
-            sludge_accumulation_period=1.0,
-            sludge_accumulation_volume_fraction=0.03,
-            top_cover_volume_fraction=0.2,
-            biogas_generation_ratio=0.38,
-            methane_generation_ratio=0.65,
-            evaporation_fraction=0.02,
-            anaerobic_digestion_temperature_set_point=37.5,
-            anaerobic_digestion_temperature_celsius=37.5
+        total_solids_removal_efficiency_for_treatment=0.45,
+        volatile_solids_removal_efficiency_for_treatment=0.40,
+        nitrogen_removal_efficiency_for_treatment=0.0,
+        total_ammoniacal_nitrogen_removal_efficiency_for_treatment=0.1,
+        phosphorus_removal_efficiency_for_treatment=0.0,
+        potassium_removal_efficiency_for_treatment=0.0,
+        storage_time_period=365,
+        freeboard_input=0.3048,
+        hydraulic_retention_time=25,
+        sludge_accumulation_period=1.0,
+        sludge_accumulation_volume_fraction=0.03,
+        top_cover_volume_fraction=0.2,
+        biogas_generation_ratio=0.38,
+        methane_generation_ratio=0.65,
+        evaporation_fraction=0.02,
+        anaerobic_digestion_temperature_set_point=37.5,
+        anaerobic_digestion_temperature_celsius=37.5
     )
 
     @classmethod
@@ -151,6 +155,11 @@ class DefaultManureTreatmentConfigFactory:
             A default manure treatment configuration data instance for the given treatment type.
 
         """
+        info_map = {
+            'class': cls.__name__,
+            'function': cls.get_instance.__name__,
+        }
+
         manure_treatment_config_by_type = {
             ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: cls.SLURRY_STORAGE_UNDERFLOOR_CONFIG,
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: cls.SLURRY_STORAGE_OUTDOOR_CONFIG,
@@ -159,4 +168,7 @@ class DefaultManureTreatmentConfigFactory:
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: cls.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: cls.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG
         }
-        return manure_treatment_config_by_type[treatment_type]
+        manure_treatment_config = manure_treatment_config_by_type[treatment_type]
+        om.add_variable("manure_treatment_config",
+                        vars(manure_treatment_config), info_map)
+        return manure_treatment_config
