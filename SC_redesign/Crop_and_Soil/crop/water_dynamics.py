@@ -5,8 +5,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 class WaterDynamics:
     def __init__(self, crop_data: Optional[CropData] = None):
-        data = crop_data or CropData()  # initialize with defaults, if not given
-        self.data = crop_data or CropData()
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def cycle_water(self, evaporation: float, transpiration: float, max_evapotranspiration: float) -> None:
         self.data.cumulative_evaporation = evaporation
