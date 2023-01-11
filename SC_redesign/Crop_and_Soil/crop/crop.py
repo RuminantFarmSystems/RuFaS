@@ -14,7 +14,7 @@ from typing import List, Optional
 # TODO: Should use an ENUM class to represent the supported species??
 
 class Crop(GrowthConstraints, BiomassAllocation,
-           NitrogenIncorporation, HeatUnits, LeafAreaIndex, Yields):
+           NitrogenIncorporation, HeatUnits, LeafAreaIndex):
     def __init__(self, crop_data: Optional[CropData] = None):
         data = crop_data or CropData() # defaults if not given
 
@@ -27,7 +27,7 @@ class Crop(GrowthConstraints, BiomassAllocation,
         HeatUnits.__init__(self)
         LeafAreaIndex.__init__(self)
         self.root_development = RootDevelopment(data)
-        Yields.__init__(self)
+        self.crop_yields = Yields(data)
         # TODO: Loi recommended that a composition pattern might fit better
         #  than multiple inheritance: A crop "has" a Growth constraint (system)
         #  but is not itself a growth constraint. This pattern might be worth

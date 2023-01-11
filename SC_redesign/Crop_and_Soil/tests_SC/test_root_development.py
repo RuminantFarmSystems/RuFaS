@@ -14,7 +14,7 @@ import pytest
 def test_determine_root_fraction(heatfrac, expect):
     """check that root fraction is properly calculated by
     determine_root_fraction()"""
-    assert RootDevelopment.determine_root_fraction(heatfrac) == expect
+    assert RootDevelopment._determine_root_fraction(heatfrac) == expect
 
 
 @pytest.mark.parametrize("maxd,heatfrac", [
@@ -33,7 +33,7 @@ def test_determine_root_depth(maxd, heatfrac):
         expect = maxd
     else:
         expect = 2.5 * heatfrac * maxd
-    assert RootDevelopment.determine_root_depth(maxd, heatfrac) == expect
+    assert RootDevelopment._determine_root_depth(maxd, heatfrac) == expect
 
 
 # ---- Test Class Functions ----
@@ -62,6 +62,6 @@ def test_develop_roots(maxd, heatfrac):
     rd = RootDevelopment(data)
     rd.develop_roots()
     assert data.root_fraction == \
-           RootDevelopment.determine_root_fraction(heatfrac)
+           RootDevelopment._determine_root_fraction(heatfrac)
     assert data.root_depth == \
-           RootDevelopment.determine_root_depth(maxd, heatfrac)
+           RootDevelopment._determine_root_depth(maxd, heatfrac)

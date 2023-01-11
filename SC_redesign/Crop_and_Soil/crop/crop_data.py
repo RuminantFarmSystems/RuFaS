@@ -9,8 +9,10 @@ class CropData:
     leaf_area_index: float = 1.2
     light_conversion: float = 20
     biomass: float = 0
+    """total plant biomass (kg/ha)"""
     growth_factor: float = 1.0
     root_fraction: float = 1 / 3
+    """proportion of plant biomass that is stored below ground in roots (unitless)"""
     usable_light: Optional[float] = None
     biomass_growth_max: Optional[float] = None
     biomass_growth: Optional[float] = None
@@ -20,17 +22,28 @@ class CropData:
     
     # ---- growth constraints
     water_uptake: float = 18
+    """water taken up by the plant for the day (mm)"""
     nitrogen: float = 35
+    """nitrogen stored in plant biomass (kg/ha)"""
     optimal_nitrogen: float = 100
+    """optimal amount of nitrogen stored in the plant for the current growth stage (kg/ha)"""
     phosphorus: float = 20
+    """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
+    """optimal amount of phosphorus stored in the plant for the curent growth stage (kg/ha)"""
     minimum_temperature: float = 15
+    """minumum temperature below which plant growth cannot occur (Celsius)"""
     optimal_temperature: float = 22
+    """ideal temperature for maximum plant growth (Celsius)"""
     ##growth_factor: float = 1.0  # duplicate
     water_stress: Optional[float] = None
+    """water stress for the day (unitless; [0, 1])"""
     temp_stress: Optional[float] = None
+    """temperature stress for the day (unitless; [0, 1])"""
     nitrogen_stress: Optional[float] = None
+    """nitrogen stress for the day (unitless; [0, 1])"""
     phosphorus_stress: Optional[float] = None
+    """phosphorus stress for the day (unitless; [0, 1])"""
     
     # ---- heat_units
     ##minimum_temperature: float = 20 # duplicate
@@ -74,6 +87,7 @@ class CropData:
     # constant declarations with defaults (unchanged during simulations)
     half_mature_heat_fraction: float = 0.5
     mature_heat_fraction: float = 1.0
+    """fraction of potential heat units accumulated for the plant to date (unitless)"""
     emergence_nitrogen_fraction: float = 0.04
     half_mature_nitrogen_fraction: float = 0.03
     near_mature_nitrogen_fraction: float = 0.02
@@ -87,10 +101,12 @@ class CropData:
     ##biomass = 12.5  # duplicate
     ##biomass_growth_max = 100  # duplicate
     root_depth: float = 1  # arbitrary
+    """current depth of the plant roots in the soil (mm)"""
     # empty declarations
     previous_nitrogen: Optional[float] = None
     shapes_nitrogen_uptake: Optional[float] = None
     optimal_nitrogen_fraction: Optional[float] = None
+    """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
     ##optimal_nitrogen = None # duplicate
     potential_nitrogen_uptake: Optional[float] = None
     total_soil_layers: Optional[float] = None
@@ -108,48 +124,80 @@ class CropData:
     # ---- root development
     ##heat_fraction = 1 / 3 #duplicate
     max_root_depth: float = 20
+    """maximum depth of roots in the soil (mm)"""
     is_perennial: bool = True
+    """is the plant perennial?"""
     ##root_depth = None # duplicate
     ##root_fraction = None #duplicate
     
     # ---- water dynamics
-    evaporation: Optional[float] = None
-    transpiration: Optional[float] = None
-    evapotranspiration: Optional[float] = None
-    evapotranspiration_max: Optional[float] = None
+    cumulative_evaporation: Optional[float] = None
+    """total water lost to evaporation by the plant during the growing season (mm)"""
+    cumulative_transpiration: Optional[float] = None
+    """total water lost to transpiration by the plant during the growing season (mm)"""
+    cumulative_evapotranspiration: Optional[float] = None
+    """total water lost to evapotranspiration by the plant during the growing season (mm)"""
+    max_cumulative_evapotranspiration: Optional[float] = None
+    """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
+    """water deficiency factor for the plant (unitless)"""
     
     # ---- yields
     # constant attributes
     optimal_harvest_index: float = 3.5
+    """expected species-specific optimal harvest index for the plant at maturity under ideal
+     growth conditions (unitless)"""
     min_harvest_index: float = 0.2
-    is_residue_added: bool = False
+    """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
+    allowed for the plant"""
+    # is_residue_added: bool = False ## not needed?
     harvest_efficiency: float = 1.0
+    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field (unitless; 
+    [0, 1])"""
     yield_nitrogen_fraction: float = 0.15
-    """crop-specific expected fraction of nitrogen in yield"""
+    """crop-specific expected fraction of nitrogen in yield (unitless)"""
     yield_phosphorus_fraction: float = 0.08
-    """crop-specific expected fraction of phosphorus in yield"""
+    """crop-specific expected fraction of phosphorus in yield (unitless)"""
 
     # temporally variable attributes
     ##heat_fraction = 0.6  # duplicate
     ##water_deficiency = 0.2  # duplicate
     above_ground_biomass: float = 15  # kg
+    """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     ##biomass = 25  # duplicate
-    dry_down_percent: float = 0.2
+    dry_down_fraction: float = 0.2
+    """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
     ##nitrogen = 15  # duplicate
     ##phosphorus = 8  # duplicate
     ##biomass = 100  # duplicate
     ##optimal_nitrogen_fraction = 0.162  # duplicate
     optimal_phosphorus_fraction: float = 0.073
+    """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
     # Empty declarations
     user_harvest_index: Optional[float] = None  # TODO: handle user input for this. - GitHub Issue #246
+    """a user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered"""
     potential_harvest_index: Optional[float] = None
+    """potential harvest index for a given day (unitless)"""
     harvest_index: Optional[float] = None
+    """harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
+    (unitless)"""
     crop_yield: Optional[float] = None
-    """total amount (kg/ha) of the desired crop product"""
+    """total amount of the desired crop product (kg/ha)"""
     yield_collected: Optional[float] = None
-    """amount (kg/ha) of the desired crop product to be removed from the field"""
-    residue_created: Optional[float] = None
-    """amount (kg/ha) of residue created (yield left in field)"""
+    """amount of the desired crop product to be removed from the field (kg/ha)"""
+    yield_residue: Optional[float] = None
+    """amount of residue created; unharvested yield (kg/ha)"""
     collected_nitrogen: Optional[float] = None
+    """nitrogen contained in the harvested yield (kg/ha)"""
     collected_phosphorus: Optional[float] = None
+    """phosphorus contained in the harvested yield (kg/ha)"""
+
+    @property
+    def is_mature(self) -> bool:
+        """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
+        return self.heat_fraction >= 1.0
+
+    @property
+    def has_given_harvest_index(self) -> bool:
+        """was a user-defined harvest index is given? This triggers a harvest index override"""
+        return self.user_harvest_index is not None

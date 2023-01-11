@@ -15,7 +15,7 @@ from SC_redesign.Crop_and_Soil.crop.water_dynamics import *
 ])
 def test_determine_evapotranspiration(evap, trans):
     """ensure that evapotranspiration is correclty calculated"""
-    assert WaterDynamics.determine_evapotranspiration(evap, trans) == evap + trans
+    assert WaterDynamics._determine_evapotranspiration(evap, trans) == evap + trans
 
 
 @pytest.mark.parametrize("et,max_et", [
@@ -35,7 +35,7 @@ def test_determine_water_deficiency(et, max_et):
         expect = 0
     else:
         expect = 100 * (et / max_et)
-    assert WaterDynamics.determine_water_deficiency(et, max_et) == expect
+    assert WaterDynamics._determine_water_deficiency(et, max_et) == expect
 
 # ---- member function tests ----
 
@@ -51,7 +51,7 @@ def test_cycle_water(evap, trans, et_max):
     """integration test to check that water cycling routines are properly carried out"""
     water_dyn = WaterDynamics()
     water_dyn.cycle_water(evap, trans, et_max)
-    expected = [water_dyn.data.evaporation, water_dyn.data.transpiration, water_dyn.data.evapotranspiration,
-                water_dyn.data.evapotranspiration_max, water_dyn.data.water_deficiency]
-    observed = [evap, trans, evap + trans, et_max, WaterDynamics.determine_water_deficiency(evap + trans, et_max)]
+    expected = [water_dyn.data.cumulative_evaporation, water_dyn.data.cumulative_transpiration, water_dyn.data.cumulative_evapotranspiration,
+                water_dyn.data.max_cumulative_evapotranspiration, water_dyn.data.water_deficiency]
+    observed = [evap, trans, evap + trans, et_max, WaterDynamics._determine_water_deficiency(evap + trans, et_max)]
     assert expected == observed

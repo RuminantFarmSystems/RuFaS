@@ -39,21 +39,21 @@ class LeafAreaIndex:
         self._lai_shapes = self._determine_lai_shapes(self.first_heat_fraction_point, self.second_heat_fraction_point,
                                                       self.first_leaf_fraction_point, self.second_leaf_fraction_point)
 
-        self.optimal_leaf_area_fraction = self.determine_optimal_leaf_area_fraction(self.heat_fraction,
-                                                                                    self._lai_shapes[0],
-                                                                                    self._lai_shapes[1])
+        self.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(self.heat_fraction,
+                                                                                     self._lai_shapes[0],
+                                                                                     self._lai_shapes[1])
 
         self.canopy_height = self.determine_canopy_height(self.max_canopy_height, self.optimal_leaf_area_fraction)
         if self.is_in_senescence:  # senescence
-            self.leaf_area_index = self.determine_senescent_leaf_area_index(self.heat_fraction,
-                                                                            self.senescent_heat_fraction,
-                                                                            self.optimal_leaf_area_fraction)
+            self.leaf_area_index = self._determine_senescent_leaf_area_index(self.heat_fraction,
+                                                                             self.senescent_heat_fraction,
+                                                                             self.optimal_leaf_area_fraction)
         else:  # normal growth
             self.check_previous_leaf_area_values()
-            self.max_leaf_area_change = self.determine_max_leaf_area_change(self.optimal_leaf_area_fraction,
-                                                                            self.previous_optimal_leaf_area_fraction,
-                                                                            self.max_leaf_area_index,
-                                                                            self.previous_leaf_area_index)
+            self.max_leaf_area_change = self._determine_max_leaf_area_change(self.optimal_leaf_area_fraction,
+                                                                             self.previous_optimal_leaf_area_fraction,
+                                                                             self.max_leaf_area_index,
+                                                                             self.previous_leaf_area_index)
             self.determine_leaf_area_added()
             self.add_leaf_area()
         self.shift_leaf_area_time()
@@ -120,8 +120,8 @@ class LeafAreaIndex:
         #    This should probably be done in the `grow_canopy()` function
         #    I'm still unsure how to do this effectively with warnings raised by static functions. - morrowcj
 
-        first_log = LeafAreaIndex.calc_shape_log(first_heat_fraction, first_leaf_fraction)
-        second_log = LeafAreaIndex.calc_shape_log(second_heat_fraction, second_leaf_fraction)
+        first_log = LeafAreaIndex._calc_shape_log(first_heat_fraction, first_leaf_fraction)
+        second_log = LeafAreaIndex._calc_shape_log(second_heat_fraction, second_leaf_fraction)
 
         second_shape = (first_log - second_log) / (second_heat_fraction - first_heat_fraction)
         first_shape = first_log + (second_shape * first_heat_fraction)
@@ -129,7 +129,7 @@ class LeafAreaIndex:
         return [first_shape, second_shape]
 
     @staticmethod
-    def determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
+    def _determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
         """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
         plant growth
 
@@ -150,8 +150,8 @@ class LeafAreaIndex:
         return max(heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0)
 
     @staticmethod
-    def determine_max_leaf_area_change(leaf_area_fraction: float, previous_leaf_area_fraction: float,
-                                       max_leaf_area_index: float, previous_leaf_area_index: float) -> float:
+    def _determine_max_leaf_area_change(leaf_area_fraction: float, previous_leaf_area_fraction: float,
+                                        max_leaf_area_index: float, previous_leaf_area_index: float) -> float:
         """
         calculates the maximum leaf area added during the day
 
@@ -176,8 +176,8 @@ class LeafAreaIndex:
             (1 - exp(5 * previous_leaf_area_index - max_leaf_area_index))
 
     @staticmethod
-    def determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
-                                            optimal_leaf_area_fraction: float) -> float:
+    def _determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
+                                             optimal_leaf_area_fraction: float) -> float:
         """calculates a plant's leaf area index during senescence
 
         replaces method calc_senescent_leaf_area_index
@@ -199,7 +199,7 @@ class LeafAreaIndex:
         return max(prop * optimal_leaf_area_fraction, 0)
 
     @staticmethod
-    def calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
+    def _calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
         """calculates the log term of LAI shape parameter function
 
         Args:
