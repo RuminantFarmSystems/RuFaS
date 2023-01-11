@@ -14,7 +14,7 @@ from SC_redesign.Crop_and_Soil.crop.biomass_allocation import *
 def test_calc_intercepted_radiation(rad, ext, lai):
     """ensure that intercepted radiation is correctly calculated by calc_intercepted_radiation()"""
     h_photo = 0.5 * rad * (1 - exp(-ext * lai))
-    result = calc_intercepted_radiation(rad, ext, lai)
+    result = BiomassAllocation.calc_intercepted_radiation(rad, ext, lai)
     assert result == h_photo
 
 
@@ -30,7 +30,7 @@ def test_calc_intercepted_radiation(rad, ext, lai):
 ])
 def test_calc_max_accumulation(rad, eff, expected):
     """test that maximum biomass accumulation is properly calculated with calc_max_accumulation()"""
-    assert calc_max_accumulation(rad, eff) == expected
+    assert BiomassAllocation.calc_max_accumulation(rad, eff) == expected
 
 
 @pytest.mark.parametrize("factor,max_growth", [
@@ -43,7 +43,7 @@ def test_calc_max_accumulation(rad, eff, expected):
 ])
 def test_calc_biomass_accumulation(factor, max_growth):
     """ensure that biomass growth is correctly calculated by calc_biomass_accumulation()"""
-    assert calc_biomass_accumulation(factor, max_growth) == max_growth * factor
+    assert BiomassAllocation.calc_biomass_accumulation(factor, max_growth) == max_growth * factor
 
 
 @pytest.mark.parametrize("frac,bmass", [
@@ -60,7 +60,7 @@ def test_calc_biomass_accumulation(factor, max_growth):
 def test_calc_above_ground_biomass(frac, bmass):
     """ensure that above ground biomass is correctly calculated"""
     expect = bmass * (1 - frac)
-    assert calc_above_ground_biomass(frac, bmass) == expect
+    assert BiomassAllocation.calc_above_ground_biomass(frac, bmass) == expect
 
 
 @pytest.mark.parametrize("frac,bmass", [
@@ -76,7 +76,7 @@ def test_calc_above_ground_biomass(frac, bmass):
 ])
 def test_calc_below_ground_biomass(frac, bmass):
     """ensure that below ground biomass is correctly calculated"""
-    assert calc_below_ground_biomass(frac, bmass) == bmass * frac
+    assert BiomassAllocation.calc_below_ground_biomass(frac, bmass) == bmass * frac
 
 
 # ---- initialization functions (reusable) ----
@@ -98,9 +98,10 @@ def init_bioal(**kwargs):
 ])
 def test_intercept_radiation(rad, ext, lai):
     """check that usable_light is properly updated"""
-    bioal = init_bioal(light_extinction=ext, leaf_area_index=lai)
+    data = CropData(light_extinction=ext, leaf_area_index=lai)
+    bioal = BiomassAllocation(data)
     bioal.intercept_radiation(rad)
-    assert bioal.usable_light == calc_intercepted_radiation(rad, ext, lai)
+    assert data.usable_light == BiomassAllocation.calc_intercepted_radiation(rad, ext, lai)
 
 
 @pytest.mark.parametrize("rad, eff", [
@@ -113,9 +114,10 @@ def test_intercept_radiation(rad, ext, lai):
 ])
 def test_determine_max_growth(rad, eff):
     """ensure that max_evapotranspiration growth is properly updated"""
-    bioal = init_bioal(light_conversion=eff, usable_light=rad)
+    data = CropData(light_conversion=eff, usable_light=rad)
+    bioal = BiomassAllocation(data)
     bioal.determine_max_growth()
-    assert bioal.biomass_growth_max == calc_max_accumulation(rad, eff)
+    assert data.biomass_growth_max == BiomassAllocation.calc_max_accumulation(rad, eff)
 
 
 @pytest.mark.parametrize("start,factor,gmax", [
@@ -128,14 +130,15 @@ def test_determine_max_growth(rad, eff):
 ])
 def test_accumulate_biomass(start, factor, gmax):
     """check that biomass attributes are correctly updated by accumulate_biomass()"""
-    bioal = init_bioal(biomass=start, growth_factor=factor, biomass_growth_max=gmax)
+    data = CropData(biomass=start, growth_factor=factor, biomass_growth_max=gmax)
+    bioal = BiomassAllocation(data)
     bioal.accumulate_biomass()
-    expect_growth = calc_biomass_accumulation(factor, gmax)
+    expect_growth = BiomassAllocation.calc_biomass_accumulation(factor, gmax)
     expect_end = start + expect_growth
 
-    assert bioal.previous_biomass == start
-    assert bioal.biomass == expect_end
-    assert bioal.biomass_growth == expect_growth
+    assert data.previous_biomass == start
+    assert data.biomass == expect_end
+    assert data.biomass_growth == expect_growth
 
 
 @pytest.mark.parametrize("light,ext,conv,gfact,rfrac", [
@@ -149,23 +152,24 @@ def test_accumulate_biomass(start, factor, gmax):
 ])
 def test_allocate_biomass(light, ext, conv, gfact, rfrac):
     """integration check to check that biomass gets allocated correctly"""
-    bioal = init_bioal(light_extinction=ext, leaf_area_index=1.87, light_conversion=conv, growth_factor=gfact,
-                       root_fraction=rfrac, biomass=89.0)
+    data = CropData(light_extinction=ext, leaf_area_index=1.87, light_conversion=conv, growth_factor=gfact,
+                    root_fraction=rfrac, biomass=89.0)
+    bioal = BiomassAllocation(data)
     bioal.allocate_biomass(light)
 
     # photosynthesize
-    energy = calc_intercepted_radiation(light, ext, lai=1.87)
-    max_growth = calc_max_accumulation(energy, conv)
-    growth = calc_biomass_accumulation(gfact, max_growth)
+    energy = BiomassAllocation.calc_intercepted_radiation(light, ext, lai=1.87)
+    max_growth = BiomassAllocation.calc_max_accumulation(energy, conv)
+    growth = BiomassAllocation.calc_biomass_accumulation(gfact, max_growth)
     mass = 89.0 + growth
     # partition_biomass
-    green = calc_above_ground_biomass(rfrac, mass)
-    root = calc_below_ground_biomass(rfrac, mass)
+    green = BiomassAllocation.calc_above_ground_biomass(rfrac, mass)
+    root = BiomassAllocation.calc_below_ground_biomass(rfrac, mass)
 
-    assert bioal.usable_light == energy
-    assert bioal.biomass_growth_max == max_growth
-    assert bioal.previous_biomass == 89.0
-    assert bioal.biomass_growth == growth
-    assert bioal.biomass == mass
-    assert bioal.green_biomass == green
-    assert bioal.root_biomass == root
+    assert data.usable_light == energy
+    assert data.biomass_growth_max == max_growth
+    assert data.previous_biomass == 89.0
+    assert data.biomass_growth == growth
+    assert data.biomass == mass
+    assert data.above_ground_biomass == green
+    assert data.root_biomass == root
