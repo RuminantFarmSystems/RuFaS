@@ -452,7 +452,7 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['m5dCG2P_conception_rate']
+            self.conception_rate = AnimalBase.config['md5CGP_conception_rate']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -473,9 +473,9 @@ class HeiferII(HeiferI):
             self.determine_tai_program_day(
                 AnimalBase.config['breeding_start_day_h'])
 
-        if self.tai_method_h == '5dCG2P':
+        if self.tai_method_h == 'd5CG2P':
             self.d5CG2P_update(sim_day)
-        elif self.tai_method_h == '5dCGP':
+        elif self.tai_method_h == 'd5CGP':
             self.d5CGP_update(sim_day)
         elif self.tai_method_h == 'user_defined':
             self.user_defined_update()
