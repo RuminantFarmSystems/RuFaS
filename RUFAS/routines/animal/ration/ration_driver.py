@@ -10,9 +10,10 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
-from RUFAS.routines.animal.ration import pyomo_solver as pslv
-import statistics as stat
+from typing import Dict, List, Set
+import collections
 import math
+import statistics as stat
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type):
@@ -26,25 +27,25 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
         animal_type: string representation of the animal
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-    price = NLP.list_reconfig(available_feeds.price)
-    TDN = NLP.list_reconfig(available_feeds.TDN)
-    DE = NLP.list_reconfig(available_feeds.DE)
-    EE = NLP.list_reconfig(available_feeds.EE)
-    is_fat = NLP.list_reconfig(available_feeds.is_fat)
-    calcium = NLP.list_reconfig(available_feeds.calcium)
-    phosphorus = NLP.list_reconfig(available_feeds.phosphorus)
-    NDF = NLP.list_reconfig(available_feeds.NDF)
-    feed_type = NLP.list_reconfig(available_feeds.type)
-    is_wetforage = NLP.list_reconfig(available_feeds.is_wetforage)
-    Kd = NLP.list_reconfig(available_feeds.Kd)
-    N_A = NLP.list_reconfig(available_feeds.N_A)
-    N_B = NLP.list_reconfig(available_feeds.N_B)
-    CP = NLP.list_reconfig(available_feeds.CP)
-    dRUP = NLP.list_reconfig(available_feeds.dRUP)
+    price = NLP.list_reconfig(available_feeds['price'])
+    TDN = NLP.list_reconfig(available_feeds['TDN'])
+    DE = NLP.list_reconfig(available_feeds['DE'])
+    EE = NLP.list_reconfig(available_feeds['EE'])
+    is_fat = NLP.list_reconfig(available_feeds['is_fat'])
+    calcium = NLP.list_reconfig(available_feeds['calcium'])
+    phosphorus = NLP.list_reconfig(available_feeds['phosphorus'])
+    NDF = NLP.list_reconfig(available_feeds['NDF'])
+    feed_type = NLP.list_reconfig(available_feeds['type'])
+    is_wetforage = NLP.list_reconfig(available_feeds['is_wetforage'])
+    Kd = NLP.list_reconfig(available_feeds['Kd'])
+    N_A = NLP.list_reconfig(available_feeds['N_A'])
+    N_B = NLP.list_reconfig(available_feeds['N_B'])
+    CP = NLP.list_reconfig(available_feeds['CP'])
+    dRUP = NLP.list_reconfig(available_feeds['dRUP'])
     if cow_type:
-        limit = NLP.list_reconfig(available_feeds.lactating_cow_limit)
+        limit = NLP.list_reconfig(available_feeds['lactating_cow_limit'])
     else:
-        limit = NLP.list_reconfig(available_feeds.dry_cow_limit)
+        limit = NLP.list_reconfig(available_feeds['dry_cow_limit'])
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
                     requirements.Ca_req, requirements.P_req,
@@ -77,7 +78,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     return solution, ration_vals
 
 
-def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
+def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -123,12 +124,12 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
 
     if solution != None:
         ration = {}
-        for feed_id in range(len(available_feeds.feed_id)):
+        for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
             num = solution.x[i]
             num += solution.x[i + 1]
             num += solution.x[i + 2]
-            ration[available_feeds.feed_key[feed_id]] = round(num, 6)
+            ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
         return ration, ration_vals
@@ -433,10 +434,10 @@ class AvailableFeeds:
         self.heiferI_limit = []
         # calf limit
         self.calf_limit = []
-        # pyomo dictionary structure
-        self.pyomo_data = {}
-        # list of the feeds used in this ration
-        self.feeds = []
+        # key = feed_id, val = index of that feed_id in self.feed_id list
+        self._feed_id_to_list_idx_dict = {}
+        # key = feed_id, val = index of that feed_id in self.feed_id list
+        self._feed_id_to_list_idx_dict = {}
 
     def feed_nutrients(self, feed):
         """
@@ -478,60 +479,36 @@ class AvailableFeeds:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
 
-    def pyomo_nutrients_data(self, feed, animal_type, cow_type):
+    def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
         """
-        Class function that manipulates the available feeds nutrient information
-        into a valid data input for the pyomo structured solver.
+        Returns a subset of data from all the available feeds based on the
+        given set of feed ids.
 
-        Arg(s):
-            feed: an instance of the Feed class object
-            animal_type: string representation  of the animal type
-            cow_type: boolean, True if cow is lactating
+        Args
+        ----
+        feed_ids: a set of feed ids
+
+        Returns
+        -------
+        A dictionary that contains a subset of data from all the available feeds based on the
+        given set of feed ids
         """
-        # available feeds dictionary from the feed module
-        available_feeds = feed.available_feeds
-        # dictionary of feed costs
-        feed_costs = feed.feed_costs
-        # list of parameters for non-LP
-        params = ['TDN', 'DE', 'EE', 'is_fat', 'calcium',
-                  'phosphorus', 'NDF', 'is_wetforage', 'Kd', 'N_A', 'N_B',
-                  'CP', 'dRUP']
-        # list of different energy types feed decision variable are split across
-        enrg = ['mact', 'lact', 'growth']
-        # structuring empty data container
-        for p in params:
-            self.pyomo_data[p] = {}
-        self.pyomo_data['price'] = {}
-        self.pyomo_data['ftype'] = {}
-        self.pyomo_data['limit'] = {}
-        feeds = []
-        # iterating through each feed available in formulation
-        for key, feed in available_feeds.items():
-            feeds.append(key)
-            # price and type data
-            for s in enrg:
-                self.pyomo_data['price'][key, s] = feed_costs[key]
-                self.pyomo_data['ftype'][key, s] = feed['type']
-            # iterating through all param values for non-LP
-            for p in params:
-                self.pyomo_data[p][key, 'mact'] = feed[p]
-                self.pyomo_data[p][key, 'lact'] = feed[p]
-                self.pyomo_data[p][key, 'growth'] = feed[p]
-            # checking if grown feed available and pop
-            if isinstance(feed['limit'], dict):
-                if cow_type:
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = \
-                            feed['limit']['lactating_cows']
-                elif animal_type == 'cow':
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = feed['limit']['dry_cows']
-                else:
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = feed['limit']['heiferIIIs']
-            # if there are not farm grown feeds in diet
-            else:
-                for s in enrg:
-                    self.pyomo_data['limit'][key, s] = feed['limit']
-        # populating feeds list class variable
-        self.feeds = feeds
+        # An explanation of code seen below can be found in Basecamp with the following path:
+        # RuFaS > Docs & Files > Animal Module > Ration Driver Logic
+
+        if not self._feed_id_to_list_idx_dict:
+            self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
+
+        excluded_keys = ['_feed_id_to_list_idx_dict']
+        result = collections.defaultdict(list)
+        for key, vals in self.__dict__.items():
+            if key in excluded_keys:
+                continue
+            if not vals:
+                result[key] = []
+                continue
+            for feed_id in sorted(list(feed_ids)):
+                # Get the list index of the feed_id in self.feed_id list.
+                idx = self._feed_id_to_list_idx_dict[int(feed_id)]
+                result[key].append(vals[idx])
+        return result

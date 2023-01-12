@@ -49,8 +49,8 @@
                 "report_name": "soil_nitrogen_report"
             },
             "soil_phosphorus_report": {
-                "produce_csv": false,
-                "produce_graphics": false,
+                "produce_csv": true,
+                "produce_graphics": true,
                 "report_name": "soil_phosphorus_report"
             },
             "soil_carbon_report": {
@@ -59,27 +59,27 @@
                 "report_name": "soil_carbon_report"
             },
             "soil_summary": {
-                "produce_csv": true,
-                "produce_graphics": true,
+                "produce_csv": false,
+                "produce_graphics": false,
                 "report_name": "soil_summary"
             }
         },
         "field_management_report": {
-            "produce_csv": false,
-            "produce_graphics": false,
+            "produce_csv": true,
+            "produce_graphics": true,
             "report_name": "field_management_report"
         },
-        "phosphorus_balance_report": {
+        "phosphorus_balance": {
             "produce_csv": false,
             "produce_graphics": false,
             "report_name": "phosphorus_balance_report"
         },
-        "nitrogen_balance_report": {
+        "nitrogen_balance": {
             "produce_csv": false,
             "produce_graphics": false,
             "report_name": "nitrogen_balance_report"
         },
-        "water_balance_report": {
+        "water_balance": {
             "produce_csv": false,
             "produce_graphics": false,
             "report_name": "water_balance_report"
