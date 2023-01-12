@@ -86,7 +86,7 @@ class BaseManureHandler:
             A ManureHandlerDailyOutput object.
 
         """
-        NH3_housing_emission = GasEmissions.calc_ammonia_housing_emission(
+        NH3_housing_emission = GasEmissions.calc_ammonia_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.barn_area_from_pen_type,  # m^2/animal
                 manure_urine_total_ammoniacal_nitrogen=pen.manure.urine_ammoniacal_nitrogen,  # kg/animal

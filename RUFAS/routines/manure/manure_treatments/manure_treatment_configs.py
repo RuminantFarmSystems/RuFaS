@@ -144,6 +144,7 @@ class DefaultManureTreatmentConfigFactory:
         anaerobic_digestion_temperature_celsius=37.5
     )
 
+
     @classmethod
     def get_instance(cls, treatment_type: ManureTreatmentType) -> ManureTreatmentConfig:
         """Return a default manure treatment configuration data instance for the given treatment type.
@@ -165,8 +166,6 @@ class DefaultManureTreatmentConfigFactory:
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: cls.SLURRY_STORAGE_OUTDOOR_CONFIG,
             ManureTreatmentType.ANAEROBIC_DIGESTION: cls.ANAEROBIC_DIGESTION_CONFIG,
             ManureTreatmentType.ANAEROBIC_LAGOON: cls.ANAEROBIC_LAGOON_CONFIG,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: cls.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: cls.ANAEROBIC_DIGESTION_AND_LAGOON_CONFIG
         }
         manure_treatment_config = manure_treatment_config_by_type[treatment_type]
         om.add_variable("manure_treatment_config",
