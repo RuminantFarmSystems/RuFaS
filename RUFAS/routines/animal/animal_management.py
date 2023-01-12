@@ -338,8 +338,6 @@ class AnimalManagement:
         for pen in self.all_pens_ids:
             animals_in_pen = pen.animals_in_pen
             for animal in animals_in_pen:
-                if animal.id == 378168:
-                    print("fully update hit")
                 self.animal_to_pen_id_map[animal.id] = pen.id
 
     def remove_animal_from_herd(self, animals_removed):
