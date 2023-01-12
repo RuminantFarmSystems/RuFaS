@@ -219,7 +219,7 @@ def cow() -> AnimalBase:
     initsetup = {
         'id': '1',
         'breed': 'HO',
-        'birth_date':  '200',
+        'birth_date': '200',
         'days_born': '201',
         'semen_type': 'conventional',
         'body_weight': 600,
