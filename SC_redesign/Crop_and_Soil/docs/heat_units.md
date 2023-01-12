@@ -36,8 +36,9 @@ day using:
   max(TminAir, TminCrop)     
 $$
 ```
-where *Tmin* is `minimum_heat_unit_temperature`, *TminAir* is `minimum_air_temperature`, the minimum temperature on 
-a given day, and *TminCrop* is `minimum_growth_temperature`, base or minimum temperature or the crop to growth.
+where $T_{\text{min}}$ is `minimum_heat_unit_temperature`, T_{\text{air, min}} is `minimum_air_temperature`, the minimum temperature on 
+a given day, and T_{\text{crop, min}} is `minimum_growth_temperature`, base or minimum temperature or the crop to growth.
+
 
 **Maximum heat unit temperature** calculates the maximum heat unit temperature on a given
 day using:
