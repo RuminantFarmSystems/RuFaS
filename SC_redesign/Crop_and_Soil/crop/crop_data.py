@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 
 @dataclass
@@ -142,6 +142,7 @@ class CropData:
     root_depth: float = 1  # arbitrary
     """current depth of the plant roots in the soil (mm)"""
     # empty declarations
+    _nitrogen_shapes: Optional[List[float]] = None
     previous_nitrogen: Optional[float] = None
     shapes_nitrogen_uptake: Optional[float] = None
     optimal_nitrogen_fraction: Optional[float] = None
@@ -150,11 +151,11 @@ class CropData:
     potential_nitrogen_uptake: Optional[float] = None
     total_soil_layers: Optional[float] = None
     accessible_soil_layers: Optional[float] = None
-    inaccessible_soil_layers: Optional[float] = None
+    inaccessible_soil_layers: Optional[int] = None
     layer_nitrogen_potentials: Optional[float] = None
     unmet_nitrogen_demands: Optional[float] = None
     nitrogen_requests: Optional[float] = None
-    actual_nitrogen_uptakes: Optional[float] = None
+    actual_nitrogen_uptakes: Optional[List[float]] = None
     total_nitrogen_uptake: Optional[float] = None
     fixed_nitrogen: Optional[float] = None
     nitrate_factor: Optional[float] = None

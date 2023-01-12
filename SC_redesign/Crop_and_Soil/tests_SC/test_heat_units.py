@@ -51,15 +51,6 @@ def test_determine_maximum_heat_unit_temperature(air, plant):
     assert HeatUnits._determine_maximum_heat_unit_temperature(air, plant) == expect
 
 
-# ---- initializer function ----
-def init_heat(**kwargs):
-    """helper function to create HeatUnits instance, with specified attributes"""
-    heat = HeatUnits()
-    for key, val in kwargs.items():
-        setattr(heat, key, val)
-    return heat
-
-
 @pytest.mark.parametrize("use_alt,meant,min_t,max_t", [
     (False, None, 18, 20),
     (True, 13.6, None, None),
@@ -81,8 +72,8 @@ def test_accumulate_heat_units(temp, mocker: MockerFixture):
     """check that accumulate_heat_units() calls the right functions"""
     patch_a = mocker.patch("SC_redesign.Crop_and_Soil.crop.heat_units.HeatUnits.assign_new_heat_units")
     patch_b = mocker.patch("SC_redesign.Crop_and_Soil.crop.heat_units.HeatUnits.add_heat_units")
-    heat = init_heat()
-    expect = init_heat()
+    heat = HeatUnits()
+    expect = HeatUnits()
     heat.accumulate_heat_units(temp)
     expect.assign_new_heat_units(temp)
     expect.add_heat_units()
