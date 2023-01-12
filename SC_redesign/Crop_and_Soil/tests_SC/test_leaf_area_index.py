@@ -192,7 +192,7 @@ def test_grow_canopy(heatfrac):
     if heatfrac <= 0.9:  # normal growth
         assert data.is_in_senescence is False
         max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0.01, 3.0, 0.1)
-        assert data.max_leaf_area_change == max_change
+        assert data.optimal_leaf_area_change == max_change
         added = max_change*sqrt(0.95)
         if max_change < added:  # when heatfrac = 0, no growth occurs
             added = max_change
