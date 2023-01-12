@@ -42,8 +42,8 @@
 				},
 				"TAI_related":{
 					"heifer_TAI_protocol": "d5CG2P",
-					"m5dCG2P_conception_rate": 0.6,
-					"m5dCGP_conception_rate": 0.48,
+					"md5CG2P_conception_rate": 0.6,
+					"md5CGP_conception_rate": 0.48,
 					"heifer_user_defined_tai_cr": 0.0,
 					"cow_presynch_protocol": "Double OvSynch",
 					"user_defined_presynch_length": 0,
