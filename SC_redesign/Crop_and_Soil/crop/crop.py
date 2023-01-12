@@ -13,7 +13,7 @@ from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(NitrogenIncorporation, HeatUnits, LeafAreaIndex):
+class Crop(NitrogenIncorporation, LeafAreaIndex):
     def __init__(self, crop_data: Optional[CropData] = None):
         """Creates a crop object, from a crop data specification object.
 
@@ -35,13 +35,12 @@ class Crop(NitrogenIncorporation, HeatUnits, LeafAreaIndex):
         self.water_dynamics = WaterDynamics(data)
         """Process component controlling plant water dynamics"""
         NitrogenIncorporation.__init__(self)
-        # nitrogen_incorporation = NitrogenIncorporation(data)
+        # self.nitrogen_incorporation = NitrogenIncorporation(data)
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
-        HeatUnits.__init__(self)
-        # heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
+        self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
         """Process component controlling plant heat accumulation"""
         LeafAreaIndex.__init__(self)  # TODO: rename module and component (e.g., "CanopyGrowth")?
-        # leaf_area_index = LeafAreaIndex(data)
+        # self.leaf_area_index = LeafAreaIndex(data)
         """Process component controlling canopy growth, including leaf area index"""
         self.root_development = RootDevelopment(data)
         """Process component controlling plant root development"""
@@ -94,11 +93,9 @@ class Crop(NitrogenIncorporation, HeatUnits, LeafAreaIndex):
             process sub-routines. It should be called every day that the crop
             is alive and growing in the simulation
         """
-        self.absorb_heat_units(mean_air_temperature, min_air_temperature,
-                               max_air_temperature)
+        self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
-        self.incorporate_nitrogen(layer_nitrates, layer_depths,
-                                  soil_water_factor)
+        self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         #
         # phosphorus_uptake.update_all()
         #
