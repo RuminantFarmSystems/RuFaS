@@ -2229,7 +2229,10 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
 @pytest.mark.parametrize(
         'total_daily_mass',
         [
+            -1.0,
             0.0,
+            0.5,
+            1.0,
             100.0,
         ])
 def test_calc_moisture_content(total_daily_mass: float) -> None:
