@@ -61,7 +61,8 @@ class MilkingParlor:
             Total number of minutes spent in holding area per animal per day.
 
         """
-        info_map = {"class": self.__class__.__name__}
+        info_map = {"class": self.__class__.__name__,
+                    "function": "total_minutes_spent_in_holding_area"}
 
         total_minutes_spent_in_holding_area = self.num_milkings * \
             self.minutes_spent_in_holding_area
@@ -78,7 +79,9 @@ class MilkingParlor:
             Fraction of day spent in holding area.
 
         """
-        info_map = {"class": self.__class__.__name__}
+        info_map = {"class": self.__class__.__name__,
+                    "function": "fraction_of_day_spent_in_holding_area"}
+
         fraction_of_day_spent_in_holding_area = self._calc_fraction_of_day_from_minutes(
             self.fraction_of_day_spent_in_holding_area)
 
@@ -116,7 +119,9 @@ class MilkingParlor:
             Total number of minutes spent milking per animal per day.
 
         """
-        info_map = {"class": self.__class__.__name__}
+        info_map = {"class": self.__class__.__name__,
+                    "function": "total_minutes_spent_milking"}
+
         total_minutes_spent_milking = self.num_milkings * \
             self.minutes_spent_per_milking
 
@@ -133,7 +138,9 @@ class MilkingParlor:
             Fraction of day spent milking.
 
         """
-        info_map = {"class": self.__class__.__name__}
+        info_map = {"class": self.__class__.__name__,
+                    "function": "fraction_of_day_spent_milking"}
+
         fraction_of_day_spent_milking = self._calc_fraction_of_day_from_minutes(
             self.fraction_of_day_spent_milking)
 
@@ -152,7 +159,16 @@ class MilkingParlor:
             Volume of fresh water used for milking, liters.
 
         """
-        return num_cows * self.fresh_water_use_rate
+        info_map = {"class": self.__class__.__name__,
+                    "function": "calc_fresh_water_volume_used_for_milking",
+                    "num_cows": num_cows}
+
+        fresh_water_volume_used_for_milking = num_cows * self.fresh_water_use_rate
+
+        om.add_variable("fresh_water_volume_used_for_milking",
+                        fresh_water_volume_used_for_milking, info_map)
+
+        return fresh_water_volume_used_for_milking
 
     # Overall
     @property
@@ -166,7 +182,8 @@ class MilkingParlor:
             Total number of minutes spent in the milking parlor per animal per day.
 
         """
-        info_map = {"class": self.__class__.__name__}
+        info_map = {"class": self.__class__.__name__,
+                    "function": "total_minutes_spent_in_milking_parlor"}
         total_minutes_spent_in_milking_parlor = self.total_minutes_spent_in_holding_area + \
             self.total_minutes_spent_milking
 
@@ -183,7 +200,9 @@ class MilkingParlor:
             Total fraction of day spent in the milking parlor per animal.
 
         """
-        info_map = {"class": self.__class__.__name__}
+        info_map = {"class": self.__class__.__name__,
+                    "function": "total_fraction_of_day_spent_in_milking_parlor"}
+
         total_fraction_of_day_spent_in_milking_parlor = self.fraction_of_day_spent_in_holding_area + \
             self.fraction_of_day_spent_milking
 
@@ -224,7 +243,9 @@ class MilkingParlor:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure_mass_deposited_in_milking_parlor.__name__}
+                    "function": self.calc_manure_mass_deposited_in_milking_parlor.__name__,
+                    "num_cows": num_cows, "manure_mass": manure_mass}
+
         manure_mass_deposited_in_milking_parlor = manure_mass * \
             self.total_fraction_of_day_spent_in_milking_parlor if num_cows > 0 else 0.0
 
@@ -245,7 +266,9 @@ class MilkingParlor:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure_volume_deposited_in_milking_parlor.__name__}
+                    "function": self.calc_manure_volume_deposited_in_milking_parlor.__name__,
+                    "manure_mass": manure_mass}
+
         manure_volume_deposited_in_milking_parlor = self.calc_manure_mass_deposited_in_milking_parlor(
             num_cows, manure_mass) / ManureConstants.MANURE_DENSITY
 
@@ -266,7 +289,8 @@ class MilkingParlor:
 
         """
         info_map = {"class": cls.__name__,
-                    "function": cls._calc_fraction_of_day_from_minutes.__name__}
+                    "function": cls._calc_fraction_of_day_from_minutes.__name__,
+                    "minutes": minutes}
 
         minutes_in_a_day = 60.0 * 24.0
         minutes_of_a_day_frac = minutes / minutes_in_a_day
