@@ -17,11 +17,6 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
 
-
-
-
-
-
 @pytest.fixture
 def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
     """Returns a mocked SimulationEngine"""
@@ -79,13 +74,14 @@ def patch_animal_object(mocker:MockerFixture)->AnimalBase:
         semen_used =  MagicMock(),
         
         body_weight = MagicMock(),
-        body_weight_history = MagicMock(),
+        body_weight_history = [],
         pen_history = MagicMock(),
         simulation_day = MagicMock()
         )
     mockerinit.stop()
     return animobj
 
+# Series of fixtures that aren't yet necessary
 
 # @pytest.fixture
 # def patch_AnimalBase() -> AnimalBase:
@@ -124,11 +120,11 @@ def patch_BodyWeightHistory(mocker:MockerFixture)->BodyWeightHistory:
     """returns a mocked BodyWeightHistory"""
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.BodyWeightHistory.__init__")
-    bwhistobj = BodyWeightHistory(
-    simulation_day = MagicMock(),
-    days_born = MagicMock(),
-    body_weight = MagicMock()
-    )
+    bwhistobj = BodyWeightHistory.__init__(
+        simulation_day = MagicMock(),
+        days_born = MagicMock(),
+        body_weight = MagicMock()
+        )
     return bwhistobj
 
 
@@ -174,11 +170,6 @@ def test_call_animal_nutrient_rqmts():
 
 def test_calc_avg_nutrient_rqmts():
     """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    pass
-
-
-def test_calc_avg_stats():
-    """Unit test for function calc_avg_stats in file routines/animal/pen.py"""
     pass
 
 
@@ -252,10 +243,33 @@ def test_set_p_intake():
     pass
 
 
-def test_daily_p_update():
+def test_daily_p_update(cow:AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
-    pass
+    cow.dP_reserves = 1
+    cow.p_intake = 0
+    cow.p_req = 1
+    
+    # Case 1: intake is less than requirements
+    cow.daily_p_update()
+    actual = cow.dP_reserves
+    expected = 0
+    assert actual == expected
 
+    # Case 2: intake over requirements and reserves below 0
+    cow.dP_reserves = -10
+    cow.p_intake = 10
+    cow.p_req = 1
+    expected = 0.7 * max(cow.p_intake - cow.p_req, 0) + cow.dP_reserves
+    cow.daily_p_update()
+    actual = cow.dP_reserves
+    assert actual == expected
+
+    # Case 3: reserves are high, intake is over requirements
+    cow.dP_reserves = 10
+    cow.daily_p_update()
+    actual = cow.dP_reserves
+    expected = 0
+    assert actual == expected
 
 def test_calc_base_manure():
     """Unit test for function calc_base_manure in file routines/animal/life_cycle/animal_base.py"""
@@ -266,110 +280,81 @@ def test_set_p_purchased():
     """Unit test for function set_p_purchased in file routines/animal/life_cycle/animal_base.py"""
     pass
 
+@pytest.fixture
+def cow() -> AnimalBase:
+    initsetup = {
+        'id': '1',
+        'breed': 'HO',
+        'birth_date':  '200',
+        'days_born': '201',
+        'semen_type': 'conventional',
+        'body_weight': 600,
+        'pen_history': []
+        }
+    AnimalBase.nutrients = {'dummy1': 'dummyval1', 'dummy2': 'dummyval2'}
+    AnimalBase.config = {'semen_type': 'dummy'}
+    cow = AnimalBase(initsetup)   
+    return cow
 
-def test_update_pen_history(
-        patch_animal_object: AnimalBase, 
-        patch_simulation_engine: SimulationEngine)-> None:
-    """Unit test for function update_pen_history in file routines/animal/life_cycle/animal_base.py"""
-    patch_simulation_engine.state.animal_management.simulation_day = 1
-    patch_animal_object.days_born = 200
-    patch_animal_object.body_weight = 600
-    patch_simulation_engine._advance_time(True)
-    curr_pen = 5
-    classes_in_pen = 'LAC_COW'
-    curr_day = patch_simulation_engine.state.animal_management.simulation_day
-    # update hist with new vals, using the time and the obj itself
-    patch_animal_object.update_pen_history(patch_animal_object.pen_history, \
-        curr_pen,
-        curr_day,
-        classes_in_pen
-        )
+def test_update_pen_history(cow: AnimalBase) -> None:
+    """Unit test for update_pen_history in file routines/animal/life_cycle/animal_base.py"""
+    curr_pen = 3
+    classes_in_pen = ['Cow']
+    curr_day = 2
+
+    # alternate way to handle, but harder to iterate check,
+    #  due to nature of PenHistory class
+    # testcases = [(3, 4, ['Cow']),
+    #         (3, 4, ['Cow']),
+    #         (3, 4, ['Cow'])]
+    # for case in testcases:
+    #     cow.update_pen_history(case)
+
+    # Case 1
+    # update hist with designated vals, using the time and the obj itself
+    cow.update_pen_history(
+        curr_pen, curr_day, classes_in_pen)
+    assert cow.pen_history[-1].pen == 3
+    assert cow.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow.pen_history[-1].start_date == 2
+    assert cow.pen_history[-1].end_date == 2
     
-    expected = [3, 2, 'LAC_COW']
-    actual = patch_animal_object.pen_history[-1]
-    #last_pen = patch_animal_object.pen_history[-1].pen
-    #assert actual == expected
-    ##### assert patch_animal_object.pen_history[-1].end_date == curr_day
-    ##### assert patch_animal_object.pen_history[-1].classes_in_pen == ['LAC_COW']
- 
-    # additional 
-    # assert that the self is an animal object
-    # assert that the curr_day is a date
-    # assert that curr_pen is a valid pen
-    # assert that the classes_in_pen is a list
-    # assert that curr_day is current day in simulation
-    # assert that the classes in the pen match
+    # Case 2
+    # check that it changes pens to 4
+    cow.update_pen_history(
+        4, 3, ['Cow'])
+    # check previous history remains the same, then check newest
+    assert cow.pen_history[-2].pen == 3
+    assert cow.pen_history[-1].pen == 4
+    assert cow.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow.pen_history[-1].start_date == 3
+    assert cow.pen_history[-1].end_date == 3
+
+    # Case 3
+    # check that the start date remains the date of the change
+    cow.update_pen_history(
+        4, 4, ['Cow'])
+    assert cow.pen_history[-1].pen == 4
+    assert cow.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow.pen_history[-1].start_date == 3
+    assert cow.pen_history[-1].end_date == 4
 
 
-def test_update_body_weight_history(
-        patch_animal_object: AnimalBase, 
-        patch_simulation_engine: SimulationEngine,
-        mocker:MockerFixture)-> None:
-    mocker.patch(
-        "RUFAS.simulation_engine.SimulationEngine._advance_time")
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
-    
-    # """Unit test for function update_body_weight_history in file routines/animal/life_cycle/animal_base.py
-    # using patches generated at start"""
-
-    # Simple example 1 - gain 1kg on second day of sim, age = 200 days
-    # patch_simulation_engine.state.animal_management.simulation_day = 1
-    # assert patch_simulation_engine.state.animal_management.simulation_day == 1
-    patch_animal_object.simulation_day = 1
-    patch_animal_object.days_born = 200
-    patch_animal_object.body_weight = 600
-    assert patch_animal_object.simulation_day == 1
-    assert patch_animal_object.days_born == 200
-    assert patch_animal_object.body_weight == 600
-    ############## patch_simulation_engine._advance_time(True)
-    ############## assert patch_simulation_engine.state.animal_management.simulation_day == 2
-    patch_animal_object.body_weight = 601
-    assert patch_animal_object.body_weight == 601
-    patch_animal_object.body_weight_history = []
-    assert patch_animal_object.body_weight_history == []
-    # update hist with new vals, using the time and the obj itself
-    ####patch_animal_object.update_body_weight_history(patch_animal_object, \
-    ####    patch_simulation_engine.state.animal_management.simulation_day)
-    # patch_animal_object.update_body_weight_history(
-    #     patch_simulation_engine.state.animal_management.simulation_day)
-    patch_animal_object.update_body_weight_history(
-        patch_animal_object.simulation_day)
- 
-    # the expected value, being second day of sim and 1 day older, 1kg heavier
-    bwhist_expected = [1, 200, 601]
-    bwhist_actual = list((patch_animal_object.body_weight_history[-1].simulation_day,\
-        patch_animal_object.body_weight_history[-1].days_born,\
-        patch_animal_object.body_weight_history[-1].body_weight))
-    assert patch_animal_object.body_weight_history[-1].simulation_day == 1
-    # assert patch_animal_object.body_weight_history[-1].days_born == 200
-    # assert patch_animal_object.body_weight_history[-1].body_weight == 601
-    
-    # assert bwhist_actual == bwhist_expected
-    #assert len(bwhist_actual) == 0 # this is wrong, but to check that it is printing an empty list
-
-
-    ##### assert patch_animal_object.body_weight_history[-1].days_born[0] > 0
-    # assert bwhist_actual == bwhist_expected
-
-
-# def test_update_body_weight_history_v2(patch_simulation_engine: SimulationEngine, patch_animal_object: AnimalBase):
-#     """Unit test for function update_body_weight_history in file routines/animal/life_cycle/animal_base.py
-#     using patches generated at start"""
-#     #animalexample = AnimalBase(1,1)
-#     # Case 1 - gain 1kg on second day of sim, age = 200 days
-#     patch_simulation_engine.state.animal_management.simulation_day = 1
-#     patch_animal_object.days_born = 200
-#     patch_animal_object.body_weight = 600
-#     patch_simulation_engine._advance_time(True)
-#     patch_animal_object.body_weight = 601
-#     # update hist with new vals, using the time and the obj itself
-#     patch_animal_object.update_body_weight_history(patch_animal_object, \
-#         patch_simulation_engine.state.animal_management.simulation_day)
-#     # the expected value, being second day of sim and 1 day older, ikg heavier
-#     bwhist_expected = [2, 201, 601]
-#     bwhist_actual = patch_animal_object.body_weight_history[-1]
-#     assert bwhist_actual == bwhist_expected
+def test_update_body_weight_history(cow:AnimalBase) -> None:
+    histories = [(1, 200, 650),
+                 (2, 300, 600),
+                 (3, 400, 550)]
+    # use update function 3x
+    for history in histories:
+        sim_day = history[0]
+        cow.days_born = history[1]
+        cow.body_weight = history[2]
+        cow.update_body_weight_history(sim_day)
+    # asserts for each update
+    for idx, history in enumerate(histories):
+        assert cow.body_weight_history[idx].simulation_day == history[0]
+        assert cow.body_weight_history[idx].days_born == history[1]
+        assert cow.body_weight_history[idx].body_weight == history[2]
 
 
 def test_init_from_string():
@@ -379,7 +364,29 @@ def test_init_from_string():
 
 def test_add_event():
     """Unit test for function add_event in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    animal_event = AnimalEvents()
+    # Case 0 check that no events are found
+    assert animal_event.events == {}
+    animal_age = 100
+    simulation_day = 200
+    event_description = 'dummy'
+
+    # Case 1: add an event
+    animal_event.add_event(animal_age, simulation_day, event_description)
+    assert animal_event.events == {100:['simulation_day=200', 'dummy']}
+
+    # Case 2: another event on the next day
+    animal_age = 101
+    simulation_day = 201
+    animal_event.add_event(animal_age, simulation_day, event_description)
+    assert animal_event.events[101] == ['simulation_day=201', 'dummy']
+    animal_age = 100
+    simulation_day = 200
+    event_description = 'dummy2'
+
+    # Case 3: another event on the first day
+    animal_event.add_event(animal_age, simulation_day, event_description)
+    assert animal_event.events[100] == ['simulation_day=200', 'dummy', 'dummy2']
 
 
 def test___str__():
