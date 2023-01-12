@@ -282,8 +282,8 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
-def test_daily_update_id_pen():
-    """Unit test for function daily_update_id_pen in file routines/animal/animal_management.py"""
+def test_daily_update_id_map():
+    """Unit test for function daily_update_id_map in file routines/animal/animal_management.py"""
     pass
 
 

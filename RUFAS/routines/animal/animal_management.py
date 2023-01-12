@@ -391,7 +391,7 @@ class AnimalManagement:
                 if key != 'status' and key != 'objective':
                     pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
 
-    def daily_update_id_pen(self, animals_added, animals_removed, calves_born, feed, temp):
+    def daily_update_id_map(self, animals_added, animals_removed, calves_born, feed, temp):
         """
         For animals removed from the herd in daily animal updates, the ids of
         the pens from which they were removed are stored in the
@@ -823,7 +823,7 @@ class AnimalManagement:
             # print("-" * 30)
             # print(calves_born)
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_pen(animals_added, animals_removed, calves_born, feed, temp)
+            self.daily_update_id_map(animals_added, animals_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts()  # per animal
