@@ -15,6 +15,8 @@ class HeatUnits:
             min_air_temperature: minimum air temperature for the day (C)
             max_air_temperature: maximum air temperature for the day (C)
 
+        SWAT References: 5:1.1, 5:2.1.2,
+
         Details: if the attribute use_heat_unit_temperature is false, both min_air_temperature and max_air_temperature
         are optional. Otherwise, they are used to determine heat unit accumulation rather than average air temperature.
         """
@@ -97,6 +99,8 @@ class HeatUnits:
         Args:
             temperature: the temperature to be compared to min_temp for accumulating heat units (C)
             min_temperature: the minimum temperature below which a crop cannot grow (C)
+
+        SWAT Reference: 5:1.1
         """
         return max(temperature - min_temperature, 0)  # from SWAT:
 

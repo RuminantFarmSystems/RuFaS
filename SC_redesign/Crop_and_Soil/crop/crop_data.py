@@ -42,7 +42,7 @@ class CropData:
     optimal_phosphorus: float = 80
     """optimal amount of phosphorus stored in the plant for the curent growth stage (kg/ha)"""
     minimum_temperature: float = 15
-    """minumum temperature below which plant growth cannot occur (Celsius)"""
+    """minimum temperature below which plant growth cannot occur (Celsius)"""
     optimal_temperature: float = 22
     """ideal temperature for maximum plant growth (Celsius)"""
     ##growth_factor: float = 1.0  # duplicate
@@ -58,18 +58,29 @@ class CropData:
     # ---- heat_units
     ##minimum_temperature: float = 20 # duplicate
     maximum_temperature: float = 38
+    """maximum temperature above which plant growth cannot occur (Celsius)"""
     potential_heat_units: float = 800
+    """total heat units required for the plant to reach maturity (unitless)
+    """
     accumulated_heat_units: float = 0  # accumulator
+    """total heat units accumulated to date (unitless)"""
     is_growing: bool = True  # TODO: not currently using; SWAT 5:2.1.4
+    """is the crop currently growing?"""
     use_heat_unit_temperature: bool = False
-    """determines if heat unit temperature will be used for heat unit 
-    accumulation."""
+    """should the alternative heat unit method be used? 
+    Determines if heat unit temperature will be used for heat unit  accumulation."""
     new_heat_units: Optional[float] = None
+    """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
     heat_fraction: Optional[float] = None
+    """fraction of potential heat units accumulated to date (unitless)"""
     minimum_heat_unit_temperature: Optional[float] = None
+    """minimum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     maximum_heat_unit_temperature: Optional[float] = None
+    """maximum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     heat_unit_temperature: Optional[float] = None
+    """heat unit temperature used by alternative heat unit method (Celsius)"""
     previous_heat_fraction: Optional[float] = None
+    """fraction of potential heat units on the previous day (unitless)"""
     
     # ---- leaf area index
     # fixed attributes (unchanged during simulations)
