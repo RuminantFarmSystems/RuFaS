@@ -32,9 +32,9 @@ comparison between minimum and maximum daily temperatures of crop and air:
 **Minimum heat unit temperature** calculates the minimum heat unit temperature on a given
 day using:
 ```math
-  $$ Tmin = 
-  max(TminAir, TminCrop)     
-$$
+  $$ T_{\text{min}} = 
+  max(T_{\text{air, min}}, T_{\text{crop, min}})     
+  $$
 ```
 where $T_{\text{min}}$ is `minimum_heat_unit_temperature`, T_{\text{air, min}} is `minimum_air_temperature`, the minimum temperature on 
 a given day, and T_{\text{crop, min}} is `minimum_growth_temperature`, base or minimum temperature or the crop to growth.
