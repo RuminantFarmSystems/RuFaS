@@ -81,38 +81,6 @@ def patch_animal_object(mocker:MockerFixture)->AnimalBase:
     mockerinit.stop()
     return animobj
 
-# Series of fixtures that aren't yet necessary
-
-# @pytest.fixture
-# def patch_AnimalBase() -> AnimalBase:
-#     patch_AnimalBase_obj = AnimalBase(MagicMock())
-#     return patch_AnimalBase_obj
-
-# from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-# @pytest.fixture
-# def patch_animal_object2(mocker:MockerFixture)->AnimalBase:
-#     """returns a mocked AnimalBase"""
-#     # mocker.patch(
-#     #     "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__")
-#     mocker.patch(
-#         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
-#     animobj = patch_AnimalBase
-#     return animobj
-
-
-# from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
-# @pytest.fixture
-# def patch_BodyWeightHistory(mocker:MockerFixture)->BodyWeightHistory:
-#     """returns a mocked BodyWeightHistory"""
-#     mocker.patch(
-#         "RUFAS.routines.animal.life_cycle.animal_base.BodyWeightHistory.__init__")
-#     bwhistobj = BodyWeightHistory()
-#     bwhistobj.simulation_day = patch_simulation_engine.state.animal_management.simulation_day
-#     bwhistobj.days_born = patch_animal_object.days_born
-#     bwhistobj.body_weight = patch_animal_object.body_weight
-    
-#     return bwhistobj
-
 
 from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
 @pytest.fixture
@@ -243,6 +211,23 @@ def test_set_p_intake():
     pass
 
 
+@pytest.fixture
+def cow() -> AnimalBase:
+    initsetup = {
+        'id': '1',
+        'breed': 'HO',
+        'birth_date':  '200',
+        'days_born': '201',
+        'semen_type': 'conventional',
+        'body_weight': 600,
+        'pen_history': []
+        }
+    AnimalBase.nutrients = {'dummy1': 'dummyval1', 'dummy2': 'dummyval2'}
+    AnimalBase.config = {'semen_type': 'dummy'}
+    cow = AnimalBase(initsetup)   
+    return cow
+
+
 def test_daily_p_update(cow:AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
     cow.dP_reserves = 1
@@ -280,21 +265,6 @@ def test_set_p_purchased():
     """Unit test for function set_p_purchased in file routines/animal/life_cycle/animal_base.py"""
     pass
 
-@pytest.fixture
-def cow() -> AnimalBase:
-    initsetup = {
-        'id': '1',
-        'breed': 'HO',
-        'birth_date':  '200',
-        'days_born': '201',
-        'semen_type': 'conventional',
-        'body_weight': 600,
-        'pen_history': []
-        }
-    AnimalBase.nutrients = {'dummy1': 'dummyval1', 'dummy2': 'dummyval2'}
-    AnimalBase.config = {'semen_type': 'dummy'}
-    cow = AnimalBase(initsetup)   
-    return cow
 
 def test_update_pen_history(cow: AnimalBase) -> None:
     """Unit test for update_pen_history in file routines/animal/life_cycle/animal_base.py"""
