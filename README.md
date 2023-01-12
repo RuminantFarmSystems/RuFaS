@@ -22,7 +22,18 @@ N/A
 
 [Uncle Bob Clean Code Lessons](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
 
+[Unit Testing Reference](https://realpython.com/python-testing/)
+
+[Doc String Reference](https://numpydoc.readthedocs.io/en/latest/format.html)
+
+[Doc String Guide](https://realpython.com/documenting-python-code/)
+
+[Pseudocode Guidelines](https://docs.google.com/document/d/1e5gM7fuT06iQYDKvwUAB-jVaLjw3iZizXAdSnOEDco0/edit?usp=sharing)
+
+[2023 Fixathon tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
+
 [2022 Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+
 
 <!---
 # Introduction 
