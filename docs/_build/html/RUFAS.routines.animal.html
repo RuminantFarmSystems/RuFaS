@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.animal package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.feed package" href="RUFAS.routines.feed.html" />
+    <link rel="prev" title="RUFAS.routines package" href="RUFAS.routines.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.animal package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.animal.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-animal-package">
+<h1>RUFAS.routines.animal package<a class="headerlink" href="#rufas-routines-animal-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.animal.animal_management">
+<span id="rufas-routines-animal-animal-management-module"></span><h2>RUFAS.routines.animal.animal_management module<a class="headerlink" href="#module-RUFAS.routines.animal.animal_management" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: animal_management.py</p>
+<dl class="simple">
+<dt>Description: The class which manages all of the animal routines and keeps track of</dt><dd><p>all animals and pens. All operations are as described in the Animal Module
+Information Flow document on Basecamp (such as daily animal updates and
+pen allocation). Method calls cascade through from the animal management
+class to pen to each individual animal in that pen. The life cycle of each animal
+is controlled by an instance of the LifeCycleManager class, and this instance
+updates the animals daily.</p>
+</dd>
+<dt>Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>Chris VanKerkhove, <a class="reference external" href="mailto:cjv47&#37;&#52;&#48;cornell&#46;edu">cjv47<span>&#64;</span>cornell<span>&#46;</span>edu</a>
+Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;cornell&#46;edu">jm2257<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.animal_management.</span></span><span class="sig-name descname"><span class="pre">AnimalManagement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages all animal routines (i.e. calling daily updates, allocating animals
+to pens, etc). Stores a list of all animals and pens in the simulation as
+well as an instance of the LifeCycleManager class in order to update the
+animals’ life cycles.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens">
+<span class="sig-name descname"><span class="pre">allocate_all_pens</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.annual_reset">
+<span class="sig-name descname"><span class="pre">annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.annual_reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.avg_pen_dist">
+<span class="sig-name descname"><span class="pre">avg_pen_dist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.avg_pen_dist" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the average distance from a pen to the milking parlor.
+Returns: a tuple of (average vertical distance from milking parlor,</p>
+<blockquote>
+<div><p>average horizontal distance from milking parlor)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.calc_all_p_conc">
+<span class="sig-name descname"><span class="pre">calc_all_p_conc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.calc_all_p_conc" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates each animal class’s P concentration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.calc_avg_growth">
+<span class="sig-name descname"><span class="pre">calc_avg_growth</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.calc_avg_growth" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each pen’s method to calculate the average growth of animals in
+the pen. This is part of the routines that happen every
+ration interval.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.calc_manure_excretion">
+<span class="sig-name descname"><span class="pre">calc_manure_excretion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.calc_manure_excretion" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each animal’s method to calculate manure excretion to find the
+total for each pen. This is part of the routines that happen every
+ration interval.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: instance of the feed class
+methane_model: methane model used for methane emission calculations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.calc_nutrient_rqmts">
+<span class="sig-name descname"><span class="pre">calc_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.calc_nutrient_rqmts" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each animal’s method to calculate its nutrient requirements.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: instance of the feed class
+temp: the temperature on the current day</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.calc_p_rqmts">
+<span class="sig-name descname"><span class="pre">calc_p_rqmts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.calc_p_rqmts" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each pen’s method to calculate each animal’s phosphorus
+requirements. This method is called daily.</p>
+<p>Args:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.calc_ration">
+<span class="sig-name descname"><span class="pre">calc_ration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.calc_ration" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each pens’s method to calculate the ration for that pen. This is
+part of the routines that happen every ration interval.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: instance of the Feed class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.clear_pens">
+<span class="sig-name descname"><span class="pre">clear_pens</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.clear_pens" title="Permalink to this definition"></a></dt>
+<dd><p>Removes animals from pens for re-allocation. This is part of the
+routines that happen every ration interval.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.daily_p_update">
+<span class="sig-name descname"><span class="pre">daily_p_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.daily_p_update" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each pen’s method to calculate each animal’s daily phosphorus
+update. This method is called daily.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.daily_update_id_pen">
+<span class="sig-name descname"><span class="pre">daily_update_id_pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animals_added</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids_removed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calves_born</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.daily_update_id_pen" title="Permalink to this definition"></a></dt>
+<dd><p>For animals removed from the herd in daily animal updates, the ids of
+the pens from which they were removed are stored in the
+pens_needing_animals queue.
+Animals added to the herd from the replacement herd are temporarily
+assigned to a pen that had animals removed from it.
+Calves that were born are assigned (currently) to the hard coded pen
+for calves.
+All new animals are set up with the characteristics of the pen to which
+they were assigned.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>animals_added: list of animal IDs that have been added to the herd
+ids_removed: list of animal IDs that have been removed from the herd
+calves_born: list of Calf objects that have been added to the herd
+feed: an instance of the Feed class defined in feed.py
+temp: the temperature on the current day</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.daily_updates">
+<span class="sig-name descname"><span class="pre">daily_updates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.daily_updates" title="Permalink to this definition"></a></dt>
+<dd><p>Executes the daily routines relating to Animals. All animals are
+updated through the life_cycle_manager’s daily_update() method. The
+daily phosphorus calculations are also done. If it is the end of the
+ration interval, the animals are allocated to new pens and the ration &amp;
+manure calculations are done.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: instance of the Feed class defined in feed.py
+weather: instance of the Weather class defined in classes.py
+time: instance of the Time class defined in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.end_ration_interval">
+<span class="sig-name descname"><span class="pre">end_ration_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.end_ration_interval" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Returns: True if today is the day a new ration has to be formulated,</dt><dd><p>false otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_id_pen">
+<span class="sig-name descname"><span class="pre">fully_update_id_pen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_id_pen" title="Permalink to this definition"></a></dt>
+<dd><p>Updates the entire id_pen dictionary so that each animal’s ID is
+associated with the pen that animal is in.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.gather_cow_class_history">
+<span class="sig-name descname"><span class="pre">gather_cow_class_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.gather_cow_class_history" title="Permalink to this definition"></a></dt>
+<dd><p>Gathers all the pen history data for a given cow class type. Checks the current pen
+and pen composition of all animals of a given cow class, before then update the
+pen history for that class using the update_pen_history() method</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cow_class: instance of whatever cow type’s pen history is being gathered</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.generate_animal_output">
+<span class="sig-name descname"><span class="pre">generate_animal_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.generate_animal_output" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the information (ID, breed, birthday, breeding method,
+semen used, pen history, bodyweight history, milk production history,
+event history) of the animal at the index of the respective
+animal_type list.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>animal_type: a string. One of ‘calf’, ‘heiferI’, ‘heiferII’,</dt><dd><p>‘heiferIII’, ‘cow’, ‘sold_heifer’, or ‘culled cow’</p>
+</dd>
+<dt>index: the index of the animal in the respective animal_type list</dt><dd><p>whose information will be returned</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns: a dictionary with an animal of animal_type’s information. Not</dt><dd><p>all information is available for each animal_type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.get_animal_config">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_animal_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.get_animal_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.get_initialize_db_summary">
+<span class="sig-name descname"><span class="pre">get_initialize_db_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.get_initialize_db_summary" title="Permalink to this definition"></a></dt>
+<dd><p>Returns: a dictionary which is the summary of the animal initialization
+database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.get_life_cycle_output">
+<span class="sig-name descname"><span class="pre">get_life_cycle_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.get_life_cycle_output" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the life cycle output on an individual level, which is the
+information of some of each type of animal as well as some animal
+statistics.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>num_animals: the number of each type of animal (calves, heiferIs,
+heiferIIs, heiferIIIs, cows, sold_heifers, and culled_cows) for
+which information will be collected and returned. If num_animals is
+larger than the minimum length of the animal lists, then num_animals
+will be set to the minimum length of the animal lists</p>
+</dd>
+</dl>
+<p>Returns: a dictionary which contains the individual life cycle output</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.init_animals">
+<span class="sig-name descname"><span class="pre">init_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">herd_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.init_animals" title="Permalink to this definition"></a></dt>
+<dd><p>Populates the list of animals with the information from the
+input JSON file: constructs the calves, heiferI’s, heiferII’s,
+heiferIII’s, and cows (the desired amounts of each is specified by
+&#64;data), then calls life_cycle_manager’s initialize_herd() with those
+numbers to create instances of the animals. The nutrient requirements
+are calculated and the animals are allocated to pens.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>config: an instance of the Config class defined in classes.py</dt><dd><p>contains model configuration information</p>
+</dd>
+</dl>
+<p>herd_data: dictionary containing information about the herd</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts">
+<span class="sig-name descname"><span class="pre">init_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates initial nutrient requirements at the beginning of the
+simulation for initial pen allocation. For the nutrient requirements
+of cows, the average walking distance of all the pens initialized
+is used.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: an instance of the Feed class defined in feed.py
+weather: instance of the Weather class defined in classes.py
+time: instance of the Time class defined in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.init_pens">
+<span class="sig-name descname"><span class="pre">init_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_pen_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">herd_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.init_pens" title="Permalink to this definition"></a></dt>
+<dd><p>Populates the list of pens with the information from the input json file.
+Args:</p>
+<blockquote>
+<div><p>all_pen_data: dictionary containing information about the pens
+herd_data: dictionary containing information about the herd</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement.record_pen_history">
+<span class="sig-name descname"><span class="pre">record_pen_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement.record_pen_history" title="Permalink to this definition"></a></dt>
+<dd><p>Records the pen history of all of the animals.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.daily_animal_routine">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.animal_management.</span></span><span class="sig-name descname"><span class="pre">daily_animal_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.daily_animal_routine" title="Permalink to this definition"></a></dt>
+<dd><p>Executes daily routines relating to Animals. This method is called every day
+in the simulation and calls &#64;animal_management’s daily_updates() method
+with &#64;feed and &#64;time as arguments. [Note that currently, &#64;weather and
+&#64; time are not used in animal updates.]</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>animal_management: instance of the AnimalManagement class
+feed: instance of the Feed class
+weather: instance of the Weather class as defined in classes.py
+time: instance of the Time class as defined in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.clustering_pen_grouping">
+<span id="rufas-routines-animal-clustering-pen-grouping-module"></span><h2>RUFAS.routines.animal.clustering_pen_grouping module<a class="headerlink" href="#module-RUFAS.routines.animal.clustering_pen_grouping" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: clustering_pen_grouping.py
+Description: This file’s main function is grouping(list, pens) (line 44) which</p>
+<blockquote>
+<div><p>returns a Dictionary of lists of cows, with the key being the pen those cows
+are assigned to based on nutritional requirements. This function is called
+in animal_management.py for each ration cycle if there are more than 7 pens
+in the input (&gt;=2 pens for lactating cows). Based on algorithm developed by
+Jorge Barrientos (<a class="reference external" href="mailto:jab924&#37;&#52;&#48;cornell&#46;edu">jab924<span>&#64;</span>cornell<span>&#46;</span>edu</a>).</p>
+</div></blockquote>
+<p>Author(s): Chris VanKerkhove, <a class="reference external" href="mailto:cjv47&#37;&#52;&#48;cornell&#46;edu">cjv47<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.clustering_pen_grouping.grouping">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.clustering_pen_grouping.</span></span><span class="sig-name descname"><span class="pre">grouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stocking_density</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.clustering_pen_grouping.grouping" title="Permalink to this definition"></a></dt>
+<dd><p>Grouping algorithm that utilizes k-means clustering and takes an input
+that is a list of objects of class cow (see cow.py) and a list of
+pen objects (from pen.py), and then groups the lactating cows into the
+available pens based on their nutritional requirements relative to the
+rest of the cows.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cow_list: a list of lactating cows
+pens: the number of pens allocated for lactating cows
+stocking_density: The required stocking density to group all cows</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.clustering_pen_grouping.norm">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.clustering_pen_grouping.</span></span><span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.clustering_pen_grouping.norm" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to normalize a list of values and returnthat normalized
+list.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x: A list of values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.clustering_pen_grouping.percentile_list">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.clustering_pen_grouping.</span></span><span class="sig-name descname"><span class="pre">percentile_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.clustering_pen_grouping.percentile_list" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function that returns a list of percentiles corresponding
+to its matching value in the original list.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>l: a list of values</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal.pen">
+<span id="rufas-routines-animal-pen-module"></span><h2>RUFAS.routines.animal.pen module<a class="headerlink" href="#module-RUFAS.routines.animal.pen" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: pen.py
+Description: The class which represents a pen on the farm. Each pen has</p>
+<blockquote>
+<div><p>operations as described in the Animal Module Information Flow document on
+Basecamp (such as calculating average nutrient requirements, ration,
+manure excretion, etc). Method calls cascade through from the animal
+management class to pen to each individual animal in that pen.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></dt><dd><p>Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;cornell&#46;edu">jm2257<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.pen.</span></span><span class="sig-name descname"><span class="pre">Pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_dist_to_milking_parlor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_dist_to_milking_parlor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_stalls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_handling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_separator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_stocking_density</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages a pen’s operation. Stores the characteristics of the pen and the
+animals that are housed in it any point in the simulation. This class also
+keeps track of some key characteristics of the average animal in the pen.</p>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>pen_id<span class="classifier">int</span></dt><dd><p>The pen’s unique pen ID.
+Obtained from the input file.</p>
+</dd>
+<dt>vertical_dist_to_milking_parlor<span class="classifier">float</span></dt><dd><p>The vertical distance to milking parlor, measured in kilometers.
+Obtained from the input file.</p>
+</dd>
+<dt>horizontal_dist_to_milking_parlor<span class="classifier">float</span></dt><dd><p>The horizontal distance to milking parlor, measured in kilometers.
+Obtained from the input file.</p>
+</dd>
+<dt>number_of_stalls<span class="classifier">int</span></dt><dd><p>The number of stalls.
+Obtained from the input file.</p>
+</dd>
+<dt>stocking_density<span class="classifier">float</span></dt><dd><p>The stocking density of the pen.
+Calculated when animals in pen are updated in update_animals()</p>
+</dd>
+<dt>housing_type<span class="classifier">string</span></dt><dd><p>The housing type of the pen.
+Obtained from the input file.</p>
+</dd>
+<dt>bedding_type<span class="classifier">string</span></dt><dd><p>The bedding type of the pen.
+Obtained from the input file.</p>
+</dd>
+<dt>pen_type<span class="classifier">string</span></dt><dd><p>The pen type (freestall or tiestall).
+Obtained from the input file.</p>
+</dd>
+<dt>manure_handling<span class="classifier">string</span></dt><dd><p>The manure handling method used to clean the pen.</p>
+</dd>
+<dt>manure_separator<span class="classifier">string</span></dt><dd><p>The type of manure separator that processes manure excreted in the pen.</p>
+</dd>
+<dt>manure_storage<span class="classifier">string</span></dt><dd><p>The type of manure storage receptacle that stores manure excreted in the pen.</p>
+</dd>
+<dt>avg_p_intake<span class="classifier">float</span></dt><dd><p>The average phosphorus intake of the animals in the pen.</p>
+</dd>
+<dt>avg_p_req<span class="classifier">float</span></dt><dd><p>The average phosphorus requirements of the animals in the pen.</p>
+</dd>
+<dt>avg_p_animal<span class="classifier">float</span></dt><dd><p>The average phosphorus content/mass of the animals in the pen.</p>
+</dd>
+<dt>animals_in_pen<span class="classifier">animal list</span></dt><dd><p>The list of all animals in this pen.</p>
+</dd>
+<dt>classes_in_pen<span class="classifier">set</span></dt><dd><p>The set (no repeats) of all the classes to which the animals in the pen belong.</p>
+</dd>
+<dt>pen_populated<span class="classifier">bool</span></dt><dd><p>True iff there is at least 1 animal in the pen, and false otherwise.</p>
+</dd>
+<dt>avg_DBW<span class="classifier">float</span></dt><dd><p>The average daily change in (delta) body weight of the animals in the pen.
+Used for ration formulation.</p>
+</dd>
+<dt>avg_BW<span class="classifier">float</span></dt><dd><p>The average body weight of the animals in the pen.
+Used for ration formulation.</p>
+</dd>
+<dt>avg_DMIest<span class="classifier">float</span></dt><dd><p>The average dry matter intake estimation of the animals in the pen.
+Used for ration formulation</p>
+</dd>
+<dt>avg_nutrient_rqmts<span class="classifier">dict</span></dt><dd><p>Contains the average nutrient requirements of the animals in the pen.
+Used for ration formulation</p>
+</dd>
+<dt>avg_calf_nutrient_rqmts<span class="classifier">dict</span></dt><dd><p>Contains the average nutrient requirements of the calves in the pen.
+Used for ration formulation</p>
+</dd>
+<dt>avg_milk<span class="classifier">float</span></dt><dd><p>The average milk production of the animals in the pen.
+Used for (lactating cow) ration formulation</p>
+</dd>
+<dt>avg_CP_milk<span class="classifier">float</span></dt><dd><p>The average milk crude protein content of the animals in the pen.
+Used for (lactating cow) ration formulation</p>
+</dd>
+<dt>ration<span class="classifier">dict</span></dt><dd><p>Contains the ration for all the animals in the pen.</p>
+</dd>
+<dt>ration_nutrient_amount<span class="classifier">dict</span></dt><dd><p>Contains the total amount of different nutrients in the current ration.</p>
+</dd>
+<dt>ration_nutrient_conc<span class="classifier">dict</span></dt><dd><p>Contains the concentration of different nutrients in the current ration.</p>
+</dd>
+<dt>dry_matter_intake<span class="classifier">float</span></dt><dd><p>The dry matter intake value of the animals in the pen.</p>
+</dd>
+<dt>avg_growth<span class="classifier">float</span></dt><dd><p>The average growth of the animals in the pen.</p>
+</dd>
+<dt>MEdiet<span class="classifier">float</span></dt><dd><p>The metabolizable energy concentration of the diet fed to the pen.</p>
+</dd>
+<dt>_manure_dict_template<span class="classifier">dict</span></dt><dd><p>The dictionary template for the manure attributes (manure, calf_total, etc)</p>
+</dd>
+<dt>manure<span class="classifier">dict</span></dt><dd><p>Contains the total manure excretion of all animals in the pen.</p>
+</dd>
+<dt>calf_total<span class="classifier">dict</span></dt><dd><p>Contains the total manure excretion of the calves in the pen.</p>
+</dd>
+<dt>heifer_total<span class="classifier">dict</span></dt><dd><p>Contains the total manure excretion of the heifers in the pen.</p>
+</dd>
+<dt>dry_total<span class="classifier">dict</span></dt><dd><p>Contains the total manure excretion of the dry cows in the pen.</p>
+</dd>
+<dt>lactating_total<span class="classifier">dict</span></dt><dd><p>Contains the total manure excretion of the lactating cows in the pen.</p>
+</dd>
+<dt>animal_combination<span class="classifier">AnimalCombination</span></dt><dd><p>Represents the valid animal type combinations in the pen.</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AnimalCombination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Enumeration that represents the valid combinations of animals in a pen.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination.CALF">
+<span class="sig-name descname"><span class="pre">CALF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination.CALF" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination.CLOSE_UP">
+<span class="sig-name descname"><span class="pre">CLOSE_UP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination.CLOSE_UP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination.GROWING">
+<span class="sig-name descname"><span class="pre">GROWING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination.GROWING" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination.GROWING_AND_CLOSE_UP">
+<span class="sig-name descname"><span class="pre">GROWING_AND_CLOSE_UP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination.GROWING_AND_CLOSE_UP" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination.LAC_COW">
+<span class="sig-name descname"><span class="pre">LAC_COW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination.LAC_COW" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.AnimalCombination.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.AnimalCombination.NONE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.calc_avg_growth">
+<span class="sig-name descname"><span class="pre">calc_avg_growth</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_avg_growth" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the average growth of the animals in the pen.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist">
+<span class="sig-name descname"><span class="pre">calc_daily_walking_dist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the daily walking distance for the cows in the pen (if any).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.calc_manure">
+<span class="sig-name descname"><span class="pre">calc_manure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methane_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_manure" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Calculates the total manure excretion of the animals in the pen,</dt><dd><p>and updates the manure attributes to contain the new amounts.</p>
+</dd>
+<dt>Args:</dt><dd><p>feed: instance of the Feed class
+methane_model: methane model used for methane emission calculations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.calc_ration">
+<span class="sig-name descname"><span class="pre">calc_ration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_feeds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.calc_ration" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates and sets the ration for the pen using the average nutrient
+requirements of the animals in the pen.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: instance of the Feed class
+available_feeds: instance of the AvailableFeeds class defined in ration_driver.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.call_p_rqmts">
+<span class="sig-name descname"><span class="pre">call_p_rqmts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.call_p_rqmts" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each animal’s method to calculate phosphorus requirements.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.clear" title="Permalink to this definition"></a></dt>
+<dd><p>Clears the pen attributes for re-allocation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.daily_p_update">
+<span class="sig-name descname"><span class="pre">daily_p_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.daily_p_update" title="Permalink to this definition"></a></dt>
+<dd><p>Calls each animal’s method to calculate daily phosphorus update.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.get_id">
+<span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.get_id" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>int : the id, the unique id number of the pen.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.get_pen_type">
+<span class="sig-name descname"><span class="pre">get_pen_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.get_pen_type" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>string : the pen type: freestall or tiestall.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.reset_manure">
+<span class="sig-name descname"><span class="pre">reset_manure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.reset_manure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.set_avg_nutrient_rqmts">
+<span class="sig-name descname"><span class="pre">set_avg_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg_nutrient_rqmts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.set_avg_nutrient_rqmts" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.set_id">
+<span class="sig-name descname"><span class="pre">set_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.set_id" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the pen’s id to id.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pen_id: The pen’s unique pen ID, obtained from the input file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.set_milk_avgs">
+<span class="sig-name descname"><span class="pre">set_milk_avgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">avg_milk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">avg_CP_milk</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.set_milk_avgs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.set_up_new_animal">
+<span class="sig-name descname"><span class="pre">set_up_new_animal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_conc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_animals_before_additions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.set_up_new_animal" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the necessary attributes for &#64;animal to be a replacement in this
+pen.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>animal: the replacement animal which needs to have necessary values</dt><dd><p>for later computations</p>
+</dd>
+<dt>p_conc: P concentration of &#64;animal’s class, used to calculate the</dt><dd><p>P in &#64;animal. -1 for this value indicates that &#64;animal is a
+calf and that its p_animal attribute has already been calculated</p>
+</dd>
+</dl>
+<p>feed: instance of the Feed class defined in feed.py
+temp: temperature on the current day
+num_animals_before_additions: the number of animals in this pen</p>
+<blockquote>
+<div><p>before any new animals were added for the day</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.subset_class_feeds">
+<span class="sig-name descname"><span class="pre">subset_class_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.subset_class_feeds" title="Permalink to this definition"></a></dt>
+<dd><p>Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
+based on the animal type(s) that are currently in the pen.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>feed: an object of the Feed class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.animal.pen.Pen.update_animals">
+<span class="sig-name descname"><span class="pre">update_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_animals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.pen.Pen.update_animals" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the list of animals to &#64;new_animals and calculates the stocking
+density and each animal’s walking distance.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>new_animals: list of new animals in the pen
+animal_combination: an AnimalCombination Enum representating the type of the new animals</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.animal">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.animal" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.html" class="btn btn-neutral float-left" title="RUFAS.routines package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.feed.html" class="btn btn-neutral float-right" title="RUFAS.routines.feed package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
