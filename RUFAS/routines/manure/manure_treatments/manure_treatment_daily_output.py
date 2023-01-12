@@ -48,7 +48,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     biogas: float = 0.0  # biogas production per day (m3/day)
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
     methane_generation_volume: float = 0.0
-    input_energy_heating: float = 0.0
+    heating_input_energy: float = 0.0
     evaporated_water: float = 0.0
     minimum_digester_volume: float = 0.0
     top_cover_volume: float = 0.0

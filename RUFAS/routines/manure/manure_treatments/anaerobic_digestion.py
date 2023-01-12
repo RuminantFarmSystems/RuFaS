@@ -70,7 +70,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                 liquid_manure_total_solids=self._manure_handler_daily_output.liquid_manure_total_solids
         )
         average_temperature_celsius = self._get_current_day_average_temperature_celsius()
-        input_energy_heating = (self._calc_specific_input_energy(average_temperature_celsius, moisture_content) *
+        heating_input_energy = (self._calc_specific_input_energy(average_temperature_celsius, moisture_content) *
                                 daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS)
         # MS.3.B.7R
         methane_generation_volume = GasEmissions.calc_methane_volume_via_Chen_equation(
@@ -85,7 +85,7 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         new_daily_output.biogas = (self.config.biogas_generation_ratio *
                                    self._manure_handler_daily_output.liquid_manure_total_volatile_solids)
-        new_daily_output.input_energy_heating = input_energy_heating
+        new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
         new_daily_output.biogas_energy_content = biogas_energy_content
         new_daily_output.minimum_digester_volume = minimum_digester_volume
