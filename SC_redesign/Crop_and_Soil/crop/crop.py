@@ -39,8 +39,7 @@ class Crop(NitrogenIncorporation, LeafAreaIndex):
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
         self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
         """Process component controlling plant heat accumulation"""
-        LeafAreaIndex.__init__(self)  # TODO: rename module and component (e.g., "CanopyGrowth")?
-        # self.leaf_area_index = LeafAreaIndex(data)
+        self.leaf_area_index = LeafAreaIndex(data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
         """Process component controlling canopy growth, including leaf area index"""
         self.root_development = RootDevelopment(data)
         """Process component controlling plant root development"""
@@ -100,7 +99,7 @@ class Crop(NitrogenIncorporation, LeafAreaIndex):
         # phosphorus_uptake.update_all()
         #
         self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
-        self.grow_canopy()
+        self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
         self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration)
 

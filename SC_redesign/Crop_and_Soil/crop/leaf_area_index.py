@@ -10,82 +10,63 @@ This module is based off of the 'Canopy Cover and Height' section of SWAT
 
 class LeafAreaIndex:
     def __init__(self, crop_data: Optional[CropData] = None):
-        data = crop_data or CropData()  # initialize with defaults, if not given
-        # TODO replace attributes with reference to data - GitHub Issue #255
-        #  in various methods
-        # fixed attributes (unchanged during simulations)
-        self.first_heat_fraction_point = 0.15
-        self.second_heat_fraction_point = 0.50
-        self.first_leaf_fraction_point = 0.01
-        self.second_leaf_fraction_point = 0.95
-        self.max_canopy_height = 2.5  # m
-        self.growth_factor = 1.0
-        self.max_leaf_area_index = 3.0
-        self.senescent_heat_fraction = 0.9
-        # variable attributes (change throughout simulations)
-        self.leaf_area_index = 0
-        self.heat_fraction = 0.73
-        # empty variables
-        self._lai_shapes = None
-        self.optimal_leaf_area_fraction = None
-        self.canopy_height = None
-        self.leaf_area_added = None
-        self.max_leaf_area_change = None
-        self.previous_leaf_area_index = None
-        self.previous_optimal_leaf_area_fraction = None
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def grow_canopy(self) -> None:
         """main leaf area index function"""
-        self._lai_shapes = self._determine_lai_shapes(self.first_heat_fraction_point, self.second_heat_fraction_point,
-                                                      self.first_leaf_fraction_point, self.second_leaf_fraction_point)
+        self.data._lai_shapes = self._determine_lai_shapes(self.data.first_heat_fraction_point,
+                                                           self.data.second_heat_fraction_point,
+                                                           self.data.first_leaf_fraction_point,
+                                                           self.data.second_leaf_fraction_point)
 
-        self.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(self.heat_fraction,
-                                                                                     self._lai_shapes[0],
-                                                                                     self._lai_shapes[1])
+        self.data.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(self.data.heat_fraction,
+                                                                                          self.data._lai_shapes[0],
+                                                                                          self.data._lai_shapes[1])
 
-        self.canopy_height = self.determine_canopy_height(self.max_canopy_height, self.optimal_leaf_area_fraction)
-        if self.is_in_senescence:  # senescence
-            self.leaf_area_index = self._determine_senescent_leaf_area_index(self.heat_fraction,
-                                                                             self.senescent_heat_fraction,
-                                                                             self.optimal_leaf_area_fraction)
+        self.data.canopy_height = self.determine_canopy_height(self.data.max_canopy_height,
+                                                               self.data.optimal_leaf_area_fraction)
+        if self.data.is_in_senescence:  # senescence
+            self.data.leaf_area_index = self._determine_senescent_leaf_area_index(self.data.heat_fraction,
+                                                                                  self.data.senescent_heat_fraction,
+                                                                                  self.data.optimal_leaf_area_fraction)
         else:  # normal growth
             self.check_previous_leaf_area_values()
-            self.max_leaf_area_change = self._determine_max_leaf_area_change(self.optimal_leaf_area_fraction,
-                                                                             self.previous_optimal_leaf_area_fraction,
-                                                                             self.max_leaf_area_index,
-                                                                             self.previous_leaf_area_index)
+            self.data.max_leaf_area_change = self._determine_max_leaf_area_change(
+                self.data.optimal_leaf_area_fraction,
+                self.data.previous_optimal_leaf_area_fraction,
+                self.data.max_leaf_area_index,
+                self.data.previous_leaf_area_index
+            )
             self.determine_leaf_area_added()
             self.add_leaf_area()
         self.shift_leaf_area_time()
 
     def shift_leaf_area_time(self) -> None:
         """shifts the time window by one step for leaf area attributes"""
-        self.previous_leaf_area_index = self.leaf_area_index
-        self.previous_optimal_leaf_area_fraction = self.optimal_leaf_area_fraction
+        self.data.previous_leaf_area_index = self.data.leaf_area_index
+        self.data.previous_optimal_leaf_area_fraction = self.data.optimal_leaf_area_fraction
 
     def check_previous_leaf_area_values(self) -> None:
         """check for previous LAI values and set them to 0 if none are present. This function handles the
         initial time point in the simulation"""
-        if self.previous_optimal_leaf_area_fraction is None:
-            self.previous_optimal_leaf_area_fraction = 0
-        if self.previous_leaf_area_index is None:
-            self.previous_leaf_area_index = 0
+        if self.data.previous_optimal_leaf_area_fraction is None:
+            self.data.previous_optimal_leaf_area_fraction = 0
+        if self.data.previous_leaf_area_index is None:
+            self.data.previous_leaf_area_index = 0
 
     def determine_leaf_area_added(self) -> None:
         """sets actual leaf area added, by adjusting for the plant growth factor
         SWAT Reference: 5:3.2.2
         """
-        self.leaf_area_added = min(self.max_leaf_area_change * sqrt(self.growth_factor), self.max_leaf_area_change)
+        self.data.leaf_area_added = min(self.data.max_leaf_area_change * sqrt(self.data.growth_factor),
+                                        self.data.max_leaf_area_change)
 
     def add_leaf_area(self) -> None:
         """add new leaf area to the plant
         SWAT Reference: 5:2.1.18"""
-        self.leaf_area_index = max(0, self.previous_leaf_area_index + self.leaf_area_added)
+        self.data.leaf_area_index = max(0., self.data.previous_leaf_area_index + self.data.leaf_area_added)
 
-    @property
-    def is_in_senescence(self) -> bool:
-        """check if the plant is in senescence"""
-        return self.heat_fraction > self.senescent_heat_fraction
+
 
     @staticmethod
     def determine_canopy_height(max_canopy_height: float, optimal_leaf_area_fraction: float) -> float:

@@ -221,3 +221,8 @@ class CropData:
     def has_given_harvest_index(self) -> bool:
         """was a user-defined harvest index is given? This triggers a harvest index override"""
         return self.user_harvest_index is not None
+
+    @property
+    def is_in_senescence(self) -> bool:
+        """check if the plant is in senescence"""
+        return self.heat_fraction > self.senescent_heat_fraction
