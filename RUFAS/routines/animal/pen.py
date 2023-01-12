@@ -534,7 +534,6 @@ class Pen:
             num_animals_before_additions = 1
 
         class_name = type(animal).__name__
-        # print(class_name)
         self.classes_in_pen.add(class_name)
 
         if class_name == 'Cow':
