@@ -5,13 +5,10 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
+from RUFAS.routines.animal.life_cycle.animal_base import PenHistory
 import pytest
 
-from mock.mock import MagicMock,mock_open, patch
-from pytest_mock.plugin import MockerFixture
-
-from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
-from mock.mock import MagicMock,mock_open, patch
+from mock.mock import MagicMock, mock_open, patch
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
@@ -20,6 +17,7 @@ from RUFAS.simulation_engine import SimulationEngine
 
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
+
 
 @pytest.fixture
 def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
@@ -36,73 +34,74 @@ def patch_simulation_engine(mocker: MockerFixture) -> SimulationEngine:
 
     return sim_eng
 
+# Fixtures that might be needed for future tests: ultimately not needed in recently added tests
+
 
 @pytest.fixture
-def patch_animal_object_v0(mocker:MockerFixture)->AnimalBase:
+def patch_animal_object_v0(mocker: MockerFixture) -> AnimalBase:
     """returns a mocked AnimalBase"""
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__")
-    ####mocker.patch(
-    ####    "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
-    #animobj = AnimalBase()
-    ### note: init didn't work with the below
+    # mocker.patch(
+    # "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
+    # animobj = AnimalBase()
+    # note: init didn't work with the below
     animobj = AnimalBase.__init__(
-        id = MagicMock(),
-        breed = MagicMock(),
-        birth_date =  MagicMock(),
-        days_born = MagicMock(),
-        semen_used =  MagicMock(),
-        
-        body_weight = MagicMock(),
-        body_weight_history = MagicMock(),
-        pen_history = MagicMock(),
-        simulation_day = MagicMock()
-        )
+        id=MagicMock(),
+        breed=MagicMock(),
+        birth_date=MagicMock(),
+        days_born=MagicMock(),
+        semen_used=MagicMock(),
+
+        body_weight=MagicMock(),
+        body_weight_history=MagicMock(),
+        pen_history=MagicMock(),
+        simulation_day=MagicMock()
+    )
     return animobj
 
+
 @pytest.fixture
-def patch_animal_object(mocker:MockerFixture)->AnimalBase:
+def patch_animal_object(mocker: MockerFixture) -> AnimalBase:
     """returns a mocked AnimalBase"""
     mockerinit = patch(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.__init__")
-    ####mocker.patch(
-    ####    "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
-    #animobj = AnimalBase()
-    ### note: init didn't work with the below
+    # mocker.patch(
+    # "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.update_body_weight_history")
+    # animobj = AnimalBase()
+    # note: init didn't work with the below
     mockerinit.start()
     animobj = AnimalBase.__init__(
-        id = MagicMock(),
-        breed = MagicMock(),
-        birth_date =  MagicMock(),
-        days_born = MagicMock(),
-        semen_used =  MagicMock(),
-        
-        body_weight = MagicMock(),
-        body_weight_history = [],
-        pen_history = MagicMock(),
-        simulation_day = MagicMock()
-        )
+        id=MagicMock(),
+        breed=MagicMock(),
+        birth_date=MagicMock(),
+        days_born=MagicMock(),
+        semen_used=MagicMock(),
+
+        body_weight=MagicMock(),
+        body_weight_history=[],
+        pen_history=MagicMock(),
+        simulation_day=MagicMock()
+    )
     mockerinit.stop()
     return animobj
 
 
-from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
 @pytest.fixture
-def patch_BodyWeightHistory(mocker:MockerFixture)->BodyWeightHistory:
+def patch_BodyWeightHistory(mocker: MockerFixture) -> BodyWeightHistory:
     """returns a mocked BodyWeightHistory"""
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.BodyWeightHistory.__init__")
     bwhistobj = BodyWeightHistory.__init__(
-        simulation_day = MagicMock(),
-        days_born = MagicMock(),
-        body_weight = MagicMock()
-        )
+        simulation_day=MagicMock(),
+        days_born=MagicMock(),
+        body_weight=MagicMock()
+    )
     return bwhistobj
 
 
-from RUFAS.routines.animal.life_cycle.animal_base import PenHistory
 @pytest.fixture
-def patch_PenHistory(mocker:MockerFixture)->PenHistory:
+def patch_PenHistory(mocker: MockerFixture) -> PenHistory:
     """returns a mocked PenHistory object"""
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.PenHistory.__init__")
@@ -111,7 +110,7 @@ def patch_PenHistory(mocker:MockerFixture)->PenHistory:
     penhistobj.end_date = 1
     penhistobj.pen = 3
     penhistobj.classes_in_pen = ['LAC_COW']
-    
+
     return penhistobj
 
 
@@ -225,19 +224,19 @@ def cow() -> AnimalBase:
         'semen_type': 'conventional',
         'body_weight': 600,
         'pen_history': []
-        }
+    }
     AnimalBase.nutrients = {'dummy1': 'dummyval1', 'dummy2': 'dummyval2'}
     AnimalBase.config = {'semen_type': 'dummy'}
-    cow = AnimalBase(initsetup)   
+    cow = AnimalBase(initsetup)
     return cow
 
 
-def test_daily_p_update(cow:AnimalBase) -> None:
+def test_daily_p_update(cow: AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
     cow.dP_reserves = 1
     cow.p_intake = 0
     cow.p_req = 1
-    
+
     # Case 1: intake is less than requirements
     cow.daily_p_update()
     actual = cow.dP_reserves
@@ -259,6 +258,7 @@ def test_daily_p_update(cow:AnimalBase) -> None:
     actual = cow.dP_reserves
     expected = 0
     assert actual == expected
+
 
 def test_calc_base_manure():
     """Unit test for function calc_base_manure in file routines/animal/life_cycle/animal_base.py"""
@@ -292,7 +292,7 @@ def test_update_pen_history(cow: AnimalBase) -> None:
     assert cow.pen_history[-1].classes_in_pen == ['Cow']
     assert cow.pen_history[-1].start_date == 2
     assert cow.pen_history[-1].end_date == 2
-    
+
     # Case 2
     # check that it changes pens to 4
     cow.update_pen_history(
@@ -314,7 +314,7 @@ def test_update_pen_history(cow: AnimalBase) -> None:
     assert cow.pen_history[-1].end_date == 4
 
 
-def test_update_body_weight_history(cow:AnimalBase) -> None:
+def test_update_body_weight_history(cow: AnimalBase) -> None:
     histories = [(1, 200, 650),
                  (2, 300, 600),
                  (3, 400, 550)]
@@ -347,7 +347,7 @@ def test_add_event():
 
     # Case 1: add an event
     animal_event.add_event(animal_age, simulation_day, event_description)
-    assert animal_event.events == {100:['simulation_day=200', 'dummy']}
+    assert animal_event.events == {100: ['simulation_day=200', 'dummy']}
 
     # Case 2: another event on the next day
     animal_age = 101
@@ -360,7 +360,8 @@ def test_add_event():
 
     # Case 3: another event on the first day
     animal_event.add_event(animal_age, simulation_day, event_description)
-    assert animal_event.events[100] == ['simulation_day=200', 'dummy', 'dummy2']
+    assert animal_event.events[100] == [
+        'simulation_day=200', 'dummy', 'dummy2']
 
 
 def test___str__():
@@ -894,13 +895,14 @@ def test_set_globals():
     """Unit test for function set_globals in file routines/animal/ration/cow_ration_NLP.py"""
     pass
 
+
 def test_list_reconfig():
     """Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py"""
-    result = list_reconfig([1,2,3,4])
-    expected = [1,1,1,2,2,2,3,3,3,4,4,4]
+    result = list_reconfig([1, 2, 3, 4])
+    expected = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]
     assert result == expected
-    result2 = list_reconfig(['1','2','3','4'])
-    expected2 = ['1','1','1','2','2','2','3','3','3','4','4','4']
+    result2 = list_reconfig(['1', '2', '3', '4'])
+    expected2 = ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4']
     assert result2 == expected2
 
 
