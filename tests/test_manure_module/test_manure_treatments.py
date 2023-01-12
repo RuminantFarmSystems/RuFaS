@@ -1,12 +1,16 @@
 import dataclasses
 from typing import Type
+from typing import Union
 
 import pytest
+from mock.mock import call
 from mock.mock import PropertyMock
 from pytest import approx
 from pytest_mock import MockFixture
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
@@ -47,6 +51,14 @@ def test_manure_treatment_daily_output() -> None:
             sludge_manure_phosphorus=16.0,
             sludge_manure_potassium=17.0,
             sludge_manure_daily_volume=18.0,
+
+            biogas=19.0,
+            biogas_energy_content=20.0,
+            methane_generation_volume=21.0,
+            heating_input_energy=22.0,
+            evaporated_water=23.0,
+            minimum_digester_volume=24.0,
+            top_cover_volume=25.0,
     )
 
     # Assert
@@ -72,6 +84,14 @@ def test_manure_treatment_daily_output() -> None:
     assert manure_treatment_daily_output.sludge_manure_phosphorus == approx(16.0)
     assert manure_treatment_daily_output.sludge_manure_potassium == approx(17.0)
     assert manure_treatment_daily_output.sludge_manure_daily_volume == approx(18.0)
+
+    assert manure_treatment_daily_output.biogas == approx(19.0)
+    assert manure_treatment_daily_output.biogas_energy_content == approx(20.0)
+    assert manure_treatment_daily_output.methane_generation_volume == approx(21.0)
+    assert manure_treatment_daily_output.heating_input_energy == approx(22.0)
+    assert manure_treatment_daily_output.evaporated_water == approx(23.0)
+    assert manure_treatment_daily_output.minimum_digester_volume == approx(24.0)
+    assert manure_treatment_daily_output.top_cover_volume == approx(25.0)
 
 
 def test_manure_treatment_daily_output_add() -> None:
@@ -110,6 +130,13 @@ def test_manure_treatment_daily_output_add() -> None:
             sludge_manure_phosphorus=16.0,
             sludge_manure_potassium=17.0,
             sludge_manure_daily_volume=18.0,
+            biogas=19.0,
+            biogas_energy_content=20.0,
+            methane_generation_volume=21.0,
+            heating_input_energy=22.0,
+            evaporated_water=23.0,
+            minimum_digester_volume=24.0,
+            top_cover_volume=25.0,
     )
 
     manure_treatment_daily_output_2 = ManureTreatmentDailyOutput(
@@ -131,6 +158,13 @@ def test_manure_treatment_daily_output_add() -> None:
             sludge_manure_phosphorus=34.0,
             sludge_manure_potassium=35.0,
             sludge_manure_daily_volume=36.0,
+            biogas=37.0,
+            biogas_energy_content=38.0,
+            methane_generation_volume=39.0,
+            heating_input_energy=40.0,
+            evaporated_water=41.0,
+            minimum_digester_volume=42.0,
+            top_cover_volume=43.0,
     )
 
     # Act
@@ -203,6 +237,13 @@ def test_manure_treatment_daily_output_clone() -> None:
             sludge_manure_phosphorus=16.0,
             sludge_manure_potassium=17.0,
             sludge_manure_daily_volume=18.0,
+            biogas=19.0,
+            biogas_energy_content=20.0,
+            methane_generation_volume=21.0,
+            heating_input_energy=22.0,
+            evaporated_water=23.0,
+            minimum_digester_volume=24.0,
+            top_cover_volume=25.0,
     )
 
     # Act
@@ -410,6 +451,10 @@ def test_manure_treatment_type_get_type(manure_treatment_type_name: str,
             ('anaerobic lagoon', None, AnaerobicLagoon, DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG),
             ('anaerobic lagoon', DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG, AnaerobicLagoon,
              DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG),
+            ('anaerobic digestion', None, AnaerobicDigestion,
+             DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG),
+            ('anaerobic digestion', DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG, AnaerobicDigestion,
+             DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG),
         ])
 def test_manure_treatment_factory_get_instance(manure_treatment_type_name: str,
                                                custom_manure_treatment_config: ManureTreatmentConfig,
@@ -452,7 +497,7 @@ def test_manure_treatment_factory_get_instance(manure_treatment_type_name: str,
         [
             'slurry storage underfloor',
             'slurry storage outdoor',
-            # 'anaerobic digestion',
+            'anaerobic digestion',
             'anaerobic lagoon',
             # 'anaerobic digestion and lagoon',
             # 'anaerobic digestion and lagoon with split',
@@ -494,7 +539,7 @@ def test_initialize_private_attributes_during_update(manure_treatment_type_name:
         [
             'slurry storage underfloor',
             'slurry storage outdoor',
-            # 'anaerobic digestion',
+            'anaerobic digestion',
             'anaerobic lagoon',
             # 'anaerobic digestion and lagoon',
             # 'anaerobic digestion and lagoon with split',
@@ -569,7 +614,7 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
         [
             'slurry storage underfloor',
             'slurry storage outdoor',
-            # 'anaerobic digestion',
+            'anaerobic digestion',
             'anaerobic lagoon',
             # 'anaerobic digestion and lagoon',
             # 'anaerobic digestion and lagoon with split',
@@ -610,7 +655,7 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
         [
             'slurry storage underfloor',
             'slurry storage outdoor',
-            # 'anaerobic digestion',
+            'anaerobic digestion',
             'anaerobic lagoon',
             # 'anaerobic digestion and lagoon',
             # 'anaerobic digestion and lagoon with split',
@@ -646,7 +691,7 @@ def test_accumulate_daily_output(manure_treatment_type_name: str,
         [
             'slurry storage underfloor',
             'slurry storage outdoor',
-            # 'anaerobic digestion',
+            'anaerobic digestion',
             'anaerobic lagoon',
             # 'anaerobic digestion and lagoon',
             # 'anaerobic digestion and lagoon with split',
@@ -1326,7 +1371,14 @@ def test_slurry_storage_outdoor_freeboard_volume(mocker: MockFixture) -> None:
 # Test AnaerobicLagoon specific methods
 # =====================================
 
-def test_calc_daily_sludge_output(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+        'anaerobic_treatment_class',
+        [
+            AnaerobicLagoon,
+            AnaerobicDigestion
+        ])
+def test_calc_daily_sludge_output(anaerobic_treatment_class: Union[Type[AnaerobicLagoon], Type[AnaerobicDigestion]],
+                                  mocker: MockFixture) -> None:
     """Unit test for _calc_daily_sludge_output() in slurry_storage_outdoor.py."""
     # Arrange
     mock_manure_treatment_config = mocker.MagicMock()
@@ -1341,7 +1393,7 @@ def test_calc_daily_sludge_output(mocker: MockFixture) -> None:
     mock_manure_treatment_config.potassium_removal_efficiency_for_treatment = \
         potassium_removal_efficiency_for_treatment = 0.1
 
-    anaerobic_lagoon = AnaerobicLagoon(
+    anaerobic_treatment = anaerobic_treatment_class(
             weather=mocker.MagicMock(),
             time=mocker.MagicMock(),
             manure_treatment_config=mock_manure_treatment_config
@@ -1364,7 +1416,7 @@ def test_calc_daily_sludge_output(mocker: MockFixture) -> None:
     expected_sludge_manure_daily_volume = liquid_manure_total_volatile_solids * 0.03 / ManureConstants.MANURE_DENSITY
 
     # Act
-    actual_daily_output = anaerobic_lagoon._calc_daily_sludge_output(
+    actual_daily_output = anaerobic_treatment._calc_daily_sludge_output(
             daily_output=mock_manure_treatment_daily_output,
             manure_treatment_daily_input=mock_manure_treatment_daily_input)
 
@@ -2032,3 +2084,258 @@ def test_bound_sludge_accumulation_volume(mocker: MockFixture) -> None:
     # Assert
     assert patch_for_sludge_accumulation_volume_property.call_count == 2
     assert actual_bound_sludge_accumulation_volume == approx(expected_bound_sludge_accumulation_volume)
+
+
+# Test AnaerobicDigestion-specific methods
+# ========================================
+
+def test_daily_update_helper(mocker: MockFixture) -> None:
+    """Unit test for _daily_update_helper() in anaerobic_lagoon.py."""
+    # Arrange
+    anaerobic_digestion = AnaerobicDigestion(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=mocker.MagicMock(),
+    )
+    current_manure_treatment_daily_input = mocker.MagicMock()
+    anaerobic_digestion._current_manure_treatment_daily_input = current_manure_treatment_daily_input
+    initial_daily_output = mocker.MagicMock()
+    patch_for_initialize_daily_output_during_update = mocker.patch.object(
+            anaerobic_digestion,
+            '_initialize_daily_output_during_update',
+            return_value=initial_daily_output
+    )
+    daily_output_with_sludge_output = mocker.MagicMock()
+    patch_for_calc_daily_sludge_output = mocker.patch.object(
+            anaerobic_digestion,
+            '_calc_daily_sludge_output',
+            return_value=daily_output_with_sludge_output
+    )
+    complete_daily_output = mocker.MagicMock()
+    patch_for_calc_anaerobic_digestion_daily_output = mocker.patch.object(
+            anaerobic_digestion,
+            '_calc_anaerobic_digestion_daily_output',
+            return_value=complete_daily_output
+    )
+    patch_for_accumulate_daily_output = mocker.patch.object(
+            anaerobic_digestion,
+            '_accumulate_daily_output'
+    )
+
+    # Act
+    actual_daily_output = anaerobic_digestion._daily_update_helper()
+
+    # Assert
+    patch_for_initialize_daily_output_during_update.assert_called_once_with(current_manure_treatment_daily_input)
+    patch_for_calc_daily_sludge_output.assert_called_once_with(initial_daily_output,
+                                                               current_manure_treatment_daily_input)
+    patch_for_calc_anaerobic_digestion_daily_output.assert_called_once_with(daily_output_with_sludge_output)
+    patch_for_accumulate_daily_output.assert_called_once_with(complete_daily_output)
+    assert actual_daily_output == complete_daily_output
+
+
+def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
+    """Unit test for _calc_anaerobic_digestion_daily_output() in anaerobic_digestion.py."""
+    # Arrange
+    mock_manure_treatment_config = mocker.MagicMock()
+    mock_manure_treatment_config.hydraulic_retention_time = hydraulic_retention_time = 12
+    mock_manure_treatment_config.top_cover_volume_fraction = top_cover_volume_fraction = 0.4
+    mock_manure_treatment_config.biogas_generation_ratio = biogas_generation_ratio = 0.6
+    mock_manure_treatment_config.evaporation_fraction = evaporation_fraction = 0.1
+    anaerobic_digestion = AnaerobicDigestion(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=mock_manure_treatment_config,
+    )
+    mock_manure_handler_daily_output = mocker.MagicMock()
+    mock_manure_handler_daily_output.liquid_manure_total_solids = liquid_manure_total_solids = 50.0
+    mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = liquid_manure_total_volatile_solids = 35.0
+    anaerobic_digestion._manure_handler_daily_output = mock_manure_handler_daily_output
+
+    mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_daily_output.daily_final_manure_volume = daily_final_manure_volume = 100.0
+    mock_manure_treatment_daily_output.clone.return_value = mock_manure_treatment_daily_output
+
+    moisture_content = 0.5
+    patch_for_calc_moisture_content = mocker.patch.object(
+            anaerobic_digestion,
+            '_calc_moisture_content',
+            return_value=moisture_content
+    )
+
+    average_temperature_celsius = 20.0
+    patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
+            anaerobic_digestion,
+            '_get_current_day_average_temperature_celsius',
+            return_value=average_temperature_celsius
+    )
+
+    specific_input_energy = 70.0
+    patch_for_calc_specific_input_energy = mocker.patch.object(
+            anaerobic_digestion,
+            '_calc_specific_input_energy',
+            return_value=specific_input_energy
+    )
+
+    methane_generation_volume = 200.0
+    patch_for_calc_methane_volume_via_Chen_equation = mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_digestion.'
+            'GasEmissions.calc_methane_volume_via_Chen_equation',
+            return_value=methane_generation_volume
+    )
+
+    biogas_energy_content = 500.0
+    patch_for_calc_biogas_energy_content = mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_digestion.'
+            'GasEmissions.calc_biogas_energy_content',
+            return_value=biogas_energy_content
+    )
+
+    expected_biogas = biogas_generation_ratio * liquid_manure_total_volatile_solids
+    expected_heating_input_energy = (specific_input_energy * daily_final_manure_volume *
+                                     GeneralConstants.LITERS_TO_CUBIC_METERS)
+    expected_evaporated_water = evaporation_fraction * daily_final_manure_volume
+    expected_biogas_energy_content = biogas_energy_content
+    expected_minimum_digester_volume = daily_final_manure_volume * hydraulic_retention_time
+    expected_top_cover_volume = expected_minimum_digester_volume * top_cover_volume_fraction
+
+    # Act
+    actual_anaerobic_digestion_daily_output = anaerobic_digestion._calc_anaerobic_digestion_daily_output(
+            mock_manure_treatment_daily_output
+    )
+
+    # Assert
+    mock_manure_treatment_daily_output.clone.assert_called_once()
+    patch_for_calc_moisture_content.assert_called_once_with(
+            total_daily_mass=daily_final_manure_volume,
+            liquid_manure_total_solids=liquid_manure_total_solids
+    )
+    patch_for_get_current_day_average_temperature_celsius.assert_called_once()
+    patch_for_calc_specific_input_energy.assert_called_once_with(average_temperature_celsius, moisture_content)
+    patch_for_calc_methane_volume_via_Chen_equation.assert_called_once_with(
+            manure_total_volatile_solids=liquid_manure_total_volatile_solids,
+            hydraulic_retention_time=hydraulic_retention_time
+    )
+    patch_for_calc_biogas_energy_content.assert_called_once_with(methane_volume=methane_generation_volume)
+
+    assert actual_anaerobic_digestion_daily_output.biogas == approx(expected_biogas)
+    assert actual_anaerobic_digestion_daily_output.heating_input_energy == approx(expected_heating_input_energy)
+    assert actual_anaerobic_digestion_daily_output.evaporated_water == approx(expected_evaporated_water)
+    assert actual_anaerobic_digestion_daily_output.biogas_energy_content == approx(expected_biogas_energy_content)
+    assert actual_anaerobic_digestion_daily_output.minimum_digester_volume == approx(expected_minimum_digester_volume)
+    assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(expected_top_cover_volume)
+
+
+@pytest.mark.parametrize(
+        'total_daily_mass',
+        [
+            -1.0,
+            0.0,
+            0.5,
+            1.0,
+            100.0,
+        ])
+def test_calc_moisture_content(total_daily_mass: float) -> None:
+    """Unit test for _calc_moisture_content() in anaerobic_digestion.py."""
+    # Arrange
+    liquid_manure_total_solids = 20.0
+    if total_daily_mass > 0:
+        expected_moisture_content = 1 - (liquid_manure_total_solids / total_daily_mass)
+    else:
+        expected_moisture_content = 0.0
+
+    # Act
+    actual_moisture_content = AnaerobicDigestion._calc_moisture_content(
+            total_daily_mass=total_daily_mass,
+            liquid_manure_total_solids=liquid_manure_total_solids
+    )
+
+    # Assert
+    assert actual_moisture_content == approx(expected_moisture_content)
+
+
+def test_calc_specific_input_energy(mocker: MockFixture) -> None:
+    """Unit test for _calc_specific_input_energy() in anaerobic_digestion.py."""
+    # Arrange
+    mock_manure_treatment_config = mocker.MagicMock()
+    mock_manure_treatment_config.anaerobic_digestion_temperature_set_point = \
+        anaerobic_digestion_temperature_set_point = 35.0
+    anaerobic_digestion = AnaerobicDigestion(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=mock_manure_treatment_config,
+    )
+    average_temperature_celsius = 20.0
+    moisture_content = 0.5
+    effluent_temperature = 30.0
+    patch_for_bound_influent_temperature = mocker.patch.object(
+            anaerobic_digestion,
+            '_bound_influent_temperature',
+            return_value=effluent_temperature
+    )
+    influent_heat_capacity = 4.2
+    anaerobic_digestion_heat_capacity = 5.8
+    patch_for_calc_manure_heat_capacity = mocker.patch.object(
+            anaerobic_digestion,
+            '_calc_manure_heat_capacity',
+            side_effect=[influent_heat_capacity, anaerobic_digestion_heat_capacity]
+    )
+    average_manure_heat_capacity = (influent_heat_capacity + anaerobic_digestion_heat_capacity) / 2
+    expected_heating_input_energy = (average_manure_heat_capacity *
+                                     (anaerobic_digestion_temperature_set_point - effluent_temperature))
+
+    # Act
+    actual_heating_input_energy = anaerobic_digestion._calc_specific_input_energy(
+            average_temperature_celsius=average_temperature_celsius,
+            moisture_content=moisture_content
+    )
+
+    # Assert
+    patch_for_bound_influent_temperature.assert_called_once_with(average_temperature_celsius)
+    assert patch_for_calc_manure_heat_capacity.call_args_list == [
+        call(average_temperature_celsius, moisture_content),
+        call(anaerobic_digestion_temperature_set_point, moisture_content)
+    ]
+    assert actual_heating_input_energy == approx(expected_heating_input_energy)
+
+
+@pytest.mark.parametrize(
+        'average_temperature_celsius',
+        [
+            3.9,
+            4.0,
+            4.1
+        ])
+def test_bound_influent_temperature(average_temperature_celsius: float) -> None:
+    """Unit test for _bound_influent_temperature() in anaerobic_digestion.py."""
+    # Arrange
+    if average_temperature_celsius <= 4.0:
+        expected_bound_influent_temperature = 4.0
+    else:
+        expected_bound_influent_temperature = average_temperature_celsius
+
+    # Act
+    actual_bound_influent_temperature = AnaerobicDigestion._bound_influent_temperature(
+            average_temperature_celsius=average_temperature_celsius
+    )
+
+    # Assert
+    assert actual_bound_influent_temperature == approx(expected_bound_influent_temperature)
+
+
+def test_calc_manure_heat_capacity() -> None:
+    """Unit test for _calc_manure_heat_capacity() in anaerobic_digestion.py."""
+    # Arrange
+    average_temperature_celsius = 20.0
+    moisture_content = 0.5
+    expected_manure_heat_capacity = (0.68298 + 0.025662 * average_temperature_celsius +
+                                     0.01306 * moisture_content * 100)
+
+    # Act
+    actual_manure_heat_capacity = AnaerobicDigestion._calc_manure_heat_capacity(
+            average_temperature_celsius=average_temperature_celsius,
+            moisture_content=moisture_content
+    )
+
+    # Assert
+    assert actual_manure_heat_capacity == approx(expected_manure_heat_capacity)
