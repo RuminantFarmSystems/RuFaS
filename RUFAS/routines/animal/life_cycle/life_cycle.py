@@ -16,6 +16,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle import animal_events_constants as const
+import numpy as np
 
 class LifeCycleManager:
     """
@@ -579,13 +580,22 @@ class LifeCycleManager:
                 if heiferII.days_in_preg == 1:
                     self.num_preg_21_days_heifer += 1   
         
+        # Jan 12th by Yijing: added check for division of 0
         #caculate service rate and conception rate
         if date >= 106:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
-                self.service_rate_each_21_d_heifer = float(self.num_ai_21_days_heifer) / float(self.num_heifer_open_acc_21_days/21)
-                self.conception_rate_each_21_d_heifer = float(self.num_preg_21_days_heifer) / float(self.num_ai_21_days_heifer)
+                if self.num_heifer_open_acc_21_days == 0:
+                    self.service_rate_each_21_d_heifer = np.nan
+                else:
+                    self.service_rate_each_21_d_heifer = float(self.num_ai_21_days_heifer) / float(self.num_heifer_open_acc_21_days/21)
+                
+                if self.num_ai_21_days_heifer == 0:
+                    self.conception_rate_each_21_d_heifer = np.nan
+                else:
+                    self.conception_rate_each_21_d_heifer = float(self.num_preg_21_days_heifer) / float(self.num_ai_21_days_heifer)
+                
                 self.num_ai_21_days_heifer = 0
                 self.num_heifer_open_acc_21_days = 0
                 self.num_preg_21_days_heifer = 0
@@ -855,14 +865,21 @@ class LifeCycleManager:
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1   
         
+        # Jan 12th by Yijing: added check for division of 0
         #caculate service rate and conception rate
         if date >= 106:
             self.count_21_days += 1
             if self.count_21_days % 21 == 0 and self.count_21_days != 0:
                 self.count_21_period += 1
-                self.service_rate_each_21_d = float(self.num_ai_21_days) / float(self.num_cow_open_acc_21_days/21)
-                if self.num_ai_21_days >0:
-                    self.conception_rate_each_21_d = float(self.num_preg_21_days) / float(self.num_ai_21_days)
+                if self.num_cow_open_acc_21_days == 0:
+                    self.service_rate_each_21_d = np.nan
+                else:
+                    self.service_rate_each_21_d = float(self.num_ai_21_days) / float(self.num_cow_open_acc_21_days/21)
+
+                if self.num_ai_21_days == 0:
+                    self.conception_rate_each_21_d = np.nan
+                else:
+                    self.conception_rate_each_21_d = float(self.num_preg_21_days) / float(self.num_ai_21_days)  
                 self.num_ai_21_days = 0
                 self.num_cow_open_acc_21_days = 0
                 self.num_preg_21_days = 0
@@ -916,11 +933,12 @@ class LifeCycleManager:
         self.feed_cost_more = self.cost_feed_calf_more + self.cost_feed_heifer_more + self.cost_feed_milking_cow + self.cost_feed_dry_cow
         self.milk_income_over_feed_cost = self.income_milk - self.cost_feed_milking_cow - self.cost_feed_dry_cow
         
+        # Jan 12th by Yijing: Added income_sold_heifer
         # bought more than sold
-        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_culled_heifer + self.income_culled_cow -\
+        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_heifer + self.income_culled_heifer + self.income_culled_cow -\
              self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost
         # sold more than bought
-        self.net_return_more_heifer = self.income_milk + self.income_sold_male_calf + self.income_culled_heifer + self.income_culled_cow -\
+        self.net_return_more_heifer = self.income_milk + self.income_sold_male_calf + self.income_sold_heifer + self.income_culled_heifer + self.income_culled_cow -\
              self.repro_cost_heifer_more - self.repro_cost_cow - self.feed_cost_more
     
         if total_animal_num == 0:
