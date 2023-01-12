@@ -85,24 +85,42 @@ class CropData:
     # ---- leaf area index
     # fixed attributes (unchanged during simulations)
     first_heat_fraction_point: float = 0.15
+    """fraction of the growing season corresponding to the first point on the optimal leaf development 
+    curve (unitless)"""
     second_heat_fraction_point: float = 0.50
+    """fraction of the growing season corresponding to the second point on the optimal leaf development 
+    curve (unitless)"""
     first_leaf_fraction_point: float = 0.01
+    """fraction of max leaf area index corresponding to the first point on the optimal leaf development 
+    curve (unitless)"""
     second_leaf_fraction_point: float = 0.95
+    """fraction of max leaf area index corresponding to the second point on the optimal leaf development 
+        curve (unitless)"""
     max_canopy_height: float = 2.5  # m
+    """maximum canopy height for the plant (m)"""
     ##growth_factor = 1.0  #duplicate
     max_leaf_area_index: float = 3.0
+    """maximum leaf area index for the plant (unitless)"""
     senescent_heat_fraction: float = 0.9
+    """the fraction of potential heat units above which the plant goes enters senescence (unitless)"""
     # variable attributes (change throughout simulations)
     ##leaf_area_index = 0 # duplicate
     ##heat_fraction = 0.73 # duplicate
     # empty variables
     _lai_shapes: Optional[float] = None
+    """shape coefficients used to calculate fraction of max leaf area index (unitless)."""
     optimal_leaf_area_fraction: Optional[float] = None
+    """fraction of the plant's maximum leaf area index corresponding to the current heat fraction (unitless)"""
     canopy_height: Optional[float] = None
+    """current height of the plant (m)"""
     leaf_area_added: Optional[float] = None
-    max_leaf_area_change: Optional[float] = None
+    """leaf area index change during the day; corrected for growth constraints (unitless)"""
+    optimal_leaf_area_change: Optional[float] = None
+    """leaf area index added under ideal conditions for the day; not corrected for growth constraints (unitless)"""
     previous_leaf_area_index: Optional[float] = None
+    """leaf area index on the previous day"""
     previous_optimal_leaf_area_fraction: Optional[float] = None
+    """optimal leaf area fraction on the previous day"""
     
     # ---- nitrogen incorporation
     # constant declarations with defaults (unchanged during simulations)

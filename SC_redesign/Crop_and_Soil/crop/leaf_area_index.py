@@ -4,7 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 
 """
-This module is based off of the 'Canopy Cover and Height' section of SWAT
+This module is based off of the 'Canopy Cover and Height' section of SWAT (5:2.1.2)
 """
 
 
@@ -31,7 +31,7 @@ class LeafAreaIndex:
                                                                                   self.data.optimal_leaf_area_fraction)
         else:  # normal growth
             self.check_previous_leaf_area_values()
-            self.data.max_leaf_area_change = self._determine_max_leaf_area_change(
+            self.data.optimal_leaf_area_change = self._determine_max_leaf_area_change(
                 self.data.optimal_leaf_area_fraction,
                 self.data.previous_optimal_leaf_area_fraction,
                 self.data.max_leaf_area_index,
@@ -58,8 +58,8 @@ class LeafAreaIndex:
         """sets actual leaf area added, by adjusting for the plant growth factor
         SWAT Reference: 5:3.2.2
         """
-        self.data.leaf_area_added = min(self.data.max_leaf_area_change * sqrt(self.data.growth_factor),
-                                        self.data.max_leaf_area_change)
+        self.data.leaf_area_added = min(self.data.optimal_leaf_area_change * sqrt(self.data.growth_factor),
+                                        self.data.optimal_leaf_area_change)
 
     def add_leaf_area(self) -> None:
         """add new leaf area to the plant
