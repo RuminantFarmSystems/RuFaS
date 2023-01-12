@@ -40,7 +40,7 @@ class CropData:
     phosphorus: float = 20
     """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
-    """optimal amount of phosphorus stored in the plant for the curent growth stage (kg/ha)"""
+    """optimal amount of phosphorus stored in the plant for the current growth stage (kg/ha)"""
     minimum_temperature: float = 15
     """minimum temperature below which plant growth cannot occur (Celsius)"""
     optimal_temperature: float = 22
@@ -118,21 +118,28 @@ class CropData:
     optimal_leaf_area_change: Optional[float] = None
     """leaf area index added under ideal conditions for the day; not corrected for growth constraints (unitless)"""
     previous_leaf_area_index: Optional[float] = None
-    """leaf area index on the previous day"""
+    """leaf area index on the previous day (unitless)"""
     previous_optimal_leaf_area_fraction: Optional[float] = None
-    """optimal leaf area fraction on the previous day"""
+    """optimal leaf area fraction on the previous day (unitless)"""
     
     # ---- nitrogen incorporation
     # constant declarations with defaults (unchanged during simulations)
     half_mature_heat_fraction: float = 0.5
+    """expected fraction of potential heat units when the plant is half-way to maturity (unitless)"""
     mature_heat_fraction: float = 1.0
     """fraction of potential heat units accumulated for the plant to date (unitless)"""
     emergence_nitrogen_fraction: float = 0.04
+    """expected fraction of plant biomass comprised of nitrogen for the plant at emergence (unitless)"""
     half_mature_nitrogen_fraction: float = 0.03
+    """expected fraction of plant biomass comprised of nitrogen for the plant at half-maturity (unitless)"""
     near_mature_nitrogen_fraction: float = 0.02
+    """expected fraction of plant biomass comprised of nitrogen for the plant at near-maturity (unitless)"""
     mature_nitrogen_fraction: float = 0.01
+    """expected fraction of plant biomass comprised of nitrogen for the plant at maturity (unitless)"""
     nitrogen_distro_param: float = 10
+    """nitrogen uptake distribution parameter (unitless)"""
     is_nitrogen_fixer: bool = False
+    """is the planta nitrogen fixer?"""
     # current declarations with defaults (change throughout simulations)
     # TODO: what module sets/updates these variables?
     ##nitrogen = 0 # duplicate
@@ -143,23 +150,36 @@ class CropData:
     """current depth of the plant roots in the soil (mm)"""
     # empty declarations
     _nitrogen_shapes: Optional[List[float]] = None
+    """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
     previous_nitrogen: Optional[float] = None
-    shapes_nitrogen_uptake: Optional[float] = None
+    """nitrogen stored in plant biomass on the previous day (kg/ha)"""
     optimal_nitrogen_fraction: Optional[float] = None
     """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
     ##optimal_nitrogen = None # duplicate
     potential_nitrogen_uptake: Optional[float] = None
-    total_soil_layers: Optional[float] = None
-    accessible_soil_layers: Optional[float] = None
+    """potential nitrogen to be taken up by the plant under ideal circumstances for the current day (kg/ha)"""
+    total_soil_layers: Optional[int] = None
+    """total number of layers in the soil profile (unitless)"""
+    accessible_soil_layers: Optional[int] = None
+    """number of layers in the soil profile that the plant roots have access to (unitless)"""
     inaccessible_soil_layers: Optional[int] = None
+    """number of layers in the soil profile that the plant roots do not have access to (unitless)"""
     layer_nitrogen_potentials: Optional[float] = None
+    """potential nitrogen uptake from each soil layer (unitless)"""
     unmet_nitrogen_demands: Optional[float] = None
+    """plant nitrogen demands that remain unmet by the overlaying soil layers (unitless)"""
     nitrogen_requests: Optional[float] = None
+    """amount of nitrogen requested from each soil layer by the plant (kg/ha)"""
     actual_nitrogen_uptakes: Optional[List[float]] = None
+    """actual nitrogen to be taken up by the plant from each soil layer (kg/ha)"""
     total_nitrogen_uptake: Optional[float] = None
+    """total nitrogen to be taken up by the plant (kg/ha)"""
     fixed_nitrogen: Optional[float] = None
+    """total amount of nitrogen fixed by the plant (kg/ha)"""
     nitrate_factor: Optional[float] = None
+    """soil nitrate factor (unitless; [0, 1])"""
     fixation_stage_factor: Optional[float] = None
+    """growth stage factor of the nitrogen fixing symbiotes for the current plant growth stage (unitless)"""
 
     # ---- root development
     ##heat_fraction = 1 / 3 #duplicate
@@ -189,11 +209,11 @@ class CropData:
      growth conditions (unitless)"""
     min_harvest_index: float = 0.2
     """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
-    allowed for the plant"""
+    allowed for the plant (unitless)"""
     # is_residue_added: bool = False ## not needed?
     harvest_efficiency: float = 1.0
-    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field (unitless; 
-    [0, 1])"""
+    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field 
+    (unitless; [0, 1])"""
     yield_nitrogen_fraction: float = 0.15
     """crop-specific expected fraction of nitrogen in yield (unitless)"""
     yield_phosphorus_fraction: float = 0.08
