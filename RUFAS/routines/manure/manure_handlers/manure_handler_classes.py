@@ -110,7 +110,7 @@ class BaseManureHandler:
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
                     "bedding": vars(bedding),
-                    "sim_day": vars(sim_day)
+                    "sim_day": sim_day
                     }
 
         NH3_housing_emission = GasEmissions.calc_ammonia_emission(

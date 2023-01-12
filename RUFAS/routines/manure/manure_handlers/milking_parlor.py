@@ -83,7 +83,7 @@ class MilkingParlor:
                     "function": "fraction_of_day_spent_in_holding_area"}
 
         fraction_of_day_spent_in_holding_area = self._calc_fraction_of_day_from_minutes(
-            self.fraction_of_day_spent_in_holding_area)
+            self.total_minutes_spent_in_holding_area)
 
         om.add_variable("fraction_of_day_spent_in_holding_area",
                         fraction_of_day_spent_in_holding_area, info_map)
@@ -142,7 +142,7 @@ class MilkingParlor:
                     "function": "fraction_of_day_spent_milking"}
 
         fraction_of_day_spent_milking = self._calc_fraction_of_day_from_minutes(
-            self.fraction_of_day_spent_milking)
+            self.total_minutes_spent_milking)
 
         om.add_variable("fraction_of_day_spent_milking",
                         fraction_of_day_spent_milking, info_map)
@@ -246,8 +246,8 @@ class MilkingParlor:
                     "function": self.calc_manure_mass_deposited_in_milking_parlor.__name__,
                     "num_cows": num_cows, "manure_mass": manure_mass}
 
-        manure_mass_deposited_in_milking_parlor = manure_mass * \
-            self.total_fraction_of_day_spent_in_milking_parlor if num_cows > 0 else 0.0
+        manure_mass_deposited_in_milking_parlor = (manure_mass *
+                                                   self.total_fraction_of_day_spent_in_milking_parlor) if num_cows > 0 else 0.0
 
         om.add_variable("manure_mass_deposited_in_milking_parlor",
                         manure_mass_deposited_in_milking_parlor, info_map)
