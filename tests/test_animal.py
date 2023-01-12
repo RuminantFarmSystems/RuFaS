@@ -11,6 +11,10 @@ from mock.mock import MagicMock,mock_open, patch
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
+from mock.mock import MagicMock,mock_open, patch
+from pytest_mock.plugin import MockerFixture
+
+from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.simulation_engine import SimulationEngine
 
