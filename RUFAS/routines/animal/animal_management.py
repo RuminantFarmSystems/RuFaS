@@ -304,8 +304,8 @@ class AnimalManagement:
             average horizontal distance from milking parlor)
         """
 
-        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+        return mean(pen.vertical_dist_to_parlor for pen in self.all_pens_ids), \
+               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens_ids)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
