@@ -349,23 +349,14 @@ class AnimalManagement:
         of the pens they were in. This function is void.
 
         Args:
-            animals_removed: list of animal IDs that are to be removed from the herd
+            animals_removed: list of animal objects that are to be removed from the herd
         """
 
-        # Loops through ids_removed, which is a list of the animals IDs that have been removed from the herd.
         for animal in animals_removed:
-            # If the given animal ID is in the animal ID/pen ID dictionary
-            # Here, we are looping through the keys of a dictionary pertaining to animal IDs
-            id = animal.id
-            if animal.id == 378168:
-                print("removal hit")
-            if id in self.animal_to_pen_id_map:
-                # Creates a "pen" variable that grabs the current pen of the animal removed
-                pen = self.all_pens_ids[self.animal_to_pen_id_map[id]]
-                # Readjusts the stocking density value of the pen in question
+            if animal.id in self.animal_to_pen_id_map:
+                pen = self.all_pens_ids[self.animal_to_pen_id_map[animal.id]]
                 pen.stocking_density = (len(pen.animals_in_pen) - 1) / pen.num_stalls
-                # Deletes the animal ID key entry corresponding to the id of the animal removed
-                del self.animal_to_pen_id_map[id]
+                del self.animal_to_pen_id_map[animal.id]
 
     def track_former_pen_population(self):
         """
@@ -376,12 +367,10 @@ class AnimalManagement:
         Returns: a list of the populations of each pen on the farm prior to
                  any additions due to daily pen updates
         """
-        # Initializes pen population list before additions are made
+
         pen_population_before_additions = [None] * len(self.all_pens_ids)
-        # Loops through the pens objects on the farm and their indices from the all_pens_ids list
+
         for index, pen in enumerate(self.all_pens_ids):
-            # Populates list with the number of animals as the values, and the indices pertaining to different pens
-            #  since pens are zero-indexed
             pen_population_before_additions[index] = len(pen.animals_in_pen)
 
         return pen_population_before_additions
@@ -397,14 +386,10 @@ class AnimalManagement:
                 pens are zero-indexed
         """
 
-        # We loop through the numbers of all the pens on the farm and their indices
         for index, pen in enumerate(self.all_pens_ids):
-            # From Militsa: "We need to adjust the ration totals for the pen attributes now
-            # that all new animals have been added"
             for key in pen.ration:
                 if key != 'status' and key != 'objective':
-                    pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * \
-                                      len(pen.animals_in_pen)
+                    pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
 
     def daily_update_id_pen(self, animals_added, animals_removed, calves_born, feed, temp):
         """
@@ -425,34 +410,12 @@ class AnimalManagement:
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
+        animals_added.extend(calves_born)
 
-        # _____________________________________________________________________________________________
-        # Calf preprocessing logic
-        # _____________________________________________________________________________________________
-        # IS THIS EXTENSION ONLY SUPPOSED TO HAPPEN ONCE?
-        print("^" * 77)
-        for calf in calves_born:
-            if calf in animals_added:
-                print("duplicate")
-                print(calf)
-        # animals_added.extend(calves_born)
-        print(len(animals_added))
-        print(animals_added[len(animals_added)-4:])
-        print(calves_born)
-        # _____________________________________________________________________________________________
-        # Animal removal logic
-        # _____________________________________________________________________________________________
         self.remove_animal_from_herd(animals_removed)
-        # From Doctor Reed: redesign how we assign new animals to a pen
 
-        # _____________________________________________________________________________________________
-        # Population tracker logic
-        # _____________________________________________________________________________________________
         original_pen_populations = self.track_former_pen_population()
 
-        # _____________________________________________________________________________________________
-        # Pen selection/animal-to-pen insertion logic (could be split but for loop is rather long)
-        # _____________________________________________________________________________________________
         animal_type_mapping_dict = {
             'Calf': {'p_conc': self.p_conc['calf'], 'animal_list': self.calves,
                      'animal_group': Pen.AnimalCombination.CALF},
@@ -468,12 +431,7 @@ class AnimalManagement:
                         'animal_group': Pen.AnimalCombination.CLOSE_UP}}
 
         for animal in animals_added:
-            if animal.id == 378168:
-                print("daily update id pen addition hit")
             animal_class = type(animal).__name__
-            if animal.id == 378168:
-                print(animal_class)
-                print(calves_born[0].id)
 
             if animal_class == 'Cow':
                 if animal.milking:
@@ -482,26 +440,16 @@ class AnimalManagement:
                     animal_class = 'Dry_Cow'
 
             animal_p_conc = (animal_type_mapping_dict.get(animal_class)['p_conc'])
-            # print(animal_class)
-            # print(type(animal))
-            # print(animal_p_conc)
-            # animal_conc_access = animal_p_conc['p_conc']
             animal_type_mapping_dict.get(animal_class)['animal_list'].append(animal)
             group = animal_type_mapping_dict.get(animal_class)['animal_group']
 
             candidate_pens = self.pens_by_animal_combination[group]
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
-        self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
-        if animal.id == 378168:
-            print('reached')
-            print(self.animal_to_pen_id_map[animal.id])
-        self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
-                                                               original_pen_populations[pen_for_insert.id])
+            self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
+            self.all_pens_ids[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
+                                                                   original_pen_populations[pen_for_insert.id])
 
-        # _____________________________________________________________________________________________
-        # Ration-specific logic
-        # _____________________________________________________________________________________________
         self.calculate_pen_rations(original_pen_populations)
 
     def allocate_all_pens(self):
@@ -602,11 +550,11 @@ class AnimalManagement:
                                    + " initializing new pen,",
                                    info_map)
                     # initializing a default pen to be used for any class
-                    pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
+                    pen = Pen(len(self.all_pens_ids), 0.1, 1.6, max_value,
                               'open air barn', 'straw', 'tiestall', 'manual_scraping',
                               'sedimentation', 'storage_pit', max_key[0], 1.2)
 
-                    self.all_pens.append(pen)
+                    self.all_pens_ids.append(pen)
                 # if available pen
                 else:
                     del mixed_type_pens[pen.id]

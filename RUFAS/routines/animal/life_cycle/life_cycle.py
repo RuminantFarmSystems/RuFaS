@@ -416,22 +416,18 @@ class LifeCycleManager:
         # those as replacement
         while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
             removed = heiferIIIs.pop()
-            animals_removed.append(removed.id)
+            animals_removed.append(removed)
             self.sold_heifers.append(removed)
             self.sold_heifer_num += 1
 
         # if the number of heifers is less than needed for the herd,
         # buy replacement from the market
-        # print(len(cows), len(heiferIIIs), self.bought_heifer_num, self.herd_num, date)
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 1.01 and \
                 date > 1:
             self.replacement_market[0].events.add_event(
                 self.replacement_market[0].days_born, date, const.ENTER_HERD)
             self.replacement_market[0].set_p_purchased()
-            # print("-----"*50)
             animals_added.append(self.replacement_market[0])
-            # print("+"*55)
-            # print(type(self.replacement_market[0]))
             self.bought_heifer_num += 1
             del self.replacement_market[0]
 
@@ -457,7 +453,6 @@ class LifeCycleManager:
                     self.calc_average(self.culled_cow_num,
                                       self.avg_cow_culling_age, cow.days_born)
 
-                # print(len(culled_cows))
                 animals_removed.append(cow)
                 del cows[index]
 
