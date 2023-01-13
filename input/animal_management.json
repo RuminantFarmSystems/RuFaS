@@ -7,7 +7,7 @@
         "graphic_dir": "output/graphics/",
         "run_tests": true,
         "set_seed": true,
-        "seed": 44,
+        "seed": 42,
         "simulate_animals": true
     },
     "weather": "barnyard_weather.csv",
