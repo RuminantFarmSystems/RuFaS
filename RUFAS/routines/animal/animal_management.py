@@ -176,6 +176,7 @@ class AnimalManagement:
 
             self.all_pens_ids.append(pen)
 
+        print(self.all_pens_ids)
         self._init_default_pens(herd_data['herd_num'])
 
     def _init_default_pens(self, herd_num):
@@ -375,9 +376,8 @@ class AnimalManagement:
 
     def calculate_pen_rations(self, prior_pen_populations):
         """
-        Calculates the ration of every pen in the simulated farm. This is done by
-        updating the values of each Pen object's ration dictionary, where the keys
-        pertain to certain food items in a ration. This function is void.
+        Adjusts the amount of each feed within a ration that is delivered to a pen
+            when the number of animals in the pen is changed
 
         Args:
             prior_pen_populations: list of the number of animals in each pen, since
