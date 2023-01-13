@@ -176,7 +176,6 @@ class AnimalManagement:
 
             self.all_pens_ids.append(pen)
 
-        print(self.all_pens_ids)
         self._init_default_pens(herd_data['herd_num'])
 
     def _init_default_pens(self, herd_num):
@@ -343,9 +342,8 @@ class AnimalManagement:
 
     def remove_animals_from_herd(self, animals_removed):
         """
-        Removes the animal IDs from the animal_to_pen_id_map dictionary pertaining to the
-        animals that have been removed from the herd, and updates the stocking density
-        of the pens they were in. This function is void.
+        Deletes the IDs of animals from animal_to_pen_id_map dictionary when the animal
+        was removed from the herd; updates the relevant pen's stocking density.
 
         Args:
             animals_removed: list of animal objects that are to be removed from the herd
@@ -721,11 +719,6 @@ class AnimalManagement:
             cow_class: list of instances of whatever cow type's pen history is being gathered
         """
         for cow in cow_class:
-            # print(cow)
-            # print(";" * 50)
-            # print(cow.id)
-            # print(";" * 50)
-            # print(self.animal_to_pen_id_map)
             current_pen = self.animal_to_pen_id_map[cow.id]
             classes_in_pen = self.all_pens_ids[current_pen].classes_in_pen
             cow.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
@@ -814,12 +807,6 @@ class AnimalManagement:
                                                      self.heiferIs,
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
-            # print("&" * 30)
-            # print(animals_added)
-            # print("^" * 30)
-            # print(ids_removed)
-            # print("-" * 30)
-            # print(calves_born)
             temp = weather.T_avg[time.year - 1][time.day - 1]
             self.daily_update_id_map(animals_added, animals_removed, calves_born, feed, temp)
 
