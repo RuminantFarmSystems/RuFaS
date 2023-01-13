@@ -160,7 +160,7 @@ def animal_management() -> AnimalManagement:
 @pytest.fixture
 def animal_management_with_mock_pens(animal_management: AnimalManagement,
                                      mock_pens: List[MagicMock]) -> AnimalManagement:
-    animal_management.all_pens_ids = mock_pens
+    animal_management.all_pens = mock_pens
     return animal_management
 
 
@@ -183,7 +183,7 @@ def test_init_pens(animal_management: AnimalManagement, mock_pen_data: Dict[str,
     # More than the minimum num of pens - 4 pens
     animal_management.init_pens(mock_pen_data, mock_herd_data)
 
-    actual = len(animal_management.all_pens_ids)
+    actual = len(animal_management.all_pens)
     expected = 4
     assert actual == expected
 
@@ -194,10 +194,10 @@ def test_init_default_pens(animal_management: AnimalManagement) -> None:
     # Less than the minimum num of pens - 0 pens
     # MIN_NUM_PENS default pens should be created
 
-    animal_management.all_pens_ids = []
+    animal_management.all_pens = []
     animal_management._init_default_pens(1)
 
-    actual = len(animal_management.all_pens_ids)
+    actual = len(animal_management.all_pens)
     expected = animal_management.MIN_NUM_PENS
     assert actual == expected
 
@@ -296,7 +296,7 @@ def test_clear_pens(animal_management_with_mock_pens: AnimalManagement) -> None:
     """Unit test for function clear_pens in file routines/animal/animal_management.py"""
     animal_management_with_mock_pens.clear_pens()
 
-    for pen in animal_management_with_mock_pens.all_pens_ids:
+    for pen in animal_management_with_mock_pens.all_pens:
         pen.clear.assert_called_once()
 
 
@@ -320,7 +320,7 @@ def test_calc_avg_growth(animal_management_with_mock_pens: AnimalManagement) -> 
 
     animal_management_with_mock_pens.calc_avg_growth()
 
-    for pen in animal_management_with_mock_pens.all_pens_ids:
+    for pen in animal_management_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
 
     pass
