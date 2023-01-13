@@ -18,7 +18,7 @@ N/A
 
 # Resources
 
-[Onboarding Document](https://public.3.basecamp.com/p/ucfdkV7n5WxSzj8XnRUFYKG2)
+[Onboarding Document](https://docs.google.com/document/d/1zN92KK2OkTDkutVmT96u7eEu3B2UDWgP/edit?usp=sharing&ouid=111321898904316595397&rtpof=true&sd=true)
 
 [Uncle Bob Clean Code Lessons](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
 
