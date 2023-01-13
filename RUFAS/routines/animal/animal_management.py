@@ -340,7 +340,7 @@ class AnimalManagement:
             for animal in animals_in_pen:
                 self.animal_to_pen_id_map[animal.id] = pen.id
 
-    def remove_animal_from_herd(self, animals_removed):
+    def remove_animals_from_herd(self, animals_removed):
         """
         Removes the animal IDs from the animal_to_pen_id_map dictionary pertaining to the
         animals that have been removed from the herd, and updates the stocking density
@@ -410,7 +410,7 @@ class AnimalManagement:
         """
         animals_added.extend(calves_born)
 
-        self.remove_animal_from_herd(animals_removed)
+        self.remove_animals_from_herd(animals_removed)
 
         original_pen_populations = self.track_former_pen_population()
 
