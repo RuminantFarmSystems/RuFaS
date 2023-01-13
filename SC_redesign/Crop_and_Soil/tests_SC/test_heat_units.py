@@ -156,23 +156,23 @@ def test_absorb_heat_units(mean, mint, maxt, use_heat_unit_temp):
         expect_heat_unit_temp = (expect_min_heat_unit_temp / 2) + (expect_max_heat_unit_temp / 2)
         assert expect_heat_unit_temp == data.heat_unit_temperature
 
-    # if use_heat_unit_temp or mean is None:
-    #     use_temp = expect_heat_unit_temp
-    # else:
-    #     use_temp = mean
-    #
-    # if 20 <= use_temp <= 38:
-    #     expect_is_growing = True
-    # else:
-    #     expect_is_growing = False
-    # assert expect_is_growing == data.is_growing
-    #
-    # if use_heat_unit_temp or (mean is None):
-    #     expect_new_heat_units = HeatUnits._determine_new_heat_units(expect_heat_unit_temp, 20)
-    # else:
-    #     expect_new_heat_units = HeatUnits._determine_new_heat_units(mean, 20)
-    # assert data.use_heat_unit_temperature == use_heat_unit_temp
-    # assert expect_new_heat_units == data.accumulated_heat_units
-    # assert data.previous_heat_fraction is None
-    # expect_heat_fraction = expect_new_heat_units / 800
-    # assert expect_heat_fraction == data.heat_fraction
+    if use_heat_unit_temp or mean is None:
+        use_temp = expect_heat_unit_temp
+    else:
+        use_temp = mean
+
+    if 20 <= use_temp <= 38:
+        expect_is_growing = True
+    else:
+        expect_is_growing = False
+    assert expect_is_growing == data.is_growing
+
+    if use_heat_unit_temp or (mean is None):
+        expect_new_heat_units = HeatUnits._determine_new_heat_units(expect_heat_unit_temp, 20)
+    else:
+        expect_new_heat_units = HeatUnits._determine_new_heat_units(mean, 20)
+    assert data.use_heat_unit_temperature == use_heat_unit_temp
+    assert expect_new_heat_units == data.accumulated_heat_units
+    assert data.previous_heat_fraction is None
+    expect_heat_fraction = expect_new_heat_units / 800
+    assert expect_heat_fraction == data.heat_fraction
