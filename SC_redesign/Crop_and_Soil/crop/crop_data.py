@@ -165,9 +165,9 @@ class CropData:
     inaccessible_soil_layers: Optional[int] = None
     """number of layers in the soil profile that the plant roots do not have access to (unitless)"""
     layer_nitrogen_potentials: Optional[float] = None
-    """potential nitrogen uptake from each soil layer (unitless)"""
+    """potential nitrogen uptake from each soil layer (kg/ha)"""
     unmet_nitrogen_demands: Optional[float] = None
-    """plant nitrogen demands that remain unmet by the overlaying soil layers (unitless)"""
+    """plant nitrogen demands that remain unmet by the overlaying soil layers (kg/ha)"""
     nitrogen_requests: Optional[float] = None
     """amount of nitrogen requested from each soil layer by the plant (kg/ha)"""
     actual_nitrogen_uptakes: Optional[List[float]] = None
