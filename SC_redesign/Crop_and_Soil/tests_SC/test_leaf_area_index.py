@@ -163,15 +163,6 @@ def test_error_determine_canopy_height(max_can_height, opt_leaf_area_frac):
         LeafAreaIndex.determine_canopy_height(max_can_height, opt_leaf_area_frac)
 
 
-# ---- Initializer functions
-def init_lai(**kwargs):
-    """helper function to create GrowthConstraint instance, with specified attributes"""
-    lai = LeafAreaIndex()
-    for key, val in kwargs.items():
-        setattr(lai, key, val)
-    return lai
-
-
 @pytest.mark.parametrize("heatfrac", [0, 0.2, 0.5, 0.75, 0.9, 0.95, 1, 1.2, -1])
 def test_grow_canopy(heatfrac):
     """integration test for leaf area processes via grow_canopy()"""
