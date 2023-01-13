@@ -11,6 +11,7 @@ from pytest_mock import MockFixture
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
@@ -394,6 +395,14 @@ def test_anaerobic_lagoon_default_config() -> None:
              DefaultManureTreatmentConfigFactory.SLURRY_STORAGE_OUTDOOR_CONFIG),
             (ManureTreatmentType.ANAEROBIC_DIGESTION, DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG),
             (ManureTreatmentType.ANAEROBIC_LAGOON, DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG),
+            (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON, (
+                    DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
+                    DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG
+            )),
+            (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT, (
+                    DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
+                    DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG
+            ))
         ])
 def test_default_manure_treatment_config_factory_get_instance(manure_treatment_type: ManureTreatmentType,
                                                               expected_manure_treatment_config:
@@ -455,6 +464,15 @@ def test_manure_treatment_type_get_type(manure_treatment_type_name: str,
              DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG),
             ('anaerobic digestion', DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG, AnaerobicDigestion,
              DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG),
+            ('anaerobic digestion and lagoon', None, AnaerobicDigestionAndLagoon,
+             (DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
+              DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG)),
+            ('anaerobic digestion and lagoon', (
+                    DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
+                    DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG),
+             AnaerobicDigestionAndLagoon, (
+                     DefaultManureTreatmentConfigFactory.ANAEROBIC_DIGESTION_CONFIG,
+                     DefaultManureTreatmentConfigFactory.ANAEROBIC_LAGOON_CONFIG)),
         ])
 def test_manure_treatment_factory_get_instance(manure_treatment_type_name: str,
                                                custom_manure_treatment_config: ManureTreatmentConfig,
@@ -499,8 +517,8 @@ def test_manure_treatment_factory_get_instance(manure_treatment_type_name: str,
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
-            # 'anaerobic digestion and lagoon',
-            # 'anaerobic digestion and lagoon with split',
+            'anaerobic digestion and lagoon',
+            'anaerobic digestion and lagoon with split',
         ])
 def test_initialize_private_attributes_during_update(manure_treatment_type_name: str,
                                                      mocker: MockFixture) -> None:
@@ -541,8 +559,6 @@ def test_initialize_private_attributes_during_update(manure_treatment_type_name:
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
-            # 'anaerobic digestion and lagoon',
-            # 'anaerobic digestion and lagoon with split',
         ])
 def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
                                                mocker: MockFixture) -> None:
@@ -616,8 +632,8 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
-            # 'anaerobic digestion and lagoon',
-            # 'anaerobic digestion and lagoon with split',
+            'anaerobic digestion and lagoon',
+            'anaerobic digestion and lagoon with split',
         ])
 def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: str,
                                                   mocker: MockFixture) -> None:
@@ -657,8 +673,8 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
-            # 'anaerobic digestion and lagoon',
-            # 'anaerobic digestion and lagoon with split',
+            'anaerobic digestion and lagoon',
+            'anaerobic digestion and lagoon with split',
         ])
 def test_accumulate_daily_output(manure_treatment_type_name: str,
                                  mocker: MockFixture) -> None:
@@ -693,8 +709,8 @@ def test_accumulate_daily_output(manure_treatment_type_name: str,
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
-            # 'anaerobic digestion and lagoon',
-            # 'anaerobic digestion and lagoon with split',
+            'anaerobic digestion and lagoon',
+            'anaerobic digestion and lagoon with split',
         ])
 def test_daily_update(manure_treatment_type_name: str,
                       mocker: MockFixture) -> None:
@@ -2339,3 +2355,160 @@ def test_calc_manure_heat_capacity() -> None:
 
     # Assert
     assert actual_manure_heat_capacity == approx(expected_manure_heat_capacity)
+
+
+# Test AnaerobicDigestionAndLagoon class
+# ======================================
+
+def test_anaerobic_digestion_and_lagoon_init(mocker: MockFixture) -> None:
+    """Unit test for __init__() in anaerobic_digestion_and_lagoon.py."""
+    # Arrange
+    mock_weather = mocker.MagicMock()
+    mock_time = mocker.MagicMock()
+    mock_manure_treatment_config = (mocker.MagicMock(), mocker.MagicMock())
+
+    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        self.weather = weather
+        self.time = time
+        self.config = manure_treatment_config
+
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__',
+            new=mock_base_manure_treatment
+    )
+
+    patch_for_anaerobic_digestion_init = mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicDigestion.__init__',
+            return_value=None
+    )
+    patch_for_anaerobic_lagoon_init = mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon.AnaerobicLagoon.__init__',
+            return_value=None
+    )
+
+    # Act
+    anaerobic_digestion_and_lagoon = AnaerobicDigestionAndLagoon(
+            weather=mock_weather,
+            time=mock_time,
+            manure_treatment_config=mock_manure_treatment_config
+    )
+
+    # Assert
+    patch_for_anaerobic_digestion_init.assert_called_once_with(mock_weather, mock_time, mock_manure_treatment_config[0])
+    assert anaerobic_digestion_and_lagoon.anaerobic_digestion_daily_output is None
+    patch_for_anaerobic_lagoon_init.assert_called_once_with(mock_weather, mock_time, mock_manure_treatment_config[1])
+
+
+def test_create_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
+    """Unit test for _create_anaerobic_digestion_daily_output() in anaerobic_digestion_and_lagoon.py."""
+    # Arrange
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon'
+            '.AnaerobicDigestionAndLagoon.__init__',
+            return_value=None
+    )
+    anaerobic_digestion_and_lagoon = AnaerobicDigestionAndLagoon(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock())
+    )
+    anaerobic_digestion_and_lagoon._manure_handler_daily_output = \
+        mock_manure_handler_daily_output = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = \
+        mock_current_manure_treatment_daily_input = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
+    mock_anaerobic_digestion_daily_output = mocker.MagicMock()
+    mock_anaerobic_digestion = mocker.MagicMock()
+    mock_anaerobic_digestion.daily_update.return_value = mock_anaerobic_digestion_daily_output
+    anaerobic_digestion_and_lagoon._anaerobic_digestion = mock_anaerobic_digestion
+
+    # Act
+    actual_anaerobic_digestion_daily_output = anaerobic_digestion_and_lagoon._create_anaerobic_digestion_daily_output()
+
+    # Assert
+    mock_anaerobic_digestion.daily_update.assert_called_once_with(
+            manure_handler_daily_output=mock_manure_handler_daily_output,
+            manure_treatment_daily_input=mock_current_manure_treatment_daily_input,
+            pen=mock_current_pen,
+            sim_day=mock_sim_day
+    )
+    assert actual_anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
+
+
+@pytest.mark.parametrize(
+        'manure_separator_exists',
+        [
+            True,
+            False
+        ]
+)
+def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exists: bool,
+                                                            mocker: MockFixture) -> None:
+    """Unit test for _daily_update_helper() in anaerobic_digestion_and_lagoon.py."""
+    # Arrange
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon'
+            '.AnaerobicDigestionAndLagoon.__init__',
+            return_value=None
+    )
+    anaerobic_digestion_and_lagoon = AnaerobicDigestionAndLagoon(
+            weather=mocker.MagicMock(),
+            time=mocker.MagicMock(),
+            manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock())
+    )
+    mock_anaerobic_digestion_daily_output = mocker.MagicMock()
+    patch_for_create_anaerobic_digestion_daily_output = mocker.patch.object(
+            anaerobic_digestion_and_lagoon,
+            '_create_anaerobic_digestion_daily_output',
+            return_value=mock_anaerobic_digestion_daily_output
+    )
+
+    if manure_separator_exists:
+        mock_manure_separator = mocker.MagicMock()
+        mock_manure_separator.daily_update.return_value = \
+            mock_manure_separator_daily_output = mocker.MagicMock()
+    else:
+        mock_manure_separator = None
+        mock_manure_separator_daily_output = None
+    anaerobic_digestion_and_lagoon._manure_separator = mock_manure_separator
+
+    mock_anaerobic_lagoon = mocker.MagicMock()
+    mock_anaerobic_lagoon.daily_update.return_value = \
+        mock_anaerobic_lagoon_daily_output = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._anaerobic_lagoon = mock_anaerobic_lagoon
+
+    anaerobic_digestion_and_lagoon._manure_handler_daily_output = \
+        mock_manure_handler_daily_output = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
+
+    # Act
+    actual_anaerobic_lagoon_daily_output = anaerobic_digestion_and_lagoon._daily_update_helper()
+
+    # Assert
+    patch_for_create_anaerobic_digestion_daily_output.assert_called_once()
+    assert anaerobic_digestion_and_lagoon.anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
+
+    if manure_separator_exists:
+        mock_manure_separator.daily_update.assert_called_once_with(
+                manure_separator_daily_input=mock_anaerobic_digestion_daily_output
+        )
+    assert anaerobic_digestion_and_lagoon._manure_separator_daily_output == mock_manure_separator_daily_output
+
+    if manure_separator_exists:
+        mock_anaerobic_lagoon.daily_update.assert_called_once_with(
+                manure_handler_daily_output=mock_manure_handler_daily_output,
+                manure_treatment_daily_input=mock_manure_separator_daily_output,
+                pen=mock_current_pen,
+                sim_day=mock_sim_day
+        )
+    else:
+        mock_anaerobic_lagoon.daily_update.assert_called_once_with(
+                manure_handler_daily_output=mock_manure_handler_daily_output,
+                manure_treatment_daily_input=mock_anaerobic_digestion_daily_output,
+                pen=mock_current_pen,
+                sim_day=mock_sim_day
+        )
+
+    assert actual_anaerobic_lagoon_daily_output == mock_anaerobic_lagoon_daily_output
