@@ -13,7 +13,7 @@ from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(NitrogenIncorporation, LeafAreaIndex):
+class Crop:
     def __init__(self, crop_data: Optional[CropData] = None):
         """Creates a crop object, from a crop data specification object.
 
@@ -34,8 +34,7 @@ class Crop(NitrogenIncorporation, LeafAreaIndex):
         """Process component controlling allocation of plant biomass as a function of growth and photosynthesis"""
         self.water_dynamics = WaterDynamics(data)
         """Process component controlling plant water dynamics"""
-        NitrogenIncorporation.__init__(self)
-        # self.nitrogen_incorporation = NitrogenIncorporation(data)
+        self.nitrogen_incorporation = NitrogenIncorporation(data)
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
         self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
         """Process component controlling plant heat accumulation"""
@@ -94,7 +93,7 @@ class Crop(NitrogenIncorporation, LeafAreaIndex):
         """
         self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
-        self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
+        self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         #
         # phosphorus_uptake.update_all()
         #
