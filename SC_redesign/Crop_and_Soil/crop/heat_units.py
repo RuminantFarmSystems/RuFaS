@@ -4,24 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 class HeatUnits:
     def __init__(self, crop_data: Optional[CropData] = None,
                  use_heat_unit_temperature: bool = False):
-        data = crop_data or CropData()  # initialize with defaults, if not given
-        # TODO replace attributes with reference to data - GitHub Issue #255
-        #  in various methods
-        self.minimum_temperature = 20
-        self.maximum_temperature = 38
-        self.potential_heat_units = 800
-        self.accumulated_heat_units = 0  # accumulator
-        self.is_growing = True  # TODO: not currently using; SWAT 5:2.1.4
-        self.use_heat_unit_temperature: bool = use_heat_unit_temperature
-        """determines if heat unit temperature will be used for heat unit accumulation."""
-        # self.heat_unit_scheduling = True
-
-        self.new_heat_units = None
-        self.heat_fraction = None
-        self.minimum_heat_unit_temperature = None
-        self.maximum_heat_unit_temperature = None
-        self.heat_unit_temperature = None
-        self.previous_heat_fraction = None
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def absorb_heat_units(self, mean_air_temperature: float = None,
                           min_air_temperature: float = None, max_air_temperature: float = None) -> None:
@@ -32,39 +15,29 @@ class HeatUnits:
             min_air_temperature: minimum air temperature for the day (C)
             max_air_temperature: maximum air temperature for the day (C)
 
+        SWAT References: 5:1.1, 5:2.1.2,
+
         Details: if the attribute use_heat_unit_temperature is false, both min_air_temperature and max_air_temperature
         are optional. Otherwise, they are used to determine heat unit accumulation rather than average air temperature.
         """
         self._check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
 
-        if self.use_heat_unit_temperature:
-            self.maximum_heat_unit_temperature = \
-                HeatUnits._determine_maximum_heat_unit_temperature(max_air_temperature, self.maximum_temperature)
-            self.minimum_heat_unit_temperature = \
-                HeatUnits._determine_minimum_heat_unit_temperature(min_air_temperature, self.minimum_temperature)
-            self.heat_unit_temperature = \
-                (self.minimum_heat_unit_temperature + self.maximum_heat_unit_temperature) / 2
+        if self.data.use_heat_unit_temperature:
+            self.data.maximum_heat_unit_temperature = \
+                HeatUnits._determine_maximum_heat_unit_temperature(max_air_temperature, self.data.maximum_temperature)
+            self.data.minimum_heat_unit_temperature = \
+                HeatUnits._determine_minimum_heat_unit_temperature(min_air_temperature, self.data.minimum_temperature)
+            self.data.heat_unit_temperature = \
+                (self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature) / 2
 
-        if self.use_heat_unit_temperature or mean_air_temperature is None:
-            use_temp = self.heat_unit_temperature
+        if self.data.use_heat_unit_temperature or mean_air_temperature is None:
+            use_temp = self.data.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
-        self.is_growing = self.minimum_temperature <= use_temp <= self.maximum_temperature
+        self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
-        self.previous_heat_fraction = self.heat_fraction
-        self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
-
-    # TODO: add these warnings to output manager at a later date.
-    def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
-                                            min_air_temperature: float = None,
-                                            max_air_temperature: float = None):
-        """raises errors if inputs given for absorb_heat_units don't make sense with the value of the
-        use_heat_unit_temperature attribute"""
-        if self.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
-            raise ValueError("min_air_temperature and max_air_temperature must be provided" +
-                             " when use_heat_unit_temperature is True")
-        if not self.use_heat_unit_temperature and mean_air_temperature is None:
-            raise ValueError("mean_air_temperature must be provided when use_heat_temperature is False")
+        self.data.previous_heat_fraction = self.data.heat_fraction
+        self.data.heat_fraction = self.data.accumulated_heat_units / self.data.potential_heat_units
 
     def accumulate_heat_units(self, air_temperature: float = None) -> None:
         """accumulates heat units during a day
@@ -97,14 +70,27 @@ class HeatUnits:
 
     def assign_new_heat_units(self, air_temperature: float = None) -> None:
         """assign new heat units based on if the alternative accumulation method is to be used"""
-        if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            self.new_heat_units = self._determine_new_heat_units(self.heat_unit_temperature, self.minimum_temperature)
+        if self.data.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+            self.data.new_heat_units = self._determine_new_heat_units(self.data.heat_unit_temperature,
+                                                                      self.data.minimum_temperature)
         else:  # main method
-            self.new_heat_units = self._determine_new_heat_units(air_temperature, self.minimum_temperature)
+            self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
 
     def add_heat_units(self) -> None:
         """add newly acquired heat units to accumulated heat units"""
-        self.accumulated_heat_units += self.new_heat_units
+        self.data.accumulated_heat_units += self.data.new_heat_units
+
+    # TODO: add these warnings to output manager at a later date.
+    def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
+                                            min_air_temperature: float = None,
+                                            max_air_temperature: float = None):
+        """raises errors if inputs given for absorb_heat_units don't make sense with the value of the
+        use_heat_unit_temperature attribute"""
+        if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
+            raise ValueError("min_air_temperature and max_air_temperature must be provided" +
+                             " when use_heat_unit_temperature is True")
+        if not self.data.use_heat_unit_temperature and mean_air_temperature is None:
+            raise ValueError("mean_air_temperature must be provided when use_heat_temperature is False")
 
     @staticmethod
     def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
@@ -113,6 +99,8 @@ class HeatUnits:
         Args:
             temperature: the temperature to be compared to min_temp for accumulating heat units (C)
             min_temperature: the minimum temperature below which a crop cannot grow (C)
+
+        SWAT Reference: 5:1.1
         """
         return max(temperature - min_temperature, 0)  # from SWAT:
 

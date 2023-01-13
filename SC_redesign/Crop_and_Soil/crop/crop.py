@@ -13,21 +13,38 @@ from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(GrowthConstraints, BiomassAllocation,
-           NitrogenIncorporation, HeatUnits, LeafAreaIndex):
+class Crop(NitrogenIncorporation, LeafAreaIndex):
     def __init__(self, crop_data: Optional[CropData] = None):
-        data = crop_data or CropData() # defaults if not given
+        """Creates a crop object, from a crop data specification object.
 
+        Args:
+            crop_data: a CropData object containing the attributes tracked throughout the simulation
 
-        # Initialize inherited classes
-        GrowthConstraints.__init__(self)
-        BiomassAllocation.__init__(self)
+        Details:
+            If crop_data is not given, the default specifications are used.
+        """
+        # Common data object that is updated throughout routines
+        data = crop_data or CropData()  # defaults if not given
+        """reference to the crop data; tracks all crop variables through the simulation"""
+
+        # growth process components
+        self.growth_constraints = GrowthConstraints(data)
+        """Process component controlling growth constraints, limits plant growth as a function of stressors"""
+        self.biomass_allocation = BiomassAllocation(data)
+        """Process component controlling allocation of plant biomass as a function of growth and photosynthesis"""
         self.water_dynamics = WaterDynamics(data)
+        """Process component controlling plant water dynamics"""
         NitrogenIncorporation.__init__(self)
-        HeatUnits.__init__(self)
-        LeafAreaIndex.__init__(self)
+        # self.nitrogen_incorporation = NitrogenIncorporation(data)
+        """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
+        self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
+        """Process component controlling plant heat accumulation"""
+        self.leaf_area_index = LeafAreaIndex(data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
+        """Process component controlling canopy growth, including leaf area index"""
         self.root_development = RootDevelopment(data)
+        """Process component controlling plant root development"""
         self.crop_yields = Yields(data)
+        """Process component controlling calculation of end-of-season production"""
         # TODO: Loi recommended that a composition pattern might fit better
         #  than multiple inheritance: A crop "has" a Growth constraint (system)
         #  but is not itself a growth constraint. This pattern might be worth
@@ -75,17 +92,15 @@ class Crop(GrowthConstraints, BiomassAllocation,
             process sub-routines. It should be called every day that the crop
             is alive and growing in the simulation
         """
-        self.absorb_heat_units(mean_air_temperature, min_air_temperature,
-                               max_air_temperature)
+        self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
-        self.incorporate_nitrogen(layer_nitrates, layer_depths,
-                                  soil_water_factor)
+        self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         #
         # phosphorus_uptake.update_all()
         #
-        self.constrain_growth(max_transpiration, air_temperature)
-        self.grow_canopy()
-        self.allocate_biomass(incoming_light)
+        self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
+        self.leaf_area_index.grow_canopy()
+        self.biomass_allocation.allocate_biomass(incoming_light)
         self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
     @classmethod

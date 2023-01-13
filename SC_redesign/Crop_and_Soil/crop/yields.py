@@ -10,9 +10,6 @@ class Yields():
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    # ---- Properties ----
-
-
     # ---- Main Method ----
     def obtain_yields(self) -> None:
         """Main yields function; determines the season's cumulative crop yield on a given day
