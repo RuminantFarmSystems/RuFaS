@@ -282,6 +282,21 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
+def test_remove_animals_from_herd():
+    """Unit test for function remove_animals_from_herd in file routines/animal/animal_management.py"""
+    pass
+
+
+def test_track_former_pen_population():
+    """Unit test for function track_former_pen_population in file routines/animal/animal_management.py"""
+    pass
+
+
+def test_calculate_pen_rations():
+    """Unit test for function calculate_pen_rations in file routines/animal/animal_management.py"""
+    pass
+
+
 def test_daily_update_id_map():
     """Unit test for function daily_update_id_map in file routines/animal/animal_management.py"""
     pass
