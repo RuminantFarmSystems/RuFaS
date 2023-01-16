@@ -20,8 +20,9 @@ from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from collections import deque
+from RUFAS.routines.feed.feed import Feed
 import random
 from typing import Tuple, List
 from statistics import mean
@@ -355,7 +356,7 @@ class AnimalManagement:
                 pen.stocking_density = (len(pen.animals_in_pen) - 1) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 
-    def track_former_pen_population(self):
+    def track_former_pen_population(self) -> List[int]:
         """
         Creates a list containing the original pen populations of a simulated
         farm before any updates are made to pens. The original pens' information
@@ -372,7 +373,7 @@ class AnimalManagement:
 
         return pen_population_before_additions
 
-    def calculate_pen_rations(self, prior_pen_populations):
+    def calculate_pen_rations(self, prior_pen_populations: List[int]) -> None:
         """
         Adjusts the amount of each feed within a ration that is delivered to a pen
             when the number of animals in the pen is changed
@@ -387,7 +388,8 @@ class AnimalManagement:
                 if key != 'status' and key != 'objective':
                     pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
 
-    def daily_update_id_map(self, animals_added, animals_removed, calves_born, feed, temp):
+    def daily_update_id_map(self, animals_added: List[AnimalBase], animals_removed: List[AnimalBase],
+                            calves_born: List[Calf], feed: Feed, temp: float):
         """
         For animals removed from the herd in daily animal updates, the ids of
         the pens from which they were removed are stored in the
