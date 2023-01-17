@@ -45,7 +45,7 @@ class OutputManager (object):
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.add_log("init_log", "Output Manager instantiated.",
                          info_map={"class": self.__class__.__name__,
-                                   "function": self.__init__.__name__})            
+                                   "function": self.__init__.__name__})
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -59,7 +59,12 @@ class OutputManager (object):
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        pool[key]['info_maps'].append(info_map)
+        # reduced_info_map is identical to info_map without class and fucntion
+        # keys as they are already stored in element key and increase the final
+        # file size.
+        reduced_info_map = {k: info_map[k]
+                            for k in info_map.keys() - {'class', 'function'}}
+        pool[key]['info_maps'].append(reduced_info_map)
         pool[key]['values'].append(value)
 
     def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
