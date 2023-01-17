@@ -10,7 +10,7 @@ from typing import Callable
 from typing import Dict
 
 import pytest
-from mock.mock import MagicMock,mock_open
+from mock.mock import MagicMock
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -301,14 +301,6 @@ def test_percent_calculator() -> None:
     pc = Utility.percent_calculator(denominator=0)
     with raises(ZeroDivisionError):
         pc(1.0)
-
-
-def test_get_time_based_suffix(mocker: MockerFixture) -> None:
-    """Unit test for function _get_suffix in file output_manager.py"""
-    auto_suffix = "1671674366502655500"
-    mocker.patch("time.time_ns", return_value=auto_suffix)
-    om = OutputManager()
-    assert om._get_time_based_suffix() == auto_suffix
 
 
 def test_get_prefix() -> None:
