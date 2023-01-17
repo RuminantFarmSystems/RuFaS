@@ -18,17 +18,17 @@ class OutputManager (object):
 
     Attributes
     ----------
-    variables_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
+    variables_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains variables reported to the output manager
-    warnings_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
+    warnings_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains warnings reported to the output manager
-    errors_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
+    errors_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains errors reported to the output manager
-    logs_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
+    logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
     """
     __instance = None
-    pool_element_type = Dict[str, List[Dict[str, Any]] | List[Any]]
+    pool_element_type = Dict[str, List[Dict[str, Any]]]
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
