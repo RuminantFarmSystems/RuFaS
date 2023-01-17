@@ -9,10 +9,10 @@ class OutputManager (object):
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
     logs, warnings, and errors into separate pools, and populates requested
-    output channels from the pools once the simulation is done. 
+    output channels from the pools once the simulation is done.
 
     OutputManager is singleton, i.e., only one instance of it can exist. After
-    the first instance is created, future calls to the constructor method 
+    the first instance is created, future calls to the constructor method
     returns the first instance. Also, the initializer method only works once.
 
     Attributes
@@ -24,7 +24,7 @@ class OutputManager (object):
     errors_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
         Contains errors reported to the output manager
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]] | List[Any]]]
-        Contains logs reported to the output manager 
+        Contains logs reported to the output manager
     """
     __instance = None
     pool_element_type = Dict[str, List[Dict[str, Any]] | List[Any]]
@@ -76,14 +76,14 @@ class OutputManager (object):
         info_map["class"] : str
             The name of the class which called this function
         info_map["function"] : str
-            The name of the function which called this function 
+            The name of the function which called this function
         info_map["prefix"] : str, optional
             If present, overrides the automated prefix
-        info_map["suffix"] : str, optional
-            If present, gets appended to the key
         info_map["suppress_prefix"] : bool, optional
             If present and True, suppresses the automated prefix generation.
-            Has no effect on manual prefix overrides.        
+            Has no effect on manual prefix overrides.
+        info_map["suffix"] : str, optional
+            If present, gets appended to the key
         """
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.variables_pool, key, value, info_map)
@@ -103,7 +103,14 @@ class OutputManager (object):
         info_map["class"] : str
             The name of the class which called this function
         info_map["function"] : str
-            The name of the function which called this function 
+            The name of the function which called this function
+        info_map["prefix"] : str, optional
+            If present, overrides the automated prefix
+        info_map["suppress_prefix"] : bool, optional
+            If present and True, suppresses the automated prefix generation.
+            Has no effect on manual prefix overrides.
+        info_map["suffix"] : str, optional
+            If present, gets appended to the key
         """
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
@@ -123,7 +130,14 @@ class OutputManager (object):
         info_map["class"] : str
             The name of the class which called this function
         info_map["function"] : str
-            The name of the function which called this function 
+            The name of the function which called this function
+        info_map["prefix"] : str, optional
+            If present, overrides the automated prefix
+        info_map["suppress_prefix"] : bool, optional
+            If present and True, suppresses the automated prefix generation.
+            Has no effect on manual prefix overrides.
+        info_map["suffix"] : str, optional
+            If present, gets appended to the key
         """
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
@@ -143,7 +157,14 @@ class OutputManager (object):
         info_map["class"] : str
             The name of the class which called this function
         info_map["function"] : str
-            The name of the function which called this function 
+            The name of the function which called this function
+        info_map["prefix"] : str, optional
+            If present, overrides the automated prefix
+        info_map["suppress_prefix"] : bool, optional
+            If present and True, suppresses the automated prefix generation.
+            Has no effect on manual prefix overrides.
+        info_map["suffix"] : str, optional
+            If present, gets appended to the key
         """
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
@@ -157,13 +178,13 @@ class OutputManager (object):
         Raises
         ------
         KeyError
-            If either info_map["class"] or info_map["function"] are 
+            If either info_map["class"] or info_map["function"] are
             not present.
         """
         if info_map.get("class") is None:
-            raise KeyError("'class' were not found in info_map")
+            raise KeyError("'class' was not found in info_map")
         if info_map.get("function") is None:
-            raise KeyError("'function' were not found in info_map")
+            raise KeyError("'function' was not found in info_map")
 
         prefix = ""
         if info_map.get("prefix") is not None:
@@ -172,11 +193,8 @@ class OutputManager (object):
             prefix = self._get_prefix(info_map.get(
                 "class"), info_map.get("function")) + "."
 
-        suffix = ""
-        if info_map.get("suffix") is not None:
-            suffix = "." + info_map.get("suffix")
-        elif not info_map.get("suppress_suffix", False):
-            suffix = "." + self._get_time_based_suffix()
+        suffix = f'.{info_map.get("suffix")}' if info_map.get(
+            "suffix") is not None else ''
 
         return f"{prefix}{name}{suffix}"
 
@@ -198,13 +216,6 @@ class OutputManager (object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def _get_time_based_suffix(self) -> str:
-        """
-        Returns a suffix for a key in the pool by using timestamp in ns.
-        This guarantees that no name collision will happen.
-        """
-        return str(time.time())
-
     def _dict_to_file_json(self, dict: Dict[str, Any], path: str) -> None:
         """Saves a dictionary into a JSON file"""
         try:
@@ -217,7 +228,8 @@ class OutputManager (object):
         """
         Returns a file name using the given base_name and timestamp.
         """
-        return f"{base_name}_{self._get_time_based_suffix()}.{extension}"
+        timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
+        return f"{base_name}_{timestamp}.{extension}"
 
     def save_variables(self, path: str) -> None:
         """
@@ -262,9 +274,9 @@ class OutputManager (object):
 
     def flush_pools(self) -> None:
         """
-        Sets all pools to an empty dictionary.
+        Sets each pool to an empty dictionary.
         """
-        self.variables_pool: Dict[str, Any] = {}
-        self.warnings_pool: Dict[str, Any] = {}
-        self.errors_pool: Dict[str, Any] = {}
-        self.logs_pool: Dict[str, Any] = {}
+        self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
+        self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
