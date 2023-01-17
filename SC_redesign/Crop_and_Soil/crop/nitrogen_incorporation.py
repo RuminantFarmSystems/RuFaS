@@ -1,6 +1,7 @@
 from math import log, exp
 from bisect import bisect
-from typing import List
+from typing import List, Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 """
 This module is based upon the 'Nitrogen Uptake" section of of the SWAT model documentation 
@@ -9,40 +10,8 @@ This module is based upon the 'Nitrogen Uptake" section of of the SWAT model doc
 
 # TODO - Refactor this class to match others - GitHub Issue #257
 class NitrogenIncorporation:
-    def __init__(self):
-        # constant declarations with defaults (unchanged during simulations)
-        self.half_mature_heat_fraction = 0.5
-        self.mature_heat_fraction = 1.0
-        self.emergence_nitrogen_fraction = 0.04
-        self.half_mature_nitrogen_fraction = 0.03
-        self.near_mature_nitrogen_fraction = 0.02
-        self.mature_nitrogen_fraction = 0.01
-        self.nitrogen_distro_param = 10
-        self.is_nitrogen_fixer = False
-        # current declarations with defaults (change throughout simulations)
-        # TODO: what module sets/updates these variables?
-        self.nitrogen = 0
-        self.heat_fraction = 0.73  # arbitrary
-        self.biomass = 12.5  # arbitrary
-        self.biomass_growth_max = 100  # arbitrary
-        self.root_depth = 1  # arbitrary
-        # empty declarations
-        self.previous_nitrogen = None
-        self._nitrogen_shapes = None
-        self.optimal_nitrogen_fraction = None
-        self.optimal_nitrogen = None
-        self.potential_nitrogen_uptake = None
-        self.total_soil_layers = None
-        self.accessible_soil_layers = None
-        self.inaccessible_soil_layers = None
-        self.layer_nitrogen_potentials = None
-        self.unmet_nitrogen_demands = None
-        self.nitrogen_requests = None
-        self.actual_nitrogen_uptakes = None
-        self.total_nitrogen_uptake = None
-        self.fixed_nitrogen = None
-        self.nitrate_factor = None
-        self.fixation_stage_factor = None
+    def __init__(self, crop_data: Optional[CropData] = None):
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float],
@@ -59,31 +28,37 @@ class NitrogenIncorporation:
         for any unmet demand. Nitrogen from extraction and fixation are added to plant biomass.
         """
         self.shift_nitrogen_time()
-        self._nitrogen_shapes = self.determine_nitrogen_shape_parameters(self.half_mature_heat_fraction,
-                                                                         self.mature_heat_fraction,
-                                                                         self.emergence_nitrogen_fraction,
-                                                                         self.half_mature_nitrogen_fraction,
-                                                                         self.near_mature_nitrogen_fraction,
-                                                                         self.mature_nitrogen_fraction)
-        self.optimal_nitrogen_fraction = self.determine_optimal_nitrogen_fraction(self.heat_fraction,
-                                                                                  self.emergence_nitrogen_fraction,
-                                                                                  self.mature_nitrogen_fraction,
-                                                                                  self._nitrogen_shapes[0],
-                                                                                  self._nitrogen_shapes[1])
-        self.optimal_nitrogen = self.determine_optimal_nitrogen(self.optimal_nitrogen_fraction, self.biomass)
-        if self.optimal_nitrogen - self.previous_nitrogen < 0:
-            self.potential_nitrogen_uptake = 0
+        self.data._nitrogen_shapes = self._determine_nitrogen_shape_parameters(self.data.half_mature_heat_fraction,
+                                                                               self.data.mature_heat_fraction,
+                                                                               self.data.emergence_nitrogen_fraction,
+                                                                               self.data.half_mature_nitrogen_fraction,
+                                                                               self.data.near_mature_nitrogen_fraction,
+                                                                               self.data.mature_nitrogen_fraction)
+        self.data.optimal_nitrogen_fraction = self._determine_optimal_nitrogen_fraction(
+            self.data.heat_fraction,
+            self.data.emergence_nitrogen_fraction,
+            self.data.mature_nitrogen_fraction,
+            self.data._nitrogen_shapes[0],
+            self.data._nitrogen_shapes[1]
+        )
+        self.data.optimal_nitrogen = self._determine_optimal_nitrogen(self.data.optimal_nitrogen_fraction,
+                                                                      self.data.biomass)
+        if self.data.optimal_nitrogen - self.data.previous_nitrogen < 0:
+            self.data.potential_nitrogen_uptake = 0
         else:
-            self.potential_nitrogen_uptake = self.determine_potential_nitrogen_uptake(self.optimal_nitrogen,
-                                                                                      self.previous_nitrogen,
-                                                                                      self.mature_nitrogen_fraction,
-                                                                                      self.biomass_growth_max)
+            self.data.potential_nitrogen_uptake = self._determine_potential_nitrogen_uptake(
+                self.data.optimal_nitrogen,
+                self.data.previous_nitrogen,
+                self.data.mature_nitrogen_fraction,
+                self.data.biomass_growth_max
+            )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         # TODO: fixing nitrogen does not increase biomass. Why not?
-        self.nitrogen = NitrogenIncorporation.determine_stored_nitrogen(self.total_nitrogen_uptake, self.nitrogen,
-                                                                        self.fixed_nitrogen)
+        self.data.nitrogen = NitrogenIncorporation._determine_stored_nitrogen(self.data.total_nitrogen_uptake,
+                                                                              self.data.nitrogen,
+                                                                              self.data.fixed_nitrogen)
 
     def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
         """conducts steps necessary to uptake nitrogen from soil
@@ -98,19 +73,25 @@ class NitrogenIncorporation:
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nitrates)
-        self.layer_nitrogen_potentials = NitrogenIncorporation.determine_layer_nitrogen_uptake_potential(
+        self.data.layer_nitrogen_potentials = NitrogenIncorporation._determine_layer_nitrogen_uptake_potential(
             accessible_depths,
-            self.potential_nitrogen_uptake,
-            self.root_depth,
-            self.nitrogen_distro_param)
-        self.unmet_nitrogen_demands = NitrogenIncorporation.determine_layer_nitrogen_demands(
-            self.layer_nitrogen_potentials, accessible_nitrates
+            self.data.potential_nitrogen_uptake,
+            self.data.root_depth,
+            self.data.nitrogen_distro_param
         )
-        self.nitrogen_requests = NitrogenIncorporation.determine_layer_nitrogen_uptake(self.unmet_nitrogen_demands,
-                                                                                       self.layer_nitrogen_potentials,
-                                                                                       accessible_nitrates)
-        self.actual_nitrogen_uptakes = NitrogenIncorporation.determine_layer_extracted_resource(self.nitrogen_requests,
-                                                                                                accessible_nitrates)
+        self.data.unmet_nitrogen_demands = NitrogenIncorporation._determine_layer_nitrogen_demands(
+            self.data.layer_nitrogen_potentials,
+            accessible_nitrates
+        )
+        self.data.nitrogen_requests = NitrogenIncorporation._determine_layer_nitrogen_uptake(
+            self.data.unmet_nitrogen_demands,
+            self.data.layer_nitrogen_potentials,
+            accessible_nitrates
+        )
+        self.data.actual_nitrogen_uptakes = NitrogenIncorporation._determine_layer_extracted_resource(
+            self.data.nitrogen_requests,
+            accessible_nitrates
+        )
         self.extend_nitrate_uptakes_to_full_profile()
         self.extract_nitrogen_from_soil_layers(layer_nitrates)
         self.tally_total_nitrogen_uptake()
@@ -118,7 +99,7 @@ class NitrogenIncorporation:
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_nitrogen_time(self) -> None:
         """copies the current nitrogen value to previous_nitrogen (for use between time steps)"""
-        self.previous_nitrogen = self.nitrogen
+        self.data.previous_nitrogen = self.data.nitrogen
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
         """evaluates the accessibility of layers in the soil profile by plant roots
@@ -129,9 +110,12 @@ class NitrogenIncorporation:
         Details: gets the total number of soil layers, the deepest layer accessible to the roots,
         and the number of layers that remain inaccessible to the plant.
         """
-        self.total_soil_layers = len(depths)
-        self.accessible_soil_layers = NitrogenIncorporation.determine_deepest_accessible_layer(self.root_depth, depths)
-        self.inaccessible_soil_layers = max(len(depths) - self.accessible_soil_layers, 0)
+        self.data.total_soil_layers = len(depths)
+        self.data.accessible_soil_layers = NitrogenIncorporation._determine_deepest_accessible_layer(
+            self.data.root_depth,
+            depths
+        )
+        self.data.inaccessible_soil_layers = max(len(depths) - self.data.accessible_soil_layers, 0)
 
     def access_layers(self, layer_list: List[float]) -> List[float]:
         """utility function that removes any inaccessible layers from a list
@@ -141,15 +125,15 @@ class NitrogenIncorporation:
 
         Returns: a trimmed resource list with an element for each soil layer that is accessible to the plant's roots
         """
-        return layer_list[0:self.accessible_soil_layers]
+        return layer_list[0:self.data.accessible_soil_layers]
 
     def extend_nitrate_uptakes_to_full_profile(self) -> None:
         """determines the actual nitrogen uptakes for the full soil profile, not just accessible layers
 
         Details: zeros are appended to the list of nitrogen uptakes for each inaccessible soil layer
         """
-        if self.inaccessible_soil_layers > 0:
-            self.actual_nitrogen_uptakes += [0] * self.inaccessible_soil_layers
+        if self.data.inaccessible_soil_layers > 0:
+            self.data.actual_nitrogen_uptakes += [0] * self.data.inaccessible_soil_layers
 
     def extract_nitrogen_from_soil_layers(self, layer_nitrates: List[float]) -> None:
         """extracts nitrogen from the soil profile by layer.
@@ -161,11 +145,11 @@ class NitrogenIncorporation:
         Details: the layer_nitrates list is updated in place. Actual nitrogen uptake values are subtracted from
         each layer
         """
-        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.actual_nitrogen_uptakes)]
+        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.data.actual_nitrogen_uptakes)]
 
     def tally_total_nitrogen_uptake(self) -> None:
         """determines total nitrogen extracted from soil by summing actual uptake from each layer"""
-        self.total_nitrogen_uptake = sum(self.actual_nitrogen_uptakes)
+        self.data.total_nitrogen_uptake = sum(self.data.actual_nitrogen_uptakes)
 
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """tries to fix nitrogen
@@ -177,39 +161,41 @@ class NitrogenIncorporation:
         Details: If the plant is a nitrogen fixer, it will fix nitrogen. Otherwise, it will hurt itself in its confusion
         (not really - nothing happens)
         """
-        if self.is_nitrogen_fixer:
+        if self.data.is_nitrogen_fixer:
             self.update_fixation_attributes(total_accessible_nitrates)
             self.fix_nitrogen(soil_water_factor)
         else:
-            self.fixed_nitrogen = 0
+            self.data.fixed_nitrogen = 0
 
     def update_fixation_attributes(self, total_accessible_nitrates: float) -> None:
         """updates attributes necessary for nitrogen fixation
         Args:
             total_accessible_nitrates: the total nitrates accessible to roots
         """
-        self.nitrate_factor = NitrogenIncorporation.determine_nitrate_factor(total_accessible_nitrates)
-        self.fixation_stage_factor = NitrogenIncorporation.determine_fixation_stage_factor(self.heat_fraction)
+        self.data.nitrate_factor = NitrogenIncorporation._determine_nitrate_factor(total_accessible_nitrates)
+        self.data.fixation_stage_factor = NitrogenIncorporation._determine_fixation_stage_factor(
+            self.data.heat_fraction
+        )
 
     def fix_nitrogen(self, water_factor: float) -> None:
         """fix nitrogen, based on any remaining demand not met by actual uptake"""
-        unmet_demand = self.potential_nitrogen_uptake - self.total_nitrogen_uptake
+        unmet_demand = self.data.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
         if unmet_demand > 0:
-            self.fixed_nitrogen = NitrogenIncorporation.determine_fixed_nitrogen(
+            self.data.fixed_nitrogen = NitrogenIncorporation._determine_fixed_nitrogen(
                 unmet_demand,
-                stage_factor=self.fixation_stage_factor,
+                stage_factor=self.data.fixation_stage_factor,
                 water_factor=water_factor,
-                nitrate_factor=self.nitrate_factor
+                nitrate_factor=self.data.nitrate_factor
             )
         else:
-            self.fixed_nitrogen = 0
+            self.data.fixed_nitrogen = 0
 
     # ---- static methods ----
     @staticmethod
-    def determine_nitrogen_shape_parameters(half_mature_heat_fraction: float, mature_heat_fraction: float,
-                                            emergence_nitrogen_fraction: float, half_mature_nitrogen_fraction: float,
-                                            near_mature_nitrogen_fraction: float,
-                                            mature_nitrogen_fraction: float) -> List[float]:
+    def _determine_nitrogen_shape_parameters(half_mature_heat_fraction: float, mature_heat_fraction: float,
+                                             emergence_nitrogen_fraction: float, half_mature_nitrogen_fraction: float,
+                                             near_mature_nitrogen_fraction: float,
+                                             mature_nitrogen_fraction: float) -> List[float]:
         # pseudocode: C.5.A.1, C.5.A.2
         """
         Description: calculates the shape coefficients for the nitrogen fraction equation
@@ -227,26 +213,26 @@ class NitrogenIncorporation:
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
         # 1st shape parameter
-        log_half = NitrogenIncorporation.determine_shape_log(heat_fraction=half_mature_heat_fraction,
-                                                             nitrogen_fraction=half_mature_nitrogen_fraction,
-                                                             mature_nitrogen_fraction=mature_nitrogen_fraction,
-                                                             emergence_nitrogen_fraction=emergence_nitrogen_fraction)
-        log_full = NitrogenIncorporation.determine_shape_log(heat_fraction=mature_heat_fraction,
-                                                             nitrogen_fraction=near_mature_nitrogen_fraction,
-                                                             mature_nitrogen_fraction=mature_nitrogen_fraction,
-                                                             emergence_nitrogen_fraction=emergence_nitrogen_fraction)
+        log_half = NitrogenIncorporation._determine_shape_log(heat_fraction=half_mature_heat_fraction,
+                                                              nitrogen_fraction=half_mature_nitrogen_fraction,
+                                                              mature_nitrogen_fraction=mature_nitrogen_fraction,
+                                                              emergence_nitrogen_fraction=emergence_nitrogen_fraction)
+        log_full = NitrogenIncorporation._determine_shape_log(heat_fraction=mature_heat_fraction,
+                                                              nitrogen_fraction=near_mature_nitrogen_fraction,
+                                                              mature_nitrogen_fraction=mature_nitrogen_fraction,
+                                                              emergence_nitrogen_fraction=emergence_nitrogen_fraction)
         s2 = (log_half - log_full) / (mature_heat_fraction - half_mature_heat_fraction)
         # second shape parameter
-        log_term = NitrogenIncorporation.determine_shape_log(heat_fraction=half_mature_heat_fraction,
-                                                             nitrogen_fraction=half_mature_nitrogen_fraction,
-                                                             emergence_nitrogen_fraction=emergence_nitrogen_fraction,
-                                                             mature_nitrogen_fraction=mature_nitrogen_fraction)
+        log_term = NitrogenIncorporation._determine_shape_log(heat_fraction=half_mature_heat_fraction,
+                                                              nitrogen_fraction=half_mature_nitrogen_fraction,
+                                                              mature_nitrogen_fraction=mature_nitrogen_fraction,
+                                                              emergence_nitrogen_fraction=emergence_nitrogen_fraction)
         s1 = log_term + s2 * half_mature_heat_fraction
         return [s1, s2]
 
     @staticmethod
-    def determine_shape_log(heat_fraction: float, nitrogen_fraction: float, mature_nitrogen_fraction: float,
-                            emergence_nitrogen_fraction: float) -> float:  # pseudocode: C.5.A.1, C.5.A.2
+    def _determine_shape_log(heat_fraction: float, nitrogen_fraction: float, mature_nitrogen_fraction: float,
+                             emergence_nitrogen_fraction: float) -> float:  # pseudocode: C.5.A.1, C.5.A.2
         """
         Description: calculate the log component of shape coefficient formulae
 
@@ -294,9 +280,9 @@ class NitrogenIncorporation:
         return log((heat_fraction / denominator) - heat_fraction)
 
     @staticmethod
-    def determine_optimal_nitrogen_fraction(heat_fraction: float, emergence_nitrogen_fraction: float,
-                                            mature_nitrogen_fraction: float, shape1: float,
-                                            shape2: float) -> float:  # pseudocode: C.5.B.1
+    def _determine_optimal_nitrogen_fraction(heat_fraction: float, emergence_nitrogen_fraction: float,
+                                             mature_nitrogen_fraction: float, shape1: float,
+                                             shape2: float) -> float:  # pseudocode: C.5.B.1
         """
         Description: calculates the optimal fraction of nitrogen in the plant biomass on a given day
 
@@ -314,7 +300,7 @@ class NitrogenIncorporation:
         return (ndiff * brackets) + mature_nitrogen_fraction
 
     @staticmethod
-    def determine_optimal_nitrogen(fraction: float, whole: float) -> float:  # pseudocode: C.5.B.2
+    def _determine_optimal_nitrogen(fraction: float, whole: float) -> float:  # pseudocode: C.5.B.2
         """calculate mass of a constituent from the fractional mass of the whole
 
         Args:
@@ -326,8 +312,8 @@ class NitrogenIncorporation:
         return fraction * whole
 
     @staticmethod
-    def determine_potential_nitrogen_uptake(demand: float, nitrogen_start: float, mature_nitrogen_fraction: float,
-                                            max_growth: float) -> float:  # pseudocode: C.5.B.3
+    def _determine_potential_nitrogen_uptake(demand: float, nitrogen_start: float, mature_nitrogen_fraction: float,
+                                             max_growth: float) -> float:  # pseudocode: C.5.B.3
         """
         Description: calculates potential nitrogen uptake for the day
 
@@ -342,7 +328,7 @@ class NitrogenIncorporation:
         return min(demand - nitrogen_start, 4 * mature_nitrogen_fraction * max_growth)
 
     @staticmethod
-    def determine_deepest_accessible_layer(root_depth: float, layer_bounds: List[float]) -> int:
+    def _determine_deepest_accessible_layer(root_depth: float, layer_bounds: List[float]) -> int:
         """
         Description:
             Determines the deepest soil layer that is accessible to roots.
@@ -365,8 +351,8 @@ class NitrogenIncorporation:
             return min(insert_position + 1, deepest_layer)
 
     @staticmethod
-    def determine_layer_nitrogen_uptake_potential(layer_bounds: List[float], total_demand: float, root_depth: float,
-                                                  nitrogen_distribution_parameter: float) -> List[float]:
+    def _determine_layer_nitrogen_uptake_potential(layer_bounds: List[float], total_demand: float, root_depth: float,
+                                                   nitrogen_distribution_parameter: float) -> List[float]:
         # pseudocode: C.5.C.2, C.5.C.3
         """
         Description: calculates potential nitrogen uptake from each soil layer
@@ -388,8 +374,8 @@ class NitrogenIncorporation:
         if len(layer_bounds) != len(set(layer_bounds)):
             raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
         # calculate results
-        boundary_nitrogen = [NitrogenIncorporation.determine_nitrogen_uptake_to_depth(total_demand, x, root_depth,
-                                                                                      nitrogen_distribution_parameter)
+        boundary_nitrogen = [NitrogenIncorporation._determine_nitrogen_uptake_to_depth(total_demand, x, root_depth,
+                                                                                       nitrogen_distribution_parameter)
                              for x in layer_bounds]  # N at each boundary
         boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
         layer_nitrogen = [below - above for below, above in
@@ -397,8 +383,8 @@ class NitrogenIncorporation:
         return layer_nitrogen
 
     @staticmethod
-    def determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float,
-                                           nitrogen_distribution_parameter: float) -> float:  # pseudocode: C.5.C.1
+    def _determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float,
+                                            nitrogen_distribution_parameter: float) -> float:  # pseudocode: C.5.C.1
         """
         Description: calculates potential nitrogen uptake from the soil surface to a specified depth
 
@@ -422,8 +408,8 @@ class NitrogenIncorporation:
             return first_term * second_term
 
     @staticmethod
-    def determine_layer_nitrogen_demands(uptake_potentials: List[float],
-                                         nitrate_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
+    def _determine_layer_nitrogen_demands(uptake_potentials: List[float],
+                                          nitrate_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
         """
         Description: calculates nitrogen demand of the plant from each soil layer
 
@@ -438,8 +424,8 @@ class NitrogenIncorporation:
         return [max(val, 0) for val in layer_demand]  # results constrained to zero
 
     @staticmethod
-    def determine_layer_nitrogen_uptake(layer_demands: List[float], layer_uptake_potentials: List[float],
-                                        layer_nitrates: List[float]) -> List[float]:  # pseudocode: C.5.C.4
+    def _determine_layer_nitrogen_uptake(layer_demands: List[float], layer_uptake_potentials: List[float],
+                                         layer_nitrates: List[float]) -> List[float]:  # pseudocode: C.5.C.4
         """
         Description: calculates nitrogen uptake from each soil layer
 
@@ -458,13 +444,13 @@ class NitrogenIncorporation:
         return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrates)]
 
     @staticmethod
-    def determine_layer_extracted_resource(requests: List[float], sources: List[float]) -> List[float]:
+    def _determine_layer_extracted_resource(requests: List[float], sources: List[float]) -> List[float]:
         if len(requests) != len(sources):
             raise ValueError("requests and sources should be the same length")
-        return [NitrogenIncorporation.determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
+        return [NitrogenIncorporation._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
     @staticmethod
-    def determine_extracted_resource(request: float, source: float) -> float:
+    def _determine_extracted_resource(request: float, source: float) -> float:
         """
         Description: calculates the amount of a resource that can be drawn from a source, based on a request
 
@@ -478,7 +464,7 @@ class NitrogenIncorporation:
 
     # TODO: method signature
     @staticmethod
-    def determine_nitrate_factor(total_accessible_nitrates: float) -> float:
+    def _determine_nitrate_factor(total_accessible_nitrates: float) -> float:
         """
         Description: calculates soil nitrate factor
 
@@ -495,7 +481,7 @@ class NitrogenIncorporation:
             return 0
 
     @staticmethod
-    def determine_fixation_stage_factor(heat_fraction: float) -> float:
+    def _determine_fixation_stage_factor(heat_fraction: float) -> float:
         """
         Description: calculates fixation symbiotic growth stage factor
 
@@ -524,8 +510,8 @@ class NitrogenIncorporation:
             return 0
 
     @staticmethod
-    def determine_fixed_nitrogen(demand: float, stage_factor: float, water_factor: float,
-                                 nitrate_factor: float) -> float:
+    def _determine_fixed_nitrogen(demand: float, stage_factor: float, water_factor: float,
+                                  nitrate_factor: float) -> float:
         """
         Description: calculate the amount of nitrogen fixed by a plant
 
@@ -548,7 +534,7 @@ class NitrogenIncorporation:
         return min(fixed, demand)
 
     @staticmethod
-    def determine_stored_nitrogen(uptake: float, previous: float, fixed: float) -> float:  # C.5.E.1
+    def _determine_stored_nitrogen(uptake: float, previous: float, fixed: float) -> float:  # C.5.E.1
         """
         Description: calculates nitrogen mass stored in plant material after the current day's growth cycle
 
