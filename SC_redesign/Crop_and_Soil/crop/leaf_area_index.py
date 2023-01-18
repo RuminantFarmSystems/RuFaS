@@ -154,7 +154,7 @@ class LeafAreaIndex:
         SWAT Reference: 5:2.1.16
         """
         return (leaf_area_fraction - previous_leaf_area_fraction) * max_leaf_area_index * \
-            (1 - exp(5 * previous_leaf_area_index - max_leaf_area_index))
+            (1 - exp(5 * (previous_leaf_area_index - max_leaf_area_index)))
 
     @staticmethod
     def _determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
