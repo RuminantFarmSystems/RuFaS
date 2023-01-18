@@ -135,7 +135,7 @@ def test_error_determine_senescent_leaf_area_index(heatfrac, senheatfrac, optare
 ])
 def test_determine_max_leaf_area_change(frac, prev_frac, max_lai, prev_lai):
     scaled_diff = (frac - prev_frac) * max_lai
-    expo = 1 - exp(5 * prev_lai - max_lai)
+    expo = 1 - exp(5 * (prev_lai - max_lai))
     assert LeafAreaIndex._determine_max_leaf_area_change(frac, prev_frac, max_lai, prev_lai) == scaled_diff * expo
 
 
