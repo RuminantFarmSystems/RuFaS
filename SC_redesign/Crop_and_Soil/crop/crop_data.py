@@ -162,6 +162,8 @@ class CropData:
     """total number of layers in the soil profile (unitless)"""
     accessible_soil_layers: Optional[int] = None
     """number of layers in the soil profile that the plant roots have access to (unitless)"""
+    accessible_depths: Optional[List[float]] = None
+    """slice of soil layer boundaries to which the plant has access (mm)"""
     inaccessible_soil_layers: Optional[int] = None
     """number of layers in the soil profile that the plant roots do not have access to (unitless)"""
     layer_nitrogen_potentials: Optional[float] = None
