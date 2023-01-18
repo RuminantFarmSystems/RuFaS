@@ -2,6 +2,7 @@ from __future__ import annotations
 from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
+from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIncorporation
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
@@ -35,6 +36,8 @@ class Crop:
         self.water_dynamics = WaterDynamics(data)
         """Process component controlling plant water dynamics"""
         self.nitrogen_incorporation = NitrogenIncorporation(data)
+        """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
+        self.phosphorus_incorporation = PhosphorusIncorporation(data)
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
         self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
         """Process component controlling plant heat accumulation"""
@@ -94,9 +97,7 @@ class Crop:
         self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
         self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
-        #
-        # phosphorus_uptake.update_all()
-        #
+        self.phosphorus_incorporation.incorporate_phosphorus()  # TODO: needs implementation
         self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
