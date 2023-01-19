@@ -391,15 +391,8 @@ class AnimalManagement:
     def daily_update_id_map(self, animals_added: List[AnimalBase], animals_removed: List[AnimalBase],
                             calves_born: List[Calf], feed: Feed, temp: float):
         """
-        For animals removed from the herd in daily animal updates, the ids of
-        the pens from which they were removed are stored in the
-        pens_needing_animals queue.
-        Animals added to the herd from the replacement herd are temporarily
-        assigned to a pen that had animals removed from it.
-        Calves that were born are assigned (currently) to the hard coded pen
-        for calves.
-        All new animals are set up with the characteristics of the pen to which
-        they were assigned.
+        Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
+        new animals are born or purchased and when animals leave the herd due to death or culling
 
         Args:
             animals_added: list of animal objects that have been added to the herd
