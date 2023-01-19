@@ -7,8 +7,8 @@ growth process.
 The main function, `grow_canopy()`, returns on a daily basis the updated **optimal leaf area fraction**, **shape coefficients**, **canopy height**, **maximum leaf 
 area change** and **senescent leaf area index** to finally determine the **leaf area added** every day.
 
-The **optimal leaf area fraction** controls the canopy height and leaf area until the maximum *LAI* is reached and represents the fraction of the plant’s maximum 
-*LAI* corresponding to a given fraction of potential heat units. To calculate this fraction on a given day, RuFaS needs to first calculate two **shape 
+The **optimal leaf area fraction** controls the **canopy height** and **leaf area added** until the maximum *LAI* is reached and represents the fraction of the 
+plant’s maximum *LAI* corresponding to a given fraction of potential heat units. To calculate this fraction on a given day, RuFaS first calculates two **shape 
 coefficients** and the **fraction of potential heat units** accumulated. Then, the **optimal leaf area fraction** is calculated as follows:
 
 ```math
@@ -51,7 +51,7 @@ where $A_{\text{leaf, i}}$ is the `leaf_area_index` on a given day, $A_{\text{le
 plant, $h$ is `heat_fraction`, the fraction of potential heat units accumulated for the plant on a given day and $h_{\text{sen}}$ is `senescent_heat_fraction`, the 
 fraction of potential heat units at which senescence begins.
 
-The **actual leaf area added** on a given day is based upon the potential leaf area added on a given day and an adjustment for plant stress, according to:
+The **actual leaf area added** on a given day is based upon the **maximum leaf area change** on a given day and an adjustment for plant stress, according to:
 
 ```math
   $$ A_{\text{leaf, act, i}} = 
