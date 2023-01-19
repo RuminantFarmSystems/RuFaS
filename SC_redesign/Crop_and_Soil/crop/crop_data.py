@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional, List
 
+# TODO: defaults need to be reviewed and updated. See the SWAT crop database for values
+
 
 @dataclass
 class CropData:
@@ -54,7 +56,7 @@ class CropData:
     """nitrogen stress for the day (unitless; [0, 1])"""
     phosphorus_stress: Optional[float] = None
     """phosphorus stress for the day (unitless; [0, 1])"""
-    
+
     # ---- heat_units
     ##minimum_temperature: float = 20 # duplicate
     maximum_temperature: float = 38
@@ -81,7 +83,7 @@ class CropData:
     """heat unit temperature used by alternative heat unit method (Celsius)"""
     previous_heat_fraction: Optional[float] = None
     """fraction of potential heat units on the previous day (unitless)"""
-    
+
     # ---- leaf area index
     # fixed attributes (unchanged during simulations)
     first_heat_fraction_point: float = 0.15
@@ -121,7 +123,7 @@ class CropData:
     """leaf area index on the previous day (unitless)"""
     previous_optimal_leaf_area_fraction: Optional[float] = None
     """optimal leaf area fraction on the previous day (unitless)"""
-    
+
     # ---- nitrogen incorporation
     # constant declarations with defaults (unchanged during simulations)
     half_mature_heat_fraction: float = 0.5
@@ -149,7 +151,7 @@ class CropData:
     root_depth: float = 1  # arbitrary
     """current depth of the plant roots in the soil (mm)"""
     # empty declarations
-    _nitrogen_shapes: Optional[List[float]] = None
+    nitrogen_shapes: Optional[List[float]] = None
     """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
     previous_nitrogen: Optional[float] = None
     """nitrogen stored in plant biomass on the previous day (kg/ha)"""
@@ -183,6 +185,29 @@ class CropData:
     fixation_stage_factor: Optional[float] = None
     """growth stage factor of the nitrogen fixing symbiotes for the current plant growth stage (unitless)"""
 
+    # --- phosphorus incorporation ----
+    emergence_phosphorus_fraction: float = 0.04
+    """expected fraction of plant biomass comprised of phosphorus for the plant at emergence (unitless)"""
+    half_mature_phosphorus_fraction: float = 0.01
+    """expected fraction of plant biomass comprised of phosphorus for the plant at half-maturity (unitless)"""
+    near_mature_phosphorus_fraction: float = 0.3
+    """expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless)"""
+    mature_phosphorus_fraction: float = 0.1
+    """expected fraction of plant biomass comprised of nitrogen for a mature plant (unitless)"""
+    phosphorus_distro_param: float = 10
+    """phosphorus uptake distribution parameter (unitless)"""
+
+    phosphorus_shapes: Optional[List[float]] = None
+    """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
+    previous_phosphorus: Optional[float] = None
+    """phosphorus value on the previous day (kg/ha)"""
+    total_phosphorus_uptake: Optional[float] = None
+    """total amount of phosphorus taken up by the plant"""
+    potential_phosphorus_uptake: Optional[float] = None
+    """potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha)"""
+    actual_phosphorus_uptakes: Optional[List[float]] = None
+    """actual phosphorus to be taken up by the plant from each soil layer (kg/ha)"""
+
     # ---- root development
     ##heat_fraction = 1 / 3 #duplicate
     max_root_depth: float = 20
@@ -191,7 +216,7 @@ class CropData:
     """is the plant perennial?"""
     ##root_depth = None # duplicate
     ##root_fraction = None #duplicate
-    
+
     # ---- water dynamics
     cumulative_evaporation: Optional[float] = None
     """total water lost to evaporation by the plant during the growing season (mm)"""
@@ -203,7 +228,7 @@ class CropData:
     """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
     """water deficiency factor for the plant (unitless)"""
-    
+
     # ---- yields
     # constant attributes
     optimal_harvest_index: float = 3.5

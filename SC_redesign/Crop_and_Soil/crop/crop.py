@@ -58,6 +58,7 @@ class Crop:
 
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
+                  layer_phosphates: List[float],
                   soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
                   incoming_light: float,
@@ -68,23 +69,20 @@ class Crop:
         """main function for growing the crop on a daily basis
 
         Args:
-            layer_nitrates: nitrates present in each layer of the soil profile
-                (kg/ha)
+            layer_nitrates: nitrates present in each layer of the soil profile (kg/ha)
             layer_depths: the maximum depth of each soil layer
+            layer_phosphates: phosphates present in each layer of the soil profile (kg/ha)
             soil_water_factor: the soil water factor
 
-            max_transpiration: maximum amount of transpiration possible (mm),
-                as determined by soil, on this day
+            max_transpiration: maximum amount of transpiration possible (mm), as determined by soil, on this day
             air_temperature: current air temperature (C)
 
             incoming_light: incoming light radiation energy (MJ/m)
 
-            evaporation: total evaporation occurring (mm) as determined by soil,
-                on a given day
-            transpiration: total transpiration occurring (mm) as determined by
-                soil, on a given day
-            max_evapotranspiration: maximum amount of evapotranspiration
-                possible (mm), as determined by soil on a given day.
+            evaporation: total evaporation occurring (mm) as determined by soil, on a given day
+            transpiration: total transpiration occurring (mm) as determined by soil, on a given day
+            max_evapotranspiration: maximum amount of evapotranspiration possible (mm), as determined by soil on
+            a given day.
 
             mean_air_temperature: average air temperature for the day (C)
             min_air_temperature: minimum air temperature for the day (C)
@@ -97,7 +95,7 @@ class Crop:
         self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
         self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
-        self.phosphorus_incorporation.incorporate_phosphorus()  # TODO: needs implementation
+        self.phosphorus_incorporation.incorporate_phosphorus(layer_phosphates, layer_depths)
         self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
@@ -105,11 +103,9 @@ class Crop:
 
     @classmethod
     def plant_species(cls, species) -> Crop:
-        """creates a crop instance with attributes determined by the species of
-        the crop.
+        """creates a crop instance with attributes determined by the species of the crop.
 
-        Details: species attributes are read from species configuration
-        files/classes
+        Details: species attributes are read from species configuration files/classes
         """
         pass
 
@@ -130,13 +126,11 @@ class Crop:
         pass
 
     def reset_perennial(self):
-        """resets some attributes for perennial crops at the start of the
-        new growing season"""
+        """resets some attributes for perennial crops at the start of the new growing season"""
         pass
 
     def destroy(self):  # Needed?
-        """destoys the crop - Destructor class. This removes the crop instance
-        from existance"""
+        """destoys the crop - Destructor class. This removes the crop instance from existence"""
         pass
 
     def _list_all_parent_var_names(self):
