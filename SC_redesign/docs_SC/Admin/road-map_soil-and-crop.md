@@ -119,7 +119,7 @@ instance of `CropData`. It is important that any variables used by multiple proc
 
 ## Managing the system: FieldManager
 
-An SC simulation contains many instances of fields and their soil and crops which need to change
+An SC simulation contains many instances of fields and their crops and soil which need to change
 independently through time. The `FieldManager` class will be the high-level container that 
 initializes and stores all the fields according to user input (from `SCInput`), tracks them 
 through time (i.e., checks if the current date/weather should trigger an event), directs 
