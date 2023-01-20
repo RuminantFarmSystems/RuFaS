@@ -106,12 +106,12 @@ class ManureManagementConfigHandler:
         return self.custom_manure_treatment_configs.get(ManureTreatmentType.get_type(manure_treatment_type_name), None)
 
     @classmethod
-    def _process_bedding_configs(cls, json_bedding_configs: List[Dict]) -> Dict[BeddingType, BeddingConfig]:
+    def _process_bedding_configs(cls, bedding_json_configs: List[Dict]) -> Dict[BeddingType, BeddingConfig]:
         """Returns a dictionary of bedding config objects, with the key being the bedding type.
 
         Parameters
         ----------
-        json_bedding_configs : List[Dict]
+        bedding_json_configs : List[Dict]
             A list of dictionaries containing the bedding config information.
 
         Returns
@@ -121,7 +121,7 @@ class ManureManagementConfigHandler:
 
         """
         bedding_config_by_bedding_type: Dict[BeddingType, BeddingConfig] = {}
-        for json_bedding_config in json_bedding_configs:
+        for json_bedding_config in bedding_json_configs:
             bedding_type = BeddingType.get_type(json_bedding_config['bedding_type'])
             del json_bedding_config['bedding_type']
             bedding_config_by_bedding_type[bedding_type] = BeddingConfig(
@@ -131,13 +131,13 @@ class ManureManagementConfigHandler:
         return bedding_config_by_bedding_type
 
     @classmethod
-    def _process_manure_handler_configs(cls, json_manure_handler_configs: List[Dict]) \
+    def _process_manure_handler_configs(cls, manure_handler_json_configs: List[Dict]) \
             -> Dict[ManureHandlerType, ManureHandlerConfig]:
         """Returns a dictionary of manure handler config objects, with the key being the manure handler type.
 
         Parameters
         ----------
-        json_manure_handler_configs : List[Dict]
+        manure_handler_json_configs : List[Dict]
             A list of dictionaries containing the manure handler config information.
 
         Returns
@@ -147,7 +147,7 @@ class ManureManagementConfigHandler:
 
         """
         manure_handler_config_by_manure_handler_type: Dict[ManureHandlerType, ManureHandlerConfig] = {}
-        for json_manure_handler_config in json_manure_handler_configs:
+        for json_manure_handler_config in manure_handler_json_configs:
             manure_handler_type = ManureHandlerType.get_type(json_manure_handler_config['manure_handler_type'])
             del json_manure_handler_config['manure_handler_type']
             manure_handler_config_by_manure_handler_type[manure_handler_type] = ManureHandlerConfig(
@@ -156,13 +156,13 @@ class ManureManagementConfigHandler:
         return manure_handler_config_by_manure_handler_type
 
     @classmethod
-    def _process_manure_separator_configs(cls, json_manure_separator_configs: List[Dict]) \
+    def _process_manure_separator_configs(cls, manure_separator_json_configs: List[Dict]) \
             -> Dict[ManureSeparatorType, ManureSeparatorConfig]:
         """Returns a dictionary of manure separator config objects, with the key being the manure separator type.
 
         Parameters
         ----------
-        json_manure_separator_configs : List[Dict]
+        manure_separator_json_configs : List[Dict]
             A list of dictionaries containing the manure separator config information.
 
         Returns
@@ -172,7 +172,7 @@ class ManureManagementConfigHandler:
 
         """
         manure_separator_config_by_manure_separator_type: Dict[ManureSeparatorType, ManureSeparatorConfig] = {}
-        for json_manure_separator_config in json_manure_separator_configs:
+        for json_manure_separator_config in manure_separator_json_configs:
             manure_separator_type = ManureSeparatorType.get_type(
                     json_manure_separator_config['manure_separator_type']
             )
@@ -183,7 +183,7 @@ class ManureManagementConfigHandler:
         return manure_separator_config_by_manure_separator_type
 
     @classmethod
-    def _process_manure_treatment_configs(cls, json_manure_treatment_configs: List[Dict]) \
+    def _process_manure_treatment_configs(cls, manure_treatment_json_configs: List[Dict]) \
             -> Dict[ManureTreatmentType, Union[ManureTreatmentConfig,
                                                Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]]:
         """Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.
@@ -193,7 +193,7 @@ class ManureManagementConfigHandler:
 
         Parameters
         ----------
-        json_manure_treatment_configs : List[Dict]
+        manure_treatment_json_configs : List[Dict]
             A list of dictionaries containing the manure treatment config information.
 
         Returns
@@ -207,7 +207,7 @@ class ManureManagementConfigHandler:
                                                     Tuple[ManureTreatmentConfig,
                                                           ManureTreatmentConfig]]] = {}
 
-        for json_manure_treatment_config in json_manure_treatment_configs:
+        for json_manure_treatment_config in manure_treatment_json_configs:
             manure_treatment_type = ManureTreatmentType.get_type(json_manure_treatment_config['manure_treatment_type'])
             del json_manure_treatment_config['manure_treatment_type']
             manure_treatment_config_by_type[manure_treatment_type] = ManureTreatmentConfig(
