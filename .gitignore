@@ -49,3 +49,5 @@ pycallexp.py
 
 # ignore html files
 *.html
+
+save_directory
