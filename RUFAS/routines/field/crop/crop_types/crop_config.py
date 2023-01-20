@@ -21,6 +21,8 @@ Description:
     or any variables that do not correspond to crop-specific parameters.
 """
 
+# TODO: Validate species-specific growth parameters - GitHub Issue #231
+
 ALFALFA = {
         # alfalfa ID variables
         "harvest_type": 'optimal',  # TODO: is this always the type for alfalfa? Corn reads this from data

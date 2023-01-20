@@ -35,6 +35,7 @@ output/*
 .idea/**
 env/
 venv/
+pycallexp.py
 
 # ignore .DS_store
 .DS_store
@@ -48,3 +49,5 @@ venv/
 
 # ignore croptime json output
 sample.json
+# ignore html files
+*.html

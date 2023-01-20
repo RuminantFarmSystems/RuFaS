@@ -10,10 +10,11 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Sadman Chowdhury, skc86@cornell.edu
 """
 import collections
-from typing import Dict, List, Tuple
+from typing import Dict
+from typing import List
+from typing import Tuple
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure.ManureManagementPen.manure_management_pen import ManureManagementPen
 
 
 class ManureManagement:
@@ -64,7 +65,7 @@ class ManureManagement:
                 key = id of an animal pen
                 value = a list of tuples where each tuple represents a group of daily output objects.
                     More precisely, each such tuple is of length 5, consisting of a
-                    ManureManagementPen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
+                    pen object, a ManureHandlerOutput object, a ReceptionPitOutput object,
                     a ManureSeparatorOutput object, and a ManureTreatment object.
 
         """
@@ -90,14 +91,7 @@ class ManureManagement:
             animal_management: An AnimalManagement object obtained from the animal module.
 
         """
-
-        # TODO: Will add the actual components in later pull requests
-        for pen in animal_management.all_pens:
-            mm_pen = ManureManagementPen(pen)
-            self.manure_handlers[mm_pen.id] = None
-            self.reception_pits[mm_pen.id] = None
-            self.manure_separators[mm_pen.id] = None
-            self.manure_treatments[mm_pen.id] = None
+        pass
 
     def update(self, animal_management: AnimalManagement) -> None:
         """
@@ -109,23 +103,7 @@ class ManureManagement:
                 from the simulation engine's AnimalManagement object.
 
         """
-
-        # TODO: Will add the actual outputs in later pull requests
-        for pen in animal_management.all_pens:
-            mm_pen = ManureManagementPen(pen)
-            manure_handler_daily_output = None
-            reception_pit_daily_output = None
-            manure_separator_daily_output = None
-            treatment_daily_output = None
-
-            daily_update_data = (
-                mm_pen,
-                manure_handler_daily_output,
-                reception_pit_daily_output,
-                manure_separator_daily_output,
-                treatment_daily_output
-            )
-            self._all_data[pen.id].append(daily_update_data)
+        pass
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:
