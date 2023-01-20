@@ -8,11 +8,7 @@ Author(s): William Donovan wmdonovan@wisc.edu
 import csv
 from pathlib import Path
 
-<<<<<<< HEAD
-import config.definitions
-=======
 import config.global_variables
->>>>>>> origin/SC_redesign
 from .. import graphics
 
 

@@ -10,6 +10,7 @@ Description: This module contains the necessary functions for calculating and
 
 from math import log, exp
 from RUFAS.routines.field.crop.nitrogen_fixation import fix_nitrogen
+from typing import List
 
 
 def reallocate_nitrogen(crop, soil) -> None:
@@ -67,7 +68,7 @@ def update_nitrogen_fraction(crop) -> None:
 
 
 def calc_shape_parameters(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
-                          nfrac_near: float, nfrac_3: float) -> list[float]:  # pseudocode: C.5.A.1, C.5.A.2
+                          nfrac_near: float, nfrac_3: float) -> List[float]:  # pseudocode: C.5.A.1, C.5.A.2
     """
     Description: calculates the shape coefficient for nitrogen fraction
 
@@ -191,8 +192,8 @@ def update_potential_nitrogen_uptake(crop) -> None:
                                                    mature_nfrac=crop.fr_n3, max_growth=crop.d_biomass_max)
 
 
-def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[float],
-                               layer_nitrate: list[float]) -> list[float]:  # pseudocode: C.5.C.4
+def calc_layer_nitrogen_uptake(layer_demand: List[float], layer_potential: List[float],
+                               layer_nitrate: List[float]) -> List[float]:  # pseudocode: C.5.C.4
     """
     Description: calculates the actual nitrogen uptake from each layer of soil
 
@@ -211,7 +212,7 @@ def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[
     return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrate)]
 
 
-def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[float]:  # pseudocode: C.5.C.5
+def calc_layer_nitrogen_demand(uptake_potentials: List[float], nitrate_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
     """
     Description: calculates the nitrogen demand of the plant from each soil layer
 
@@ -258,8 +259,8 @@ def uptake_nitrogen(crop, soil) -> None:
     crop.N_act_up = sum(uptakes)  # give to crop
 
 
-def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
-                                  root_depth: float, ndistro: float) -> list[float]:  # pseudocode: C.5.C.2, C.5.C.3
+def calc_layer_nitrogen_potential(boundaries: List[float], demand: float,
+                                  root_depth: float, ndistro: float) -> List[float]:  # pseudocode: C.5.C.2, C.5.C.3
     """
     Description: calculates the potential nitrogen uptake from each soil layer
 
