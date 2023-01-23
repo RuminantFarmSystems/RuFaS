@@ -2,7 +2,11 @@ from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
-# TODO - Refactor this class to match others - GitHub Issue #257
+"""
+This module primarily follows the Biomass Production section of the SWAT model (5:2.1.1)
+and some components from the Crop Yield section (5:2.4)
+"""
+
 class BiomassAllocation:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
