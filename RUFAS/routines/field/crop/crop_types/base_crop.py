@@ -14,10 +14,10 @@ class BaseCrop:
     def __init__(self, crop_name=None, data=None, species=None):
         """create an instance of BaseCrop class
 
-            Args:
-                crop_name (str): the name of the crop
-                data (dict): a dictionary containg crop data
-                species (str): the species of the crop (see crop_config.py)
+        Args:
+            crop_name (str): the name of the crop
+            data (dict): a dictionary containg crop data
+            species (str): the species of the crop (see crop_config.py)
         """
         #  id variables
         self.crop_name = 'null'

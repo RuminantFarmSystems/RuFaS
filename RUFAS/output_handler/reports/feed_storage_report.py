@@ -13,7 +13,7 @@ class FeedStorageReport(BaseReportDriver):
     def __init__(self, data, state):
         super().__init__(data)
 
-        self.storage_report_data = data['storage_report']
+        self.storage_report_data = data['feed_storage_report']
 
         for storage in state.feed.storage_options:
             self.reports[storage] = StorageReport(self.storage_report_data, storage)
