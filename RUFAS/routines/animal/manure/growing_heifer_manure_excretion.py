@@ -68,6 +68,7 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
 
     return p_excrt, \
            {"U": 0.340,  # TODO: Implement with correct equation
+            "Urine": 7,
             "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": N_manure,
             "Mkg": manure,

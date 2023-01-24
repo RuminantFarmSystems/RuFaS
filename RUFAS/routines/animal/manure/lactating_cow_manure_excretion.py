@@ -123,6 +123,7 @@ def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
 
     return p_excrt, \
            {"U": U,
+            "Urine": urine,
             "TAN_s": TAN_s,
             "MN": N_manure,
             "Mkg": manure,

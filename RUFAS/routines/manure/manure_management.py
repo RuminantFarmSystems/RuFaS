@@ -10,11 +10,26 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
             Sadman Chowdhury, skc86@cornell.edu
 """
 import collections
+import typing
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.input_handler.manure_management_config_handler import ManureManagementConfigHandler
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 
 
 class ManureManagement:
@@ -35,7 +50,11 @@ class ManureManagement:
 
     """
 
-    def __init__(self, animal_management: AnimalManagement):
+    def __init__(self,
+                 animal_management: AnimalManagement,
+                 weather,
+                 time,
+                 manure_management_config):
         """
         Initializes a ManureManagement object by setting up the appropriate manure
         management components as specified by the data in the animal_management object.
@@ -43,15 +62,23 @@ class ManureManagement:
         Args:
             animal_management: A reference to the AnimalManagement object that is one of the attributes
                 of the simulation engine object.
+            weather: The Weather object used to initialize State variables.
+            time: The Time object used to initialize State variables.
+            manure_management_config: A dictionary that contains the configuration data for
+                different manure management scenarios.
 
         """
-
-        self.manure_handlers = {}
-        self.reception_pits = {}
-        self.manure_separators = {}
-        self.manure_treatments = {}
+        self.beddings: Dict[int, BaseBedding] = {}
+        self.manure_handlers: Dict[int, BaseManureHandler] = {}
+        self.reception_pits: Dict[int, ReceptionPit] = {}
+        self.manure_separators: Dict[int, Optional[BaseManureSeparator]] = {}
+        self.manure_treatments: Dict[int, BaseManureTreatment] = {}
+        self.weather = weather
+        self.time = time
+        self.manure_management_config_handler = ManureManagementConfigHandler(manure_management_config)
         self._all_data = collections.defaultdict(list)
-        self._setup_manure_management_components(animal_management)
+
+        self._configure_manure_management_components(animal_management)
 
     @property
     def all_data(self) -> Dict[int, List[Tuple]]:
@@ -69,12 +96,11 @@ class ManureManagement:
                     a ManureSeparatorOutput object, and a ManureTreatment object.
 
         """
-
         return self._all_data
 
-    def _setup_manure_management_components(self, animal_management: AnimalManagement) -> None:
+    def _configure_manure_management_components(self, animal_management: AnimalManagement) -> None:
         """
-        Sets up the chain of manure management components for each animal pen as follows:
+        Configures the chain of manure management components for each animal pen as follows:
             Each pen has one of each of the following components - manure handler,
             reception pit, manure separator, and manure storage treatment.
             These four components, in that order, form a chain such that each downstream
@@ -91,7 +117,45 @@ class ManureManagement:
             animal_management: An AnimalManagement object obtained from the animal module.
 
         """
-        pass
+
+        for pen in animal_management.all_pens:
+            mm_pen = ManureManagementPen(pen)
+
+            custom_bedding_config = self.manure_management_config_handler.get_custom_bedding_config(mm_pen.bedding_type)
+            self.beddings[pen.id] = BeddingFactory.get_instance(
+                    bedding_type_name=mm_pen.bedding_type,
+                    custom_bedding_config=custom_bedding_config
+            )
+
+            custom_manure_handler_config = \
+                self.manure_management_config_handler.get_custom_manure_handler_config(mm_pen.manure_handler)
+            self.manure_handlers[mm_pen.id] = ManureHandlerFactory.get_instance(
+                    manure_handler_type_name=mm_pen.manure_handler,
+                    weather=self.weather,
+                    time=self.time,
+                    custom_manure_handler_config=custom_manure_handler_config,
+            )
+
+            self.reception_pits[mm_pen.id] = ReceptionPit()
+
+            if mm_pen.manure_separator.lower() == 'none':
+                self.manure_separators[mm_pen.id] = None
+            else:
+                custom_manure_separator_config = \
+                    self.manure_management_config_handler.get_custom_manure_separator_config(mm_pen.manure_separator)
+                self.manure_separators[mm_pen.id] = ManureSeparatorFactory.get_instance(
+                        manure_separator_type_name=mm_pen.manure_separator,
+                        custom_manure_separator_config=custom_manure_separator_config
+                )
+
+            custom_manure_treatment_config = \
+                self.manure_management_config_handler.get_custom_manure_treatment_config(mm_pen.manure_treatment)
+            self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
+                    manure_treatment_type_name=mm_pen.manure_treatment,
+                    weather=self.weather,
+                    time=self.time,
+                    custom_manure_treatment_config=custom_manure_treatment_config
+            )
 
     def update(self, animal_management: AnimalManagement) -> None:
         """
@@ -103,7 +167,57 @@ class ManureManagement:
                 from the simulation engine's AnimalManagement object.
 
         """
-        pass
+        for pen in animal_management.all_pens:
+            mm_pen = ManureManagementPen(pen)
+
+            manure_handler_daily_output = self.manure_handlers[mm_pen.id].daily_update(
+                    pen=mm_pen,
+                    bedding=self.beddings[mm_pen.id],
+                    sim_day=animal_management.simulation_day
+            )
+
+            reception_pit_daily_output = self.reception_pits[mm_pen.id].daily_update(
+                    manure_handler_daily_output=manure_handler_daily_output,
+                    pen=mm_pen,
+                    bedding=self.beddings[mm_pen.id]
+            )
+
+            anaerobic_digestion_daily_output = None
+
+            if ManureTreatmentType.get_type(mm_pen.manure_treatment) is \
+                    ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT:
+                manure_treatment_daily_output = self.manure_treatments[mm_pen.id].daily_update(
+                        manure_handler_daily_output=manure_handler_daily_output,
+                        manure_treatment_daily_input=reception_pit_daily_output,
+                        pen=mm_pen,
+                        sim_day=animal_management.simulation_day,
+                        manure_separator=self.manure_separators[mm_pen.id]
+                )
+                anaerobic_digestion_daily_output = (
+                    typing.cast(AnaerobicDigestionAndLagoon, self.manure_treatments[mm_pen.id])
+                    .anaerobic_digestion_daily_output)
+                manure_separator_daily_output = self.manure_treatments[mm_pen.id].manure_separator_daily_output
+            else:
+                manure_separator_daily_output = self.manure_separators[mm_pen.id].daily_update(
+                        manure_separator_daily_input=reception_pit_daily_output
+                ) if self.manure_separators[mm_pen.id] else None
+
+                manure_treatment_daily_output = self.manure_treatments[mm_pen.id].daily_update(
+                        manure_handler_daily_output=manure_handler_daily_output,
+                        manure_treatment_daily_input=manure_separator_daily_output or reception_pit_daily_output,
+                        pen=mm_pen,
+                        sim_day=animal_management.simulation_day
+                )
+
+            daily_update_data = (
+                mm_pen,
+                manure_handler_daily_output,
+                reception_pit_daily_output,
+                manure_separator_daily_output,
+                manure_treatment_daily_output,
+                anaerobic_digestion_daily_output
+            )
+            self._all_data[pen.id].append(daily_update_data)
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:
@@ -123,5 +237,4 @@ def simulate_daily_manure_management(manure_management: ManureManagement, animal
             This object is treated as a read-only object so no changes are made to it.
 
     """
-
     manure_management.update(animal_management)
