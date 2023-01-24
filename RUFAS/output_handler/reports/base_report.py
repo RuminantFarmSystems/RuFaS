@@ -8,7 +8,6 @@ Author(s): William Donovan wmdonovan@wisc.edu
 import csv
 from pathlib import Path
 
-import config.definitions
 import config.global_variables
 from .. import graphics
 
@@ -23,8 +22,6 @@ class BaseReport:
         This is called in the report handler's __init__() method, and takes in
         the data passed to it and assigns the properties below.
         """
-
-        _suppress_graphics = config.definitions.SUPPRESS_GRAPHICS #check for global graphics suppression flag
 
         self.produce_csv = data['produce_csv']
         self.produce_graphics = data['produce_graphics'] if config.global_variables.PRODUCE_GRAPHICS else False
@@ -104,7 +101,6 @@ class BaseReport:
     # writes stored values to the csv at the end of the year
     #
     def write_annual_report(self):
-
 
         mode = 'a+' if Path(str(self.csv_dir) + '/' +
                             self.file_name).exists() else 'w+'
