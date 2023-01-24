@@ -76,6 +76,8 @@ def formulate_manure_application(manure_storage, m_app):
         P_mass = min(available_P, desired_P)
 
         # FM.4.A.6
+        N_frac = 0.05 if N_frac == 0 else N_frac
+        P_frac = 0.06 if P_frac == 0 else P_frac
         applied_manure = min(max(N_mass / N_frac, P_mass / P_frac), available_manure)
 
         # FM.4.A.7
@@ -88,6 +90,9 @@ def formulate_manure_application(manure_storage, m_app):
         solid_ratio = storage.TS / available_manure
         liquid_ratio = storage.TS_liquid / available_manure
 
+        available_N = 0.05 if available_N == 0 else available_N
+        available_P = 0.05 if available_P == 0 else available_P
+        available_K = 0.05 if available_K == 0 else available_K
         solid_N_ratio = storage.N / available_N
         solid_P_ratio = storage.P / available_P
         solid_K_ratio = storage.K / available_K

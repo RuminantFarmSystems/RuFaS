@@ -186,6 +186,7 @@ class HeiferII(HeiferI):
             'breed': self.breed,
             'birth_date': self.birth_date,
             'days_born': self.days_born,
+            'net_merit': self.net_merit,
             'birth_weight': self.birth_weight,
             'body_weight': self.body_weight,
             'wean_weight': self.wean_weight,

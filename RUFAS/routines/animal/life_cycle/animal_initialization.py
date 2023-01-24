@@ -14,6 +14,8 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import sqlite3
 from enum import IntEnum
+import pandas as pd
+from random import uniform
 
 
 class AnimalValues(IntEnum):
@@ -372,6 +374,7 @@ class AnimalInitialization:
                 'breed': row[AnimalValues.breed],
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
+                'net_merit': int(self.assign_NM(int(row[AnimalValues.days_born]))),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'p_init': 0,
                 'body_weight': float(row[AnimalValues.body_weight]),
@@ -409,6 +412,7 @@ class AnimalInitialization:
                 'breed': row[AnimalValues.breed],
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
+                'net_merit': int(self.assign_NM(int(row[AnimalValues.days_born]))),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
@@ -445,6 +449,7 @@ class AnimalInitialization:
                 'breed': row[AnimalValues.breed],
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
+                'net_merit': int(self.assign_NM(int(row[AnimalValues.days_born]))),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
@@ -497,6 +502,7 @@ class AnimalInitialization:
                 'breed': row[AnimalValues.breed],
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
+                'net_merit': int(self.assign_NM(int(row[AnimalValues.days_born]))),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
@@ -549,6 +555,7 @@ class AnimalInitialization:
                 'breed': row[AnimalValues.breed],
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
+                'net_merit': int(self.assign_NM(int(row[AnimalValues.days_born]))),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
@@ -607,6 +614,7 @@ class AnimalInitialization:
                 'breed': row[AnimalValues.breed],
                 'birth_date': int(row[AnimalValues.birth_date]),
                 'days_born': int(row[AnimalValues.days_born]),
+                'net_merit': int(self.assign_NM(int(row[AnimalValues.days_born]))),
                 'birth_weight': float(row[AnimalValues.birth_weight]),
                 'body_weight': float(row[AnimalValues.body_weight]),
                 'wean_weight': float(row[AnimalValues.wean_weight]),
@@ -739,3 +747,62 @@ class AnimalInitialization:
                   "connecting to and querying the animal initialization "
                   "database: ", e, "\nExiting.")
             exit(1)
+
+
+    # for genetic progress only
+    def assign_NM(self, age):
+        '''
+        Description:
+            Assign a $NM to the animals selected from the database according to their ages
+        Input:
+            age: the age of the picked animal
+        Return:
+            NM: the net merit of the animal
+        '''
+        # According to genetic progress (https://webconnect.uscdcb.com/#/summary-stats/genetic-trend)
+        # from 2015-2020, PTA increase = 369
+        # from 2010-2015, PTA increase = 253
+        # from 2005-2010, PTA increase = 140
+        # from 2000-2005, PTA increase = 107
+
+        # According to VanRaden et al., 2010; VanRaden et al., 2014; Norman et al., 2020 report
+        # PTA increase for $NM were $132, $184, $231 for years 2000 to 2005, 2005 to 2010, and 2010 to 2015, respectively 
+
+        # EBV progress = 2 * PTA progress
+        
+        # if I have all percentile table, I can accosiate the age to which percentile table it should look at
+        # and then use the from_pct_to_nm() function to get a $NM
+
+        # for testing, I pretend the current available percentile table (Dec, 2022) is 2020 percentile table
+        nm = 0
+        if age < 5*365:
+            nm = self.from_pct_to_nm() - age * 369*2/(5*365)
+        elif age < 10*365:
+            nm = self.from_pct_to_nm() - 369*2 - (age-5*365) * 253*2/(5*365)
+        elif age < 15*365:
+            nm = self.from_pct_to_nm() - 369*2 - 253*2 - (age-10*365) * 140*2/(5*365)
+        elif age < 20*365:
+            nm = self.from_pct_to_nm() - 369*2 - 253*2 - 140*2 - (age-15*365) * 107*2/(5*365)
+        else:
+            print('no available $NM for cows before 2000 (should not see this because no cows live longer than 20 years)')
+        return nm
+
+        
+    
+    def from_pct_to_nm(self):
+        # Evaluation date = Dec, 2022
+        nm_pt_df = pd.read_csv('input/animal/Combine_Merit_PCTL.csv')
+        nm_rand = uniform(-1, 99) # Random float:  -1 <= x <= 99
+
+        # inverse transform sampling
+        pt_lower_limit = pt_upper_limit = nm_lower_limit = nm_upper_limit = 0
+        for i in range(nm_pt_df.shape[0] - 1, -1, -1):
+            if nm_pt_df.iloc[i]['PERCENTILE'] <= nm_rand < nm_pt_df.iloc[i-1]['PERCENTILE']:
+                pt_lower_limit = nm_pt_df.iloc[i]['PERCENTILE']
+                pt_upper_limit = nm_pt_df.iloc[i-1]['PERCENTILE']
+                nm_lower_limit = nm_pt_df.iloc[i]['NET_MERIT']
+                nm_upper_limit = nm_pt_df.iloc[i-1]['NET_MERIT']
+                break
+        proportion = (nm_upper_limit - nm_lower_limit) / (pt_upper_limit - pt_lower_limit)
+        nm = round(nm_lower_limit + proportion * (nm_rand - pt_lower_limit))
+        return nm

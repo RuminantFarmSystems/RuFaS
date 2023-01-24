@@ -44,6 +44,7 @@ class Calf(AnimalBase):
         self.birth_weight = 0
         self.animal_intake = 0
         self.DBW = 0
+        self.net_merit = 0
 
         if 'body_weight' in args:
             self.assign_calf_values(args)
@@ -113,6 +114,7 @@ class Calf(AnimalBase):
         self.wean_weight = args['wean_weight']
         self.mature_body_weight = args['mature_body_weight']
         self.events.init_from_string(args['events'])
+        self.net_merit = args['net_merit']
 
     def get_calf_values(self):
         """
@@ -123,6 +125,7 @@ class Calf(AnimalBase):
             'breed': self.breed,
             'birth_date': self.birth_date,
             'days_born': self.days_born,
+            'net_merit': self.net_merit,
             'birth_weight': self.birth_weight,
             'body_weight': self.body_weight,
             'wean_weight': self.wean_weight,

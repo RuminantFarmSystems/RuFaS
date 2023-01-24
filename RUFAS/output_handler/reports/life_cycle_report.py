@@ -230,13 +230,19 @@ class LifeCycleReport(BaseReportDriver):
                 self.reproduction_performance['culled_cow_dim_for_parity_' + parity] = \
                     ['life_cycle_manager.culled_cow_dim[\'' + parity + '\']', '', []]
 
+            self.genetic_performance = {
+                'net_merit_cow': ['life_cycle_manager.avg_net_merit_cow', '$', []],
+                'net_merit_heifer': ['life_cycle_manager.avg_net_merit_heifer', '$', []],
+            }
+
             self.daily_variables = {
                 **self.herd_structure, 
                 **self.reproduction_performance, 
                 **self.production_performance, 
                 **self.preg,
                 **self.average_animal_profile,
-                **self.econmic_cal
+                **self.econmic_cal,
+                **self.genetic_performance
             }
             
             self.annual_variables = {'year': ['time.calendar_year', '', []]}
