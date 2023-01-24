@@ -384,9 +384,7 @@ class Pen:
                 ration[key] = ration_per_animal[key] * num_animals
         
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__, 
-                    "feed": feed, 
-                    "available_feeds": available_feeds, }
+                    "function": self.calc_ration.__name__, }
         om.add_variable("pen_ration_data", self.ration, info_map)
 
         return ration
@@ -449,8 +447,7 @@ class Pen:
         self.dry_total = dry_total
         self.lactating_total = lactating_total
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure.__name__, 
-                    "feed": feed, }
+                    "function": self.calc_manure.__name__, }
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):

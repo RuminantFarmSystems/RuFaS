@@ -18,8 +18,7 @@ class TallFescue(BaseCrop):
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
-                    "crop_name": crop_name,
-                    "data": data, }
+                    "crop_name": crop_name, }
 
         if tall_fescue_data['harvest_type'] != 'optimal':
             harvest_type_warning = "Perennial crops are always optimally harvested"
