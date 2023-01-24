@@ -26,11 +26,11 @@ def update_all(soil, crop, weather, time):
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
+    for crop_types in crop.current_crop.values():
+        calc_sed(soil, crop_types, weather, time)
 
-    calc_sed(soil, crop, weather, time)
 
-
-def calc_sed(soil, crop, weather, time):
+def calc_sed(soil, crop_type, weather, time):
     """
     Description:
         Calculates sed, sediment yield on a given day (metric tons)
@@ -42,11 +42,11 @@ def calc_sed(soil, crop, weather, time):
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
-
+            
     runoff = soil.runoff
     peak_runoff = calc_peak_runoff(soil, weather, time)
     K = calc_K(soil)
-    C = calc_C(soil, crop)
+    C = calc_C(soil, crop_type)
 
     #P = soil.practice_factor
     # we get the corresponding tillage year mapped to using time.calendar_year as the key
@@ -63,7 +63,7 @@ def calc_sed(soil, crop, weather, time):
         exp_part = exp(3 * 20 / 25.4)
         sed = sed / exp_part
 
-    soil.sed = sed
+    soil.sed += sed
 
 
 def calc_peak_runoff(soil, weather, time):
@@ -311,7 +311,7 @@ def calc_F_sand(soil):
     return 1 - (0.7 * (1 - sand / 100) / ((1 - sand / 100) + exp_part))
 
 
-def calc_C(soil, crop):
+def calc_C(soil, crop_type):
     """
     Definitions:
         Calculates the cover and management factor, C, as the ratio of soil
@@ -328,7 +328,8 @@ def calc_C(soil, crop):
         int: C, unitless cover and management factor
     """
 
-    bio_AG = crop.current_crop.bio_AG
+    bio_AG = crop_type.bio_AG
+
     residue = soil.residue
     Cover = bio_AG + residue
 

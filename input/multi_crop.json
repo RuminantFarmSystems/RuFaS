@@ -1,13 +1,12 @@
 {
     "config":
     {
-        "start_date" : "2013:1",
+        "start_date" : "1989:1",
         "end_date" : "2019:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,
-        "seed": 0,
-        "simulate_animals": false
+        "seed": 0
     },
 
     "weather": "ARL_weather.csv",
@@ -18,9 +17,9 @@
     {
         "fields": {
             "field_1": {
-                "soil": "ARL_soil.json",
-                "crop": "ARL_rotation.json",
-                "field_management": "ARL_field_management.json"
+                "soil": "multi_crop_soil.json",
+                "crop": "multi_crop_rotation.json",
+                "field_management": "multi_crop_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",

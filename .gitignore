@@ -47,5 +47,7 @@ pycallexp.py
 # ignore pytest cache folder
 .pytest_cache/
 
+# ignore croptime json output
+sample.json
 # ignore html files
 *.html
