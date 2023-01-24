@@ -13,7 +13,6 @@ from .soil.soil import *
 from .field_management.field_management import *
 from ...util import Utility
 
-
 def daily_fields_routine(fields, manure_storage, weather, time):
     """execute field management, crop, and soil routines for each field and generate summaries.
     

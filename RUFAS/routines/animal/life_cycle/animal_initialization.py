@@ -736,4 +736,5 @@ class AnimalInitialization:
             print("The program encountered the following exception while "
                   "connecting to and querying the animal initialization "
                   "database: ", e, "\nExiting.")
+
             exit(1)
