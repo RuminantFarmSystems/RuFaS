@@ -1,5 +1,6 @@
 from RUFAS.routines.field.crop.crop_types import crop_config
 
+# TODO: Should use an ENUM class to represent the supported species??
 supported_species = [item.lower() for item in crop_config.__dict__.keys() if not item.startswith("__")]
 
 

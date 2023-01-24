@@ -14,6 +14,7 @@ Description: This file updates the heifer form breeding to close to calving.
 
 import numpy as np
 from scipy.stats import truncnorm
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
@@ -22,6 +23,8 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 import math
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class HeiferII(HeiferI):
@@ -286,6 +289,7 @@ class HeiferII(HeiferI):
             cull_stage: culling for reproduction failure
             third_stage: move to next stage -- heiferIII stage when time comes
         """
+
         self.update_body_weight_history(sim_day)
         cull_stage = False
         third_stage = False
@@ -619,6 +623,7 @@ class HeiferII(HeiferI):
         for preg check 2 and 3, confirm pregnancy, there are chances of preg
             loss in each period of time between preg checks
         """
+
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
@@ -705,3 +710,4 @@ class HeiferII(HeiferI):
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
+        
