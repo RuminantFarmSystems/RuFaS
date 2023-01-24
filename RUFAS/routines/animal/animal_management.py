@@ -239,9 +239,7 @@ class AnimalManagement:
 
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._print_animal_num_warnings.__name__,
-            "herd_data": herd_data
-        }
+            "function": self._print_animal_num_warnings.__name__, }
 
         counter = 0
 
