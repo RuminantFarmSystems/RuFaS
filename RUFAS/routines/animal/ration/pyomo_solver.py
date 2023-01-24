@@ -165,7 +165,7 @@ def create_model(feeds_data, req_data, feeds):
                 "function": create_model.__name__,
                 "feeds_data": feeds_data,
                 "req_data": req_data,
-                "feeds": feeds,}
+                "feeds": feeds, }
 
     # TODO update "m1" variable to a more descriptive name.
     om.add_variable("m1", m1, info_map)  

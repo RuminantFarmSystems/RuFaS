@@ -333,8 +333,7 @@ class Weather:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
-                    "weather_file": weather_file,
-                    "config": config, }
+                    "weather_file": weather_file, }
 
         years = config.years
         w_start_year = config.w_start_year
