@@ -386,7 +386,7 @@ def check_conditions_plant(soil, weather, time):
 
 class cropTime:
     
-    def __init__(self,time, data,cropclass):
+    def __init__(self,time, data, cropclass):
         """
         Description:
             This object is responsible for creating and tracking what crops are being planted, grown, and harvested in the simulation.
@@ -417,8 +417,8 @@ class cropTime:
             for crop in crop_list.keys():
                 crop_class= cropclass.setcrop(crop)
                 if (crop_class.crop_type == 'Perennial'): 
-                    if crop_time['year'][day] ==  end_year:
-                            if crop_time['day'][day] == harvest_day:
+                    if crop_time['year'][day] == crop_class.end_year:
+                            if crop_time['day'][day] == crop_class.harvest_day:
                                 crop_time['crops_killed'][day].append(crop)
                 else: 
                     for year in range(len(crop_list[crop]['plant_years'])):
