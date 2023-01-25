@@ -2,6 +2,9 @@
 ## This will work for **all** such issues and pull requests. Another action [TODO: REFERENCE]
 ## Will be added to switch the "Status" of a Task to "Done"
 ## Source: https://github.com/actions/add-to-project#current-status
+##
+## Other default actions can be (and are) set from within the project: 
+## https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/quickstart-for-projects#configure-built-in-automation
 
 name: Add tasks to SC_redesign project
 
