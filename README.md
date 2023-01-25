@@ -36,6 +36,7 @@ N/A
 
 [2022 Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
 
+[SC_redesign tasks (GitHub Projects)](https://github.com/orgs/RuminantFarmSystems/projects/1)
 
 <!---
 # Introduction 
