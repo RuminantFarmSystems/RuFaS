@@ -28,7 +28,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None, TP_Milk=None, Fat_Milk=None,
                Lactose_Milk=None, Milk=None, DIM=None, lactating=None,
                BCS5=None, PrevTemp=None,
-               ADG_heifer=None, Age=None):
+               ADG_heifer=None, Age=None, distance=None):
     """
     Calculates the dietary requirements of a single animal. These values are used
     on the RHS of the linear program and furthermore will be used in constraint
@@ -57,7 +57,23 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None, TP_Milk=None, Fat
         ADG_heifer: Average daily gain of a heifer
         Age: Current age, month
     """
-    if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
+    if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
+        NEmaint, CW, CBW = calculate_NRC_energy_maintenance_requirements(
+            BW, MW, DOP, BCS5, PrevTemp, animal_type)
+        NEg, ADG, EQSBW = calculate_NRC_energy_growth_requirements(
+            BW, MW, CW, animal_type, parity, CI, ADG_heifer)
+        NEpreg = calculate_NRC_energy_pregnancy_requirements(DOP, CBW)
+        NEl = calculate_NRC_energy_lactation_requirements(
+            animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
+        MP_req = calculate_NRC_protein_requirements(
+            BW, CW, DOP, animal_type, Milk, TP_Milk, CBW, NEg, ADG, EQSBW)
+        Ca_req = calculate_NRC_calcium_requirements(
+            BW, MW, DOP, animal_type, lactating, ADG, Milk)
+        P_req = calculate_NRC_P_requirements(
+            BW, MW, DOP, Milk, animal_type, ADG)
+        DMIest = calculate_NRC_DMI(
+            animal_type, BW, DOP, DIM, lactating, Milk, Fat_Milk)
+    elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
         NEl = calculate_NASEM_energy_lactation_requirements(
             animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
         DMIest = calculate_NASEM_DMI(BW, MW, DIM, lactating, NEl, parity, BCS5)
@@ -73,23 +89,6 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None, TP_Milk=None, Fat
             BW, MW, DOP, ADG, DMIest, TP_Milk, Milk)
         P_req = calculate_NASEM_P_requirements(
             BW, MW, animal_type, DOP, ADG, DMIest, TP_Milk, Milk)
-
-    elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
-        NEmaint, CW, CBW = calculate_NRC_energy_maintenance_requirements(
-            BW, MW, DOP, BCS5, PrevTemp, animal_type)
-        NEg, ADG, EQSBW = calculate_NRC_energy_growth_requirements(
-            BW, MW, CW, animal_type, parity, CI, ADG_heifer)
-        NEpreg = calculate_NRC_energy_pregnancy_requirements(DOP, CBW)
-        NEl = calculate_NRC_energy_lactation_requirements(
-            animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk)
-        MP_req = calculate_NRC_protein_requirements(
-            BW, MW, CW, DOP, animal_type, Milk, TP_Milk, CBW, NEg, ADG, EQSBW)
-        Ca_req = calculate_NRC_calcium_requirements(
-            BW, MW, DOP, animal_type, lactating, ADG, Milk)
-        P_req = calculate_NRC_P_requirements(
-            BW, MW, DOP, Milk, animal_type, ADG)
-        DMIest = calculate_NRC_DMI(
-            animal_type, BW, DOP, DIM, lactating, Milk, Fat_Milk)
     else:
         DMIest = []
         print(f"DMI estimation method \
@@ -101,7 +100,8 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None, TP_Milk=None, Fat
             'DMIest': DMIest}
 
 
-def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, animal_type):
+def calculate_NRC_energy_maintenance_requirements(BW: float, MW: float, DOP: int | None, BCS5: int | None, PrevTemp: float | None,
+                                                  animal_type: str) -> tuple[float, float, float]:
     """ Calculates energy requirement for maintenance, conceptus weight, and calf birth weight 
 
     Calculates the estimated energy requirements requirements for maintenance in megacalories per day,
@@ -119,7 +119,7 @@ def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, a
         Body condition score (score from 1 to 5)
     PrevTemp : float
         Adjustment for previous temperature
-    animal_type : str
+    animal_type : strF
         Animal type according to set categories in RuFaS model, 
         currently only expecting either 'heifer' or 'cow' 
 
@@ -134,7 +134,7 @@ def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, a
 
     Notes
     -----
-    # Energy requirements for activity are not included within calculations for maintenance.
+    Energy requirements for activity are not included within calculations for maintenance.
 
     References
     ----------
@@ -144,6 +144,7 @@ def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, a
     CBW = MW * 0.06275
     if DOP == None:
         CW = 0
+        CBW = 0
     elif DOP > 190:
         CW = (18 + (DOP - 190) * 0.665) * (CBW / 45)
     else:
@@ -157,7 +158,7 @@ def calculate_NRC_energy_maintenance_requirements(BW, MW, DOP, BCS5, PrevTemp, a
     return NEmaint, CW, CBW
 
 
-def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
+def calculate_NASEM_energy_maintenance_requirements(BW: float, MW: float, DOP: int | None, DIM: int | None) -> tuple[float, float, float]:
     """ Calculates energy requirement for maintenance and two measures of uterine weight
 
     Calculates the estimated energy requirements requirements for maintenance in megacalories per day,
@@ -194,7 +195,7 @@ def calculate_NASEM_energy_maintenance_requirements(BW, MW, DOP, DIM):
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    .. National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
+        National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
     """
     if DOP == None:
         NEmaint = 0.10*(BW)**0.75
@@ -218,7 +219,7 @@ def calculate_NRC_energy_activity_requirements():
     pass
 
 
-def calculate_NASEM_energy_activity_requirements(BW, housing, distance):
+def calculate_NASEM_energy_activity_requirements(BW: float, housing: str, distance: float | None) -> float:
     """ Calculates energy requirement for activity according to NASEM (2001).
 
     Calculates the estimated energy requirements requirements for maintenance in megacalories per day
@@ -246,7 +247,7 @@ def calculate_NASEM_energy_activity_requirements(BW, housing, distance):
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    .. National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
+        National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
     """
     if housing == 'Barn':
         NEa = distance * 0.00035 * BW  # TODO This logic is the same as NRC \
@@ -260,7 +261,8 @@ def calculate_NASEM_energy_activity_requirements(BW, housing, distance):
     return NEa
 
 
-def calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI, ADG_heifer):
+def calculate_NRC_energy_growth_requirements(BW: float, MW: float, CW: float, animal_type: float, parity: int | None, 
+    CI: int | None, ADG_heifer: float | None) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth and associated weight gain parameters.
 
     Calculates the estimated energy requirements requirements for growth in megacalories per day, 
@@ -339,7 +341,8 @@ def calculate_NRC_energy_growth_requirements(BW, MW, CW, animal_type, parity, CI
     return NEg, ADG, EQSBW
 
 
-def calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer, animal_type, parity, CI):
+def calculate_NASEM_energy_growth_requirements(BW: float, MW: float, ADG_heifer: float | None, animal_type: str,
+                                               parity: int | None, CI: int | None) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth, and also growth metrics
 
     Calculates the estimated energy requirements requirements for growth in megacalories per day,
@@ -378,10 +381,12 @@ def calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer, animal_type, 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    National Academic Press, Chapter 3 "Energy", pp. 32-35, 2021.
+        National Academic Press, Chapter 3 "Energy", pp. 32-35, 2021.
 
     """
     MSBW = 0.96 * MW
+    # TODO Edward: check this logic. We hashed it out early on,
+    #  but I want to be sure that it's correct for parity =0 or >2
     if animal_type == 'cow':
         if parity == 1 and CI != 0:
             ADG = ((0.92 - 0.82) * MSBW) / CI
@@ -405,7 +410,7 @@ def calculate_NASEM_energy_growth_requirements(BW, MW, ADG_heifer, animal_type, 
     return NEg, ADG, Frame_Weight_Gain_g
 
 
-def calculate_NRC_energy_pregnancy_requirements(DOP, CBW):
+def calculate_NRC_energy_pregnancy_requirements(DOP: int | None, CBW: float | None) -> float:
     """ Calculates energy requirement for pregnancy according to NRC (2001).
 
     Calculates the estimated energy requirements requirements for pregnancy in megacalories per day
@@ -447,7 +452,8 @@ def calculate_NRC_energy_pregnancy_requirements(DOP, CBW):
     return NEpreg
 
 
-def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, UterW):
+def calculate_NASEM_energy_pregnancy_requirements(lactating: bool | None, DOP: int | None, DIM: int | None, GrUterW: float,
+                                                  UterW: float) -> tuple[float, float]:
     """ Calculates energy requirement for pregnancy and gravid uterine weight gain
 
     Calculates the estimated energy requirements requirements for pregnancy in megacalories per day,
@@ -455,7 +461,7 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, 
 
     Parameters
     ----------
-    lactating : str
+    lactating : bool
         Physiological condition
     DOP : int
         Days of pregnancy
@@ -468,7 +474,7 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, 
 
     Returns
     -------
-    NEpreg : int
+    NEpreg : float
         Net energy requirement for pregnancy (Mcal/d)
     GrUterWGain : float
         Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
@@ -482,7 +488,7 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    National Academic Press, Chapter 3 "Energy", pp. 31-32, 2021.
+        National Academic Press, Chapter 3 "Energy", pp. 31-32, 2021.
 
     """
 
@@ -496,7 +502,8 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating, DOP, DIM, GrUterW, 
     return NEpreg, GrUterWGain
 
 
-def calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk):
+def calculate_NRC_energy_lactation_requirements(animal_type: str, Fat_Milk: float | None, TP_Milk: float | None,
+                                                Lactose_Milk: float | None, Milk: float | None) -> float:
     """ Calculates energy requirement for lactation according to NRC (2001).
 
     Calculates the estimated energy requirements requirements for lactation in megacalories per day
@@ -540,7 +547,8 @@ def calculate_NRC_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, 
     return NEl
 
 
-def calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk, Lactose_Milk, Milk):
+def calculate_NASEM_energy_lactation_requirements(animal_type: str, Fat_Milk: float | None, TP_Milk: float | None,
+                                                  Lactose_Milk: float | None, Milk: float | None) -> float:
     """ Calculates energy requirement for lactation according to NASEM (2021).
 
     Calculates the estimated energy requirements requirements for lactation in megacalories per day
@@ -565,12 +573,12 @@ def calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk
 
     Notes
     -----
-    # Same calculations as done in the NRC (2001). Requiremets are based on milk yield and composition.
+    Same calculations as done in the NRC (2001). Requiremets are based on milk yield and composition.
 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
+        National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
 
     """
     if animal_type == 'cow':
@@ -582,7 +590,8 @@ def calculate_NASEM_energy_lactation_requirements(animal_type, Fat_Milk, TP_Milk
     return NEl
 
 
-def calculate_NRC_protein_requirements(BW, MW, CW, DOP, animal_type, Milk, TP_Milk, CBW, NEg, ADG, EQSBW):
+def calculate_NRC_protein_requirements(BW: float, CW: float, DOP: int | None, animal_type: str, Milk: float | None,
+                                       TP_Milk: float | None, CBW: float, NEg: float, ADG: float, EQSBW: float) -> float:
     """ Protein requirement for maintenance according to NRC (2001).
 
     Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -620,7 +629,7 @@ def calculate_NRC_protein_requirements(BW, MW, CW, DOP, animal_type, Milk, TP_Mi
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
-    National Academic Press, Chapter 5 "Protein and Amino acids",pp. 67-69. 2001;
+        National Academic Press, Chapter 5 "Protein and Amino acids",pp. 67-69. 2001;
 
     """
 
@@ -677,7 +686,8 @@ def calculate_NRC_protein_requirements(BW, MW, CW, DOP, animal_type, Milk, TP_Mi
     return MP_req
 
 
-def calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrUterWGain, DMIest, TP_Milk, Milk):
+def calculate_NASEM_protein_requirements(lactating: bool | None, BW: float, Frame_Weight_Gain_g: float, GrUterWGain: float,
+                                         DMIest: float, TP_Milk: float | None, Milk: float | None) -> float:
     """ Calculates Protein requirement for maintenance according to NASEM (2021).
 
     Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -706,18 +716,18 @@ def calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrU
 
     Notes
     -----
-    # As in the NRC (2021), the protein requirement is also divided into four components: maintenance, growth, pregnancy,
-    # and lactation (all of them on a metabolizable protein basis (MP, g/d).
-    # The MP is defined as the sum of rumen undegraded protein (RUP + microbial protein (MCP).
-    # MP requirements for maintenance includes: scurf + endogenous urinary loss + metabolic fecal protein.
-    # Current versions of RuFaS code for both NRC and NASEM do not split MP into physiological functions.
+    As in the NRC (2021), the protein requirement is also divided into four components: maintenance, growth, pregnancy,
+    and lactation (all of them on a metabolizable protein basis (MP, g/d).
+    The MP is defined as the sum of rumen undegraded protein (RUP + microbial protein (MCP).
+    MP requirements for maintenance includes: scurf + endogenous urinary loss + metabolic fecal protein.
+    Current versions of RuFaS code for both NRC and NASEM do not split MP into physiological functions.
 
     # TODO Consider inclusion of equations for estimating requirement for Non-Essential Aminoacids (NEAA)
 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition." 
-    National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
+        National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
     """
     NPscurf = 0.20*BW**(0.60)*0.85
     NPEndUrin = 53*6.25 * BW * 0.001
@@ -748,7 +758,8 @@ def calculate_NASEM_protein_requirements(lactating, BW, Frame_Weight_Gain_g, GrU
     return MP_req
 
 
-def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG, Milk):
+def calculate_NRC_calcium_requirements(BW: float, MW: float, DOP: int | None, animal_type: str, lactating: bool | None,
+                                       ADG: float, Milk) -> float:
     """ Calculates total Calcium requirement according to NRC (2001).
 
     Calculates the estimated the total calcium requirement (Ca) in grams per day
@@ -778,7 +789,7 @@ def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG,
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-    Chapter 6 "Minerals",pp. 106-109. 2001
+        Chapter 6 "Minerals",pp. 106-109. 2001
 
     """
 
@@ -824,7 +835,8 @@ def calculate_NRC_calcium_requirements(BW, MW, DOP, animal_type, lactating, ADG,
     return Ca_req
 
 
-def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk):
+def calculate_NASEM_calcium_requirements(BW: float, MW: float, DOP: int | None, ADG: float, DMIest: float, TP_Milk: float | None,
+                                         Milk: float | None) -> float:
     """ Calculates total Calcium requirement according to NASEM (2021).
 
     Calculates the estimated the total calcium requirement (Ca) in grams per day.
@@ -843,7 +855,7 @@ def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk
         Estimated dry matter intake (kg/d)
     TP_Milk : float
         True protein contents in milk (%)
-    Milk: float
+    Milk : float
         Milk yield (kg/d)
 
     Returns
@@ -853,12 +865,12 @@ def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk
 
     Notes
     -----
-    # NASEM (2021) calculation for both Ca and P requirements consider milk production variables.
+    NASEM (2021) calculation for both Ca and P requirements consider milk production variables.
 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    National Academic Press, Chapter 7 "Minerals" pp. 106-110, 2021.
+        National Academic Press, Chapter 7 "Minerals" pp. 106-110, 2021.
     """
     Ca_Maint = 0.90*DMIest
     Ca_Growth = ((9.83 * MW**-0.22) * BW**-0.22)*ADG
@@ -876,7 +888,8 @@ def calculate_NASEM_calcium_requirements(BW, MW, DOP, ADG, DMIest, TP_Milk, Milk
     return Ca_Req
 
 
-def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
+def calculate_NRC_P_requirements(BW: float, MW: float, DOP: int | None, Milk: float | None, animal_type: str,
+                                 ADG: float) -> float:
     """ Calculates total Phosphorus requirement according to NRC (2001).
 
     Calculates the estimated the total phosphorus requirement (P) in grams per day
@@ -887,10 +900,10 @@ def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
         Body weight (kilograms)
     MW : float
         Mature body weight (kilograms)
-    Milk: float
-        Milk yield (kg/d)
     DOP : int
         Days of pregnancy (days)
+    Milk: float
+        Milk yield (kg/d)
     animal_type : str
         Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     ADG : float
@@ -903,14 +916,13 @@ def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
 
     Notes
     -----
-    # This total phosphorus requirement (g)
-    # sum does not include the maintenance requirement which will
-    # be calculated within the NLP and added to this sum
+    This total phosphorus requirement (g) sum does not include the maintenance requirement which will
+    be calculated within the NLP and added to this sum
 
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-    Chapter 6 "Minerals",pp. 109-118. 2001
+        Chapter 6 "Minerals",pp. 109-118. 2001
     """
     P_growth = (1.2 + 4.635 * MW ** 0.22 * BW ** (-0.22)) * (ADG / 0.96)
     if DOP == None:
@@ -929,7 +941,8 @@ def calculate_NRC_P_requirements(BW, MW, DOP, Milk, animal_type, ADG):
     return P_req
 
 
-def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Milk, Milk):
+def calculate_NASEM_P_requirements(BW: float, MW: float, animal_type: str, DOP: int | None, ADG: float, DMIest: float,
+                                   TP_Milk: float | None, Milk: float | None) -> float:
     """ Calculates total Phosphorus requirement according to NASEM (2021).
 
     Calculates the estimated the total phosphorus requirement (P) in grams per day
@@ -960,12 +973,12 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Mil
 
     Notes
     -----
-    # NASEM (2021) calculation for both Ca and P requirements consider milk production variables.
+    NASEM (2021) calculation for both Ca and P requirements consider milk production variables.
 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    .. National Academic Press, Chapter 7 "Minerals" pp. 112, 2021.
+        National Academic Press, Chapter 7 "Minerals" pp. 112, 2021.
 
     """
     if animal_type == "cow":
@@ -989,7 +1002,7 @@ def calculate_NASEM_P_requirements(BW, MW, animal_type, DOP, ADG, DMIest, TP_Mil
 
 
 def calculate_NRC_DMI(animal_type: str, BW: float, DOP: int, DIM: int | None,
-                      lactating: bool | None, Milk: float, Fat_Milk: float):
+                      lactating: bool | None, Milk: float | None, Fat_Milk: float | None) -> float:
     """ Calculates dry matter intake according to NRC (2001).
 
     Calculates the estimated total dry matter intake in kilograms per day
@@ -1006,25 +1019,25 @@ def calculate_NRC_DMI(animal_type: str, BW: float, DOP: int, DIM: int | None,
         Days in milk (days)
     lactating : bool
         Physiological condition (conditional)
-    Milk: float
+    Milk : float
         Milk yield (kg/d)
     Fat_Milk : float
         Fat contents in milk (%)
 
     Returns
     -------
-    DMIest: float
+    DMIest : float
         Dry matter intake (kilograms per day)
 
     Notes
     -----
-    # The sum of dry matter intake of each feed is assumed to be less than
-    # dry matter intake estimation (Sum of Feed < DMIest).
+    The sum of dry matter intake of each feed is assumed to be less than
+    dry matter intake estimation (Sum of Feed < DMIest).
 
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter 1 "Dry Matter Intake",
-    pp. 4; and pp. 325, 2001 (Equations 1 and 2).
+        pp. 4; and pp. 325, 2001 (Equations 1 and 2).
 
     """
     if animal_type == 'cow':
@@ -1042,7 +1055,7 @@ def calculate_NRC_DMI(animal_type: str, BW: float, DOP: int, DIM: int | None,
 
 def calculate_NASEM_DMI(BW: float, MW: float, DIM: int | None,
                         lactating: bool | None, NEl: float,
-                        parity: int | None, BCS5: int = 3):
+                        parity: int | None, BCS5: int = 3) -> float:
     """ Calculates dry matter intake according to NASEM (2021).
 
     Calculates the estimated total dry matter intake in kilograms per day
@@ -1063,7 +1076,7 @@ def calculate_NASEM_DMI(BW: float, MW: float, DIM: int | None,
         Physiological condition (conditional)
     NEl : float
         Net energy for lactation
-    Parity : int
+    parity : int
         Parity number
     BCS5 : int
         Body condition score (score; scale from 1 to 5)
@@ -1075,18 +1088,16 @@ def calculate_NASEM_DMI(BW: float, MW: float, DIM: int | None,
 
     Notes
     -----
-    # The sum of dry matter intake of each feed is assumed to be less than
-    # dry matter intake estimation (Sum of Feed < DMIest).
-    # There are additional equation in NASEM (2021) book including neutral detergent concentrations in the diet
-    # for both lactating (page 12) and growing animals (page 14).
+    The sum of dry matter intake of each feed is assumed to be less than
+    dry matter intake estimation (Sum of Feed < DMIest).
+    There are additional equation in NASEM (2021) book including neutral detergent concentrations in the diet
+    for both lactating (page 12) and growing animals (page 14). [1]
 
     References
     ----------
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
-    National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
+        National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
     """
-    if BCS5 == None:
-        BCS5 = 3
     if lactating:
         DMIest = ((3.7 + parity*5.7)+0.305*NEl
                   + 0.022*BW+(-0.689-1.87*parity)*BCS5) \
