@@ -5,18 +5,11 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
-from RUFAS.routines.animal.life_cycle.animal_base import PenHistory
 import pytest
 
-from mock.mock import MagicMock, mock_open, patch
-from pytest_mock.plugin import MockerFixture
-
-from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-from RUFAS.simulation_engine import SimulationEngine
-
+from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.animal_base import BodyWeightHistory
 
 
 def test_norm():
@@ -120,7 +113,8 @@ def test_set_p_intake():
 
 
 @pytest.fixture
-def cow() -> AnimalBase:
+def cow_fixture() -> AnimalBase:
+    """simple AnimalBase fixture for use in animal tests"""
     initsetup = {
         'id': '1',
         'breed': 'HO',
@@ -132,35 +126,35 @@ def cow() -> AnimalBase:
     }
     AnimalBase.nutrients = {'dummy1': 'dummyval1', 'dummy2': 'dummyval2'}
     AnimalBase.config = {'semen_type': 'dummy'}
-    cow = AnimalBase(initsetup)
-    return cow
+    cowfixture = AnimalBase(initsetup)
+    return cowfixture
 
 
-def test_daily_p_update(cow: AnimalBase) -> None:
+def test_daily_p_update(cow_fixture: AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
-    cow.dP_reserves = 1
-    cow.p_intake = 0
-    cow.p_req = 1
+    cow_fixture.dP_reserves = 1
+    cow_fixture.p_intake = 0
+    cow_fixture.p_req = 1
 
     # Case 1: intake is less than requirements
-    cow.daily_p_update()
-    actual = cow.dP_reserves
+    cow_fixture.daily_p_update()
+    actual = cow_fixture.dP_reserves
     expected = 0
     assert actual == expected
 
     # Case 2: intake over requirements and reserves below 0
-    cow.dP_reserves = -10
-    cow.p_intake = 10
-    cow.p_req = 1
-    expected = 0.7 * max(cow.p_intake - cow.p_req, 0) + cow.dP_reserves
-    cow.daily_p_update()
-    actual = cow.dP_reserves
+    cow_fixture.dP_reserves = -10
+    cow_fixture.p_intake = 10
+    cow_fixture.p_req = 1
+    expected = 0.7 * max(cow_fixture.p_intake - cow_fixture.p_req, 0) + cow_fixture.dP_reserves
+    cow_fixture.daily_p_update()
+    actual = cow_fixture.dP_reserves
     assert actual == expected
 
     # Case 3: reserves are high, intake is over requirements
-    cow.dP_reserves = 10
-    cow.daily_p_update()
-    actual = cow.dP_reserves
+    cow_fixture.dP_reserves = 10
+    cow_fixture.daily_p_update()
+    actual = cow_fixture.dP_reserves
     expected = 0
     assert actual == expected
 
@@ -175,65 +169,58 @@ def test_set_p_purchased():
     pass
 
 
-def test_update_pen_history(cow: AnimalBase) -> None:
+def test_update_pen_history(cow_fixture: AnimalBase) -> None:
     """Unit test for update_pen_history in file routines/animal/life_cycle/animal_base.py"""
     curr_pen = 3
     classes_in_pen = ['Cow']
     curr_day = 2
 
-    # alternate way to handle, but harder to iterate check,
-    #  due to nature of PenHistory class
-    # testcases = [(3, 4, ['Cow']),
-    #         (3, 4, ['Cow']),
-    #         (3, 4, ['Cow'])]
-    # for case in testcases:
-    #     cow.update_pen_history(case)
-
     # Case 1
     # update hist with designated vals, using the time and the obj itself
-    cow.update_pen_history(
+    cow_fixture.update_pen_history(
         curr_pen, curr_day, classes_in_pen)
-    assert cow.pen_history[-1].pen == 3
-    assert cow.pen_history[-1].classes_in_pen == ['Cow']
-    assert cow.pen_history[-1].start_date == 2
-    assert cow.pen_history[-1].end_date == 2
+    assert cow_fixture.pen_history[-1].pen == 3
+    assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow_fixture.pen_history[-1].start_date == 2
+    assert cow_fixture.pen_history[-1].end_date == 2
 
     # Case 2
     # check that it changes pens to 4
-    cow.update_pen_history(
+    cow_fixture.update_pen_history(
         4, 3, ['Cow'])
     # check previous history remains the same, then check newest
-    assert cow.pen_history[-2].pen == 3
-    assert cow.pen_history[-1].pen == 4
-    assert cow.pen_history[-1].classes_in_pen == ['Cow']
-    assert cow.pen_history[-1].start_date == 3
-    assert cow.pen_history[-1].end_date == 3
+    assert cow_fixture.pen_history[-2].pen == 3
+    assert cow_fixture.pen_history[-1].pen == 4
+    assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow_fixture.pen_history[-1].start_date == 3
+    assert cow_fixture.pen_history[-1].end_date == 3
 
     # Case 3
     # check that the start date remains the date of the change
-    cow.update_pen_history(
+    cow_fixture.update_pen_history(
         4, 4, ['Cow'])
-    assert cow.pen_history[-1].pen == 4
-    assert cow.pen_history[-1].classes_in_pen == ['Cow']
-    assert cow.pen_history[-1].start_date == 3
-    assert cow.pen_history[-1].end_date == 4
+    assert cow_fixture.pen_history[-1].pen == 4
+    assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow_fixture.pen_history[-1].start_date == 3
+    assert cow_fixture.pen_history[-1].end_date == 4
 
 
-def test_update_body_weight_history(cow: AnimalBase) -> None:
+def test_update_body_weight_history(cow_fixture: AnimalBase) -> None:
+    """Unit test for update_body_weight_history in file routines/animal/life_cycle/animal_base.py"""
     histories = [(1, 200, 650),
                  (2, 300, 600),
                  (3, 400, 550)]
     # use update function 3x
     for history in histories:
         sim_day = history[0]
-        cow.days_born = history[1]
-        cow.body_weight = history[2]
-        cow.update_body_weight_history(sim_day)
+        cow_fixture.days_born = history[1]
+        cow_fixture.body_weight = history[2]
+        cow_fixture.update_body_weight_history(sim_day)
     # asserts for each update
     for idx, history in enumerate(histories):
-        assert cow.body_weight_history[idx].simulation_day == history[0]
-        assert cow.body_weight_history[idx].days_born == history[1]
-        assert cow.body_weight_history[idx].body_weight == history[2]
+        assert cow_fixture.body_weight_history[idx].simulation_day == history[0]
+        assert cow_fixture.body_weight_history[idx].days_born == history[1]
+        assert cow_fixture.body_weight_history[idx].body_weight == history[2]
 
 
 def test_init_from_string():
