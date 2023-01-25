@@ -2,8 +2,13 @@ from __future__ import annotations
 
 from typing import Dict
 from typing import Optional
+from typing import Tuple
 from typing import Type
+from typing import Union
 
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
+from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
@@ -19,7 +24,10 @@ class ManureTreatmentFactory:
     def get_instance(manure_treatment_type_name: str,
                      weather,
                      time,
-                     custom_manure_treatment_config: Optional[ManureTreatmentConfig] = None) \
+                     custom_manure_treatment_config: Optional[Union[ManureTreatmentConfig,
+                                                                    Tuple[
+                                                                        ManureTreatmentConfig,
+                                                                        ManureTreatmentConfig]]] = None) \
             -> BaseManureTreatment:
         """Returns a manure treatment system instance for the given manure treatment type name.
 
@@ -37,10 +45,10 @@ class ManureTreatmentFactory:
         manure_treatment_class_by_type: Dict[ManureTreatmentType, Type[BaseManureTreatment]] = {
             ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: SlurryStorageUnderfloor,
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: SlurryStorageOutdoor,
-            # ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
-            # ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
-            # ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
-            # ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon
+            ManureTreatmentType.ANAEROBIC_LAGOON: AnaerobicLagoon,
+            ManureTreatmentType.ANAEROBIC_DIGESTION: AnaerobicDigestion,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon
         }
 
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)

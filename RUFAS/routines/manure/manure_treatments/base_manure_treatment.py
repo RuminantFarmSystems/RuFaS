@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from typing import Optional
+from typing import Tuple
+from typing import Union
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
@@ -23,7 +25,10 @@ class BaseManureTreatment(ABC):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather, time,
+                 manure_treatment_config: Union[ManureTreatmentConfig,
+                                                Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+                 ) -> None:
         """Initializes the BaseManureTreatment class.
 
         Args:
@@ -33,8 +38,14 @@ class BaseManureTreatment(ABC):
                 configuration for the manure treatment.
 
         Private attributes:
+            _sim_day: The current simulation day.
+            _current_pen: The current pen object.
+            _manure_handler_daily_output: The daily output of the manure handler.
             _current_manure_treatment_daily_input: The current input data assigned based on the
                 input data passed into the daily_update() method.
+            _manure_separator: Only present in the digester - separator - lagoon scenario.
+            _manure_separator_daily_output: Only present in the digester - separator - lagoon scenario.
+            _accumulated_output: Summation of all daily outputs.
 
         """
         self.weather = weather
@@ -64,8 +75,7 @@ class BaseManureTreatment(ABC):
                                                      current_pen: ManureManagementPen,
                                                      manure_handler_daily_output: ManureHandlerDailyOutput,
                                                      manure_treatment_daily_input: LiquidManurePortionProtocol,
-                                                     manure_separator: BaseManureSeparator) -> \
-            None:
+                                                     manure_separator: BaseManureSeparator) -> None:
         """Initializes the private attributes of the class.
 
         Args:
@@ -82,8 +92,8 @@ class BaseManureTreatment(ABC):
         self._current_manure_treatment_daily_input = manure_treatment_daily_input
         self._manure_separator = manure_separator
 
-    def _initialize_daily_output_during_update(self, manure_treatment_daily_input: LiquidManurePortionProtocol) -> \
-            ManureTreatmentDailyOutput:
+    def _initialize_daily_output_during_update(self, manure_treatment_daily_input: LiquidManurePortionProtocol) \
+            -> ManureTreatmentDailyOutput:
         """Initializes the daily output of the manure treatment, which will be subsequently modified.
 
         Typically, this method should be called at the beginning of the _daily_update_helper() method.
@@ -93,6 +103,9 @@ class BaseManureTreatment(ABC):
         Args:
             manure_treatment_daily_input: A LiquidManurePortionProtocol object containing
                 the daily input of the manure treatment.
+
+        Returns:
+            A ManureTreatmentDailyOutput object containing the daily output of the manure treatment.
 
         """
         final_manure_volume = (manure_treatment_daily_input.liquid_manure_daily_volume -
@@ -121,7 +134,7 @@ class BaseManureTreatment(ABC):
                 liquid_manure_potassium=(
                         manure_treatment_daily_input.liquid_manure_potassium *
                         (1 - self.config.potassium_removal_efficiency_for_treatment)),
-                final_manure_volume=final_manure_volume,
+                daily_final_manure_volume=final_manure_volume,
         )
 
     def daily_update(self,
