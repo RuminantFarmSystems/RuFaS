@@ -18,7 +18,8 @@ class WaterDynamics:
                                                                       self.data.max_cumulative_evapotranspiration)
 
     @staticmethod
-    def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:  # TODO: belongs in Soil class?
+    def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:
+        # TODO: belongs in Soil class? - GitHub Issue #303
         """
         Description: calculate the annual evapotranspiration #TODO: why is this 'annual' routine executed every day?
 
@@ -48,4 +49,5 @@ class WaterDynamics:
         else:
             return 0
 
-    # TODO: Further functions in RUFAS/routines/field/crop/transpiration.py need to be translated (into soil methods?)
+    # TODO: Further functions water files need to be translated (into soil methods?) - GitHub Issue #303
+    #    RUFAS/routines/field/crop/transpiration.py
