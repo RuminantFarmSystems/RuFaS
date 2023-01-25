@@ -88,8 +88,8 @@ class Config:
         """
 
         info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__, 
-                    "data": data, 
+                    "function": self.__init__.__name__,
+                    "config_data": data,
                     "weather_file_path": weather_file, }
 
         # gets a start/end date in the format year:julian-day. That way the program
