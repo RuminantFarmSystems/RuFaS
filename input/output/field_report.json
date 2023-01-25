@@ -32,7 +32,12 @@
         "crop_report": {
             "produce_csv": true,
             "produce_graphics": true,
-            "report_name": "crop_report"
+            "report_name": "crop_report",
+            "crop_type_reports": {
+                "produce_csv": true,
+                "produce_graphics": true,
+                "report_name": "crop_type_report"
+            }
         },
         "soil_report": {
             "produce_csv": true,
@@ -104,7 +109,7 @@
         "produce_csv": true,
         "produce_graphics": false,
         "report_name": "feed_storage_report",
-        "storage_report": {
+        "feed_storage_report": {
             "produce_csv": true,
             "produce_graphics": false,
             "report_name": "storage_report"
@@ -132,7 +137,7 @@
         "storage_report": {
             "produce_csv": true,
             "produce_graphics": false,
-            "report_name": "storage_report"
+            "report_name": "feed_storage_report"
         },
         "manure_storage_summary": {
             "produce_csv": true,

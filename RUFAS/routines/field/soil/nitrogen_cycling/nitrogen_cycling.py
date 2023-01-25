@@ -110,7 +110,6 @@ def update_profile_N(soil, field_management):
         soil.stable_N += layer.stable_N
         layer.stable_N_average += layer.stable_N
         soil.N_uptake += layer.N_uptake
-
     profile_N = soil.NH4 + soil.NO3 + soil.org_N + soil.fresh_N
 
     soil.delta_N = profile_N - soil.profile_N

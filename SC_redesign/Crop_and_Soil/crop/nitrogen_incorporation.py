@@ -8,7 +8,6 @@ This module is based upon the 'Nitrogen Uptake" section of of the SWAT model doc
 """
 
 
-# TODO - Refactor this class to match others - GitHub Issue #257
 class NitrogenIncorporation:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given

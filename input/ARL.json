@@ -1,12 +1,13 @@
 {
     "config":
     {
-        "start_date" : "1989:1",
+        "start_date" : "2013:1",
         "end_date" : "2019:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,
-        "seed": 0
+        "seed": 0,
+        "simulate_animals": false
     },
 
     "weather": "ARL_weather.csv",
@@ -23,6 +24,6 @@
             }
         },
         "animal": "barnyard_animal.json",
-        "feed": "panke_buisse_feed.json"
+        "feed": "purchased_feed.json"
     }
 }
