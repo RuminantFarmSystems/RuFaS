@@ -565,6 +565,18 @@ class Time:
 
         return False
 
+    def is_last_day_of_simulation(self):
+        """Checks whether the current day is the last day of the simulation.
+
+        Returns:
+            bool: True if the current day is the last day of the simulation, false otherwise
+
+        """
+        if self.year == len(self.years):
+            return self.day == len(self.years[self.year - 1])
+
+        return False
+
 
 def is_leap_year(year):
     """
