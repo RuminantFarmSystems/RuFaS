@@ -5,6 +5,11 @@ class BaseCrop:
         self.repeat = 0
         self.planting_day = 0
         self.harvest_day = 0
+        self.planted = False
+
+        self.T_base_min = 10  # unknown
+        self.T_base_max = 40
+        self.PHU = 648
 
         self.harvest_type = ''
 

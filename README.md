@@ -18,7 +18,7 @@ N/A
 
 # Resources
 
-[Onboarding Document](https://public.3.basecamp.com/p/ucfdkV7n5WxSzj8XnRUFYKG2)
+[Onboarding Document](https://docs.google.com/document/d/1zN92KK2OkTDkutVmT96u7eEu3B2UDWgP/edit?usp=sharing&ouid=111321898904316595397&rtpof=true&sd=true)
 
 [Uncle Bob Clean Code Lessons](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)
 
@@ -30,7 +30,9 @@ N/A
 
 [Pseudocode Guidelines](https://docs.google.com/document/d/1e5gM7fuT06iQYDKvwUAB-jVaLjw3iZizXAdSnOEDco0/edit?usp=sharing)
 
-[2023 Fixathon tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
+[2023 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
+
+[2023 Fixathon tasks alive](https://docs.google.com/spreadsheets/d/13_DoP4uFIsXjFKOcJhG25ys3dOL4wPp1rT-0Xu_fUyA/edit?usp=sharing)
 
 [2022 Fixathon tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
 

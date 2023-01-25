@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Tuple
+from typing import Union
 
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
@@ -120,7 +122,8 @@ class DefaultManureTreatmentConfigFactory:
     )
 
     @classmethod
-    def get_instance(cls, treatment_type: ManureTreatmentType) -> ManureTreatmentConfig:
+    def get_instance(cls, treatment_type: ManureTreatmentType) -> \
+            Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]:
         """Return a default manure treatment configuration data instance for the given treatment type.
 
         Args:
@@ -135,5 +138,11 @@ class DefaultManureTreatmentConfigFactory:
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: cls.SLURRY_STORAGE_OUTDOOR_CONFIG,
             ManureTreatmentType.ANAEROBIC_DIGESTION: cls.ANAEROBIC_DIGESTION_CONFIG,
             ManureTreatmentType.ANAEROBIC_LAGOON: cls.ANAEROBIC_LAGOON_CONFIG,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: (
+                cls.ANAEROBIC_DIGESTION_CONFIG, cls.ANAEROBIC_LAGOON_CONFIG
+            ),
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: (
+                cls.ANAEROBIC_DIGESTION_CONFIG, cls.ANAEROBIC_LAGOON_CONFIG
+            ),
         }
         return manure_treatment_config_by_type[treatment_type]
