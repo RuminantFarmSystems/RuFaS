@@ -164,12 +164,7 @@ class SimulationEngine:
             InvalidJSONFile: If the json file at the given path does not conform 
             with the format required
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._initialize_simulation.__name__,
-                    "file_path": file_path, }
         print(f"Initializing simulation environment from {file_path}")
-        om.add_variable("simulation_initialization_file_path",
-                        file_path, info_map)
 
         try:
             data = Utility.read_json_file(file_path)

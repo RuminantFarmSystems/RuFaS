@@ -228,7 +228,6 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
         expected_info_map = {
             "class": "AnimalManagement",
             "function": "_print_animal_num_warnings",
-            "herd_data": herd_data
         }
 
         # test for simulate_animals = True

@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from typing import Optional
+from typing import Tuple
+from typing import Union
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
@@ -23,7 +25,10 @@ class BaseManureTreatment(ABC):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather, time,
+                 manure_treatment_config: Union[ManureTreatmentConfig,
+                                                Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+                 ) -> None:
         """Initializes the BaseManureTreatment class.
 
         Args:
