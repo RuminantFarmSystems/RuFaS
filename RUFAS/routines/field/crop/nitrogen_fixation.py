@@ -24,6 +24,7 @@ CropType attribute definitions:
 """
 
 from bisect import bisect
+from typing import List
 # from RUFAS.routines.field.crop.nitrogen_uptake import calc_layer_nitrogen_demand
 
 
@@ -90,7 +91,7 @@ def fix_nitrogen(crop, soil) -> None:
     crop.N_fix = calc_fixed_nitrogen(demand, growth_factor, water_factor, nitrate_factor)
 
 
-def get_deepest_root_accessible_layer(root_depth: float, layer_bounds: list[float]):  # pseudocode: C.5.D.8
+def get_deepest_root_accessible_layer(root_depth: float, layer_bounds: List[float]):  # pseudocode: C.5.D.8
     """
     Description:
         Determines the deepest soil layer that is accessible to root biomass.

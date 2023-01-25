@@ -19,7 +19,6 @@ class BaseReport:
 
     def __init__(self, data):
         """Sets the properties of each report handler initialized.
-
         This is called in the report handler's __init__() method, and takes in
         the data passed to it and assigns the properties below.
         """
@@ -102,7 +101,6 @@ class BaseReport:
     # writes stored values to the csv at the end of the year
     #
     def write_annual_report(self):
-
 
         mode = 'a+' if Path(str(self.csv_dir) + '/' +
                             self.file_name).exists() else 'w+'
