@@ -301,7 +301,7 @@ class Pen:
             new_animals: list of new animals in the pen
             animal_combination: an AnimalCombination Enum representating the type of the new animals
         """
-        # self.animals_in_pen = new_animals
+
         for animal in new_animals:
             self.animals_in_pen.append(animal)
         self.pen_populated = not (len(self.animals_in_pen) == 0)
@@ -341,17 +341,17 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'heifer', False)
+                    ration_driver.ration_formulation(self, available_feeds, 'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', True)
+                    ration_driver.ration_formulation(self, available_feeds, 'cow', True)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', False)
+                    ration_driver.ration_formulation(self, available_feeds, 'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -384,10 +384,8 @@ class Pen:
                 ration[key] = ration_per_animal[key] * num_animals
         
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__, 
-                    "feed": feed, 
-                    "available_feeds": available_feeds, }
-        om.add_variable("pen_ration_data", self.ration, info_map)
+                    "function": self.calc_ration.__name__, }
+        om.add_variable("pen_ration_data", ration, info_map)
 
         return ration
 
@@ -449,8 +447,7 @@ class Pen:
         self.dry_total = dry_total
         self.lactating_total = lactating_total
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure.__name__, 
-                    "feed": feed, }
+                    "function": self.calc_manure.__name__, }
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
@@ -556,10 +553,6 @@ class Pen:
                 'NEl']) / animal.DMIest
             animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
 
-        # set animal's ration to be the intake of all other animals in pen
-        # if self.ration == {}:
-        #     self.ration = self.calc_ration(feed, temp)
-
         animal.dry_matter_intake = self.dry_matter_intake
 
         for key in self.ration:
@@ -572,7 +565,8 @@ class Pen:
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
-            animal.manure_excretion[key] = self.manure[key] / len(self.animals_in_pen)
+            if len(self.animals_in_pen) > 0:
+                animal.manure_excretion[key] = self.manure[key] / (len(self.animals_in_pen))
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
@@ -617,7 +611,6 @@ class Pen:
         # that are non-zero.
         self.animals_in_pen = []
         self.pen_populated = False
-        # self.classes_in_pen = set()
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):

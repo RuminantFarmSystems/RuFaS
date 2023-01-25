@@ -7,7 +7,6 @@ from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import SludgeOutput
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
@@ -16,79 +15,30 @@ class AnaerobicLagoon(BaseManureTreatment):
         super().__init__(weather, time, manure_treatment_config)
         self.storage_time_period = self.config.storage_time_period
         self.freeboard_input = self.config.freeboard_input
-        self._accumulated_sludge_output = SludgeOutput()
         self._accumulated_precipitation_volume = 0.0
 
     def _calc_daily_sludge_output(self, daily_output: ManureTreatmentDailyOutput,
-                                  manure_treatment_daily_input: LiquidManurePortionProtocol) -> None:
+                                  manure_treatment_daily_input: LiquidManurePortionProtocol) \
+            -> ManureTreatmentDailyOutput:
         """Calculates the daily sludge output for the current day.
 
         """
-        daily_output.sludge_manure_total_solids = (manure_treatment_daily_input.liquid_manure_total_solids *
-                                                   self.config.total_solids_removal_efficiency_for_treatment)
-        daily_output.sludge_manure_total_volatile_solids = (
+        new_daily_output = daily_output.clone()
+        new_daily_output.sludge_manure_total_solids = (manure_treatment_daily_input.liquid_manure_total_solids *
+                                                       self.config.total_solids_removal_efficiency_for_treatment)
+        new_daily_output.sludge_manure_total_volatile_solids = (
                 manure_treatment_daily_input.liquid_manure_total_volatile_solids *
                 self.config.volatile_solids_removal_efficiency_for_treatment)
-        daily_output.sludge_manure_nitrogen = (manure_treatment_daily_input.liquid_manure_nitrogen *
-                                               self.config.nitrogen_removal_efficiency_for_treatment)
-        daily_output.sludge_manure_phosphorus = (manure_treatment_daily_input.liquid_manure_phosphorus *
-                                                 self.config.phosphorus_removal_efficiency_for_treatment)
-        daily_output.sludge_manure_potassium = (manure_treatment_daily_input.liquid_manure_potassium *
-                                                self.config.potassium_removal_efficiency_for_treatment)
-        daily_output.sludge_manure_daily_volume = (manure_treatment_daily_input.liquid_manure_total_volatile_solids *
-                                                   0.03 / 1000.0)  # TODO: Use constants instead
-
-    def _create_daily_sludge_output(self, manure_treatment_daily_input: LiquidManurePortionProtocol) -> SludgeOutput:
-        """Creates the daily sludge output for the current day.
-
-        Args:
-            manure_treatment_daily_input: The daily output for the current day.
-
-        Returns:
-            The daily sludge output for the current day.
-
-        """
-        return SludgeOutput(
-                sludge_manure_total_solids=manure_treatment_daily_input.liquid_manure_total_solids *
-                                           self.config.total_solids_removal_efficiency_for_treatment,
-                sludge_manure_total_volatile_solids=manure_treatment_daily_input.liquid_manure_total_volatile_solids
-                                                    * self.config.volatile_solids_removal_efficiency_for_treatment,
-                sludge_manure_nitrogen=manure_treatment_daily_input.liquid_manure_nitrogen *
-                                       self.config.nitrogen_removal_efficiency_for_treatment,
-                sludge_manure_phosphorus=manure_treatment_daily_input.liquid_manure_phosphorus *
-                                         self.config.phosphorus_removal_efficiency_for_treatment,
-                sludge_manure_potassium=manure_treatment_daily_input.liquid_manure_potassium *
-                                        self.config.potassium_removal_efficiency_for_treatment,
-                sludge_manure_daily_volume=manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.03 /
-                                           1000.0
-        )
-
-    def _accumulate_daily_sludge_output(self, daily_sludge_output: SludgeOutput) -> None:
-        """Accumulates the daily sludge output.
-
-        Args:
-            daily_sludge_output: The daily sludge output for the current day.
-
-        """
-        self._accumulated_sludge_output += daily_sludge_output
-
-    def _assign_extra_output_variables(self, daily_output: ManureTreatmentDailyOutput,
-                                       daily_sludge_output: SludgeOutput) -> None:
-        """Assigns extra output variables for the anaerobic lagoon.
-
-        Args:
-            daily_output: The daily output for the current day.
-            daily_sludge_output: The daily sludge output for the current day.
-
-        """
-        daily_output.sludge_manure_total_solids = daily_sludge_output.sludge_manure_total_solids
-        daily_output.sludge_manure_total_volatile_solids = daily_sludge_output.sludge_manure_total_volatile_solids
-        daily_output.sludge_manure_nitrogen = daily_sludge_output.sludge_manure_nitrogen
-        daily_output.sludge_manure_phosphorus = daily_sludge_output.sludge_manure_phosphorus
-        daily_output.sludge_manure_potassium = daily_sludge_output.sludge_manure_potassium
-        daily_output.sludge_manure_daily_volume = daily_sludge_output.sludge_manure_daily_volume
-        daily_output.accumulated_sludge_volume = self._accumulated_sludge_output.sludge_manure_daily_volume
-        daily_output.accumulated_final_manure_volume = self._accumulated_output.final_manure_volume
+        new_daily_output.sludge_manure_nitrogen = (manure_treatment_daily_input.liquid_manure_nitrogen *
+                                                   self.config.nitrogen_removal_efficiency_for_treatment)
+        new_daily_output.sludge_manure_phosphorus = (manure_treatment_daily_input.liquid_manure_phosphorus *
+                                                     self.config.phosphorus_removal_efficiency_for_treatment)
+        new_daily_output.sludge_manure_potassium = (manure_treatment_daily_input.liquid_manure_potassium *
+                                                    self.config.potassium_removal_efficiency_for_treatment)
+        new_daily_output.sludge_manure_daily_volume = (
+                manure_treatment_daily_input.liquid_manure_total_volatile_solids *
+                0.03 / ManureConstants.MANURE_DENSITY)  # TODO: Use constants instead
+        return new_daily_output
 
     def calc_methane_emission(self,
                               accumulated_liquid_manure_total_volatile_solids: float,
@@ -148,16 +98,12 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
-        daily_output.final_manure_volume = self._adjust_final_manure_volume(daily_output.final_manure_volume)
-        daily_output.daily_volume = daily_output.final_manure_volume
+        adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
+        daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
+        daily_output = self._calc_daily_sludge_output(daily_output, self._current_manure_treatment_daily_input)
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
-        daily_output.accumulated_final_manure_volume = self._accumulated_output.final_manure_volume
-        self._accumulate_precipitation_volume()
-
-        self._calc_daily_sludge_output(daily_output, self._current_manure_treatment_daily_input)
-        daily_sludge_output = self._create_daily_sludge_output(self._current_manure_treatment_daily_input)
-        self._accumulate_daily_sludge_output(daily_sludge_output)
+        self._accumulated_precipitation_volume += self.precipitation_volume
 
         methane_loss, new_accumulated_liquid_manure_total_solids = self.calc_methane_emission(
                 self._accumulated_output.liquid_manure_total_volatile_solids,
@@ -169,7 +115,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             self.calc_ammonia_emission(
                     num_animals=self._current_pen.num_animals,
                     barn_area=self._current_pen.barn_area_from_pen_type,
-                    accumulated_manure_volume=self._accumulated_output.final_manure_volume,
+                    accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
                     accumulated_manure_total_ammoniacal_nitrogen=(
                         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen)
             )
@@ -177,10 +123,9 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = \
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
 
-        self._assign_extra_output_variables(daily_output, daily_sludge_output)
         return daily_output
 
-    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float):
+    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
         """Adjusts the final manure volume to account for the precipitation and the storage time period.
 
         Args:
@@ -190,10 +135,10 @@ class AnaerobicLagoon(BaseManureTreatment):
             The adjusted final manure volume.
 
         """
-        current_day_final_manure_volume += self.precipitation_volume
+        adjusted_final_manure_volume = current_day_final_manure_volume + self.precipitation_volume
         if self._sim_day % self.storage_time_period > 1:
-            current_day_final_manure_volume -= self.flushing_volume
-        return current_day_final_manure_volume
+            adjusted_final_manure_volume -= self.flushing_volume
+        return adjusted_final_manure_volume
 
     @property
     def sludge_accumulation_volume(self) -> float:
@@ -202,7 +147,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         Returns:
             Sludge accumulation volume, m^3.
         """
-        return self._accumulated_sludge_output.sludge_manure_daily_volume
+        return self._accumulated_output.sludge_manure_daily_volume
 
     @property
     def flushing_volume(self) -> float:
@@ -216,6 +161,17 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) \
             -> ManureTreatmentDailyOutput:
+        """Adjusts the accumulated output by either resetting it or adding the daily output to it.
+
+        The accumulated output will be reset on the first day of every storage time period.
+
+        Args:
+            manure_treatment_daily_output: The daily output from the manure treatment system.
+
+        Returns:
+            The adjusted accumulated output.
+
+        """
         if self._sim_day % self.storage_time_period == 1:
             return manure_treatment_daily_output
         else:
@@ -229,7 +185,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             Volume needed, m^3.
 
         """
-        return self._accumulated_output.final_manure_volume + self.sludge_accumulation_volume
+        return self._accumulated_output.daily_final_manure_volume + self.sludge_accumulation_volume
 
     @property
     def lagoon_depth(self):
@@ -251,7 +207,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         return 2.0
 
-    def calc_abc(self):
+    def _calc_abc(self):
         """Calculates the a, b, and c parameters for the lagoon sizing equation.
 
         Returns:
@@ -264,15 +220,20 @@ class AnaerobicLagoon(BaseManureTreatment):
         return a, b, c
 
     @property
-    def lagoon_width(self):
-        """returns lagoon width in meters"""
-        abc = self.calc_abc()
+    def lagoon_width(self) -> float:
+        """Returns lagoon width.
+
+        Returns:
+            Lagoon width, m.
+
+        """
+        abc = self._calc_abc()
         a, b, c = abc[0], abc[1], abc[2]
         return (-1 * b + (b ** 2 - 4 * a * c) ** 0.5) / (2 * a)
 
     @property
     def lagoon_length(self):
-        """Returns lagoon width.
+        """Returns lagoon length.
 
         Returns:
             Lagoon length, m.
@@ -295,7 +256,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         """Returns modeled lagoon volume.
 
         This modeled volume is used to verify that equations for surface area,
-        with slope assumptions, match the volume needed for treatment
+        with slope assumptions, match the volume needed for treatment.
 
         Returns:
             Modeled lagoon volume, m^3.
@@ -315,10 +276,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         return self._get_current_day_rainfall() * self.lagoon_surface_area
 
-    def _accumulate_precipitation_volume(self) -> None:
-        """Accumulates daily precipitation."""
-        self._accumulated_precipitation_volume += self.precipitation_volume
-
     @property
     def freeboard_volume(self) -> float:
         """Returns additional lagoon volume needed for freeboard.
@@ -329,12 +286,14 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         return self.freeboard_input * self.lagoon_surface_area
 
-    def _bound_sludge_accumulation_volume(self, calculated_SAV_value: float, lower_bound: float,
+    def _bound_sludge_accumulation_volume(self,
+                                          calculated_sludge_accumulation_volume: float,
+                                          lower_bound: float,
                                           upper_bound: float) -> float:
         """Returns a value bounded by the lower and upper bounds.
 
         Args:
-            calculated_SAV_value: The value to be bounded.
+            calculated_sludge_accumulation_volume: The value to be bounded.
             lower_bound: The lower bound.
             upper_bound: The upper bound.
 
@@ -342,5 +301,5 @@ class AnaerobicLagoon(BaseManureTreatment):
             The bounded value of sludge accumulation volume.
 
         """
-        return min(max(self.sludge_accumulation_volume * lower_bound, calculated_SAV_value),
+        return min(max(self.sludge_accumulation_volume * lower_bound, calculated_sludge_accumulation_volume),
                    self.sludge_accumulation_volume * upper_bound)
