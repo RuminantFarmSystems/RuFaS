@@ -8,11 +8,11 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Tuple
+from typing import Type
+from typing import Union
 
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-from matplotlib.ticker import MaxNLocator
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
@@ -43,7 +43,6 @@ class ManureManagementOutputHandler:
 
     def __init__(self):
         self.df = None
-        self._delete_files_and_subdirectories(self._get_graphics_dir())
 
     def _convert_dataclass_obj_to_formatted_dict(self,
                                                  dataclass_obj,
@@ -51,17 +50,25 @@ class ManureManagementOutputHandler:
                                                  prefix: str = '',
                                                  delimiter: str = ' ') \
             -> Dict[str, List[Any]]:
-        """Converts a dataclass object to a dictionary with formatted keys and values in lists.
+        """Converts a dataclass object from any manure component to a dictionary with formatted keys and values in
+        lists.
 
-        Args:
-            dataclass_obj: A dataclass object
-            data_fields: A list of dataclass fields
-            prefix: prepend each field name with this prefix
-            delimiter: A delimiter to use between the prefix and the field name
+        Parameters
+        ----------
+        dataclass_obj : Any
+            A dataclass object from any manure component.
+        data_fields: Tuple[Field]
+            A list of dataclass fields of the dataclass object.
+            This is needed because the dataclass object may be None.
+        prefix : str, optional
+            Prepend each field name with this prefix, by default ''
+        delimiter : str, optional
+            A delimiter to use between the prefix and the field name, by default ' '
 
-        Returns:
-            A dictionary with keys formatted as
-            <prefix><delimiter><field_name><delimiter><unit>. Values are stored in
+        Returns
+        -------
+        Dict[str, List[Any]]
+            A dictionary with keys formatted as <prefix><delimiter><field_name><delimiter><unit>. Values are stored in
             lists. This structure facilitates the conversion to a pandas dataframe.
 
         """
@@ -77,17 +84,21 @@ class ManureManagementOutputHandler:
         return d
 
     def _process_pen(self, pen: ManureManagementPen):
-        """Returns a dictionary of important pen attributes to be converted to dataframe.
+        """Returns a properly formatted dictionary of important pen attributes to be converted to dataframe.
 
-        Args:
-            pen: A ManureManagementPen object.
+        Parameters
+        ----------
+        pen : ManureManagementPen
+            A ManureManagementPen object to be processed.
 
-        Returns:
-            A dictionary of important pen attributes.
+        Returns
+        -------
+        Dict[str, List[Any]]
+            A dictionary of important pen attributes that is properly formatted to be converted to dataframe.
 
         """
-        prefix = self.HEADER_PREFIXES.get(type(pen), '')
-        temp = {
+        prefix = self.HEADER_PREFIXES.get(ManureManagementPen, '')
+        pen_data = {
             'pen_id': [pen.id],
             'num_animals': [pen.num_animals],
             'num_lactating_cows': [pen.num_lactating_cows],
@@ -98,9 +109,35 @@ class ManureManagementOutputHandler:
             'separator_type': [pen.manure_separator],
             'treatment_type': [pen.manure_treatment],
         }
-        return {f'{prefix}{self.HEADER_PRIMARY_DELIMITER}{k}': v for k, v in temp.items()}
+        return {f'{prefix}{self.HEADER_PRIMARY_DELIMITER}{k}': v for k, v in pen_data.items()}
 
-    def _process_dataclass_output_obj(self, dataclass_obj, obj_type, extra_prefix=''):
+    def _process_dataclass_output_obj(self,
+                                      dataclass_obj: Union[PenManure, ManureHandlerDailyOutput,
+                                                           ReceptionPitDailyOutput, ManureSeparatorDailyOutput,
+                                                           ManureTreatmentDailyOutput],
+                                      obj_type: Union[Type[PenManure], Type[ManureHandlerDailyOutput],
+                                                      Type[ReceptionPitDailyOutput], Type[ManureSeparatorDailyOutput],
+                                                      Type[ManureTreatmentDailyOutput]],
+                                      extra_prefix=''):
+        """Returns a properly formatted dictionary of important dataclass attributes to be converted to dataframe.
+
+        Parameters
+        ----------
+        dataclass_obj : Union[PenManure, ManureHandlerDailyOutput, ReceptionPitDailyOutput, ManureSeparatorDailyOutput,
+                                ManureTreatmentDailyOutput]
+            A dataclass object of the expected type to be processed.
+        obj_type : Union[Type[PenManure], Type[ManureHandlerDailyOutput], Type[ReceptionPitDailyOutput],
+                    Type[ManureSeparatorDailyOutput], Type[ManureTreatmentDailyOutput]]
+            The type of the dataclass object.
+        extra_prefix : str, optional
+            An extra prefix to prepend to the field names, by default ''
+
+        Returns
+        -------
+        Dict[str, List[Any]]
+            A dictionary of important dataclass attributes that is properly formatted to be converted to dataframe.
+
+        """
         return self._convert_dataclass_obj_to_formatted_dict(
                 dataclass_obj,
                 fields(obj_type),
@@ -113,17 +150,17 @@ class ManureManagementOutputHandler:
 
         Each daily update of a pen corresponds to a row in the dataframe.
 
-        Args:
-            simulation_day: The simulation day.
-            data: A tuple of dataclass objects containing daily update data for a pen.
-
-        Returns:
-            None
+        Parameters
+        ----------
+        simulation_day : int
+            The current simulation day.
+        data : PenDailyUpdateDataType
+            A tuple of dataclass objects containing daily update data for a pen.
 
         """
         (pen, manure_handler_output, reception_pit_output,
          manure_separator_output, treatment_output, anaerobic_digestion_output) = data
-        d = {
+        row_data = {
             'pen_id': [pen.id],
             'sim_day': [simulation_day],
             **self._process_pen(pen),
@@ -134,12 +171,12 @@ class ManureManagementOutputHandler:
             **self._process_dataclass_output_obj(treatment_output, ManureTreatmentDailyOutput),
             **self._process_dataclass_output_obj(anaerobic_digestion_output, ManureTreatmentDailyOutput, 'ad'),
         }
-        self._append_df(d)
+        self._append_df(row_data)
 
-    def _append_df(self, data: Dict[str, List[Any]]) -> None:
-        """Appends data to the dataframe."""
-        temp_df = pd.DataFrame(data)
-        if self.df is None:
+    def _append_df(self, row_data: Dict[str, List[Any]]) -> None:
+        """Appends row data to the dataframe."""
+        temp_df = pd.DataFrame(row_data)
+        if not self.df:
             self.df = temp_df
         else:
             self.df = pd.concat([self.df, temp_df], ignore_index=True)
@@ -216,22 +253,6 @@ class ManureManagementOutputHandler:
         title = self._capitalize_first_letters(title)
         return self._squeeze_spaces(title)
 
-    def _make_scatter_plot_with_anchor_column(self, output_dir: str, anchor_col: str,
-                                              x: str, y: str, anchor_label: str, x_label: str, y_label: str,
-                                              title: str):
-        for val in self.df[anchor_col].unique():
-            x_series = self.df.loc[self.df[anchor_col] == val, x]
-            y_series = self.df.loc[self.df[anchor_col] == val, y]
-            plot_name = f'{anchor_label} {val} - {title}'
-            self._make_simple_scatter_plot_with_matplotlib(
-                    output_path=f'{output_dir}/{plot_name}.png',
-                    x=x_series,
-                    y=y_series,
-                    x_label=x_label,
-                    y_label=y_label,
-                    title=plot_name,
-            )
-
     def _get_header_prefixes(self) -> List[str]:
         """Returns a list of all header prefixes."""
         return list(self.HEADER_PREFIXES.values())
@@ -249,75 +270,12 @@ class ManureManagementOutputHandler:
         return [header for header in headers
                 if all([attr.lower() not in header.lower() for attr in self._get_excluded_attrs()])]
 
-    def produce_graphics(self):
-        """Produces graphics from the data."""
-        for header in self._get_headers():
-            self._make_scatter_plot_with_anchor_column(
-                    output_dir=self._get_graphics_dir(),
-                    anchor_col='pen_id',
-                    x='sim_day',
-                    y=header,
-                    anchor_label='Pen',
-                    x_label='Simulation Day',
-                    y_label=self._format_label(header),
-                    title=self._format_title(header)
-            )
-
-    @staticmethod
-    def _make_simple_scatter_plot_with_matplotlib(output_path: str,
-                                                  x: pd.Series,
-                                                  y: pd.Series,
-                                                  x_label: str,
-                                                  y_label: str,
-                                                  title: str) -> None:
-        """Makes a simple scatter plot with matplotlib."""
-        if y.dtype.kind not in 'iuf' or y.hasnans:
-            return
-        small, medium, large = 10, 12, 16
-        plt.style.use('fivethirtyeight')
-        # plt.figure()
-        # plt.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        # plt.plot(x, y, c='#1746A2', linewidth=2)
-        fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
-        ax[0].scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        ax[1].plot(x, y, c='#1746A2', linewidth=2)
-        # ax.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        # ax.plot(x, y, c='#1746A2', linewidth=2)
-        ax[0].set_xlabel(x_label, fontsize=medium)
-        ax[1].set_xlabel(x_label, fontsize=medium)
-        ax[0].set_ylabel(y_label, fontsize=medium)
-        # ax[1].set_ylabel(y_label, fontsize=medium)
-        ax[0].set_title(title, fontsize=large)
-        # ax.tick_params(axis='both', which='major', labelsize=small)
-        # set integer x-axis ticks
-        ax[0].xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
-
-        # plt.xlabel(x_label, fontsize=medium)
-        # plt.ylabel(y_label, fontsize=medium)
-        # plt.title(title, fontsize=large)
-        #
-        # locs, _ = plt.xticks()
-        # plt.xticks([int(loc) for loc in locs if loc >= 0], fontsize=medium)
-        # plt.yticks(fontsize=medium)
-        # plt.legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        ax[0].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        ax[1].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        plt.savefig(output_path, dpi=400, bbox_inches='tight', pad_inches=0.2)
-        plt.close()
-
     @staticmethod
     def _get_output_main_directory() -> str:
         """Returns the main output directory."""
         output_dir = 'RUFAS/routines/manure/output'
         os.makedirs(output_dir, exist_ok=True)
         return output_dir
-
-    def _get_graphics_dir(self) -> str:
-        """Returns the graphics output directory."""
-        graphics_dir = f'{self._get_output_main_directory()}/graphics'
-        os.makedirs(graphics_dir, exist_ok=True)
-        return graphics_dir
 
     def _get_csv_dir(self) -> str:
         """Returns the csv output directory."""
@@ -389,9 +347,3 @@ class ManureManagementOutputHandler:
         return self.group_by_and_aggregate(['pen_id'], {
             col: [self._get_agg_func(col)] for col in self.df.columns
         })
-
-    def export_summary_to_csv(self) -> None:
-        """Exports the summary of the dataframe to a csv file."""
-        self.group_by_pen_id().to_csv(f'{self._get_csv_dir()}/manure_management_summary_'
-                                      f'{self._get_current_time_str()}.csv',
-                                      index=False)
