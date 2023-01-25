@@ -333,6 +333,7 @@ class LifeCycleManager:
             cows: updated list of cows
 
         """
+        # print("simulating", date)
         ids_removed = []
         animals_added = []
         calves_born = []
@@ -352,6 +353,7 @@ class LifeCycleManager:
         self.culled_cow_num = 0
         total_animal_num = 0
 
+        self.heifer_total_num = 0
         self.net_merit_cow = 0
         self.net_merit_heifer = 0
         self.avg_net_merit_cow = 0
@@ -495,6 +497,7 @@ class LifeCycleManager:
                 })
                 new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
+                self.net_merit_heifer += new_heiferI.net_merit
                 del calves[index]
             else:
                 self.calf_num += 1
@@ -506,7 +509,6 @@ class LifeCycleManager:
         # heiferI to heiferII, assign repro programs
         for index, heiferI in enumerate(heiferIs):
             second_stage = heiferI.update(date)
-            # self.net_merit_heifer -= heiferI.net_merit
             if second_stage:
                 args = heiferI.get_heiferI_values()
                 args.update({
@@ -533,7 +535,6 @@ class LifeCycleManager:
         for index, heiferII in enumerate(heiferIIs):
             cull_stage, third_stage = heiferII.update(date)
             if cull_stage:
-                # self.net_merit_heifer -= heiferII.net_merit
                 self.culled_heifer_num, self.avg_heifer_culling_age = \
                     self.calc_average(self.culled_heifer_num,
                                        self.avg_heifer_culling_age, heiferII.days_born)
@@ -541,7 +542,6 @@ class LifeCycleManager:
                 self.culled_heifers.append(heiferII)
                 del heiferIIs[index]
             elif third_stage:
-                # self.net_merit_heifer -= heiferII.net_merit
                 args = heiferII.get_heiferII_values()
                 args.update({
                     'body_weight_history': heiferII.body_weight_history,
@@ -625,7 +625,6 @@ class LifeCycleManager:
                 cow_stage = heiferIII.update(date, self.avg_CI)
 
             if cow_stage:
-                # self.net_merit_heifer -= heiferIII.net_merit
                 args = heiferIII.get_heiferIII_values()
                 args.update({
                     'body_weight_history': heiferIII.body_weight_history,
@@ -993,6 +992,7 @@ class LifeCycleManager:
                     self.num_cow_for_parity[parity] / self.cow_num * 100
         
         self.avg_net_merit_cow = self.net_merit_cow/self.cow_num
+        self.heifer_total_num = self.heiferI_num + self.heiferII_num + self.heiferIII_num
         self.avg_net_merit_heifer = self.net_merit_heifer/(self.heiferI_num + self.heiferII_num + self.heiferIII_num)
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows

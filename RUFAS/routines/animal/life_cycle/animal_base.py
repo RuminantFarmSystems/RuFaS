@@ -100,6 +100,7 @@ class AnimalBase(object):
         self.birth_date = args['birth_date']
         self.days_born = args['days_born']
         self.semen_used = self.config['semen_type']
+        self.net_merit = args['net_merit']
 
         self.culled = False
         self.do_not_breed = False
