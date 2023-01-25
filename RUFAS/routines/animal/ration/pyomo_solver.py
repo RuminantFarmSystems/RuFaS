@@ -161,14 +161,8 @@ def create_model(feeds_data, req_data, feeds):
     m1 = model.create_instance(data)
     results = pyo.SolverFactory('APOPT').solve(m1)
 
-    info_map = {"class": "no_caller_class",
-                "function": create_model.__name__,
-                "feeds_data": feeds_data,
-                "req_data": req_data,
-                "feeds": feeds,}
-
     # TODO update "m1" variable to a more descriptive name.
-    om.add_variable("m1", m1, info_map)  
+    
     
     # for i,j in m1.feed*m1.nrg:
     #     print(i, j, m1.x[i,j]())

@@ -1,12 +1,12 @@
 {
 	"herd_information": {
-		"calf_num": 0,
-		"heiferI_num": 0,
-		"heiferII_num": 0,
-		"heiferIII_num": 0,
-		"cow_num": 0,
-		"replace_num": 0,
-		"herd_num": 0,
+		"calf_num": 10,
+		"heiferI_num": 50,
+		"heiferII_num": 50,
+		"heiferIII_num": 10,
+		"cow_num": 100,
+		"replace_num": 5000,
+		"herd_num": 100,
 		"herd_init": false,
 		"breed": "HO"
 	},
@@ -41,7 +41,7 @@
 					"heifer_synchED_protocol": "2P"
 				},
 				"TAI_related":{
-					"heifer_TAI_protocol": "5dCG2P",
+					"heifer_TAI_protocol": "d5CG2P",
 					"md5CG2P_conception_rate": 0.6,
 					"md5CGP_conception_rate": 0.48,
 					"heifer_user_defined_tai_cr": 0.0,
@@ -64,7 +64,7 @@
 				"prefresh_day": 30,
 				"num_21_days_repro": 15,
 				"calving_interval": 400,
-				"use_input_calving_interval": false
+				"use_input_calving_interval": false			
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
@@ -79,7 +79,7 @@
 		"from_literature": {
 			"repro": {
 				"avg_estrus_cycle_heifer": 21,
-				"std_estrus_cycle_heifer": 3,				
+				"std_estrus_cycle_heifer": 3,
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
 				"preg_check_day_2": 91,
@@ -91,7 +91,7 @@
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 2.5,
 				"avg_estrus_cycle_p": 10,
-				"std_estrus_cycle_p": 2	
+				"std_estrus_cycle_p": 2
 			},
 			"milking": {
 				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
@@ -120,11 +120,68 @@
 	},
 	"housing": "barn",
 	"pasture_concentrate": -1,
-	"methane_model": "Mutian",
+	"methane_model": "IPCC",
 	"ration": {
 		"user_input": false,
-		"formulation_interval": 7
+		"formulation_interval": 30
 	},
+
 	"pen_information": {
+		"pen0": {
+			"id": 0,
+			"animal_combination": "CALF",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 30,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "freestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
+		},
+		"pen1": {
+			"id": 1,
+			"animal_combination": "GROWING",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 100,
+			"housing_type": "open air barn",
+			"bedding_type": "organic",
+			"pen_type": "freestall",
+			"manure_handling": "flush_system",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
+		},
+		"pen2": {
+			"id": 2,
+			"animal_combination": "CLOSE_UP",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 100,
+			"housing_type": "open air barn",
+			"bedding_type": "organic",
+			"pen_type": "tiestall",
+			"manure_handling": "automatic_alley_scrapers",
+			"manure_separator": "sedimentation",
+			"manure_storage": "storage_pit",
+			"max_stocking_density": 1.2
+		},
+		"pen3": {
+			"id": 3,
+			"animal_combination": "LAC_COW",
+			"vertical_dist_to_milking_parlor": 0.1,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 110,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall",
+			"manure_handling": "manual_scraping",
+			"manure_separator": "sedimentation",
+			"manure_storage": "anaerobic_lagoon",
+			"max_stocking_density": 1.2
+		}
 	}
 }

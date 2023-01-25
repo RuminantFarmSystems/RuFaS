@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import Tuple
+from typing import Union
+
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
@@ -19,11 +22,14 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather, time,
+                 manure_treatment_config: Union[ManureTreatmentConfig,
+                                                Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+                 ) -> None:
         super().__init__(weather, time, manure_treatment_config)
-        self._anaerobic_digestion = AnaerobicDigestion(weather, time, manure_treatment_config)
-        self._anaerobic_digestion_daily_output = None
-        self._anaerobic_lagoon = AnaerobicLagoon(weather, time, manure_treatment_config)
+        self._anaerobic_digestion = AnaerobicDigestion(weather, time, manure_treatment_config[0])
+        self.anaerobic_digestion_daily_output = None
+        self._anaerobic_lagoon = AnaerobicLagoon(weather, time, manure_treatment_config[1])
 
     def _create_anaerobic_digestion_daily_output(self) -> ManureTreatmentDailyOutput:
         """Creates the daily output for the anaerobic digestion model.
@@ -49,15 +55,14 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
         """
         self.anaerobic_digestion_daily_output = self._create_anaerobic_digestion_daily_output()
 
-        manure_separator_daily_output = self._manure_separator.daily_update(
+        self._manure_separator_daily_output = self._manure_separator.daily_update(
                 manure_separator_daily_input=self.anaerobic_digestion_daily_output,
         ) if self._manure_separator else None
 
-        self._manure_separator_daily_output = manure_separator_daily_output
-
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
                 manure_handler_daily_output=self._manure_handler_daily_output,
-                manure_treatment_daily_input=manure_separator_daily_output or self.anaerobic_digestion_daily_output,
+                manure_treatment_daily_input=(self._manure_separator_daily_output or
+                                              self.anaerobic_digestion_daily_output),
                 pen=self._current_pen,
                 sim_day=self._sim_day
         )
