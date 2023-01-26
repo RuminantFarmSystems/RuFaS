@@ -77,7 +77,7 @@ the other units.
 ### Main (composite) classes
 
 In general, the main composite classes should receive most of their methods and attributes
-from their respective components (e.g., `Crop` uses has an attribute `nitrogen_incorporation` which is an instance
+from their respective components (e.g., `Crop` has an attribute `nitrogen_incorporation` which is an instance
 of `NitrogenIncorporation` and `nitrogen_incorporation.incorporate_nitrogen()` is called by the main method). However, 
 some features may be implemented directly in the  composite class: 
 
