@@ -44,20 +44,51 @@ def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth, depths, 
     (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
 ])
 def test_access_layers(deepest, layers):
+    """check that soil layers are accessed correctly with access_layers()"""
     data = CropData(accessible_soil_layers=deepest)
     incorp = PhosphorusIncorporation(data)
     assert incorp.access_layers(layers) == layers[slice(deepest)]
 
 
-def test_extract_phosphorus_from_soil_layers():
-    pass
+@pytest.mark.parametrize("uptakes,nitrates", [
+    ([1], [1]),  # start
+    ([1], [0]),  # no nitrates
+    ([0], [1]),  # no uptakes
+    ([0.5], [1]),  # uptakes < nitrates
+    ([1.2], [1]),  # uptakes > nitrates
+    ([37.9, 40.2, 18.3], [100.5, 83.3, 30.7]),  # arbitrary - abundant nitrates
+    ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
+    ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
+])
+def test_cd_phosphorus_from_soil_layers(uptakes, nitrates):
+    """check that layer_nitrates were correctly updated by extract_phosphorus_from_soil_layers"""
+    nitrates_copy = nitrates.copy()
+    data = CropData(actual_phosphorus_uptakes=uptakes)
+    incorp = PhosphorusIncorporation(data)
+    incorp.extract_phosphorus_from_soil_layers(nitrates)
+    remaining = []
+
+    for i in range(len(uptakes)):
+        remaining.append(max(nitrates_copy [i] - uptakes[i], 0))
+    assert nitrates == remaining
 
 
-def test_tally_total_phosphorus_uptake():
-    pass
+@pytest.mark.parametrize("uptakes", [
+    [1],  # one layer
+    [1, 1, 1, 1],  # four layers
+    [81.2, 0],  # arbitrary with zero
+    [15.3, 18.2, 4, 20.33]
+])
+def test_tally_total_phosphorus_uptake(uptakes):
+    """check that total phosphorus was correctly summed by tally_total_phosphorus_uptake"""
+    data = CropData(actual_phosphorus_uptakes=uptakes)
+    incorp = PhosphorusIncorporation(data)
+    incorp.tally_total_phosphorus_uptake()
+    assert data.total_phosphorus_uptake == sum(uptakes)
 
 
 def test_uptake_phosphorus():
+
     pass
 
 
