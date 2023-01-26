@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.output_handler.reports package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines package" href="RUFAS.routines.html" />
+    <link rel="prev" title="RUFAS.output_handler package" href="RUFAS.output_handler.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+      <li class="breadcrumb-item active">RUFAS.output_handler.reports package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.output_handler.reports.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-output-handler-reports-package">
+<h1>RUFAS.output_handler.reports package<a class="headerlink" href="#rufas-output-handler-reports-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.output_handler.reports.base_report">
+<span id="rufas-output-handler-reports-base-report-module"></span><h2>RUFAS.output_handler.reports.base_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.base_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: base_report_handler.py
+Description:
+Author(s): William Donovan <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.base_report.</span></span><span class="sig-name descname"><span class="pre">BaseReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Interface for report handlers</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.annual_flush">
+<span class="sig-name descname"><span class="pre">annual_flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.annual_flush" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.finalize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.initialize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.initialize_dir">
+<span class="sig-name descname"><span class="pre">initialize_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_csv_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_graphic_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.initialize_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.write_annual_report">
+<span class="sig-name descname"><span class="pre">write_annual_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.write_annual_report" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report.BaseReport.write_headers">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_csv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report.BaseReport.write_headers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.base_report_driver">
+<span id="rufas-output-handler-reports-base-report-driver-module"></span><h2>RUFAS.output_handler.reports.base_report_driver module<a class="headerlink" href="#module-RUFAS.output_handler.reports.base_report_driver" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.base_report_driver.</span></span><span class="sig-name descname"><span class="pre">BaseReportDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.annual_flush">
+<span class="sig-name descname"><span class="pre">annual_flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.annual_flush" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.annual_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.finalize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.initialize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.initialize_dir">
+<span class="sig-name descname"><span class="pre">initialize_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_csv_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_graphic_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.initialize_dir" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.write_annual_report">
+<span class="sig-name descname"><span class="pre">write_annual_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver.write_annual_report" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.custom_report">
+<span id="rufas-output-handler-reports-custom-report-module"></span><h2>RUFAS.output_handler.reports.custom_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.custom_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: custom_report.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<blockquote>
+<div><p>Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.custom_report.CustomReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.custom_report.</span></span><span class="sig-name descname"><span class="pre">CustomReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.custom_report.CustomReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.feed_storage_report">
+<span id="rufas-output-handler-reports-feed-storage-report-module"></span><h2>RUFAS.output_handler.reports.feed_storage_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.feed_storage_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: feed_storage_report.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.feed_storage_report.</span></span><span class="sig-name descname"><span class="pre">BaseStorageReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.feed_storage_report.FeedStorageReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.feed_storage_report.</span></span><span class="sig-name descname"><span class="pre">FeedStorageReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.feed_storage_report.FeedStorageReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.feed_storage_report.FeedStorageSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.feed_storage_report.</span></span><span class="sig-name descname"><span class="pre">FeedStorageSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.feed_storage_report.FeedStorageSummary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.feed_storage_report.StorageReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.feed_storage_report.</span></span><span class="sig-name descname"><span class="pre">StorageReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.feed_storage_report.StorageReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport" title="RUFAS.output_handler.reports.feed_storage_report.BaseStorageReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseStorageReport</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.field_report">
+<span id="rufas-output-handler-reports-field-report-module"></span><h2>RUFAS.output_handler.reports.field_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.field_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: field_report.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.field_report.</span></span><span class="sig-name descname"><span class="pre">FieldReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseFieldMassBalanceReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseFieldReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.CropReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CropReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.CropReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.CustomFieldReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CustomFieldReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.CustomFieldReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.FieldManagementReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldManagementReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.FieldManagementReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.NitrogenBalance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NitrogenBalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.NitrogenBalance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldMassBalanceReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.PhosphorusBalance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PhosphorusBalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.PhosphorusBalance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldMassBalanceReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilCarbonReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilCarbonReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilCarbonReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilReportDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseLayerReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_no</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport" title="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseSoilReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.LayerReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LayerReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_no</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.LayerReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport" title="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseLayerReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseLayerReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilCarbonReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilCarbonReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilCarbonReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport" title="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilNitrogenReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilNitrogenReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilNitrogenReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport" title="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilPhosphorusReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilPhosphorusReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilPhosphorusReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport" title="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.SoilSummary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport" title="RUFAS.output_handler.reports.field_report.FieldReport.SoilReportDriver.BaseSoilReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilReport</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.WaterBalance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WaterBalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.WaterBalance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport" title="RUFAS.output_handler.reports.field_report.FieldReport.BaseFieldMassBalanceReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFieldMassBalanceReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldsReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.field_report.</span></span><span class="sig-name descname"><span class="pre">FieldsReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldsReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.field_report.FieldsSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.field_report.</span></span><span class="sig-name descname"><span class="pre">FieldsSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.field_report.FieldsSummary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.life_cycle_report">
+<span id="rufas-output-handler-reports-life-cycle-report-module"></span><h2>RUFAS.output_handler.reports.life_cycle_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.life_cycle_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: life_cycle_report.py
+Description: Report for the life cycle submodule.
+Author(s): Militsa Sotirova, <a class="reference external" href="mailto:militsasotirova&#37;&#52;&#48;gmail&#46;com">militsasotirova<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<blockquote>
+<div><p>Katrina Wang, <a class="reference external" href="mailto:kw433&#37;&#52;&#48;cornell&#46;edu">kw433<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.life_cycle_report.</span></span><span class="sig-name descname"><span class="pre">LifeCycleReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.HerdReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HerdReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.HerdReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IndividualAnimalReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.finalize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.initialize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.write_annual_report">
+<span class="sig-name descname"><span class="pre">write_annual_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.IndividualAnimalReport.write_annual_report" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InitializationDBSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.finalize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.initialize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.write_annual_report">
+<span class="sig-name descname"><span class="pre">write_annual_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.life_cycle_report.LifeCycleReport.InitializationDBSummary.write_annual_report" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.manure_storage_report">
+<span id="rufas-output-handler-reports-manure-storage-report-module"></span><h2>RUFAS.output_handler.reports.manure_storage_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.manure_storage_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: feed_storage_report.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">BaseHandlingReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">BaseSeparatorReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">BaseStorageReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.HandlingReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">HandlingReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.HandlingReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport" title="RUFAS.output_handler.reports.manure_storage_report.BaseHandlingReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseHandlingReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.ManureStorageReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">ManureStorageReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.ManureStorageReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.ManureStorageSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">ManureStorageSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.ManureStorageSummary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.SeparatorReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">SeparatorReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.SeparatorReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport" title="RUFAS.output_handler.reports.manure_storage_report.BaseSeparatorReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSeparatorReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.manure_storage_report.StorageReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.manure_storage_report.</span></span><span class="sig-name descname"><span class="pre">StorageReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.manure_storage_report.StorageReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport" title="RUFAS.output_handler.reports.manure_storage_report.BaseStorageReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseStorageReport</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.mass_balance_report">
+<span id="rufas-output-handler-reports-mass-balance-report-module"></span><h2>RUFAS.output_handler.reports.mass_balance_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.mass_balance_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: mass_balance_report.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.mass_balance_report.MassBalanceReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.mass_balance_report.</span></span><span class="sig-name descname"><span class="pre">MassBalanceReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.mass_balance_report.MassBalanceReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.mass_balance_report.MassBalanceReport.BaseMassBalanceReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseMassBalanceReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.mass_balance_report.MassBalanceReport.BaseMassBalanceReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.mass_balance_report.MassBalanceReport.BaseMassBalanceReport.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.mass_balance_report.MassBalanceReport.BaseMassBalanceReport.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports.pen_report">
+<span id="rufas-output-handler-reports-pen-report-module"></span><h2>RUFAS.output_handler.reports.pen_report module<a class="headerlink" href="#module-RUFAS.output_handler.reports.pen_report" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: pen_report.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.pen_report.</span></span><span class="sig-name descname"><span class="pre">PenReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BasePenReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport.annual_update">
+<span class="sig-name descname"><span class="pre">annual_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport.annual_update" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the yearly values that need to be printed in the report.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport.daily_update">
+<span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport.daily_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.GrowthReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GrowthReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.GrowthReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport" title="RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePenReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.ManureReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ManureReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.ManureReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport" title="RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePenReport</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.RationReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RationReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.RationReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport" title="RUFAS.output_handler.reports.pen_report.PenReport.BasePenReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePenReport</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PenReport.RationReport.produce_report_graphics">
+<span class="sig-name descname"><span class="pre">produce_report_graphics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PenReport.RationReport.produce_report_graphics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PensReport">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.pen_report.</span></span><span class="sig-name descname"><span class="pre">PensReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PensReport" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report_driver.BaseReportDriver" title="RUFAS.output_handler.reports.base_report_driver.BaseReportDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReportDriver</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.output_handler.reports.pen_report.PensSummary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.output_handler.reports.pen_report.</span></span><span class="sig-name descname"><span class="pre">PensSummary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.output_handler.reports.pen_report.PensSummary" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#RUFAS.output_handler.reports.base_report.BaseReport" title="RUFAS.output_handler.reports.base_report.BaseReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseReport</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.output_handler.reports">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.output_handler.reports" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.output_handler.html" class="btn btn-neutral float-left" title="RUFAS.output_handler package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.html" class="btn btn-neutral float-right" title="RUFAS.routines package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
