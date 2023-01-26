@@ -35,6 +35,34 @@ def pen() -> Pen:
     return pen
 
 
+def test_set_avg_nutrient_rqmts(pen: Pen):
+    """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
+    avg_nutrient_rqmts = {'NEmaint': 22.739694446587276,
+                          'NEa': 0,
+                          'NEg': 0.0,
+                          'NEpreg': 0.8809032714863911,
+                          'NEl': 0,
+                          'MP_req': 169.60219829211576,
+                          'Ca_req': 8.551061771355254,
+                          'P_req': 0.8978663353409345,
+                          'DMIest': 0,
+                          'avg_BW': 445.74074026264447}
+
+    pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
+
+    assert pen.avg_nutrient_rqmts == avg_nutrient_rqmts
+
+
+def test_set_milk_avgs(pen: Pen):
+    """Unit test for function set_milk_avgs in file routines/animal/pen.py"""
+    avg_milk = 40.362
+    avg_CP_milk = 3.196
+
+    pen.set_milk_avgs(avg_milk, avg_CP_milk)
+
+    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk
+
+
 def test_update_animals():
     """Unit test for function update_animals in file routines/animal/pen.py"""
     pass
