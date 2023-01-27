@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.carbon_cycling package" href="RUFAS.routines.field.soil.carbon_cycling.html" />
+    <link rel="prev" title="RUFAS.routines.field.field_management package" href="RUFAS.routines.field.field_management.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.soil.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-field-soil-package">
+<h1>RUFAS.routines.field.soil package<a class="headerlink" href="#rufas-routines-field-soil-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html">RUFAS.routines.field.soil.carbon_cycling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.carbon_cycle">RUFAS.routines.field.soil.carbon_cycling.carbon_cycle module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.soil_carbon_aggregation"><code class="docutils literal notranslate"><span class="pre">soil_carbon_aggregation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.decomp_factors">RUFAS.routines.field.soil.carbon_cycling.decomp_factors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.decomp_factors.moisture_factor"><code class="docutils literal notranslate"><span class="pre">moisture_factor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.decomp_factors.temp_factor"><code class="docutils literal notranslate"><span class="pre">temp_factor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.decomp_factors.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.residue_partitioning">RUFAS.routines.field.soil.carbon_cycling.residue_partitioning module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.residue_partitioning"><code class="docutils literal notranslate"><span class="pre">residue_partitioning()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html">RUFAS.routines.field.soil.nitrogen_cycling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.denitrification">RUFAS.routines.field.soil.nitrogen_cycling.denitrification module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.denitrification.denitrification"><code class="docutils literal notranslate"><span class="pre">denitrification()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization">RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization.humus_mineralization"><code class="docutils literal notranslate"><span class="pre">humus_mineralization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion">RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion.leaching_runoff_erosion"><code class="docutils literal notranslate"><span class="pre">leaching_runoff_erosion()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp.mineralization_decomp"><code class="docutils literal notranslate"><span class="pre">mineralization_decomp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization">RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization.nitrification_volatilization"><code class="docutils literal notranslate"><span class="pre">nitrification_volatilization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling">RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.calc_temp_factors"><code class="docutils literal notranslate"><span class="pre">calc_temp_factors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.calc_water_factors"><code class="docutils literal notranslate"><span class="pre">calc_water_factors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.update_annual_N"><code class="docutils literal notranslate"><span class="pre">update_annual_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling.update_profile_N"><code class="docutils literal notranslate"><span class="pre">update_profile_N()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html">RUFAS.routines.field.soil.phosphorus_cycling package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization">RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.erosion">RUFAS.routines.field.soil.phosphorus_cycling.erosion module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.erosion.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.fert_leach">RUFAS.routines.field.soil.phosphorus_cycling.fert_leach module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.fert_leach.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.manure_leach">RUFAS.routines.field.soil.phosphorus_cycling.manure_leach module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.manure_leach.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_annual_P"><code class="docutils literal notranslate"><span class="pre">update_annual_P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling.update_profile_P"><code class="docutils literal notranslate"><span class="pre">update_profile_P()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_P">RUFAS.routines.field.soil.phosphorus_cycling.soluble_P module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#RUFAS.routines.field.soil.phosphorus_cycling.soluble_P.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.field.soil.evapotranspiration">
+<span id="rufas-routines-field-soil-evapotranspiration-module"></span><h2>RUFAS.routines.field.soil.evapotranspiration module<a class="headerlink" href="#module-RUFAS.routines.field.soil.evapotranspiration" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: evapotranspiration.py</p>
+<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl>
+<dt>Description: This module contains the necessary functions for calculating and</dt><dd><dl class="simple">
+<dt>updating water evapotranspiration on a given day by calculating:</dt><dd><ol class="arabic simple">
+<li><p>Potential evapotranspiration</p></li>
+<li><p>Crop transpiration</p></li>
+<li><p>Sublimation and Soil Evaporation.</p></li>
+<li><p>Soil Evaporation by soil layer</p></li>
+</ol>
+</dd>
+</dl>
+<p>Currently the only function meant to be used outside of this file
+is the update_all() function. The other functions are meant to
+serve as helper functions within this file.</p>
+</dd>
+</dl>
+<p>Soil attribute definitions</p>
+<blockquote>
+<div><p>LHV = latent heat of vaporization (MJ kg^-1)</p>
+<p>ET_max = potential evapotranspiration a.k.a PET (mm d^-1)</p>
+<p>H0 = extraterrestrial radiation (mm m^-2d^-1)</p>
+<p>T_max = maximum air temperature for a given day (ºC)</p>
+<p>T_min = minimum air temperature for a given day (ºC)</p>
+<p>T_avg = mean air temperature for a given day (ºC)</p>
+<p>trans_max = maximum transpiration on a given day (mm H2O)</p>
+<p>LAI = Leaf Area Index (calculated in Crop Routine)</p>
+<p>evap = maximum soil evaporation/sublimation on a given day (mm H2O)</p>
+<p>soil_cov = soil cover index</p>
+<p>bio_mass = above ground biomass and residue (kg/ha)</p>
+<p>evap_z = evaporation demand at depth z (mm H2O)</p>
+<p>z = depth below soil surface (mm)</p>
+<dl class="simple">
+<dt>SW = soil water content of entire profile, excluding water held at wilting</dt><dd><p>point (mm H2O)</p>
+</dd>
+</dl>
+<p>WP = soil water content held at wilting point (mm H2O)</p>
+<p>FC = field capacity (mm H2O)</p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.calc_LHV">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">calc_LHV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T_avg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.calc_LHV" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
+determining potential evapotranspiration
+“pseudocode_soil” S.2.B.2</p>
+</dd>
+<dt>Args:</dt><dd><p>T_avg: the average temperature on the current day</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: LHV, the latent heat of vaporization (MJ kg^-1)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.calc_crop_transpiration">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">calc_crop_transpiration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.calc_crop_transpiration" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates crop transpiration as a function of maximum transpiration on a
+given day and Leaf Area Index (calculated in the Crop Routine file
+leaf_area_index.py)
+“pseudocode_soil” S.2.B.3</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.calc_potential_evap">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">calc_potential_evap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.calc_potential_evap" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates potential evapotranspiration ET_max using the Hargreaves method
+“pseudocode_soil” S.2.B.1</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.calc_soil_cov">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">calc_soil_cov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.calc_soil_cov" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates soil cover for use in calculating soil evaporation
+“pseudocode_soil” S.2.B.5</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.calc_soil_evap">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">calc_soil_evap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.calc_soil_evap" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates sublimation and soil evaporation
+“pseudocode_soil” S.2.B.4/6</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>This function calls all the necessary functions to update information related
+to evapotranspiration</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
+crop: instance of the Crop class specified in crop.py
+weather: instance of the Weather class specified in classes.py
+time: instance of the Time class specified in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.evapotranspiration.update_evap_z">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.evapotranspiration.</span></span><span class="sig-name descname"><span class="pre">update_evap_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.evapotranspiration.update_evap_z" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the evap for each layer of soil in a given profile as a function
+of the evaporation demand between the soil layers above and below.
+“pseudocode_soil” S.2.B.7-10</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.infiltration">
+<span id="rufas-routines-field-soil-infiltration-module"></span><h2>RUFAS.routines.field.soil.infiltration module<a class="headerlink" href="#module-RUFAS.routines.field.soil.infiltration" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: infiltration.py</p>
+<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="simple">
+<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating water infiltration into the soil on a given day using the
+curve number approach. Currently the only function meant to be
+used outside of this file is the update_all() function. The other
+functions are meant to serve as helper functions within this file.</p>
+</dd>
+</dl>
+<p>Soil attribute definitions</p>
+<blockquote>
+<div><p>runoff = daily runoff (mm H2O)</p>
+<p>R = daily rainfall depth (mm H2O)</p>
+<p>S = retention parameter (mm H2O)</p>
+<dl class="simple">
+<dt>CN1 = Curve Number 1 (empirical value used to determine the retention</dt><dd><p>parameter S)</p>
+</dd>
+</dl>
+<p>CN2 = Curve Number 2</p>
+<p>CN3 = Curve Number 3</p>
+<p>S_max = maximum value for S on any given day (mm H2O)</p>
+<dl class="simple">
+<dt>SW = soil water content of entire profile, excluding water held at wilting</dt><dd><p>point (mm H2O)</p>
+</dd>
+</dl>
+<p>w1 = shape coefficient</p>
+<p>w2 = shape coefficient</p>
+<p>FC = amount of water in soil profile at field capacity (mm H2O)</p>
+<p>SAT = amount of water in soil profile at saturation (mm H2O)</p>
+<p>S_frz = retention parameter when the top layer of soil is frozen</p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_CN1">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_CN1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_CN1" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates Curve Number 1 for use in calculating S_max
+“pseudocode_soil” S.2.A.2</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: CN1, unitless Curve Number 1 for use in calculating S_max</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_CN3">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_CN3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_CN3" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates Curve Number 3 for use in calculating S3
+“pseudocode_soil” S.2.A.3</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: CN3, unitless Curve Number 3 for use in calculating S3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_S">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_S</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_S" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates the retention parameter S (mm H2O) for use in calculating daily
+runoff (mm H2O)
+“pseudocode_soil” S.2.A.4</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: S, retention parameter (mm H2O)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_S3">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_S3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CN3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_S3" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates S3 for use in calculating shape coefficients w1/w2
+“pseudocode_soil” S. 2.A.8</p>
+</dd>
+<dt>Args:</dt><dd><p>CN3: Curve Number 3</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: S3, used in calculating unitless shape coefficients w1, w2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_S_max">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_S_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_S_max" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates S_max, the maximum value for S on the current given day (mm H2O)
+“pseudocode_soil” S.2.A.5</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: S_max, the maximum value for retention parameter S on the current day (mm H2O)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_daily_infiltration">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_daily_infiltration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_daily_infiltration" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates and updates daily infiltration as rainfall - runoff
+“pseudocode_soil” S.2.A.10</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_runoff">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_runoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_runoff" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates the daily runoff (mm H2O)
+“pseudocode_soil” S.2.A.1</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_w1">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_w1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CN3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_w1" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the shape coefficient w1
+“pseudocode_soil” S.2.A.6</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+S_max: Maximum value for retention parameter S on a given day
+CN3: unitless Curve Number 3
+w2: shape coefficient w2</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: w1, unitless shape coefficient</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.calc_w2">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">calc_w2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CN3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.calc_w2" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates the shape coefficient w2
+“pseudocode_soil” S.2.A.7</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+S_max: Maximum value for the retention parameter S on a given day
+CN3: Curve Number 3. Calculated above</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: w2, unitless shape coefficient</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.sum_SW">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">sum_SW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.sum_SW" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates soil water content of the entire profile for use in calculating S
+“pseudocode_soil” S.2.A.4</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: SW, the total soil water content of the profile (mm H2O)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.sum_WW">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">sum_WW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.sum_WW" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the quantity of water held at wilting point in the entire profile
+for use in calculating S
+“pseudocode_soil” S.2.A.4</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: WW, the total quantity of water held at wilting point for the profile (mm H2O)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.infiltration.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.infiltration.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.infiltration.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>This function calls all the necessary functions to update information related
+to infiltration</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
+weather: instance of the Weather class specified in classes.py
+time: instance of the Time class specified in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.percolation">
+<span id="rufas-routines-field-soil-percolation-module"></span><h2>RUFAS.routines.field.soil.percolation module<a class="headerlink" href="#module-RUFAS.routines.field.soil.percolation" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: percolation.py</p>
+<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="simple">
+<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating water percolation on a given day. Currently the only
+function meant to be used outside of this file is the update_all()
+function. The other functions are meant to serve as helper
+methods within this file.</p>
+</dd>
+</dl>
+<p>Soil attribute definitions</p>
+<blockquote>
+<div><p>percolation = amount of water that percolates to the underlying soil layer (mm H2O)</p>
+<p>t = time step (24h)</p>
+<p>TT = travel time for percolation (h)</p>
+<p>K_sat = saturated hydraulic conductivity (mm/h)</p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.calc_daily_percolation">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.percolation.</span></span><span class="sig-name descname"><span class="pre">calc_daily_percolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.calc_daily_percolation" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>Calculates daily percolation as a function of the water available for
+percolation (SW_perc) in a soil layer.
+“pseudocode_soil” S.2.C.1/2</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.percolation.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.percolation.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.percolation.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definition:</dt><dd><p>This function calls all the necessary functions to update information related
+to percolation</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: an instance of the Soil class specified in soil.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.soil">
+<span id="rufas-routines-field-soil-soil-module"></span><h2>RUFAS.routines.field.soil.soil module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: soil.py</p>
+<p>Description: Driver for the soil sub-module</p>
+<dl class="simple">
+<dt>Author(s): Kass Chupongstimun, <a class="reference external" href="mailto:kass_c&#37;&#52;&#48;hotmail&#46;com">kass_c<span>&#64;</span>hotmail<span>&#46;</span>com</a></dt><dd><p>Jit Patil, <a class="reference external" href="mailto:spatil5&#37;&#52;&#48;wisc&#46;edu">spatil5<span>&#64;</span>wisc<span>&#46;</span>edu</a>
+William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil.</span></span><span class="sig-name descname"><span class="pre">Soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.SoilLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SoilLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.SoilLayer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.annual_mass_balance">
+<span class="sig-name descname"><span class="pre">annual_mass_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.annual_mass_balance" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates annual water balance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.annual_nitrogen_balance">
+<span class="sig-name descname"><span class="pre">annual_nitrogen_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.annual_nitrogen_balance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.annual_phosphorus_balance">
+<span class="sig-name descname"><span class="pre">annual_phosphorus_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.annual_phosphorus_balance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.annual_reset">
+<span class="sig-name descname"><span class="pre">annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.annual_reset" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Resets the annual values for the next year.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.annual_water_balance">
+<span class="sig-name descname"><span class="pre">annual_water_balance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.annual_water_balance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.Soil.initialize_profile_characteristics">
+<span class="sig-name descname"><span class="pre">initialize_profile_characteristics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.Soil.initialize_profile_characteristics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.annual_variable_update">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil.</span></span><span class="sig-name descname"><span class="pre">annual_variable_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.annual_variable_update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.daily_soil_reset">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil.</span></span><span class="sig-name descname"><span class="pre">daily_soil_reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.daily_soil_reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil.daily_soil_routine">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil.</span></span><span class="sig-name descname"><span class="pre">daily_soil_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil.daily_soil_routine" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Executes all the daily soil routines.</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: instance of the Soil class
+crop: instance of the Crop class
+field_management: instance of the FieldManagement class
+weather: instance of the Weather class
+time: instance of the Time class</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.soil_erosion">
+<span id="rufas-routines-field-soil-soil-erosion-module"></span><h2>RUFAS.routines.field.soil.soil_erosion module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil_erosion" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: soil_erosion.py</p>
+<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="simple">
+<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating the soil erosion on a given day. Currently the only
+function meant to be used outside of this file is the update_all()
+function. The other functions are meant to serve as helper
+functions within this file.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_C">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_C" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Definitions:</dt><dd><p>Calculates the cover and management factor, C, as the ratio of soil
+loss from land cropped under specified conditions to loss from
+clean-tilled, continuous fallow. The minimum value for C is estimated
+at 0.05
+“pseudocode_soil” S.3.A.14</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: C, unitless cover and management factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_F_org_C">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_F_org_C</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_F_org_C" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates F_org_C. F_org_C reduces soil erodibility for soils with
+high organic carbon content when calculating K
+“pseudocode_soil” S.3.A.12</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: F_org_C, unitless organic carbon factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_F_sand">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_F_sand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_F_sand" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates F_sand. F_sand reduces soil erodibility for soils with high
+sand contents when calculating K
+“pseudocode_soil” S.3.A.13</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: F_sand, unitless sand factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_Fc_sand">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_Fc_sand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_Fc_sand" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates Fc_sand. Fc_sand gives low factors for soils with high sand
+contents and high values for soils with little sand when calculating K
+“pseudocode_soil” S.3.A.10</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: Fc_sand, unitless sand factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_Fcl_si">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_Fcl_si</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_Fcl_si" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates Fcl_si. Fcl_si gives low factors for soils with high clay to silt
+ratios when calculating K
+“pseudocode_soil” S.3.A.11</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: Fcl_si, unitless clay:silt ratio factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_I">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_I</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_I" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates I, the rainfall intensity (mm/hr)
+“pseudocode_soil” S.3.A.4</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: I, rainfall intensity (mm/hr)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_K">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_K</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_K" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the soil erodibility factor K.
+“pseudocode_soil” S.3.A.9</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: K, unitless soil erodibility factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_LS">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_LS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_LS" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the topographic factor LS (the expected ratio of soil loss
+per unit area from a 22.1-m length of uniform 9 percent slope under
+identical conditions
+“pseudocode_soil” S.3.A.15</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: LS, unitless topographic factor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_Rtc">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_Rtc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_Rtc" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates Rtc, the amount of rain during time of concentration (mm)
+“pseudocode_soil” S.3.A.6</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: Rtc, rainfall during time of concentration (mm)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_T_conc">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_T_conc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_T_conc" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates T_conc (the time of concentration (h))
+“pseudocode_soil” S.3.A.5</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: T_conc, time of greatest concentration (h)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_alpha">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_alpha" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><dl class="simple">
+<dt>Calculates alpha, the fraction of daily rain during the time of concentration</dt><dd><p>“pseudocode_soil” S.3.A.7</p>
+</dd>
+</dl>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: alpha, fraction of rain that occurs during time of concentration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_alpha_05">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_alpha_05</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_alpha_05" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates alpha_05, the fraction of daily rain in the 1/2 hour of
+highest intensity.
+“pseudocode_soil” S.3.A.8</p>
+</dd>
+<dt>Args:</dt><dd><p>weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: alpha_05, fraction of daily rain in the 1/2 hour of highest intensity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_m">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_m" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the exponent m as a function of field slope
+“pseudocode_soil” S.3.A.16</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: m, unitless field slope exponent</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_peak_runoff">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_peak_runoff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_peak_runoff" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the peak runoff rate (m^3/sec)
+“pseudocode_soil” S.3.A.2/3</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: peak_runoff, the peak runoff rate on the current day (m^3/sec</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.calc_sed">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">calc_sed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.calc_sed" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates sed, sediment yield on a given day (metric tons)
+“pseudocode_soil” S.3.A.1/17</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_erosion.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_erosion.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_erosion.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Updates all soil erosion information</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
+crop: instance of the Crop class specified in crop.py
+weather: instance of the Weather class specified in classes.py
+time: instance of the Time class specified in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.soil_temp">
+<span id="rufas-routines-field-soil-soil-temp-module"></span><h2>RUFAS.routines.field.soil.soil_temp module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil_temp" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: soil_temp.py</p>
+<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="simple">
+<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating the soil temperature on a given day. Currently the only
+function meant to be used outside of this file is the update_all()
+function. The other functions are meant to serve as helper
+functions within this file.</p>
+</dd>
+</dl>
+<p>Soil attribute definitions</p>
+<blockquote>
+<div><p>T_soil = soil temperature (ºC) at depth z (mm)</p>
+<p>L = lag coefficient, set to 0.8</p>
+<p>T_soil_prev_day = soil temperature (ºC) at depth z (mm) on the previous day</p>
+<p>df = depth factor</p>
+<p>T_a_air = average annual air temperature (ºC)</p>
+<p>T_surf = Daily soil surface temperature (ºC)</p>
+<p>zd = ratio of depth at the center of soil layer to damping depth</p>
+<p>dd = damping depth (mm)</p>
+<p>z = depth at the center of the soil layer</p>
+<p>dd_max = maximum damping depth (mm)</p>
+<p>scale = scaling factor for soil water</p>
+<p>bd = soil bulk density (g/cm^3)</p>
+<p>SW = total soil water in the profile (mm)</p>
+<p>Z_tot = total soil profile depth</p>
+<p>T_bare = Temperature of bare soil surface (ºC)</p>
+<p>T_av = Average daily temperature (ºC)</p>
+<p>radiate = radiation term</p>
+<p>H_day = daily solar radiation (MJ/m^2)</p>
+<p>albedo = daily albedo</p>
+<p>albedo_soil = soil albedo constant</p>
+<p>cover = soil cover index</p>
+<p>CV = above ground biomass and residue (kg/ha)</p>
+<p>bcv = weighting factor of ground cover</p>
+<p>snow = snow water content on the current day (mm)</p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_T_bare">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_T_bare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_T_bare" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the temperature of a bare soil.
+“pseudocode_soil” S.1.A.7</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop
+weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: T_bare, the theoretical temperature of the bare soil (ºC)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_T_soil">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_T_soil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_T_soil" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the soil temperature for each layer given average annual air
+temperature. “pseudocode_soil” S.1.A.1</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_T_surf">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_T_surf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_T_surf" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the surface temperature as a function of the previous day’s
+temperature, the amount of ground cover, and the temperature of a bare
+soil surface.
+“pseudocode_soil” S.1.A.13</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_albedo">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_albedo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_albedo" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the daily albedo as a function of soil type, plant cover,
+and snow cover.
+“pseudocode_soil” S.1.A.9/10</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: soil albedo</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_bcv">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_bcv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_bcv" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the weighting factor for ground cover
+“pseudocode_soil” S.1.A.11/12</p>
+</dd>
+<dt>Args:</dt><dd><p>crop
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: bcv, the bio-cover weighting factor for ground cover</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_dd">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_dd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_dd" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates damping depth of a given soil profile as a function of soil
+water and dd_max.
+“pseudocode_soil” S.1.A.4</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: dd, damping depth of the profile (mm)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_dd_max">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_dd_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_dd_max" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates maximum damping depth for a given soil profile.
+“pseudocode_soil” S.1.A.6</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: dd_max, the maximum damping depth fro the profile (mm)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_radiate">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_radiate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_radiate" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Calculates the radiation term for the temperature of bare soil.
+“pseudocode_soil” S.1.A.8</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop
+weather
+time</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: radiate, the radiation term for the temperature of bare soil</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.calc_scale">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">calc_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.calc_scale" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Description:</dt><dd><blockquote>
+<div><p>Calculates the scaling factor for soil water in a given soil profile.</p>
+</div></blockquote>
+<p>“pseudocode_soil” S.1.A.5</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: soil water scaling factor for the profile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.sum_soil_water">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">sum_soil_water</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.sum_soil_water" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Helper method to calculates the sum of soil water in the profile.</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: total_soil_water (mm)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_temp.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_temp.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_temp.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>This function updates all soil temperature information.</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
+crop: instance of the Crop class specified in crop.py
+weather: instance of the Weather class specified in classes.py
+time: instance of the Time class specified in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.soil_water">
+<span id="rufas-routines-field-soil-soil-water-module"></span><h2>RUFAS.routines.field.soil.soil_water module<a class="headerlink" href="#module-RUFAS.routines.field.soil.soil_water" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: soil_water.py</p>
+<p>Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<dl class="simple">
+<dt>Description: This module contains the necessary functions for calculating and</dt><dd><p>updating the soil water in the profile at the end of a given day.
+Currently the only function meant to be used outside of this file
+is the update_all() function. The other functions are meant to
+serve as helper functions within this file.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_water.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_water.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_water.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>This function calls all the necessary functions to update and track
+soil water pools</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: instance of the Soil class specified in soil.py
+weather: instance of the Weather class specified in classes.py
+time: instance of the Time class specified in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_water.update_annual_SW">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_water.</span></span><span class="sig-name descname"><span class="pre">update_annual_SW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_water.update_annual_SW" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.soil_water.update_profile_SW">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.soil_water.</span></span><span class="sig-name descname"><span class="pre">update_profile_SW</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.soil_water.update_profile_SW" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Tracks and updates soil water pools based on calculated fluxes.
+Currently, all soil water transformations occur at the end of the day
+and are limited at saturation and wilting point. Percolation accounts
+for any excess flux.</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.soil" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.field_management.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.field_management package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.carbon_cycling.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.carbon_cycling package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
