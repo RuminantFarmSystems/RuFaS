@@ -1,9 +1,16 @@
 from __future__ import annotations
 from itertools import groupby
+from typing import Optional
+
+from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 class Soil:
-    def __init__(self):
+    def __init__(self, soil_data: Optional[SoilData] = None):
+        data = soil_data or SoilData()
+        self.evapotranspiration = Evapotranspiration(data)
+
         # whole-profile attributes
         self.evaporation = 20  # arbitrary
         self.transpiration = 30  # arbitrary

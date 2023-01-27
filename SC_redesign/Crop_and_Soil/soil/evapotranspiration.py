@@ -60,48 +60,47 @@ class Evapotranspiration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
-    def update_all(soil, crop, weather, time):
-        """
-        Description:
-            This function calls all the necessary functions to update information related
-            to evapotranspiration
-        Args:
-            soil: instance of the Soil class specified in soil.py
-            crop: instance of the Crop class specified in crop.py
-            weather: instance of the Weather class specified in classes.py
-            time: instance of the Time class specified in classes.py
-        """
-        for crop_types in crop.current_crop.values():
-            calc_potential_evap(soil, weather, time)
-
-            calc_crop_transpiration(soil, crop_types)
-
-            calc_soil_evap(soil, crop_types)
-
-            update_evap_z(soil)
-
-    # def calc_potential_evap(soil, weather, time):
+    # def update_all(soil, crop, weather, time) -> None:
     #     """
     #     Description:
-    #         Calculates potential evapotranspiration ET_max using the Hargreaves method
-    #         "pseudocode_soil" S.2.B.1
+    #         This function calls all the necessary functions to update information related
+    #         to evapotranspiration
     #     Args:
-    #         soil: instance of Soil class
-    #         weather: instance of Weather class
-    #         time: instance of Time class
+    #         soil: instance of the Soil class specified in soil.py
+    #         crop: instance of the Crop class specified in crop.py
+    #         weather: instance of the Weather class specified in classes.py
+    #         time: instance of the Time class specified in classes.py
     #     """
+    #     for crop_types in crop.current_crop.values():
+    #         calc_potential_evap(soil, weather, time)
     #
-    #     H0 = weather.radiation[time.year - 1][time.day - 1]
+    #         calc_crop_transpiration(soil, crop_types)
     #
-    #     T_max = weather.T_max[time.year - 1][time.day - 1]
-    #     T_min = weather.T_min[time.year - 1][time.day - 1]
-    #     T_avg = weather.T_avg[time.year - 1][time.day - 1]
+    #         calc_soil_evap(soil, crop_types)
     #
-    #     LHV = calc_LHV(T_avg)
-    #
-    #     ET_max = (0.0023 * H0 * ((T_max - T_min) ** 0.5) * (T_avg + 17.8)) / LHV
-    #
-    #     soil.ET_max = max(0.001, ET_max)
+    #         update_evap_z(soil)
+
+    # --- main routine ---
+    def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
+                         avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float) \
+            -> None:
+        """does the evapotranspiration of the soil on a given day
+
+        Details: calculates and stores the potential evapotranspiration, soil evaporation in the SoilData object
+        """
+        self.data.potential_evapotranspiration = self._determine_potential_evapotranspiration(
+            extraterrestrial_radiation,
+            max_air_temp,
+            min_air_temp,
+            avg_air_temp)
+        self.data.soil_evaporation = self._determine_soil_evaporation(
+            above_ground_biomass,
+            residue,
+            snow_water_content,
+            self.data.potential_evapotranspiration_adjusted,
+            self.data.transpiration)
+
+    # --- static methods ---
     @staticmethod
     def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
                                                 min_air_temp: float,
@@ -128,22 +127,6 @@ class Evapotranspiration:
             latent_heat_vaporization = Evapotranspiration._determine_latent_heat_vaporization(avg_air_temp)
             return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
                     * (avg_air_temp + 17.8)) / latent_heat_vaporization
-
-    # def calc_LHV(T_avg):
-    #     """
-    #     Description:
-    #         Calculates LHV (latent heat of vaporization (MJ kg^-1)) for use in
-    #         determining potential evapotranspiration
-    #         "pseudocode_soil" S.2.B.2
-    #
-    #     Args:
-    #         T_avg: the average temperature on the current day
-    #
-    #     Returns:
-    #         int: LHV, the latent heat of vaporization (MJ kg^-1)
-    #     """
-    #
-    #     return 2.501 - (2.361 * (10 ** (-3)) * T_avg)
 
     @staticmethod
     def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
@@ -181,25 +164,6 @@ class Evapotranspiration:
     #     else:
     #         soil.trans_max = soil.ET_max
 
-    # def calc_soil_evap(soil, crop_type):
-    #     """
-    #     Description:
-    #         Calculates sublimation and soil evaporation
-    #         "pseudocode_soil" S.2.B.4/6
-    #
-    #     Args:
-    #         soil: instance of Soil class
-    #         crop: instance of Crop type class
-    #     """
-    #
-    #     soil_cov = calc_soil_cov(soil, crop_type)
-    #
-    #     # "pseudocode_soil" S.2.B.4
-    #     evap_max = soil.ET_max * soil_cov
-    #
-    #     # "pseudocode_soil" S.2.B.6
-    #     soil.evap_max = min(evap_max, ((evap_max * soil.ET_max) / (evap_max + soil.trans_max)))
-
     @staticmethod
     def _determine_soil_evaporation(above_ground_biomass: float, residue: float, snow_water_content: float,
                                     potential_evapotranspiration_adjusted: float, transpiration: float) -> float:
@@ -212,6 +176,7 @@ class Evapotranspiration:
             snow_water_content: amount of water from snow in mm
             potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
                 in canopy in mm
+            @TODO: potential evapotranspiration adjusted will need to implemented at a later point, issue #313
             transpiration: transpiration in mm for a given day
         Returns:
             maximum soil evaporation in the day
@@ -226,8 +191,6 @@ class Evapotranspiration:
                                            (max_soil_evaporation + transpiration))
                                           )
         return actual_max_soil_evaporation
-
-    # @TODO: function that calculates potential_evapotranspiration_adjusted (maybe)
 
     # def calc_soil_cov(soil, crop_type):
     #     """

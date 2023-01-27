@@ -1,9 +1,22 @@
 import pytest
 
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import *
+from unittest.mock import patch, MagicMock
 
 
 # --- static function tests ---
+@pytest.mark.parametrize("avg_temp", [
+    12.86878,
+    0,
+    (-2.586948),
+    20.4486,
+])
+def test_determine_latent_heat_vaporization(avg_temp):
+    observe = Evapotranspiration._determine_latent_heat_vaporization(avg_temp)
+    expect = 2.501 - (0.002361 * avg_temp)
+    assert expect == observe
+
+
 @pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
     (100, 28, 10, 14),
     (568, 20, 14, 18),
@@ -24,16 +37,34 @@ def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_
                                                                                              + 17.8)) / latent_heat
     assert observe == expect
 
+    # check that _determine_potential_evapotranspiration() actually calls _determine_latent_heat_vaporization once
+    # @TODO: make this patch work, throws AttributeError. Currently tests pass because heat_vaporization is before
+    # potential_evapotranspiration
+    # p = patch("SC_redesign.Crop_and_Soil.soil.evapotranspiration._determine_latent_heat_vaporization",
+    #           new=MagicMock(return_value=1.3))
+    # p.start()
+    Evapotranspiration._determine_latent_heat_vaporization = MagicMock(return_value=1.3)
+    throwaway = Evapotranspiration._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp,
+                                                                           min_temp, avg_temp)
+    Evapotranspiration._determine_latent_heat_vaporization.assert_called_once()
+    # p.stop()
 
-@pytest.mark.parametrize("avg_temp", [
-    12.86878,
-    0,
-    (-2.586948),
-    20.4486,
+
+@pytest.mark.parametrize("above_ground_biomass,residue,snow_water", [
+    (400, 65, 0.3),
+    (800, 120, 0),
+    (0, 0, 0),
+    (1250, 800, 0.4999),
+    (990, 200, 0.338),
+    (400, 30, 0.51),
 ])
-def test_determine_latent_heat_vaporization(avg_temp):
-    observe = Evapotranspiration._determine_latent_heat_vaporization(avg_temp)
-    expect = 2.501 - (0.002361 * avg_temp)
+def test_determine_soil_cover_index(above_ground_biomass, residue, snow_water):
+    # expect = None
+    if snow_water > 0.5:
+        expect = 0.5
+    else:
+        expect = exp((-0.00005) * (above_ground_biomass + residue))
+    observe = Evapotranspiration._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
     assert expect == observe
 
 
@@ -54,21 +85,39 @@ def test_determine_soil_evaporation(above_ground_biomass, residue, snow_water, p
     observe = Evapotranspiration._determine_soil_evaporation(above_ground_biomass, residue, snow_water,
                                                              potential_evapotrans_adj, transpiration)
     assert actual_soil_evaporation == observe
+    # Check that _determine_soil_cover_index() is being called once
+    # @TODO: write this mock test as a patch so that it can run independent of order, same as above
+    Evapotranspiration._determine_soil_cover_index = MagicMock(return_value=2.1)
+    throwaway = Evapotranspiration._determine_soil_evaporation(above_ground_biomass, residue, snow_water,
+                                                               potential_evapotrans_adj, transpiration)
+    Evapotranspiration._determine_soil_cover_index.assert_called_once()
 
 
-@pytest.mark.parametrize("above_ground_biomass,residue,snow_water", [
-    (400, 65, 0.3),
-    (800, 120, 0),
-    (0, 0, 0),
-    (1250, 800, 0.4999),
-    (990, 200, 0.338),
-    (400, 30, 0.51),
-])
-def test_determine_soil_cover_index(above_ground_biomass, residue, snow_water):
-    expect = None
-    if snow_water > 0.5:
-        expect = 0.5
-    else:
-        expect = exp((-0.00005) * (above_ground_biomass + residue))
-    observe = Evapotranspiration._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
-    assert expect == observe
+# --- integration tests ---
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp,above_ground_mass,residue,snow_water", {
+    (500, 24, 18, 20, 1000, 200, 0.12),
+    (600.398, 28.33, 12.0119, 20.1134, 856, 120, 0.6),  # snowy
+    (1100, 20.334, 8.933, 15.808, 789, 103, 0.08),
+    (300, 10, 0, 3, 0, 0, 0),  # empty field, no snow
+})
+def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
+                          snow_water):
+    # initialize objects
+    data = SoilData(potential_evapotranspiration_adjusted=2.673, transpiration=0.4325)
+    assert data.potential_evapotranspiration_adjusted == 2.673
+    assert data.transpiration == 0.4325
+    incorp = Evapotranspiration(data)
+
+    # mock helper functions
+    incorp._determine_potential_evapotranspiration = MagicMock(return_value=1.89)
+    incorp._determine_soil_evaporation = MagicMock(return_value=2.845)
+
+    # run method
+    incorp.evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
+                            snow_water)
+
+    # check results
+    incorp._determine_potential_evapotranspiration.assert_called_once()
+    incorp._determine_soil_evaporation.assert_called_once()
+    assert data.potential_evapotranspiration == 1.89
+    assert data.soil_evaporation == 2.845
