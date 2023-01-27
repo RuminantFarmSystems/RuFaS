@@ -10,11 +10,13 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu,
 
 import math
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
+om = OutputManager()
 
 
-def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, parity=None, calving_interval=None, milk_true_protein=None, milk_fat=None,
-               milk_lactose=None, milk_production=None, days_in_milk=None, lactating=None,
-               body_condition_score_5=None, previous_temperature=None,
+def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, parity=None, calving_interval=None,
+               milk_true_protein=None, milk_fat=None, milk_lactose=None, milk_production=None, days_in_milk=None,
+               lactating=None, body_condition_score_5=None, previous_temperature=None,
                average_daily_gain_heifer=None, Age=None, distance=None):
     """
     Calculates the dietary requirements of a single animal. These values are used
@@ -49,21 +51,23 @@ def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, p
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type)
         net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight = calculate_NRC_energy_growth_requirements(
             body_weight, mature_body_weight, conceptus_weight, animal_type, parity, calving_interval, average_daily_gain_heifer)
-        net_energy_pregnancy = calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy, calf_birth_weight)
+        net_energy_pregnancy = calculate_NRC_energy_pregnancy_requirements(
+            day_of_pregnancy, calf_birth_weight)
         net_energy_lactation = calculate_NRC_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
         metabolizable_protein_requirement = calculate_NRC_protein_requirements(
             body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein, calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight)
         calcium_requirement = calculate_NRC_calcium_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain, milk_production)
-        phosphorus_requirement = calculate_NRC_P_requirements(
+        phosphorus_requirement = calculate_NRC_phosphorus_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain)
         dry_matter_intake_estimate = calculate_NRC_DMI(
             animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat)
     elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
         net_energy_lactation = calculate_NASEM_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
-        dry_matter_intake_estimate = calculate_NASEM_DMI(body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, parity, body_condition_score_5)
+        dry_matter_intake_estimate = calculate_NASEM_DMI(
+            body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, parity, body_condition_score_5)
         net_energy_maintenance, gravid_utertine_weight, utertine_weight = calculate_NASEM_energy_maintenance_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, days_in_milk)
         net_energy_growth, average_daily_gain, frame_weight_gain = calculate_NASEM_energy_growth_requirements(
@@ -74,13 +78,16 @@ def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, p
             lactating, body_weight, frame_weight_gain, gravid_utertine_weight_gain, dry_matter_intake_estimate, milk_true_protein, milk_production)
         calcium_requirement = calculate_NASEM_calcium_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate, milk_true_protein, milk_production)
-        phosphorus_requirement = calculate_NASEM_P_requirements(
+        phosphorus_requirement = calculate_NASEM_phosphorus_requirements(
             body_weight, mature_body_weight, animal_type, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate, milk_true_protein, milk_production)
     else:
         dry_matter_intake_estimate = []
-        print(f"DMI estimation method \
-            {AnimalBase.config['NASEM_or_NRC_requirement_calculations']}\
-            not supported")
+        energy_and_nutrient_calculation_method_error = f"energy and nutrient calculation method \
+            {AnimalBase.config['energy_and_nutrient_calculation_method']}\
+            not supported"
+        info_map = {"function": calc_rqmts}
+        om.add_error("energy_and_nutrient_calculation_method_error",
+                     energy_and_nutrient_calculation_method_error, info_map)
     # Requirements summary dictionary
     return {'NEmaint': net_energy_maintenance, 'NEg': net_energy_growth, 'NEpreg': net_energy_pregnancy,
             'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'Ca_req': calcium_requirement, 'P_req': phosphorus_requirement,
@@ -133,15 +140,18 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
         conceptus_weight = 0
         calf_birth_weight = 0
     elif day_of_pregnancy > 190:
-        conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (calf_birth_weight / 45)
+        conceptus_weight = (18 + (day_of_pregnancy - 190)
+                            * 0.665) * (calf_birth_weight / 45)
     else:
         conceptus_weight = 0
     if animal_type == 'cow':
-        net_energy_maintenance = (0.08 * (body_weight - conceptus_weight) ** 0.75)
+        net_energy_maintenance = (
+            0.08 * (body_weight - conceptus_weight) ** 0.75)
     elif animal_type == 'heifer':
         BCDS9 = (body_condition_score_5 - 1) * 2 + 1
         net_energy_maintenance = (body_weight-conceptus_weight)**(0.75) * \
-            (0.086*(0.8 + (BCDS9 - 1) * 0.5)) + 0.0007*(20-previous_temperature)
+            (0.086*(0.8 + (BCDS9 - 1) * 0.5)) + \
+            0.0007*(20-previous_temperature)
     return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
 
@@ -191,22 +201,25 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
     else:
         calf_birth_weight = mature_body_weight * 0.06275
         gravid_utertine_weight = (calf_birth_weight * 1.825) * math.exp(-0.0243 -
-                                           (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy))
+                                                                        (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy))
         if days_in_milk == None:
             days_in_milk = 0
-        utertine_weight = ((calf_birth_weight * 0.2288) * math.exp(-0.2*days_in_milk)) + 0.204
-        net_energy_maintenance = 0.10*(body_weight-gravid_utertine_weight - utertine_weight)**0.75
+        utertine_weight = ((calf_birth_weight * 0.2288) *
+                           math.exp(-0.2*days_in_milk)) + 0.204
+        net_energy_maintenance = 0.10 * \
+            (body_weight-gravid_utertine_weight - utertine_weight)**0.75
     return net_energy_maintenance, gravid_utertine_weight, utertine_weight
 
 
 def calculate_NRC_energy_activity_requirements():
     """ TODO refactor existing separate energy activity requirements function here?
-    #   e.g., NEa = distance * 0.00035 * body_weight
+    #   e.g., net_energy_activity = distance * 0.00035 * body_weight
     """
     pass
 
 
-def calculate_NASEM_energy_activity_requirements(body_weight: float, housing: str, distance: float | None) -> float:
+def calculate_NASEM_energy_activity_requirements(
+    body_weight: float, housing: str, distance: float | None) -> float:
     """ Calculates energy requirement for activity according to NASEM (2001).
 
     Calculates the estimated energy requirements requirements for maintenance in megacalories per day
@@ -222,13 +235,14 @@ def calculate_NASEM_energy_activity_requirements(body_weight: float, housing: st
 
     Returns
     -------
-    NEa : float
+    net_energy_activity : float
         Net energy requirement for activity in megacalories per day
 
     Notes
     -----
-    # Activity requirement (NEa) is proportional to body weight and daily walking distance.
-    # Grazing system and hilly topography will cost additional energy. This is not implemented yet in the current version of code.
+    # Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
+    # Grazing system and hilly topography will cost additional energy. 
+    # This is not implemented yet in the current version of code.
     # The latter requires implementation with the grazing module.
 
     References
@@ -237,19 +251,21 @@ def calculate_NASEM_energy_activity_requirements(body_weight: float, housing: st
         National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
     """
     if housing == 'Barn':
-        NEa = distance * 0.00035 * body_weight  # TODO This logic is the same as NRC \
+        net_energy_activity = distance * 0.00035 * \
+            body_weight  # TODO This logic is the same as NRC \
         # following instructions by Edward C.G., but can or should be updated according to Kristan R.
     elif housing == 'Grazing':
-        # TODO This will be the DMI supplemented after grazing - requires implementation with grazing module
+        # TODO This will be the DMI supplemented after grazing - requires grazing module implementation
         nonpasturekgDMI = 1
-        NEa = distance * body_weight * 0.75 * ((600-12*nonpasturekgDMI))/600
+        net_energy_activity = distance * body_weight * \
+            0.75 * ((600-12*nonpasturekgDMI))/600
     else:
-        NEa = 0
-    return NEa
+        net_energy_activity = 0
+    return net_energy_activity
 
 
-def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_weight: float, conceptus_weight: float, animal_type: float, parity: int | None, 
-    calving_interval: int | None, average_daily_gain_heifer: float | None) -> tuple[float, float, float]:
+def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_weight: float, conceptus_weight: float, animal_type: float, parity: int | None,
+                                             calving_interval: int | None, average_daily_gain_heifer: float | None) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth and associated weight gain parameters.
 
     Calculates the estimated energy requirements requirements for growth in megacalories per day, 
@@ -328,8 +344,9 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
     return net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight
 
 
-def calculate_NASEM_energy_growth_requirements(body_weight: float, mature_body_weight: float, average_daily_gain_heifer: float | None, animal_type: str,
-                                               parity: int | None, calving_interval: int | None) -> tuple[float, float, float]:
+def calculate_NASEM_energy_growth_requirements(
+    body_weight: float, mature_body_weight: float, average_daily_gain_heifer: float | None, animal_type: str,
+    parity: int | None, calving_interval: int | None) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth, and also growth metrics
 
     Calculates the estimated energy requirements requirements for growth in megacalories per day,
@@ -372,8 +389,8 @@ def calculate_NASEM_energy_growth_requirements(body_weight: float, mature_body_w
 
     """
     MSBW = 0.96 * mature_body_weight
-    # TODO Edward: check this logic. We hashed it out early on,
-    #  but I want to be sure that it's correct for parity = 0 or parity > 2
+    # TODO Edward: check this logic. We wrote it together, but I want to be sure that it's correct for cases
+    # e.g. parity = 0 or parity > 2
     if animal_type == 'cow':
         if parity == 1 and calving_interval != 0:
             average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
@@ -388,8 +405,10 @@ def calculate_NASEM_energy_growth_requirements(body_weight: float, mature_body_w
     EBG = 0.85*average_daily_gain
     if average_daily_gain == 0:
         average_daily_gain = 0.0001  # TODO fix to avoid divide by 0 error
-    FatADG = (0.067 + 0.375*(body_weight/mature_body_weight))*EBG/average_daily_gain
-    ProtADG = (0.201 - 0.081*(body_weight/mature_body_weight))*EBG/average_daily_gain
+    FatADG = (0.067 + 0.375*(body_weight/mature_body_weight)) * \
+        EBG/average_daily_gain
+    ProtADG = (0.201 - 0.081*(body_weight/mature_body_weight)) * \
+        EBG/average_daily_gain
     frame_weight_gain = FatADG + ProtADG
     REFADG = (9.4*FatADG + 5.55*ProtADG)*average_daily_gain
     MEFrameADG = REFADG/0.4  # Possible future use for this calc, see docstring notes
@@ -430,7 +449,8 @@ def calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy: int | None, ca
     if day_of_pregnancy == None:
         MEpreg = 0
     elif day_of_pregnancy > 190:
-        MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (calf_birth_weight / (45 * 0.14))
+        MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * \
+            (calf_birth_weight / (45 * 0.14))
     else:
         MEpreg = 0
     # [A.Cow.A.16]-[A.Heifer.A.17]
@@ -479,12 +499,14 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating: bool | None, day_of
 
     """
 
-    if lactating:  # and after the first month?
-        gravid_utertine_weight_gain = -0.2 * days_in_milk * (utertine_weight - 0.204)
+    if lactating:
+        gravid_utertine_weight_gain = -0.2 * \
+            days_in_milk * (utertine_weight - 0.204)
     elif day_of_pregnancy == None:
         gravid_utertine_weight_gain = 0
     else:
-        gravid_utertine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_utertine_weight
+        gravid_utertine_weight_gain = (
+            0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_utertine_weight
     net_energy_pregnancy = gravid_utertine_weight_gain * (0.882 / 0.14) * 0.66
     return net_energy_pregnancy, gravid_utertine_weight_gain
 
@@ -629,7 +651,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     # Metabolizable protein requirement for maintenance (g)
     # (note this is not the full calculation, which will be completed within the
     # non-linear program)
-    MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + 4.1 * (body_weight - conceptus_weight) ** 0.5
+    MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
+        4.1 * (body_weight - conceptus_weight) ** 0.5
     # Growth Requirement
     # ---------------------
     # [A.Cow.B.2]-[A.Heifer.B.2]
@@ -637,7 +660,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     if average_daily_gain == 0:
         NPg = 0
     else:
-        NPg = average_daily_gain * (268 - 29.4 * (net_energy_growth / average_daily_gain))
+        NPg = average_daily_gain * \
+            (268 - 29.4 * (net_energy_growth / average_daily_gain))
     # [A.Cow.B.3]-[A.Heifer.B.3]
     # Efficiency of converting metabolizable protein to net protein
     if equivalent_shrunk_body_weight <= 478:
@@ -654,7 +678,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     if day_of_pregnancy == None:
         MPpreg = 0
     elif day_of_pregnancy > 190:
-        MPpreg = (0.69 * day_of_pregnancy - 69.2) * (calf_birth_weight / (45 * 0.33))
+        MPpreg = (0.69 * day_of_pregnancy - 69.2) * \
+            (calf_birth_weight / (45 * 0.33))
     else:
         MPpreg = 0
     # Lactation Requirement
@@ -738,7 +763,7 @@ def calculate_NASEM_protein_requirements(lactating: bool | None, body_weight: fl
     TargetEffMP = 0.69
     if lactating:  # TODO better mimic logic from NRC if computationally superior
         metabolizable_protein_requirement = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
-                  TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100 # final div/100 is correcting the units g/kg
+                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100  # final div/100 is correcting the units g/kg
     else:
         metabolizable_protein_requirement = (NPscurf + NPMFP) / TargetEffMP + \
             (NPGest/0.33) + (NPGrowth/0.40) + NPEndUrin
@@ -798,14 +823,16 @@ def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: f
         Ca_main = 0.0154*body_weight + 0.08*(body_weight/100)
     # [A.Cow.C.2]-[A.Heifer.C.2]
     # Calcium growth requirement (g)
-    Ca_growth = 9.83 * mature_body_weight ** 0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
+    Ca_growth = 9.83 * mature_body_weight ** 0.22 * \
+        body_weight ** (-0.22) * (average_daily_gain / 0.96)
     # [A.Cow.C.3]-[A.Heifer.C.3]
     # Calcium pregnancy requirement (g)
     if day_of_pregnancy == None:
         Ca_preg = 0
     elif day_of_pregnancy > 190:
         Ca_preg = 0.02456 * math.exp((0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy) - 0.02456 * \
-            math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+            math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1))
+                     * (day_of_pregnancy - 1))
     else:
         Ca_preg = 0
     if animal_type == 'cow':
@@ -860,12 +887,14 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
         National Academic Press, Chapter 7 "Minerals" pp. 106-110, 2021.
     """
     Ca_Maint = 0.90*dry_matter_intake_estimate
-    Ca_Growth = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22)*average_daily_gain
+    Ca_Growth = ((9.83 * mature_body_weight**-0.22) *
+                 body_weight**-0.22)*average_daily_gain
     if day_of_pregnancy == None:
         Ca_Preg = 0
     else:
         Ca_Preg = 0.02456 * math.exp((0.05581-0.00007*day_of_pregnancy)*day_of_pregnancy) - 0.02456 * \
-            math.exp((0.05581-0.00007*(day_of_pregnancy-1)) * (day_of_pregnancy - 1)) * (body_weight/715)
+            math.exp((0.05581-0.00007*(day_of_pregnancy-1)) *
+                     (day_of_pregnancy - 1)) * (body_weight/715)
     if milk_true_protein == None:
         milk_true_protein = 0
     if milk_production == None:
@@ -875,8 +904,8 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
     return calcium_requirement
 
 
-def calculate_NRC_P_requirements(body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, milk_production: float | None, animal_type: str,
-                                 average_daily_gain: float) -> float:
+def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, milk_production: float | None, animal_type: str,
+                                          average_daily_gain: float) -> float:
     """ Calculates total Phosphorus requirement according to NRC (2001).
 
     Calculates the estimated the total phosphorus requirement (P) in grams per day
@@ -911,12 +940,14 @@ def calculate_NRC_P_requirements(body_weight: float, mature_body_weight: float, 
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
         Chapter 6 "Minerals",pp. 109-118. 2001
     """
-    P_growth = (1.2 + 4.635 * mature_body_weight ** 0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+    P_growth = (1.2 + 4.635 * mature_body_weight ** 0.22 *
+                body_weight ** (-0.22)) * (average_daily_gain / 0.96)
     if day_of_pregnancy == None:
         P_preg = 0
     elif day_of_pregnancy > 190:
         P_preg = 0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy) - 0.02743 * \
-            math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+            math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1))
+                     * (day_of_pregnancy - 1))
     else:
         P_preg = 0
     if animal_type == 'cow':
@@ -928,8 +959,8 @@ def calculate_NRC_P_requirements(body_weight: float, mature_body_weight: float, 
     return phosphorus_requirement
 
 
-def calculate_NASEM_P_requirements(body_weight: float, mature_body_weight: float, animal_type: str, day_of_pregnancy: int | None, average_daily_gain: float, dry_matter_intake_estimate: float,
-                                   milk_true_protein: float | None, milk_production: float | None) -> float:
+def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weight: float, animal_type: str, day_of_pregnancy: int | None, average_daily_gain: float, dry_matter_intake_estimate: float,
+                                            milk_true_protein: float | None, milk_production: float | None) -> float:
     """ Calculates total Phosphorus requirement according to NASEM (2021).
 
     Calculates the estimated the total phosphorus requirement (P) in grams per day
@@ -974,12 +1005,14 @@ def calculate_NASEM_P_requirements(body_weight: float, mature_body_weight: float
         P_Maint = 0.8 * dry_matter_intake_estimate + 0.0006 * body_weight
     else:
         P_Maint = 0
-    P_Growth = (1.2+4.635*mature_body_weight**0.22 * body_weight ** -0.22) * average_daily_gain
+    P_Growth = (1.2+4.635*mature_body_weight**0.22 *
+                body_weight ** -0.22) * average_daily_gain
     if day_of_pregnancy == None:
         P_Preg = 0
     else:
         P_Preg = 0.02743 * math.exp(0.05527-0.000075)*day_of_pregnancy - 0.02743 * \
-            math.exp((0.05527-0.000075*(day_of_pregnancy-1))*(day_of_pregnancy-1)*(body_weight / 715))
+            math.exp((0.05527-0.000075*(day_of_pregnancy-1)) *
+                     (day_of_pregnancy-1)*(body_weight / 715))
     if milk_true_protein == None or milk_production == None:
         P_Lact = 0
     else:
@@ -1029,13 +1062,16 @@ def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: in
     """
     if animal_type == 'cow':
         if lactating:
-            fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
+            fat_corrected_milk_kg = (
+                0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
             dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) \
                 * (1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67)))
         else:
-            dry_matter_intake_estimate = ((1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
+            dry_matter_intake_estimate = (
+                (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
     else:
-        dry_matter_intake_estimate = 0  # TODO: Actual calculation for dry_matter_intake_estimate
+        # TODO: Actual calculation for dry_matter_intake_estimate
+        dry_matter_intake_estimate = 0
         # this comment is a holdover from the previous version
     return dry_matter_intake_estimate
 
@@ -1083,13 +1119,16 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
         National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
     """
-    if body_condition_score_5 == None: body_condition_score_5 = 3 #  the typing default doesn't seem to actually set None inputs to 3, at least in the testing framework I'm currently using
+    if body_condition_score_5 == None:
+        # TODO the typing default doesn't seem to actually set None inputs to 3, at least in the testing framework I'm currently using
+        body_condition_score_5 = 3
     if lactating:
         dry_matter_intake_estimate = ((3.7 + parity*5.7)+0.305*net_energy_lactation
-                  + 0.022*body_weight+(-0.689-1.87*parity)*body_condition_score_5) \
+                                      + 0.022*body_weight+(-0.689-1.87*parity)*body_condition_score_5) \
             * (1-(0.212+parity*0.136)*math.exp(-0.053*days_in_milk))
     else:
-        dry_matter_intake_estimate = 0.022*mature_body_weight*(1-math.exp(-1.54*(body_weight/mature_body_weight)))
+        dry_matter_intake_estimate = 0.022*mature_body_weight * \
+            (1-math.exp(-1.54*(body_weight/mature_body_weight)))
         """
         # TODO: implement this by getting NDF_concentration_percentage
             (neutral detergent fiber) from the feeds
@@ -1116,10 +1155,10 @@ def energy_activity_rqmts(body_weight, housing, distance):
     # [A.Cow.A.4]-[A.Heifer.A.5]
     # Net energy for activity requirement caused by grazing system (Mcal)
     if housing == 'Grazing':
-        NEa1 = 0.0012 * body_weight
+        net_energy_activity1 = 0.0012 * body_weight
     else:
-        NEa1 = 0
+        net_energy_activity1 = 0
     # [A.Cow.A.6]-[A.Heifer.A.7]
     # Total net energy for activity requirement (Mcal)
-    NEa = distance * 0.00045 * body_weight + NEa1
-    return NEa
+    net_energy_activity = distance * 0.00045 * body_weight + net_energy_activity1
+    return net_energy_activity
