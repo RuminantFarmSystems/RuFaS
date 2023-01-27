@@ -212,8 +212,8 @@ class HeiferII(HeiferI):
 		Calculates this heiferII's nutrient requirements.
 		"""
         req = calc_rqmts(self.body_weight, self.mature_body_weight, self.days_in_preg,
-					           animal_type = 'heifer', BCS5 = 3, PrevTemp = temp,
-							ADG_heifer = self.daily_growth, Age = self.days_born
+					           animal_type = 'heifer', body_condition_score_5 = 3, previous_temperature = temp,
+							average_daily_gain_heifer = self.daily_growth, Age = self.days_born
 					)
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
