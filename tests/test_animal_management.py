@@ -5,20 +5,16 @@ Description: Implements test cases for the AnimalManagement class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
-import pytest
+from typing import List, Dict, Union, Any
 from unittest.mock import MagicMock, patch
+
+import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.output_manager import OutputManager
-
-from typing import List, Dict, Union
-
-import io
-import sys
 
 
-def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
+def create_mock_object_list(attribute_dicts: List[Dict[str: Any]]) -> List[MagicMock]:
     mock_object_list = []
 
     for attribute_dict in attribute_dicts:
@@ -36,16 +32,36 @@ def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
 def mock_pens() -> List[MagicMock]:
     pen_attribute_dicts = [
         {
+            "id": 0,
             "vertical_dist_to_parlor": 1.0,
-            "horizontal_dist_to_parlor": 2.0
+            "horizontal_dist_to_parlor": 2.0,
+            "stocking_density": 1.075,
+            "num_stalls": 200,
+            "animals_in_pen": []
         },
         {
+            "id": 1,
             "vertical_dist_to_parlor": 5.0,
-            "horizontal_dist_to_parlor": 10.0
+            "horizontal_dist_to_parlor": 10.0,
+            "stocking_density": 1.075,
+            "num_stalls": 50,
+            "animals_in_pen": []
         },
         {
+            "id": 2,
             "vertical_dist_to_parlor": 4.0,
-            "horizontal_dist_to_parlor": 8.0
+            "horizontal_dist_to_parlor": 8.0,
+            "stocking_density": 1.075,
+            "num_stalls": 200,
+            "animals_in_pen": []
+        },
+        {
+            "id": 3,
+            "vertical_dist_to_parlor": 2.0,
+            "horizontal_dist_to_parlor": 4.0,
+            "stocking_density": 1.075,
+            "num_stalls": 200,
+            "animals_in_pen": []
         },
     ]
 
@@ -112,6 +128,26 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "max_stocking_density": 1.2
         }
     }
+
+
+@pytest.fixture()
+def mock_animals_small() -> List[MagicMock]:
+    animal_attribute_dicts = [
+        {
+            "body_weight": 5.0,
+            "p_animal": 7.0
+        },
+        {
+            "body_weight": 1.0,
+            "p_animal": 8.0
+        },
+        {
+            "body_weight": 2.0,
+            "p_animal": 1.0
+        },
+    ]
+
+    return create_mock_object_list(animal_attribute_dicts)
 
 
 @pytest.fixture
@@ -217,7 +253,7 @@ def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture
     animal_management.life_cycle_manager.initialize_herd.assert_called_once()
 
 
-def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: MockerFixture):
+def test_print_animal_num_warnings(animal_management: AnimalManagement):
     """Unit test for function _print_animal_num_warnings in file routines/animal/animal_management.py"""
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
             patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -267,7 +303,7 @@ def test_avg_pen_dist(animal_management_with_mock_pens: AnimalManagement) -> Non
     """Unit test for function avg_pen_dist in file routines/animal/animal_management.py"""
 
     actual = animal_management_with_mock_pens.avg_pen_dist()
-    expected = (10 / 3, 20 / 3)
+    expected = (12 / 4, 24 / 4)
 
     assert actual == pytest.approx(expected)
 
@@ -282,9 +318,45 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
-def test_remove_animals_from_herd():
+# install flake 8
+# make them different sizes
+@pytest.fixture()
+def animal_ids_in_pens():
+    return [
+        {"ids_in_pen": [128382, 173829, 183920, 113803, 120462], "removal_ids": [113803],
+         "expected_stocking_density": 1.075},
+        {"ids_in_pen": [149495, 189237, 128193, 145927, 156253], "removal_ids": [145927],
+         "expected_stocking_density": 1.075},
+        {"ids_in_pen": [161832, 182729, 162719, 152394, 182938], "removal_ids": [152394],
+         "expected_stocking_density": 1.075},
+        {"ids_in_pen": [2178392, 182738, 128374, 101239, 118389], "removal_ids": [101239],
+         "expected_stocking_density": 1.075},
+    ]
+
+
+def test_remove_animals_from_herd(animal_management_with_mock_pens: AnimalManagement, mock_animals_big: List[MagicMock],
+                                  mock_pens: List[MagicMock], animal_ids_in_pens) -> None:
     """Unit test for function remove_animals_from_herd in file routines/animal/animal_management.py"""
-    pass
+
+    expected = animal_ids_in_pens()
+    # create a pen ( mocked or real) based on the ids in pen, then call the function with removal ids from dictionary above
+    # then calculate the stocking densitys and check if they match the expected ones in the dictionary above
+    # I will need to go inside that pen and make sure that the list of IDs and make sure that the removed IDs are gone
+    # This will also be checked from looking at the expected mapping dictionary and the one returned after the function
+
+    # reach out to Doctor Reed about the animals_in_pen variable never being removed
+    animal_management_with_mock_pens.animal_to_pen_id_map = test_mapping_dict
+
+    animal_management_with_mock_pens.remove_animals_from_herd(removal_list)
+
+    for id in removed_ids:
+        del expected[id]
+
+    assert animal_management_with_mock_pens.animal_to_pen_id_map == expected
+    assert mock_pens[0].stocking_density == 0.02
+    assert mock_pens[1].stocking_density == 0.08
+    assert mock_pens[2].stocking_density == 0.02
+    assert mock_pens[3].stocking_density == 0.02
 
 
 def test_track_former_pen_population():
@@ -346,33 +418,13 @@ def test_record_pen_history():
     pass
 
 
-@pytest.fixture
-def mock_animals() -> List[MagicMock]:
-    animal_attribute_dicts = [
-        {
-            "body_weight": 5.0,
-            "p_animal": 7.0
-        },
-        {
-            "body_weight": 1.0,
-            "p_animal": 8.0
-        },
-        {
-            "body_weight": 2.0,
-            "p_animal": 1.0
-        },
-    ]
-
-    return create_mock_object_list(animal_attribute_dicts)
-
-
-def test_calc_p_conc(mock_animals: List[MagicMock]) -> None:
+def test_calc_p_conc(mock_animals_small: List[MagicMock]) -> None:
     """Unit test for function _calc_p_conc in file routines/animal/animal_management.py"""
     expected = 0
     actual = AnimalManagement._calc_p_conc([])
     assert actual == expected
 
-    actual = AnimalManagement._calc_p_conc(mock_animals)
+    actual = AnimalManagement._calc_p_conc(mock_animals_small)
     expected = (16.0 / 8.0) / 1000.0
 
     assert actual == pytest.approx(expected)
