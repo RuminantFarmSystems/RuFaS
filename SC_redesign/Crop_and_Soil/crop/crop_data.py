@@ -2,12 +2,28 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 
-@dataclass
+
+
+@dataclass(kw_only=True, slots=True)
 class CropData:
+    """Data class containing crop variables.
+
+    Details:
+      The kw_only=True argument of the @dataclass decorator specifies that this class' attributes can only be initialized
+      with values other than defaults by explicitly including the keyword (i.e, positional arguments are disabled).
+      For example CropData() will initialize with the default light_extinction value (0.65),
+      CropData(light_extinction=0.7) will initialize with the vallue set to 0.7, but CropData(0.65) will not work.
+      The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
+      but will have its values set to different defaults.
+
+      The slots=True argument sets up the data class so that memory is pre-allocated for the instance. This means that
+      only the declared attributes can exist. This also means that the __dict__ attribute does not exist by default,
+      but a dictionary can still be easily created with dataclasses.asdict().
+    """
     # ---- biomass allocation
     light_extinction: float = 0.65
     """the light extinction coefficient (unitless)"""
-    leaf_area_index: float = 1.2
+    leaf_area_index: float = 0.0
     """leaf area index of the plant (unitless)"""
     light_use_efficiency: float = 20
     """light use efficiency of the plant (dg/MJ)"""
@@ -265,3 +281,69 @@ class CropData:
     def is_in_senescence(self) -> bool:
         """check if the plant is in senescence"""
         return self.heat_fraction > self.senescent_heat_fraction
+
+
+"""
+The species child classes provide default configuration for the supported CropSpecies. 
+Only values that differ from the default CropData need to be declared by default in these species classes.
+
+Users should be able also be able to modify specific variables by including them in the signature when calling
+the species classes.
+
+Attribute values are taken from the SWAT database: https://swat.tamu.edu/media/69419/Appendix-A.pdf
+This "database" is actually a PDF with tables for broad groupings of paramters. Therefore, the
+attributes in this class are grouped in line with those tables, for ease of entering the data.
+"""
+
+# TODO: implement child classes
+@dataclass(kw_only=True)
+class Corn(CropData):
+    """crop data class with default values for corn"""
+
+@dataclass(kw_only=True)
+class Alfalfa(CropData):
+    """crop data class with default values for alfalfa"""
+
+@dataclass(kw_only=True)
+class CerealRye(CropData):
+    """crop data class with default values for cereal rye"""
+
+@dataclass(kw_only=True)
+class FallOats(CropData):
+    """crop data class with default values for fall oats"""
+
+@dataclass(kw_only=True)
+class Potato(CropData):
+    """crop data class with default values for potato"""
+
+@dataclass(kw_only=True)
+class SoyBean(CropData):
+    """crop data class with default values for soy bean"""
+
+@dataclass(kw_only=True)
+class SpringBarley(CropData):
+    """crop data class with default values for spring barley"""
+
+@dataclass(kw_only=True)
+class SpringWheat(CropData):
+    """crop data class with default values for spring wheat"""
+
+@dataclass(kw_only=True)
+class SugarBeet(CropData):
+    """crop data class with default values for sugar beet"""
+
+@dataclass(kw_only=True)
+class TallFescue(CropData):
+    """crop data class with default values for tall fescue"""
+
+@dataclass(kw_only=True)
+class Triticale(CropData):
+    """crop data class with default values for triticale"""
+
+@dataclass(kw_only=True)
+class WinterWheat(CropData):
+    """crop data class with default values for winter wheat"""
+
+
+
+
