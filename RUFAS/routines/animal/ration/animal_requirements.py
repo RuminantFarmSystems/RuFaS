@@ -79,12 +79,12 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None, TP_Milk=None, Fat
         DMIest = calculate_NASEM_DMI(BW, MW, DIM, lactating, NEl, parity, BCS5)
         NEmaint, GrUterW, UterW = calculate_NASEM_energy_maintenance_requirements(
             BW, MW, DOP, DIM)
-        NEg, ADG, Frame_Weight_Gain_g = calculate_NASEM_energy_growth_requirements(
+        NEg, ADG, frame_weight_gain = calculate_NASEM_energy_growth_requirements(
             BW, MW, ADG_heifer, animal_type, parity, CI)
         NEpreg, GrUterWGain = calculate_NASEM_energy_pregnancy_requirements(
             lactating, DOP, DIM, GrUterW, UterW)
         MP_req = calculate_NASEM_protein_requirements(
-            lactating, BW, Frame_Weight_Gain_g, GrUterWGain, DMIest, TP_Milk, Milk)
+            lactating, BW, frame_weight_gain, GrUterWGain, DMIest, TP_Milk, Milk)
         Ca_req = calculate_NASEM_calcium_requirements(
             BW, MW, DOP, ADG, DMIest, TP_Milk, Milk)
         P_req = calculate_NASEM_P_requirements(
@@ -213,8 +213,8 @@ def calculate_NASEM_energy_maintenance_requirements(BW: float, MW: float, DOP: i
 
 
 def calculate_NRC_energy_activity_requirements():
-    """ TODO refactor existing energy activity requirements function here
-    #   Same as NRC (2021) included: NEa = distance * 0.00035 * BW
+    """ TODO refactor existing separate energy activity requirements function here?
+    #   e.g., NEa = distance * 0.00035 * BW
     """
     pass
 
@@ -369,7 +369,7 @@ def calculate_NASEM_energy_growth_requirements(BW: float, MW: float, ADG_heifer:
         Net energy requirement for frame growth (Mcal/d)
     ADG : float
         Average daily gain (grams per day)
-    Frame_Weight_Gain_g : float
+    frame_weight_gain : float
         Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day)
 
     Notes
@@ -386,7 +386,7 @@ def calculate_NASEM_energy_growth_requirements(BW: float, MW: float, ADG_heifer:
     """
     MSBW = 0.96 * MW
     # TODO Edward: check this logic. We hashed it out early on,
-    #  but I want to be sure that it's correct for parity =0 or >2
+    #  but I want to be sure that it's correct for parity = 0 or parity > 2
     if animal_type == 'cow':
         if parity == 1 and CI != 0:
             ADG = ((0.92 - 0.82) * MSBW) / CI
@@ -403,11 +403,11 @@ def calculate_NASEM_energy_growth_requirements(BW: float, MW: float, ADG_heifer:
         ADG = 0.0001  # TODO fix to avoid divide by 0 error
     FatADG = (0.067 + 0.375*(BW/MW))*EBG/ADG
     ProtADG = (0.201 - 0.081*(BW/MW))*EBG/ADG
-    Frame_Weight_Gain_g = FatADG + ProtADG
+    frame_weight_gain = FatADG + ProtADG
     REFADG = (9.4*FatADG + 5.55*ProtADG)*ADG
     MEFrameADG = REFADG/0.4  # Possible future use for this calc, see docstring notes
     NEg = REFADG/0.61
-    return NEg, ADG, Frame_Weight_Gain_g
+    return NEg, ADG, frame_weight_gain
 
 
 def calculate_NRC_energy_pregnancy_requirements(DOP: int | None, CBW: float | None) -> float:
@@ -686,7 +686,7 @@ def calculate_NRC_protein_requirements(BW: float, CW: float, DOP: int | None, an
     return MP_req
 
 
-def calculate_NASEM_protein_requirements(lactating: bool | None, BW: float, Frame_Weight_Gain_g: float, GrUterWGain: float,
+def calculate_NASEM_protein_requirements(lactating: bool | None, BW: float, frame_weight_gain: float, GrUterWGain: float,
                                          DMIest: float, TP_Milk: float | None, Milk: float | None) -> float:
     """ Calculates Protein requirement for maintenance according to NASEM (2021).
 
@@ -698,7 +698,7 @@ def calculate_NASEM_protein_requirements(lactating: bool | None, BW: float, Fram
         Physiological condition
     BW : float
         Body weight (kilograms)
-    Frame_Weight_Gain_g : float
+    frame_weight_gain : float
         Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day)
     GrUterWGain : float
         Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
@@ -739,7 +739,7 @@ def calculate_NASEM_protein_requirements(lactating: bool | None, BW: float, Fram
     # amount, conc = ration_report(self.ration, feed.available_feeds)
     CPMFP = (11.62+0.134*NDF_conc)*DMIest
     NPMFP = CPMFP*0.73
-    NPGrowth = Frame_Weight_Gain_g*0.11*0.86
+    NPGrowth = frame_weight_gain*0.11*0.86
     NPGest = GrUterWGain * 125
     if TP_Milk is None:
         TP_Milk = 0
@@ -749,12 +749,11 @@ def calculate_NASEM_protein_requirements(lactating: bool | None, BW: float, Fram
     NPMilk = TP_Milk*Milk*1000
     TargetEffMP = 0.69
     if lactating:  # TODO better mimic logic from NRC if computationally superior
-        MP_req = ((NPscurf + NPMFP + NPMilk + NPGrowth) /
-                  TargetEffMP) + (NPGest/0.33) + NPEndUrin
+        MP_req = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
+                  TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100 # final div/100 is correcting the units g/kg
     else:
         MP_req = (NPscurf + NPMFP) / TargetEffMP + \
             (NPGest/0.33) + (NPGrowth/0.40) + NPEndUrin
-    MP_req = MP_req/100  # correcting the units g/kg
     return MP_req
 
 
@@ -1055,7 +1054,7 @@ def calculate_NRC_DMI(animal_type: str, BW: float, DOP: int, DIM: int | None,
 
 def calculate_NASEM_DMI(BW: float, MW: float, DIM: int | None,
                         lactating: bool | None, NEl: float,
-                        parity: int | None, BCS5: int = 3) -> float:
+                        parity: int | None, BCS5: int | None = 3) -> float:
     """ Calculates dry matter intake according to NASEM (2021).
 
     Calculates the estimated total dry matter intake in kilograms per day
@@ -1098,6 +1097,7 @@ def calculate_NASEM_DMI(BW: float, MW: float, DIM: int | None,
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
         National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
     """
+    if BCS5 == None: BCS5 = 3 #  the typing default doesn't seem to actually set None inputs to 3, at least in the testing framework I'm currently using
     if lactating:
         DMIest = ((3.7 + parity*5.7)+0.305*NEl
                   + 0.022*BW+(-0.689-1.87*parity)*BCS5) \
