@@ -201,6 +201,8 @@ class CropData:
     """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
     """water deficiency factor for the plant (unitless)"""
+    max_transpiration: Optional[float] = None
+    """maximum transpiration on a given day (mm)"""
     
     # ---- yields
     # constant attributes
