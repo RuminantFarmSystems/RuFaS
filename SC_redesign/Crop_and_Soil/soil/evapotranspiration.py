@@ -60,26 +60,6 @@ class Evapotranspiration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
-    # def update_all(soil, crop, weather, time) -> None:
-    #     """
-    #     Description:
-    #         This function calls all the necessary functions to update information related
-    #         to evapotranspiration
-    #     Args:
-    #         soil: instance of the Soil class specified in soil.py
-    #         crop: instance of the Crop class specified in crop.py
-    #         weather: instance of the Weather class specified in classes.py
-    #         time: instance of the Time class specified in classes.py
-    #     """
-    #     for crop_types in crop.current_crop.values():
-    #         calc_potential_evap(soil, weather, time)
-    #
-    #         calc_crop_transpiration(soil, crop_types)
-    #
-    #         calc_soil_evap(soil, crop_types)
-    #
-    #         update_evap_z(soil)
-
     # --- main routine ---
     def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
                          avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float) \
@@ -142,28 +122,6 @@ class Evapotranspiration:
         """
         return 2.501 - ((2.361 * (10 ** (-3))) * avg_air_temp)
 
-    # @TODO: this should be in the crop module, not soil
-    # def calc_crop_transpiration(soil, crop_type):
-    #     """
-    #     Description:
-    #         Calculates crop transpiration as a function of maximum transpiration on a
-    #         given day and Leaf Area Index (calculated in the Crop Routine file
-    #         leaf_area_index.py)
-    #         "pseudocode_soil" S.2.B.3
-    #
-    #     Args:
-    #         soil: instance of Soil class
-    #         crop: instance of Crop type class
-    #     """
-    #
-    #     LAI = crop_type.LAI_actual
-    #     # print(LAI)
-    #     if 0 <= LAI <= 3.0:
-    #         soil.trans_max = 0
-    #         soil.trans_max = (soil.ET_max * LAI) / 3.0
-    #     else:
-    #         soil.trans_max = soil.ET_max
-
     @staticmethod
     def _determine_soil_evaporation(above_ground_biomass: float, residue: float, snow_water_content: float,
                                     potential_evapotranspiration_adjusted: float, transpiration: float) -> float:
@@ -191,23 +149,6 @@ class Evapotranspiration:
                                            (max_soil_evaporation + transpiration))
                                           )
         return actual_max_soil_evaporation
-
-    # def calc_soil_cov(soil, crop_type):
-    #     """
-    #     Description:
-    #         Calculates soil cover for use in calculating soil evaporation
-    #         "pseudocode_soil" S.2.B.5
-    #
-    #     Args:
-    #         soil: instance of Soil class
-    #         crop: instance of Crop type class
-    #     """
-    #
-    #     bio_AG = crop_type.bio_AG
-    #     residue = soil.residue
-    #     bio_mass = bio_AG + residue
-    #
-    #     return exp(-5.0 * (10 ** -5) * bio_mass)
 
     @staticmethod
     def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
