@@ -263,24 +263,24 @@ def test_calculate_NRC_calcium_requirements(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_Ca_req) == pytest.approx((17.5), rel=1e-1)
 
 
-def test_calculate_NRC_P_requirements(cow_a, cow_b, heifer_a, heifer_b):
-    """Unit test for function calculate_NRC_P_requirements in file routines/animal/ration/animal_requirements.py"""
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_P_requirements(
+def test_calculate_NRC_phosphorus_requirements(cow_a, cow_b, heifer_a, heifer_b):
+    """Unit test for function calculate_NRC_phosophorus_requirements in file routines/animal/ration/animal_requirements.py"""
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], cow_a['Milk'],
         cow_a['animal_type'], 1)
     assert (result_P_req) == pytest.approx((33), rel=1e-1)
 
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_P_requirements(
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['day_of_pregnancy'], cow_b['Milk'],
         cow_b['animal_type'], 1)
     assert (result_P_req) == pytest.approx((29), rel=1e-1)
 
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_P_requirements(
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['Milk'],
         heifer_a['animal_type'], 1)
     assert (result_P_req) == pytest.approx((7.5), rel=1e-1)
 
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_P_requirements(
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['Milk'],
         heifer_b['animal_type'], 1)
     assert (result_P_req) == pytest.approx((6.9), rel=1e-1)
@@ -478,24 +478,24 @@ def test_calculate_NASEM_calcium_requirements(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
 
 
-def test_calculate_NASEM_P_requirements(cow_a, cow_b, heifer_a, heifer_b):
-    """Unit test for function calculate_NASEM_P_requirements in file routines/animal/ration/animal_requirements.py"""
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_P_requirements(
+def test_calculate_NASEM_phosphorus_requirements(cow_a, cow_b, heifer_a, heifer_b):
+    """Unit test for function calculate_NASEM_phosphorus_requirements in file routines/animal/ration/animal_requirements.py"""
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['animal_type'], cow_a['day_of_pregnancy'], 1, 20,
         cow_a['milk_protein'], cow_a['Milk'])
     assert (result_P_req) == pytest.approx((55), rel=1e-1)
 
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_P_requirements(
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['animal_type'], cow_b['day_of_pregnancy'], 1, 8,
         cow_b['milk_protein'], cow_b['Milk'])
     assert (result_P_req) == pytest.approx((28), rel=1e-1)
 
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_P_requirements(
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['animal_type'], heifer_a['day_of_pregnancy'], 1, 7,
         heifer_a['milk_protein'], heifer_a['Milk'])
     assert (result_P_req) == pytest.approx((13), rel=1e-1)
 
-    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_P_requirements(
+    result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['animal_type'], heifer_b['day_of_pregnancy'], 1, 7,
         heifer_b['milk_protein'], heifer_b['Milk'])
     assert (result_P_req) == pytest.approx((12.4), rel=1e-1)
