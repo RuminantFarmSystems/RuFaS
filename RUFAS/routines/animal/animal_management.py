@@ -237,14 +237,18 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._print_animal_num_warnings.__name__, }
+            "function": self._print_animal_num_warnings.__name__,
+            "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys}
+        }
 
         counter = 0
 
         if not self.simulate_animals:
-            animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+
             for key in animal_keys:
                 if herd_data[key] != 0:
                     om.add_warning(f"invalid_{key}_warning",
@@ -438,7 +442,8 @@ class AnimalManagement:
                     available_feeds = ration_driver.AvailableFeeds()
                     available_feeds.feed_nutrients(feed)
                     self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
-                    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(self.all_pens[i].allocated_feeds)
+                    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(
+                        self.all_pens[i].allocated_feeds)
                     self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
             else:
                 if len(self.all_pens[i].animals_in_pen) > 0:
@@ -448,7 +453,7 @@ class AnimalManagement:
                         if key != 'status' and key != 'objective' and pen_population_before_additions[i] > 0:
                             self.all_pens[i].ration[key] = \
                                 (self.all_pens[i].ration[key] /
-                                    pen_population_before_additions[i]) * len(
+                                 pen_population_before_additions[i]) * len(
                                     self.all_pens[i].animals_in_pen)
 
         for calf in calves_born:
@@ -765,7 +770,8 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(
+                a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
