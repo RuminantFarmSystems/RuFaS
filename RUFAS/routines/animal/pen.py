@@ -16,6 +16,8 @@ import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS import util, errors
 from enum import Enum
+from typing import DefaultDict, Any
+
 
 om = OutputManager()
 
@@ -317,14 +319,14 @@ class Pen:
         # updates the animal class this pen holds
         self.animal_combination = animal_combination
 
-    def calc_ration(self, feed, available_feeds):
+    def calc_ration(self, feed, available_feeds: DefaultDict[Any, Any]):
         """
         Calculates and sets the ration for the pen using the average nutrient
         requirements of the animals in the pen.
 
         Args:
             feed: instance of the Feed class
-            available_feeds: instance of the AvailableFeeds class defined in ration_driver.py
+            available_feeds: a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
         """
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
@@ -382,9 +384,11 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
-        
+                
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__, }
+                    "function": self.calc_ration.__name__, 
+                    "feed": vars(feed),
+                    "available_feeds": available_feeds, }
         om.add_variable("pen_ration_data", ration, info_map)
 
         return ration
@@ -447,7 +451,8 @@ class Pen:
         self.dry_total = dry_total
         self.lactating_total = lactating_total
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure.__name__, }
+                    "function": self.calc_manure.__name__, 
+                    "feed": vars(feed)}
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
