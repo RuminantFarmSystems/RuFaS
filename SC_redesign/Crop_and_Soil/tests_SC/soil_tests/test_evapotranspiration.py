@@ -1,7 +1,7 @@
 import pytest
 
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import *
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 
 # --- static function tests ---
@@ -126,6 +126,7 @@ def test_determine_evaporative_demand(max_soil_water_evap, layer_data):
                                                    exp(2.374 - (0.00713 * layer_data.bottom_depth))))
     assert (expect_bottom_demand - (expect_top_demand * layer_data.esco)) == observe
 
+
 @pytest.mark.parametrize("max_soil_water_evap, layer_data", [
     (1, LayerData(top_depth=None, bottom_depth=2)),
     (1, LayerData(top_depth=-1.2, bottom_depth=4)),
@@ -135,6 +136,41 @@ def test_determine_evaporative_demand(max_soil_water_evap, layer_data):
 def test_determine_evaporative_demand_error(max_soil_water_evap, layer_data):
     with pytest.raises(Exception):
         Evapotranspiration._determine_evaporative_demand(max_soil_water_evap, layer_data)
+
+
+@pytest.mark.parametrize("evap_demand,layer_data", [
+    (0.3, LayerData(top_depth=0, bottom_depth=3)),
+    (0.8, LayerData(top_depth=2, bottom_depth=8, soil_water_content=1.8, field_capacity_water_content=1.6,
+                    wilting_point_water_content=0.9)),
+    (1.4, LayerData(top_depth=4, bottom_depth=12, soil_water_content=1.1, field_capacity_water_content=2,
+                    wilting_point_water_content=1)),
+    (1.1, LayerData(top_depth=0, bottom_depth=15, soil_water_content=2.3, field_capacity_water_content=2.5,
+                    wilting_point_water_content=0.3)),
+])
+def test_determine_evaporative_demand_reduced(evap_demand, layer_data):
+    observe = Evapotranspiration._determine_evaporative_demand_reduced(evap_demand, layer_data)
+    if layer_data.soil_water_content < layer_data.field_capacity_water_content:
+        expect = evap_demand * exp((2.5 * (layer_data.soil_water_content - layer_data.field_capacity_water_content)) /
+                                   (layer_data.field_capacity_water_content - layer_data.wilting_point_water_content))
+    else:
+        expect = evap_demand
+    assert expect == observe
+
+
+@pytest.mark.parametrize("reduced_evap_demand,layer", [
+    (0.2, LayerData(top_depth=0, bottom_depth=3)),
+    (0.5, LayerData(top_depth=2, bottom_depth=8, soil_water_content=1.8, field_capacity_water_content=1.6,
+                    wilting_point_water_content=0.9)),
+    (1.8, LayerData(top_depth=4, bottom_depth=12, soil_water_content=1.1, field_capacity_water_content=2,
+                    wilting_point_water_content=1)),
+    (1.1, LayerData(top_depth=0, bottom_depth=15, soil_water_content=2.3, field_capacity_water_content=2.5,
+                    wilting_point_water_content=0.3)),
+])
+def test_determine_amount_water_removed(reduced_evap_demand, layer):
+    observe = Evapotranspiration._determine_amount_water_removed(reduced_evap_demand, layer)
+    expect = min(reduced_evap_demand, 0.8 * (layer.soil_water_content - layer.wilting_point_water_content))
+    assert expect == observe
+
 
 # --- helper function tests ---
 @pytest.mark.parametrize("initial_canopy_water", [
@@ -172,7 +208,9 @@ def test_determine_potential_evapotranspiration_adjusted(initial_canopy_water):
 def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
                           snow_water, initial_canopy_water):
     # initialize objects
-    data = SoilData(transpiration=0.4325)
+    data = SoilData(transpiration=0.4325, soil_layers=[LayerData(top_depth=0, bottom_depth=5, nitrate=0.5),
+                                                       LayerData(top_depth=5, bottom_depth=8, nitrate=1),
+                                                       LayerData(top_depth=8, bottom_depth=20, nitrate=5)])
     assert data.transpiration == 0.4325
     incorp = Evapotranspiration(data)
 
@@ -195,3 +233,50 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
     assert data.potential_evapotranspiration_adjusted == 1.354
     assert data.soil_evaporation_adjusted == 2.845
     assert data.maximum_soil_evaporation == 2.195
+
+
+@pytest.mark.parametrize("layers", [
+    [LayerData(top_depth=0, bottom_depth=4, soil_water_content=1.8, field_capacity_water_content=1.6,
+               wilting_point_water_content=0.9),
+     LayerData(top_depth=4, bottom_depth=12, soil_water_content=0.9, field_capacity_water_content=1.2,
+               wilting_point_water_content=0.8),
+     LayerData(top_depth=12, bottom_depth=20, soil_water_content=0.8, field_capacity_water_content=0.8,
+               wilting_point_water_content=0.3)],
+    [LayerData(top_depth=0, bottom_depth=3, soil_water_content=2.8, field_capacity_water_content=2.3,
+               wilting_point_water_content=1.8),
+     LayerData(top_depth=3, bottom_depth=15, soil_water_content=1.9, field_capacity_water_content=1.8,
+               wilting_point_water_content=0.8),
+     LayerData(top_depth=15, bottom_depth=22, soil_water_content=0.8, field_capacity_water_content=1,
+               wilting_point_water_content=0.2)],
+    [LayerData(top_depth=0, bottom_depth=8, soil_water_content=2.3, field_capacity_water_content=2.9,
+               wilting_point_water_content=1.8),
+     LayerData(top_depth=8, bottom_depth=20, soil_water_content=1.4, field_capacity_water_content=1.8,
+               wilting_point_water_content=0.8),
+     LayerData(top_depth=20, bottom_depth=22, soil_water_content=0.8, field_capacity_water_content=1,
+               wilting_point_water_content=0.6)],
+])
+def test_evaporate_from_soil(layers):
+    # initialize objects
+    soildata = SoilData(soil_layers=layers)
+    assert soildata.soil_layers == layers
+    incorp = Evapotranspiration(soildata)
+
+    # mock helper functions
+    incorp._determine_evaporative_demand = MagicMock(return_value=0.8)
+    incorp._determine_evaporative_demand_reduced = MagicMock(return_value=0.6)
+    incorp._determine_amount_water_removed = MagicMock(return_value=0.5)
+
+    # record expected values
+    expect = []
+    for layer in layers:
+        expect.append(layer.soil_water_content - 0.5)
+
+    # run function
+    incorp.evaporate_from_soil()
+
+    # make sure values match
+    assert incorp._determine_evaporative_demand.call_count == len(layers)
+    assert incorp._determine_evaporative_demand_reduced.call_count == len(layers)
+    assert incorp._determine_amount_water_removed.call_count == len(layers)
+    for i in range(len(layers)):
+        assert expect[i] == incorp.data.soil_layers[i].soil_water_content
