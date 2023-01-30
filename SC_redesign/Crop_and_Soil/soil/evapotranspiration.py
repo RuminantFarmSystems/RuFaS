@@ -62,7 +62,8 @@ class Evapotranspiration:
 
     # --- main routine ---
     def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
-                         avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float) \
+                         avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float,
+                         initial_canopy_free_water: float) \
             -> None:
         """does the evapotranspiration of the soil on a given day
 
@@ -73,12 +74,41 @@ class Evapotranspiration:
             max_air_temp,
             min_air_temp,
             avg_air_temp)
+        self.data.potential_evapotranspiration_adjusted = self._determine_potential_evapotranspiration_adjusted(
+            initial_canopy_free_water)
         self.data.soil_evaporation = self._determine_soil_evaporation(
             above_ground_biomass,
             residue,
             snow_water_content,
             self.data.potential_evapotranspiration_adjusted,
             self.data.transpiration)
+
+    def _determine_potential_evapotranspiration_adjusted(self, initial_canopy_free_water: float) -> float:
+        """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
+
+        Args:
+            initial_canopy_free_water: initial amount of free water held in canopy on a given day
+
+        Returns:
+            potential evapotranspiration adjusted for evaporation of free water in canopy in mm
+
+        SWAT Reference: 2:2.3.1 (Whole section)
+        """
+        if self.data.potential_evapotranspiration < initial_canopy_free_water:
+            """
+            Evaporation from free water in canopy on a given day is set equal to potential evapotranspiration on a given
+            day (2:2.3.1), and the potential evapotranspiration adjusted for evaporation of free water in 
+            canopy is equal to their difference (E'_0 = E_0 - E_CAN = 0)
+            """
+            return 0  # 2:2.3.1
+        else:
+            """
+            Evaporation from free water in canopy on given day is set equal to initial free water in the canopy 
+            (2:2.3.3), and the potential evapotranspiration adjusted for evaporation of free water in copy is equal to 
+            difference between potential evapotranspiration and evaporation from free water in canopy 
+            (E'_0 = E_0 - E_CAN)
+            """
+            return self.data.potential_evapotranspiration - initial_canopy_free_water
 
     # --- static methods ---
     @staticmethod
@@ -88,7 +118,7 @@ class Evapotranspiration:
         """calculates the potential evapotranspiration for a given day
 
         Args:
-            extra_terrestrial_radiation: radiation from the aliens, in MJ m^(-2) d^(-1) @TODO: better description
+            extra_terrestrial_radiation: radiation from the aliens, in MJ m^(-2) d^(-1) TODO: better description
             max_air_temp: maximum air temperature in degrees C
             min_air_temp: minimum air temperature in degrees C
             avg_air_temp: average air temperature in degrees C
@@ -134,7 +164,7 @@ class Evapotranspiration:
             snow_water_content: amount of water from snow in mm
             potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
                 in canopy in mm
-            @TODO: potential evapotranspiration adjusted will need to implemented at a later point, issue #313
+            - TODO: potential evapotranspiration adjusted will need to implemented at a later point, issue #313
             transpiration: transpiration in mm for a given day
         Returns:
             maximum soil evaporation in the day

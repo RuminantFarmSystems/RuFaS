@@ -29,7 +29,7 @@ class WaterDynamics:
         """calculates the maximum transpiration for a given day
 
         Args:
-            leaf_area_index:
+            leaf_area_index: leaf area index of plant, unitless
             potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
             the canopy in mm
              - Note: this value will eventually be calculated in evapotranspiration.py - issue #313

@@ -93,31 +93,59 @@ def test_determine_soil_evaporation(above_ground_biomass, residue, snow_water, p
     Evapotranspiration._determine_soil_cover_index.assert_called_once()
 
 
+# --- helper function tests ---
+@pytest.mark.parametrize("initial_canopy_water", [
+    0.91,
+    0,  # zero
+    1.35,
+    3.99,  # greater than potential evapotranspiration
+])
+def test_determine_potential_evapotranspiration_adjusted(initial_canopy_water):
+    # initialize object
+    data = SoilData(transpiration=0.356)
+    assert data.transpiration == 0.356
+    incorp = Evapotranspiration(data)
+
+    # set needed data field inside object
+    incorp.data.potential_evapotranspiration = 1.4
+
+    # run method
+    observe = incorp._determine_potential_evapotranspiration_adjusted(initial_canopy_water)
+    if initial_canopy_water > 1.4:
+        assert observe == 0
+    else:
+        assert observe == (1.4 - initial_canopy_water)
+
+
 # --- integration tests ---
-@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp,above_ground_mass,residue,snow_water", {
-    (500, 24, 18, 20, 1000, 200, 0.12),
-    (600.398, 28.33, 12.0119, 20.1134, 856, 120, 0.6),  # snowy
-    (1100, 20.334, 8.933, 15.808, 789, 103, 0.08),
-    (300, 10, 0, 3, 0, 0, 0),  # empty field, no snow
-})
+@pytest.mark.parametrize(
+    "extraterrestrial_radiation,max_temp,min_temp,avg_temp,above_ground_mass,residue,snow_water,initial_canopy_water",
+    [
+        (500, 24, 18, 20, 1000, 200, 0.12, 1.01),
+        (600.398, 28.33, 12.0119, 20.1134, 856, 120, 0.6, 1.03),  # snowy
+        (1100, 20.334, 8.933, 15.808, 789, 103, 0.08, 1.3),
+        (300, 10, 0, 3, 0, 0, 0, 0),  # empty field, no snow
+    ])
 def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
-                          snow_water):
+                          snow_water, initial_canopy_water):
     # initialize objects
-    data = SoilData(potential_evapotranspiration_adjusted=2.673, transpiration=0.4325)
-    assert data.potential_evapotranspiration_adjusted == 2.673
+    data = SoilData(transpiration=0.4325)
     assert data.transpiration == 0.4325
     incorp = Evapotranspiration(data)
 
     # mock helper functions
     incorp._determine_potential_evapotranspiration = MagicMock(return_value=1.89)
+    incorp._determine_potential_evapotranspiration_adjusted = MagicMock(return_value=1.354)
     incorp._determine_soil_evaporation = MagicMock(return_value=2.845)
 
     # run method
     incorp.evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
-                            snow_water)
+                            snow_water, initial_canopy_water)
 
     # check results
     incorp._determine_potential_evapotranspiration.assert_called_once()
+    incorp._determine_potential_evapotranspiration_adjusted.assert_called_once()
     incorp._determine_soil_evaporation.assert_called_once()
     assert data.potential_evapotranspiration == 1.89
+    assert data.potential_evapotranspiration_adjusted == 1.354
     assert data.soil_evaporation == 2.845
