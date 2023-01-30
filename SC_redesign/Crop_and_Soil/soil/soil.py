@@ -4,6 +4,7 @@ from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 
 class Soil:
@@ -22,8 +23,11 @@ class Soil:
         self.water_factor = None
 
         # profile layer attributes
-        self.depths = [5, 8, 20]  # arbitrary
-        self.nitrates = [0.5, 1, 5]  # arbitrary
+        self.soil_layers = [LayerData(top_depth=0, bottom_depth=5, nitrate=0.5),
+                            LayerData(top_depth=5, bottom_depth=8, nitrate=1),
+                            LayerData(top_depth=8, bottom_depth=20, nitrate=5)]
+        # self.depths = [5, 8, 20]  # arbitrary
+        # self.nitrates = [0.5, 1, 5]  # arbitrary
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:

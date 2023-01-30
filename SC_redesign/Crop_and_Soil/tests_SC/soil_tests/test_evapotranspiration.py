@@ -82,16 +82,28 @@ def test_determine_soil_evaporation(above_ground_biomass, residue, snow_water, p
     soil_evaporation = potential_evapotrans_adj * soil_cover_index
     reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / (soil_evaporation + transpiration)
     actual_soil_evaporation = min(soil_evaporation, reduced_soil_evaporation)
-    observe = Evapotranspiration._determine_soil_evaporation(above_ground_biomass, residue, snow_water,
-                                                             potential_evapotrans_adj, transpiration)
+    observe = Evapotranspiration._determine_soil_evaporation_adjusted(above_ground_biomass, residue, snow_water,
+                                                                      potential_evapotrans_adj, transpiration)
     assert actual_soil_evaporation == observe
     # Check that _determine_soil_cover_index() is being called once
     # @TODO: write this mock test as a patch so that it can run independent of order, same as above
     Evapotranspiration._determine_soil_cover_index = MagicMock(return_value=2.1)
-    throwaway = Evapotranspiration._determine_soil_evaporation(above_ground_biomass, residue, snow_water,
-                                                               potential_evapotrans_adj, transpiration)
+    throwaway = Evapotranspiration._determine_soil_evaporation_adjusted(above_ground_biomass, residue, snow_water,
+                                                                        potential_evapotrans_adj, transpiration)
     Evapotranspiration._determine_soil_cover_index.assert_called_once()
 
+@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
+    (1.3, 3.2),
+    (0, 0),
+    (1.3, 0.4),
+    (1.8954, 0)
+])
+def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
+    observe = Evapotranspiration._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
+    if snow_water_content > soil_evaporation_adj:
+        assert 0 == observe
+    else:
+        assert (soil_evaporation_adj - snow_water_content) == observe
 
 # --- helper function tests ---
 @pytest.mark.parametrize("initial_canopy_water", [
@@ -136,7 +148,8 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
     # mock helper functions
     incorp._determine_potential_evapotranspiration = MagicMock(return_value=1.89)
     incorp._determine_potential_evapotranspiration_adjusted = MagicMock(return_value=1.354)
-    incorp._determine_soil_evaporation = MagicMock(return_value=2.845)
+    incorp._determine_soil_evaporation_adjusted = MagicMock(return_value=2.845)
+    incorp._determine_maximum_soil_evaporation = MagicMock(return_value=2.195)
 
     # run method
     incorp.evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
@@ -145,7 +158,9 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
     # check results
     incorp._determine_potential_evapotranspiration.assert_called_once()
     incorp._determine_potential_evapotranspiration_adjusted.assert_called_once()
-    incorp._determine_soil_evaporation.assert_called_once()
+    incorp._determine_soil_evaporation_adjusted.assert_called_once()
+    incorp._determine_maximum_soil_evaporation.assert_called_once()
     assert data.potential_evapotranspiration == 1.89
     assert data.potential_evapotranspiration_adjusted == 1.354
-    assert data.soil_evaporation == 2.845
+    assert data.soil_evaporation_adjusted == 2.845
+    assert data.maximum_soil_evaporation == 2.195
