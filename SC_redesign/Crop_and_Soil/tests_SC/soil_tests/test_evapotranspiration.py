@@ -92,6 +92,7 @@ def test_determine_soil_evaporation(above_ground_biomass, residue, snow_water, p
                                                                         potential_evapotrans_adj, transpiration)
     Evapotranspiration._determine_soil_cover_index.assert_called_once()
 
+
 @pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
     (1.3, 3.2),
     (0, 0),
@@ -104,6 +105,36 @@ def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_con
         assert 0 == observe
     else:
         assert (soil_evaporation_adj - snow_water_content) == observe
+
+
+@pytest.mark.parametrize("max_soil_water_evap,layer_data", [
+    (1.2, LayerData(top_depth=0, bottom_depth=3)),  # defaults
+    (0.9, LayerData(top_depth=4, bottom_depth=9, esco=0.78)),  # default water contents, different esco
+    (1.1, LayerData(top_depth=2, bottom_depth=8, soil_water_content=1.8, field_capacity_water_content=1.6,
+                    wilting_point_water_content=0.9)),
+    (1.5, LayerData(top_depth=4, bottom_depth=12, soil_water_content=1.1, field_capacity_water_content=2,
+                    wilting_point_water_content=1)),
+    (2.1, LayerData(top_depth=0, bottom_depth=15, soil_water_content=2.3, field_capacity_water_content=2.5,
+                    wilting_point_water_content=0.3, esco=0.6)),
+])
+def test_determine_evaporative_demand(max_soil_water_evap, layer_data):
+    observe = Evapotranspiration._determine_evaporative_demand(max_soil_water_evap, layer_data)
+    expect_top_demand = max_soil_water_evap * (layer_data.top_depth /
+                                               (layer_data.top_depth + exp(2.374 - (0.00713 * layer_data.top_depth))))
+    expect_bottom_demand = max_soil_water_evap * (layer_data.bottom_depth /
+                                                  (layer_data.bottom_depth +
+                                                   exp(2.374 - (0.00713 * layer_data.bottom_depth))))
+    assert (expect_bottom_demand - (expect_top_demand * layer_data.esco)) == observe
+
+@pytest.mark.parametrize("max_soil_water_evap, layer_data", [
+    (1, LayerData(top_depth=None, bottom_depth=2)),
+    (1, LayerData(top_depth=-1.2, bottom_depth=4)),
+    (1, LayerData(top_depth=3, bottom_depth=2)),
+    (1, LayerData(top_depth=1, bottom_depth=None)),
+])
+def test_determine_evaporative_demand_error(max_soil_water_evap, layer_data):
+    with pytest.raises(Exception):
+        Evapotranspiration._determine_evaporative_demand(max_soil_water_evap, layer_data)
 
 # --- helper function tests ---
 @pytest.mark.parametrize("initial_canopy_water", [

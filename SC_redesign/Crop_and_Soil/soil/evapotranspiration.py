@@ -90,7 +90,7 @@ class Evapotranspiration:
             snow_water_content)
         # TODO: snow water content needs to be tracked and adjusted as time goes by (in SoilData or by a weather
         #  monitor?) - issue #317
-        self.evaporate_from_soil()
+        # self.evaporate_from_soil()
 
     def _determine_potential_evapotranspiration_adjusted(self, initial_canopy_free_water: float) -> float:
         """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
@@ -268,6 +268,14 @@ class Evapotranspiration:
 
         SWAT Reference: 2:2.3.17
         """
+        # Check layer integrity
+        if layer_data.top_depth is None or \
+                layer_data.top_depth < 0 or \
+                layer_data.bottom_depth is None or \
+                layer_data.bottom_depth < 0 or \
+                (layer_data.bottom_depth <= layer_data.top_depth):
+            raise ValueError("Missing or illegal values for top or bottom depths")
+
         # Calculate top evaporative demand
         top_depth = layer_data.top_depth
         top_quotient = top_depth / (top_depth + exp(2.374 - (0.00713 * top_depth)))
@@ -279,4 +287,3 @@ class Evapotranspiration:
         bottom_evaporative_demand = max_soil_water_evaporation * bottom_quotient
 
         return bottom_evaporative_demand - (top_evaporative_demand * layer_data.esco)
-
