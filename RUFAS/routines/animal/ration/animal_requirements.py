@@ -404,7 +404,7 @@ def calculate_NASEM_energy_growth_requirements(
         average_daily_gain = 0
     EBG = 0.85*average_daily_gain
     if average_daily_gain == 0:
-        average_daily_gain = 0.0001  # TODO fix to avoid divide by 0 error
+        average_daily_gain = 0.00001  # fix to avoid divide by 0 error
     FatADG = (0.067 + 0.375*(body_weight/mature_body_weight)) * \
         EBG/average_daily_gain
     ProtADG = (0.201 - 0.081*(body_weight/mature_body_weight)) * \
@@ -758,10 +758,9 @@ def calculate_NASEM_protein_requirements(lactating: bool | None, body_weight: fl
         milk_true_protein = 0
     if milk_production is None:
         milk_production = 0
-    # TODO CHECK THAT milk_true_protein is in % or 0.1 decimal percent etc.
     NPMilk = milk_true_protein*milk_production*1000
     TargetEffMP = 0.69
-    if lactating:  # TODO better mimic logic from NRC if computationally superior
+    if lactating:
         metabolizable_protein_requirement = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
                                               TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100  # final div/100 is correcting the units g/kg
     else:

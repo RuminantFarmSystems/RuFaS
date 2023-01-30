@@ -10,7 +10,6 @@ import pytest
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 import RUFAS.routines.animal.ration.animal_requirements
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
 
 @pytest.fixture
@@ -1155,11 +1154,6 @@ def test_manure_calculations():
 
 def test_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/lactating_cow_manure_excretion.py"""
-    pass
-
-
-def test_calc_rqmts():
-    """Unit test for function optimize in file routines/animal/ration/animal_requirements.py"""
     pass
 
 
