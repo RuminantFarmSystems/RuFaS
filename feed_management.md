@@ -1,7 +1,7 @@
 ## Feed Management and Inventory Model
 
-The **Feed Management and Inventory Model** is currently managed by the **Feed** class 
-and its subclass, **Storage**.
+The **Feed Management and Inventory Model** is currently managed by the `Feed` class 
+and its subclass, `Storage`.
 
 The **Feed** class takes in data from the input JSON file and stores information 
 for the feeds managed by the farm and the methods for storage. It contains the 
