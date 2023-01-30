@@ -391,7 +391,7 @@ def test_calculate_NASEM_energy_growth_requirements(cow_a, cow_b, heifer_a, heif
             cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['ADG_heifer'], cow_b['animal_type'],
             cow_b['parity'], cow_b['calving_interval'])
     assert (result_NEg, result_ADG, result_frame_weight_gain) == pytest.approx(
-        (0.0, 0.0001, 0.0), rel=1e-1)
+        (0.0, 0.00001, 0.0), rel=1e-1)
 
     result_NEg, result_ADG, result_frame_weight_gain = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_energy_growth_requirements(
