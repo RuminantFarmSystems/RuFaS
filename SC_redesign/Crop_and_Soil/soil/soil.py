@@ -22,12 +22,10 @@ class Soil:
         self.evapotranspiration = None
         self.water_factor = None
 
-        # profile layer attributes
-        self.soil_layers = [LayerData(top_depth=0, bottom_depth=5, nitrate=0.5),
-                            LayerData(top_depth=5, bottom_depth=8, nitrate=1),
-                            LayerData(top_depth=8, bottom_depth=20, nitrate=5)]
-        # self.depths = [5, 8, 20]  # arbitrary
-        # self.nitrates = [0.5, 1, 5]  # arbitrary
+        self.data.soil_layers = [LayerData(top_depth=0, bottom_depth=5, nitrate=0.5),
+                                 LayerData(top_depth=5, bottom_depth=8, nitrate=1),
+                                 LayerData(top_depth=8, bottom_depth=20, nitrate=5)]
+
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
