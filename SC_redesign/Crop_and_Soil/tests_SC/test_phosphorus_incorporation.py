@@ -133,11 +133,11 @@ def test_uptake_phosphorus(phosphates, depths):
     incorp.tally_total_phosphorus_uptake.assert_called_once()
 
 
-@pytest.mark.parametrize("phosphates,depths,water_factor,gate", [
-    ([.5, .3, .2], [1, 2, 5], .692, True),
-    ([.5, .3, .2], [1, 2, 5], .692, False)
+@pytest.mark.parametrize("phosphates,depths,gate", [
+    ([.5, .3, .2], [1, 2, 5], True),
+    ([.5, .3, .2], [1, 2, 5], False)
 ])
-def test_incorporate_phosphorus(phosphates, depths, water_factor, gate):
+def test_incorporate_phosphorus(phosphates, depths, gate):
     # initialize object
     data = CropData(heat_fraction=0.38, half_mature_heat_fraction=.54, mature_heat_fraction=0.99,
                     emergence_phosphorus_fraction=0.71, half_mature_phosphorus_fraction=0.68,
@@ -147,42 +147,40 @@ def test_incorporate_phosphorus(phosphates, depths, water_factor, gate):
 
     # mock intermediate functions
     incorp.shift_phosphorus_time = MagicMock(return_value=None)
-    incorp.determine_nutrient_shape_parameters = MagicMock(return_value=[1.2, 0.8])
-    incorp.determine_optimal_nutrient_fraction = MagicMock(return_value=0.75)
+    NitrogenIncorporation.determine_nutrient_shape_parameters = MagicMock(return_value=[1.2, 0.8])
+    NitrogenIncorporation.determine_optimal_nutrient_fraction = MagicMock(return_value=0.75)
     if gate:
-        incorp.determine_optimal_nutrient = MagicMock(return_value=-268)
+        NitrogenIncorporation.determine_optimal_nutrient = MagicMock(return_value=-268)
     else:
-        incorp.determine_optimal_nutrient = MagicMock(return_value=268)
-    incorp.determine_potential_nutrient_uptake = MagicMock(return_value=123.1)
+        NitrogenIncorporation.determine_optimal_nutrient = MagicMock(return_value=268)
+    NitrogenIncorporation.determine_potential_nutrient_uptake = MagicMock(return_value=123.1)
     incorp.uptake_phosphorus = MagicMock(return_value=None)
     incorp.access_layers = MagicMock(return_value=[5, 10, 15.3])
-    incorp.try_fixation = MagicMock(return_value=None)
     NitrogenIncorporation.determine_stored_nutrient = MagicMock(return_value=99.3)
 
     # run method
     incorp.incorporate_phosphorus(phosphates, depths)
 
     # assertions
-    incorp.shift_phosphorus_time.assert_called_once() # TODO - assertion error
-
-    incorp.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.62, 0.60)
+    incorp.shift_phosphorus_time.assert_called_once()
+    NitrogenIncorporation.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.62, 0.60)
     assert data.phosphorus_shapes == [1.2, 0.8]
 
-    incorp.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
+    NitrogenIncorporation.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
     assert data.optimal_phosphorus_fraction == 0.75
 
     if gate:
-        incorp.determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
+        NitrogenIncorporation.determine_optimal_nutrient.assert_called_once_with(0.75, 122.8)
         assert data.optimal_phosphorus == -268
 
-        incorp.determine_potential_nutrient_uptake.assert_not_called()
+        NitrogenIncorporation.determine_potential_nutrient_uptake.assert_not_called()
         assert data.potential_phosphorus_uptake == 0
     else:
         assert data.optimal_phosphorus == 268
-        incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
+        NitrogenIncorporation.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
         assert data.potential_phosphorus_uptake == 123.1
 
     incorp.uptake_phosphorus.assert_called_once_with(phosphates, depths)
     NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should be called_once_with() w/ attr mocked
-    assert data.nitrogen == 99.3
+    assert data.phosphorus == 99.3
 
