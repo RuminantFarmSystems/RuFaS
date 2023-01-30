@@ -205,7 +205,6 @@ class ManureManagementOutputHandler:
             Otherwise, the row data will be appended to the dataframe.
 
         """
-
         temp_df = pd.DataFrame(row_data)
 
         if self._df is None:
@@ -257,7 +256,7 @@ class ManureManagementOutputHandler:
         s : str
             The string to capitalize each constituent word.
         delimiter : str, optional
-            The delimiter to use to split the string, by default ' '
+            The delimiter to use to split the string and rejoin the parts, by default ' '.
 
         Returns
         -------
@@ -265,6 +264,8 @@ class ManureManagementOutputHandler:
             The string with each constituent word capitalized.
 
         """
+        if not s:
+            return s
         return delimiter.join(word[0].upper() + word[1:] for word in s.split(delimiter))
 
     @classmethod

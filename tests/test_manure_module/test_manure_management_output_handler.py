@@ -1,5 +1,6 @@
 import collections
 
+import pytest
 from pytest_mock import MockFixture
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
@@ -312,4 +313,290 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
     patch_for_append_row.assert_called_once_with(mock_row_data)
     assert manure_management_output_handler._df == mock_dataframe_with_appended_row
 
-# TODO: Add more tests for the other methods in this PR
+
+@pytest.mark.parametrize(
+        'instance_df_exists',
+        [
+            True,
+            False
+        ]
+)
+def test_append_row(instance_df_exists: bool,
+                    mocker: MockFixture) -> None:
+    """Unit test for _append_row() in manure_management_output_handler.py."""
+    # Arrange
+    mock_row_data = {'<test_field>': ['<test_value>']}
+    mock_row_dataframe = mocker.MagicMock()
+    patch_for_pandas_dataframe_init = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'pd.DataFrame',
+            return_value=mock_row_dataframe
+    )
+    mock_concatenated_dataframe = mocker.MagicMock()
+    patch_for_pandas_concat = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'pd.concat',
+            return_value=mock_concatenated_dataframe
+    )
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+    mock_instance_df = mocker.MagicMock()
+    if instance_df_exists:
+        manure_management_output_handler._df = mock_instance_df
+    else:
+        manure_management_output_handler._df = None
+
+    # Act
+    actual_df = manure_management_output_handler._append_row(mock_row_data)
+
+    # Assert
+    patch_for_pandas_dataframe_init.assert_called_once_with(mock_row_data)
+    if instance_df_exists:
+        patch_for_pandas_concat.assert_called_once_with([mock_instance_df, mock_row_dataframe], ignore_index=True)
+        assert actual_df == mock_concatenated_dataframe
+    else:
+        assert actual_df == mock_row_dataframe
+
+
+def test_sort_by(mocker: MockFixture) -> None:
+    """Unit test for sort_by() in manure_management_output_handler.py."""
+    # Arrange
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+    mock_df = mocker.MagicMock()
+    manure_management_output_handler._df = mock_df
+
+    mock_df.sort_values.return_value = None
+    mock_sort_columns = ['test_field_1', 'test_field_2']
+
+    # Act
+    manure_management_output_handler.sort_by(mock_sort_columns)
+
+    # Assert
+    mock_df.sort_values.assert_called_once_with(by=mock_sort_columns, inplace=True)
+
+
+def test_move_columns_to_front(mocker: MockFixture) -> None:
+    """Unit test for move_columns_to_front() in manure_management_output_handler.py."""
+    # Arrange
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+    mock_df = mocker.MagicMock()
+    manure_management_output_handler._df = mock_df
+
+    mock_df_columns = ['test_field_1', 'test_field_2', 'test_field_3']
+    mock_df.columns = mock_df_columns
+    mock_columns_to_move = ['test_field_2', 'test_field_3']
+    mock_df.pop.return_value = None
+    mock_df.insert.return_value = None
+
+    # Act
+    manure_management_output_handler.move_columns_to_front(mock_columns_to_move)
+
+    # Assert
+    mock_df.pop.assert_has_calls([
+        mocker.call('test_field_2'),
+        mocker.call('test_field_3')
+    ])
+    mock_df.insert.assert_has_calls([
+        mocker.call(0, 'test_field_2', None),
+        mocker.call(1, 'test_field_3', None)
+    ])
+
+
+def test_sort_by_pen_id_and_simulation_day(mocker: MockFixture) -> None:
+    """Unit test for sort_by_pen_id_and_simulation_day() in manure_management_output_handler.py."""
+    # Arrange
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+
+    patch_for_sort_by = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.sort_by',
+            return_value=None
+    )
+
+    patch_for_move_columns_to_front = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.move_columns_to_front',
+            return_value=None
+    )
+
+    # Act
+    manure_management_output_handler.sort_by_pen_id_and_simulation_day()
+
+    # Assert
+    patch_for_sort_by.assert_called_once_with(['pen_id', 'sim_day'])
+    patch_for_move_columns_to_front.assert_called_once_with(['pen_id', 'sim_day'])
+
+
+def test_export_to_csv(mocker: MockFixture) -> None:
+    """Unit test for export_to_csv() in manure_management_output_handler.py."""
+    # Arrange
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+    mock_df = mocker.MagicMock()
+    mock_df.to_csv.return_value = None
+    manure_management_output_handler._df = mock_df
+    mock_csv_output_path = 'test_csv_output_path'
+    patch_for_get_csv_output_path = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.get_csv_output_path',
+            return_value=mock_csv_output_path
+    )
+
+    # Act
+    actual_csv_output_path = manure_management_output_handler.export_to_csv()
+
+    # Assert
+    patch_for_get_csv_output_path.assert_called_once_with()
+    mock_df.to_csv.assert_called_once_with(mock_csv_output_path, index=False)
+    assert actual_csv_output_path == mock_csv_output_path
+
+
+@pytest.mark.parametrize(
+        'phrase, delimiter, expected_result',
+        [
+            ('test phrase', ' ', 'Test Phrase'),
+            ('test phrase', '_', 'Test phrase'),
+            ('test', ' ', 'Test'),
+            ('test', '_', 'Test'),
+            ('', ' ', ''),
+            ('', '_', ''),
+        ]
+)
+def test_capitalize_first_letters(phrase: str,
+                                  delimiter: str,
+                                  expected_result: str,
+                                  mocker: MockFixture) -> None:
+    """Unit test for _capitalize_first_letters() in manure_management_output_handler.py."""
+    # Act
+    actual_result = ManureManagementOutputHandler._capitalize_first_letters(phrase, delimiter)
+
+    # Assert
+    assert actual_result == expected_result
+
+
+def test_get_main_output_directory(mocker: MockFixture) -> None:
+    """Unit test for get_main_output_directory() in manure_management_output_handler.py."""
+    # Arrange
+    patch_for_os_makedirs = mocker.patch('os.makedirs', return_value=None)
+    expected_output_dir = 'RUFAS/routines/manure/output'
+
+    # Act
+    actual_output_dir = ManureManagementOutputHandler.get_main_output_directory()
+
+    # Assert
+    patch_for_os_makedirs.assert_called_once_with(expected_output_dir, exist_ok=True)
+    assert actual_output_dir == expected_output_dir
+
+
+def test_get_csv_output_directory(mocker: MockFixture) -> None:
+    """Unit test for get_csv_output_directory() in manure_management_output_handler.py."""
+    # Arrange
+    mock_main_output_directory = 'test_main_output_directory'
+    patch_for_get_main_output_directory = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.get_main_output_directory',
+            return_value=mock_main_output_directory
+    )
+    patch_for_os_makedirs = mocker.patch('os.makedirs', return_value=None)
+    expected_csv_dir = f'{mock_main_output_directory}/csv'
+
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+
+    # Act
+    actual_csv_dir = manure_management_output_handler.get_csv_output_directory()
+
+    # Assert
+    patch_for_get_main_output_directory.assert_called_once_with()
+    patch_for_os_makedirs.assert_called_once_with(expected_csv_dir, exist_ok=True)
+    assert actual_csv_dir == expected_csv_dir
+
+
+def test_get_csv_output_path(mocker: MockFixture) -> None:
+    """Unit test for _get_csv_output_path() in manure_management_output_handler.py."""
+    # Arrange
+    mock_csv_output_directory = 'test_csv_output_directory'
+    patch_for_get_csv_output_directory = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.get_csv_output_directory',
+            return_value=mock_csv_output_directory
+    )
+    mock_formatted_current_datetime = 'test_formatted_current_datetime'
+    patch_for_get_formatted_current_time = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler._get_formatted_current_time',
+            return_value=mock_formatted_current_datetime
+    )
+    expected_csv_output_path = f'{mock_csv_output_directory}/manure_management_output_' \
+                               f'{mock_formatted_current_datetime}.csv'
+
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+
+    # Act
+    actual_csv_output_path = manure_management_output_handler.get_csv_output_path()
+
+    # Assert
+    patch_for_get_csv_output_directory.assert_called_once()
+    patch_for_get_formatted_current_time.assert_called_once()
+    assert actual_csv_output_path == expected_csv_output_path
+
+
+def test_empty_main_output_directory(mocker: MockFixture) -> None:
+    """Unit test for empty_main_output_directory() in manure_management_output_handler.py."""
+    # Arrange
+    mock_main_output_directory = 'test_main_output_directory'
+    patch_for_get_main_output_directory = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.get_main_output_directory',
+            return_value=mock_main_output_directory
+    )
+    path_for_delete_files_and_subdirectories = mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler._delete_files_and_subdirectories',
+            return_value=None
+    )
+    mocker.patch(
+            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+            'ManureManagementOutputHandler.__init__',
+            return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+
+    # Act
+    manure_management_output_handler.empty_main_output_directory()
+
+    # Assert
+    patch_for_get_main_output_directory.assert_called_once()
+    path_for_delete_files_and_subdirectories.assert_called_once_with(mock_main_output_directory)
