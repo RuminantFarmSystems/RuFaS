@@ -14,18 +14,16 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-# from RUFAS.classes import Config
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.clustering_pen_grouping import grouping
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.clustering_pen_grouping import grouping
+from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-
 from collections import deque
 import random
-from typing import Any, Dict, Tuple
+from typing import Tuple
 from statistics import mean
 
 om = OutputManager()
@@ -210,7 +208,7 @@ class AnimalManagement:
                                       Pen.AnimalCombination.NONE, 1.2)
                 self.all_pens.append(new_default_pen)
 
-    def init_animals(self, herd_data: Dict[str, Any], config):
+    def init_animals(self, herd_data, config):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
