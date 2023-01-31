@@ -21,5 +21,5 @@ class LayerData:
     """water content of soil layer at field capacity (mm)"""
     wilting_point_water_content: float = 0.2  # arbitrary
     """water content of soil layer at wilting point (mm)"""
-    esco: float = 1
+    soil_evaporation_compensation_coefficient: float = 1
     """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (2:2.3.17)"""
