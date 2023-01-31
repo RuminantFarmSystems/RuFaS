@@ -97,7 +97,6 @@ def test_uptake_phosphorus(phosphates, depths):
     incorp = PhosphorusIncorporation(data)
 
     # Mock functions
-    # Mock functions
     incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
     incorp.access_layers = MagicMock(return_value=[1, 2, 3])
     NitrogenIncorporation.determine_layer_nutrient_uptake_potential = MagicMock(return_value=[3.25, 6.33, 7.10])
