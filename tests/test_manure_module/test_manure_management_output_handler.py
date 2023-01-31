@@ -369,7 +369,15 @@ def test_append_row(instance_df_exists: bool,
         assert actual_df == mock_row_dataframe
 
 
-def test_sort_by(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+        'instance_df_exists',
+        [
+            True,
+            False
+        ]
+)
+def test_sort_by(instance_df_exists: bool,
+                 mocker: MockFixture) -> None:
     """Unit test for sort_by() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
@@ -378,20 +386,35 @@ def test_sort_by(mocker: MockFixture) -> None:
             return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
-    mock_df = mocker.MagicMock()
-    manure_management_output_handler._df = mock_df
 
-    mock_df.sort_values.return_value = None
+    if instance_df_exists:
+        mock_instance_df = mocker.MagicMock()
+        mock_instance_df.sort_values.return_value = None
+    else:
+        mock_instance_df = None
+
+    manure_management_output_handler._df = mock_instance_df
     mock_sort_columns = ['test_field_1', 'test_field_2']
 
     # Act
     manure_management_output_handler.sort_by(mock_sort_columns)
 
     # Assert
-    mock_df.sort_values.assert_called_once_with(by=mock_sort_columns, inplace=True)
+    if instance_df_exists:
+        mock_instance_df.sort_values.assert_called_once_with(by=mock_sort_columns, inplace=True)
+    else:
+        assert True
 
 
-def test_move_columns_to_front(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+        'instance_df_exists',
+        [
+            True,
+            False
+        ]
+)
+def test_move_columns_to_front(instance_df_exists: bool,
+                               mocker: MockFixture) -> None:
     """Unit test for move_columns_to_front() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
@@ -400,27 +423,35 @@ def test_move_columns_to_front(mocker: MockFixture) -> None:
             return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
-    mock_df = mocker.MagicMock()
-    manure_management_output_handler._df = mock_df
 
-    mock_df_columns = ['test_field_1', 'test_field_2', 'test_field_3']
-    mock_df.columns = mock_df_columns
+    mock_instance_df_columns = ['test_field_1', 'test_field_2', 'test_field_3']
+    if instance_df_exists:
+        mock_instance_df = mocker.MagicMock()
+        mock_instance_df.columns = mock_instance_df_columns
+        mock_instance_df.pop.return_value = None
+        mock_instance_df.insert.return_value = None
+    else:
+        mock_instance_df = None
+
+    manure_management_output_handler._df = mock_instance_df
+
     mock_columns_to_move = ['test_field_2', 'test_field_3']
-    mock_df.pop.return_value = None
-    mock_df.insert.return_value = None
 
     # Act
     manure_management_output_handler.move_columns_to_front(mock_columns_to_move)
 
     # Assert
-    mock_df.pop.assert_has_calls([
-        mocker.call('test_field_2'),
-        mocker.call('test_field_3')
-    ])
-    mock_df.insert.assert_has_calls([
-        mocker.call(0, 'test_field_2', None),
-        mocker.call(1, 'test_field_3', None)
-    ])
+    if instance_df_exists:
+        mock_instance_df.pop.assert_has_calls([
+            mocker.call('test_field_2'),
+            mocker.call('test_field_3')
+        ])
+        mock_instance_df.insert.assert_has_calls([
+            mocker.call(0, 'test_field_2', None),
+            mocker.call(1, 'test_field_3', None)
+        ])
+    else:
+        assert True
 
 
 def test_sort_by_pen_id_and_simulation_day(mocker: MockFixture) -> None:
@@ -453,7 +484,15 @@ def test_sort_by_pen_id_and_simulation_day(mocker: MockFixture) -> None:
     patch_for_move_columns_to_front.assert_called_once_with(['pen_id', 'sim_day'])
 
 
-def test_export_to_csv(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+        'instance_df_exists',
+        [
+            True,
+            False
+        ]
+)
+def test_export_to_csv(instance_df_exists: bool,
+                       mocker: MockFixture) -> None:
     """Unit test for export_to_csv() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
@@ -462,9 +501,12 @@ def test_export_to_csv(mocker: MockFixture) -> None:
             return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
-    mock_df = mocker.MagicMock()
-    mock_df.to_csv.return_value = None
-    manure_management_output_handler._df = mock_df
+    if instance_df_exists:
+        mock_instance_df = mocker.MagicMock()
+        mock_instance_df.to_csv.return_value = None
+    else:
+        mock_instance_df = None
+    manure_management_output_handler._df = mock_instance_df
     mock_csv_output_path = mocker.MagicMock()
     patch_for_get_csv_output_path = mocker.patch(
             'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
@@ -476,9 +518,13 @@ def test_export_to_csv(mocker: MockFixture) -> None:
     actual_csv_output_path = manure_management_output_handler.export_to_csv()
 
     # Assert
-    patch_for_get_csv_output_path.assert_called_once_with()
-    mock_df.to_csv.assert_called_once_with(mock_csv_output_path, index=False)
-    assert actual_csv_output_path == mock_csv_output_path
+    if instance_df_exists:
+        mock_instance_df.to_csv.assert_called_once_with(mock_csv_output_path, index=False)
+        patch_for_get_csv_output_path.assert_called_once()
+        assert actual_csv_output_path == mock_csv_output_path
+    else:
+        patch_for_get_csv_output_path.assert_not_called()
+        assert actual_csv_output_path is None
 
 
 @pytest.mark.parametrize(
