@@ -174,7 +174,7 @@ class ManureManagement:
         for pen in animal_management.all_pens:
             self._pen_daily_update(animal_management.simulation_day, pen)
 
-        if self.time.is_last_day_of_simulation():
+        if self.time.is_last_day_of_simulation:
             self.manure_management_output_handler.sort_by_pen_id_and_simulation_day()
             self.manure_management_output_handler.export_to_csv()
 

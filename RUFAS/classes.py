@@ -564,6 +564,7 @@ class Time:
 
         return False
 
+    @property
     def is_last_day_of_simulation(self):
         """Checks whether the current day is the last day of the simulation.
 
