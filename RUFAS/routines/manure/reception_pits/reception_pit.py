@@ -32,7 +32,11 @@ class ReceptionPit:
 
         """
         info_map = {"class": cls.__name__,
-                    "function": cls.daily_update.__name__, }
+                    "function": cls.daily_update.__name__,
+                    "manure_handler_daily_output": vars(manure_handler_daily_output),
+                    "pen": vars(pen),
+                    "bedding": vars(bedding),
+                    }
 
         mh = manure_handler_daily_output
         daily_output = ReceptionPitDailyOutput(

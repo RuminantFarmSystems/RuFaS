@@ -19,6 +19,7 @@ from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
+from typing import Any, Dict
 
 
 om = OutputManager()
@@ -90,8 +91,7 @@ class Config:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
-                    "config_data": data,
-                    "weather_file_path": weather_file, }
+                    "config_data": data, }
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
@@ -334,7 +334,7 @@ class Weather:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
-                    "weather_file": weather_file, }
+                    "weather_config": vars(config), }
 
         years = config.years
         w_start_year = config.w_start_year
