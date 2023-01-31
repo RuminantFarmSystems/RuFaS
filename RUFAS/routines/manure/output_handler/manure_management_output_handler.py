@@ -222,6 +222,8 @@ class ManureManagementOutputHandler:
             A list of column names to sort by.
 
         """
+        if self._df is None:
+            return
         self._df.sort_values(by=cols, inplace=True)
 
     def move_columns_to_front(self, cols: List[str]) -> None:
@@ -233,6 +235,8 @@ class ManureManagementOutputHandler:
             A list of column names to move to the front.
 
         """
+        if self._df is None:
+            return
         cols_to_move = [col for col in cols if col in self._df.columns]
         for i, col in enumerate(cols_to_move):
             self._df.insert(i, col, self._df.pop(col))
@@ -242,11 +246,20 @@ class ManureManagementOutputHandler:
         self.sort_by(['pen_id', 'sim_day'])
         self.move_columns_to_front(['pen_id', 'sim_day'])
 
-    def export_to_csv(self) -> Path:
-        """Exports all data to a csv file."""
-        output_path = self.get_csv_output_file_path()
-        self._df.to_csv(output_path, index=False)
-        return output_path
+    def export_to_csv(self) -> Optional[Path]:
+        """Exports all data to a csv file.
+
+        Returns
+        -------
+        Optional[Path]
+            The path to the csv file if there is data to be exported, None otherwise.
+
+        """
+        if self._df is None:
+            return None
+        csv_output_file_path = self.get_csv_output_file_path()
+        self._df.to_csv(csv_output_file_path, index=False)
+        return csv_output_file_path
 
     @classmethod
     def _capitalize_first_letters(cls, s: str, delimiter=' ') -> str:
