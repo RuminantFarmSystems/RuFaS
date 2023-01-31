@@ -42,6 +42,7 @@ class ManureManagementOutputHandler:
     HEADER_PRIMARY_DELIMITER = '__'
     HEADER_SECONDARY_DELIMITER = '_'
 
+    # TODO: Add an overwrite=True option
     def __init__(self) -> None:
         """Initializes a ManureManagementOutputHandler object."""
         self._df: Optional[DataFrame] = None
@@ -268,6 +269,7 @@ class ManureManagementOutputHandler:
             return s
         return delimiter.join(word[0].upper() + word[1:] for word in s.split(delimiter))
 
+    # TODO: Move to a more general folder of a location specified in the config file
     @classmethod
     def get_main_output_directory_path(cls) -> Path:
         """Returns the path of the main output directory for the manure module.
