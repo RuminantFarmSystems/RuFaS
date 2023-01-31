@@ -4,6 +4,9 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
+"""
+This module is based off of the 'Actual Evapotranspiration' (2:2.3) section of the SWAT model documentation
+"""
 
 class Evapotranspiration:
     def __init__(self, soil_data: Optional[SoilData] = None):
@@ -12,8 +15,7 @@ class Evapotranspiration:
     # --- main routine ---
     def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
                          avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float,
-                         initial_canopy_free_water: float) \
-            -> None:
+                         initial_canopy_free_water: float) -> None:
         """does the evapotranspiration of the soil on a given day
 
         Details: calculates and stores the potential evapotranspiration, soil evaporation in the SoilData object
@@ -76,8 +78,13 @@ class Evapotranspiration:
             evaporative_demand = self._determine_layer_evaporative_demand(self.data.maximum_soil_evaporation,
                                                                           layer.top_depth, layer.bottom_depth,
                                                                           layer.soil_evaporation_compensation_coefficient)
-            evaporative_demand_reduced = self._determine_evaporative_demand_reduced(evaporative_demand, layer)
-            amount_water_removed = self._determine_amount_water_removed(evaporative_demand_reduced, layer)
+            evaporative_demand_reduced = self._determine_evaporative_demand_reduced(evaporative_demand,
+                                                                                    layer.soil_water_content,
+                                                                                    layer.field_capacity_water_content,
+                                                                                    layer.wilting_point_water_content)
+            amount_water_removed = self._determine_amount_water_removed(evaporative_demand_reduced,
+                                                                        layer.soil_water_content,
+                                                                        layer.wilting_point_water_content)
 
             # remove water from soil water content
             layer.soil_water_content -= amount_water_removed
@@ -193,6 +200,22 @@ class Evapotranspiration:
             return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
+    def _determine_depth_evaporative_demand(max_soil_water_evaporation: float, depth: float) -> float:
+        """calculates evaporative demand
+
+        Args:
+            max_soil_water_evaporation: maximum soil water evaporation on a given day in mm
+            depth: depth below the surface in mm
+                TODO: check that it is actually in mm, SWAT page 137 does not explicitly say so
+
+        Returns:
+            evaporative demand at the given depth in mm
+
+        SWAT Reference: 2:2.3.16
+        """
+        return max_soil_water_evaporation * (depth / (depth + exp(2.374 - (0.00713 * depth))))
+
+    @staticmethod
     def _determine_layer_evaporative_demand(max_soil_water_evaporation: float, top_depth: float, bottom_depth: float,
                                             compensation: float) -> float:
         """calculates the evaporative demand for a given layer of soil
@@ -217,24 +240,23 @@ class Evapotranspiration:
             raise ValueError("Missing or illegal values for top or bottom depths")
 
         # Calculate evaporative demand at top of layer
-        top_depth = top_depth
-        top_quotient = top_depth / (top_depth + exp(2.374 - (0.00713 * top_depth)))
-        top_evaporative_demand = max_soil_water_evaporation * top_quotient
-
+        top_evaporative_demand = Evapotranspiration._determine_depth_evaporative_demand(max_soil_water_evaporation,
+                                                                                        top_depth)
         # Calculate evaporative demand at bottom of layer
-        bottom_depth = bottom_depth
-        bottom_quotient = bottom_depth / (bottom_depth + exp(2.374 - (0.00713 * bottom_depth)))
-        bottom_evaporative_demand = max_soil_water_evaporation * bottom_quotient
-
+        bottom_evaporative_demand = Evapotranspiration._determine_depth_evaporative_demand(max_soil_water_evaporation,
+                                                                                           bottom_depth)
         return bottom_evaporative_demand - (top_evaporative_demand * compensation)
 
     @staticmethod
-    def _determine_evaporative_demand_reduced(evaporative_demand: float, layer: LayerData) -> float:
+    def _determine_evaporative_demand_reduced(evaporative_demand: float, soil_water_content: float,
+                                              field_water_content: float, wilting_water_content: float) -> float:
         """calculates evaporative demand reduced for water content and field capacity
 
         Args:
-            evaporative_demand: evaporative demand for current soil layer
-            layer: LayerData object with soil layer to be analyzed
+            evaporative_demand: evaporative demand for current soil layer in mm
+            soil_water_content: soil water content of given layer in mm
+            field_water_content: field capacity water content of given layer in mm
+            wilting_water_content: wilting point water content of given layer in mm
 
         Returns:
             reduced evaporative demand for current layer based on how much water is in layer in mm
@@ -242,10 +264,10 @@ class Evapotranspiration:
         SWAT Reference: 2:2.3.18, 19
         """
         # calculate adjusted evaporative demand
-        if layer.soil_water_content < layer.field_capacity_water_content:
+        if soil_water_content < field_water_content:
             # 2:2.3.18
-            quotient = (2.5 * (layer.soil_water_content - layer.field_capacity_water_content)) / \
-                       (layer.field_capacity_water_content - layer.wilting_point_water_content)
+            quotient = (2.5 * (soil_water_content - field_water_content)) / (
+                        field_water_content - wilting_water_content)
             evaporative_demand_reduced = evaporative_demand * exp(quotient)
         else:
             # 2:2.3.19
@@ -254,16 +276,18 @@ class Evapotranspiration:
         return evaporative_demand_reduced
 
     @staticmethod
-    def _determine_amount_water_removed(reduced_evaporative_demand, layer: LayerData) -> float:
+    def _determine_amount_water_removed(reduced_evaporative_demand, soil_water_content: float,
+                                        wilting_water_content: float) -> float:
         """calculates amount of water lost from soil layer from evaporation
 
         Args:
-            reduced_evaporative_demand: evaporative demand reduced for water content and field capacity
-            layer: LayerData object with soil layer to be analyzed
+            reduced_evaporative_demand: evaporative demand reduced for water content and field capacity in mm
+            soil_water_content: soil water content of given layer in mm
+            wilting_water_content: wilting point water content of given layer in mm
 
         Returns:
-            amount of water removed from soil layer by evaporation
+            amount of water removed from soil layer by evaporation in mm
 
         SWAT Reference: 2:2.3.20
         """
-        return min(reduced_evaporative_demand, 0.8 * (layer.soil_water_content - layer.wilting_point_water_content))
+        return min(reduced_evaporative_demand, 0.8 * (soil_water_content - wilting_water_content))
