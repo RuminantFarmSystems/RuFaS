@@ -158,7 +158,6 @@ def calc_yield_act(crop_type):
 
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
-
 def calc_quality_assessment(crop_type):  #TODO: Stand in for more sophisticated method - GitHub Issue #161
     """
     Description:

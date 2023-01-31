@@ -30,6 +30,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     daily_soil_reset(soil)
 
+    
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
@@ -41,7 +42,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     # transpiration is defined in the crop module, but called here as a
     # component of water balance
-    transpiration.update_all(soil, crop.current_crop)
+    transpiration.update_all(soil, crop)
 
     # calculate daily percolation
     percolation.update_all(soil)
@@ -58,7 +59,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     phosphorus_cycling.update_all(soil, field_management, weather, time)
 
-    carbon_cycle.update_all(soil, crop.current_crop, weather, time)
+    carbon_cycle.update_all(soil, crop, weather, time)
 
     # update annual sums at the end of each day
     annual_variable_update(soil)
@@ -88,6 +89,7 @@ def annual_variable_update(soil):
     Args:
         soil: an instance of the Soil class
     """
+    #soil.ag_biomass=0
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
@@ -410,8 +412,7 @@ class Soil:
             self.percolation = 0.0  # amount of water that percolates to next layer
 
             # Variable to simulate nitrogen Cycling
-            # self.org_C = layer_data['org_C_percent']
-            self.org_C = 0
+            self.org_C = layer_data['org_C_percent']
             self.active_mineral_rate = layer_data['active_mineral_rate']
             self.denitrification_rate = layer_data['denitrification_rate']
             self.NH4 = layer_data['NH4']
@@ -605,7 +606,7 @@ class Soil:
 
             # S.4.A.2
             org_C = layer.org_C
-            org_N = (10 ** 4) * (org_C / 14)
+            org_N = (10 ** 4) * (org_C / 14) #nitrogen bug
 
             # S.4.A.3
             frac_N = 0.02

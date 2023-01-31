@@ -1,6 +1,6 @@
 import math
 
-def update_all(soil, crop_type, weather, time):
+def update_all(soil, crop, weather, time):
     """
     Description:
         Partitions residue from crop yield
@@ -12,8 +12,8 @@ def update_all(soil, crop_type, weather, time):
         weather: an instance of the Weather class defined in classes.py
         time: an instance of the Time class defined in time.py
     """
-
-    residue_partitioning(soil, crop_type, weather, time)
+    for crop_type in crop.current_crop.values():
+        residue_partitioning(soil, crop_type, weather, time)
 
 
 def residue_partitioning(soil, crop_type, weather, time):

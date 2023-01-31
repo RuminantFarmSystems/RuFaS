@@ -9,6 +9,7 @@ Description: This module contains the necessary functions for calculating and
 """
 
 from math import log, exp
+from typing import List
 from RUFAS.routines.field.crop.nitrogen_fixation import fix_nitrogen
 
 
@@ -24,7 +25,7 @@ def reallocate_nitrogen(crop, soil) -> None:
     update_optimal_nitrogen(crop)
     update_potential_nitrogen_uptake(crop)
     uptake_nitrogen(crop, soil)
-    if crop.is_nitrogen_fixer:
+    if crop.fix_nitrogen:
         fix_nitrogen(crop, soil)
     store_nitrogen_biomass(crop)
 
@@ -55,17 +56,19 @@ def update_nitrogen_fraction(crop) -> None:
 
     Returns: Nothing. Instead, the crop.fr_N attribute is updated.
     """
-    shapes = calc_shape_parameters(heatfrac_half=crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
+    shapes = calc_shape_parameters(heatfrac_half= crop.fr_PHU_50, heatfrac_full=crop.fr_PHU_100, nfrac_1=crop.fr_n1,
                                    nfrac_2=crop.fr_n2, nfrac_near=crop.fr_n3ish, nfrac_3=crop.fr_n3)
+                                
     if crop.biomass_actual == 0:
         crop.fr_N = 0
     else:
         crop.fr_N = calc_nitrogen_fraction(phu_frac=crop.prev_fr_PHU, nfrac_1=crop.fr_n1, nfrac_3=crop.fr_n3,
                                            shape1=shapes[0], shape2=shapes[1])
+    #print('fr_n:',crop.fr_N)
 
 
 def calc_shape_parameters(heatfrac_half: float, heatfrac_full: float, nfrac_1: float, nfrac_2: float,
-                          nfrac_near: float, nfrac_3: float) -> list[float]:  # pseudocode: C.5.A.1, C.5.A.2
+                          nfrac_near: float, nfrac_3: float) -> List[float]:  # pseudocode: C.5.A.1, C.5.A.2
     """
     Description: calculates the shape coefficient for nitrogen fraction
 
@@ -113,7 +116,7 @@ def calc_shape_log(heat_frac: float, nfrac_x: float, nfrac_3: float, nfrac_1: fl
         raise ValueError("nfrac_1 must not be equivalent to nfrac_3")
     if nfrac_x == nfrac_1:  # leads to divide by zero
         raise ValueError("nfrac_x must not be equivalent to nfrac_1")
-    if nfrac_x == nfrac_3:  # leads to log(0)
+    if nfrac_x == nfrac_3: 
         raise ValueError("nfrac_x must not be equivalent to nfrac_3")
     if nfrac_x > nfrac_1 or nfrac_x == nfrac_1:  # leads to ln(-y) or divide by 0
         raise ValueError("nfrac_x must be less than nfrac_1")
@@ -184,12 +187,13 @@ def update_potential_nitrogen_uptake(crop) -> None:
     if crop.bio_N_opt - crop.bio_N < 0:
         crop.N_up = 0
     else:
+        #print(crop.bio_N_opt)
         crop.N_up = calc_potential_nitrogen_uptake(demand=crop.bio_N_opt, nitrogen_start=crop.bio_N,
                                                    mature_nfrac=crop.fr_n3, max_growth=crop.d_biomass_max)
 
 
-def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[float],
-                               layer_nitrate: list[float]) -> list[float]:  # pseudocode: C.5.C.4
+def calc_layer_nitrogen_uptake(layer_demand: List[float], layer_potential: List[float],
+                               layer_nitrate: List[float]) -> List[float]:  # pseudocode: C.5.C.4
     """
     Description: calculates the actual nitrogen uptake from each layer of soil
 
@@ -208,7 +212,7 @@ def calc_layer_nitrogen_uptake(layer_demand: list[float], layer_potential: list[
     return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nitrate)]
 
 
-def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabilities: list[float]) -> list[float]:  # pseudocode: C.5.C.5
+def calc_layer_nitrogen_demand(uptake_potentials: List[float], nitrate_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
     """
     Description: calculates the nitrogen demand of the plant from each soil layer
 
@@ -220,6 +224,7 @@ def calc_layer_nitrogen_demand(uptake_potentials: list[float], nitrate_availabil
     """
     layer_delta = [desired - available for desired, available in zip(uptake_potentials, nitrate_availabilities)]
     layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))]  # cumulative sum, starting at 0
+    
     return [max(val, 0) for val in layer_demand]  # results constrained to zero
 
 
@@ -242,6 +247,9 @@ def uptake_nitrogen(crop, soil) -> None:
                                                ndistro=crop.beta_n)
     demands = calc_layer_nitrogen_demand(uptake_potentials=potentials, nitrate_availabilities=layer_nitrates)
     uptakes = calc_layer_nitrogen_uptake(layer_demand=demands, layer_potential=potentials, layer_nitrate=layer_nitrates)
+    #print('layer potentials',potentials)
+
+    #print('layer uptakes',uptakes)
     # update attributes
     crop.pot_N_up_each_layer = potentials  # todo: needed?
     crop.act_N_up_each_layer = uptakes  # todo: needed?
@@ -251,8 +259,8 @@ def uptake_nitrogen(crop, soil) -> None:
     crop.N_act_up = sum(uptakes)  # give to crop
 
 
-def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
-                                  root_depth: float, ndistro: float) -> list[float]:  # pseudocode: C.5.C.2, C.5.C.3
+def calc_layer_nitrogen_potential(boundaries: List[float], demand: float,
+                                  root_depth: float, ndistro: float) -> List[float]:  # pseudocode: C.5.C.2, C.5.C.3
     """
     Description: calculates the potential nitrogen uptake from each soil layer
 
@@ -266,6 +274,7 @@ def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
     Returns: a list of potential nitrogen uptake from each layer
     """
     # check that boundaries are in ascending order
+
     sorted_boundaries = boundaries.copy()
     sorted_boundaries.sort()
     if sorted_boundaries != boundaries:
@@ -274,7 +283,8 @@ def calc_layer_nitrogen_potential(boundaries: list[float], demand: float,
     if len(boundaries) != len(set(boundaries)):
         raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
     # calculate results
-    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries]  # N at each boundary
+    boundary_nitrogen = [calc_nitrogen_uptake_to_depth(demand, x, root_depth, ndistro) for x in boundaries] 
+ # N at each boundary
     boundary_nitrogen.insert(0, 0)  # 0 N uptake at soil surface
     layer_nitrogen = [below - above for below, above in zip(boundary_nitrogen[1:], boundary_nitrogen)]  # subtract previous layer
     return layer_nitrogen
@@ -292,6 +302,7 @@ def calc_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float
 
     Returns: the potential amount of nitrogen taken up
     """
+    #print(f'{demand},{depth},{root_depth},{ndistro}')
     # error checks
     if ndistro == 0:
         raise ValueError("ndistro cannot equal 0")
