@@ -599,7 +599,8 @@ def test_manure_management_daily_update(is_last_day_of_simulation: bool,
     mock_animal_management_init = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
-    mock_time.is_last_day_of_simulation.return_value = is_last_day_of_simulation
+    mock_time.is_last_day_of_simulation = is_last_day_of_simulation
+
     mock_manure_management_config = mocker.MagicMock()
     manure_management = ManureManagement(
             animal_management=mock_animal_management_init,
