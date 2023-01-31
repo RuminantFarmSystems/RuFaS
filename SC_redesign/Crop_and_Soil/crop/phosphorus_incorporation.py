@@ -20,7 +20,7 @@ class PhosphorusIncorporation:
         """main phosphorus incorporation function - runs all phosphorus processes and stores phosphorus as biomass
 
         Args:
-            layer_phosphates: nitrates present in each layer of the soil profile
+            layer_phosphates: phosphates present in each layer of the soil profile
             layer_depths: maximum depths of each soil layer
 
         Details: calling this function will execute all phosphorus incorporation routines. It determines the amount of
@@ -84,7 +84,7 @@ class PhosphorusIncorporation:
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_phosphorus_time(self) -> None:
-        """copies the current nitrogen value to previous_nitrogen (for use between time steps)"""
+        """copies the current phosphorus value to previous_phosphorus (for use between time steps)"""
         self.data.previous_phosphorus = self.data.phosphorus
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
@@ -113,24 +113,24 @@ class PhosphorusIncorporation:
         return layer_list[0:self.data.accessible_soil_layers]
 
     def extend_phosphate_uptakes_to_full_profile(self) -> None:
-        """determines the actual nitrogen uptakes for the full soil profile, not just accessible layers
+        """determines the actual phosphorus uptakes for the full soil profile, not just accessible layers
 
-        Details: zeros are appended to the list of nitrogen uptakes for each inaccessible soil layer
+        Details: zeros are appended to the list of phosphorus uptakes for each inaccessible soil layer
         """
         if self.data.inaccessible_soil_layers > 0:
             self.data.actual_phosphorus_uptakes += [0] * self.data.inaccessible_soil_layers
 
-    def extract_phosphorus_from_soil_layers(self, layer_nitrates: List[float]) -> None:
+    def extract_phosphorus_from_soil_layers(self, layer_phosphates: List[float]) -> None:
         """extracts phosphorus from the soil profile by layer.
 
         Args:
-            layer_nitrates: a list of nitrates in each layer of the soil profile, from which nitrates will be extracted
-            by the plant.
+            layer_phosphates: a list of phosphates in each layer of the soil profile, from which phosphates will be
+            extracted by the plant.
 
-        Details: the layer_nitrates list is updated in place. Actual phosphorus uptake values are subtracted from
+        Details: the layer_phosphates list is updated in place. Actual phosphorus uptake values are subtracted from
         each layer
         """
-        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.data.actual_phosphorus_uptakes)]
+        layer_phosphates[:] = [max(src - snk, 0) for src, snk in zip(layer_phosphates, self.data.actual_phosphorus_uptakes)]
 
     def tally_total_phosphorus_uptake(self) -> None:
         """determines total phosphorus extracted from soil by summing actual uptake from each layer"""
