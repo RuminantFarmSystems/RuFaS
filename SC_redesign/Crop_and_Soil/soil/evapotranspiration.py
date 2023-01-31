@@ -191,7 +191,7 @@ class Evapotranspiration:
             return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
-    def _determine_evaporative_demand(max_soil_water_evaporation: float, layer_data: LayerData) -> float:
+    def _determine_layer_evaporative_demand(max_soil_water_evaporation: float, layer_data: LayerData) -> float:
         """calculates the evaporative demand for a given layer of soil
 
         Args:
@@ -201,7 +201,7 @@ class Evapotranspiration:
         Returns:
             evaporative demand for given layer of soil in mm
 
-        SWAT Reference: 2:2.3.17
+        SWAT Reference: 2:2.3.16, 17
         """
         # Check layer integrity
         if layer_data.top_depth is None or \
@@ -211,12 +211,12 @@ class Evapotranspiration:
                 (layer_data.bottom_depth <= layer_data.top_depth):
             raise ValueError("Missing or illegal values for top or bottom depths")
 
-        # Calculate top evaporative demand
+        # Calculate evaporative demand at top of layer
         top_depth = layer_data.top_depth
         top_quotient = top_depth / (top_depth + exp(2.374 - (0.00713 * top_depth)))
         top_evaporative_demand = max_soil_water_evaporation * top_quotient
 
-        # Calculate bottom evaporative demand
+        # Calculate evaporative demand at bottom of layer
         bottom_depth = layer_data.bottom_depth
         bottom_quotient = bottom_depth / (bottom_depth + exp(2.374 - (0.00713 * bottom_depth)))
         bottom_evaporative_demand = max_soil_water_evaporation * bottom_quotient
