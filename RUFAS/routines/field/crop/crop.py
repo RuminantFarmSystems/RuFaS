@@ -37,7 +37,11 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     daily_reset(crop_type, soil)
 
     info_map = {"class": "no_caller_class",
-                "function": daily_crop_routine.__name__, }
+                "function": daily_crop_routine.__name__, 
+                "soil": vars(soil),
+                "crop": vars(crop),
+                "field_management": vars(field_management),
+                "weather": vars(weather), }
 
     # If there is no crop in rotation this year, current crop will be named
     # 'null'. The routine is skipped in this case
@@ -236,7 +240,8 @@ class Crop:
         """
 
         info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__, }
+                    "function": self.__init__.__name__, 
+                    "crop_growth_data": data, }
 
         self.crops_list = []
         self.crops_data = data['crops']
