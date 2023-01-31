@@ -1,8 +1,8 @@
 import collections
-import os
 import shutil
 from dataclasses import fields
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 from typing import Dict
 from typing import List
@@ -133,7 +133,7 @@ class ManureManagementOutputHandler:
                                       obj_type: Union[Type[PenManure], Type[ManureHandlerDailyOutput],
                                                       Type[ReceptionPitDailyOutput], Type[ManureSeparatorDailyOutput],
                                                       Type[ManureTreatmentDailyOutput]],
-                                      extra_prefix='')\
+                                      extra_prefix='') \
             -> Dict[str, List[Any]]:
         """Returns a properly formatted dictionary of important dataclass attributes to be converted to dataframe.
 
@@ -241,9 +241,9 @@ class ManureManagementOutputHandler:
         self.sort_by(['pen_id', 'sim_day'])
         self.move_columns_to_front(['pen_id', 'sim_day'])
 
-    def export_to_csv(self) -> str:
+    def export_to_csv(self) -> Path:
         """Exports all data to a csv file."""
-        output_path = self.get_csv_output_path()
+        output_path = self.get_csv_output_file_path()
         self._df.to_csv(output_path, index=False)
         return output_path
 
@@ -269,36 +269,58 @@ class ManureManagementOutputHandler:
         return delimiter.join(word[0].upper() + word[1:] for word in s.split(delimiter))
 
     @classmethod
-    def get_main_output_directory(cls) -> str:
-        """Returns the main output directory for the manure module."""
-        output_dir = 'RUFAS/routines/manure/output'
-        os.makedirs(output_dir, exist_ok=True)
-        return output_dir
+    def get_main_output_directory_path(cls) -> Path:
+        """Returns the path of the main output directory for the manure module.
 
-    def get_csv_output_directory(self) -> str:
-        """Returns the csv output directory."""
-        csv_dir = f'{self.get_main_output_directory()}/csv'
-        os.makedirs(csv_dir, exist_ok=True)
-        return csv_dir
+        Returns
+        -------
+        Path
+            The path of the main output directory for the manure module.
 
-    def get_csv_output_path(self) -> str:
-        """Returns the output csv path."""
-        return f'{self.get_csv_output_directory()}/manure_management_output_{self._get_formatted_current_time()}.csv'
+        """
+        main_output_dir_path = Path('RUFAS/routines/manure/output')
+        main_output_dir_path.mkdir(parents=True, exist_ok=True)
+        return main_output_dir_path
+
+    def get_csv_output_directory_path(self) -> Path:
+        """Returns the path of the csv output directory.
+
+        Returns
+        -------
+        Path
+            The path of the csv output directory.
+
+        """
+        csv_dir_path = self.get_main_output_directory_path() / 'csv'
+        csv_dir_path.mkdir(parents=True, exist_ok=True)
+        return csv_dir_path
+
+    def get_csv_output_file_path(self) -> Path:
+        """Returns the path of the csv output file.
+
+        Returns
+        -------
+        Path
+            The path of the csv output file.
+
+        """
+        file_name = f'manure_management_output_{self._get_formatted_current_time()}'
+        file_extension = '.csv'
+        return self.get_csv_output_directory_path() / (file_name + file_extension)
 
     def empty_main_output_directory(self) -> None:
         """Empties the main output directory."""
-        self._delete_files_and_subdirectories(self.get_main_output_directory())
+        self._delete_files_and_subdirectories(self.get_main_output_directory_path())
 
     @classmethod
-    def _delete_files_and_subdirectories(cls, path: str) -> None:
+    def _delete_files_and_subdirectories(cls, path: Path) -> None:
         """Deletes all files and subdirectories in the specified path."""
-        if os.path.exists(path):
-            for file in os.listdir(path):
-                file_path = os.path.join(path, file)
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
+        if path.exists():
+            for file in path.iterdir():
+                if file.is_file():
+                    file.unlink()
+                elif file.is_dir():
+                    shutil.rmtree(file)
 
     @classmethod
     def _get_formatted_current_time(cls) -> str:
@@ -310,7 +332,7 @@ class ManureManagementOutputHandler:
             A string representation of the current time in the format `mm_dd_yyyy__hh_00`.
 
         """
-        return datetime.now().strftime('%m_%d_%Y__%H_00')
+        return datetime.now().strftime('%Y_%m_%d__%H_00')
 
     # ----------------------------------------------------------------------------------
     # The following aggregation are not currently used or unit-tested, but may be useful in the future.
