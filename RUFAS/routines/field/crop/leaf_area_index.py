@@ -122,11 +122,11 @@ def calculate_LAI_actual(crop_type):
     d_fr_LAI_max = (crop_type.fr_LAI_max - crop_type.prev_fr_LAI_max)
     d_LAI_max = d_fr_LAI_max * crop_type.LAI_max * (1 - exp_part)
     d_LAI_actual = calculate_d_LAI_actual(crop_type, d_LAI_max)
-
     if crop_type.fr_PHU <= crop_type.fr_PHU_sen:
-        # C.8.A.6
-        crop_type.LAI_actual = crop_type.LAI_actual + d_LAI_actual
-        crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
+        #C.8.A.6
+        LAI_actual = crop_type.LAI_actual + d_LAI_actual
+        crop_type.LAI_actual = max(LAI_actual, 0)
+
     else:
         # C.8.A.6
         crop_type.LAI_actual = crop_type.LAI_actual * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
@@ -146,5 +146,5 @@ def calculate_d_LAI_actual(crop_type, d_LAI_max):
     Returns:
         float: change in LAI actual
     """
-
-    return d_LAI_max * sqrt(crop_type.gamma_reg)
+    #print('d_LAI_max',d_LAI_max,'crop_type.gamma_reg',crop_type.gamma_reg)
+    return min(d_LAI_max * sqrt(crop_type.gamma_reg),0.01)

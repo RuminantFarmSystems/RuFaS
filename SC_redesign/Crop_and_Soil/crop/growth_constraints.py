@@ -7,7 +7,6 @@ This module primarily follows the Growth Constraints section of the SWAT model (
 """
 
 
-# TODO - Refactor this class to match others - GitHub Issue #257
 class GrowthConstraints:
     """crop process class pertaining to growth constraints"""
     def __init__(self, crop_data: Optional[CropData] = None):

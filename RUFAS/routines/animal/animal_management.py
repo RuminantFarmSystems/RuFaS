@@ -434,21 +434,24 @@ class AnimalManagement:
             self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc,
                                                     feed, temp, pen_population_before_additions[pen.id])
 
-        for pen in range(len(self.all_pens)):
-            if len(self.all_pens[pen].animals_in_pen) > 0 and 'Cow' in self.all_pens[pen].classes_in_pen and \
-                    self.all_pens[pen].ration == {}:
-                available_feeds = ration_driver.AvailableFeeds()
-                available_feeds.feed_nutrients(feed)
-                self.all_pens[pen].ration = self.all_pens[pen].calc_ration(feed, available_feeds)
+        for i in range(len(self.all_pens)):
+            if len(self.all_pens[i].animals_in_pen) > 0:
+                if self.all_pens[i].ration == {}:
+                    available_feeds = ration_driver.AvailableFeeds()
+                    available_feeds.feed_nutrients(feed)
+                    self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
+                    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(self.all_pens[i].allocated_feeds)
+                    self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
             else:
-                # Need to adjust the ration totals for the pen attributes now
-                # that all new animals have been added
-                for key in self.all_pens[pen].ration:
-                    if key != 'status' and key != 'objective':
-                        self.all_pens[pen].ration[key] = \
-                            (self.all_pens[pen].ration[key] /
-                             pen_population_before_additions[pen]) * len(
-                                self.all_pens[pen].animals_in_pen)
+                if len(self.all_pens[i].animals_in_pen) > 0:
+                    # Need to adjust the ration totals for the pen attributes now
+                    # that all new animals have been added
+                    for key in self.all_pens[i].ration:
+                        if key != 'status' and key != 'objective' and pen_population_before_additions[i] > 0:
+                            self.all_pens[i].ration[key] = \
+                                (self.all_pens[i].ration[key] /
+                                    pen_population_before_additions[i]) * len(
+                                    self.all_pens[i].animals_in_pen)
 
         for calf in calves_born:
             # getting valid pen to place calves in
@@ -697,7 +700,9 @@ class AnimalManagement:
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
             if pen.pen_populated:
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, available_feeds)
+                pen.subset_class_feeds(feed)
+                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
 
     def calc_manure_excretion(self, feed, methane_model):
         """

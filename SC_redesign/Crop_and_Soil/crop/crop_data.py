@@ -11,7 +11,7 @@ class CropData:
     """the light extinction coefficient (unitless)"""
     leaf_area_index: float = 1.2
     """leaf area index of the plant (unitless)"""
-    light_conversion: float = 20
+    light_use_efficiency: float = 20
     """light use efficiency of the plant (dg/MJ)"""
     biomass: float = 0
     """total plant biomass (kg/ha)"""

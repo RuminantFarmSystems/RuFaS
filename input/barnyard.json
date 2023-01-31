@@ -6,7 +6,8 @@
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,
-        "seed": 0
+        "seed": 0,
+        "simulate_animals": false
     },
 
     "weather": "barnyard_weather.csv",
@@ -33,6 +34,6 @@
             }
         },
         "animal": "barnyard_animal.json",
-        "feed": "panke_buisse_feed.json"
+        "feed": "purchased_feed.json"
     }
 }

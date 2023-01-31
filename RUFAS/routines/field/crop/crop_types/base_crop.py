@@ -14,10 +14,10 @@ class BaseCrop:
     def __init__(self, crop_name=None, data=None, species=None):
         """create an instance of BaseCrop class
 
-            Args:
-                crop_name (str): the name of the crop
-                data (dict): a dictionary containg crop data
-                species (str): the species of the crop (see crop_config.py)
+        Args:
+            crop_name (str): the name of the crop
+            data (dict): a dictionary containg crop data
+            species (str): the species of the crop (see crop_config.py)
         """
         #  id variables
         self.crop_name = 'null'
@@ -119,7 +119,7 @@ class BaseCrop:
         # biomass
         self.kl = 0.65  # psuedocode C.9.A.2
         """float: light extinction coefficient"""
-        self.RUE = 20  # psuedocode C.9.A.2
+        self.RUE = 100  # psuedocode C.9.A.2
         """float: crop-specific radiation use efficiency"""
         self.T_opt = 25  # psuedocode C.7.B.2
         """float: crop-specific optimal temperature for growth"""
@@ -241,7 +241,7 @@ class BaseCrop:
         """float: Annual crop yield (kg/ha)"""
 
         # use data to set attributes, if given
-        self._use_data(data)
+        self._use_data(data,crop_name)
         self._set_crop_name(crop_name)
 
         # fetch and set species-specific data, if needed
@@ -249,7 +249,7 @@ class BaseCrop:
             self._set_species(species)
             self._set_species_attributes(self._get_crop_data())
 
-    def _use_data(self, data=None):
+    def _use_data(self, data=None,cropname=None):
         """use input data to assign some attributes
 
            Args:
@@ -258,6 +258,7 @@ class BaseCrop:
                and "extracted"
         """
         if data is not None:
+            data=data[cropname]
             self.plant_years = data['plant_years']
             self.repeat = data['repeat']
             self.planting_day = data['planting_day']
@@ -309,6 +310,3 @@ class BaseCrop:
         """
         for key, val in data_variable.items():
             setattr(self, key, val)
-
-## TODO: The Crop() class needs to be updated to work with the new functionality of BaseCrop and the child - GitHub Issue #180
-##  crop classes should have everything removed except species-specific methods.
