@@ -6,7 +6,8 @@
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,
-        "seed": 0
+        "seed": 0,
+        "simulate_animals": false
     },
 
     "weather": "swat_weather.csv",

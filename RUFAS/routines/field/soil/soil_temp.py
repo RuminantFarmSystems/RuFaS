@@ -76,8 +76,9 @@ def update_all(soil, crop, weather, time):
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
-
-    calc_T_surf(soil, crop, weather, time)
+    for crop_types in crop.current_crop.values():
+        
+        calc_T_surf(soil, crop_types, weather, time)
 
     calc_T_soil(soil, weather, time)
 
@@ -204,7 +205,7 @@ def sum_soil_water(soil):
     return total_soil_water
 
 
-def calc_T_surf(soil, crop, weather, time):
+def calc_T_surf(soil, crop_type, weather, time):
     """
     Description:
         Calculates the surface temperature as a function of the previous day's
@@ -219,13 +220,13 @@ def calc_T_surf(soil, crop, weather, time):
         time: an instance of the Time class
     """
 
-    T_bare = calc_T_bare(soil, crop, weather, time)
-    bcv = calc_bcv(crop, time)
+    T_bare = calc_T_bare(soil, crop_type, weather, time)
+    bcv = calc_bcv(crop_type, time)
 
     soil.T_surf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * T_bare)
 
 
-def calc_T_bare(soil, crop, weather, time):
+def calc_T_bare(soil, crop_type, weather, time):
     """
     Description:
         Calculates the temperature of a bare soil.
@@ -241,12 +242,12 @@ def calc_T_bare(soil, crop, weather, time):
         int: T_bare, the theoretical temperature of the bare soil (ºC)
     """
     T_av = weather.T_avg[time.year - 1][time.day - 1]
-    radiate = calc_radiate(soil, crop, weather, time)
+    radiate = calc_radiate(soil, crop_type, weather, time)
 
     return T_av + radiate * T_av
 
 
-def calc_radiate(soil, crop, weather, time):
+def calc_radiate(soil, crop_type, weather, time):
     """
     Description:
         Calculates the radiation term for the temperature of bare soil.
@@ -263,12 +264,12 @@ def calc_radiate(soil, crop, weather, time):
     """
 
     H_day = weather.radiation[time.year - 1][time.day - 1]
-    albedo = calc_albedo(soil, crop)
+    albedo = calc_albedo(soil, crop_type)
 
     return (H_day * (1 - albedo) - 14) / 20
 
 
-def calc_albedo(soil, crop):
+def calc_albedo(soil, crop_type):
     """
     Description:
         Calculates the daily albedo as a function of soil type, plant cover,
@@ -283,7 +284,7 @@ def calc_albedo(soil, crop):
         int: soil albedo
     """
 
-    CV = crop.current_crop.bio_AG
+    CV = crop_type.bio_AG
 
     # "pseudocode_soil" S.1.A.10
     cover = exp(-0.00005 * CV)
@@ -292,7 +293,7 @@ def calc_albedo(soil, crop):
     return 0.23 * (1 - cover) + soil.soil_albedo * cover
 
 
-def calc_bcv(crop, time):
+def calc_bcv(crop_type, time):
     """
     Description:
         Calculates the weighting factor for ground cover
@@ -306,7 +307,7 @@ def calc_bcv(crop, time):
         int: bcv, the bio-cover weighting factor for ground cover
     """
 
-    CV = crop.current_crop.bio_AG
+    CV = crop_type.bio_AG
     exp_part = exp(7.563 - 0.0001297 * (-CV))
 
     bcv = CV / (CV + exp_part)
