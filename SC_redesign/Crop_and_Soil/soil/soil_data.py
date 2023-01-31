@@ -19,3 +19,8 @@ class SoilData:
     """maximum amount of evaporation from soil on a given day (mm)"""
     soil_layers: Optional[List[LayerData]] = None
     """list of soil layer data objects, top layer is 0th, bottom is nth"""
+
+    # ---- infiltration
+    curve_number_2: float = 40  # arbitrary
+    """Part of SCS Curve Number Procedure for runoff (SWAT 2:1.1)"""
+
