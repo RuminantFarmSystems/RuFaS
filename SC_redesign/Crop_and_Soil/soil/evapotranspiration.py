@@ -191,7 +191,7 @@ class Evapotranspiration:
             return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
-    def _determine_evaporative_demand(max_soil_water_evaporation: float, layer_data: LayerData) -> float:
+    def _determine_layer_evaporative_demand(max_soil_water_evaporation: float, top_depth: float, bottom_depth: float, compensation: float) -> float:
         """calculates the evaporative demand for a given layer of soil
 
         Args:
