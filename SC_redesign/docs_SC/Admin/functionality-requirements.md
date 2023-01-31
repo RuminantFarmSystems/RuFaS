@@ -8,7 +8,7 @@ output:
 
 # Crop and Soil Requirements
 
-This document outlines expected functionality of the RuFaS Soil and Crop Module.
+This document outlines expected functionality of the RuFaS Soil and Crop Module in Fall 2022.
 
 ## Version 1.0.0 (Jan 2023)
 
