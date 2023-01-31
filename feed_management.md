@@ -30,7 +30,7 @@ data required for ration formulation.
 Develop a `FeedManagement` class that directs the management of the `Feed` class
 similar to the `AnimalManagement` and `ManureManagement` classes.
 
-The `FeedManagement` class will have 4 primary jobs:
+The `FeedManagement` class will have 5 primary jobs:
 1. Keep track of the different `Storage` objects and how much of each type of feed is in all of them
 2. Direct newly-harvested feed from the **Crop and Soil** module to a storage object
 3. Tell the **Animal Module** how much feed there is
