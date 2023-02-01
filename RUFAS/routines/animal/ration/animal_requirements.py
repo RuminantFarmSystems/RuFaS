@@ -19,11 +19,12 @@ def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, p
                lactating=None, body_condition_score_5=None, previous_temperature=None,
                average_daily_gain_heifer=None, Age=None, distance=None):
     """
-    Calculates the dietary requirements of a single animal. These values are used
-    on the RHS of the linear program and furthermore will be used in constraint
-    generation functions. Each calculation has a reference to the
-    respective calculation in the pseudocode (both Cow and Heifer).
-    (Note that arguments that are only for a single animal class are instanciated
+    Calculates the dietary requirements of a single animal.
+
+    The energy requirements calculated according to NRC (2001) or NASEM (2021) are values that are used
+    to generate the constraints or RHS of the nonlinear program for diet optimization.
+    Each calculation has a reference to the respective calculation in the pseudocode (both Cow and Heifer).
+    (Note that arguments that are only for a single animal class are instantiated
     at None however the respective parameters must be set when calling said
     animal class)
     Args:
@@ -48,38 +49,48 @@ def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, p
     """
     if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
         net_energy_maintenance, conceptus_weight, calf_birth_weight = calculate_NRC_energy_maintenance_requirements(
-            body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type)
+            body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature,
+            animal_type)
         net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight = calculate_NRC_energy_growth_requirements(
-            body_weight, mature_body_weight, conceptus_weight, animal_type, parity, calving_interval, average_daily_gain_heifer)
+            body_weight, mature_body_weight, conceptus_weight, animal_type, parity, calving_interval,
+            average_daily_gain_heifer)
         net_energy_pregnancy = calculate_NRC_energy_pregnancy_requirements(
             day_of_pregnancy, calf_birth_weight)
         net_energy_lactation = calculate_NRC_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
         metabolizable_protein_requirement = calculate_NRC_protein_requirements(
-            body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein, calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight)
+            body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
+            calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight)
         calcium_requirement = calculate_NRC_calcium_requirements(
-            body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain, milk_production)
+            body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain,
+            milk_production)
         phosphorus_requirement = calculate_NRC_phosphorus_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain)
         dry_matter_intake_estimate = calculate_NRC_DMI(
             animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat)
+
     elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
         net_energy_lactation = calculate_NASEM_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
         dry_matter_intake_estimate = calculate_NASEM_DMI(
-            body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, parity, body_condition_score_5)
-        net_energy_maintenance, gravid_utertine_weight, utertine_weight = calculate_NASEM_energy_maintenance_requirements(
-            body_weight, mature_body_weight, day_of_pregnancy, days_in_milk)
+            body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, parity,
+            body_condition_score_5)
+        net_energy_maintenance, gravid_utertine_weight, utertine_weight = \
+            calculate_NASEM_energy_maintenance_requirements(body_weight, mature_body_weight, day_of_pregnancy,
+                                                            days_in_milk)
         net_energy_growth, average_daily_gain, frame_weight_gain = calculate_NASEM_energy_growth_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval)
         net_energy_pregnancy, gravid_utertine_weight_gain = calculate_NASEM_energy_pregnancy_requirements(
             lactating, day_of_pregnancy, days_in_milk, gravid_utertine_weight, utertine_weight)
         metabolizable_protein_requirement = calculate_NASEM_protein_requirements(
-            lactating, body_weight, frame_weight_gain, gravid_utertine_weight_gain, dry_matter_intake_estimate, milk_true_protein, milk_production)
+            lactating, body_weight, frame_weight_gain, gravid_utertine_weight_gain, dry_matter_intake_estimate,
+            milk_true_protein, milk_production)
         calcium_requirement = calculate_NASEM_calcium_requirements(
-            body_weight, mature_body_weight, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate, milk_true_protein, milk_production)
+            body_weight, mature_body_weight, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate,
+            milk_true_protein, milk_production)
         phosphorus_requirement = calculate_NASEM_phosphorus_requirements(
-            body_weight, mature_body_weight, animal_type, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate, milk_true_protein, milk_production)
+            body_weight, mature_body_weight, animal_type, day_of_pregnancy, average_daily_gain,
+            dry_matter_intake_estimate, milk_true_protein, milk_production)
     else:
         dry_matter_intake_estimate = []
         energy_and_nutrient_calculation_method_error = f"energy and nutrient calculation method \
@@ -90,11 +101,13 @@ def calc_rqmts(body_weight, mature_body_weight, day_of_pregnancy, animal_type, p
                      energy_and_nutrient_calculation_method_error, info_map)
     # Requirements summary dictionary
     return {'NEmaint': net_energy_maintenance, 'NEg': net_energy_growth, 'NEpreg': net_energy_pregnancy,
-            'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'Ca_req': calcium_requirement, 'P_req': phosphorus_requirement,
-            'DMIest': dry_matter_intake_estimate}
+            'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'Ca_req': calcium_requirement,
+            'P_req': phosphorus_requirement,'DMIest': dry_matter_intake_estimate}
 
 
-def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, body_condition_score_5: int | None, previous_temperature: float | None,
+def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_body_weight: float,
+                                                  day_of_pregnancy: int | None, body_condition_score_5: int | None,
+                                                  previous_temperature: float | None,
                                                   animal_type: str) -> tuple[float, float, float]:
     """ Calculates energy requirement for maintenance, conceptus weight, and calf birth weight 
 
@@ -104,9 +117,9 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     Parameters
     ----------
     body_weight : float
-        Body weight (kilograms)
+        Body weight (kg)
     mature_body_weight : float
-        Mature body weight (kilograms)
+        Mature body weight (kg)
     day_of_pregnancy : int
         Day of pregnancy (days)
     body_condition_score_5 : int
@@ -122,9 +135,9 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     net_energy_maintenance : float
         Net energy requirement for maintenance (mcal/day)
     conceptus_weight : float
-        Conceptus weight (kilograms)
+        Conceptus weight (kg)
     calf_birth_weight : float
-        Calf birth weight (kilograms)
+        Calf birth weight (kg)
 
     Notes
     -----
@@ -132,7 +145,8 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter 2 "Energy",pp. 18-25, 2001.
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+    Chapter 2 "Energy",pp. 18-25, 2001.
 
     """
     calf_birth_weight = mature_body_weight * 0.06275
@@ -155,18 +169,20 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
 
-def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, days_in_milk: int | None) -> tuple[float, float, float]:
+def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_body_weight: float,
+                                                    day_of_pregnancy: int | None, days_in_milk: int | None) -> \
+        tuple[float, float, float]:
     """ Calculates energy requirement for maintenance and two measures of uterine weight
 
-    Calculates the estimated energy requirements requirements for maintenance in megacalories per day,
+    The estimated energy requirements requirements for maintenance are calculated in megacalories per day,
     as well as gravid uterine weight and uterine weight in kg, according to NASEM (2021).
 
     Parameters
     ----------
     body_weight : float
-        Body weight (kilograms)
+        Body weight (kg)
     mature_body_weight : float
-        Mature body weight (kilograms)
+        Mature body weight (kg)
     day_of_pregnancy : int
         Day of pregnancy (days)
     days_in_milk : int
@@ -175,18 +191,21 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
     Returns
     -------
     net_energy_maintenance : float
-        Net energy requirement for maintenance in megacalories per day
+        Net energy requirement for maintenance (mcal/day)
     gravid_utertine_weight : float
-        Gravid uterine weight in kilograms
+        Gravid uterine weight (kg))
     utertine_weight : float
-        Uterine weight in kilograms
+        Uterine weight (kg))
 
     Notes
     -----
     # NASEM (2021) does not adjust energy requirements for environmental temperature as it assumes
-    # that confinement conditions already provide comfort temperature to the animals. Something to think for the grazing module?
-    # Instead of calculating calf_birth_weight, NASEM (2021) also contains standards calf_birth_weight and mature_body_weight (tabulated values) for selected breeds (eg., Holstein)
-    # Instead of estimating conceptus_weight, gain in pregnancy tissues is estimated (gravid_utertine_weight and utertine_weight).
+    # that confinement conditions already provide comfort temperature to the animals.
+    # This is something to consider and update for the grazing module
+    # Instead of calculating calf_birth_weight, NASEM (2021) also contains standards calf_birth_weight and
+    # mature_body_weight (tabulated values) for selected breeds (eg., Holstein)
+    # Instead of estimating conceptus_weight, gain in pregnancy tissues is estimated:
+    # (gravid_utertine_weight and utertine_weight).
     # day_of_pregnancy (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in NASEM (2021) book.
 
     References
@@ -200,8 +219,8 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
         utertine_weight = 0
     else:
         calf_birth_weight = mature_body_weight * 0.06275
-        gravid_utertine_weight = (calf_birth_weight * 1.825) * math.exp(-0.0243 -
-                                                                        (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy))
+        gravid_utertine_weight = (calf_birth_weight * 1.825) * \
+                                 math.exp(-0.0243 -(0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy))
         if days_in_milk == None:
             days_in_milk = 0
         utertine_weight = ((calf_birth_weight * 0.2288) *
@@ -220,23 +239,24 @@ def calculate_NRC_energy_activity_requirements():
 
 def calculate_NASEM_energy_activity_requirements(
     body_weight: float, housing: str, distance: float | None) -> float:
-    """ Calculates energy requirement for activity according to NASEM (2001).
+    """ Calculates energy requirement for activity
 
-    Calculates the estimated energy requirements requirements for maintenance in megacalories per day
+    The estimated energy requirements requirements for activity in megacalories per day are calculated
+    according to NASEM (2001) using an estimated distance traveled based on the distance from the pen to the milking parlor
 
     Parameters
     ----------
     body_weight : float
-        Body weight (kilograms)
+        Body weight (kg)
     housing : str
         Production system
     distance : float
-        Estimated distance traveles by the animal daily (meters)
+        Estimated distance travels by the animal daily (meters)
 
     Returns
     -------
     net_energy_activity : float
-        Net energy requirement for activity in megacalories per day
+        Net energy requirement for activity (mcal/day)
 
     Notes
     -----
@@ -268,17 +288,17 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
                                              calving_interval: int | None, average_daily_gain_heifer: float | None) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth and associated weight gain parameters.
 
-    Calculates the estimated energy requirements requirements for growth in megacalories per day, 
-    and average daily gain and estimate of shrunk body weight, according to NRC (2001).
+    The estimated energy requirements requirements for growth in megacalories per day,
+    and average daily gain and estimate of shrunk body weight, in kilograms are calculated according to NRC (2001).
 
     Parameters
     ----------
     body_weight : float
-        Body weight (kilograms)
+        Body weight (kg)
     mature_body_weight : float
-        Mature body weight (kilograms)
+        Mature body weight (kg)
     conceptus_weight : float
-        Conceptus weight (kilograms)
+        Conceptus weight (kg)
     animal_type : str
         Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     parity : int
@@ -299,7 +319,8 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx, pp. xx-xx, 2001.
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+    Chapter xx, pp. xx-xx, 2001.
     """
     # Activity requirements
     # ---------------------
