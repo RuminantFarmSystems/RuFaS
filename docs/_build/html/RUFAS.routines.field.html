@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.crop package" href="RUFAS.routines.field.crop.html" />
+    <link rel="prev" title="RUFAS.routines.feed package" href="RUFAS.routines.feed.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-field-package">
+<h1>RUFAS.routines.field package<a class="headerlink" href="#rufas-routines-field-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.crop.html">RUFAS.routines.field.crop package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html">RUFAS.routines.field.crop.crop_types package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.alfalfa">RUFAS.routines.field.crop.crop_types.alfalfa module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.base_crop">RUFAS.routines.field.crop.crop_types.base_crop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.corn">RUFAS.routines.field.crop.crop_types.corn module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.potato">RUFAS.routines.field.crop.crop_types.potato module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.soybean">RUFAS.routines.field.crop.crop_types.soybean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.spring_barley">RUFAS.routines.field.crop.crop_types.spring_barley module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.spring_wheat">RUFAS.routines.field.crop.crop_types.spring_wheat module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.sugar_beet">RUFAS.routines.field.crop.crop_types.sugar_beet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types.tall_fescue">RUFAS.routines.field.crop.crop_types.tall_fescue module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.crop_types.html#module-RUFAS.routines.field.crop.crop_types">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.biomass">RUFAS.routines.field.crop.biomass module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.biomass.calc_act_biomass"><code class="docutils literal notranslate"><span class="pre">calc_act_biomass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.biomass.calc_bio_AG"><code class="docutils literal notranslate"><span class="pre">calc_bio_AG()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.biomass.calc_gamma_wu"><code class="docutils literal notranslate"><span class="pre">calc_gamma_wu()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.biomass.calc_intercepted_radiation"><code class="docutils literal notranslate"><span class="pre">calc_intercepted_radiation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.biomass.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.crop">RUFAS.routines.field.crop.crop module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.Crop"><code class="docutils literal notranslate"><span class="pre">Crop</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.Crop.annual_reset"><code class="docutils literal notranslate"><span class="pre">Crop.annual_reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.Crop.iterate_planting_day"><code class="docutils literal notranslate"><span class="pre">Crop.iterate_planting_day()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.Crop.set_grow_regimen"><code class="docutils literal notranslate"><span class="pre">Crop.set_grow_regimen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.annual_crop_routine"><code class="docutils literal notranslate"><span class="pre">annual_crop_routine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.annual_variable_update"><code class="docutils literal notranslate"><span class="pre">annual_variable_update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.calculate_minimum_day_length"><code class="docutils literal notranslate"><span class="pre">calculate_minimum_day_length()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.calculate_start"><code class="docutils literal notranslate"><span class="pre">calculate_start()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.calculate_t_dorm"><code class="docutils literal notranslate"><span class="pre">calculate_t_dorm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.check_conditions_plant"><code class="docutils literal notranslate"><span class="pre">check_conditions_plant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.daily_crop_routine"><code class="docutils literal notranslate"><span class="pre">daily_crop_routine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.daily_reset"><code class="docutils literal notranslate"><span class="pre">daily_reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.dormancy_routine"><code class="docutils literal notranslate"><span class="pre">dormancy_routine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.get_year_length"><code class="docutils literal notranslate"><span class="pre">get_year_length()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.in_dormancy"><code class="docutils literal notranslate"><span class="pre">in_dormancy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.crop.is_kill_year"><code class="docutils literal notranslate"><span class="pre">is_kill_year()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.growth_constraints">RUFAS.routines.field.crop.growth_constraints module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_gamma_reg"><code class="docutils literal notranslate"><span class="pre">calc_gamma_reg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_n_stress"><code class="docutils literal notranslate"><span class="pre">calc_n_stress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_p_stress"><code class="docutils literal notranslate"><span class="pre">calc_p_stress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_phi_N"><code class="docutils literal notranslate"><span class="pre">calc_phi_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_phi_P"><code class="docutils literal notranslate"><span class="pre">calc_phi_P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_t_stress"><code class="docutils literal notranslate"><span class="pre">calc_t_stress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.calc_w_stress"><code class="docutils literal notranslate"><span class="pre">calc_w_stress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.growth_constraints.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.heat_units">RUFAS.routines.field.crop.heat_units module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.heat_units.calc_HU"><code class="docutils literal notranslate"><span class="pre">calc_HU()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.heat_units.calc_T_HU_max"><code class="docutils literal notranslate"><span class="pre">calc_T_HU_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.heat_units.calc_T_HU_min"><code class="docutils literal notranslate"><span class="pre">calc_T_HU_min()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.heat_units.calculate_fr_PHU"><code class="docutils literal notranslate"><span class="pre">calculate_fr_PHU()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.heat_units.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.leaf_area_index">RUFAS.routines.field.crop.leaf_area_index module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.leaf_area_index.calc_fr_LAI_max"><code class="docutils literal notranslate"><span class="pre">calc_fr_LAI_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.leaf_area_index.calculate_LAI_actual"><code class="docutils literal notranslate"><span class="pre">calculate_LAI_actual()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.leaf_area_index.calculate_d_LAI_actual"><code class="docutils literal notranslate"><span class="pre">calculate_d_LAI_actual()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.leaf_area_index.calculate_shape_coefficients"><code class="docutils literal notranslate"><span class="pre">calculate_shape_coefficients()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.leaf_area_index.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.nitrogen_fixation">RUFAS.routines.field.crop.nitrogen_fixation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_fixation.calc_N_demand"><code class="docutils literal notranslate"><span class="pre">calc_N_demand()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_fixation.calc_N_fixation"><code class="docutils literal notranslate"><span class="pre">calc_N_fixation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_fixation.calc_f_NO3"><code class="docutils literal notranslate"><span class="pre">calc_f_NO3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_fixation.calc_f_gr"><code class="docutils literal notranslate"><span class="pre">calc_f_gr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_fixation.calc_f_sw"><code class="docutils literal notranslate"><span class="pre">calc_f_sw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_fixation.get_root_accessible_layers"><code class="docutils literal notranslate"><span class="pre">get_root_accessible_layers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.nitrogen_uptake">RUFAS.routines.field.crop.nitrogen_uptake module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.N_uptake"><code class="docutils literal notranslate"><span class="pre">N_uptake()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_N_up"><code class="docutils literal notranslate"><span class="pre">calc_N_up()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_N_up_each_layer"><code class="docutils literal notranslate"><span class="pre">calc_N_up_each_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_N_up_z"><code class="docutils literal notranslate"><span class="pre">calc_N_up_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_act_N_up_each_layer"><code class="docutils literal notranslate"><span class="pre">calc_act_N_up_each_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_bio_N"><code class="docutils literal notranslate"><span class="pre">calc_bio_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_bio_N_opt"><code class="docutils literal notranslate"><span class="pre">calc_bio_N_opt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_fr_N"><code class="docutils literal notranslate"><span class="pre">calc_fr_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_log_term_of_shape_coefficient"><code class="docutils literal notranslate"><span class="pre">calc_log_term_of_shape_coefficient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_n1"><code class="docutils literal notranslate"><span class="pre">calc_n1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.calc_n2"><code class="docutils literal notranslate"><span class="pre">calc_n2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.nitrogen_uptake.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.phosphorus_uptake">RUFAS.routines.field.crop.phosphorus_uptake module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.P_uptake"><code class="docutils literal notranslate"><span class="pre">P_uptake()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_P_up"><code class="docutils literal notranslate"><span class="pre">calc_P_up()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_P_up_each_layer"><code class="docutils literal notranslate"><span class="pre">calc_P_up_each_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_P_up_z"><code class="docutils literal notranslate"><span class="pre">calc_P_up_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_act_P_up_each_layer"><code class="docutils literal notranslate"><span class="pre">calc_act_P_up_each_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_bio_P"><code class="docutils literal notranslate"><span class="pre">calc_bio_P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_bio_P_opt"><code class="docutils literal notranslate"><span class="pre">calc_bio_P_opt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_fr_P"><code class="docutils literal notranslate"><span class="pre">calc_fr_P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_log_term_of_shape_coefficient"><code class="docutils literal notranslate"><span class="pre">calc_log_term_of_shape_coefficient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_p1"><code class="docutils literal notranslate"><span class="pre">calc_p1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.calc_p2"><code class="docutils literal notranslate"><span class="pre">calc_p2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.phosphorus_uptake.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.root_development">RUFAS.routines.field.crop.root_development module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.root_development.calc_daily_root_biomass"><code class="docutils literal notranslate"><span class="pre">calc_daily_root_biomass()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.root_development.calc_z_root"><code class="docutils literal notranslate"><span class="pre">calc_z_root()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.root_development.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.transpiration">RUFAS.routines.field.crop.transpiration module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.transpiration.calc_act_water_uptake"><code class="docutils literal notranslate"><span class="pre">calc_act_water_uptake()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.transpiration.calc_max_water_uptake_each_layer"><code class="docutils literal notranslate"><span class="pre">calc_max_water_uptake_each_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.transpiration.calc_max_water_uptake_z"><code class="docutils literal notranslate"><span class="pre">calc_max_water_uptake_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.transpiration.decrease_efficiency_of_uptake"><code class="docutils literal notranslate"><span class="pre">decrease_efficiency_of_uptake()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.transpiration.inc_lower_layer_uptake"><code class="docutils literal notranslate"><span class="pre">inc_lower_layer_uptake()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.transpiration.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop.yields">RUFAS.routines.field.crop.yields module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_HI_act"><code class="docutils literal notranslate"><span class="pre">calc_HI_act()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_HI_max"><code class="docutils literal notranslate"><span class="pre">calc_HI_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_dry_down"><code class="docutils literal notranslate"><span class="pre">calc_dry_down()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_harvest_quality"><code class="docutils literal notranslate"><span class="pre">calc_harvest_quality()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_nutrient_removal"><code class="docutils literal notranslate"><span class="pre">calc_nutrient_removal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_quality_assessment"><code class="docutils literal notranslate"><span class="pre">calc_quality_assessment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_residue"><code class="docutils literal notranslate"><span class="pre">calc_residue()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_yield_act"><code class="docutils literal notranslate"><span class="pre">calc_yield_act()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.calc_yield_max"><code class="docutils literal notranslate"><span class="pre">calc_yield_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.cut"><code class="docutils literal notranslate"><span class="pre">cut()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.kill"><code class="docutils literal notranslate"><span class="pre">kill()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.crop.html#RUFAS.routines.field.crop.yields.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.crop.html#module-RUFAS.routines.field.crop">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.field_management.html">RUFAS.routines.field.field_management package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.field_management.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.fertilizer_application">RUFAS.routines.field.field_management.fertilizer_application module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.fertilizer_application.fertilizer_K"><code class="docutils literal notranslate"><span class="pre">fertilizer_K()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.fertilizer_application.fertilizer_N"><code class="docutils literal notranslate"><span class="pre">fertilizer_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.fertilizer_application.fertilizer_P"><code class="docutils literal notranslate"><span class="pre">fertilizer_P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.fertilizer_application.formulate_fert_app"><code class="docutils literal notranslate"><span class="pre">formulate_fert_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.fertilizer_application.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.field_management">RUFAS.routines.field.field_management.field_management module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.FieldManagement"><code class="docutils literal notranslate"><span class="pre">FieldManagement</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.FieldManagement.BaseApplicationManagement"><code class="docutils literal notranslate"><span class="pre">FieldManagement.BaseApplicationManagement</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.FieldManagement.FertApplicationManagement"><code class="docutils literal notranslate"><span class="pre">FieldManagement.FertApplicationManagement</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.FieldManagement.annual_reset"><code class="docutils literal notranslate"><span class="pre">FieldManagement.annual_reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.FieldManagement.check_conditions"><code class="docutils literal notranslate"><span class="pre">FieldManagement.check_conditions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.FieldManagement.update_annual_variables"><code class="docutils literal notranslate"><span class="pre">FieldManagement.update_annual_variables()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.daily_field_management_reset"><code class="docutils literal notranslate"><span class="pre">daily_field_management_reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.field_management.daily_field_management_routine"><code class="docutils literal notranslate"><span class="pre">daily_field_management_routine()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.manure_application">RUFAS.routines.field.field_management.manure_application module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.manure_application.added_manure_N"><code class="docutils literal notranslate"><span class="pre">added_manure_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.manure_application.added_manure_P"><code class="docutils literal notranslate"><span class="pre">added_manure_P()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.manure_application.formulate_manure_application"><code class="docutils literal notranslate"><span class="pre">formulate_manure_application()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.manure_application.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management.tillage_application">RUFAS.routines.field.field_management.tillage_application module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.field_management.html#RUFAS.routines.field.field_management.tillage_application.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.field_management.html#module-RUFAS.routines.field.field_management">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html">RUFAS.routines.field.soil.carbon_cycling package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.carbon_cycle">RUFAS.routines.field.soil.carbon_cycling.carbon_cycle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.decomp_factors">RUFAS.routines.field.soil.carbon_cycling.decomp_factors module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling.residue_partitioning">RUFAS.routines.field.soil.carbon_cycling.residue_partitioning module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.carbon_cycling.html#module-RUFAS.routines.field.soil.carbon_cycling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html">RUFAS.routines.field.soil.nitrogen_cycling package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.denitrification">RUFAS.routines.field.soil.nitrogen_cycling.denitrification module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization">RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion">RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp">RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization">RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling">RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.nitrogen_cycling.html#module-RUFAS.routines.field.soil.nitrogen_cycling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html">RUFAS.routines.field.soil.phosphorus_cycling package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization">RUFAS.routines.field.soil.phosphorus_cycling.P_mineralization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.erosion">RUFAS.routines.field.soil.phosphorus_cycling.erosion module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.fert_leach">RUFAS.routines.field.soil.phosphorus_cycling.fert_leach module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.manure_leach">RUFAS.routines.field.soil.phosphorus_cycling.manure_leach module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling">RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling.soluble_P">RUFAS.routines.field.soil.phosphorus_cycling.soluble_P module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.phosphorus_cycling.html#module-RUFAS.routines.field.soil.phosphorus_cycling">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.evapotranspiration">RUFAS.routines.field.soil.evapotranspiration module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.calc_LHV"><code class="docutils literal notranslate"><span class="pre">calc_LHV()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.calc_crop_transpiration"><code class="docutils literal notranslate"><span class="pre">calc_crop_transpiration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.calc_potential_evap"><code class="docutils literal notranslate"><span class="pre">calc_potential_evap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.calc_soil_cov"><code class="docutils literal notranslate"><span class="pre">calc_soil_cov()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.calc_soil_evap"><code class="docutils literal notranslate"><span class="pre">calc_soil_evap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.evapotranspiration.update_evap_z"><code class="docutils literal notranslate"><span class="pre">update_evap_z()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.infiltration">RUFAS.routines.field.soil.infiltration module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_CN1"><code class="docutils literal notranslate"><span class="pre">calc_CN1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_CN3"><code class="docutils literal notranslate"><span class="pre">calc_CN3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_S"><code class="docutils literal notranslate"><span class="pre">calc_S()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_S3"><code class="docutils literal notranslate"><span class="pre">calc_S3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_S_max"><code class="docutils literal notranslate"><span class="pre">calc_S_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_daily_infiltration"><code class="docutils literal notranslate"><span class="pre">calc_daily_infiltration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_runoff"><code class="docutils literal notranslate"><span class="pre">calc_runoff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_w1"><code class="docutils literal notranslate"><span class="pre">calc_w1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.calc_w2"><code class="docutils literal notranslate"><span class="pre">calc_w2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.sum_SW"><code class="docutils literal notranslate"><span class="pre">sum_SW()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.sum_WW"><code class="docutils literal notranslate"><span class="pre">sum_WW()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.infiltration.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.percolation">RUFAS.routines.field.soil.percolation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.percolation.calc_daily_percolation"><code class="docutils literal notranslate"><span class="pre">calc_daily_percolation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.percolation.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil">RUFAS.routines.field.soil.soil module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil"><code class="docutils literal notranslate"><span class="pre">Soil</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.SoilLayer"><code class="docutils literal notranslate"><span class="pre">Soil.SoilLayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.annual_mass_balance"><code class="docutils literal notranslate"><span class="pre">Soil.annual_mass_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.annual_nitrogen_balance"><code class="docutils literal notranslate"><span class="pre">Soil.annual_nitrogen_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.annual_phosphorus_balance"><code class="docutils literal notranslate"><span class="pre">Soil.annual_phosphorus_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.annual_reset"><code class="docutils literal notranslate"><span class="pre">Soil.annual_reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.annual_water_balance"><code class="docutils literal notranslate"><span class="pre">Soil.annual_water_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.Soil.initialize_profile_characteristics"><code class="docutils literal notranslate"><span class="pre">Soil.initialize_profile_characteristics()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.annual_variable_update"><code class="docutils literal notranslate"><span class="pre">annual_variable_update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.daily_soil_reset"><code class="docutils literal notranslate"><span class="pre">daily_soil_reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil.daily_soil_routine"><code class="docutils literal notranslate"><span class="pre">daily_soil_routine()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_erosion">RUFAS.routines.field.soil.soil_erosion module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_C"><code class="docutils literal notranslate"><span class="pre">calc_C()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_F_org_C"><code class="docutils literal notranslate"><span class="pre">calc_F_org_C()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_F_sand"><code class="docutils literal notranslate"><span class="pre">calc_F_sand()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_Fc_sand"><code class="docutils literal notranslate"><span class="pre">calc_Fc_sand()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_Fcl_si"><code class="docutils literal notranslate"><span class="pre">calc_Fcl_si()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_I"><code class="docutils literal notranslate"><span class="pre">calc_I()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_K"><code class="docutils literal notranslate"><span class="pre">calc_K()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_LS"><code class="docutils literal notranslate"><span class="pre">calc_LS()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_Rtc"><code class="docutils literal notranslate"><span class="pre">calc_Rtc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_T_conc"><code class="docutils literal notranslate"><span class="pre">calc_T_conc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_alpha"><code class="docutils literal notranslate"><span class="pre">calc_alpha()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_alpha_05"><code class="docutils literal notranslate"><span class="pre">calc_alpha_05()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_m"><code class="docutils literal notranslate"><span class="pre">calc_m()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_peak_runoff"><code class="docutils literal notranslate"><span class="pre">calc_peak_runoff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.calc_sed"><code class="docutils literal notranslate"><span class="pre">calc_sed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_erosion.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_temp">RUFAS.routines.field.soil.soil_temp module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_T_bare"><code class="docutils literal notranslate"><span class="pre">calc_T_bare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_T_soil"><code class="docutils literal notranslate"><span class="pre">calc_T_soil()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_T_surf"><code class="docutils literal notranslate"><span class="pre">calc_T_surf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_albedo"><code class="docutils literal notranslate"><span class="pre">calc_albedo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_bcv"><code class="docutils literal notranslate"><span class="pre">calc_bcv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_dd"><code class="docutils literal notranslate"><span class="pre">calc_dd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_dd_max"><code class="docutils literal notranslate"><span class="pre">calc_dd_max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_radiate"><code class="docutils literal notranslate"><span class="pre">calc_radiate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.calc_scale"><code class="docutils literal notranslate"><span class="pre">calc_scale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.sum_soil_water"><code class="docutils literal notranslate"><span class="pre">sum_soil_water()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_temp.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil.soil_water">RUFAS.routines.field.soil.soil_water module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_water.update_all"><code class="docutils literal notranslate"><span class="pre">update_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_water.update_annual_SW"><code class="docutils literal notranslate"><span class="pre">update_annual_SW()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.field.soil.html#RUFAS.routines.field.soil.soil_water.update_profile_SW"><code class="docutils literal notranslate"><span class="pre">update_profile_SW()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.field.soil.html#module-RUFAS.routines.field.soil">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.field.field">
+<span id="rufas-routines-field-field-module"></span><h2>RUFAS.routines.field.field module<a class="headerlink" href="#module-RUFAS.routines.field.field" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model
+File name: field.py
+Description:
+Author(s): William Donovan, <a class="reference external" href="mailto:wmdonovan&#37;&#52;&#48;wisc&#46;edu">wmdonovan<span>&#64;</span>wisc<span>&#46;</span>edu</a></p>
+<blockquote>
+<div><p>Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.Field">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.Field" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.Fields">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.</span></span><span class="sig-name descname"><span class="pre">Fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.Fields" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.Fields.annual_reset">
+<span class="sig-name descname"><span class="pre">annual_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.Fields.annual_reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.Fields.summarize_annual_variables">
+<span class="sig-name descname"><span class="pre">summarize_annual_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.Fields.summarize_annual_variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.Fields.summarize_fields">
+<span class="sig-name descname"><span class="pre">summarize_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.Fields.summarize_fields" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.annual_fields_routine">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.</span></span><span class="sig-name descname"><span class="pre">annual_fields_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.annual_fields_routine" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.field.daily_fields_routine">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.field.</span></span><span class="sig-name descname"><span class="pre">daily_fields_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.field.daily_fields_routine" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.feed.html" class="btn btn-neutral float-left" title="RUFAS.routines.feed package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.crop.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.crop package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

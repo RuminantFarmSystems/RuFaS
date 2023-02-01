@@ -9,9 +9,12 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 """
 
 from math import acos, asin, sin, tan, pi
+from RUFAS.output_manager import OutputManager
 from .crop_types import base_crop, alfalfa, corn, soybean, tall_fescue, spring_barley, potato, sugar_beet, spring_wheat
 from . import heat_units, leaf_area_index, root_development, biomass, yields, \
     phosphorus_uptake, nitrogen_uptake, growth_constraints
+
+om = OutputManager()
 
 
 def daily_crop_routine(soil, crop, field_management, weather, time):
@@ -32,6 +35,13 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
     crop_type = crop.current_crop
 
     daily_reset(crop_type, soil)
+
+    info_map = {"class": "no_caller_class",
+                "function": daily_crop_routine.__name__, 
+                "soil": vars(soil),
+                "crop": vars(crop),
+                "field_management": vars(field_management),
+                "weather": vars(weather), }
 
     # If there is no crop in rotation this year, current crop will be named
     # 'null'. The routine is skipped in this case
@@ -70,15 +80,19 @@ def daily_crop_routine(soil, crop, field_management, weather, time):
                 # "pseudocode_crop" C.10.A.1/2
                 if crop_type.harvest_type == 'scheduled':
                     if time.day == crop_type.kill_day:
-                        yields.update_all(soil, crop_type, field_management, time)
+                        yields.update_all(
+                            soil, crop_type, field_management, time)
 
                 elif crop_type.harvest_type == 'optimal':
                     if crop_type.fr_PHU >= crop_type.fr_PHU_harvest:
-                        yields.update_all(soil, crop_type, field_management, time)
+                        yields.update_all(
+                            soil, crop_type, field_management, time)
 
                 else:
-                    print('"' + crop_type.harvest_type + '"', 'is not a recognized harvest type.'
-                                                              ' Harvesting on optimal date.')
+                    harvest_type_warning = f"{crop_type.harvest_type} is not a recognized" \
+                        " harvest type. Harvesting on optimal date."
+                    om.add_warning(
+                        "harvest_type", harvest_type_warning, info_map)
                     crop_type.harvest_type = 'optimal'
 
             # If the crop is perennial, determine whether it is dormant
@@ -176,7 +190,8 @@ def dormancy_routine(soil, crop_type, field_management, time):
         # C.11.C.2
         if crop_type.fr_PHU > fr_PHU_harvest_min:
             yields.update_all(soil, crop_type, field_management, time)
-        crop_type.LAI_actual = max(0, min(crop_type.LAI_min, crop_type.LAI_actual))
+        crop_type.LAI_actual = max(
+            0, min(crop_type.LAI_min, crop_type.LAI_actual))
 
         # C.11.C.3
         soil.residue += crop_type.biomass_actual * 0.1
@@ -224,6 +239,10 @@ class Crop:
             time: an instance of the Time class specified in classes.py
         """
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__, 
+                    "crop_growth_data": data, }
+
         self.crops_list = []
         self.crops_data = data['crops']
         for crop_name, crop_data in self.crops_data.items():
@@ -244,9 +263,9 @@ class Crop:
             elif crop_name.startswith("spring_wheat"):
                 crop = spring_wheat.SpringWheat(crop_name, crop_data)
             else:
-                print(crop_name, "is an invalid crop_type. Please consult the list of crop_types")
-                continue
-
+                crop_type_error = f"{crop_name} is an invalid crop_type." \
+                    " Please consult the list of crop_types."
+                om.add_error("crop_type", crop_type_error, info_map)
             self.crops_list.append(crop)
 
         # self.alfalfa = alfalfa.Alfalfa(data)
@@ -257,7 +276,8 @@ class Crop:
 
         self.current_crop = base_crop.BaseCrop()
 
-        self.grow_regimen = [self.current_crop for _ in range(0, len(time.years))]
+        self.grow_regimen = [
+            self.current_crop for _ in range(0, len(time.years))]
         self.set_grow_regimen(time)
 
         # dormancy for perennial crops
@@ -277,12 +297,18 @@ class Crop:
             time: an instance of the Time class specified in classes.py
         """
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.set_grow_regimen.__name__, }
+
         for crop_type in self.crops_list:
             for year in crop_type.plant_years:
                 # checks requested grow years against model boundaries
                 if year - time.start_year >= len(self.grow_regimen) or year - time.start_year < 0:
-                    print('\nCannot grow', crop_type.crop_name, 'in year', year,
-                          'because', year, '\nis outside of the scope of the simulation.')
+                    crop_year_error = f"Cannot grow {crop_type.crop_name} in" \
+                        f" year {year} because {year} is outside of the scope" \
+                        " of the simulation."
+                    info_map["year"] = year
+                    om.add_error("crop_year", crop_year_error, info_map)
                 else:
                     # specified grow years have priority over cycles (specified by repeat)
                     if crop_type.repeat == 0:
@@ -296,8 +322,14 @@ class Crop:
                             if self.grow_regimen[curr_year].crop_name == 'null':
                                 self.grow_regimen[curr_year] = crop_type
                             else:
-                                print('Cannot grow', crop_type.crop_name, 'in', str(year + curr_year) + ',',
-                                      self.grow_regimen[curr_year].crop_name, 'is already growing.')
+                                crop_duplicate_error = f"Cannot grow {crop_type.crop_name} in" \
+                                    f"{year + curr_year};" \
+                                    f" {self.grow_regimen[curr_year].crop_name}" \
+                                    " is already growing"
+                                info_map["crop_name"] = crop_type.crop_name
+                                om.add_error("crop_duplicate",
+                                             crop_duplicate_error,
+                                             info_map)
                             curr_year += crop_type.repeat
 
         list(filter(lambda crop: crop.crop_name != 'null', self.grow_regimen))
@@ -429,7 +461,8 @@ def calculate_minimum_day_length(latitude):
     solar_declination = -0.4102
     latitude_radians = latitude * pi / 180
 
-    T_dl_min = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
+    T_dl_min = 2 * acos(-tan(solar_declination) *
+                        tan(latitude_radians)) / angular_velocity
 
     return T_dl_min
 
@@ -479,7 +512,8 @@ def in_dormancy(crop, time):
     angular_velocity = 0.2618
     latitude_radians = crop.latitude * pi / 180
 
-    T_dl = 2 * acos(-tan(solar_declination) * tan(latitude_radians)) / angular_velocity
+    T_dl = 2 * acos(-tan(solar_declination) *
+                    tan(latitude_radians)) / angular_velocity
 
     T_dl_thr = crop.T_dl_min + crop.t_dorm
 

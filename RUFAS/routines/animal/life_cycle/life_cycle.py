@@ -23,6 +23,7 @@ from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryType
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -31,6 +32,8 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.util import Utility
 
 GenericAnimal = TypeVar("GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
+
+om = OutputManager()
 
 
 class LifeCycleManager:
@@ -299,6 +302,10 @@ class LifeCycleManager:
 
         total_animal_num = self._cull_cows_and_record_stats(sim_day, cows, calves_born,
                                                             ids_removed, total_animal_num)
+        # info_map = {"class": self.__class__.__name__,
+        #             "function": self.daily_update.__name__,
+        #             "date": date, }
+
 
         self._calculate_herd_percentages(total_animal_num)
         self._calculate_cow_percentages()
@@ -667,6 +674,17 @@ class LifeCycleManager:
 
             if new_born:
                 self._handle_new_born(sim_day, cow, calves_born)
+                # om.add_variable("average_cow_body_weight",
+                #                 self.avg_cow_body_weight, info_map)
+                # om.add_variable("average_mature_body_weight",
+                #                 self.avg_mature_body_weight, info_map)
+
+                    # om.add_variable("daily_milk_production",
+                    #                 self.daily_milk_production, info_map)
+                    # om.add_variable("milking_cow_num",
+                    #                 self.milking_cow_num, info_map)
+                    # om.add_variable("average_days_in_milk",
+                    #                 self.avg_days_in_milk, info_map)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num

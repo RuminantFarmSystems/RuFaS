@@ -69,6 +69,7 @@ class Utility:
         data: the data read from the json file
 
         """
+        
 
         try:
             if file_path.suffix == '.json':

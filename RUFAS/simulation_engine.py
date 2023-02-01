@@ -3,15 +3,21 @@
 import sys
 import time as timer
 from pathlib import Path
+
+import config.global_variables
 from RUFAS import routines, errors
 from RUFAS.classes import Config, State, Weather, Time
 from RUFAS.output_handler import OutputHandler
+from RUFAS.output_manager import OutputManager
 import random
 import numpy
 from typing import Optional
 
 from RUFAS.routines.manure.manure_management import simulate_daily_manure_management
 from RUFAS.util import Utility
+
+
+om = OutputManager()
 
 
 class SimulationEngine:
@@ -26,23 +32,32 @@ class SimulationEngine:
 
     def simulate(self) -> None:
         """Executes the simulation"""
-
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.simulate.__name__, }
         t_start_sim = timer.time()
+
         self._run_simulation_main_loop()
         self.output.finalize(self.state, self.weather, self.time)
         t_end_sim = timer.time()
 
         print("Simulation Successful")
-        print(f"Total Simulation Time: {t_end_sim - t_start_sim} seconds")
+        total_simulation_time = t_end_sim - t_start_sim
+        total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
+        om.add_log("total_simulation_time",
+                   total_simulation_time_log, info_map)
 
-        t_start_graphics = timer.time()
-        sys.stdout.write('Producing Graphics\n')
-        self.output.produce_graphics()
-        t_end_graphics = timer.time()
+        if config.global_variables.PRODUCE_GRAPHICS:
+            sys.stdout.write('Producing Graphics\n')
+            t_start_graphics = timer.time()
+            self.output.produce_graphics()
+            t_end_graphics = timer.time()
+            graphics_prod_time = t_end_graphics - t_start_graphics
+        else:
+            graphics_prod_time = 0
 
-        graphics_prod_time = t_end_graphics - t_start_graphics
-        total_runtime = (t_end_sim-t_start_sim) + \
-            (t_end_graphics-t_start_graphics)
+        om.add_log("graphics_prod_time", f"Graphics production time is: {graphics_prod_time}", info_map)
+        total_runtime = (t_end_sim-t_start_sim) + graphics_prod_time
+        om.add_log("total_runtime", f"Total runtime is: {total_runtime}", info_map)
         self._show_final_messages(graphics_prod_time, total_runtime)
 
     def _run_simulation_main_loop(self) -> None:
@@ -58,7 +73,7 @@ class SimulationEngine:
         Shows the messages of the end of the simulation
         """
         sys.stdout.write(
-            f"Output Successful.\nGraphics stored in: {self.config.graphic_dir}\n")
+            f"Graphics stored in: {self.config.graphic_dir}\n")
         sys.stdout.write(f"Time to produce graphics: {graphics_prod_time}\n")
         sys.stdout.write(f"Total Run Time: {total_runtime} seconds\n")
 
@@ -69,7 +84,8 @@ class SimulationEngine:
             self.state.animal_management, self.state.feed, self.weather, self.time)
         routines.daily_manure_storage_routine(
             self.state.manure_storage, self.state.animal_management)
-        simulate_daily_manure_management(self.state.manure_management, self.state.animal_management)
+        simulate_daily_manure_management(
+            self.state.manure_management, self.state.animal_management)
         routines.daily_fields_routine(
             self.state.fields, self.state.manure_storage, self.weather, self.time)
         routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_management,
@@ -82,8 +98,15 @@ class SimulationEngine:
         """
         Advances time and increments simulation_day
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._advance_time.__name__,
+                    "print_day": print_day, }
         if print_day:
-            print(f"simulating day: {self.time.to_str()}")
+            simulating_day_log = f"simulating day: {self.time.to_str()}"
+            om.add_log("simulation_day",
+                       simulating_day_log,
+                       info_map)
         self.time.advance()
         self.state.animal_management.simulation_day += 1
 
@@ -141,8 +164,8 @@ class SimulationEngine:
             InvalidJSONFile: If the json file at the given path does not conform 
             with the format required
         """
-
         print(f"Initializing simulation environment from {file_path}")
+
         try:
             data = Utility.read_json_file(file_path)
             self.config = Config(data['config'], data['weather'])
