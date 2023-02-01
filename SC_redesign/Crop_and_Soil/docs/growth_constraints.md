@@ -1,15 +1,10 @@
-The `GrowthConstraints` class handles the environmental constraints to potential plant growth that a crop
-face during the growing season. This module addresses the stresses caused by insufficient 
-water, inadequate nutrients (nitrogen and phosphorus) and extreme temperatures, and determines which, if any, 
-is limiting plant growth on a given day.  
+The `GrowthConstraints` class handles the environmental constraints to potential plant growth that a crop faces during the growing season. This module addresses the 
+stresses caused by insufficient water, inadequate nutrients (nitrogen and phosphorus) and extreme temperatures, and determines which, if any, is limiting plant 
+growth on a given day.  
 
-The main method, `constrain_growth()` calls on the **water stress**, **temperature stress**, **nitrogen 
-stress** and **phosphorus stress** methods to provide daily updates on the **plant growth factor**, 
-which quantifies the fraction of potential plant growth achieved on a given day. Each environmental stress 
-varies from 0, under optimal conditions, to 1, under extreme stress. 
+The main method, `constrain_growth()` calls on the **water stress**, **temperature stress**, **nitrogen stress** and **phosphorus stress** methods to provide daily updates on the **plant growth factor**, which quantifies the fraction of potential plant growth achieved on a given day. Each environmental stress varies from 0, under optimal conditions, to 1, under extreme stress. 
 
-**Water stress** calculates the stress caused by the water soil conditions on a given day by comparing 
-actual and potential plant transpiration according to:
+**Water stress** is the stress caused by the water soil conditions on a given day by comparing actual and potential plant transpiration:
 
 ```math
   $$ W_{\text{stress}} = 
@@ -21,13 +16,10 @@ actual and potential plant transpiration according to:
   \end{cases}
 $$
 ```
-where $W_{\text{stress}}$ is `water_stress`, $W_{\text{uptake}}$ is `water_uptake`, the total water 
-taken up by the plant from the soil on a given day, and $Tr_{\text{max}}$ is `max_transpiration`, 
-the maximum plant transpiration on a given day. 
+where $W_{\text{stress}}$ is the water stress (`water_stress`), $W_{\text{uptake}}$ is the total water taken up by the plant from the soil on a given day (`water_uptake`), and $Tr_{\text{max}}$ is the maximum plant transpiration on a given day (`max_transpiration`). 
 
-**Temperature stress** represents the stress experienced by a plant when the mean air temperature on a 
-given day diverges from the optimal temperature for plant growth. It is calculated using the following 
-equations:
+**Temperature stress** represents the stress experienced by a plant when the mean air temperature on a given day diverges from the optimal temperature for plant 
+growth. It is calculated using the following equations:
 
 ```math
   $$ T_{\text{stress}} = 
@@ -39,12 +31,12 @@ equations:
   \end{cases}
 $$
 ```
-where $T_{\text{stress}}$ is `temp_stress`, $T_{\text{air}}$ is `temperature`, the mean air
-temperature for a given day, $T_{\text{crop, min}}$ is `minimum_temperature`, the base or minimum temperature for the crop 
-to grow, and $T_{\text{opt}}$ is `optimal_temperature`, the optimal temperature for the crop to grow. 
+where $T_{\text{stress}}$ is the temperature stress (`temp_stress`), $T_{\text{air}}$ is the mean air temperature for a given day (`temperature`), $T_{\text{crop, 
+min}}$ is the base or minimum temperature for the crop to grow (`minimum_temperature`), and $T_{\text{opt}}$ is the optimal temperature for the crop to grow 
+(`optimal_temperature`). 
 
-**Nitrogen stress** calculates the plant nitrogen stress on a given day by comparing actual and optimal 
-plant nitrogen levels and requires the initial estimation of a **stress factor** for nitrogen stress: 
+**Nitrogen stress** calculates the plant nitrogen stress on a given day by comparing actual and optimal plant nitrogen levels and requires the initial estimation of 
+a **stress factor** for nitrogen stress: 
 
 ```math
   $$ S_{\text{N}} = 
@@ -53,9 +45,8 @@ plant nitrogen levels and requires the initial estimation of a **stress factor**
 $$
 ```
 
-where $S_{\text{N}}$ is `stress_factor`, the stress factor for nitrogen stress, $N_{\text{plant}}$ is 
-`nitrogen`, the actual mass of nitrogen stored in plant material on a given day, and $N_{\text{opt}}$ is
-`optimal_nitrogen`, the optimal mass of nitrogen stored in plant material for the current growth stage.
+where $S_{\text{N}}$ is the stress factor for nitrogen stress (`stress_factor`), $N_{\text{plant}}$ is the actual mass of nitrogen stored in plant material on a 
+given day (`nitrogen`), and $N_{\text{opt}}$ is the optimal mass of nitrogen stored in plant material for the current growth stage (`optimal_nitrogen`).
 
 Then, **nitrogen stress** is calculated as follows:
 
@@ -65,11 +56,10 @@ Then, **nitrogen stress** is calculated as follows:
     
 $$
 ```
-where $N_{\text{stress}}$ is `nitrogen_stress`, and $S_{\text{N}}$ is `stress_factor`, the stress factor for 
-nitrogen stress. 
+where $N_{\text{stress}}$ is the nitrogen stress (`nitrogen_stress`), and $S_{\text{N}}$ is the stress factor for nitrogen stress (`stress_factor`). 
 
-**Phosphorus stress** follows the same calculation as **nitrogen stress**, quantifying the plant phosphorus stress
-by comparing actual and optimal plant phosphorus levels. First, the stress_factor for phosphorus stress is calculated:
+**Phosphorus stress** follows the same calculation as **nitrogen stress**, quantifying the plant phosphorus stress by comparing actual and optimal plant phosphorus 
+levels. First, the stress_factor for phosphorus stress is calculated:
 
 ```math
   $$ S_{\text{P}} = 
@@ -78,10 +68,8 @@ by comparing actual and optimal plant phosphorus levels. First, the stress_facto
 $$
 ```
 
-where $S_{\text{P}}$ is `stress_factor`, the stress factor for phosphorus stress, $P_{\text{plant}}$ is 
-`phosphorus`, the actual mass of phosphorus stored in plant material on a given day, and 
-$P_{\text{opt}}$ is `optimal_phosphorus`, the optimal mass of phosphorus stored in plant material for 
-the current growth stage.
+where $S_{\text{P}}$ is the stress factor for phosphorus stress (`stress_factor`), $P_{\text{plant}}$ is the actual mass of phosphorus stored in plant material on a 
+given day (`phosphorus`), and $P_{\text{opt}}$ is the optimal mass of phosphorus stored in plant material for the current growth stage (`optimal_phosphorus`).
 
 Then, **phosphorus stress** is calculated using the equation:
 
@@ -91,11 +79,9 @@ Then, **phosphorus stress** is calculated using the equation:
     
 $$
 ```
-where $P_{\text{stress}}$ is `phosphorus_stress`, and $S_{\text{P}}$ is `stress_factor`, the stress factor for 
-phosphorus stress. 
+where $P_{\text{stress}}$ is the phosphorus stress (`phosphorus_stress`), and $S_{\text{P}}$ is the stress factor for phosphorus stress (`stress_factor`). 
 
-Finally, the 4 environmental stresses quantified on a given day are used to calculate the **plant growth factor** as 
-follows:
+Finally, the 4 environmental stresses quantified on a given day are used to calculate the **plant growth factor** as follows:
 
 ```math
   $$ \gamma_{\text{reg}} = 
@@ -103,8 +89,9 @@ follows:
     
 $$
 ```
-where $\gamma_{\text{reg}}$ is `growth_factor`, $W_{\text{stress}}$ is `water_stress`, $T_{\text{stress}}$
-is `temp_stress`, $N_{\text{stress}}$ is `nitrogen_stress`, and $P_{\text{stress}}$ is `phosphorus_stress`. 
+where $\gamma_{\text{reg}}$ is the plant growth factor (`growth_factor`), $W_{\text{stress}}$ is the water stress (`water_stress`), $T_{\text{stress}}$ is the 
+temperature stress (`temp_stress`), $N_{\text{stress}}$ is the nitrogen stress (`nitrogen_stress`), and $P_{\text{stress}}$ is the phosphorus stress 
+(`phosphorus_stress`). 
 
 ---
 **References**: this module is based upon the "Growth Constraints" section of the [SWAT][1] model (5:3.1).
