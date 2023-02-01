@@ -97,11 +97,9 @@ def grow_biomass(start: float, growth_factor: float, max_growth: float) -> dict:
         raise Exception("growth_factor must be between 0 and 1")
     if start < 0:
         raise Exception("start must be positive")
-
     actual_growth = max_growth * growth_factor
     end = start + actual_growth
     return {"start": start, "end": end, "accumulated biomass": actual_growth}
-
 
 def intercept_radiation(daily_radiation: float, light_extinction: float, lai_actual: float) -> float:  # pseudocode: C.9.A.1
     """

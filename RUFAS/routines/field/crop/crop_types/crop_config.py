@@ -80,6 +80,7 @@ ALFALFA = {
 }
 
 CORN = {
+        "fix_nitrogen": False,
         # corn ID variables
         "crop_type": 'annual',
         "raw_id": 34,
@@ -97,13 +98,13 @@ CORN = {
         "fr_PHU_sen": 0.90,
         "fr_PHU_harvest": 1.2,
         "fr_PHU_harvest_min": 0.7,
-        "LAI_max": 3,
+        "LAI_max": 10,
         "LAI_min": 0,
         # root depth
         "z_root_max": 2000,
         # biomass
         "kl": 0.65,
-        "RUE": 39,
+        "RUE": 700,
         "T_opt": 25,
         # water uptake
         "beta_w": 10,
@@ -131,8 +132,8 @@ CORN = {
         "biomass_dry_down_percent": 0.0,  # TODO: GitHub Issue #156
         "DM_harvest_percent": 0.35  # TODO: Hard coded dry matter percent at harvest - GitHub Issue #156
 }
-
 CEREAL_RYE = {
+        "fix_nitrogen": False,
         "crop_type": 'annual',
         "feed_id": '107g',
         "raw_id": 107,
@@ -165,6 +166,7 @@ CEREAL_RYE = {
 }
 
 FALL_OATS = {
+        "fix_nitrogen": False,
         "crop_type": 'annual',
         "feed_id": '103g',
         "raw_id": 103,
@@ -196,6 +198,7 @@ FALL_OATS = {
 }
 
 POTATO = {
+        "fix_nitrogen": False,
         "crop_type": 'annual',
         "feed_id": '105g',
         "raw_id": 105,
@@ -225,11 +228,12 @@ POTATO = {
 }
 
 SOYBEAN = {
+        "fix_nitrogen": True,
         "crop_type": 'annual',
         "raw_id": 121,
         "feed_id": '121g',
         "kill_year": True,
-        "is_nitrogen_fixer": True,
+        "fix_nitrogen": True,
         "T_base_max": 43.33,
         "PHU": 1150,
         "fr_LAI_1": 0.05,
@@ -255,6 +259,7 @@ SOYBEAN = {
 }
 
 SPRING_BARLEY = {
+        "fix_nitrogen": False, 
         "crop_type": 'annual',
         "feed_id": '10g',
         "raw_id": 10,
@@ -288,7 +293,7 @@ SPRING_WHEAT = {
         "feed_id": '130g',
         "raw_id": 130,
         "kill_year": True,
-        "is_nitrogen_fixer": False,  # TODO: change back - GitHub Issue #160
+        "fix_nitrogen": False,
         "T_base_min": 0,
         "T_base_max": 35,
         "PHU": 996,
@@ -347,6 +352,7 @@ SUGAR_BEET = {
 }
 
 TALL_FESCUE = {
+        "fix_nitrogen": False,
         "crop_type": 'perennial',
         "feed_id": '56g',
         "raw_id": 56,
@@ -378,6 +384,7 @@ TALL_FESCUE = {
 }
 
 TRITICALE = {
+        "fix_nitrogen": False,
         "crop_type": 'annual',
         "feed_id": '125g',
         "raw_id": 125,
@@ -410,6 +417,7 @@ TRITICALE = {
 }
 
 WINTER_WHEAT = {
+        "fix_nitrogen": False,
         "crop_type": 'annual',
         "feed_id": '130g',
         "raw_id": 130,

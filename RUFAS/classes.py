@@ -58,6 +58,7 @@ class State:
         self.manure_storage = ManureStorage(self.animal_management)
         self.manure_management = ManureManagement(self.animal_management)
 
+
     def annual_reset(self):
         """
         Description:
@@ -492,7 +493,7 @@ class Time:
             config: instance of the Config class containing information necessary
                 to initialize time
         """
-
+        
         calendar_year = config.start_year
         # number of years
         years = config.years
@@ -511,7 +512,7 @@ class Time:
             else:
                 self.day = self.years[0][i]
                 break
-
+        self.index = 0 
     def to_str(self):
         """
         Description:
@@ -529,6 +530,7 @@ class Time:
             Advances the time in the simulation by 1 day
             Automatically detects end of months and years
         """
+        self.index += 1
 
         if self.end_year():
             self.day = 1
@@ -563,7 +565,6 @@ class Time:
             return self.day > len(self.years[self.year - 1])
 
         return False
-
 
 def is_leap_year(year):
     """

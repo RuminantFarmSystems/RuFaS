@@ -1,0 +1,291 @@
+{
+    "latitude": 43.304346,
+
+    "crops": {
+        "Corn90": {
+            "plant_years": [1990],
+            "repeat": 0,
+            "planting_day": 113,
+            "harvest_day": 305,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa91": {
+            "plant_years": [1991],
+            "repeat": 0,
+            "planting_day": 113,
+            "harvest_day": 296,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn92": {
+            "plant_years": [1992],
+            "repeat": 0,
+            "planting_day": 133,
+            "harvest_day": 323,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa93": {
+            "plant_years": [1993,1994],
+            "repeat": 0,
+            "planting_day": 121,
+            "harvest_day": 273,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats93": {
+            "plant_years": [1993],
+            "repeat": 0,
+            "planting_day": 121,
+            "harvest_day": 225,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Corn95": {
+            "plant_years": [1994],
+            "repeat": 0,
+            "planting_day": 132,
+            "harvest_day": 286,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "FallOats96": {
+            "plant_years": [1996],
+            "repeat": 0,
+            "planting_day": 99,
+            "harvest_day": 237,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa96": {
+            "plant_years": [1996,1997],
+            "repeat": 0,
+            "planting_day": 99,
+            "harvest_day": 274,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Corn98": {
+            "plant_years": [2008],
+            "repeat": 0,
+            "planting_day": 99,
+            "harvest_day": 293,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "FallOats99": {
+            "plant_years": [1999],
+            "repeat": 0,
+            "planting_day": 83,
+            "harvest_day": 231,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa99": {
+            "plant_years": [1999,2000],
+            "repeat": 0,
+            "planting_day": 83,
+            "harvest_day": 250,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Corn01": {
+            "plant_years": [2001],
+            "repeat": 0,
+            "planting_day": 121,
+            "harvest_day": 288,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats02": {
+            "plant_years": [2002],
+            "repeat": 0,
+            "planting_day": 83,
+            "harvest_day": 231,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa02": {
+            "plant_years": [2002,2003],
+            "repeat": 0,
+            "planting_day": 83,
+            "harvest_day": 250,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn04": {
+            "plant_years": [2004],
+            "repeat": 0,
+            "planting_day": 138,
+            "harvest_day": 300,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats05": {
+            "plant_years": [2005],
+            "repeat": 0,
+            "planting_day": 104,
+            "harvest_day": 193,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa05": {
+            "plant_years": [2005,2006],
+            "repeat": 0,
+            "planting_day": 104,
+            "harvest_day": 251,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn07": {
+            "plant_years": [2007],
+            "repeat": 0,
+            "planting_day": 110,
+            "harvest_day": 290,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats08": {
+            "plant_years": [2008],
+            "repeat": 0,
+            "planting_day": 104,
+            "harvest_day": 193,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa08": {
+            "plant_years": [2008,2009],
+            "repeat": 0,
+            "planting_day": 104,
+            "harvest_day": 292,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn10": {
+            "plant_years": [2010],
+            "repeat": 0,
+            "planting_day": 139,
+            "harvest_day": 286,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats11": {
+            "plant_years": [2011],
+            "repeat": 0,
+            "planting_day": 103,
+            "harvest_day": 193,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa11": {
+            "plant_years": [2011,2012],
+            "repeat": 0,
+            "planting_day": 103,
+            "harvest_day": 236,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn13": {
+            "plant_years": [2013],
+            "repeat": 0,
+            "planting_day": 139,
+            "harvest_day": 286,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats14": {
+            "plant_years": [2014],
+            "repeat": 0,
+            "planting_day": 113,
+            "harvest_day": 246,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa14": {
+            "plant_years": [2014,2015],
+            "repeat": 0,
+            "planting_day": 113,
+            "harvest_day": 245,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn16": {
+            "plant_years": [2013],
+            "repeat": 0,
+            "planting_day": 131,
+            "harvest_day": 294,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "FallOats17": {
+            "plant_years": [2014],
+            "repeat": 0,
+            "planting_day": 115,
+            "harvest_day": 240,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        "Alfalfa17": {
+            "plant_years": [2014,2015],
+            "repeat": 0,
+            "planting_day": 115,
+            "harvest_day": 251,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        },
+        "Corn19": {
+            "plant_years": [2019],
+            "repeat": 0,
+            "planting_day": 116,
+            "harvest_day": 303,
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        }
+    }
+}

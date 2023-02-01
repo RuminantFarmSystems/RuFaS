@@ -12,8 +12,9 @@ import pytest
     (2.1, 0)
 ])
 def test_determine_root_fraction(heatfrac, expect):
-    """check that root fraction is properly calculated by determine_root_fraction()"""
-    assert RootDevelopment.determine_root_fraction(heatfrac) == expect
+    """check that root fraction is properly calculated by
+    determine_root_fraction()"""
+    assert RootDevelopment._determine_root_fraction(heatfrac) == expect
 
 
 @pytest.mark.parametrize("maxd,heatfrac", [
@@ -26,17 +27,19 @@ def test_determine_root_fraction(heatfrac, expect):
     (100, 0.5),
 ])
 def test_determine_root_depth(maxd, heatfrac):
-    """check that root depths are properly calculated by determine_root_depths()"""
+    """check that root depths are properly calculated by
+    determine_root_depths()"""
     if heatfrac > 0.4:
         expect = maxd
     else:
         expect = 2.5 * heatfrac * maxd
-    assert RootDevelopment.determine_root_depth(maxd, heatfrac) == expect
+    assert RootDevelopment._determine_root_depth(maxd, heatfrac) == expect
 
 
 # ---- Test Class Functions ----
 def init_rootdev(**kwargs):
-    """helper function to initialize RootDevelopment object, with specified attributes"""
+    """helper function to initialize RootDevelopment object, with
+    specified attributes"""
     rd = RootDevelopment()
     for key, val in kwargs.items():
         setattr(rd, key, val)
@@ -53,7 +56,12 @@ def init_rootdev(**kwargs):
 ])
 def test_develop_roots(maxd, heatfrac):
     """integration test for main root development function develop_roots()"""
-    rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
+
+    # rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
+    data = CropData(heat_fraction=heatfrac, max_root_depth=maxd)
+    rd = RootDevelopment(data)
     rd.develop_roots()
-    assert rd.root_fraction == RootDevelopment.determine_root_fraction(heatfrac)
-    assert rd.root_depth == RootDevelopment.determine_root_depth(maxd, heatfrac)
+    assert data.root_fraction == \
+           RootDevelopment._determine_root_fraction(heatfrac)
+    assert data.root_depth == \
+           RootDevelopment._determine_root_depth(maxd, heatfrac)

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
@@ -7,70 +8,114 @@ from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
 from SC_redesign.Crop_and_Soil.crop.yields import Yields
 
-from typing import List
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
-class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorporation, HeatUnits, LeafAreaIndex,
-           RootDevelopment, Yields):
-    def __init__(self):
-        GrowthConstraints.__init__(self)
-        BiomassAllocation.__init__(self)
-        WaterDynamics.__init__(self)
-        NitrogenIncorporation.__init__(self)
-        HeatUnits.__init__(self)
-        LeafAreaIndex.__init__(self)
-        RootDevelopment.__init__(self)
-        Yields.__init__(self)
+class Crop:
+    def __init__(self, crop_data: Optional[CropData] = None):
+        """Creates a crop object, from a crop data specification object.
+
+        Args:
+            crop_data: a CropData object containing the attributes tracked throughout the simulation
+
+        Details:
+            If crop_data is not given, the default specifications are used.
+        """
+        # Common data object that is updated throughout routines
+        data = crop_data or CropData()  # defaults if not given
+        """reference to the crop data; tracks all crop variables through the simulation"""
+
+        # growth process components
+        self.growth_constraints = GrowthConstraints(data)
+        """Process component controlling growth constraints, limits plant growth as a function of stressors"""
+        self.biomass_allocation = BiomassAllocation(data)
+        """Process component controlling allocation of plant biomass as a function of growth and photosynthesis"""
+        self.water_dynamics = WaterDynamics(data)
+        """Process component controlling plant water dynamics"""
+        self.nitrogen_incorporation = NitrogenIncorporation(data)
+        """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
+        self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
+        """Process component controlling plant heat accumulation"""
+        self.leaf_area_index = LeafAreaIndex(data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
+        """Process component controlling canopy growth, including leaf area index"""
+        self.root_development = RootDevelopment(data)
+        """Process component controlling plant root development"""
+        self.crop_yields = Yields(data)
+        """Process component controlling calculation of end-of-season production"""
+        # TODO: Loi recommended that a composition pattern might fit better
+        #  than multiple inheritance: A crop "has" a Growth constraint (system)
+        #  but is not itself a growth constraint. This pattern might be worth
+        #  looking into in the future. One problem I foresee is that because
+        #  individual attributes occur in multiple process classes
+        #  (e.g., nitrogen in GrowthConstraints and NitrogenIncorporation), a
+        #  composite design would require interdependence such that these
+        #  common attributes remain in-sync. - GitHub Issue #255
 
 
-    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float], soil_water_factor: float,
+    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
+                  soil_water_factor: float,
                   max_transpiration: float, air_temperature: float,
                   incoming_light: float,
-                  evaporation: float, transpiration: float, max_evapotranspiration: float,
-                  mean_air_temperature: float, min_air_temperature: float, max_air_temperature: float) -> None:
+                  evaporation: float, transpiration: float,
+                  max_evapotranspiration: float,
+                  mean_air_temperature: float, min_air_temperature: float,
+                  max_air_temperature: float) -> None:
         """main function for growing the crop on a daily basis
 
         Args:
-            layer_nitrates: nitrates present in each layer of the soil profile (kg/ha)
+            layer_nitrates: nitrates present in each layer of the soil profile
+                (kg/ha)
             layer_depths: the maximum depth of each soil layer
             soil_water_factor: the soil water factor
 
-            max_transpiration: maximum amount of transpiration possible (mm), as determined by soil, on this day
+            max_transpiration: maximum amount of transpiration possible (mm),
+                as determined by soil, on this day
             air_temperature: current air temperature (C)
 
             incoming_light: incoming light radiation energy (MJ/m)
 
-            evaporation: total evaporation occurring (mm) as determined by soil, on a given day
-            transpiration: total transpiration occurring (mm) as determined by soil, on a given day
-            max_evapotranspiration: maximum amount of evapotranspiration possible (mm), as determined by soil
-                on a given day.
+            evaporation: total evaporation occurring (mm) as determined by soil,
+                on a given day
+            transpiration: total transpiration occurring (mm) as determined by
+                soil, on a given day
+            max_evapotranspiration: maximum amount of evapotranspiration
+                possible (mm), as determined by soil on a given day.
 
-            mean_air_temperature:
-            min_air_temperature:
-            max_air_temperature:
+            mean_air_temperature: average air temperature for the day (C)
+            min_air_temperature: minimum air temperature for the day (C)
+            max_air_temperature: maximum air temperature for the day (C)
 
-        Details: grow_crop is a wrapper function for all the Crop growth process sub-routines. It should be called
-        every day that the crop is alive and growing in the simulation
+        Details: grow_crop is a wrapper function for all the Crop growth
+            process sub-routines. It should be called every day that the crop
+            is alive and growing in the simulation
         """
-        self.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
-        self.develop_roots()
-        self.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
+        self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
+        self.root_development.develop_roots()
+        self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         #
         # phosphorus_uptake.update_all()
         #
-        self.constrain_growth(max_transpiration, air_temperature)
-        self.grow_canopy()
-        self.allocate_biomass(incoming_light)
-        self.cycle_water(evaporation, transpiration, max_evapotranspiration)
+        self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
+        self.leaf_area_index.grow_canopy()
+        self.biomass_allocation.allocate_biomass(incoming_light)
+        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration)
 
-    def list_all_var_names(self) -> dict:
-        """list all variables used by Crop"""  # TODO: check for conflicts among parents - GitHub Issue #247
-        return vars(self)
+    @classmethod
+    def plant_species(cls, species) -> Crop:
+        """creates a crop instance with attributes determined by the species of
+        the crop.
+
+        Details: species attributes are read from species configuration
+        files/classes
+        """
+        pass
 
     # TODO: implement cut() and kill() methods - GitHub Issue #248
     #   the old versions are pasted in the comment blocks below.
-    #   these method (or a similar harvest method) will eventually need to call obtain_yields()
+    #   these method (or a similar harvest method) will eventually need to call
+    #   obtain_yields()
     def cut(self, fraction: float, mass=None) -> None:
         """remove biomass from the plant (via cutting)"""
         pass
@@ -79,13 +124,31 @@ class Crop(GrowthConstraints, BiomassAllocation, WaterDynamics, NitrogenIncorpor
         """kill the plant, preventing it from growing"""
         pass
 
+    def harvest(self):
+        """harvests the crop's cut yield biomass"""
+        pass
+
+    def reset_perennial(self):
+        """resets some attributes for perennial crops at the start of the
+        new growing season"""
+        pass
+
+    def destroy(self):  # Needed?
+        """destoys the crop - Destructor class. This removes the crop instance
+        from existance"""
+        pass
+
+    def _list_all_parent_var_names(self):
+        """list all variables used by Crop"""
+        return vars(self)  # TODO: check for duplicates or conflicts among parents
+
 # ---- Old versions of cut() and kill()
 # def kill(crop_type, field_management, time):
 #     """
 #     Description:
 #         Kills the crop.
-#         NOTE: Any day-of-yield values reset here will be reported to the output
-#         handler as 0. To reset after reporting see crop.daily_reset()
+#         NOTE: Any day-of-yield values reset here will be reported to the
+#         output handler as 0. To reset after reporting see crop.daily_reset()
 #         "pseudocode_crop" C.10.H.4
 #
 #     Args:
