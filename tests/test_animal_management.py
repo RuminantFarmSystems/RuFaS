@@ -223,11 +223,24 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
             patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-        herd_data = dict()
+        herd_data = {
+            "calf_num": 0,
+            "heiferI_num": 0,
+            "heiferII_num": 0,
+            "heiferIII_num": 0,
+            "cow_num": 0
+        }
 
         expected_info_map = {
             "class": "AnimalManagement",
             "function": "_print_animal_num_warnings",
+            "herd_data_animal_nums": {
+                "calf_num": 0,
+                "heiferI_num": 0,
+                "heiferII_num": 0,
+                "heiferIII_num": 0,
+                "cow_num": 0
+            }
         }
 
         # test for simulate_animals = True
@@ -239,8 +252,11 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
 
         # test for warnings for every animal key and simulate_animals = False
         animal_management.simulate_animals = False
+
         for key in animal_keys:
             herd_data[key] = 1
+            expected_info_map['herd_data_animal_nums'][key] = 1
+
         animal_management._print_animal_num_warnings(herd_data)
 
         for key in animal_keys:
@@ -248,7 +264,6 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
                                         f"Warning: herd_num is 0, but {key} is not.",
                                         expected_info_map)
 
-        # question: how to reset assert_called_once with
         add_log.assert_any_call("num_warnings_associated_with_simulate_animals",
                                 f"{len(animal_keys)} warnings were associated with simulate_animals",
                                 expected_info_map)
