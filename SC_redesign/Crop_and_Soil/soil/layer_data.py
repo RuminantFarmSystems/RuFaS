@@ -15,11 +15,13 @@ class LayerData:
     """bottom depth of the layer (mm)"""
     nitrate: float = 1.5
     """nitrate level of the layer ()"""  # TODO: units?
-    soil_water_content: float = 1.3  # arbitrary
+    soil_water_content: float = 0.25  # arbitrary
     """soil water content of the layer (mm)"""
-    field_capacity_water_content: float = 1.5  # arbitrary
+    field_capacity_water_content: float = 0.3  # arbitrary
     """water content of soil layer at field capacity (mm)"""
     wilting_point_water_content: float = 0.2  # arbitrary
     """water content of soil layer at wilting point (mm)"""
     esco: float = 1
     """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (2:2.3.17)"""
+    saturation: float = 0.5
+    """TODO: figure out what this means"""

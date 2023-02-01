@@ -1,109 +1,238 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-
-File name: infiltration.py
-
-Author(s): William Donovan, wmdonovan@wisc.edu
-
-Description: This module contains the necessary functions for calculating and
-             updating water infiltration into the soil on a given day using the
-             curve number approach. Currently the only function meant to be
-             used outside of this file is the update_all() function. The other
-             functions are meant to serve as helper functions within this file.
-
-Soil attribute definitions
-
-    runoff = daily runoff (mm H2O)
-
-    R = daily rainfall depth (mm H2O)
-
-    S = retention parameter (mm H2O)
-
-    CN1 = Curve Number 1 (empirical value used to determine the retention
-                            parameter S)
-
-    CN2 = Curve Number 2
-
-    CN3 = Curve Number 3
-
-    S_max = maximum value for S on any given day (mm H2O)
-
-    SW = soil water content of entire profile, excluding water held at wilting
-            point (mm H2O)
-
-    w1 = shape coefficient
-
-    w2 = shape coefficient
-
-    FC = amount of water in soil profile at field capacity (mm H2O)
-
-    SAT = amount of water in soil profile at saturation (mm H2O)
-
-    S_frz = retention parameter when the top layer of soil is frozen
-"""
-
 from math import exp, log
 from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
+"""
+This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) section of the SWAT model documentation
+"""
+
 
 class Infiltration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()
 
-    def infiltrate(self, rainfall) -> None:
+    def infiltrate(self, second_moisture_condition_parameter: float, rainfall: float, is_top_layer_frozen: bool,
+                   weighting_coefficient: float) -> None:
         """main routine for determining runoff and infiltration of soil for a given day"""
-        curve_number_1 = self._determine_curve_number_1(self.data.curve_number_2)
-        curve_number_3 = self._determine_curve_number_3(self.data.curve_number_2)
-        retention_parameter = self._determine_max_retention_parameter(self.data.curve_number_1)
+        third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
+                                                                                    second_moisture_condition_parameter)
+
+        # --- adjust moisture condition parameters for slope of soil, if necessary -------------------------------------
+        if self.data.average_slope_fraction != 0.05:
+            adjusted_second_moisture_condition_parameter = self._determine_second_moisture_condition_adjusted(
+                                                                                    self.data.average_slope_fraction,
+                                                                                    second_moisture_condition_parameter,
+                                                                                    third_moisture_condition_parameter)
+            adjusted_third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
+                                                                        adjusted_second_moisture_condition_parameter)
+        else:
+            adjusted_second_moisture_condition_parameter = second_moisture_condition_parameter
+            adjusted_third_moisture_condition_parameter = third_moisture_condition_parameter
+        # --------------------------------------------------------------------------------------------------------------
+        adjusted_first_moisture_condition_parameter = self._determine_first_moisture_condition_parameter(
+                                                                        adjusted_second_moisture_condition_parameter)
+
+        first_moisture_condition_retention_parameter = self._determine_retention_parameter_for_moisture_condition(
+                                                                            adjusted_first_moisture_condition_parameter)
+        third_moisture_condition_retention_parameter = self._determine_retention_parameter_for_moisture_condition(
+                                                                            adjusted_third_moisture_condition_parameter)
+
+        profile_saturation = self.data.profile_saturation
+        profile_field_capacity = self.data.profile_field_capacity
+
+        second_shape_coefficient = self._determine_second_shape_coefficient(profile_field_capacity, profile_saturation,
+                                                                            first_moisture_condition_retention_parameter,
+                                                                            third_moisture_condition_retention_parameter)
+        first_shape_coefficient = self._determine_first_shape_coefficient(profile_field_capacity,
+                                                                          first_moisture_condition_retention_parameter,
+                                                                          third_moisture_condition_retention_parameter,
+                                                                          second_shape_coefficient)
+        profile_water_content = self.data.profile_soil_water_content
+        retention_parameter = self._determine_retention_parameter(profile_water_content,
+                                                                  first_moisture_condition_retention_parameter,
+                                                                  first_shape_coefficient,
+                                                                  second_shape_coefficient)
+
+        # --- Adjust retention parameter only if top layer of soil is frozen -------------------------------------------
+        if is_top_layer_frozen:
+            retention_parameter = self._determine_frozen_retention_parameter(
+                                                                        first_moisture_condition_retention_parameter,
+                                                                        retention_parameter)
+        # --------------------------------------------------------------------------------------------------------------
+
         runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
+
+        # --- Update previous retention parameter ----------------------------------------------------------------------
+        if self.data.previous_retention_parameter is None:
+            self.data.previous_retention_parameter = 0.9 * first_moisture_condition_retention_parameter
+        else:
+            self.data.previous_retention_parameter = self._determine_updated_retention_parameter(
+                                                                        self.data.previous_retention_parameter,
+                                                                        self.data.potential_evapotranspiration,
+                                                                        first_moisture_condition_retention_parameter,
+                                                                        rainfall,
+                                                                        runoff,
+                                                                        weighting_coefficient)
+        # --------------------------------------------------------------------------------------------------------------
+
+        self.data.moisture_condition_parameter = self._determine_moisture_condition_parameter(retention_parameter)
 
     # --- static methods ---
     @staticmethod
-    def _determine_curve_number_1(curve_number_2: float):
+    def _determine_first_moisture_condition_parameter(second_moisture_condition: float):
         """determine curve number for dry (wilting point) conditions
 
         Args:
-            curve_number_2: curve number for average moisture conditions
+            second_moisture_condition: curve number for average moisture conditions
 
         Returns:
             curve number 1 (dry/wilting point conditions), unitless
 
         SWAT Reference: 2:1.1.4
         """
-        top = 20 * (100 - curve_number_2)
-        bottom = (100 - curve_number_2 + exp(2.533 - 0.0636 * (100 - curve_number_2)))
-        return curve_number_2 - (top / bottom)
+        top = 20 * (100 - second_moisture_condition)
+        bottom = (100 - second_moisture_condition + exp(2.533 - 0.0636 * (100 - second_moisture_condition)))
+        return second_moisture_condition - (top / bottom)
 
     @staticmethod
-    def _determine_curve_number_3(curve_number_2: float):
+    def _determine_third_moisture_condition_parameter(second_moisture_condition: float):
         """determine curve number for wet (field capacity) conditions
 
         Args:
-            curve_number_2: curve number for average moisture conditions
+            second_moisture_condition: curve number for average moisture conditions
 
         Returns:
             curve number 3 (wet/field capacity conditions), unitless
 
         SWAT Reference: 2:1.1.5
         """
-        return curve_number_2 * exp(0.00673 * (100 - curve_number_2))
+        return second_moisture_condition * exp(0.00673 * (100 - second_moisture_condition))
 
     @staticmethod
-    def _determine_max_retention_parameter(curve_number: float) -> float:
+    def _determine_retention_parameter_for_moisture_condition(moisture_condition_parameter: float) -> float:
         """calculates the retention parameter used to determine runoff
 
         Args:
-            curve_number: curve number for the day (from SCS runoff equations (SWAT 2:1.1))
+            moisture_condition_parameter: curve number for the day (from SCS runoff equations (SWAT 2:1.1))
 
         Returns:
             retention parameter in mm
 
         SWAT Reference: 2:1.1.2
         """
-        return 25.4 * ((1000 / curve_number) - 10)
+        return 25.4 * ((1000 / moisture_condition_parameter) - 10)
+
+    @staticmethod
+    def _determine_second_shape_coefficient(field_capacity: float,
+                                            saturation: float,
+                                            max_retention_parameter: float,
+                                            third_moisture_condition_retention_parameter: float) -> float:
+        """determines the second shape coefficient for use in calculating the first shape coefficient and retention
+        parameter for a given day
+
+        Args:
+            field_capacity: amount of water in soil profile at field capacity in mm
+            saturation: amount of water in soil profile when saturated in mm
+            max_retention_parameter: retention parameter calculated from curve number 1 (driest conditions)
+            third_moisture_condition_retention_parameter: retention parameter calculated from curve number 3 (the
+                wettest conditions)
+
+        Returns:
+            the second shape coefficient (unitless)
+
+        SWAT Reference: 2:1.1.8
+        """
+        first_top_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
+                                                     max_retention_parameter))) -
+                             field_capacity)
+        second_top_term = log((saturation / (1 - (2.54 / max_retention_parameter))) - saturation)
+        return (first_top_term - second_top_term) / (saturation - field_capacity)
+
+    @staticmethod
+    def _determine_first_shape_coefficient(field_capacity: float,
+                                           max_retention_parameter: float,
+                                           third_moisture_condition_retention_parameter: float,
+                                           second_shape_coefficient: float) -> float:
+        """calculates the first shape coefficient for use in calculating the retention parameter
+
+        Args:
+            field_capacity: amount of water in soil profile at field capacity in mm
+            max_retention_parameter: retention parameter calculated from curve number 1 (driest conditions)
+            third_moisture_condition_retention_parameter: retention parameter calculated from curve number 3 (the
+                wettest conditions)
+            second_shape_coefficient: the second shape coefficient (unitless)
+
+        Returns:
+            the first shape coefficient unitless
+
+        SWAT Reference: 2:1.1.7
+        """
+        first_term = log((field_capacity / (1 - (third_moisture_condition_retention_parameter /
+                                                 max_retention_parameter))) - field_capacity)
+        second_term = second_shape_coefficient * field_capacity
+        return first_term + second_term
+
+    @staticmethod
+    def _determine_retention_parameter(soil_water_content: float,
+                                       max_retention_parameter: float,
+                                       first_shape_coefficient: float,
+                                       second_shape_coefficient: float) -> float:
+        """returns the retention parameter for a given day
+
+        Args:
+            soil_water_content: amount of water held in the soil profile excluding amount of water held in profile at
+                the wilting point in mm
+            max_retention_parameter: maximum retention parameter, calculated from curve number 1 (driest conditions) in
+                mm
+            first_shape_coefficient: first shape coefficient, unitless
+            second_shape_coefficient: second shape coefficient, unitless
+
+        Returns:
+            retention parameter for a given day in mm
+
+        SWAT Reference: 2:1.1.6
+        """
+        return max_retention_parameter * (1 - (soil_water_content / (soil_water_content + exp(first_shape_coefficient -
+                                                                                              (second_shape_coefficient
+                                                                                               * soil_water_content)))))
+
+    @staticmethod
+    def _determine_frozen_retention_parameter(max_retention_parameter: float, retention_parameter: float) -> float:
+        """determines the adjusted retention parameter if the top layer of soil is frozen
+
+        Args:
+            max_retention_parameter: maximum retention parameter, calculated from curve number 1 (driest conditions) in
+                mm
+            retention_parameter: retention parameter for a given day in mm
+
+        Returns:
+            retention parameter for a given day adjusted for frozen soil in mm
+
+        SWAT Reference: 2:1.1.10
+        """
+        return max_retention_parameter * (1 - exp(-0.000862 * retention_parameter))
+
+    @staticmethod
+    def _determine_second_moisture_condition_adjusted(average_fraction_slope: float,
+                                                      second_moisture_condition: float,
+                                                      third_moisture_condition: float) -> float:
+        """determines curve for moisture condition 2 (average moisture conditions) adjusted for slope
+
+        Args:
+            average_fraction_slope: average slope fraction of subbasin
+            second_moisture_condition: moisture condition 2 curve for (default) 5% slope
+            third_moisture_condition: moisture condition 3 curve for (default) 5% slope
+
+        Returns:
+            moisture condition 2 curve adjusted for actual slop of the soil
+
+        SWAT Reference: 2:1.1.12
+        """
+        first_factor = (third_moisture_condition - second_moisture_condition) / 3
+        second_factor = 1 - (2 * exp(-13.86 * average_fraction_slope))
+        return (first_factor * second_factor) + second_moisture_condition
 
     @staticmethod
     def _determine_accumulated_runoff(rainfall: float, retention_parameter: float) -> float:
@@ -127,251 +256,36 @@ class Infiltration:
         else:
             return 0
 
-# def update_all(soil, weather, time):
-#     """
-#     Definition:
-#         This function calls all the necessary functions to update information related
-#         to infiltration
-#
-#     Args:
-#         soil: instance of the Soil class specified in soil.py
-#         weather: instance of the Weather class specified in classes.py
-#         time: instance of the Time class specified in classes.py
-#     """
-#
-#     calc_runoff(soil, weather, time)
-#
-#     calc_daily_infiltration(soil, weather, time)
-#
-#
-# def calc_runoff(soil, weather, time):
-#     """
-#     Definition:
-#         Calculates the daily runoff (mm H2O)
-#         "pseudocode_soil" S.2.A.1
-#
-#     Args:
-#         soil
-#         weather
-#         time
-#     """
-#
-#     R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
-#     S = calc_S(soil)
-#
-#     # modifies S if the top layer of soil is frozen
-#     # "pseudocode_soil" S.2.A.9
-#     if soil.soil_layers[0].temperature <= 2:
-#         S_max = calc_S_max(soil)
-#         exp_part = exp(-0.000862 * S)
-#         S = S_max * (1 - exp_part)
-#
-#     runoff = 0.0
-#     if R > 0.2 * S:
-#         runoff = ((R - 0.2 * S) ** 2) / (R + 0.8 * S)
-#
-#     soil.runoff = runoff
-#
-#
-# def calc_S(soil):
-#     """
-#     Definition:
-#         Calculates the retention parameter S (mm H2O) for use in calculating daily
-#         runoff (mm H2O)
-#         "pseudocode_soil" S.2.A.4
-#
-#     Args:
-#         soil
-#
-#     Returns:
-#         int: S, retention parameter (mm H2O)
-#     """
-#
-#     CN3 = calc_CN3(soil)
-#
-#     S_max = calc_S_max(soil)
-#     w2 = calc_w2(soil, S_max, CN3)
-#     w1 = calc_w1(soil, S_max, CN3, w2)
-#
-#     SW_available = sum_SW(soil) - sum_WW(soil)
-#
-#     S_exp = exp(w1 - (w2 * SW_available))
-#
-#     return S_max * (1 - (SW_available / (SW_available + S_exp)))
-#
-#
-# def calc_CN1(soil):
-#     """
-#     Definition:
-#         Calculates Curve Number 1 for use in calculating S_max
-#         "pseudocode_soil" S.2.A.2
-#
-#     Args:
-#         soil
-#
-#     Returns:
-#         int: CN1, unitless Curve Number 1 for use in calculating S_max
-#     """
-#
-#     CN2 = soil.CN2
-#     CN1_exp = exp(2.533 - 0.0636 * (100 - CN2))
-#     return CN2 - (20 * (100 - CN2)) / (100 - CN2 + CN1_exp)
-#
-#
-# def calc_CN3(soil):
-#     """
-#     Definition:
-#         Calculates Curve Number 3 for use in calculating S3
-#         "pseudocode_soil" S.2.A.3
-#
-#     Args:
-#         soil
-#
-#     Returns:
-#         int: CN3, unitless Curve Number 3 for use in calculating S3
-#     """
-#
-#     CN2 = soil.CN2
-#     CN3_exp = exp(0.00673 * (100 - CN2))
-#     return CN2 * CN3_exp
-#
-#
-# def calc_S_max(soil):
-#     """
-#     Definition:
-#         Calculates S_max, the maximum value for S on the current given day (mm H2O)
-#         "pseudocode_soil" S.2.A.5
-#
-#     Args:
-#         soil
-#
-#     Returns:
-#         int: S_max, the maximum value for retention parameter S on the current day (mm H2O)
-#     """
-#
-#     CN1 = calc_CN1(soil)
-#     return 25.4 * ((1000 / CN1) - 10)
-#
-#
-# def calc_w1(soil, S_max, CN3, w2):
-#     """
-#     Description:
-#         Calculates the shape coefficient w1
-#         "pseudocode_soil" S.2.A.6
-#
-#     Args:
-#         soil
-#         S_max: Maximum value for retention parameter S on a given day
-#         CN3: unitless Curve Number 3
-#         w2: shape coefficient w2
-#
-#     Returns:
-#         int: w1, unitless shape coefficient
-#     """
-#
-#     FC = soil.profile_depth * soil.soil_layers[0].field_capacity
-#
-#     S3 = calc_S3(CN3)
-#
-#     log_part = log(FC / (1 - S3 * (1 / S_max)) - FC)
-#
-#     return log_part + (w2 * FC)
-#
-#
-# def calc_w2(soil, S_max, CN3):
-#     """
-#     Definition:
-#         Calculates the shape coefficient w2
-#         "pseudocode_soil" S.2.A.7
-#
-#     Args:
-#         soil
-#         S_max: Maximum value for the retention parameter S on a given day
-#         CN3: Curve Number 3. Calculated above
-#
-#     Returns:
-#         int: w2, unitless shape coefficient
-#     """
-#
-#     FC = soil.profile_depth * soil.soil_layers[0].field_capacity
-#
-#     SAT = soil.profile_depth * soil.soil_layers[0].saturation
-#
-#     S3 = calc_S3(CN3)
-#
-#     L1 = log(FC / (1 - S3 * (1 / S_max)) - FC)
-#     L2 = log(SAT / (1 - 2.54 * (1 / S_max)) - SAT)
-#
-#     return (L1 - L2) / (SAT - FC)
-#
-#
-# def calc_S3(CN3):
-#     """
-#     Definition:
-#         Calculates S3 for use in calculating shape coefficients w1/w2
-#         "pseudocode_soil" S. 2.A.8
-#
-#     Args:
-#         CN3: Curve Number 3
-#
-#     Returns:
-#         int: S3, used in calculating unitless shape coefficients w1, w2
-#     """
-#
-#     return 25.4 * ((1000 / CN3) - 10)
-#
-#
-# def sum_SW(soil):
-#     """
-#     Description:
-#         Calculates soil water content of the entire profile for use in calculating S
-#         "pseudocode_soil" S.2.A.4
-#
-#     Args:
-#         soil
-#
-#     Returns:
-#         int: SW, the total soil water content of the profile (mm H2O)
-#     """
-#
-#     SW = 0.0
-#     for layer in soil.soil_layers:
-#         SW += layer.soil_water
-#     return SW
-#
-#
-# def sum_WW(soil):
-#     """
-#     Description:
-#         Calculates the quantity of water held at wilting point in the entire profile
-#         for use in calculating S
-#         "pseudocode_soil" S.2.A.4
-#
-#     Args:
-#         soil
-#
-#     Returns:
-#         int: WW, the total quantity of water held at wilting point for the profile (mm H2O)
-#     """
-#
-#     WW = 0.0
-#     for layer in soil.soil_layers:
-#         WW += layer.wilting_water
-#     return WW
-#
-#
-# def calc_daily_infiltration(soil, weather, time):
-#     """
-#     Description:
-#         Calculates and updates daily infiltration as rainfall - runoff
-#         "pseudocode_soil" S.2.A.10
-#
-#     Args:
-#         soil
-#         weather
-#         time
-#     """
-#
-#     R = weather.rainfall[time.year - 1][time.day - 1] + weather.irrigation[time.year - 1][time.day - 1]
-#     runoff = soil.runoff
-#     soil.infiltration = R - runoff
+    @staticmethod
+    def _determine_updated_retention_parameter(previous_retention_parameter: float,
+                                               potential_evapotranspiration: float,
+                                               max_retention_parameter: float,
+                                               rainfall: float,
+                                               runoff: float,
+                                               weighting_coefficient: float) -> float:
+        """updates the retention parameter based on the previous day's retention parameter and the current day's
+            conditions
+
+        Args:
+            previous_retention_parameter: retention parameter from previous day in mm
+            potential_evapotranspiration: potential evapotranspiration for current day in mm per day
+            max_retention_parameter: maximum retention parameter for the current day in mm
+            rainfall: rainfall depth of current day in mm
+            runoff: surface runoff of current day in mm
+            weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
+                calculations dependent on plant evapotranspiration
+
+        Returns:
+            retention parameter for the current day in mm
+
+        SWAT Reference: 2:1.1.9
+        """
+        retention_parameter = previous_retention_parameter - rainfall + runoff
+        retention_parameter += potential_evapotranspiration * exp((((-1) * weighting_coefficient) *
+                                                                   previous_retention_parameter)
+                                                                  / max_retention_parameter)
+        return retention_parameter
+
+    @staticmethod
+    def _determine_moisture_condition_parameter(retention_parameter: float) -> float:
+        return 25400 / (retention_parameter + 254)
