@@ -223,9 +223,9 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        herd_data['config'] = config
+        # herd_data['config'] = config
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-            = self.life_cycle_manager.initialize_herd(**herd_data)
+            = self.life_cycle_manager.initialize_herd(config, herd_data)
 
     def _print_animal_num_warnings(self, herd_data):
         """

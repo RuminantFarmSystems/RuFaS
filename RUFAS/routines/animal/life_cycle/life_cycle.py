@@ -147,9 +147,7 @@ class LifeCycleManager:
         self.initialize_db_summary = {}
         self.avg_CI = 0
 
-    def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
-                        heiferIII_num, cow_num, replace_num, herd_init, breed,
-                        config):
+    def initialize_herd(self, config, herd_data):
         """
         Generates a replacement herd to simulate the market, for the herd to get
          replacements. Initializes the herd.
@@ -175,8 +173,8 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], breed,
-                                                       config.set_seed, herd_init)
+        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], herd_data['breed'],
+                                                       config.set_seed, herd_data['herd_init'])
 
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
@@ -184,31 +182,31 @@ class LifeCycleManager:
             self.initialize_db_summary = \
                 self.animal_initializer.initialization_db_summary()
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
-        self.herd_num = herd_num
+        self.herd_num = herd_data['herd_num']
 
-        calves = self.animal_initializer.get_calves(calf_num, breed)
+        calves = self.animal_initializer.get_calves(herd_data['calf_num'], herd_data['breed'])
         for calf in calves:
             calf.events.add_event(calf.days_born, 0, const.INIT_HERD)
 
-        heiferIs = self.animal_initializer.get_heiferIs(heiferI_num, breed)
+        heiferIs = self.animal_initializer.get_heiferIs(herd_data['heiferI_num'], herd_data['breed'])
         for heiferI in heiferIs:
             heiferI.events.add_event(heiferI.days_born, 0, const.INIT_HERD)
 
-        heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num, breed)
+        heiferIIs = self.animal_initializer.get_heiferIIs(herd_data['heiferII_num'], herd_data['breed'])
         for heiferII in heiferIIs:
             heiferII.events.add_event(heiferII.days_born, 0, const.INIT_HERD)
 
         heiferIIIs = self.animal_initializer.get_heiferIIIs(
-            heiferIII_num, breed)
+            herd_data['heiferIII_num'], herd_data['breed'])
         for heiferIII in heiferIIIs:
             heiferIII.events.add_event(heiferIII.days_born, 0, const.INIT_HERD)
 
-        cows = self.animal_initializer.get_cows(cow_num, breed)
+        cows = self.animal_initializer.get_cows(herd_data['cow_num'], herd_data['breed'])
         for cow in cows:
             cow.events.add_event(cow.days_born, 0, const.INIT_HERD)
 
         self.replacement_market = self.animal_initializer.get_replacement_cows(
-            replace_num, breed)
+            herd_data['replace_num'], herd_data['breed'])
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def daily_update(self, date, calves, heiferIs, heiferIIs,
