@@ -51,7 +51,7 @@ def test_access_layers(deepest, layers):
     assert incorp.access_layers(layers) == layers[slice(deepest)]
 
 
-@pytest.mark.parametrize("uptakes,nitrates", [
+@pytest.mark.parametrize("uptakes,phosphates", [
     ([1], [1]),  # start
     ([1], [0]),  # no nitrates
     ([0], [1]),  # no uptakes
@@ -61,17 +61,17 @@ def test_access_layers(deepest, layers):
     ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),  # nitrates limited
     ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
 ])
-def test_cd_phosphorus_from_soil_layers(uptakes, nitrates):
+def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
     """check that layer_nitrates were correctly updated by extract_phosphorus_from_soil_layers"""
-    nitrates_copy = nitrates.copy()
+    nitrates_copy = phosphates.copy()
     data = CropData(actual_phosphorus_uptakes=uptakes)
     incorp = PhosphorusIncorporation(data)
-    incorp.extract_phosphorus_from_soil_layers(nitrates)
+    incorp.extract_phosphorus_from_soil_layers(phosphates)
     remaining = []
 
     for i in range(len(uptakes)):
         remaining.append(max(nitrates_copy[i] - uptakes[i], 0))
-    assert nitrates == remaining
+    assert phosphates == remaining
 
 
 @pytest.mark.parametrize("uptakes", [
@@ -92,6 +92,7 @@ def test_tally_total_phosphorus_uptake(uptakes):
     ([.5, 1, 10, 20], [0.5, 0.8, 5, 10])
 ])
 def test_uptake_phosphorus(phosphates, depths):
+    """check that uptake_phosphorus() correctly called functions and variables were updated as expected"""
     # initialize crop and run method
     data = CropData(potential_phosphorus_uptake=17.5, root_depth=35.0, phosphorus_distro_param=0.32)
     incorp = PhosphorusIncorporation(data)
@@ -137,6 +138,7 @@ def test_uptake_phosphorus(phosphates, depths):
     ([.5, .3, .2], [1, 2, 5], False)
 ])
 def test_incorporate_phosphorus(phosphates, depths, gate):
+    """check that incorporate_phosphorus() correctly called functions and variables were updated as expected"""
     # initialize object
     data = CropData(heat_fraction=0.38, half_mature_heat_fraction=.54, mature_heat_fraction=0.99,
                     emergence_phosphorus_fraction=0.71, half_mature_phosphorus_fraction=0.68,
