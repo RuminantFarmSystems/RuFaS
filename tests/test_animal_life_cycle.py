@@ -750,6 +750,7 @@ def test_check_if_replacement_heifers_needed(mocker: MockerFixture,
     assert len(mock_heiferIIIs) == 51
     assert len(mock_cows) == 50
     assert len(animals_added) == 0
+
     # ---------------------------------------------------------------
 
     # Case 3: sim_day == 1
@@ -1000,8 +1001,58 @@ def test_extract_repro_stats_from_cow(mocker: MockerFixture, life_cycle_manager:
     assert life_cycle_manager.ai_num == expected_ai_num
 
 
-def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
-    pass
+@pytest.mark.parametrize('is_calf_culled, is_calf_sold',
+                         [(True, True),
+                          (True, False),
+                          (False, True),
+                          (False, True)
+                          ])
+def test_handle_new_born(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
+                         is_calf_culled: bool,
+                         is_calf_sold: bool) -> None:
+    # Arrange
+    sim_day = 1
+    life_cycle_manager.sold_calf_num = sold_calf_num = 0
+    mock_animal_initializer = mocker.MagicMock(autospec=AnimalInitialization)
+    mock_animal_initializer.next_id.return_value = calf_id = 100
+    life_cycle_manager.animal_initializer = mock_animal_initializer
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.p_animal = p_animal = 1.0
+    mock_cow.p_gest_for_calf = p_gest_for_calf = 2.0
+    mock_cow.p_growth = p_growth = 3.0
+    mock_cow.dP_reserves = dP_reserves = 4.0
+    mock_cow.calf_birth_weight = calf_birth_weight = 5.0
+    expected_cow_p_animal = p_animal - p_gest_for_calf + p_growth + dP_reserves
+
+    mock_calf = mocker.MagicMock(autospec=Calf)
+    mock_calf.days_born = calf_days_born = 6
+    mock_calf.culled = is_calf_culled
+    mock_calf.sold = is_calf_sold
+    patch_for_mock_calf = mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.Calf',
+                                       return_value=mock_calf)
+    calves_born = []
+
+    # Act
+    life_cycle_manager._handle_new_born(sim_day, mock_cow, calves_born)
+
+    # Assert
+    assert mock_cow.p_animal == expected_cow_p_animal
+    assert mock_cow.p_gest_for_calf == approx(0.0)
+    assert mock_cow.calf_birth_weight == approx(0.0)
+    patch_for_mock_calf.assert_called_once_with({
+        'id': calf_id,
+        'breed': 'HO',
+        'birth_date': sim_day,
+        'days_born': 0,
+        'p_init': p_gest_for_calf,
+        'birth_weight': calf_birth_weight
+    })
+    if not is_calf_culled and not is_calf_sold:
+        mock_calf.events.add_event.assert_called_once_with(calf_days_born, sim_day, animal_constants.ENTER_HERD)
+        assert len(calves_born) == 1
+        assert calves_born[0] == mock_calf
+    if is_calf_sold:
+        assert life_cycle_manager.sold_calf_num == sold_calf_num + 1
 
 
 @pytest.mark.parametrize('cow_calves', [1, 2, 3, 4])
@@ -1178,3 +1229,50 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
                    approx(LifeCycleManager.num_cow_for_parity[parity] * 100.0 / cow_num)
         elif cow_num == 0:
             assert life_cycle_manager.percent_cow_for_parity[parity] == approx(0.0)
+
+
+def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
+    # Arrange
+    sim_day = 1
+    mock_cows = []
+    num_cows = 10
+    calves_born = []
+    ids_removed = []
+    removed_cows_idx = []
+    for i in range(num_cows):
+        mock_cow = mocker.MagicMock(autospec=Cow)
+        mock_cow.id = i
+        is_culled = True
+        has_new_born = True
+        mock_cow.update.return_value = (None, None, None, is_culled, has_new_born)
+        if is_culled:
+            removed_cows_idx.append(i)
+        mock_cows.append(mock_cow)
+    mock_cows_original = mock_cows.copy()
+    total_animal_num = 0
+    calving_interval_avail_num = 0
+
+    patch_for_cull_cow = mocker.patch.object(life_cycle_manager, '_cull_cow')
+    patch_for_remove_items_from_list_by_indices = mocker.patch(
+            'RUFAS.routines.animal.life_cycle.life_cycle.Utility.remove_items_from_list_by_indices')
+    patch_for_handle_new_born = mocker.patch.object(life_cycle_manager, '_handle_new_born')
+
+    # Act
+    actual = life_cycle_manager._cull_cows_and_record_stats(sim_day, mock_cows,
+                                                            calves_born, ids_removed,
+                                                            total_animal_num)
+
+    # Assert
+    for mock_cow in mock_cows_original:
+        _, _, _, is_culled, has_new_born = mock_cow.update.return_value
+        if is_culled:
+            patch_for_cull_cow.assert_called_once_with(mock_cow)
+            assert mock_cow.id in ids_removed
+            assert mock_cow.id in removed_cows_idx
+        else:
+            pass
+        if has_new_born:
+            patch_for_handle_new_born.assert_called_once_with(sim_day, mock_cow, calves_born)
+
+    patch_for_remove_items_from_list_by_indices.assert_called_once_with(mock_cows_original, removed_cows_idx)
+
