@@ -242,6 +242,7 @@ class AnimalManagement:
         info_map = {
             "class": self.__class__.__name__,
             "function": self._print_animal_num_warnings.__name__,
+            "simulate_animals": self.simulate_animals,
             "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys}
         }
 
@@ -252,7 +253,7 @@ class AnimalManagement:
             for key in animal_keys:
                 if herd_data[key] != 0:
                     om.add_warning(f"invalid_{key}_warning",
-                                   f"Warning: herd_num is 0, but {key} is not.",
+                                   f"Warning: simulate_animals is false, but {key} is not.",
                                    info_map)
                     counter += 1
             om.add_log("num_warnings_associated_with_simulate_animals",
