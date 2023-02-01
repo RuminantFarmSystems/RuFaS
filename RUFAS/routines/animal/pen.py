@@ -9,12 +9,17 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS import util, errors
 from enum import Enum
+from typing import DefaultDict, Any
+
+
+om = OutputManager()
 
 
 class Pen:
@@ -25,19 +30,19 @@ class Pen:
 
     Attributes
     -------------
-    id : int
+    pen_id : int
         The pen's unique pen ID.
         Obtained from the input file.
 
-    vertical_dist_to_parlor : float
+    vertical_dist_to_milking_parlor : float
         The vertical distance to milking parlor, measured in kilometers.
         Obtained from the input file.
 
-    horizontal_dist_to_parlor : float
+    horizontal_dist_to_milking_parlor : float
         The horizontal distance to milking parlor, measured in kilometers.
         Obtained from the input file.
 
-    num_stalls : int
+    number_of_stalls : int
         The number of stalls.
         Obtained from the input file.
 
@@ -163,17 +168,18 @@ class Pen:
         GROWING_AND_CLOSE_UP = 4
         LAC_COW = 5
 
-    def __init__(self, id_number, vert_dist, horiz_dist, num_stalls, housing_type,
+    def __init__(self, pen_id, vertical_dist_to_milking_parlor, horizontal_dist_to_milking_parlor, number_of_stalls,
+                 housing_type,
                  bedding_type, pen_type, manure_handling, manure_separator,
                  manure_storage, animal_combination, max_stocking_density):
         """
         Initializes a pen with the given arguments.
 
         Args:
-            id_number: the unique id number of the pen
-            vert_dist: vertical distance to milking parlor, km
-            horiz_dist: horizontal distance to milking parlor, km
-            num_stalls: number of stalls in the pen
+            pen_id: the unique id number of the pen
+            vertical_dist_to_milking_parlor: vertical distance to milking parlor, km
+            horizontal_dist_to_milking_parlor: horizontal distance to milking parlor, km
+            number_of_stalls: number of stalls in the pen
             housing_type: housing type of the pen
             bedding_type: bedding type of the pen
             pen_type: freestall or tiestall
@@ -183,13 +189,13 @@ class Pen:
             animal_combination: the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
             max_stocking_density: maximum stocking density allowed for pen
         """
-        self.id = id_number
+        self.id = pen_id
 
         self.max_stocking_density = max_stocking_density
 
-        self.vertical_dist_to_parlor = vert_dist
-        self.horizontal_dist_to_parlor = horiz_dist
-        self.num_stalls = num_stalls
+        self.vertical_dist_to_parlor = vertical_dist_to_milking_parlor
+        self.horizontal_dist_to_parlor = horizontal_dist_to_milking_parlor
+        self.num_stalls = number_of_stalls
         self.housing_type = housing_type
         self.bedding_type = bedding_type
         self._pen_type = pen_type
@@ -297,7 +303,7 @@ class Pen:
             new_animals: list of new animals in the pen
             animal_combination: an AnimalCombination Enum representating the type of the new animals
         """
-        # self.animals_in_pen = new_animals
+
         for animal in new_animals:
             self.animals_in_pen.append(animal)
         self.pen_populated = not (len(self.animals_in_pen) == 0)
@@ -313,14 +319,14 @@ class Pen:
         # updates the animal class this pen holds
         self.animal_combination = animal_combination
 
-    def calc_ration(self, feed, available_feeds):
+    def calc_ration(self, feed, available_feeds: DefaultDict[Any, Any]):
         """
         Calculates and sets the ration for the pen using the average nutrient
         requirements of the animals in the pen.
 
         Args:
             feed: instance of the Feed class
-            available_feeds: instance of the AvailableFeeds class defined in ration_driver.py
+            available_feeds: a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
         """
         # sets ration's necessary fields for ration formulation calculation
         # there should only be one group of animals in a pen
@@ -337,17 +343,17 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'heifer', False)
+                    ration_driver.ration_formulation(self, available_feeds, 'heifer', False)
 
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', True)
+                    ration_driver.ration_formulation(self, available_feeds, 'cow', True)
 
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, feed, available_feeds, 'cow', False)
+                    ration_driver.ration_formulation(self, available_feeds, 'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -378,6 +384,13 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
+                
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_ration.__name__, 
+                    "feed": vars(feed),
+                    "available_feeds": available_feeds, }
+        om.add_variable("pen_ration_data", ration, info_map)
+
         return ration
 
     def calc_manure(self, feed, methane_model):
@@ -437,6 +450,10 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_manure.__name__, 
+                    "feed": vars(feed)}
+        om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
         return copy.deepcopy(self._manure_dict_template)
@@ -496,7 +513,7 @@ class Pen:
                 total_p_animal += animal.p_animal
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
-    def set_up_new_animal(self, animal, p_comp, feed, temp, num_animals_before_additions):
+    def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
         """
         Sets the necessary attributes for @animal to be a replacement in this
         pen.
@@ -504,7 +521,7 @@ class Pen:
         Args:
             animal: the replacement animal which needs to have necessary values
                 for later computations
-            p_comp: P composition of @animal's class, used to calculate the
+            p_conc: P concentration of @animal's class, used to calculate the
                 P in @animal. -1 for this value indicates that @animal is a
                 calf and that its p_animal attribute has already been calculated
             feed: instance of the Feed class defined in feed.py
@@ -541,10 +558,6 @@ class Pen:
                 'NEl']) / animal.DMIest
             animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
 
-        # set animal's ration to be the intake of all other animals in pen
-        # if self.ration == {}:
-        #     self.ration = self.calc_ration(feed, temp)
-
         animal.dry_matter_intake = self.dry_matter_intake
 
         for key in self.ration:
@@ -557,7 +570,8 @@ class Pen:
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
-            animal.manure_excretion[key] = self.manure[key] / len(self.animals_in_pen)
+            if len(self.animals_in_pen) > 0:
+                animal.manure_excretion[key] = self.manure[key] / (len(self.animals_in_pen))
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
@@ -584,8 +598,8 @@ class Pen:
 
         # set this animal's p_animal to be the average P concentration of other
         # animals in its class times its body weight
-        if not p_comp == -1:
-            animal.p_animal = animal.body_weight * p_comp
+        if not p_conc == -1:
+            animal.p_animal = animal.body_weight * p_conc
 
         animal.p_intake = self.avg_p_intake
 
@@ -602,7 +616,6 @@ class Pen:
         # that are non-zero.
         self.animals_in_pen = []
         self.pen_populated = False
-        # self.classes_in_pen = set()
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):

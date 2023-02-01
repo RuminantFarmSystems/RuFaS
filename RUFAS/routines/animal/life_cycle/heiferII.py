@@ -14,6 +14,7 @@ Description: This file updates the heifer form breeding to close to calving.
 
 import numpy as np
 from scipy.stats import truncnorm
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import \
@@ -22,6 +23,8 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 import math
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class HeiferII(HeiferI):
@@ -286,6 +289,7 @@ class HeiferII(HeiferI):
             cull_stage: culling for reproduction failure
             third_stage: move to next stage -- heiferIII stage when time comes
         """
+
         self.update_body_weight_history(sim_day)
         cull_stage = False
         third_stage = False
@@ -448,7 +452,7 @@ class HeiferII(HeiferI):
             self.PGF_injections = self.PGF_injections + 1
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
-            self.conception_rate = AnimalBase.config['m5dCGP_conception_rate']
+            self.conception_rate = AnimalBase.config['md5CGP_conception_rate']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -469,9 +473,9 @@ class HeiferII(HeiferI):
             self.determine_tai_program_day(
                 AnimalBase.config['breeding_start_day_h'])
 
-        if self.tai_method_h == '5dCG2P':
+        if self.tai_method_h == 'd5CG2P':
             self.d5CG2P_update(sim_day)
-        elif self.tai_method_h == '5dCGP':
+        elif self.tai_method_h == 'd5CGP':
             self.d5CGP_update(sim_day)
         elif self.tai_method_h == 'user_defined':
             self.user_defined_update()
@@ -619,6 +623,7 @@ class HeiferII(HeiferI):
         for preg check 2 and 3, confirm pregnancy, there are chances of preg
             loss in each period of time between preg checks
         """
+
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
@@ -705,3 +710,4 @@ class HeiferII(HeiferI):
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
+        

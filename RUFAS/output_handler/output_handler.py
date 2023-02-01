@@ -11,7 +11,9 @@ from pathlib import Path
 
 from .reports import *
 from ..util import Utility
+from RUFAS.output_manager import OutputManager
 
+om = OutputManager()
 
 class OutputHandler:
     """Handles all output related interactions.
@@ -83,11 +85,18 @@ class OutputHandler:
     def initialize_reports(self):
         """Transfer needed (initial) data from state to report handlers."""
 
+        info_map = {"class": self.__class__.__name__, 
+                    "function": self.initialize_reports.__name__, }
+
         for report_name in self.reports:
             report = self.reports[report_name]
             if not report.produce_csv and report.produce_graphics:
-                print("Warning: Cannot produce graphics for inactive report:", report.report_name,
-                      ". Setting produce_graphics to False")
+                info_map["report"] = report
+                om.add_warning("inactive_report_warning", 
+                                "Warning: Cannot produce graphics for" 
+                                + f" inactive report: {report.report_name}."
+                                + " Setting produce_graphics to False", 
+                                info_map)
                 report.produce_graphics = False
             if report.produce_csv:
                 report.initialize()
