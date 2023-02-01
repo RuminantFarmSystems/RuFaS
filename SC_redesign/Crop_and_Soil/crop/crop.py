@@ -38,7 +38,7 @@ class Crop:
         self.nitrogen_incorporation = NitrogenIncorporation(data)
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
         self.phosphorus_incorporation = PhosphorusIncorporation(data)
-        """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
+        """Process component controlling plant phosphorus uptake and incorporation"""
         self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
         """Process component controlling plant heat accumulation"""
         self.leaf_area_index = LeafAreaIndex(data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
