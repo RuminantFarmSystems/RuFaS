@@ -27,6 +27,7 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
         p_excrt: amount of P excreted by animal, g
         and a dictionary containing the following values
             U: urea concentration, mol/L
+            Urine: # TODO: Add description
             TAN_s: total ammoniacal nitrogen concentration in the manure slurry,
                 mol/L
             MN: nitrogen in liquid and solid manure, g
@@ -68,6 +69,7 @@ def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
 
     return p_excrt, \
            {"U": 0.340,  # TODO: Implement with correct equation
+            "Urine": 7,
             "TAN_s": 0.14,  # TODO: Implement with correct equation
             "MN": N_manure,
             "Mkg": manure,
