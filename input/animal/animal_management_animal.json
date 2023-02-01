@@ -16,7 +16,7 @@
 			"heifer_repro_cull_time": 500,
 			"heifer_repro_method": "TAI",
 			"cow_repro_method": "TAI",
-			"semen_type": "conventional",
+			"semen_type": "beef_sexed",
 			"days_in_preg_when_dry": 218,
 			"lactation_curve": "wood",
 			"cull_milk_production": 30,
@@ -24,8 +24,10 @@
 		},
 		"farm_level": {
 			"calf": {
-				"male_calf_rate_sexed_semen": 0.1,
-				"male_calf_rate_conventional_semen": 0.53,
+				"male_calf_rate_dairy_sexed_semen": 0.1,
+				"male_calf_rate_dairy_conventional_semen": 0.53,
+				"male_calf_rate_beef_conventional_semen": 0.53,
+				"male_calf_rate_beef_sexed_semen": 0.9,
 				"keep_female_calf_rate": 1,
 				"wean_day": 60,
 				"wean_length": 7,
@@ -52,6 +54,7 @@
 					"cow_resynch_protocol": "TAIbeforePD",
 					"tai_program_start_day": 41
 				},
+				"conception_rate_drop_sexed_semen": 0.15,
 				"voluntary_waiting_period": 45,			
 				"conception_rate_decrease": 0.05,
 				"avg_gestation_len": 278,

@@ -205,7 +205,7 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_feed_calf': ['life_cycle_manager.cost_feed_calf', '$/d', []],
                 'cost_feed_heifer': ['life_cycle_manager.cost_feed_heifer', '$/d', []],
                 'cost_feed': ['life_cycle_manager.feed_cost', '$/d', []],
-                'net_return': ['life_cycle_manager.net_return', '$/d', []],
+                # 'net_return': ['life_cycle_manager.net_return', '$/d', []],
                 'cost_hormone_heifer_more': ['life_cycle_manager.cost_hormone_heifer_more', '$/d', []],
                 'cost_ed_heifer_more': ['life_cycle_manager.cost_ed_heifer_more', '$/d', []],
                 'cost_ai_heifer_more': ['life_cycle_manager.cost_ai_heifer_more', '$/d', []],
@@ -215,7 +215,9 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_feed_calf_more': ['life_cycle_manager.cost_feed_calf_more', '$/d', []],
                 'cost_feed_heifer_more': ['life_cycle_manager.cost_feed_heifer_more', '$/d', []],
                 'cost_feed_more': ['life_cycle_manager.feed_cost_more', '$/d', []],
-                'net_return_more_heifer': ['life_cycle_manager.net_return_more_heifer', '$/d', []]
+                'net_return_more_heifer': ['life_cycle_manager.net_return_more_heifer', '$/d', []],
+                'net_return': ['life_cycle_manager.net_return', '$/d', []],
+                'net_return_last_year': ['life_cycle_manager.net_return_last_year', '$/y', []]
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
@@ -235,6 +237,18 @@ class LifeCycleReport(BaseReportDriver):
                 'net_merit_heifer': ['life_cycle_manager.avg_net_merit_heifer', '$', []],
             }
 
+            self.last_year_avg_vars = {
+                'culling_rate': ['life_cycle_manager.cull_rate', '%', []],
+                'sold_calf_total_last_year': ['life_cycle_manager.sold_calf_total_last_year', '', []],
+                'sold_calf_male_last_year': ['life_cycle_manager.sold_calf_male_last_year', '', []],
+                'sold_calf_female_last_year': ['life_cycle_manager.sold_calf_female_last_year', '', []],
+                'sold_calf_cross_bred_male_last_year': ['life_cycle_manager.sold_calf_cross_bred_male_last_year', '', []],
+                'sold_calf_cross_bred_female_last_year': ['life_cycle_manager.sold_calf_cross_bred_female_last_year', '', []],
+                'sold_heifer_last_year': ['life_cycle_manager.sold_heifer_last_year', '', []],
+                'bought_heifer_last_year': ['life_cycle_manager.bought_heifer_last_year', '', []],
+                'culled_heifer_last_year': ['life_cycle_manager.culled_heifer_last_year', '', []]
+            }
+
             self.daily_variables = {
                 **self.herd_structure, 
                 **self.reproduction_performance, 
@@ -242,7 +256,8 @@ class LifeCycleReport(BaseReportDriver):
                 **self.preg,
                 **self.average_animal_profile,
                 **self.econmic_cal,
-                **self.genetic_performance
+                **self.genetic_performance,
+                **self.last_year_avg_vars
             }
             
             self.annual_variables = {'year': ['time.calendar_year', '', []]}

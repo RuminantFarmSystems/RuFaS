@@ -17,6 +17,7 @@ from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 import numpy as np
+import warnings
 
 class LifeCycleManager:
     """
@@ -46,6 +47,30 @@ class LifeCycleManager:
     culled_heifer_num = 0
     culled_cow_num = 0
     do_not_breed_num = 0
+
+    cull_rate = 0 # sum of culled cow for last year/ avg cow num last year
+    culled_cow_sum_last_year = 0
+    culled_cow_sum_last_year_store_list =[]
+    cow_num_avg_last_year = 0
+    cow_num_avg_last_year_store_list = []
+
+    culled_heifer_last_year = 0
+    culled_heifer_last_year_store_list =[]
+    sold_calf_total = 0
+    sold_calf_total_last_year = 0
+    sold_calf_total_store_list = []
+    sold_calf_male_last_year = 0
+    sold_calf_male_store_list = []
+    sold_calf_female_last_year = 0
+    sold_calf_female_store_list = []
+    sold_calf_cross_bred_male_last_year = 0
+    sold_calf_cross_bred_male_store_list = []
+    sold_calf_cross_bred_female_last_year = 0
+    sold_calf_cross_bred_female_store_list = []
+    sold_heifer_last_year = 0
+    sold_heifer_store_list = []
+    bought_heifer_last_year = 0
+    bought_heifer_store_list = []
 
     num_cow_for_parity = {
         '1': 0,
@@ -225,6 +250,8 @@ class LifeCycleManager:
     milk_income_over_feed_cost = 0
     net_return = 0
     net_return_more_heifer = 0
+    net_return_last_year = 0
+    net_return_store_list = []
     
 
     config = None
@@ -679,6 +706,8 @@ class LifeCycleManager:
             self.replacement_market[0].events.add_event(
                 self.replacement_market[0].days_born, date, const.ENTER_HERD)
             self.replacement_market[0].set_p_purchased()
+            # adjust replacement's net merit - increase linearly (from 2015-2020, NM increase from -5 to 364 <- 0.2022 per day)
+            self.replacement_market[0].net_merit += date * 0.2022 
             animals_added.append(self.replacement_market[0])
             self.net_merit_heifer += self.replacement_market[0].net_merit
             self.bought_heifer_num += 1
@@ -991,9 +1020,32 @@ class LifeCycleManager:
                 self.percent_cow_for_parity[parity] = \
                     self.num_cow_for_parity[parity] / self.cow_num * 100
         
-        self.avg_net_merit_cow = self.net_merit_cow/self.cow_num
+        # moved from SA to here
+        self.net_return_last_year, self.net_return_store_list = self.moving_sum(self.net_return, 365, self.net_return_store_list)
+
+        self.culled_cow_sum_last_year, self.culled_cow_sum_last_year_store_list = self.moving_sum(self.culled_cow_num, 365, self.culled_cow_sum_last_year_store_list)
+        self.cow_num_avg_last_year, self.cow_num_avg_last_year_store_list = self.moving_average(self.cow_num, 365, self.cow_num_avg_last_year_store_list)
+        self.cull_rate = self.culled_cow_sum_last_year / self.cow_num_avg_last_year
+
+        self.sold_calf_total = self.sold_calf_male_num + self.sold_calf_female_num + self.sold_calf_crossbred_male_num + self.sold_calf_crossbred_female_num
+        self.sold_calf_total_last_year, self.sold_calf_total_store_list = self.moving_sum(self.sold_calf_total, 365, self.sold_calf_total_store_list)
+        self.sold_calf_male_last_year, self.sold_calf_male_store_list = self.moving_sum(self.sold_calf_male_num, 365, self.sold_calf_male_store_list)
+        self.sold_calf_female_last_year, self.sold_calf_female_store_list = self.moving_sum(self.sold_calf_female_num, 365, self.sold_calf_female_store_list)
+        self.sold_calf_cross_bred_male_last_year, self.sold_calf_cross_bred_male_store_list = self.moving_sum(self.sold_calf_crossbred_male_num, 365, self.sold_calf_cross_bred_male_store_list)
+        self.sold_calf_cross_bred_female_last_year, self.sold_calf_cross_bred_female_store_list = self.moving_sum(self.sold_calf_crossbred_female_num, 365, self.sold_calf_cross_bred_female_store_list)
+        self.sold_heifer_last_year, self.sold_heifer_store_list = self.moving_sum(self.sold_heifer_num, 365, self.sold_heifer_store_list)
+        self.bought_heifer_last_year, self.bought_heifer_store_list = self.moving_sum(self.bought_heifer_num, 365, self.bought_heifer_store_list)
+        self.culled_heifer_last_year, self.culled_heifer_last_year_store_list = self.moving_sum(self.culled_heifer_num, 365, self.culled_heifer_last_year_store_list)
+        
+        if self.cow_num == 0:
+            self.avg_net_merit_cow = 0
+        else:
+            self.avg_net_merit_cow = self.net_merit_cow/self.cow_num
         self.heifer_total_num = self.heiferI_num + self.heiferII_num + self.heiferIII_num
-        self.avg_net_merit_heifer = self.net_merit_heifer/(self.heiferI_num + self.heiferII_num + self.heiferIII_num)
+        if self.heifer_total_num == 0:
+            self.avg_net_merit_heifer = 0
+        else:
+            self.avg_net_merit_heifer = self.net_merit_heifer/self.heifer_total_num
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
     @staticmethod
@@ -1027,12 +1079,34 @@ class LifeCycleManager:
 
         Return:
             avg_value: moving average value
+            stor_list: list where stores the values between averaging period
         """
         if len(stor_list) == length_moving:
             stor_list = stor_list[1:]+[new_value]
         else: 
             stor_list += [new_value]
-
-        avg_value = sum(stor_list)/length_moving
-        
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            avg_value = np.nanmean(stor_list)
         return avg_value, stor_list
+
+    @staticmethod
+    def moving_sum(new_value, length_moving, stor_list):
+        """
+        Calcuate the new sum given the number of values, the current average, and the new value.
+
+        Args:
+            new_values: the new value to be sumed
+            lenth_moving: the length of the moving sum period
+            stor_list: list where stores the values between the moving sum period
+
+        Return:
+            sum_value: moving sum value
+            stor_list: list where stores the values between the moving sum period
+        """
+        if len(stor_list) == length_moving:
+            stor_list = stor_list[1:]+[new_value]
+        else: 
+            stor_list += [new_value]
+        sum_val = sum(stor_list)
+        return sum_val, stor_list

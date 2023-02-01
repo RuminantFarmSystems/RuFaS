@@ -384,6 +384,9 @@ class HeiferII(HeiferI):
                         self.conception_rate = AnimalBase.config['estrus_conception_rate_h']
                     else:
                         self.conception_rate = AnimalBase.config['estrus_conception_rate_h'] - 0.05
+                    # #adjust for sexed semen:
+                    # if AnimalBase.config['semen_type'][-5:] == "sexed":
+                    #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
                 # Return estrus after estrus not serviced
                 else:
                     self.estrus_day = self.determine_estrus_day(self.days_born, const.BASIC_ESTRUS_NOTE, 
@@ -418,6 +421,9 @@ class HeiferII(HeiferI):
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
             self.conception_rate = AnimalBase.config['TAI_conception_rate_h']
+            # #adjust for sexed semen:
+            # if AnimalBase.config['semen_type'][-5:] == "sexed":
+            #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -435,6 +441,9 @@ class HeiferII(HeiferI):
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
             self.conception_rate = AnimalBase.config['TAI_conception_rate_h']
+            # #adjust for sexed semen:
+            # if AnimalBase.config['semen_type'][-5:] == "sexed":
+            #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -499,6 +508,9 @@ class HeiferII(HeiferI):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate_h']
+                    # #adjust for sexed semen:
+                    # if AnimalBase.config['semen_type'][-5:] == "sexed":
+                    #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
             else:
                 # finish up with TAI
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
@@ -535,6 +547,9 @@ class HeiferII(HeiferI):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate_h']
+                    # #adjust for sexed semen:
+                    # if AnimalBase.config['semen_type'][-5:] == "sexed":
+                    #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
                     self.synch_ed_program_start_day_h = self.synch_ed_stop_day
@@ -578,6 +593,16 @@ class HeiferII(HeiferI):
         #         AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
         self.repro_program = 'ED'
 
+
+    def adjust_conception(self):
+        """
+        Adjust conception rate based on semen type
+        """
+        adjusted_conception_rate = self.conception_rate
+        #adjust for sexed semen:
+        if AnimalBase.config['semen_type'][-5:] == "sexed":
+            adjusted_conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
+        return adjusted_conception_rate
     
     # artificial inseminated 
     def preg_update(self, sim_day):
@@ -605,7 +630,7 @@ class HeiferII(HeiferI):
             self.AI_times += 1
             # conception
             conception_rand = random()
-            if conception_rand < self.conception_rate:
+            if conception_rand < self.adjust_conception():
                 self.days_in_preg = 1
                 self.abortion_day = 0
                 self.breeding_to_preg_time = self.days_born - AnimalBase.config['breeding_start_day_h']

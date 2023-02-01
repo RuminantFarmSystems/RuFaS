@@ -55,22 +55,26 @@ class Calf(AnimalBase):
         """
         Determine stillbirth, gender, and birth weight
         """
+        # ['semen_type'] now is in the format of 
+        # "semen_type": {"dairy_conventional": 1, "dairy_sexed": 0, "beef_conventional": 0, "beef_sexed": 0},
         # gender determined with gender ratio relates to semen type
-        if AnimalBase.config['semen_type'] == 'conventional':
+        if AnimalBase.config['semen_type'] == 'dairy_conventional':
             male_calf_rate = \
-                AnimalBase.config['male_calf_rate_conventional_semen']
+                AnimalBase.config['male_calf_rate_dairy_conventional_semen']
             self.breed = 'HO'
-        elif AnimalBase.config['semen_type'] == 'sexed':
-            male_calf_rate = AnimalBase.config['male_calf_rate_sexed_semen']
+        elif AnimalBase.config['semen_type'] == 'dairy_sexed':
+            male_calf_rate = AnimalBase.config['male_calf_rate_dairy_sexed_semen']
             self.breed = 'HO'
         elif AnimalBase.config['semen_type'] == 'beef_conventional':
             male_calf_rate = \
-                AnimalBase.config['male_calf_rate_conventional_semen']
+                AnimalBase.config['male_calf_rate_beef_conventional_semen']
             self.breed = 'HO-AN'
         elif AnimalBase.config['semen_type'] == 'beef_sexed':
             male_calf_rate = \
                 AnimalBase.config['male_calf_rate_beef_sexed_semen']
             self.breed = 'HO-AN'
+        else:
+            print("cannot recognize semen_type input")
         
         if random() < male_calf_rate:
             self.gender = 'male'
@@ -88,7 +92,7 @@ class Calf(AnimalBase):
         # if AnimalBase.config['keep_female_calf_rate = 0,
         # sell all female calves)
 
-        if self.gender == 'male' or random() > \
+        if self.gender == 'male' or self.breed != 'HO' or random() > \
                 AnimalBase.config['keep_female_calf_rate']:
             self.sold = True
         else:
