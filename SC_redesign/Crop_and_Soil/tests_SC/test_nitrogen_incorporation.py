@@ -587,6 +587,6 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
         incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
         assert data.potential_nitrogen_uptake == 123.1
     incorp.uptake_nitrogen.assert_called_once_with(nitrates, depths)
-    incorp.try_fixation.assert_called_once_with(5+10+15.3, water_factor)
+    incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
     NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should be called_once_with() w/ attr mocked
     assert data.nitrogen == 99.3
