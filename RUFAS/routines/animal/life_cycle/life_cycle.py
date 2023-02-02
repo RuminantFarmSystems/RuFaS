@@ -679,12 +679,12 @@ class LifeCycleManager:
                 # om.add_variable("average_mature_body_weight",
                 #                 self.avg_mature_body_weight, info_map)
 
-                    # om.add_variable("daily_milk_production",
-                    #                 self.daily_milk_production, info_map)
-                    # om.add_variable("milking_cow_num",
-                    #                 self.milking_cow_num, info_map)
-                    # om.add_variable("average_days_in_milk",
-                    #                 self.avg_days_in_milk, info_map)
+                # om.add_variable("daily_milk_production",
+                #                 self.daily_milk_production, info_map)
+                # om.add_variable("milking_cow_num",
+                #                 self.milking_cow_num, info_map)
+                # om.add_variable("average_days_in_milk",
+                #                 self.avg_days_in_milk, info_map)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num

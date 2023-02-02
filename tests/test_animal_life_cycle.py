@@ -1239,40 +1239,112 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     calves_born = []
     ids_removed = []
     removed_cows_idx = []
+    total_animal_num_start = 0
+    current_total_animal_num = total_animal_num_start
+    total_animal_num_side_effect = []
+    num_cows_culled = 0
+    num_new_born = 0
+    life_cycle_manager.avg_CI = avg_CI = 365
     for i in range(num_cows):
-        mock_cow = mocker.MagicMock(autospec=Cow)
+        mock_cow = mocker.MagicMock()
         mock_cow.id = i
-        is_culled = True
-        has_new_born = True
+        is_culled = i % 2 == 0
+        has_new_born = i % 3 == 0
         mock_cow.update.return_value = (None, None, None, is_culled, has_new_born)
         if is_culled:
+            ids_removed.append(i)
             removed_cows_idx.append(i)
+            num_cows_culled += 1
+        else:
+            current_total_animal_num += 1
+            total_animal_num_side_effect.append(current_total_animal_num)
+        if has_new_born:
+            num_new_born += 1
         mock_cows.append(mock_cow)
+    num_cows_not_culled = num_cows - num_cows_culled
     mock_cows_original = mock_cows.copy()
-    total_animal_num = 0
     calving_interval_avail_num = 0
+    calving_age_avail_num = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        'greater_than_3': 0
+    }
+    calf_to_preg_time_avail_num = {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        'greater_than_3': 0
+    }
 
     patch_for_cull_cow = mocker.patch.object(life_cycle_manager, '_cull_cow')
+
+    patch_for_handle_cow_body_weight_and_parity = mocker.patch.object(
+            life_cycle_manager,
+            '_handle_cow_body_weight_and_parity',
+            side_effect=total_animal_num_side_effect
+    )
+    patch_for_handle_cow_milking = mocker.patch.object(life_cycle_manager, '_handle_cow_milking')
+    patch_for_handle_cow_days_in_preg = mocker.patch.object(life_cycle_manager, '_handle_cow_days_in_preg')
+    patch_for_handle_cow_calves = mocker.patch.object(life_cycle_manager, '_handle_cow_calves')
+    patch_for_handle_cow_CI = mocker.patch.object(
+            life_cycle_manager,
+            '_handle_cow_CI',
+            return_value=calving_interval_avail_num
+    )
+    patch_for_extract_repro_stats_from_cow = mocker.patch.object(life_cycle_manager, '_extract_repro_stats_from_cow')
+
+    patch_for_handle_new_born = mocker.patch.object(life_cycle_manager, '_handle_new_born')
     patch_for_remove_items_from_list_by_indices = mocker.patch(
             'RUFAS.routines.animal.life_cycle.life_cycle.Utility.remove_items_from_list_by_indices')
-    patch_for_handle_new_born = mocker.patch.object(life_cycle_manager, '_handle_new_born')
 
     # Act
-    actual = life_cycle_manager._cull_cows_and_record_stats(sim_day, mock_cows,
-                                                            calves_born, ids_removed,
-                                                            total_animal_num)
+    actual_total_animal_num = life_cycle_manager._cull_cows_and_record_stats(sim_day, mock_cows,
+                                                                             calves_born, ids_removed,
+                                                                             total_animal_num_start)
 
     # Assert
-    for mock_cow in mock_cows_original:
-        _, _, _, is_culled, has_new_born = mock_cow.update.return_value
+    for cow in mock_cows_original:
+        cow.update.assert_called_once_with(sim_day, avg_CI)
+        _, _, _, is_culled, has_new_born = cow.update.return_value
         if is_culled:
-            patch_for_cull_cow.assert_called_once_with(mock_cow)
-            assert mock_cow.id in ids_removed
-            assert mock_cow.id in removed_cows_idx
+            assert cow.id in ids_removed
+            assert cow.id in removed_cows_idx
         else:
-            pass
+            patch_for_handle_cow_body_weight_and_parity.assert_any_call(cow,
+                                                                        total_animal_num_side_effect.pop(0) - 1)
+            patch_for_handle_cow_milking.assert_any_call(cow)
+            patch_for_handle_cow_days_in_preg.assert_any_call(cow)
+            patch_for_handle_cow_calves.assert_any_call(cow, calving_age_avail_num,
+                                                        calf_to_preg_time_avail_num)
+            patch_for_handle_cow_CI.assert_any_call(cow, calving_interval_avail_num)
+            patch_for_extract_repro_stats_from_cow.assert_any_call(cow)
         if has_new_born:
-            patch_for_handle_new_born.assert_called_once_with(sim_day, mock_cow, calves_born)
+            patch_for_handle_new_born.assert_any_call(sim_day, cow, calves_born)
 
+    assert patch_for_cull_cow.call_count == num_cows_culled
+    assert patch_for_handle_cow_body_weight_and_parity.call_count == num_cows_not_culled
+    assert patch_for_handle_cow_milking.call_count == num_cows_not_culled
+    assert patch_for_handle_cow_days_in_preg.call_count == num_cows_not_culled
+    assert patch_for_handle_cow_calves.call_count == num_cows_not_culled
+    assert patch_for_handle_cow_CI.call_count == num_cows_not_culled
+    assert patch_for_extract_repro_stats_from_cow.call_count == num_cows_not_culled
+    assert patch_for_handle_new_born.call_count == num_new_born
+
+    # for mock_cow in mock_cows_original:
+    #     _, _, _, is_culled, has_new_born = mock_cow.update.return_value
+    #     if is_culled:
+    #         patch_for_cull_cow.assert_called_once_with(mock_cow)
+    #         assert mock_cow.id in ids_removed
+    #         assert mock_cow.id in removed_cows_idx
+    #     else:
+    #         patch_for_handle_cow_body_weight_and_parity.assert_called_once_with(
+    #                 mock_cow, total_animal_num_side_effect.pop(0))
+    #         patch_for_handle_cow_calves.assert_called_once_with(mock_cow)
+    #         patch_for_handle_cow_CI.assert_called_once_with(mock_cow, calving_interval_avail_num)
+    #         patch_for_extract_repro_stats_from_cow.assert_called_once_with(mock_cow)
+    #     if has_new_born:
+    #         patch_for_handle_new_born.assert_called_once_with(sim_day, mock_cow, calves_born)
+    #
     patch_for_remove_items_from_list_by_indices.assert_called_once_with(mock_cows_original, removed_cows_idx)
-
+    assert actual_total_animal_num == current_total_animal_num
