@@ -371,8 +371,8 @@ class Corn(CropData):
 @dataclass(kw_only=True)
 class SpringWheat(CropData):
     """crop data class with default values for spring wheat"""
-    species = "spring wheat"
-    name = "default spring wheat"
+    species = "spring_wheat"
+    name = "default spring_wheat"
     plant_code = "SWHT"
     scientific_name = "Triticum aestivum"
     is_perennial = False
@@ -405,8 +405,8 @@ class SpringWheat(CropData):
 @dataclass(kw_only=True)
 class WinterWheat(CropData):
     """crop data class with default values for winter wheat"""
-    species = "winter wheat"
-    name = "default winter wheat"
+    species = "winter_wheat"
+    name = "default winter_wheat"
     plant_code = "WWHT"
     scientific_name = "Triticum aestivum"
     is_perennial = False
@@ -439,8 +439,8 @@ class WinterWheat(CropData):
 @dataclass(kw_only=True)
 class CerealRye(CropData):
     """crop data class with default values for cereal rye"""
-    species = "cereal rye"
-    name = "default cereal rye"
+    species = "cereal_rye"
+    name = "default cereal_rye"
     plant_code = "RYE"
     scientific_name = "Secale cereale"
     is_perennial = False
@@ -473,8 +473,8 @@ class CerealRye(CropData):
 @dataclass(kw_only=True)
 class SpringBarley(CropData):
     """crop data class with default values for spring barley"""
-    species = "spring barley"
-    name = "default spring barley"
+    species = "spring_barley"
+    name = "default spring_barley"
     plant_code = "BARL"
     scientific_name = "Hordeum vulgare"
     is_perennial = False
@@ -506,8 +506,8 @@ class SpringBarley(CropData):
 @dataclass(kw_only=True)
 class FallOats(CropData):
     """crop data class with default values for fall oats"""
-    species = "fall oats"
-    name = "default fall oats"
+    species = "fall_oats"
+    name = "default fall_oats"
     plant_code = "OATS"
     scientific_name = "Avena sativa"
     is_perennial = False
@@ -540,8 +540,8 @@ class FallOats(CropData):
 @dataclass(kw_only=True)
 class TallFescue(CropData):
     """crop data class with default values for tall fescue"""
-    species = "tall fescue"
-    name = "default tall fescue"
+    species = "tall_fescue"
+    name = "default tall_fescue"
     plant_code = "FESC"
     scientific_name = "Festuca arundinaceae"
     is_perennial = True
@@ -607,10 +607,10 @@ class Alfalfa(CropData):
 
 
 @dataclass(kw_only=True)
-class SoyBean(CropData):
+class Soybean(CropData):
     """crop data class with default values for soy bean"""
-    species = "soy bean"
-    name = "default soy bean"
+    species = "soybean"
+    name = "default soybean"
     plant_code = "SOYB"
     scientific_name = "Glycine max"
     is_perennial = False
@@ -643,8 +643,8 @@ class SoyBean(CropData):
 @dataclass(kw_only=True)
 class SugarBeet(CropData):
     """crop data class with default values for sugar beet"""
-    species = "sugar beet"
-    name = "default sugar beet"
+    species = "sugar_beet"
+    name = "default sugar_beet"
     plant_code = "SGBT"
     scientific_name = "Beta vulgaris saccharifera"
     is_perennial = False

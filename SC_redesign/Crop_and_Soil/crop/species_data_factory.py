@@ -1,6 +1,6 @@
 from enum import Enum
 import dataclasses
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, Corn, Alfalfa, CerealRye, FallOats, Potato, SoyBean
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, Corn, Alfalfa, CerealRye, FallOats, Potato, Soybean
 from SC_redesign.Crop_and_Soil.crop.crop_data import SpringBarley, SpringWheat, SugarBeet, TallFescue, Triticale
 from SC_redesign.Crop_and_Soil.crop.crop_data import WinterWheat
 
@@ -10,7 +10,7 @@ class CropSpecies(Enum):
     CORN = "corn"
     ALFALFA = "alfalfa"
     CEREAL_RYE = "cereal_rye"
-    FALL_OATS = "fall oats"
+    FALL_OATS = "fall_oats"
     POTATO = "potato"
     SOYBEAN = "soybean"
     SPRING_BARLEY = "spring_barley"
@@ -33,7 +33,7 @@ class CropSpeciesDataFactory:
             CropSpecies.CEREAL_RYE: CerealRye,
             CropSpecies.FALL_OATS: FallOats,
             CropSpecies.POTATO: Potato,
-            CropSpecies.SOYBEAN: SoyBean,
+            CropSpecies.SOYBEAN: Soybean,
             CropSpecies.SPRING_BARLEY: SpringBarley,
             CropSpecies.SPRING_WHEAT: SpringWheat,
             CropSpecies.SUGAR_BEET: SugarBeet,
@@ -56,7 +56,9 @@ class CropSpeciesDataFactory:
                     raise AttributeError(f"{attribute} is not a valid attribute of CropData")
 
             # set new name to indicate that the class has been altered.
-            if "name" not in kwargs.keys():
+            name_key_absent = "name" not in kwargs.keys()
+            id_is_only_key = (len(kwargs) == 1 and "id" in kwargs.keys())
+            if name_key_absent and not id_is_only_key:
                 species_instance.name = species_instance.name.replace("default", "altered")
 
         return species_instance
