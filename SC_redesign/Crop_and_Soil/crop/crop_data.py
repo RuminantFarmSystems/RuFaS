@@ -157,7 +157,6 @@ class CropData:
     """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
     heat_fraction: Optional[float] = None
     """fraction of potential heat units accumulated to date (unitless)"""
-    """fraction of potential heat units accumulated to date (unitless)"""
     minimum_heat_unit_temperature: Optional[float] = None
     """minimum temperature used for heat unit calculations during the alternative heat unit method (Celsius)"""
     maximum_heat_unit_temperature: Optional[float] = None
