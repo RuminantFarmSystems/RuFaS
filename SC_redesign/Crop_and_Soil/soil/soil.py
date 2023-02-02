@@ -26,7 +26,6 @@ class Soil:
                                  LayerData(top_depth=5, bottom_depth=8, nitrate=1),
                                  LayerData(top_depth=8, bottom_depth=20, nitrate=5)]
 
-
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
         """"""
@@ -35,7 +34,7 @@ class Soil:
 
     def check_layer_lengths_match(self):
         """check that soil layer attributes are all the same length"""
-        layer_attribute_list = [self.depths, self.nitrates]  # TODO: update as new varibales are added
+        layer_attribute_list = [self.depths, self.nitrates]  # TODO: update as new variables are added
         g = groupby([len(item) for item in layer_attribute_list])
         return next(g, True) and not next(g, False)
 
