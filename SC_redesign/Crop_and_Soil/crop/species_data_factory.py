@@ -44,13 +44,20 @@ class CropSpeciesDataFactory:
         species_class = species_by_type[species]
         species_instance = species_class()
 
+        # handle additional attribute specifications
         if kwargs:
             attr_list = dataclasses.asdict(species_instance).keys()
+
+            # update valid attributes
             for attribute, value in kwargs.items():
                 if attribute in attr_list:
                     setattr(species_instance, attribute, value)
                 else:
                     raise AttributeError(f"{attribute} is not a valid attribute of CropData")
+
+            # set new name to indicate that the class has been altered.
+            if "name" not in kwargs.keys():
+                species_instance.name = species_instance.name.replace("default", "altered")
 
         return species_instance
 

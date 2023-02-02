@@ -2,8 +2,6 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 
-
-
 @dataclass(kw_only=True, slots=True)
 class CropData:
     """Data class containing crop variables.
@@ -23,7 +21,7 @@ class CropData:
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
     """the species of the crop"""
-    name: Optional[str] = "generic annual crop"
+    name: Optional[str] = "default generic annual crop"
     """the name of this specific crop instance"""
     id: Optional[int] = 0
     """the numeric identifier for this crop instance"""
