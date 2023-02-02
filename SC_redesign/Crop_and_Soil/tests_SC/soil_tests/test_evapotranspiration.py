@@ -275,7 +275,7 @@ def test_evaporate_from_soil(layers):
         expect.append(layer.soil_water_content - 0.5)
 
     # run function
-    incorp.evaporate_from_soil()
+    incorp._evaporate_from_soil()
 
     # make sure values match
     assert incorp._determine_layer_evaporative_demand.call_count == len(layers)

@@ -8,6 +8,7 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 This module is based off of the 'Actual Evapotranspiration' (2:2.3) section of the SWAT model documentation
 """
 
+
 class Evapotranspiration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
@@ -16,7 +17,7 @@ class Evapotranspiration:
     def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
                          avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float,
                          initial_canopy_free_water: float) -> None:
-        """executes evapotranspiration processes on the soil on a given day
+        """executes evapotranspiration processes on nh the soil on a given day
 
         Details: calculates and stores the potential evapotranspiration, soil evaporation in the SoilData object
 
@@ -33,25 +34,25 @@ class Evapotranspiration:
 
         """
         self.data.potential_evapotranspiration = self._determine_potential_evapotranspiration(
-                                                                                            extraterrestrial_radiation,
-                                                                                            max_air_temp,
-                                                                                            min_air_temp,
-                                                                                            avg_air_temp)
+            extraterrestrial_radiation,
+            max_air_temp,
+            min_air_temp,
+            avg_air_temp)
         self.data.potential_evapotranspiration_adjusted = self._determine_potential_evapotranspiration_adjusted(
-                                                                                            initial_canopy_free_water)
+            initial_canopy_free_water)
         # TODO: add attribute (in CropData?) to track amount of free water in canopy as it gets adjusted - issue #316
         self.data.soil_evaporation_adjusted = self._determine_soil_evaporation_adjusted(
-                                                                        above_ground_biomass,
-                                                                        residue,
-                                                                        snow_water_content,
-                                                                        self.data.potential_evapotranspiration_adjusted,
-                                                                        self.data.transpiration)
+            above_ground_biomass,
+            residue,
+            snow_water_content,
+            self.data.potential_evapotranspiration_adjusted,
+            self.data.transpiration)
         self.data.maximum_soil_evaporation = self._determine_maximum_soil_evaporation(
-                                                                                    self.data.soil_evaporation_adjusted,
-                                                                                    snow_water_content)
+            self.data.soil_evaporation_adjusted,
+            snow_water_content)
         # TODO: snow water content needs to be tracked and adjusted as time goes by (in SoilData or by a weather
         #  monitor?) - issue #317
-        self.evaporate_from_soil()
+        self._evaporate_from_soil()
 
     def _determine_potential_evapotranspiration_adjusted(self, initial_canopy_free_water: float) -> float:
         """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
@@ -80,7 +81,7 @@ class Evapotranspiration:
             """
             return self.data.potential_evapotranspiration - initial_canopy_free_water
 
-    def evaporate_from_soil(self) -> None:
+    def _evaporate_from_soil(self) -> None:
         """
         Evaporates water from each layer of soil
 
@@ -280,7 +281,7 @@ class Evapotranspiration:
         if soil_water_content < field_water_content:
             # 2:2.3.18
             quotient = (2.5 * (soil_water_content - field_water_content)) / (
-                        field_water_content - wilting_water_content)
+                    field_water_content - wilting_water_content)
             evaporative_demand_reduced = evaporative_demand * exp(quotient)
         else:
             # 2:2.3.19
