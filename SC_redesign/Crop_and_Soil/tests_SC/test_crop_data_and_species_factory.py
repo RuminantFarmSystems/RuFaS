@@ -1,5 +1,6 @@
 import pytest
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from dataclasses import asdict
 
 
@@ -404,6 +405,22 @@ def test_species_factory_defaults():
 
     # ---- Triticale ----
     # TODO: omitting triticale test, since it does not have non-default values at present
+
+
+def test_manual_custom_crop_data():
+    """checks (and demonstrates) the alternate way of customizing a crop"""
+    # setup custom crop
+    aspen = CropData(name="custom crop: aspen", species="aspen", scientific_name="Populus tremuloides",
+                     plant_code="PTREM", is_perennial=True, is_nitrogen_fixer=False, max_leaf_area_index=5.0)
+
+    # check that each attribute is set appropriately
+    assert aspen.name == "custom crop: aspen"
+    assert aspen.species == "aspen"
+    assert aspen.scientific_name == "Populus tremuloides"
+    assert aspen.plant_code == "PTREM"
+    assert aspen.is_perennial is True
+    assert aspen.is_nitrogen_fixer is False
+    assert aspen.max_leaf_area_index == 5.0
 
 
 @pytest.mark.parametrize("species,vars_dict", [
