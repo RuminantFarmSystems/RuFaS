@@ -294,7 +294,8 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
                 "heiferII_num": 0,
                 "heiferIII_num": 0,
                 "cow_num": 0
-            }
+            },
+            "simulate_animals": True
         }
 
         # test for simulate_animals = True
@@ -310,12 +311,13 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
         for key in animal_keys:
             herd_data[key] = 1
             expected_info_map['herd_data_animal_nums'][key] = 1
+        expected_info_map['simulate_animals'] = False
 
         animal_management._print_animal_num_warnings(herd_data)
 
         for key in animal_keys:
             add_warning.assert_any_call(f"invalid_{key}_warning",
-                                        f"Warning: herd_num is 0, but {key} is not.",
+                                        f"Warning: simulate_animals is false, but {key} is not.",
                                         expected_info_map)
 
         add_log.assert_any_call("num_warnings_associated_with_simulate_animals",
