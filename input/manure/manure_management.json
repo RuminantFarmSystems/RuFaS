@@ -175,7 +175,7 @@
       "methane_generation_ratio": 0.65,
       "evaporation_fraction": 0.02,
       "anaerobic_digestion_temperature_set_point": 37.5,
-      "anaerobic_digestion_temperature": 37.5
+      "anaerobic_digestion_temperature_celsius": 37.5
     }
   ]
 }
