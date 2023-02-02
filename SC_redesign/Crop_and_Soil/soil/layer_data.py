@@ -14,7 +14,7 @@ class LayerData:
     bottom_depth: Optional[float] = None
     """bottom depth of the layer (mm)"""
     nitrate: float = 1.5
-    """nitrate level of the layer ()"""  # TODO: units?
+    """nitrate level of the layer (kg/ha)"""
     soil_water_content: float = 0.25  # arbitrary
     """soil water content of the layer (mm)"""
     field_capacity_water_content: float = 0.3  # arbitrary
