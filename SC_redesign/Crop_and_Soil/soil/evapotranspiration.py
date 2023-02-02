@@ -16,27 +16,39 @@ class Evapotranspiration:
     def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
                          avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float,
                          initial_canopy_free_water: float) -> None:
-        """does the evapotranspiration of the soil on a given day
+        """executes evapotranspiration processes on the soil on a given day
 
         Details: calculates and stores the potential evapotranspiration, soil evaporation in the SoilData object
+
+        Args:
+            extraterrestrial_radiation: radiation from the aliens, in MJ per square meter per day
+                TODO: better description
+            max_air_temp: maximum air temperature in degrees C
+            min_air_temp: minimum air temperature in degrees C
+            avg_air_temp: average air temperature in degrees C
+            above_ground_biomass: mass of plant above ground in kg per hectare
+            residue: biomass separated from plant on the ground in kg per hectare
+            snow_water_content: amount of water from snow in mm
+            initial_canopy_free_water: initial amount of free water held in canopy on a given day in mm
+
         """
         self.data.potential_evapotranspiration = self._determine_potential_evapotranspiration(
-            extraterrestrial_radiation,
-            max_air_temp,
-            min_air_temp,
-            avg_air_temp)
+                                                                                            extraterrestrial_radiation,
+                                                                                            max_air_temp,
+                                                                                            min_air_temp,
+                                                                                            avg_air_temp)
         self.data.potential_evapotranspiration_adjusted = self._determine_potential_evapotranspiration_adjusted(
-            initial_canopy_free_water)
+                                                                                            initial_canopy_free_water)
         # TODO: add attribute (in CropData?) to track amount of free water in canopy as it gets adjusted - issue #316
         self.data.soil_evaporation_adjusted = self._determine_soil_evaporation_adjusted(
-            above_ground_biomass,
-            residue,
-            snow_water_content,
-            self.data.potential_evapotranspiration_adjusted,
-            self.data.transpiration)
+                                                                        above_ground_biomass,
+                                                                        residue,
+                                                                        snow_water_content,
+                                                                        self.data.potential_evapotranspiration_adjusted,
+                                                                        self.data.transpiration)
         self.data.maximum_soil_evaporation = self._determine_maximum_soil_evaporation(
-            self.data.soil_evaporation_adjusted,
-            snow_water_content)
+                                                                                    self.data.soil_evaporation_adjusted,
+                                                                                    snow_water_content)
         # TODO: snow water content needs to be tracked and adjusted as time goes by (in SoilData or by a weather
         #  monitor?) - issue #317
         self.evaporate_from_soil()
@@ -45,7 +57,7 @@ class Evapotranspiration:
         """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
 
         Args:
-            initial_canopy_free_water: initial amount of free water held in canopy on a given day
+            initial_canopy_free_water: initial amount of free water held in canopy on a given day in mm
 
         Returns:
             potential evapotranspiration adjusted for evaporation of free water in canopy in mm
@@ -97,7 +109,8 @@ class Evapotranspiration:
         """calculates the potential evapotranspiration for a given day
 
         Args:
-            extra_terrestrial_radiation: radiation from the aliens, in MJ m^(-2) d^(-1) TODO: better description
+            extra_terrestrial_radiation: radiation from the aliens, in MJ per square meter per day
+                TODO: better description
             max_air_temp: maximum air temperature in degrees C
             min_air_temp: minimum air temperature in degrees C
             avg_air_temp: average air temperature in degrees C
@@ -125,7 +138,7 @@ class Evapotranspiration:
             avg_air_temp: average air temperature in degrees C
 
         Returns:
-            latent heat of vaporization in MJ kg^(-1)
+            latent heat of vaporization in MJ per kg
 
         SWAT Reference: 1:2.3.6
         """
