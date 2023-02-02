@@ -11,14 +11,24 @@ class WaterDynamics:
 
     def cycle_water(self, evaporation: float, transpiration: float, max_evapotranspiration: float,
                     potential_evapotranspiration_adjusted: float) -> None:
-        self.data.cumulative_evaporation = evaporation
+        """executes the daily cycling of water between the plants, soil, and environment
+
+        Args:
+            evaporation: evaporation on a given day in mm
+            transpiration: transpiration on a given day in mm
+            max_evapotranspiration: TODO: what is maximum evapotranspiration and where is it calculated?
+            potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
+                the canopy in mm
+
+        """
+        self.data.cumulative_evaporation = evaporation      # should these be +=, because we're accumulating?
         self.data.cumulative_transpiration = transpiration
         self.data.max_cumulative_evapotranspiration = max_evapotranspiration
         self.data.cumulative_evapotranspiration = self._determine_evapotranspiration(self.data.cumulative_evaporation,
                                                                                      self.data.cumulative_transpiration)
         self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
                                                                       self.data.max_cumulative_evapotranspiration)
-        # @CHECKME: cumumlative evaporation, transpiration, evapotranspiration, and maximum cumulative
+        # @CHECKME: cumulative evaporation, transpiration, evapotranspiration, and maximum cumulative
         # evapotranspiration are all listed as yearly totals, but maximum transpiration is a daily value.
         # Do they need to calculated in separate methods?
         self.data.max_transpiration = self._determine_maximum_transpiration(self.data.leaf_area_index,
@@ -55,6 +65,8 @@ class WaterDynamics:
             transpiration: transpiration
 
         Returns: total evapotranspiration
+
+        TODO: find where SWAT has this equation (if it does, if not make note of assumption)
         """
         return evaporation + transpiration
 
@@ -64,7 +76,7 @@ class WaterDynamics:
         """
         Description: calculate water deficiency factor
 
-        SWAT Reference: 5:3.3
+        SWAT Reference: 5:3.3.2
 
         Args:
             evapotranspiration: annual evapotranspiration
