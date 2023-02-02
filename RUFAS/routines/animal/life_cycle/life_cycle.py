@@ -8,15 +8,18 @@ Description: The class which manages the life cycle of the animals. This
 Author(s): Manfei Li, mli497@wisc.edu
            Militsa Sotirova, militsasotirova@gmail.com
 """
-from RUFAS.output_manager import OutputManager
+
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
-from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.output_manager import OutputManager
+
+from typing import Any, Dict
 
 om = OutputManager()
 
@@ -147,26 +150,14 @@ class LifeCycleManager:
         self.initialize_db_summary = {}
         self.avg_CI = 0
 
-    def initialize_herd(self, herd_num, calf_num, heiferI_num, heiferII_num,
-                        heiferIII_num, cow_num, replace_num, herd_init, breed,
-                        config):
+    def initialize_herd(self, config, herd_data: Dict[str, Any]):
         """
         Generates a replacement herd to simulate the market, for the herd to get
          replacements. Initializes the herd.
 
         Args:
-            breed: TODO: needs description
-            config: stores (among other things) information on whether the seed
-                has been set by the user
-            herd_init: boolean - true to populate database with new animals,
-                false to use current database
-            herd_num: what the number of cows should be maintained at
-            calf_num: the number of calves to start the simulation with
-            heiferI_num: the number of heiferIs to start the simulation with
-            heiferII_num: the number of heiferIIs to start the simulation with
-            heiferIII_num: the number of heiferIIIs to start the simulation with
-            cow_num: the number of cows to start the simulation with
-            replace_num: replacements in the market
+            config: instance of the Config class
+            herd_data: dictionary containing information about the herd
 
         Returns:
             calves: list of calves for the simulation
@@ -175,8 +166,8 @@ class LifeCycleManager:
             heiferIIIs: list of heiferIIIs for the simulation
             cows: list of cows for the simulation
         """
-        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], breed,
-                                                       config.set_seed, herd_init)
+        self.animal_initializer = AnimalInitialization(self.config['calving_interval'], herd_data['breed'],
+                                                       config.set_seed, herd_data['herd_init'])
 
         if self.config['use_input_calving_interval']:
             self.avg_CI = self.config['calving_interval']
@@ -184,31 +175,31 @@ class LifeCycleManager:
             self.initialize_db_summary = \
                 self.animal_initializer.initialization_db_summary()
             self.avg_CI = self.initialize_db_summary['cow_avg_CI']
-        self.herd_num = herd_num
+        self.herd_num = herd_data['herd_num']
 
-        calves = self.animal_initializer.get_calves(calf_num, breed)
+        calves = self.animal_initializer.get_calves(herd_data['calf_num'], herd_data['breed'])
         for calf in calves:
             calf.events.add_event(calf.days_born, 0, const.INIT_HERD)
 
-        heiferIs = self.animal_initializer.get_heiferIs(heiferI_num, breed)
+        heiferIs = self.animal_initializer.get_heiferIs(herd_data['heiferI_num'], herd_data['breed'])
         for heiferI in heiferIs:
             heiferI.events.add_event(heiferI.days_born, 0, const.INIT_HERD)
 
-        heiferIIs = self.animal_initializer.get_heiferIIs(heiferII_num, breed)
+        heiferIIs = self.animal_initializer.get_heiferIIs(herd_data['heiferII_num'], herd_data['breed'])
         for heiferII in heiferIIs:
             heiferII.events.add_event(heiferII.days_born, 0, const.INIT_HERD)
 
         heiferIIIs = self.animal_initializer.get_heiferIIIs(
-            heiferIII_num, breed)
+            herd_data['heiferIII_num'], herd_data['breed'])
         for heiferIII in heiferIIIs:
             heiferIII.events.add_event(heiferIII.days_born, 0, const.INIT_HERD)
 
-        cows = self.animal_initializer.get_cows(cow_num, breed)
+        cows = self.animal_initializer.get_cows(herd_data['cow_num'], herd_data['breed'])
         for cow in cows:
             cow.events.add_event(cow.days_born, 0, const.INIT_HERD)
 
         self.replacement_market = self.animal_initializer.get_replacement_cows(
-            replace_num, breed)
+            herd_data['replace_num'], herd_data['breed'])
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def daily_update(self, date, calves, heiferIs, heiferIIs,
