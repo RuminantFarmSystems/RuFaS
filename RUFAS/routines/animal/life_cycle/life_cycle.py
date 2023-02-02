@@ -8,15 +8,18 @@ Description: The class which manages the life cycle of the animals. This
 Author(s): Manfei Li, mli497@wisc.edu
            Militsa Sotirova, militsasotirova@gmail.com
 """
-from RUFAS.output_manager import OutputManager
+
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
 from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
-from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.output_manager import OutputManager
+
+from typing import Any, Dict
 
 om = OutputManager()
 
@@ -147,24 +150,14 @@ class LifeCycleManager:
         self.initialize_db_summary = {}
         self.avg_CI = 0
 
-    def initialize_herd(self, config, herd_data):
+    def initialize_herd(self, config, herd_data: Dict[str, Any]):
         """
         Generates a replacement herd to simulate the market, for the herd to get
          replacements. Initializes the herd.
 
         Args:
-            breed: TODO: needs description
-            config: stores (among other things) information on whether the seed
-                has been set by the user
-            herd_init: boolean - true to populate database with new animals,
-                false to use current database
-            herd_num: what the number of cows should be maintained at
-            calf_num: the number of calves to start the simulation with
-            heiferI_num: the number of heiferIs to start the simulation with
-            heiferII_num: the number of heiferIIs to start the simulation with
-            heiferIII_num: the number of heiferIIIs to start the simulation with
-            cow_num: the number of cows to start the simulation with
-            replace_num: replacements in the market
+            config: instance of the Config class
+            herd_data: dictionary containing information about the herd
 
         Returns:
             calves: list of calves for the simulation

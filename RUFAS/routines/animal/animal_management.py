@@ -14,17 +14,17 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from collections import deque
+
 import random
-from typing import Tuple
 from statistics import mean
+from typing import Any, Dict, Tuple
 
 om = OutputManager()
 
@@ -152,7 +152,7 @@ class AnimalManagement:
         self.init_pens(data['pen_information'], data['herd_information'])
 
         if self.simulate_animals:
-            self.init_animals(data['herd_information'], config)
+            self.init_animals(config, data['herd_information'])
 
             self.init_nutrient_rqmts(weather, time, feed)
 
@@ -160,7 +160,7 @@ class AnimalManagement:
 
         self._print_animal_num_warnings(data['herd_information'])
 
-    def init_pens(self, all_pen_data, herd_data):
+    def init_pens(self, all_pen_data, herd_data: Dict[str, Any]):
         """
         Populates the list of pens with the information from the input json file.
         Args:
@@ -208,7 +208,7 @@ class AnimalManagement:
                                       Pen.AnimalCombination.NONE, 1.2)
                 self.all_pens.append(new_default_pen)
 
-    def init_animals(self, herd_data, config):
+    def init_animals(self, config, herd_data: Dict[str, Any]):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -223,11 +223,10 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        # herd_data['config'] = config
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
             = self.life_cycle_manager.initialize_herd(config, herd_data)
 
-    def _print_animal_num_warnings(self, herd_data):
+    def _print_animal_num_warnings(self, herd_data: Dict[str, Any]):
         """
         If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
             and logs how many warnings were generated
