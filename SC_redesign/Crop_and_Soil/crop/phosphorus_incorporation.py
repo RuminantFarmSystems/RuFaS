@@ -8,7 +8,8 @@ from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorp
 """
 This module is based upon the 'Phosphorus Uptake" section (5:2.3.2) of of the SWAT model documentation
 
-Also: Since much of the functionality is similar to nitrogen, many of the static Nitrogen functions are called directly. 
+Also: Since much of the functionality is similar to nitrogen (5:2.3.2), many of the static Nitrogen functions are 
+called directly. 
 """
 
 

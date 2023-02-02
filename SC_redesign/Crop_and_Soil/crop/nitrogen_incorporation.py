@@ -4,7 +4,7 @@ from typing import List, Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 """
-This module is based upon the 'Nitrogen Uptake" section (5:2.3) of of the SWAT model documentation
+This module is based upon the 'Nitrogen Uptake" section (5:2.3.1) of of the SWAT model documentation
 """
 
 
@@ -190,6 +190,8 @@ class NitrogenIncorporation:
             near_mature_nutrient_fraction: nitrogen fraction *near* maturity
             mature_nutrient_fraction: nitrogen fraction *at* maturity
 
+        SWAT Reference: Equations 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
+
         Returns: list of the first and second shape coefficients, respectively
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
@@ -224,7 +226,7 @@ class NitrogenIncorporation:
             mature_nitrogen_fraction: nitrogen fraction at maturity
             emergence_nitrogen_fraction: nitrogen fraction at emergence
 
-        SWAT Reference: Equations 5:2.3.2, 3
+        SWAT Reference: Equations 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
         Returns: the log term of nitrogen shape coefficients
         """
@@ -270,6 +272,8 @@ class NitrogenIncorporation:
         """
         Description: calculates the optimal fraction of nitrogen in the plant biomass on a given day
 
+        SWAT Reference: Equations 5:2.3.1, 5:2.3.19
+
         Args:
             heat_fraction: fraction of total potential heat units (PHU fraction) accumulated to date
             emergence_nutrient_fraction: expected fraction of plant biomass comprised of nitrogen (nitrogen fraction) at
@@ -291,6 +295,8 @@ class NitrogenIncorporation:
           fraction: proportion of the whole made up of the constituent
           whole: total mass of the whole
 
+        SWAT Reference: Equations 5:2.3.4, 5:2.3.22
+
         Returns: mass of the constituent
         """
         return fraction * whole
@@ -306,6 +312,8 @@ class NitrogenIncorporation:
             nutrient_start: nitrogen biomass at the end of the previous day
             mature_nutrient_fraction: nitrogen fraction at maturity
             max_growth: maximum potential biomass the plant can gain on a given day
+
+        SWAT Reference: Equations 5:2.3.5, 5:2.3.23
 
         Returns: the potential nitrogen uptake for the day
         """
@@ -378,6 +386,8 @@ class NitrogenIncorporation:
             root_depth: the current root depth
             nitrogen_distribution_parameter: the nitrogen uptake distribution parameter
 
+        SWAT Reference: Equations 5:2.3.6, 5:2.3.24
+
         Returns: the potential amount of nitrogen taken up
         """
         # error checks
@@ -411,12 +421,14 @@ class NitrogenIncorporation:
     def determine_layer_nutrient_uptake(layer_demands: List[float], layer_uptake_potentials: List[float],
                                         layer_nutrient: List[float]) -> List[float]:  # pseudocode: C.5.C.4
         """
-        Description: calculates nutrient amount uptake from each soil layer
+        Description: calculates nutrient amount uptaken from each soil layer
 
         Args:
             layer_demands: list of demands from each soil layer not met by the above layers, for the nutrient
             layer_uptake_potentials: list of maximum uptake of the nutrient from each soil layer
             layer_nutrient: list of nutrient amounts present in each soil layer
+
+        SWAT Reference: 5:2.3.1, 5:2.3.2 (see paragraphs below equations 5:2.3.8 and 5:2.3.26)
 
         Returns: a list of nitrogen mass taken up from each soil layer
         """
@@ -436,6 +448,8 @@ class NitrogenIncorporation:
             requests: desired amount of the resource from each layer
             sources: the pool of available resources in each layer
 
+        SWAT Reference: Equations 5:2.3.8, 5:2.3.26
+
         Returns: The actual amounts of a resource to be extracted from the soil layers
 
         """
@@ -452,6 +466,8 @@ class NitrogenIncorporation:
             request: requested amount of the resource
             source: amount of the resource available at the source
 
+        SWAT Reference: Equations 5:2.3.8, 5:2.3.26
+
         Returns: the amount of the resource to be extracted
         """
         return min(request, max(0.0, source))
@@ -464,6 +480,8 @@ class NitrogenIncorporation:
 
         Args:
             total_accessible_nitrates: total nitrates available in the soil layers accessible to roots
+
+        SWAT Reference: Equations 5:2.3.15, 5:2.3.16, 5:2.3.17
 
         Returns: the nitrate factor
         """
@@ -481,6 +499,8 @@ class NitrogenIncorporation:
 
         Args:
             heat_fraction: the accumulated fraction of potential heat units
+
+        SWAT Reference: Equations 2:2.3.10 - 2:2.3.14
 
         Returns: growth stage factor
 
@@ -514,6 +534,8 @@ class NitrogenIncorporation:
             stage_factor: growth stage factor [0, 1]
             water_factor: soil water factor [0, 1]
             nitrate_factor: soil nitrate factor [0, 1]
+
+        SWAT Reference: Equation 5:2.3.9
 
         Returns: the amount of nitrogen added to plant biomass through fixation, capped at demand.
         """
