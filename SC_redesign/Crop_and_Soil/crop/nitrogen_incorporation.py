@@ -4,7 +4,7 @@ from typing import List, Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 """
-This module is based upon the 'Nitrogen Uptake" section of of the SWAT model documentation 
+This module is based upon the 'Nitrogen Uptake" section (5:2.3) of of the SWAT model documentation
 """
 
 
@@ -224,6 +224,8 @@ class NitrogenIncorporation:
             mature_nitrogen_fraction: nitrogen fraction at maturity
             emergence_nitrogen_fraction: nitrogen fraction at emergence
 
+        SWAT Reference: Equations 5:2.3.2, 3
+
         Returns: the log term of nitrogen shape coefficients
         """
         # throw an error if any parameters do not satisfy [0-1]
@@ -393,13 +395,13 @@ class NitrogenIncorporation:
     def determine_layer_nutrient_demands(uptake_potentials: List[float],
                                          nutrient_availabilities: List[float]) -> List[float]:  # pseudocode: C.5.C.5
         """
-        Description: calculates nitrogen demand of the plant from each soil layer
+        Description: calculates demand for a nutrient of the plant from each soil layer
 
         Args:
-            uptake_potentials: maximum nitrogen uptake by the plant from each soil layer
-            nutrient_availabilities: available nitrates (NO3) in each soil layer
+            uptake_potentials: maximum uptake of the nutrient by the plant from each soil layer
+            nutrient_availabilities: available amount of the nutrient in each soil layer
 
-        Returns: a list of nitrogen demands from each soil layer
+        Returns: a list of demands for the nutrient from each soil layer
         """
         layer_delta = [desired - available for desired, available in zip(uptake_potentials, nutrient_availabilities)]
         layer_demand = [sum(layer_delta[:i]) for i in range(len(layer_delta))]  # cumulative sum, starting at 0
@@ -409,12 +411,12 @@ class NitrogenIncorporation:
     def determine_layer_nutrient_uptake(layer_demands: List[float], layer_uptake_potentials: List[float],
                                         layer_nutrient: List[float]) -> List[float]:  # pseudocode: C.5.C.4
         """
-        Description: calculates nitrogen uptake from each soil layer
+        Description: calculates nutrient amount uptake from each soil layer
 
         Args:
-            layer_demands: list of nitrogen demands from each soil layer not met by the above layers
-            layer_uptake_potentials: list of maximum nitrogen uptake from each soil layer
-            layer_nutrient: list of nitrates present in each soil layer
+            layer_demands: list of demands from each soil layer not met by the above layers, for the nutrient
+            layer_uptake_potentials: list of maximum uptake of the nutrient from each soil layer
+            layer_nutrient: list of nutrient amounts present in each soil layer
 
         Returns: a list of nitrogen mass taken up from each soil layer
         """
@@ -427,6 +429,16 @@ class NitrogenIncorporation:
 
     @staticmethod
     def determine_layer_extracted_resource(requests: List[float], sources: List[float]) -> List[float]:
+        """
+        Description: calculates the amount of a resource actually extracted from each layer of the soil
+
+        Args:
+            requests: desired amount of the resource from each layer
+            sources: the pool of available resources in each layer
+
+        Returns: The actual amounts of a resource to be extracted from the soil layers
+
+        """
         if len(requests) != len(sources):
             raise ValueError("requests and sources should be the same length")
         return [NitrogenIncorporation._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
@@ -518,13 +530,13 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_stored_nutrient(uptake: float, previous: float, fixed: float) -> float:  # C.5.E.1
         """
-        Description: calculates nitrogen mass stored in plant material after the current day's growth cycle
+        Description: calculates mass of the nutrient stored in plant material after the current day's growth cycle
 
         Args:
-            uptake: the mass of the nitrogen taken up by the plant on the current day
-            previous: the nitrogen mass stored in the plant at the end of the previous day
-            fixed: the mass of nitrogen fixed by the plant on the current day
+            uptake: the mass of the nutrient taken up by the plant on the current day
+            previous: the nutrient mass stored in the plant at the end of the previous day
+            fixed: the mass of nutrient fixed by the plant on the current day (only applies to nitrogen)
 
-        Returns: the total mass of nitrogen in the plant at the end of current day
+        Returns: the total mass of the nutrient in the plant at the end of current day
         """
         return previous + uptake + fixed
