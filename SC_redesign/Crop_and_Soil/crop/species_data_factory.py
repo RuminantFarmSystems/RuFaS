@@ -8,17 +8,17 @@ class CropSpecies(Enum):
     """Enum of all the crop types supported by RUFAS"""
     GENERIC = "generic"  # generic crop
     CORN = "corn"
-    ALFALFA = "alfalfa"
-    CEREAL_RYE = "cereal_rye"
-    FALL_OATS = "fall_oats"
-    POTATO = "potato"
-    SOYBEAN = "soybean"
-    SPRING_BARLEY = "spring_barley"
     SPRING_WHEAT = "spring_wheat"
-    SUGAR_BEET = "sugar_beet"
-    TALL_FESCUE = "tall_fescue"
-    TRITICALE = "triticale"
     WINTER_WHEAT = "winter_wheat"
+    CEREAL_RYE = "cereal_rye"
+    SPRING_BARLEY = "spring_barley"
+    FALL_OATS = "fall_oats"
+    TALL_FESCUE = "tall_fescue"
+    ALFALFA = "alfalfa"
+    SOYBEAN = "soybean"
+    SUGAR_BEET = "sugar_beet"
+    POTATO = "potato"
+    TRITICALE = "triticale"
 
 
 class CropSpeciesDataFactory:
@@ -29,17 +29,17 @@ class CropSpeciesDataFactory:
         species_by_type = {
             CropSpecies.GENERIC: CropData,
             CropSpecies.CORN: Corn,
-            CropSpecies.ALFALFA: Alfalfa,
-            CropSpecies.CEREAL_RYE: CerealRye,
-            CropSpecies.FALL_OATS: FallOats,
-            CropSpecies.POTATO: Potato,
-            CropSpecies.SOYBEAN: Soybean,
-            CropSpecies.SPRING_BARLEY: SpringBarley,
             CropSpecies.SPRING_WHEAT: SpringWheat,
-            CropSpecies.SUGAR_BEET: SugarBeet,
+            CropSpecies.WINTER_WHEAT: WinterWheat,
+            CropSpecies.CEREAL_RYE: CerealRye,
+            CropSpecies.SPRING_BARLEY: SpringBarley,
+            CropSpecies.FALL_OATS: FallOats,
             CropSpecies.TALL_FESCUE: TallFescue,
-            CropSpecies.TRITICALE: Triticale,
-            CropSpecies.WINTER_WHEAT: WinterWheat
+            CropSpecies.ALFALFA: Alfalfa,
+            CropSpecies.SOYBEAN: Soybean,
+            CropSpecies.SUGAR_BEET: SugarBeet,
+            CropSpecies.POTATO: Potato,
+            CropSpecies.TRITICALE: Triticale
         }
         species_class = species_by_type[species]
         species_instance = species_class()
