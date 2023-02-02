@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, slots=True)
 class CropData:
     """Data class containing crop variables.
 
