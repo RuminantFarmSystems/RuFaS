@@ -20,7 +20,7 @@ class Infiltration:
                                                                                     second_moisture_condition_parameter)
 
         # --- adjust moisture condition parameters for slope of soil, if necessary -------------------------------------
-        if self.data.average_slope_fraction != 0.05:
+        if abs(self.data.average_slope_fraction - 0.05) != 0:
             adjusted_second_moisture_condition_parameter = self._determine_second_moisture_condition_adjusted(
                                                                                     self.data.average_slope_fraction,
                                                                                     second_moisture_condition_parameter,
