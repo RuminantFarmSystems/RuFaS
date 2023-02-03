@@ -21,7 +21,7 @@ class WaterDynamics:
                 the canopy in mm
 
         """
-        self.data.cumulative_evaporation += evaporation      # should these be +=, because we're accumulating?
+        self.data.cumulative_evaporation += evaporation
         self.data.cumulative_transpiration += transpiration
         self.data.cumulative_potential_evapotranspiration += potential_evapotranspiration
         self.data.cumulative_evapotranspiration += self._determine_evapotranspiration(self.data.cumulative_evaporation,
