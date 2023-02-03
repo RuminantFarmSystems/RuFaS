@@ -24,6 +24,7 @@ others
 # only stores non-empty directories
 output/*
 !output/.keep
+RUFAS/routines/manure/output*
 
 # ignore project files
 *.sublime-project
@@ -35,7 +36,6 @@ output/*
 .idea/**
 env/
 venv/
-pycallexp.py
 
 # ignore .DS_store
 .DS_store
