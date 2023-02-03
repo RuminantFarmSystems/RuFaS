@@ -21,7 +21,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build HTML from Sphinx 
+    - name: Build HTML from Sphinx
       run: |
         cd docs
         make html
