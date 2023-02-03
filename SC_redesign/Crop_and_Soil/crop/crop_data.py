@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 
-@dataclass(kw_only=True, slots=True)
+@dataclass(kw_only=True)
 class CropData:
     """Data class containing crop variables.
 
@@ -14,10 +14,6 @@ class CropData:
       CropData(light_extinction=0.7) will initialize with the vallue set to 0.7, but CropData(0.65) will not work.
       The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
       but will have its values set to different defaults.
-
-      The slots=True argument sets up the data class so that memory is pre-allocated for the instance. This means that
-      only the declared attributes can exist. This also means that the __dict__ attribute does not exist by default,
-      but a dictionary can still be easily created with dataclasses.asdict().
     """
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
