@@ -13,7 +13,7 @@ class Infiltration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()
 
-    def infiltrate(self, second_moisture_condition_parameter: float, rainfall: float, is_top_layer_frozen: bool,
+    def infiltrate(self, second_moisture_condition_parameter: float, rainfall: float,
                    weighting_coefficient: float) -> None:
         """main routine for determining runoff and infiltration of soil for a given day"""
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
@@ -56,7 +56,7 @@ class Infiltration:
                                                                   second_shape_coefficient)
 
         # --- Adjust retention parameter only if top layer of soil is frozen -------------------------------------------
-        if is_top_layer_frozen:
+        if self.data.soil_layers[0].temperature <= 0:
             retention_parameter = self._determine_frozen_retention_parameter(
                                                                         first_moisture_condition_retention_parameter,
                                                                         retention_parameter)
