@@ -382,7 +382,7 @@ def test_update_nitrogen(hf, hf50, hf100, phf, nf1, nf2, nfn, nf3, bm, nmo, ns, 
     # observe
     mc = mock_crop(fr_PHU_50=hf50, fr_PHU_100=hf100, fr_n1=nf1, fr_n2=nf2, fr_n3ish=nfn, fr_n3=nf3,
                    prev_fr_PHU=phf, bio_N_opt=nmo, bio_N=ns, d_biomass_max=mg, z_root=rd, beta_n=nds,
-                   biomass_actual=bm, fr_PHU=hf, N_fix=nfx, is_nitrogen_fixer=fix)
+                   biomass_actual=bm, fr_PHU=hf, N_fix=nfx, is_nitrogen_fixer=fix, fix_nitrogen=fix)
     ms = mock_soil(soil_layers=[])
     for depth, nitrate, water, cap_water in zip(sbs, sns, sw, scw):
         ml = mock_soil_layer(bottom_depth=depth, NO3=nitrate, N_uptake=0, soil_water=water, fc_water=cap_water)
