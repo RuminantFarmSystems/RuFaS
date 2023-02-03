@@ -99,7 +99,7 @@ class Crop:
         self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
-        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration)
+        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration, )
 
     @classmethod
     def plant_species(cls, species) -> Crop:

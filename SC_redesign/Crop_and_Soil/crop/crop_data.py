@@ -224,10 +224,12 @@ class CropData:
     """total water lost to transpiration by the plant during the growing season (mm)"""
     cumulative_evapotranspiration: Optional[float] = None
     """total water lost to evapotranspiration by the plant during the growing season (mm)"""
-    max_cumulative_evapotranspiration: Optional[float] = None
+    cumulative_potential_evapotranspiration: Optional[float] = None
     """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
     """water deficiency factor for the plant (unitless)"""
+    max_transpiration: Optional[float] = None
+    """maximum transpiration on a given day (mm)"""
 
     # ---- yields
     # constant attributes
