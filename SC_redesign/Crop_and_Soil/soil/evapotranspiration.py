@@ -78,7 +78,7 @@ class Evapotranspiration:
             amount_water_removed = self._determine_amount_water_removed(evaporative_demand_reduced, layer)
 
             # remove water from soil water content
-            layer.soil_water_content -= amount_water_removed
+            layer.soil_water_concentration -= amount_water_removed
 
     # --- static methods ---
     @staticmethod
@@ -221,7 +221,7 @@ class Evapotranspiration:
         bottom_quotient = bottom_depth / (bottom_depth + exp(2.374 - (0.00713 * bottom_depth)))
         bottom_evaporative_demand = max_soil_water_evaporation * bottom_quotient
 
-        return bottom_evaporative_demand - (top_evaporative_demand * layer_data.esco)
+        return bottom_evaporative_demand - (top_evaporative_demand * layer_data.soil_evaporation_compensation_coefficient)
 
     @staticmethod
     def _determine_evaporative_demand_reduced(evaporative_demand: float, layer: LayerData) -> float:
@@ -237,10 +237,10 @@ class Evapotranspiration:
         SWAT Reference: 2:2.3.18, 19
         """
         # calculate adjusted evaporative demand
-        if layer.soil_water_content < layer.field_capacity_water_content:
+        if layer.soil_water_concentration < layer.field_capacity_water_concentration:
             # 2:2.3.18
-            quotient = (2.5 * (layer.soil_water_content - layer.field_capacity_water_content)) / \
-                       (layer.field_capacity_water_content - layer.wilting_point_water_content)
+            quotient = (2.5 * (layer.soil_water_concentration - layer.field_capacity_water_concentration)) / \
+                       (layer.field_capacity_water_concentration - layer.wilting_point_water_concentration)
             evaporative_demand_reduced = evaporative_demand * exp(quotient)
         else:
             # 2:2.3.19
@@ -261,4 +261,4 @@ class Evapotranspiration:
 
         SWAT Reference: 2:2.3.20
         """
-        return min(reduced_evaporative_demand, 0.8 * (layer.soil_water_content - layer.wilting_point_water_content))
+        return min(reduced_evaporative_demand, 0.8 * (layer.soil_water_concentration - layer.wilting_point_water_concentration))

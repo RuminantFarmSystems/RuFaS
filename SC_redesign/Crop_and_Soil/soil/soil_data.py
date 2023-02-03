@@ -47,7 +47,7 @@ class SoilData:
         else:
             water_sum = 0
             for layer in self.soil_layers:
-                water_sum += min(0, (layer.soil_water_content - layer.wilting_point_water_content))
+                water_sum += min(0, (layer.soil_water_content - layer.wilting_point_content))
             return
 
     @property
@@ -62,7 +62,7 @@ class SoilData:
         else:
             saturation_sum = 0
             for layer in self.soil_layers:
-                saturation_sum += layer.saturation
+                saturation_sum += layer.saturation_content
             return saturation_sum
 
     @property
@@ -77,5 +77,5 @@ class SoilData:
         else:
             field_capacity_sum = 0
             for layer in self.soil_layers:
-                field_capacity_sum += layer.field_capacity_water_content
+                field_capacity_sum += layer.field_capacity_content
             return field_capacity_sum

@@ -109,13 +109,13 @@ def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_con
 
 @pytest.mark.parametrize("max_soil_water_evap,layer_data", [
     (1.2, LayerData(top_depth=0, bottom_depth=3)),  # defaults
-    (0.9, LayerData(top_depth=4, bottom_depth=9, esco=0.78)),  # default water contents, different esco
-    (1.1, LayerData(top_depth=2, bottom_depth=8, soil_water_content=1.8, field_capacity_water_content=1.6,
-                    wilting_point_water_content=0.9)),
-    (1.5, LayerData(top_depth=4, bottom_depth=12, soil_water_content=1.1, field_capacity_water_content=2,
-                    wilting_point_water_content=1)),
-    (2.1, LayerData(top_depth=0, bottom_depth=15, soil_water_content=2.3, field_capacity_water_content=2.5,
-                    wilting_point_water_content=0.3, esco=0.6)),
+    (0.9, LayerData(top_depth=4, bottom_depth=9, soil_evaporation_compensation_coefficient=0.78)),  # default water contents, different soil_evaporation_compensation_coefficient
+    (1.1, LayerData(top_depth=2, bottom_depth=8, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+                    wilting_point_water_concentration=0.9)),
+    (1.5, LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=1.1, field_capacity_water_concentration=2,
+                    wilting_point_water_concentration=1)),
+    (2.1, LayerData(top_depth=0, bottom_depth=15, soil_water_concentration=2.3, field_capacity_water_concentration=2.5,
+                    wilting_point_water_concentration=0.3, soil_evaporation_compensation_coefficient=0.6)),
 ])
 def test_determine_evaporative_demand(max_soil_water_evap, layer_data):
     observe = Evapotranspiration._determine_evaporative_demand(max_soil_water_evap, layer_data)
@@ -124,7 +124,7 @@ def test_determine_evaporative_demand(max_soil_water_evap, layer_data):
     expect_bottom_demand = max_soil_water_evap * (layer_data.bottom_depth /
                                                   (layer_data.bottom_depth +
                                                    exp(2.374 - (0.00713 * layer_data.bottom_depth))))
-    assert (expect_bottom_demand - (expect_top_demand * layer_data.esco)) == observe
+    assert (expect_bottom_demand - (expect_top_demand * layer_data.soil_evaporation_compensation_coefficient)) == observe
 
 
 @pytest.mark.parametrize("max_soil_water_evap, layer_data", [
@@ -140,18 +140,18 @@ def test_determine_evaporative_demand_error(max_soil_water_evap, layer_data):
 
 @pytest.mark.parametrize("evap_demand,layer_data", [
     (0.3, LayerData(top_depth=0, bottom_depth=3)),
-    (0.8, LayerData(top_depth=2, bottom_depth=8, soil_water_content=1.8, field_capacity_water_content=1.6,
-                    wilting_point_water_content=0.9)),
-    (1.4, LayerData(top_depth=4, bottom_depth=12, soil_water_content=1.1, field_capacity_water_content=2,
-                    wilting_point_water_content=1)),
-    (1.1, LayerData(top_depth=0, bottom_depth=15, soil_water_content=2.3, field_capacity_water_content=2.5,
-                    wilting_point_water_content=0.3)),
+    (0.8, LayerData(top_depth=2, bottom_depth=8, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+                    wilting_point_water_concentration=0.9)),
+    (1.4, LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=1.1, field_capacity_water_concentration=2,
+                    wilting_point_water_concentration=1)),
+    (1.1, LayerData(top_depth=0, bottom_depth=15, soil_water_concentration=2.3, field_capacity_water_concentration=2.5,
+                    wilting_point_water_concentration=0.3)),
 ])
 def test_determine_evaporative_demand_reduced(evap_demand, layer_data):
     observe = Evapotranspiration._determine_evaporative_demand_reduced(evap_demand, layer_data)
-    if layer_data.soil_water_content < layer_data.field_capacity_water_content:
-        expect = evap_demand * exp((2.5 * (layer_data.soil_water_content - layer_data.field_capacity_water_content)) /
-                                   (layer_data.field_capacity_water_content - layer_data.wilting_point_water_content))
+    if layer_data.soil_water_concentration < layer_data.field_capacity_water_concentration:
+        expect = evap_demand * exp((2.5 * (layer_data.soil_water_concentration - layer_data.field_capacity_water_concentration)) /
+                                   (layer_data.field_capacity_water_concentration - layer_data.wilting_point_water_concentration))
     else:
         expect = evap_demand
     assert expect == observe
@@ -159,16 +159,16 @@ def test_determine_evaporative_demand_reduced(evap_demand, layer_data):
 
 @pytest.mark.parametrize("reduced_evap_demand,layer", [
     (0.2, LayerData(top_depth=0, bottom_depth=3)),
-    (0.5, LayerData(top_depth=2, bottom_depth=8, soil_water_content=1.8, field_capacity_water_content=1.6,
-                    wilting_point_water_content=0.9)),
-    (1.8, LayerData(top_depth=4, bottom_depth=12, soil_water_content=1.1, field_capacity_water_content=2,
-                    wilting_point_water_content=1)),
-    (1.1, LayerData(top_depth=0, bottom_depth=15, soil_water_content=2.3, field_capacity_water_content=2.5,
-                    wilting_point_water_content=0.3)),
+    (0.5, LayerData(top_depth=2, bottom_depth=8, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+                    wilting_point_water_concentration=0.9)),
+    (1.8, LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=1.1, field_capacity_water_concentration=2,
+                    wilting_point_water_concentration=1)),
+    (1.1, LayerData(top_depth=0, bottom_depth=15, soil_water_concentration=2.3, field_capacity_water_concentration=2.5,
+                    wilting_point_water_concentration=0.3)),
 ])
 def test_determine_amount_water_removed(reduced_evap_demand, layer):
     observe = Evapotranspiration._determine_amount_water_removed(reduced_evap_demand, layer)
-    expect = min(reduced_evap_demand, 0.8 * (layer.soil_water_content - layer.wilting_point_water_content))
+    expect = min(reduced_evap_demand, 0.8 * (layer.soil_water_concentration - layer.wilting_point_water_concentration))
     assert expect == observe
 
 
@@ -236,24 +236,24 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
 
 
 @pytest.mark.parametrize("layers", [
-    [LayerData(top_depth=0, bottom_depth=4, soil_water_content=1.8, field_capacity_water_content=1.6,
-               wilting_point_water_content=0.9),
-     LayerData(top_depth=4, bottom_depth=12, soil_water_content=0.9, field_capacity_water_content=1.2,
-               wilting_point_water_content=0.8),
-     LayerData(top_depth=12, bottom_depth=20, soil_water_content=0.8, field_capacity_water_content=0.8,
-               wilting_point_water_content=0.3)],
-    [LayerData(top_depth=0, bottom_depth=3, soil_water_content=2.8, field_capacity_water_content=2.3,
-               wilting_point_water_content=1.8),
-     LayerData(top_depth=3, bottom_depth=15, soil_water_content=1.9, field_capacity_water_content=1.8,
-               wilting_point_water_content=0.8),
-     LayerData(top_depth=15, bottom_depth=22, soil_water_content=0.8, field_capacity_water_content=1,
-               wilting_point_water_content=0.2)],
-    [LayerData(top_depth=0, bottom_depth=8, soil_water_content=2.3, field_capacity_water_content=2.9,
-               wilting_point_water_content=1.8),
-     LayerData(top_depth=8, bottom_depth=20, soil_water_content=1.4, field_capacity_water_content=1.8,
-               wilting_point_water_content=0.8),
-     LayerData(top_depth=20, bottom_depth=22, soil_water_content=0.8, field_capacity_water_content=1,
-               wilting_point_water_content=0.6)],
+    [LayerData(top_depth=0, bottom_depth=4, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+               wilting_point_water_concentration=0.9),
+     LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
+               wilting_point_water_concentration=0.8),
+     LayerData(top_depth=12, bottom_depth=20, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
+               wilting_point_water_concentration=0.3)],
+    [LayerData(top_depth=0, bottom_depth=3, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
+               wilting_point_water_concentration=1.8),
+     LayerData(top_depth=3, bottom_depth=15, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
+               wilting_point_water_concentration=0.8),
+     LayerData(top_depth=15, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+               wilting_point_water_concentration=0.2)],
+    [LayerData(top_depth=0, bottom_depth=8, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
+               wilting_point_water_concentration=1.8),
+     LayerData(top_depth=8, bottom_depth=20, soil_water_concentration=1.4, field_capacity_water_concentration=1.8,
+               wilting_point_water_concentration=0.8),
+     LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+               wilting_point_water_concentration=0.6)],
 ])
 def test_evaporate_from_soil(layers):
     # initialize objects
@@ -269,7 +269,7 @@ def test_evaporate_from_soil(layers):
     # record expected values
     expect = []
     for layer in layers:
-        expect.append(layer.soil_water_content - 0.5)
+        expect.append(layer.soil_water_concentration - 0.5)
 
     # run function
     incorp.evaporate_from_soil()
@@ -279,4 +279,4 @@ def test_evaporate_from_soil(layers):
     assert incorp._determine_evaporative_demand_reduced.call_count == len(layers)
     assert incorp._determine_amount_water_removed.call_count == len(layers)
     for i in range(len(layers)):
-        assert expect[i] == incorp.data.soil_layers[i].soil_water_content
+        assert expect[i] == incorp.data.soil_layers[i].soil_water_concentration
