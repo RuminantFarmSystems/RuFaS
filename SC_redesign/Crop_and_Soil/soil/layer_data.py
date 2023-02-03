@@ -29,7 +29,7 @@ class LayerData:
     @property
     def layer_thickness(self):
         """thickness of soil layer in mm"""
-        return self.top_depth - self.bottom_depth
+        return self.bottom_depth - self.top_depth
 
     @property
     def soil_water_content(self):
