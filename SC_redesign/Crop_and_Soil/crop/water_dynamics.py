@@ -28,7 +28,7 @@ class WaterDynamics:
                                                                                       self.data.cumulative_transpiration)
         self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
                                                                       self.data.cumulative_potential_evapotranspiration)
-        # @CHECKME: cumulative evaporation, transpiration, evapotranspiration, and maximum cumulative
+        # TODO: cumulative evaporation, transpiration, evapotranspiration, and maximum cumulative
         # evapotranspiration are all listed as yearly totals, but maximum transpiration is a daily value.
         # Do they need to calculated in separate methods?
         self.data.max_transpiration = self._determine_maximum_transpiration(self.data.leaf_area_index,
@@ -71,7 +71,7 @@ class WaterDynamics:
 
     @staticmethod
     def _determine_water_deficiency(cumulative_evapotranspiration: float,
-                                    cumulative_potential_evapotranspiration: float) -> float:  # pseudocode: C.9.C.1
+                                    cumulative_potential_evapotranspiration: float) -> float:
         """
         Description: calculate water deficiency factor
 

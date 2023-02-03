@@ -105,6 +105,7 @@ def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_con
     else:
         assert (soil_evaporation_adj - snow_water_content) == observe
 
+
 @pytest.mark.parametrize("max_soil_water_evap,depth", [
     (1.1, 0),
     (0, 0),
@@ -238,24 +239,24 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
 
 
 @pytest.mark.parametrize("layers", [
-    [LayerData(top_depth=0, bottom_depth=4, soil_water_content=1.8, field_capacity_water_content=1.6,
-               wilting_point_water_content=0.9),
-     LayerData(top_depth=4, bottom_depth=12, soil_water_content=0.9, field_capacity_water_content=1.2,
-               wilting_point_water_content=0.8),
-     LayerData(top_depth=12, bottom_depth=20, soil_water_content=0.8, field_capacity_water_content=0.8,
-               wilting_point_water_content=0.3)],
-    [LayerData(top_depth=0, bottom_depth=3, soil_water_content=2.8, field_capacity_water_content=2.3,
-               wilting_point_water_content=1.8),
-     LayerData(top_depth=3, bottom_depth=15, soil_water_content=1.9, field_capacity_water_content=1.8,
-               wilting_point_water_content=0.8),
-     LayerData(top_depth=15, bottom_depth=22, soil_water_content=0.8, field_capacity_water_content=1,
-               wilting_point_water_content=0.2)],
-    [LayerData(top_depth=0, bottom_depth=8, soil_water_content=2.3, field_capacity_water_content=2.9,
-               wilting_point_water_content=1.8),
-     LayerData(top_depth=8, bottom_depth=20, soil_water_content=1.4, field_capacity_water_content=1.8,
-               wilting_point_water_content=0.8),
-     LayerData(top_depth=20, bottom_depth=22, soil_water_content=0.8, field_capacity_water_content=1,
-               wilting_point_water_content=0.6)],
+    [LayerData(top_depth=0, bottom_depth=4, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+               wilting_point_water_concentration=0.9),
+     LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
+               wilting_point_water_concentration=0.8),
+     LayerData(top_depth=12, bottom_depth=20, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
+               wilting_point_water_concentration=0.3)],
+    [LayerData(top_depth=0, bottom_depth=3, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
+               wilting_point_water_concentration=1.8),
+     LayerData(top_depth=3, bottom_depth=15, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
+               wilting_point_water_concentration=0.8),
+     LayerData(top_depth=15, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+               wilting_point_water_concentration=0.2)],
+    [LayerData(top_depth=0, bottom_depth=8, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
+               wilting_point_water_concentration=1.8),
+     LayerData(top_depth=8, bottom_depth=20, soil_water_concentration=1.4, field_capacity_water_concentration=1.8,
+               wilting_point_water_concentration=0.8),
+     LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+               wilting_point_water_concentration=0.6)],
 ])
 def test_evaporate_from_soil(layers):
     # initialize objects
@@ -272,7 +273,7 @@ def test_evaporate_from_soil(layers):
     # record expected values
     expect = []
     for layer in layers:
-        expect.append(layer.soil_water_content - 0.5)
+        expect.append(layer.soil_water_concentration - 0.5)
 
     # run function
     incorp._evaporate_from_soil()
@@ -282,4 +283,4 @@ def test_evaporate_from_soil(layers):
     assert incorp._determine_evaporative_demand_reduced.call_count == len(layers)
     assert incorp._determine_amount_water_removed.call_count == len(layers)
     for i in range(len(layers)):
-        assert expect[i] == incorp.data.soil_layers[i].soil_water_content
+        assert expect[i] == incorp.data.soil_layers[i].soil_water_concentration
