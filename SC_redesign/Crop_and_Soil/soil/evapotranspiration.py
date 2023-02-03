@@ -261,4 +261,5 @@ class Evapotranspiration:
 
         SWAT Reference: 2:2.3.20
         """
-        return min(reduced_evaporative_demand, 0.8 * (layer.soil_water_concentration - layer.wilting_point_water_concentration))
+        return min(reduced_evaporative_demand, 0.8 * (layer.soil_water_concentration -
+                                                      layer.wilting_point_water_concentration))
