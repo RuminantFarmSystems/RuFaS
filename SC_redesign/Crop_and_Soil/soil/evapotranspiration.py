@@ -117,7 +117,7 @@ class Evapotranspiration:
             avg_air_temp: average air temperature in degrees C
 
         Returns:
-            potential evapotranspiration in mm d^(-1)
+            potential evapotranspiration in mm per day
 
         SWAT Reference: 2:2.2.24
         """
