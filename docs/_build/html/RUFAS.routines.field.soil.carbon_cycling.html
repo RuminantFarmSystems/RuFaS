@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.field.soil.carbon_cycling package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.field.soil.nitrogen_cycling package" href="RUFAS.routines.field.soil.nitrogen_cycling.html" />
+    <link rel="prev" title="RUFAS.routines.field.soil package" href="RUFAS.routines.field.soil.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.html">RUFAS.routines.field package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.field.soil.html">RUFAS.routines.field.soil package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.field.soil.carbon_cycling package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.field.soil.carbon_cycling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-field-soil-carbon-cycling-package">
+<h1>RUFAS.routines.field.soil.carbon_cycling package<a class="headerlink" href="#rufas-routines-field-soil-carbon-cycling-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.field.soil.carbon_cycling.carbon_cycle">
+<span id="rufas-routines-field-soil-carbon-cycling-carbon-cycle-module"></span><h2>RUFAS.routines.field.soil.carbon_cycling.carbon_cycle module<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling.carbon_cycle" title="Permalink to this heading"></a></h2>
+<p>RUFAS: Ruminant Farm Systems Model</p>
+<p>File name: carbon_cycling.py</p>
+<p>Author(s): Jacob Johnson, <a class="reference external" href="mailto:jacob8399&#37;&#52;&#48;gmail&#46;com">jacob8399<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<p>Description: Carbon Cycle driver class.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.soil_carbon_aggregation">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.</span></span><span class="sig-name descname"><span class="pre">soil_carbon_aggregation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.soil_carbon_aggregation" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>This function does the aggregation of carbon into pools
+“pseudocode_soil” S.6.C</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.carbon_cycle.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>This function calls all the necessary functions to update information related
+to the carbon cycle. The order in which each method is called is significant.</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: an instance of the Soil class defined in soil.py
+crop_type: an instance of a BaseCrop representing the crop being grown in this field
+weather: an instance of the Weather class defined in classes.py
+time: an instance of the Time class defined in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.carbon_cycling.decomp_factors">
+<span id="rufas-routines-field-soil-carbon-cycling-decomp-factors-module"></span><h2>RUFAS.routines.field.soil.carbon_cycling.decomp_factors module<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling.decomp_factors" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.decomp_factors.moisture_factor">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.decomp_factors.</span></span><span class="sig-name descname"><span class="pre">moisture_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.decomp_factors.moisture_factor" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description: calculates the moisture factor for carbon decomposition</dt><dd><p>“pseudocode_soil” S.6.A.2
+defaults drawn from defac: course soil</p>
+</dd>
+<dt>Args:</dt><dd><p>soil</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.decomp_factors.temp_factor">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.decomp_factors.</span></span><span class="sig-name descname"><span class="pre">temp_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.decomp_factors.temp_factor" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description: calculates the Temperature factor for carbon decomposition</dt><dd><p>“pseudocode_soil” S.6.A.1
+defaults drawn from defac: course soil</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.decomp_factors.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.decomp_factors.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.decomp_factors.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description: calculates temperature and moisture decomposition factors for</dt><dd><p>Carbon based on weather and soil profile.
+“pseudocode_soil” S.6.A</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: an instance of the Soil class defined in soil.py
+weather: an instance of the Weather class defined in classes.py
+time: an instance of the Time class defined in classes.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning">
+<span id="rufas-routines-field-soil-carbon-cycling-pool-gas-partitioning-module"></span><h2>RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning module<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.pool_gas_partitioning.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>This function does the partitioning of carbon into pools or gas loss
+“pseudocode_soil” S.6.C</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: an instance of the Soil class defined in soil.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.carbon_cycling.residue_partitioning">
+<span id="rufas-routines-field-soil-carbon-cycling-residue-partitioning-module"></span><h2>RUFAS.routines.field.soil.carbon_cycling.residue_partitioning module<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling.residue_partitioning" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.residue_partitioning">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.</span></span><span class="sig-name descname"><span class="pre">residue_partitioning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.residue_partitioning" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Partitions residue from crop yield
+“pseudocode_soil” S.6.B</p>
+</dd>
+<dt>Args:</dt><dd><p>soil
+crop_type
+weather
+time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">soil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.field.soil.carbon_cycling.residue_partitioning.update_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Partitions residue from crop yield
+“pseudocode_soil” S.6.B</p>
+</dd>
+<dt>Args:</dt><dd><p>soil: an instance of the Soil class defined in soil.py
+crop_type: the instance of BaseCrop stored in crop.current_crop
+weather: an instance of the Weather class defined in classes.py
+time: an instance of the Time class defined in time.py</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.field.soil.carbon_cycling">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.field.soil.carbon_cycling" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.field.soil.html" class="btn btn-neutral float-left" title="RUFAS.routines.field.soil package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.field.soil.nitrogen_cycling.html" class="btn btn-neutral float-right" title="RUFAS.routines.field.soil.nitrogen_cycling package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -24,6 +24,7 @@
             }
         },
         "animal": "barnyard_animal.json",
-        "feed": "purchased_feed.json"
+        "feed": "purchased_feed.json",
+        "manure": "manure_management.json"
     }
 }
