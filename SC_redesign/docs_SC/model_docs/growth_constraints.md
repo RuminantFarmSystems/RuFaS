@@ -1,3 +1,4 @@
+### __Growth constraints__
 The `GrowthConstraints` class handles the environmental constraints to potential plant growth that a crop faces during the growing season. This module addresses the 
 stresses caused by insufficient water, inadequate nutrients (nitrogen and phosphorus) and extreme temperatures, and determines which, if any, is limiting plant 
 growth on a given day.  

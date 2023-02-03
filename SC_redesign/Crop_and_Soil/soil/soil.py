@@ -19,9 +19,9 @@ class Soil:
                                  LayerData(top_depth=5, bottom_depth=8, nitrate=1),
                                  LayerData(top_depth=8, bottom_depth=20, nitrate=5)]
 
-
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
         """"""
         Warning("create from config file not yet implement, returning default Soil()")
         return Soil()
+
