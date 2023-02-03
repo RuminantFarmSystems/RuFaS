@@ -34,6 +34,11 @@ class SoilData:
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
 
+    # ---- decomposition
+    decomposition_temperature_effect: Optional[float] = None
+    decomposition_moisture_effect: Optional[float] = None
+
+
     @property
     def profile_soil_water_content(self) -> float:
         """
