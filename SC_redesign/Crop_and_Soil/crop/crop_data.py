@@ -244,14 +244,8 @@ class CropData:
     """growth stage factor of the nitrogen fixing symbiotes for the current plant growth stage (unitless)"""
 
     # --- phosphorus incorporation ----
-    emergence_phosphorus_fraction: float = 0.04
-    """expected fraction of plant biomass comprised of phosphorus for the plant at emergence (unitless)"""
-    half_mature_phosphorus_fraction: float = 0.01
-    """expected fraction of plant biomass comprised of phosphorus for the plant at half-maturity (unitless)"""
     near_mature_phosphorus_fraction: float = 0.3
     """expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless)"""
-    mature_phosphorus_fraction: float = 0.1
-    """expected fraction of plant biomass comprised of nitrogen for a mature plant (unitless)"""
     phosphorus_distro_param: float = 10
     """phosphorus uptake distribution parameter (unitless)"""
 
