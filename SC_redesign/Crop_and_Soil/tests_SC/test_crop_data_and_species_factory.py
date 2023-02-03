@@ -65,13 +65,11 @@ def test_species_factory_defaults():
     assert generic.min_harvest_index == 0.2
     assert generic.yield_nitrogen_fraction == 0.2
     assert generic.yield_phosphorus_fraction == 0.003
-    del generic  # cleanup
 
     # check that setting the crop ID works and doesn't trigger the "altered" crop name
     generic_id = CropSpeciesDataFactory.create_species_data(CropSpecies("generic"), id=1530)
     assert generic_id.id == 1530
     assert generic_id.name == "default generic annual crop"
-    del generic_id  # cleanup
 
     # ---- corn ----
     corn = CropSpeciesDataFactory.create_species_data(CropSpecies("corn"), id=12)
@@ -101,7 +99,6 @@ def test_species_factory_defaults():
     assert corn.min_harvest_index == 0.30
     assert corn.yield_nitrogen_fraction == 0.014
     assert corn.yield_phosphorus_fraction == 0.0016
-    del corn
 
     # ---- spring wheat ----
     spring_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("spring_wheat"), id=85)
@@ -131,7 +128,6 @@ def test_species_factory_defaults():
     assert spring_wheat.min_harvest_index == 0.20
     assert spring_wheat.yield_nitrogen_fraction == 0.0234
     assert spring_wheat.yield_phosphorus_fraction == 0.0033
-    del spring_wheat
 
     # ---- winter wheat ----
     winter_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("winter_wheat"), id=1000)
@@ -161,8 +157,7 @@ def test_species_factory_defaults():
     assert winter_wheat.min_harvest_index == 0.20
     assert winter_wheat.yield_nitrogen_fraction == 0.0250
     assert winter_wheat.yield_phosphorus_fraction == 0.0022
-    del winter_wheat
-    
+
     # ---- cereal rye ----
     cereal_rye = CropSpeciesDataFactory.create_species_data(CropSpecies("cereal_rye"), id=123)
     assert cereal_rye.species == "cereal_rye"  
@@ -191,8 +186,7 @@ def test_species_factory_defaults():
     assert cereal_rye.min_harvest_index == 0.20
     assert cereal_rye.yield_nitrogen_fraction == 0.0284
     assert cereal_rye.yield_phosphorus_fraction == 0.0042
-    del cereal_rye
-    
+
     # ---- spring barley ----
     spring_barley = CropSpeciesDataFactory.create_species_data(CropSpecies("spring_barley"), id=42)
     assert spring_barley.species == "spring_barley"  
@@ -221,7 +215,6 @@ def test_species_factory_defaults():
     assert spring_barley.min_harvest_index == 0.20
     assert spring_barley.yield_nitrogen_fraction == 0.0210
     assert spring_barley.yield_phosphorus_fraction == 0.0017
-    del spring_barley
 
     # ---- fall oats ----
     fall_oats = CropSpeciesDataFactory.create_species_data(CropSpecies("fall_oats"), id=9001)
@@ -251,8 +244,7 @@ def test_species_factory_defaults():
     assert fall_oats.min_harvest_index == 0.175
     assert fall_oats.yield_nitrogen_fraction == 0.0316
     assert fall_oats.yield_phosphorus_fraction == 0.0057
-    del fall_oats
-    
+
     # ---- tall fescue ----
     tall_fescue = CropSpeciesDataFactory.create_species_data(CropSpecies("tall_fescue"), id=-1)
     assert tall_fescue.species == "tall_fescue"  
@@ -281,8 +273,7 @@ def test_species_factory_defaults():
     assert tall_fescue.min_harvest_index == 0.90
     assert tall_fescue.yield_nitrogen_fraction == 0.0234
     assert tall_fescue.yield_phosphorus_fraction == 0.0033
-    del tall_fescue
-    
+
     # ---- alfalfa ----
     alfalfa = CropSpeciesDataFactory.create_species_data(CropSpecies("alfalfa"), id=7)
     assert alfalfa.species == "alfalfa"  
@@ -311,8 +302,7 @@ def test_species_factory_defaults():
     assert alfalfa.min_harvest_index == 0.90
     assert alfalfa.yield_nitrogen_fraction == 0.0250
     assert alfalfa.yield_phosphorus_fraction == 0.0035
-    del alfalfa
-    
+
     # ---- soybeans ----
     soybean = CropSpeciesDataFactory.create_species_data(CropSpecies("soybean"), id=999)
     assert soybean.species == "soybean"  
@@ -341,8 +331,7 @@ def test_species_factory_defaults():
     assert soybean.min_harvest_index == 0.01
     assert soybean.yield_nitrogen_fraction == 0.0650
     assert soybean.yield_phosphorus_fraction == 0.0091
-    del soybean
-    
+
     # ---- sugar beet ----
     sugar_beet = CropSpeciesDataFactory.create_species_data(CropSpecies("sugar_beet"), id=5)
     assert sugar_beet.species == "sugar_beet"  
@@ -371,7 +360,6 @@ def test_species_factory_defaults():
     assert sugar_beet.min_harvest_index == 1.10
     assert sugar_beet.yield_nitrogen_fraction == 0.0130
     assert sugar_beet.yield_phosphorus_fraction == 0.0020
-    del sugar_beet
 
     # ---- potato ----
     potato = CropSpeciesDataFactory.create_species_data(CropSpecies("potato"), id=2)
@@ -401,7 +389,6 @@ def test_species_factory_defaults():
     assert potato.min_harvest_index == 0.95
     assert potato.yield_nitrogen_fraction == 0.0246
     assert potato.yield_phosphorus_fraction == 0.0023
-    del potato
 
     # ---- Triticale ----
     # TODO: omitting triticale test, since it does not have non-default values at present
