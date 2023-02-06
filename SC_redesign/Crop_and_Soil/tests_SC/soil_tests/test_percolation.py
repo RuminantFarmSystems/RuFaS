@@ -1,6 +1,7 @@
 import pytest
-from math import exp
+from unittest.mock import MagicMock, patch
 
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.percolation import *
 
 
@@ -45,17 +46,46 @@ def test_determine_percolation_to_next_layer(drainable_water, time_step, travel_
     assert observe == expect
 
 
-@pytest.mark.parametrize("water_content,field_capacity_content,saturated_capacity_content", [
-    (0.98, 0.83, 1.13),
-    (0.68, 0.74, 0.99),
-    (0.34, 0.68, 1.34),
-    (1.21, 1.13, 1.21),
-    (0.89, 0.78, 1.02),
+@pytest.mark.parametrize("water_content,field_capacity_content,saturated_capacity_content,high_seasonal_water_table", [
+    (0.98, 0.83, 1.13, True),
+    (0.68, 0.74, 0.99, True),
+    (0.34, 0.68, 1.34, False),
+    (1.21, 1.13, 1.21, True),
+    (0.89, 0.78, 1.02, False),
 ])
-def test_determine_if_percolation_allowed(water_content, field_capacity_content, saturated_capacity_content):
+def test_determine_if_percolation_allowed(water_content, field_capacity_content, saturated_capacity_content,
+                                          high_seasonal_water_table):
+    """tests _determine_if_percolation_allowed() in percolation.py"""
     observe = Percolation._determine_if_percolation_allowed(water_content, field_capacity_content,
-                                                            saturated_capacity_content)
-    if water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content))):
+                                                            saturated_capacity_content, high_seasonal_water_table)
+    if not high_seasonal_water_table:
+        assert True == observe
+    elif (water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content)))) and \
+            high_seasonal_water_table:
         assert True == observe
     else:
         assert False == observe
+
+
+# --- Integration tests ----
+@pytest.mark.parametrize("upper,lower", [
+    (LayerData(top_depth=0, bottom_depth=15), LayerData(top_depth=15, bottom_depth=39)),
+    (LayerData(top_depth=39, bottom_depth=83), LayerData(top_depth=83, bottom_depth=143)),
+    (LayerData(top_depth=143, bottom_depth=567), LayerData(top_depth=567, bottom_depth=634)),
+])
+def test_percolate_between_layers(upper, lower):
+    travel_time = Percolation._determine_percolation_travel_time(upper.saturation_content, upper.field_capacity_content,
+                                                                 upper.saturated_hydraulic_conductivity)
+    percolation_amount = Percolation._determine_percolation_to_next_layer(upper.excess_water_available, 24, travel_time)
+
+    if upper.excess_water_available <= 0:
+        expect = 0
+    elif lower.acceptable_percolation_amount < percolation_amount:
+        expect = lower.acceptable_percolation_amount
+    else:
+        expect = percolation_amount
+
+    observe = Percolation._percolate_between_layers(24, upper, lower)
+
+    # Assertions
+    assert observe == expect

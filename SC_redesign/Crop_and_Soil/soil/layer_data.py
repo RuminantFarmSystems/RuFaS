@@ -42,19 +42,13 @@ class LayerData:
     """available water capacity expressed as fraction of total soil volume"""
 
     def __post_init__(self):
-        """This function initializes all attributes in the dataclass that depend on """
+        """This function initializes all attributes in the dataclass that depend on"""
         self.soil_water_content = self.soil_water_concentration * self.layer_thickness
-        """initializes volume of soil water in the layer in mm"""
 
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer in mm"""
         return self.bottom_depth - self.top_depth
-
-    # @property
-    # def initial_soil_water_content(self) -> float:
-    #     """volume of soil water in the layer in mm"""
-    #     return self.soil_water_concentration * self.layer_thickness
 
     @property
     def field_capacity_content(self) -> float:
@@ -96,3 +90,8 @@ class LayerData:
     def saturation_content(self) -> float:
         """volume of water in layer when saturated in mm"""
         return self.saturation_point_water_concentration * self.layer_thickness
+
+    @property
+    def acceptable_percolation_amount(self) -> float:
+        """volume of water that can be accepted by layer before reaching saturation (in mm)"""
+        return max(0, self.saturation_content - self.soil_water_content)
