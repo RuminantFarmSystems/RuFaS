@@ -1,6 +1,6 @@
 {
     "pens_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "pen_report",
         "ration_report": {
@@ -26,7 +26,7 @@
         }
     },
     "fields_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "field_report",
         "crop_report": {
@@ -96,12 +96,12 @@
         }
     },
     "mass_balance": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "mass_balance_report"
     },
     "feed_storage_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "feed_storage_report",
         "storage_report": {
@@ -116,7 +116,7 @@
         }
     },
     "manure_storage_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "manure_storage_report",
         "handling_report": {
@@ -168,7 +168,7 @@
         }
     },
     "custom_report": {
-        "produce_csv": true,
+        "produce_csv": false,
         "produce_graphics": false,
         "report_name": "custom_report"
     }

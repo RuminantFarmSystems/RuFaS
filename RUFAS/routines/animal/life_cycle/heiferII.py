@@ -76,9 +76,20 @@ class HeiferII(HeiferI):
         self.GnRH_injections = 0
         self.PGF_injections = 0
         self.CIDR_count = 0
-        self.semen_num = 0
+        # self.semen_num = 0
+        self.semen_num_dairy_conventional = 0
+        self.semen_num_dairy_sexed = 0
+        self.semen_num_beef_conventional = 0
+        self.semen_num_beef_sexed = 0
         self.AI_times = 0
         self.preg_diagnoses = 0
+        self.semen_method = AnimalBase.config['semen_method']
+        self.semen_type = None
+        self.semen_proportion = AnimalBase.config['semen_proportion_h'] 
+        self.avg_net_merit_cow = 0
+        self.net_merit_list = []
+        self.calf_breed = None
+        self.calf_gender = None
 
     def get_bw_change(self):
         """
@@ -282,6 +293,7 @@ class HeiferII(HeiferI):
             cull_stage: culling for reproduction failure
             third_stage: move to next stage -- heiferIII stage when time comes
         """
+        # print(">>>>", self.id, sim_day)
         self.update_body_weight_history(sim_day)
         cull_stage = False
         third_stage = False
@@ -300,6 +312,7 @@ class HeiferII(HeiferI):
             self.body_weight = self.mature_body_weight
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
+        # those values are just for the current day
         self.ED_days = 0
         self.GnRH_injections = 0
         self.PGF_injections = 0
@@ -320,9 +333,13 @@ class HeiferII(HeiferI):
                 third_stage = True
                 self.events.add_event(self.days_born, sim_day, const.HEIFERII_TO_III)
 
+            # here those costs are accumulated cost for this heifer
             self.heifer_hormone_cost += 1.83 * self.GnRH_injections + 2.29 * self.PGF_injections + 12.53 * self.CIDR_count
             self.heifer_ed_cost += self.ED_days * 0.03
-            self.heifer_ai_semen_cost += 10 * self.AI_times + 15 * self.semen_num 
+            self.heifer_ai_cost += 10 * self.AI_times
+            # self.heifer_ai_semen_cost += 10 * self.AI_times + 15 * self.semen_num 
+            self.heifer_semen_cost += 15 * (self.semen_num_dairy_conventional + self.semen_num_beef_conventional) + \
+                35 * (self.semen_num_dairy_sexed + self.semen_num_beef_sexed) 
             self.heifer_pc_cost += 4.37 * self.preg_diagnoses
         
         # cull heifer for reproduction reason
@@ -384,9 +401,6 @@ class HeiferII(HeiferI):
                         self.conception_rate = AnimalBase.config['estrus_conception_rate_h']
                     else:
                         self.conception_rate = AnimalBase.config['estrus_conception_rate_h'] - 0.05
-                    # #adjust for sexed semen:
-                    # if AnimalBase.config['semen_type'][-5:] == "sexed":
-                    #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
                 # Return estrus after estrus not serviced
                 else:
                     self.estrus_day = self.determine_estrus_day(self.days_born, const.BASIC_ESTRUS_NOTE, 
@@ -421,9 +435,6 @@ class HeiferII(HeiferI):
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
             self.conception_rate = AnimalBase.config['TAI_conception_rate_h']
-            # #adjust for sexed semen:
-            # if AnimalBase.config['semen_type'][-5:] == "sexed":
-            #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -441,9 +452,6 @@ class HeiferII(HeiferI):
         elif self.days_born == self.tai_program_start_day_h + 8:
             self.ai_day = self.days_born
             self.conception_rate = AnimalBase.config['TAI_conception_rate_h']
-            # #adjust for sexed semen:
-            # if AnimalBase.config['semen_type'][-5:] == "sexed":
-            #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
             self.events.add_event(self.days_born, sim_day, const.INJECT_GNRH)
             self.GnRH_injections = self.GnRH_injections + 1
 
@@ -508,9 +516,6 @@ class HeiferII(HeiferI):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate_h']
-                    # #adjust for sexed semen:
-                    # if AnimalBase.config['semen_type'][-5:] == "sexed":
-                    #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
             else:
                 # finish up with TAI
                 self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 21
@@ -547,9 +552,6 @@ class HeiferII(HeiferI):
                     self.ai_day = self.synch_ed_estrus_day + 1
                     self.conception_rate = \
                         AnimalBase.config['estrus_conception_rate_h']
-                    # #adjust for sexed semen:
-                    # if AnimalBase.config['semen_type'][-5:] == "sexed":
-                    #     self.conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
                 else:
                     self.synch_ed_stop_day = self.synch_ed_program_start_day_h + 14
                     self.synch_ed_program_start_day_h = self.synch_ed_stop_day
@@ -600,8 +602,8 @@ class HeiferII(HeiferI):
         """
         adjusted_conception_rate = self.conception_rate
         #adjust for sexed semen:
-        if AnimalBase.config['semen_type'][-5:] == "sexed":
-            adjusted_conception_rate -= AnimalBase.config['conception_rate_drop_sexed_semen']
+        if self.semen_type[-5:] == "sexed":
+            adjusted_conception_rate *= AnimalBase.config['conception_rate_sexed_semen_to_conv']
         return adjusted_conception_rate
     
     # artificial inseminated 
@@ -618,15 +620,28 @@ class HeiferII(HeiferI):
         if self.days_in_preg > 0:
             self.days_in_preg += 1
 
-        self.semen_num = 0
+        # self.semen_num = 0
+        self.semen_num_dairy_conventional = 0
+        self.semen_num_dairy_sexed = 0
+        self.semen_num_beef_conventional = 0
+        self.semen_num_beef_sexed = 0
         self.AI_times = 0
         self.preg_diagnoses = 0
 
         # AI
         if self.days_born == self.ai_day:
+            self.semen_type = self.determine_semen_type()
+            # print(self.semen_type)
             self.events.add_event(
-                self.days_born, sim_day, const.INSEMINATED_W_BASE + AnimalBase.config['semen_type'])
-            self.semen_num += 1
+                self.days_born, sim_day, const.INSEMINATED_W_BASE + self.semen_type)
+            if self.semen_type == "dairy_conventional":
+                self.semen_num_dairy_conventional += 1
+            elif self.semen_type == "dairy_sexed":
+                self.semen_num_dairy_sexed += 1
+            elif self.semen_type == "beef_conventional":
+                self.semen_num_beef_conventional += 1
+            elif self.semen_type == "beef_sexed":
+                self.semen_num_beef_sexed += 1
             self.AI_times += 1
             # conception
             conception_rand = random()
@@ -644,12 +659,33 @@ class HeiferII(HeiferI):
                     self.calf_birth_weight = truncnorm.rvs(-2, 2, \
                         AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_PREG)
+
+                # generate calf breed according to semen type
+                if self.semen_type == "dairy_conventional" or self.semen_type == "dairy_sexed":
+                    self.calf_breed = 'HO'
+                elif self.semen_type == "beef_conventional" or self.semen_type == "beef_sexed":
+                    self.calf_breed = 'HO-AN'
+
+                # generate calf gender according to semen type
+                if self.semen_type == "dairy_conventional":
+                    male_calf_rate = AnimalBase.config['male_calf_rate_dairy_conventional_semen']
+                elif self.semen_type == "dairy_sexed":
+                    male_calf_rate = AnimalBase.config['male_calf_rate_dairy_sexed_semen']
+                elif self.semen_type == "beef_conventional":
+                    male_calf_rate = AnimalBase.config['male_calf_rate_beef_conventional_semen']
+                elif self.semen_type == "beef_sexed":
+                    male_calf_rate = AnimalBase.config['male_calf_rate_beef_sexed_semen']
+                if random() < male_calf_rate:
+                    self.calf_gender = 'male'
+                else:
+                    self.calf_gender = 'female'
+
             else:
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)
                 # estrus detection after ai before preg check
                 self.repro_program = 'ED'
                 self.estrus_day = self.determine_estrus_day(
-                    self.estrus_day, const.ESTRUS_AFTER_AI_NOTE, 
+                    self.ai_day, const.ESTRUS_AFTER_AI_NOTE, 
                 AnimalBase.config['avg_estrus_cycle_heifer'],
                 AnimalBase.config['std_estrus_cycle_heifer'], sim_day)
 
@@ -719,3 +755,41 @@ class HeiferII(HeiferI):
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
         
 
+    def determine_semen_type(self):
+        # print("avg_NM:", self.avg_net_merit_cow)
+        # print("self NM:", self.days_born, self.net_merit)
+        if self.semen_method == "uniform":
+            semen_type_this_ai = AnimalBase.config['semen_type']
+        elif self.semen_method == "three portions based on average":
+            if self.net_merit >= 0:
+                if self.net_merit < (1-AnimalBase.config['semen_above_below_average']) * self.avg_net_merit_cow:
+                    semen_type_this_ai = "beef_conventional"
+                elif self.net_merit > (1+AnimalBase.config['semen_above_below_average']) * self.avg_net_merit_cow:
+                    semen_type_this_ai = "dairy_sexed"
+                else:
+                    semen_type_this_ai = "dairy_conventional"
+            else:
+                if self.net_merit < (1+AnimalBase.config['semen_above_below_average']) * self.avg_net_merit_cow:
+                    semen_type_this_ai = "beef_conventional"
+                elif self.net_merit > (1-AnimalBase.config['semen_above_below_average']) * self.avg_net_merit_cow:
+                    semen_type_this_ai = "dairy_sexed"
+                else:
+                    semen_type_this_ai = "dairy_conventional"
+        elif self.semen_method == "user-defined proportion": 
+            # heifer part
+            animal_num = len(self.net_merit_list)
+            dairy_conventional_portion = self.semen_proportion[0]
+            dairy_sexed_portion = self.semen_proportion[1]
+            beef_conventional_portion = self.semen_proportion[2]
+            beef_sexed_portion = self.semen_proportion[3]
+            if self.net_merit <= self.net_merit_list[int(animal_num * beef_conventional_portion)]:
+                semen_type_this_ai =  "beef_conventional"
+            elif self.net_merit <= self.net_merit_list[int(animal_num * (beef_conventional_portion + dairy_conventional_portion))]:
+                semen_type_this_ai =  "dairy_conventional"
+            else:
+                semen_type_this_ai = "dairy_sexed"
+            # pass
+        else:
+            print("no such semen protocol")
+        # print(semen_type_this_ai)
+        return semen_type_this_ai

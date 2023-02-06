@@ -56,6 +56,9 @@ class PenReport(BaseReportDriver):
             pen = state.animal_management.all_pens[self.pen_id]
 
             for variable in self.daily_variables:
+                print("daily_variables[variable]:", self.daily_variables[variable])
+                print("daily_variables[variable][0]:", self.daily_variables[variable][0])
+                print("daily_variables[variable][2]:", self.daily_variables[variable][2])
                 # index 2 is the accumulator for the evauated variables
                 # index 0 is the string literal code representation of the variable
                 self.daily_variables[variable][2].append(

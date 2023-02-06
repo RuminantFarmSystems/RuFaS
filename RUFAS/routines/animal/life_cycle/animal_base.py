@@ -135,7 +135,9 @@ class AnimalBase(object):
         self.calf_cost = 0
         self.heifer_hormone_cost = 0
         self.heifer_ed_cost = 0
-        self.heifer_ai_semen_cost = 0
+        self.heifer_ai_cost = 0
+        self.heifer_semen_cost = 0
+        # self.heifer_ai_semen_cost = 0
         self.heifer_pc_cost = 0
         self.heifer_feed_cost = 0
 
@@ -153,7 +155,8 @@ class AnimalBase(object):
         if 'heifer_ed_cost' in args:
             self.heifer_ed_cost = args['heifer_ed_cost']
         if 'heifer_ai_semen_cost' in args:
-            self.heifer_ai_semen_cost = args['heifer_ai_semen_cost']
+            self.heifer_ai_cost = args['heifer_ai_semen_cost']*0.4
+            self.heifer_semen_cost = args['heifer_ai_semen_cost']*0.6
         if 'heifer_pc_cost' in args:
             self.heifer_pc_cost = args['heifer_pc_cost']
         if 'heifer_feed_cost' in args:

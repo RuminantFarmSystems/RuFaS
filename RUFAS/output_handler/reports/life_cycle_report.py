@@ -124,6 +124,10 @@ class LifeCycleReport(BaseReportDriver):
                 'CIDR_count': ['life_cycle_manager.CIDR_count', '', []],
                 'GnRH_injections_heifer': ['life_cycle_manager.GnRH_injection_num_h', '', []],
                 'PGF_injections_heifer': ['life_cycle_manager.PGF_injection_num_h', '', []],
+                'semen_num_dairy_conventional_heifer': ['life_cycle_manager.semen_num_dairy_conventional_h', '', []],
+                'semen_num_dairy_sexed_heifer': ['life_cycle_manager.semen_num_dairy_sexed_h', '', []],
+                'semen_num_beef_conventional_heifer': ['life_cycle_manager.semen_num_beef_conventional_h', '', []],
+                'semen_num_beef_sexed_heifer': ['life_cycle_manager.semen_num_beef_sexed_h', '', []],
                 'ai_num_heifer': ['life_cycle_manager.ai_num_h', '', []],
                 'preg_check_num_heifer': ['life_cycle_manager.preg_check_num_h', '', []],
                 'ed_period_heifer': ['life_cycle_manager.ed_period_h', '', []],
@@ -132,18 +136,23 @@ class LifeCycleReport(BaseReportDriver):
                 'pregnancy_rate_heifer': ['life_cycle_manager.pregnancy_rate_heifer', '', []],
                 'GnRH_injections': ['life_cycle_manager.GnRH_injection_num', '', []],
                 'PGF_injections': ['life_cycle_manager.PGF_injection_num', '', []],
+                'semen_num_dairy_conventional': ['life_cycle_manager.semen_num_dairy_conventional', '', []],
+                'semen_num_dairy_sexed': ['life_cycle_manager.semen_num_dairy_sexed', '', []],
+                'semen_num_beef_conventional': ['life_cycle_manager.semen_num_beef_conventional', '', []],
+                'semen_num_beef_sexed': ['life_cycle_manager.semen_num_beef_sexed', '', []],
                 'ai_num': ['life_cycle_manager.ai_num', '', []],
                 'preg_check_num': ['life_cycle_manager.preg_check_num', '', []],
                 'ed_period': ['life_cycle_manager.ed_period', '', []],
                 'avg_conception_rate': ['life_cycle_manager.avg_conception_rate', '', []],
                 'avg_service_rate': ['life_cycle_manager.avg_service_rate', '', []],
                 'pregnancy_rate': ['life_cycle_manager.pregnancy_rate', '', []],
-                'sold_calf_male_num': ['life_cycle_manager.sold_calf_male_num', '', []],
-                'sold_calf_female_num': ['life_cycle_manager.sold_calf_female_num', '', []],
-                'sold_calf_crossbred_male_num': ['life_cycle_manager.sold_calf_crossbred_male_num', '', []],
-                'sold_calf_crossbred_female_num': ['life_cycle_manager.sold_calf_crossbred_female_num', '', []],
+                'sold_dairy_male_calf_num': ['life_cycle_manager.sold_dairy_male_calf_num', '', []],
+                'sold_dairy_female_calf_num': ['life_cycle_manager.sold_dairy_female_calf_num', '', []],
+                'sold_beef_male_calf_num': ['life_cycle_manager.sold_beef_male_calf_num', '', []],
+                'sold_beef_female_calf_num': ['life_cycle_manager.sold_beef_female_calf_num', '', []],
                 'culled_heifer_age': ['life_cycle_manager.culled_heifer_age', '', []],
-                'heifer_open_time': ['life_cycle_manager.heifer_open_time', '', []]
+                'heifer_open_time': ['life_cycle_manager.heifer_open_time', '', []],
+                'produced_female_num': ['life_cycle_manager.produced_female_num', '', []]
             }
 
             self.production_performance = {
@@ -182,8 +191,10 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_bought_heifer': ['life_cycle_manager.cost_bought_heifer', '$/d', []],
                 'cost_sold_heifer': ['life_cycle_manager.sold_heifer_cost', '$/d', []],
                 'income_sold_heifer': ['life_cycle_manager.income_sold_heifer', '$/d', []],
-                'income_sold_female_calf': ['life_cycle_manager.income_sold_female_calf', '$/d', []],
-                'income_sold_male_calf': ['life_cycle_manager.income_sold_male_calf', '$/d', []],
+                'income_sold_dairy_male_calf': ['life_cycle_manager.income_sold_dairy_male_calf', '$/d', []],
+                'income_sold_dairy_female_calf': ['life_cycle_manager.income_sold_dairy_female_calf', '$/d', []],
+                'income_sold_beef_male_calf': ['life_cycle_manager.income_sold_beef_male_calf', '$/d', []],
+                'income_sold_beef_female_calf': ['life_cycle_manager.income_sold_beef_female_calf', '$/d', []],
                 'income_culled_heifer': ['life_cycle_manager.income_culled_heifer', '$/d', []],
                 'income_culled_cow': ['life_cycle_manager.income_culled_cow', '$/d', []],
                 'income_milk': ['life_cycle_manager.income_milk', '$/d', []],
@@ -205,7 +216,8 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_feed_calf': ['life_cycle_manager.cost_feed_calf', '$/d', []],
                 'cost_feed_heifer': ['life_cycle_manager.cost_feed_heifer', '$/d', []],
                 'cost_feed': ['life_cycle_manager.feed_cost', '$/d', []],
-                # 'net_return': ['life_cycle_manager.net_return', '$/d', []],
+                'net_return': ['life_cycle_manager.net_return', '$/d', []],
+                'net_return_last_year': ['life_cycle_manager.net_return_last_year', '$/y', []],
                 'cost_hormone_heifer_more': ['life_cycle_manager.cost_hormone_heifer_more', '$/d', []],
                 'cost_ed_heifer_more': ['life_cycle_manager.cost_ed_heifer_more', '$/d', []],
                 'cost_ai_heifer_more': ['life_cycle_manager.cost_ai_heifer_more', '$/d', []],
@@ -216,8 +228,7 @@ class LifeCycleReport(BaseReportDriver):
                 'cost_feed_heifer_more': ['life_cycle_manager.cost_feed_heifer_more', '$/d', []],
                 'cost_feed_more': ['life_cycle_manager.feed_cost_more', '$/d', []],
                 'net_return_more_heifer': ['life_cycle_manager.net_return_more_heifer', '$/d', []],
-                'net_return': ['life_cycle_manager.net_return', '$/d', []],
-                'net_return_last_year': ['life_cycle_manager.net_return_last_year', '$/y', []]
+                'net_return_more_heifer_last_year': ['life_cycle_manager.net_return_more_heifer_last_year', '$/y', []],
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
@@ -240,10 +251,10 @@ class LifeCycleReport(BaseReportDriver):
             self.last_year_avg_vars = {
                 'culling_rate': ['life_cycle_manager.cull_rate', '%', []],
                 'sold_calf_total_last_year': ['life_cycle_manager.sold_calf_total_last_year', '', []],
-                'sold_calf_male_last_year': ['life_cycle_manager.sold_calf_male_last_year', '', []],
-                'sold_calf_female_last_year': ['life_cycle_manager.sold_calf_female_last_year', '', []],
-                'sold_calf_cross_bred_male_last_year': ['life_cycle_manager.sold_calf_cross_bred_male_last_year', '', []],
-                'sold_calf_cross_bred_female_last_year': ['life_cycle_manager.sold_calf_cross_bred_female_last_year', '', []],
+                'sold_dairy_male_calf_num_last_year': ['life_cycle_manager.sold_dairy_male_calf_num_last_year', '', []],
+                'sold_dairy_female_calf_num_last_year': ['life_cycle_manager.sold_dairy_female_calf_num_last_year', '', []],
+                'sold_beef_male_calf_num_last_year': ['life_cycle_manager.sold_beef_male_calf_num_last_year', '', []],
+                'sold_beef_female_calf_num_last_year': ['life_cycle_manager.sold_beef_female_calf_num_last_year', '', []],
                 'sold_heifer_last_year': ['life_cycle_manager.sold_heifer_last_year', '', []],
                 'bought_heifer_last_year': ['life_cycle_manager.bought_heifer_last_year', '', []],
                 'culled_heifer_last_year': ['life_cycle_manager.culled_heifer_last_year', '', []]

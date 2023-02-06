@@ -589,6 +589,7 @@ class AnimalInitialization:
         conn.close()
         return cows
 
+    # I believe this should be get_replacement_heiferIIIs
     def get_replacement_cows(self, num, breed):
         '''
         Description:

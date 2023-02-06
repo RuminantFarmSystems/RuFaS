@@ -744,6 +744,7 @@ class AnimalManagement:
             'ID': animal.id,
             'breed': animal.breed,
             'birthday': animal.birth_date,
+            'net_merit': animal.net_merit,
             'repro_program': None if not is_cow else animal.repro_program,
             'tai_method_h': None if not is_heifer_repr else animal.tai_method_h,
             'synch_ed_method_h':

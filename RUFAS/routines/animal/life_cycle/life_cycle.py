@@ -38,10 +38,11 @@ class LifeCycleManager:
     heiferIII_percent = 0
     cow_num = 0
     cow_percent = 0
-    sold_calf_male_num = 0
-    sold_calf_female_num = 0
-    sold_calf_crossbred_male_num = 0
-    sold_calf_crossbred_female_num = 0
+    produced_female_num = 0
+    sold_dairy_male_calf_num = 0
+    sold_dairy_female_calf_num = 0
+    sold_beef_male_calf_num = 0
+    sold_beef_female_calf_num = 0
     sold_heifer_num = 0
     bought_heifer_num = 0
     culled_heifer_num = 0
@@ -59,14 +60,14 @@ class LifeCycleManager:
     sold_calf_total = 0
     sold_calf_total_last_year = 0
     sold_calf_total_store_list = []
-    sold_calf_male_last_year = 0
-    sold_calf_male_store_list = []
-    sold_calf_female_last_year = 0
-    sold_calf_female_store_list = []
-    sold_calf_cross_bred_male_last_year = 0
-    sold_calf_cross_bred_male_store_list = []
-    sold_calf_cross_bred_female_last_year = 0
-    sold_calf_cross_bred_female_store_list = []
+    sold_dairy_male_calf_num_last_year = 0
+    sold_dairy_male_calf_store_list = []
+    sold_dairy_female_calf_num_last_year = 0
+    sold_dairy_female_calf_store_list = []
+    sold_beef_male_calf_num_last_year = 0
+    sold_beef_male_calf_store_list = []
+    sold_beef_female_calf_num_last_year = 0
+    sold_beef_female_calf_store_list = []
     sold_heifer_last_year = 0
     sold_heifer_store_list = []
     bought_heifer_last_year = 0
@@ -153,10 +154,18 @@ class LifeCycleManager:
     parity_culling_stats_range = {}
 
     ai_num_h = 0
-    semen_num_h = 0
+    # semen_num_h = 0
+    semen_num_dairy_conventional_h = 0
+    semen_num_dairy_sexed_h = 0
+    semen_num_beef_conventional_h = 0
+    semen_num_beef_sexed_h = 0
     ed_period_h = 0
     ai_num = 0
-    semen_num = 0
+    # semen_num = 0
+    semen_num_dairy_conventional = 0
+    semen_num_dairy_sexed = 0
+    semen_num_beef_conventional = 0
+    semen_num_beef_sexed = 0
     ed_period = 0
 
     count_21_days = 0
@@ -235,8 +244,10 @@ class LifeCycleManager:
     cost_feed_heifer = 0
     cost_feed_milking_cow = 0
     cost_feed_dry_cow = 0
-    income_sold_female_calf = 0
-    income_sold_male_calf = 0
+    income_sold_dairy_male_calf = 0
+    income_sold_dairy_female_calf = 0
+    income_sold_beef_male_calf = 0
+    income_sold_beef_female_calf = 0
     income_sold_heifer = 0
     income_culled_heifer = 0
     income_culled_cow = 0
@@ -252,6 +263,8 @@ class LifeCycleManager:
     net_return_more_heifer = 0
     net_return_last_year = 0
     net_return_store_list = []
+    net_return_more_heifer_last_year = 0
+    net_return_more_heifer_store_list = []
     
 
     config = None
@@ -360,7 +373,7 @@ class LifeCycleManager:
             cows: updated list of cows
 
         """
-        # print("simulating", date)
+        # print(">>simulating", date)
         ids_removed = []
         animals_added = []
         calves_born = []
@@ -369,11 +382,17 @@ class LifeCycleManager:
         self.heiferI_num = 0
         self.heiferII_num = 0
         self.heiferIII_num = 0
+        self.calf_idx_to_remove = []
+        self.heiferI_idx_to_remove = []
+        self.heiferII_idx_to_remove = []
+        self.heiferIII_idx_to_remove = []
+        self.cow_idx_to_remove = []
         self.cow_num = 0
-        self.sold_calf_male_num = 0
-        self.sold_calf_female_num = 0
-        self.sold_calf_crossbred_male_num = 0
-        self.sold_calf_crossbred_female_num = 0
+        self.produced_female_num = 0
+        self.sold_dairy_male_calf_num = 0
+        self.sold_dairy_female_calf_num = 0
+        self.sold_beef_male_calf_num = 0
+        self.sold_beef_female_calf_num = 0
         self.sold_heifer_num = 0
         self.bought_heifer_num = 0
         self.culled_heifer_num = 0
@@ -385,6 +404,7 @@ class LifeCycleManager:
         self.net_merit_heifer = 0
         self.avg_net_merit_cow = 0
         self.avg_net_merit_heifer = 0
+        self.net_merit_list = []
 
         self.preg_check_num_h = 0
         self.preg_check_num = 0
@@ -394,10 +414,18 @@ class LifeCycleManager:
         self.GnRH_injection_num = 0
         self.PGF_injection_num = 0
         self.ai_num_h = 0
-        self.semen_num_h = 0
+        # self.semen_num_h = 0
+        self.semen_num_dairy_conventional_h = 0
+        self.semen_num_dairy_sexed_h = 0
+        self.semen_num_beef_conventional_h = 0
+        self.semen_num_beef_sexed_h = 0
         self.ed_period_h = 0
         self.ai_num = 0
-        self.semen_num = 0
+        # self.semen_num = 0
+        self.semen_num_dairy_conventional = 0
+        self.semen_num_dairy_sexed = 0
+        self.semen_num_beef_conventional = 0
+        self.semen_num_beef_sexed = 0
         self.ed_period = 0
 
         self.daily_milk_production = 0
@@ -459,8 +487,10 @@ class LifeCycleManager:
         self.cost_feed_heifer = 0
         self.cost_feed_milking_cow = 0
         self.cost_feed_dry_cow = 0
-        self.income_sold_female_calf = 0
-        self.income_sold_male_calf = 0
+        self.income_sold_dairy_male_calf = 0
+        self.income_sold_dairy_female_calf = 0
+        self.income_sold_beef_male_calf = 0
+        self.income_sold_beef_female_calf = 0
         self.income_sold_heifer = 0
         self.income_culled_heifer = 0
         self.income_culled_cow = 0
@@ -525,13 +555,19 @@ class LifeCycleManager:
                 new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
                 self.net_merit_heifer += new_heiferI.net_merit
-                del calves[index]
+                self.net_merit_list.append(new_heiferI.net_merit)
+                self.calf_idx_to_remove.append(index)
+                # del calves[index]
+                # print("wean", index)
             else:
                 self.calf_num += 1
                 self.total_body_weight_calf += calf.body_weight
                 total_animal_num, self.avg_mature_body_weight = \
                     self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, calf.mature_body_weight)
+        
+        for index in sorted(self.calf_idx_to_remove, reverse=True):
+            del calves[index]
 
         # heiferI to heiferII, assign repro programs
         for index, heiferI in enumerate(heiferIs):
@@ -549,7 +585,9 @@ class LifeCycleManager:
                 args.update(synch_ed_method_h=AnimalBase.config['heifer_synchED_protocol'])
                 new_heiferII = HeiferII(args)
                 heiferIIs.append(new_heiferII)
-                del heiferIs[index]
+                # del heiferIs[index]
+                self.heiferI_idx_to_remove.append(index)
+                # print("from heiferI to II")
             else:
                 self.heiferI_num += 1
                 self.total_body_weight_heifer += heiferI.body_weight
@@ -557,6 +595,10 @@ class LifeCycleManager:
                     self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferI.mature_body_weight)
                 self.net_merit_heifer += heiferI.net_merit
+                self.net_merit_list.append(heiferI.net_merit)
+
+        for index in sorted(self.heiferI_idx_to_remove, reverse=True):
+            del heiferIs[index]
 
         # heiferII to heiferIII
         for index, heiferII in enumerate(heiferIIs):
@@ -567,7 +609,9 @@ class LifeCycleManager:
                                        self.avg_heifer_culling_age, heiferII.days_born)
                 self.culled_heifer_age.append(heiferII.days_born) 
                 self.culled_heifers.append(heiferII)
-                del heiferIIs[index]
+                # del heiferIIs[index]
+                self.heiferII_idx_to_remove.append(index)
+                # print("heiferII was culled")
             elif third_stage:
                 args = heiferII.get_heiferII_values()
                 args.update({
@@ -579,12 +623,15 @@ class LifeCycleManager:
                     'heifer_feed_cost': heiferII.heifer_feed_cost,
                     'heifer_hormone_cost': heiferII.heifer_hormone_cost,
                     'heifer_ed_cost': heiferII.heifer_ed_cost,
-                    'heifer_ai_semen_cost': heiferII.heifer_ai_semen_cost,
+                    'heifer_ai_cost': heiferII.heifer_ai_cost,
+                    'heifer_semen_cost': heiferII.heifer_semen_cost,
                     'heifer_pc_cost': heiferII.heifer_pc_cost
                 })
                 new_heiferIII = HeiferIII(args)
                 heiferIIIs.append(new_heiferIII)
-                del heiferIIs[index]
+                # del heiferIIs[index]
+                self.heiferII_idx_to_remove.append(index)
+                # print("from heiferII to III")
             else:
                 self.heiferII_num += 1
                 self.total_body_weight_heifer += heiferII.body_weight
@@ -603,12 +650,17 @@ class LifeCycleManager:
                 self.GnRH_injection_num_h += heiferII.GnRH_injections
                 self.PGF_injection_num_h += heiferII.PGF_injections
                 self.preg_check_num_h += heiferII.preg_diagnoses
-                self.semen_num_h += heiferII.semen_num
+                # self.semen_num_h += heiferII.semen_num
+                self.semen_num_dairy_conventional_h += heiferII.semen_num_dairy_conventional
+                self.semen_num_dairy_sexed_h += heiferII.semen_num_dairy_sexed
+                self.semen_num_beef_conventional_h += heiferII.semen_num_beef_conventional
+                self.semen_num_beef_sexed_h += heiferII.semen_num_beef_sexed
                 self.ai_num_h += heiferII.AI_times
                 self.ed_period_h += heiferII.ED_days
                 
                 self.net_merit_heifer += heiferII.net_merit
-               
+                self.net_merit_list.append(heiferII.net_merit)
+
                 # caculate reproduction indications
             if date >= 1:
                 if heiferII.days_born == heiferII.ai_day:
@@ -617,6 +669,9 @@ class LifeCycleManager:
                     self.num_heifer_open_acc_21_days += 1
                 if heiferII.days_in_preg == 1:
                     self.num_preg_21_days_heifer += 1   
+
+        for index in sorted(self.heiferII_idx_to_remove, reverse=True):
+            del heiferIIs[index]
         
         # Jan 12th by Yijing: added check for division of 0
         #caculate service rate and conception rate
@@ -662,7 +717,8 @@ class LifeCycleManager:
                     'heifer_feed_cost': heiferIII.heifer_feed_cost,
                     'heifer_hormone_cost': heiferIII.heifer_hormone_cost,
                     'heifer_ed_cost': heiferIII.heifer_ed_cost,
-                    'heifer_ai_semen_cost': heiferIII.heifer_ai_semen_cost,
+                    'heifer_ai_cost': heiferIII.heifer_ai_cost,
+                    'heifer_semen_cost': heiferIII.heifer_semen_cost,
                     'heifer_pc_cost': heiferIII.heifer_pc_cost
                      })
                 args.update(repro_program=AnimalBase.config['cow_repro_method'])
@@ -671,7 +727,9 @@ class LifeCycleManager:
                 args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
                 new_cow = Cow(args)
                 cows.append(new_cow)
-                del heiferIIIs[index]
+                # del heiferIIIs[index]
+                self.heiferIII_idx_to_remove.append(index)
+                # print("from heiferIII to cow")
             else:
                 self.heiferIII_num += 1
                 self.total_body_weight_heifer += heiferIII.body_weight
@@ -679,40 +737,13 @@ class LifeCycleManager:
                     self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
                 self.net_merit_heifer += heiferIII.net_merit
+                self.net_merit_list.append(heiferIII.net_merit)
 
-        # if the number of heifers is more than needed for the herd, sell
-        # those as replacement
-        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
-            removed = heiferIIIs.pop()
-            self.sold_heifer_cost += removed.calf_cost + removed.heifer_feed_cost + removed.heifer_hormone_cost\
-                + removed.heifer_ed_cost + removed.heifer_ai_semen_cost +removed.heifer_pc_cost
-            self.sold_heifer_calf_cost += removed.calf_cost
-            self.sold_heifer_hormone_cost += removed.heifer_hormone_cost
-            self.sold_heifer_ed_cost += removed.heifer_ed_cost
-            self.sold_heifer_ai_cost += removed.heifer_ai_semen_cost * 0.4
-            self.sold_heifer_semen_cost += removed.heifer_ai_semen_cost * 0.6
-            self.sold_heifer_pc_cost += removed.heifer_pc_cost
-            self.sold_heifer_feed_cost += removed.heifer_feed_cost
-            ids_removed.append(removed.id)
-            self.sold_heifers.append(removed)
-            self.sold_heifer_num += 1
-            self.heiferIII_num -= 1
-            self.net_merit_heifer -= removed.net_merit
-
-        # if the number of heifers is less than needed for the herd,
-        # buy replacement from the market
-        while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 1.01 and \
-                date > 1:
-            self.replacement_market[0].events.add_event(
-                self.replacement_market[0].days_born, date, const.ENTER_HERD)
-            self.replacement_market[0].set_p_purchased()
-            # adjust replacement's net merit - increase linearly (from 2015-2020, NM increase from -5 to 364 <- 0.2022 per day)
-            self.replacement_market[0].net_merit += date * 0.2022 
-            animals_added.append(self.replacement_market[0])
-            self.net_merit_heifer += self.replacement_market[0].net_merit
-            self.bought_heifer_num += 1
-            self.heiferIII_num += 1
-            del self.replacement_market[0]
+        for index in sorted(self.heiferIII_idx_to_remove, reverse=True):
+            del heiferIIIs[index]
+        
+        # print("today I have", self.calf_num, "calves, ", self.heiferI_num, "heiferIs, ", self.heiferII_num, "heiferIIs, ",
+        # self.heiferIII_num, "heiferIIIs")
 
         # cow culling action and stats
         for index, cow in enumerate(cows):
@@ -736,7 +767,6 @@ class LifeCycleManager:
                     else:
                         self.culled_cow_dim['greater_than_3'].append(cow.days_in_milk) 
 
-                # self.net_merit_cow -= cow.net_merit
                 self.culled_cows.append(cow)
                 self.total_body_weight_culled_cow += cow.body_weight
                 self.cull_reason_stats[cow.cull_reason] += 1
@@ -745,8 +775,9 @@ class LifeCycleManager:
                                        self.avg_cow_culling_age, cow.days_born)
 
                 ids_removed.append(cow.id)
-                del cows[index]
-
+                # del cows[index]
+                self.cow_idx_to_remove.append(index)
+                # print("cow is culled")
             else:
                 if cow.do_not_breed:
                     self.do_not_breed_num += 1
@@ -861,18 +892,25 @@ class LifeCycleManager:
                 self.GnRH_injection_num += cow.GnRH_injections
                 self.PGF_injection_num += cow.PGF_injections
                 self.preg_check_num += cow.preg_diagnoses
-                self.semen_num += cow.semen_num
+                # self.semen_num += cow.semen_num
+                self.semen_num_dairy_conventional += cow.semen_num_dairy_conventional
+                self.semen_num_dairy_sexed += cow.semen_num_dairy_sexed
+                self.semen_num_beef_conventional += cow.semen_num_beef_conventional
+                self.semen_num_beef_sexed += cow.semen_num_beef_sexed
                 self.ai_num += cow.AI_times
                 self.ed_period += cow.ED_days
                 self.net_merit_cow += cow.net_merit
+                self.net_merit_list.append(cow.net_merit)
 
+            top_sire_net_merit = (1309 + 0.2383 * date) * 2
             if new_born:
                 args = {
                     'id': self.animal_initializer.next_id(),
-                    'breed': 'HO',
+                    'breed': cow.calf_breed,
+                    'gender': cow.calf_gender,
                     'birth_date': date,
                     'days_born': 0,
-                    'net_merit': int((cow.net_merit + 1309*2)/2),
+                    'net_merit': (cow.net_merit + top_sire_net_merit)/2,
                     'p_init': cow.p_gest_for_calf,
                     'birth_weight': cow.calf_birth_weight
                 }
@@ -887,6 +925,9 @@ class LifeCycleManager:
                 cow.p_gest_for_calf = 0
                 cow.calf_birth_weight = 0
 
+                if new_calf.breed == 'HO' and new_calf.gender == 'female':
+                    self.produced_female_num += 1
+
                 if not (new_calf.culled or new_calf.sold):
                     new_calf.events.add_event(
                         new_calf.days_born, date, const.ENTER_HERD)
@@ -895,14 +936,14 @@ class LifeCycleManager:
                 if new_calf.sold:
                     if new_calf.breed == 'HO':
                         if new_calf.gender == 'male':
-                            self.sold_calf_male_num += 1
+                            self.sold_dairy_male_calf_num += 1
                         else:
-                            self.sold_calf_female_num += 1
+                            self.sold_dairy_female_calf_num += 1
                     if new_calf.breed == 'HO-AN':
                         if new_calf.gender == 'male':
-                            self.sold_calf_crossbred_male_num += 1
+                            self.sold_beef_male_calf_num += 1
                         else:
-                            self.sold_calf_crossbred_female_num += 1  
+                            self.sold_beef_female_calf_num += 1  
 
             # caculate reproduction indications
             if date >= 1:
@@ -912,6 +953,75 @@ class LifeCycleManager:
                     self.num_cow_open_acc_21_days += 1
                 if cow.days_in_preg == 1:
                     self.num_preg_21_days += 1   
+
+        for index in sorted(self.cow_idx_to_remove, reverse=True):
+            del cows[index]
+
+        # print("today I cull", self.culled_cow_num, "cows")
+        # print("I have cow_num =", self.cow_num, "and cow list length =", len(cows))
+
+        if self.cow_num == 0:
+            self.avg_net_merit_cow = 0
+        else:
+            self.avg_net_merit_cow = self.net_merit_cow/self.cow_num
+        self.heifer_total_num = self.heiferI_num + self.heiferII_num + self.heiferIII_num
+        if self.heifer_total_num == 0:
+            self.avg_net_merit_heifer = 0
+        else:
+            self.avg_net_merit_heifer = self.net_merit_heifer/self.heifer_total_num
+
+        self.net_merit_list = sorted(self.net_merit_list)
+        for heiferII in heiferIIs:
+            heiferII.avg_net_merit_cow = self.avg_net_merit_cow
+            heiferII.net_merit_list = self.net_merit_list
+        for cow in cows:
+            cow.avg_net_merit_cow = self.avg_net_merit_cow
+            cow.net_merit_list = self.net_merit_list
+
+        # if date % 7 == 0:
+        # if the number of heifers is more than needed for the herd, sell
+        # those as replacement
+        # print("cow list length:", len(cows), "heiferIII list length:", len(heiferIIIs))
+        while len(heiferIIIs) + len(cows) > self.herd_num * 1.03 and len(heiferIIIs) > 0:
+            removed = heiferIIIs.pop()
+            self.sold_heifer_cost += removed.calf_cost + removed.heifer_feed_cost + removed.heifer_hormone_cost\
+                + removed.heifer_ed_cost + removed.heifer_ai_cost + removed.heifer_semen_cost +removed.heifer_pc_cost
+            self.sold_heifer_calf_cost += removed.calf_cost
+            self.sold_heifer_hormone_cost += removed.heifer_hormone_cost
+            self.sold_heifer_ed_cost += removed.heifer_ed_cost
+            self.sold_heifer_ai_cost += removed.heifer_ai_cost 
+            self.sold_heifer_semen_cost += removed.heifer_semen_cost 
+            self.sold_heifer_pc_cost += removed.heifer_pc_cost
+            self.sold_heifer_feed_cost += removed.heifer_feed_cost
+            ids_removed.append(removed.id)
+            self.sold_heifers.append(removed)
+            self.sold_heifer_num += 1
+            self.heiferIII_num -= 1
+            self.net_merit_heifer -= removed.net_merit
+            self.net_merit_list.pop()
+            
+
+        # if the number of heifers is less than needed for the herd,
+        # buy replacement from the market
+        while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * 0.97 and \
+                date > 1:
+            self.replacement_market[0].events.add_event(
+                self.replacement_market[0].days_born, date, const.ENTER_HERD)
+            self.replacement_market[0].set_p_purchased()
+            # for now: set the replacement heifer net merit the same as the avg net merit of own herd
+            # self.replacement_market[0].net_merit = self.avg_net_merit_heifer 
+            # adjust replacement's net merit - increase linearly (from 2015-2020, NM increase from -5 to 364 <- 0.2022 per day)
+            self.replacement_market[0].net_merit += date * 0.2022 * 2
+            animals_added.append(self.replacement_market[0])
+            self.net_merit_heifer += self.replacement_market[0].net_merit
+            self.net_merit_list.append(self.replacement_market[0].net_merit)
+            self.bought_heifer_num += 1
+            self.heiferIII_num += 1
+            del self.replacement_market[0]
+
+        # print("today I sell", self.sold_heifer_num, "heiferIIIs and buy ", self.bought_heifer_num, "heiferIIIs, ")
+        # print("so now I have", self.heiferIII_num, "heiferIIIs")
+
         
         # Jan 12th by Yijing: added check for division of 0
         #caculate service rate and conception rate
@@ -939,19 +1049,23 @@ class LifeCycleManager:
         self.cost_hormone_heifer = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count
         self.cost_ed_heifer = 0.11 * self.ed_period_h
         self.cost_ai_heifer = 10 * self.ai_num_h
-        self.cost_semen_heifer = 15 * self.semen_num_h
+        self.cost_semen_heifer = 15 * (self.semen_num_dairy_conventional_h + self.semen_num_beef_conventional_h) + \
+            35 * (self.semen_num_dairy_sexed_h + self.semen_num_beef_sexed_h)
         self.cost_pc_heifer = 4.37 * self.preg_check_num_h
 
         self.cost_hormone_heifer_more = 1.83 * self.GnRH_injection_num_h + 2.29 * self.PGF_injection_num_h + 12.53 * self.CIDR_count - self.sold_heifer_hormone_cost
         self.cost_ed_heifer_more = 0.11 * self.ed_period_h - self.sold_heifer_ed_cost
         self.cost_ai_heifer_more = 10 * self.ai_num_h - self.sold_heifer_ai_cost
-        self.cost_semen_heifer_more = 15 * self.semen_num_h - self.sold_heifer_semen_cost
+        self.cost_semen_heifer_more = 15 * (self.semen_num_dairy_conventional_h + self.semen_num_beef_conventional_h) + \
+            35 * (self.semen_num_dairy_sexed_h + self.semen_num_beef_sexed_h) - self.sold_heifer_semen_cost
         self.cost_pc_heifer_more = 4.37 * self.preg_check_num_h - self.sold_heifer_pc_cost          
 
         self.cost_hormone = 1.83 * self.GnRH_injection_num + 2.29 * self.PGF_injection_num
         self.cost_ed = 0.11 * self.ed_period 
         self.cost_ai = 10 * self.ai_num
-        self.cost_semen = 15 * self.semen_num
+        # self.cost_semen = 15 * self.semen_num
+        self.cost_semen = 15 * (self.semen_num_dairy_conventional + self.semen_num_beef_conventional) + \
+            35 * (self.semen_num_dairy_sexed + self.semen_num_beef_sexed)
         self.cost_pc = 4.37 * self.preg_check_num
 
         self.cost_bought_heifer = 1500 * self.bought_heifer_num
@@ -964,8 +1078,10 @@ class LifeCycleManager:
         # $0.06-0.08 per lb DM
         self.cost_feed_milking_cow = 0.24 * self.total_lactating_DMI
         self.cost_feed_dry_cow = 0.24 * self.total_dry_DMI
-        self.income_sold_female_calf = 120 * self.sold_heifer_num
-        self.income_sold_male_calf = 50 * self.sold_calf_male_num
+        self.income_sold_dairy_male_calf = 57.5 * self.sold_dairy_male_calf_num
+        self.income_sold_dairy_female_calf = 45 * self.sold_dairy_female_calf_num
+        self.income_sold_beef_male_calf = 225 * self.sold_beef_male_calf_num
+        self.income_sold_beef_female_calf = 225 * self.sold_beef_female_calf_num
         self.income_sold_heifer = 1380 * self.sold_heifer_num
         self.income_culled_heifer = 124 * self.culled_heifer_num
         self.income_culled_cow = 1.49 * self.total_body_weight_culled_cow
@@ -983,11 +1099,15 @@ class LifeCycleManager:
         
         # Jan 12th by Yijing: Added income_sold_heifer
         # bought more than sold
-        self.net_return = self.income_milk + self.income_sold_male_calf + self.income_sold_heifer + self.income_culled_heifer + self.income_culled_cow -\
-             self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost
+        self.net_return = self.income_milk + self.income_sold_dairy_male_calf + self.income_sold_dairy_female_calf + \
+            self.income_sold_beef_male_calf + self.income_sold_beef_female_calf + \
+            self.income_sold_heifer + self.income_culled_heifer + self.income_culled_cow -\
+            self.repro_cost_heifer - self.repro_cost_cow - self.feed_cost
         # sold more than bought
-        self.net_return_more_heifer = self.income_milk + self.income_sold_male_calf + self.income_sold_heifer + self.income_culled_heifer + self.income_culled_cow -\
-             self.repro_cost_heifer_more - self.repro_cost_cow - self.feed_cost_more
+        self.net_return_more_heifer = self.income_milk + self.income_sold_dairy_male_calf + + self.income_sold_dairy_female_calf + \
+            self.income_sold_beef_male_calf + self.income_sold_beef_female_calf + \
+            self.income_sold_heifer + self.income_culled_heifer + self.income_culled_cow -\
+            self.repro_cost_heifer_more - self.repro_cost_cow - self.feed_cost_more
     
         if total_animal_num == 0:
             self.calf_percent = 0
@@ -1022,30 +1142,22 @@ class LifeCycleManager:
         
         # moved from SA to here
         self.net_return_last_year, self.net_return_store_list = self.moving_sum(self.net_return, 365, self.net_return_store_list)
+        self.net_return_more_heifer_last_year, self.net_return_more_heifer_store_list = self.moving_sum(self.net_return_more_heifer, 365, self.net_return_more_heifer_store_list)
 
         self.culled_cow_sum_last_year, self.culled_cow_sum_last_year_store_list = self.moving_sum(self.culled_cow_num, 365, self.culled_cow_sum_last_year_store_list)
         self.cow_num_avg_last_year, self.cow_num_avg_last_year_store_list = self.moving_average(self.cow_num, 365, self.cow_num_avg_last_year_store_list)
         self.cull_rate = self.culled_cow_sum_last_year / self.cow_num_avg_last_year
 
-        self.sold_calf_total = self.sold_calf_male_num + self.sold_calf_female_num + self.sold_calf_crossbred_male_num + self.sold_calf_crossbred_female_num
+        self.sold_calf_total = self.sold_dairy_male_calf_num + self.sold_dairy_female_calf_num + self.sold_beef_male_calf_num + self.sold_beef_female_calf_num
         self.sold_calf_total_last_year, self.sold_calf_total_store_list = self.moving_sum(self.sold_calf_total, 365, self.sold_calf_total_store_list)
-        self.sold_calf_male_last_year, self.sold_calf_male_store_list = self.moving_sum(self.sold_calf_male_num, 365, self.sold_calf_male_store_list)
-        self.sold_calf_female_last_year, self.sold_calf_female_store_list = self.moving_sum(self.sold_calf_female_num, 365, self.sold_calf_female_store_list)
-        self.sold_calf_cross_bred_male_last_year, self.sold_calf_cross_bred_male_store_list = self.moving_sum(self.sold_calf_crossbred_male_num, 365, self.sold_calf_cross_bred_male_store_list)
-        self.sold_calf_cross_bred_female_last_year, self.sold_calf_cross_bred_female_store_list = self.moving_sum(self.sold_calf_crossbred_female_num, 365, self.sold_calf_cross_bred_female_store_list)
+        self.sold_dairy_male_calf_num_last_year, self.sold_dairy_male_calf_store_list = self.moving_sum(self.sold_dairy_male_calf_num, 365, self.sold_dairy_male_calf_store_list)
+        self.sold_dairy_female_calf_num_last_year, self.sold_dairy_female_calf_store_list = self.moving_sum(self.sold_dairy_female_calf_num, 365, self.sold_dairy_female_calf_store_list)
+        self.sold_beef_male_calf_num_last_year, self.sold_beef_male_calf_store_list = self.moving_sum(self.sold_beef_male_calf_num, 365, self.sold_beef_male_calf_store_list)
+        self.sold_beef_female_calf_num_last_year, self.sold_beef_female_calf_store_list = self.moving_sum(self.sold_beef_female_calf_num, 365, self.sold_beef_female_calf_store_list)
         self.sold_heifer_last_year, self.sold_heifer_store_list = self.moving_sum(self.sold_heifer_num, 365, self.sold_heifer_store_list)
         self.bought_heifer_last_year, self.bought_heifer_store_list = self.moving_sum(self.bought_heifer_num, 365, self.bought_heifer_store_list)
         self.culled_heifer_last_year, self.culled_heifer_last_year_store_list = self.moving_sum(self.culled_heifer_num, 365, self.culled_heifer_last_year_store_list)
-        
-        if self.cow_num == 0:
-            self.avg_net_merit_cow = 0
-        else:
-            self.avg_net_merit_cow = self.net_merit_cow/self.cow_num
-        self.heifer_total_num = self.heiferI_num + self.heiferII_num + self.heiferIII_num
-        if self.heifer_total_num == 0:
-            self.avg_net_merit_heifer = 0
-        else:
-            self.avg_net_merit_heifer = self.net_merit_heifer/self.heifer_total_num
+
         return animals_added, ids_removed, calves_born, calves, heiferIs, \
                heiferIIs, heiferIIIs, cows
     @staticmethod

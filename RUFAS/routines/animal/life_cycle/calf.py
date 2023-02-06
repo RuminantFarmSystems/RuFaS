@@ -55,31 +55,6 @@ class Calf(AnimalBase):
         """
         Determine stillbirth, gender, and birth weight
         """
-        # ['semen_type'] now is in the format of 
-        # "semen_type": {"dairy_conventional": 1, "dairy_sexed": 0, "beef_conventional": 0, "beef_sexed": 0},
-        # gender determined with gender ratio relates to semen type
-        if AnimalBase.config['semen_type'] == 'dairy_conventional':
-            male_calf_rate = \
-                AnimalBase.config['male_calf_rate_dairy_conventional_semen']
-            self.breed = 'HO'
-        elif AnimalBase.config['semen_type'] == 'dairy_sexed':
-            male_calf_rate = AnimalBase.config['male_calf_rate_dairy_sexed_semen']
-            self.breed = 'HO'
-        elif AnimalBase.config['semen_type'] == 'beef_conventional':
-            male_calf_rate = \
-                AnimalBase.config['male_calf_rate_beef_conventional_semen']
-            self.breed = 'HO-AN'
-        elif AnimalBase.config['semen_type'] == 'beef_sexed':
-            male_calf_rate = \
-                AnimalBase.config['male_calf_rate_beef_sexed_semen']
-            self.breed = 'HO-AN'
-        else:
-            print("cannot recognize semen_type input")
-        
-        if random() < male_calf_rate:
-            self.gender = 'male'
-        else:
-            self.gender = 'female'
 
         # calf born, with stillbirth probability
         if random() < AnimalBase.config['still_birth_rate']:
@@ -92,12 +67,7 @@ class Calf(AnimalBase):
         # if AnimalBase.config['keep_female_calf_rate = 0,
         # sell all female calves)
 
-        if self.gender == 'male' or self.breed != 'HO' or random() > \
-                AnimalBase.config['keep_female_calf_rate']:
-            self.sold = True
-        else:
-            self.sold = False
-
+        self.gender = args['gender']
         self.birth_weight = args['birth_weight']
         self.body_weight = args['birth_weight']
         self.mature_body_weight = truncnorm.rvs(-2, 2, AnimalBase.config['mature_body_weight_avg'],\
@@ -105,7 +75,16 @@ class Calf(AnimalBase):
         self.wean_weight = 0
         self.p_animal = args['p_init']
 
-    def assign_calf_values(self, args):
+        if self.breed != 'HO':
+            self.sold = True
+        else:
+            if self.gender == 'male':
+                self.sold = True
+            else:
+                if random() > AnimalBase.config['keep_female_calf_rate']:
+                    self.sold = True
+
+    def assign_calf_values(self, args): # this is from the database
         """
         Assign calf with given values
         """

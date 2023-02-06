@@ -72,10 +72,10 @@ def daily_simulation():
 
     # Daily routines
     routines.daily_animal_routine(state.animal_management, state.feed, weather, time)
-    routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
-    routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
-    routines.daily_feed_routine(state.feed, state.fields, state.animal_management,
-                                output.reports['feed_storage_report'])
+    # routines.daily_manure_storage_routine(state.manure_storage, state.animal_management)
+    # routines.daily_fields_routine(state.fields, state.manure_storage, weather, time)
+    # routines.daily_feed_routine(state.feed, state.fields, state.animal_management,
+                                # output.reports['feed_storage_report'])
 
     #
     # Daily Output Updates
