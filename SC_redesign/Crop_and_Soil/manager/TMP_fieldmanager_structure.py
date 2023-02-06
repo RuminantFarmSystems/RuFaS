@@ -66,6 +66,7 @@ class Field:  # TODO: move to field/ directory
         # allow crops to grow
         self.grow_crops()
 
+        # allow grazing
         if self.field_data.grazers_present:
             self.graze_field()
 
