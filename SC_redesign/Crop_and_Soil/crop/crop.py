@@ -114,7 +114,8 @@ class Crop:
     #   these method (or a similar harvest method) will eventually need to call
     #   obtain_yields()
     def cut(self, fraction: float, mass=None) -> None:
-        """remove biomass from the plant (via cutting)"""
+        """remove biomass from the plant (via cutting) as either a proportion (fraction) or fixed amount of biomass
+        (mass)"""
         pass
 
     def kill(self) -> None:
