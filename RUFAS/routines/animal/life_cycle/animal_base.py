@@ -170,6 +170,9 @@ class AnimalBase(object):
             p_feces_excrt: amount of P excreted by an animal (g)
         """
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_base_manure.__name__, }
+
         # amount of P required for urine production (g) (A.1G.B.1)
         p_urine = 0.000002 * self.body_weight * 1000
 
@@ -185,6 +188,13 @@ class AnimalBase(object):
                 self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
+
+        animal_base_manure = {}
+        animal_base_manure["p_urine"] = p_urine
+        animal_base_manure["p_excess"] = self.p_excess
+        animal_base_manure["p_feces_excrt"] = p_feces_excrt
+    
+        om.add_variable("animal_base_manure_calc", animal_base_manure, info_map)
 
         return p_urine, p_feces_excrt
 
