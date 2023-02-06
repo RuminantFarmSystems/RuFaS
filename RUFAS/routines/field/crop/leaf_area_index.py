@@ -147,4 +147,4 @@ def calculate_d_LAI_actual(crop_type, d_LAI_max):
         float: change in LAI actual
     """
     #print('d_LAI_max',d_LAI_max,'crop_type.gamma_reg',crop_type.gamma_reg)
-    return min(d_LAI_max * sqrt(crop_type.gamma_reg),0.01)
+    return min(d_LAI_max * sqrt(crop_type.gamma_reg), 0.01)

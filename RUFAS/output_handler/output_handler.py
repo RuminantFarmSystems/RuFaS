@@ -86,7 +86,7 @@ class OutputHandler:
         """Transfer needed (initial) data from state to report handlers."""
 
         info_map = {"class": self.__class__.__name__, 
-                    "function": self.initialize_reports.__name__,}
+                    "function": self.initialize_reports.__name__, }
 
         for report_name in self.reports:
             report = self.reports[report_name]
