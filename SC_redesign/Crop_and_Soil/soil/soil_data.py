@@ -34,6 +34,12 @@ class SoilData:
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
 
+    # ---- percolation
+    vadose_zone_water: Optional[float] = 0
+    """total amount of water that has percolated into the vadose zone (mm) (SWAT 2:3.2)"""
+    time_step: float = 24
+    """length of time step over which percolation occurs (hours) """
+
     @property
     def profile_soil_water_content(self) -> float:
         """
