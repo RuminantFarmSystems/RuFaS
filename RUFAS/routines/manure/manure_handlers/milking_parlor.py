@@ -244,7 +244,7 @@ class MilkingParlor:
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure_mass_deposited_in_milking_parlor.__name__,
-                    "num_cows": num_cows, "manure_mass": manure_mass}
+                    "num_cows": num_cows, "manure_mass": manure_mass, }
 
         manure_mass_deposited_in_milking_parlor = (manure_mass *
                                                    self.total_fraction_of_day_spent_in_milking_parlor) if num_cows > 0 else 0.0
@@ -267,7 +267,7 @@ class MilkingParlor:
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure_volume_deposited_in_milking_parlor.__name__,
-                    "manure_mass": manure_mass}
+                    "manure_mass": manure_mass, }
 
         manure_volume_deposited_in_milking_parlor = self.calc_manure_mass_deposited_in_milking_parlor(
             num_cows, manure_mass) / ManureConstants.MANURE_DENSITY
@@ -290,7 +290,7 @@ class MilkingParlor:
         """
         info_map = {"class": cls.__name__,
                     "function": cls._calc_fraction_of_day_from_minutes.__name__,
-                    "minutes": minutes}
+                    "minutes": minutes, }
 
         minutes_in_a_day = 60.0 * 24.0
         minutes_of_a_day_frac = minutes / minutes_in_a_day
