@@ -29,6 +29,14 @@ def daily_crop_routine(soil, crop, field_management, weather, time, croptime):
         weather: an instance of the Weather class defined in classes.py
         time: an instance of the Time class defined in classes.py
     """
+
+    info_map = {"class": "no_caller_class",
+                "function": daily_crop_routine.__name__,
+                "soil": vars(soil),
+                "crop": vars(crop),
+                "field_management": vars(field_management),
+                "weather": vars(weather), }
+
     # Current crop is set at the beginning of the year in annual_crop_routine
     try: 
         daily_crops_planted=croptime.crops['crops_planted'][time.index]
@@ -164,6 +172,10 @@ class Crop(object):
                 relevant to crop growth
             time: an instance of the Time class specified in classes.py
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__, 
+                    "crop_growth_data": data, }
+
         # dormancy for perennial crops
         self.latitude = abs(data['latitude'])
         """float: latitude of where the farm is located"""

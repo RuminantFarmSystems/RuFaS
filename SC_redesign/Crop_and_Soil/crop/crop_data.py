@@ -4,15 +4,99 @@ from typing import Optional, List
 # TODO: defaults need to be reviewed and updated. See the SWAT crop database for values
 
 
-@dataclass
+@dataclass(kw_only=True)
 class CropData:
+    """Data class containing crop variables.
+
+    Details:
+      The kw_only=True argument of the @dataclass decorator specifies that this class' attributes can only be
+      initialized with values other than defaults by explicitly including the keyword (i.e, positional arguments are
+      disabled).
+      For example CropData() will initialize with the default light_extinction value (0.65),
+      CropData(light_extinction=0.7) will initialize with the vallue set to 0.7, but CropData(0.65) will not work.
+      The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
+      but will have its values set to different defaults.
+    """
+    # ID variables (SWAT Table A-1 ish)
+    species: Optional[str] = "generic"
+    """the species of the crop"""
+    name: Optional[str] = "default generic annual crop"
+    """the name of this specific crop instance"""
+    id: Optional[int] = 0
+    """the numeric identifier for this crop instance"""
+    plant_code: Optional[str] = None
+    """4-letter plant code (used by SWAT)"""
+    scientific_name: Optional[str] = None
+    """taxonomic name of the plant"""
+    is_perennial: bool = False
+    """is the plant perennial?"""
+    is_nitrogen_fixer: bool = False
+    """is the plant a nitrogen fixer?"""
+
+    # SWAT Table A-3
+    minimum_temperature: float = 0
+    """minimum temperature below which plant growth cannot occur (Celsius)"""
+    optimal_temperature: float = 25
+    """ideal temperature for maximum plant growth (Celsius)"""
+
+    # SWAT Table A-4
+    max_leaf_area_index: float = 4.0
+    """maximum leaf area index for the plant (unitless)"""
+    first_heat_fraction_point: float = 0.15
+    """fraction of the growing season corresponding to the first point on the optimal leaf development 
+    curve (unitless)"""
+    first_leaf_fraction_point: float = 0.01
+    """fraction of max leaf area index corresponding to the first point on the optimal leaf development 
+    curve (unitless)"""
+    second_heat_fraction_point: float = 0.50
+    """fraction of the growing season corresponding to the second point on the optimal leaf development 
+    curve (unitless)"""
+    second_leaf_fraction_point: float = 0.95
+    """fraction of max leaf area index corresponding to the second point on the optimal leaf development 
+        curve (unitless)"""
+    senescent_heat_fraction: float = 0.9
+    """the fraction of potential heat units above which the plant goes enters senescence (unitless)"""
+
+    # SWAT Table A-5
+    light_use_efficiency: float = 30
+    """light use efficiency of the plant (dg/MJ)"""
+    # light_use_decline_rate: float  # UNUSED (WAVP, $\Delta rue_{dcl}$)
+    # stressed_light_use_efficiency  # UNUSED (BIOEHI, $RUE_{hi}$)
+    # carbon_dioxide_stress_level = 660 # UNUSED (CO2HI, $CO_{2hi}$)
+
+    # SWAT Table A-6 UNUSED
+
+    # SWAT Table A-7
+    emergence_nitrogen_fraction: float = 0.05
+    """expected fraction of plant biomass comprised of nitrogen for the plant at emergence (unitless)"""
+    half_mature_nitrogen_fraction: float = 0.02
+    """expected fraction of plant biomass comprised of nitrogen for the plant at half-maturity (unitless)"""
+    mature_nitrogen_fraction: float = 0.01
+    """expected fraction of plant biomass comprised of nitrogen for the plant at maturity (unitless)"""
+    emergence_phosphorus_fraction: float = 0.005
+    """expected fraction of plant biomass comprised of phosphorus for the plant at emergence (unitless)"""
+    half_mature_phosphorus_fraction: float = 0.003
+    """expected fraction of plant biomass comprised of phosphorus for the plant at half-maturity (unitless)"""
+    mature_phosphorus_fraction: float = 0.002
+    """expected fraction of plant biomass comprised of phosphorus for the plant at maturity (unitless)"""
+
+    # SWAT Table A-8
+    optimal_harvest_index: float = 0.5
+    """expected species-specific optimal harvest index for the plant at maturity under ideal
+     growth conditions (unitless)"""
+    min_harvest_index: float = 0.2
+    """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
+    allowed for the plant (unitless)"""
+    yield_nitrogen_fraction: float = 0.2
+    """crop-specific expected fraction of nitrogen in yield (unitless)"""
+    yield_phosphorus_fraction: float = 0.003
+    """crop-specific expected fraction of phosphorus in yield (unitless)"""
+
     # ---- biomass allocation
     light_extinction: float = 0.65
     """the light extinction coefficient (unitless)"""
-    leaf_area_index: float = 1.2
+    leaf_area_index: float = 0.0
     """leaf area index of the plant (unitless)"""
-    light_use_efficiency: float = 20
-    """light use efficiency of the plant (dg/MJ)"""
     biomass: float = 0
     """total plant biomass (kg/ha)"""
     growth_factor: float = 1.0
@@ -43,10 +127,7 @@ class CropData:
     """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
     """optimal amount of phosphorus stored in the plant for the current growth stage (kg/ha)"""
-    minimum_temperature: float = 15
-    """minimum temperature below which plant growth cannot occur (Celsius)"""
-    optimal_temperature: float = 22
-    """ideal temperature for maximum plant growth (Celsius)"""
+
     ##growth_factor: float = 1.0  # duplicate
     water_stress: Optional[float] = None
     """water stress for the day (unitless; [0, 1])"""
@@ -62,8 +143,7 @@ class CropData:
     maximum_temperature: float = 38
     """maximum temperature above which plant growth cannot occur (Celsius)"""
     potential_heat_units: float = 800
-    """total heat units required for the plant to reach maturity (unitless)
-    """
+    """total heat units required for the plant to reach maturity (unitless)"""
     accumulated_heat_units: float = 0  # accumulator
     """total heat units accumulated to date (unitless)"""
     is_growing: bool = True  # TODO: not currently using; SWAT 5:2.1.4
@@ -86,25 +166,10 @@ class CropData:
 
     # ---- leaf area index
     # fixed attributes (unchanged during simulations)
-    first_heat_fraction_point: float = 0.15
-    """fraction of the growing season corresponding to the first point on the optimal leaf development 
-    curve (unitless)"""
-    second_heat_fraction_point: float = 0.50
-    """fraction of the growing season corresponding to the second point on the optimal leaf development 
-    curve (unitless)"""
-    first_leaf_fraction_point: float = 0.01
-    """fraction of max leaf area index corresponding to the first point on the optimal leaf development 
-    curve (unitless)"""
-    second_leaf_fraction_point: float = 0.95
-    """fraction of max leaf area index corresponding to the second point on the optimal leaf development 
-        curve (unitless)"""
     max_canopy_height: float = 2.5  # m
     """maximum canopy height for the plant (m)"""
     ##growth_factor = 1.0  #duplicate
-    max_leaf_area_index: float = 3.0
-    """maximum leaf area index for the plant (unitless)"""
-    senescent_heat_fraction: float = 0.9
-    """the fraction of potential heat units above which the plant goes enters senescence (unitless)"""
+
     # variable attributes (change throughout simulations)
     ##leaf_area_index = 0 # duplicate
     ##heat_fraction = 0.73 # duplicate
@@ -130,18 +195,11 @@ class CropData:
     """expected fraction of potential heat units when the plant is half-way to maturity (unitless)"""
     mature_heat_fraction: float = 1.0
     """fraction of potential heat units accumulated for the plant to date (unitless)"""
-    emergence_nitrogen_fraction: float = 0.04
-    """expected fraction of plant biomass comprised of nitrogen for the plant at emergence (unitless)"""
-    half_mature_nitrogen_fraction: float = 0.03
-    """expected fraction of plant biomass comprised of nitrogen for the plant at half-maturity (unitless)"""
     near_mature_nitrogen_fraction: float = 0.02
     """expected fraction of plant biomass comprised of nitrogen for the plant at near-maturity (unitless)"""
-    mature_nitrogen_fraction: float = 0.01
-    """expected fraction of plant biomass comprised of nitrogen for the plant at maturity (unitless)"""
     nitrogen_distro_param: float = 10
     """nitrogen uptake distribution parameter (unitless)"""
-    is_nitrogen_fixer: bool = False
-    """is the planta nitrogen fixer?"""
+
     # current declarations with defaults (change throughout simulations)
     # TODO: what module sets/updates these variables?
     ##nitrogen = 0 # duplicate
@@ -186,14 +244,8 @@ class CropData:
     """growth stage factor of the nitrogen fixing symbiotes for the current plant growth stage (unitless)"""
 
     # --- phosphorus incorporation ----
-    emergence_phosphorus_fraction: float = 0.04
-    """expected fraction of plant biomass comprised of phosphorus for the plant at emergence (unitless)"""
-    half_mature_phosphorus_fraction: float = 0.01
-    """expected fraction of plant biomass comprised of phosphorus for the plant at half-maturity (unitless)"""
     near_mature_phosphorus_fraction: float = 0.3
     """expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless)"""
-    mature_phosphorus_fraction: float = 0.1
-    """expected fraction of plant biomass comprised of nitrogen for a mature plant (unitless)"""
     phosphorus_distro_param: float = 10
     """phosphorus uptake distribution parameter (unitless)"""
 
@@ -212,8 +264,7 @@ class CropData:
     ##heat_fraction = 1 / 3 #duplicate
     max_root_depth: float = 20
     """maximum depth of roots in the soil (mm)"""
-    is_perennial: bool = True
-    """is the plant perennial?"""
+
     ##root_depth = None # duplicate
     ##root_fraction = None #duplicate
 
@@ -233,20 +284,11 @@ class CropData:
 
     # ---- yields
     # constant attributes
-    optimal_harvest_index: float = 3.5
-    """expected species-specific optimal harvest index for the plant at maturity under ideal
-     growth conditions (unitless)"""
-    min_harvest_index: float = 0.2
-    """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
-    allowed for the plant (unitless)"""
+
     # is_residue_added: bool = False ## not needed?
     harvest_efficiency: float = 1.0
     """efficiency of the harvest operation: the proportion of yield that will be extracted from the field 
     (unitless; [0, 1])"""
-    yield_nitrogen_fraction: float = 0.15
-    """crop-specific expected fraction of nitrogen in yield (unitless)"""
-    yield_phosphorus_fraction: float = 0.08
-    """crop-specific expected fraction of phosphorus in yield (unitless)"""
 
     # temporally variable attributes
     ##heat_fraction = 0.6  # duplicate
@@ -294,3 +336,408 @@ class CropData:
     def is_in_senescence(self) -> bool:
         """check if the plant is in senescence"""
         return self.heat_fraction > self.senescent_heat_fraction
+
+
+"""
+The species child classes provide default configuration for the supported CropSpecies. 
+Only values that differ from the default CropData need to be declared by default in these species classes.
+
+Users should be able also be able to modify specific variables by including them in the signature when calling
+the species classes.
+
+Attribute values are taken from the SWAT database: https://swat.tamu.edu/media/69419/Appendix-A.pdf
+This "database" is actually a PDF with tables for broad groupings of paramters. Therefore, the
+attributes in this class are grouped in line with those tables, for ease of entering the data.
+"""
+
+
+@dataclass(kw_only=True)
+class Corn(CropData):
+    """crop data class with default values for corn"""
+    species: str = "corn"
+    name: str = "default corn"
+    plant_code: str = "CORN"
+    scientific_name: str = "Zea mays"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 8.0
+    optimal_temperature: float = 25.0
+
+    max_leaf_area_index: float = 3.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.05
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 39.0
+
+    emergence_nitrogen_fraction: float = 0.0470
+    half_mature_nitrogen_fraction: float = 0.0177
+    mature_nitrogen_fraction: float = 0.0138
+    emergence_phosphorus_fraction: float = 0.0048
+    half_mature_phosphorus_fraction: float = 0.0018
+    mature_phosphorus_fraction: float = 0.0014
+
+    optimal_harvest_index: float = 0.50
+    min_harvest_index: float = 0.30
+    yield_nitrogen_fraction: float = 0.0140
+    yield_phosphorus_fraction: float = 0.0016
+
+
+@dataclass(kw_only=True)
+class SpringWheat(CropData):
+    """crop data class with default values for spring wheat"""
+    species: str = "spring_wheat"
+    name: str = "default spring_wheat"
+    plant_code: str = "SWHT"
+    scientific_name: str = "Triticum aestivum"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0.0
+    optimal_temperature: float = 18.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.05
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 35.0
+
+    emergence_nitrogen_fraction: float = 0.0600
+    half_mature_nitrogen_fraction: float = 0.0231
+    mature_nitrogen_fraction: float = 0.0134
+    emergence_phosphorus_fraction: float = 0.0084
+    half_mature_phosphorus_fraction: float = 0.0032
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 0.42
+    min_harvest_index: float = 0.20
+    yield_nitrogen_fraction: float = 0.0234
+    yield_phosphorus_fraction: float = 0.0033
+
+
+@dataclass(kw_only=True)
+class WinterWheat(CropData):
+    """crop data class with default values for winter wheat"""
+    species: str = "winter_wheat"
+    name: str = "default winter_wheat"
+    plant_code: str = "WWHT"
+    scientific_name: str = "Triticum aestivum"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0.0
+    optimal_temperature: float = 18.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.05
+    first_leaf_fraction_point: float = 0.05
+    second_heat_fraction_point: float = 0.45
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 30.0
+
+    emergence_nitrogen_fraction: float = 0.0663
+    half_mature_nitrogen_fraction: float = 0.0255
+    mature_nitrogen_fraction: float = 0.0148
+    emergence_phosphorus_fraction: float = 0.0053
+    half_mature_phosphorus_fraction: float = 0.0020
+    mature_phosphorus_fraction: float = 0.0012
+
+    optimal_harvest_index: float = 0.40
+    min_harvest_index: float = 0.20
+    yield_nitrogen_fraction: float = 0.0250
+    yield_phosphorus_fraction: float = 0.0022
+
+
+@dataclass(kw_only=True)
+class CerealRye(CropData):
+    """crop data class with default values for cereal rye"""
+    species: str = "cereal_rye"
+    name: str = "default cereal_rye"
+    plant_code: str = "RYE"
+    scientific_name: str = "Secale cereale"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0
+    optimal_temperature: float = 12.5
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.80
+
+    light_use_efficiency: float = 35.0
+
+    emergence_nitrogen_fraction: float = 0.0600
+    half_mature_nitrogen_fraction: float = 0.0231
+    mature_nitrogen_fraction: float = 0.0130
+    emergence_phosphorus_fraction: float = 0.0084
+    half_mature_phosphorus_fraction: float = 0.0032
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 0.40
+    min_harvest_index: float = 0.20
+    yield_nitrogen_fraction: float = 0.0284
+    yield_phosphorus_fraction: float = 0.0042
+
+
+@dataclass(kw_only=True)
+class SpringBarley(CropData):
+    """crop data class with default values for spring barley"""
+    species: str = "spring_barley"
+    name: str = "default spring_barley"
+    plant_code: str = "BARL"
+    scientific_name: str = "Hordeum vulgare"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0.0
+    optimal_temperature: float = 25.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.45
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 35.0
+
+    emergence_nitrogen_fraction: float = 0.0590
+    half_mature_nitrogen_fraction: float = 0.0226
+    mature_nitrogen_fraction: float = 0.0131
+    emergence_phosphorus_fraction: float = 0.0057
+    half_mature_phosphorus_fraction: float = 0.0022
+    mature_phosphorus_fraction: float = 0.0013
+
+    optimal_harvest_index: float = 0.54
+    min_harvest_index: float = 0.20
+    yield_nitrogen_fraction: float = 0.0210
+    yield_phosphorus_fraction: float = 0.0017
+
+
+@dataclass(kw_only=True)
+class FallOats(CropData):
+    """crop data class with default values for fall oats"""
+    species: str = "fall_oats"
+    name: str = "default fall_oats"
+    plant_code: str = "OATS"
+    scientific_name: str = "Avena sativa"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0.0
+    optimal_temperature: float = 15.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.02
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 35.0
+
+    emergence_nitrogen_fraction: float = 0.0600
+    half_mature_nitrogen_fraction: float = 0.0231
+    mature_nitrogen_fraction: float = 0.0134
+    emergence_phosphorus_fraction: float = 0.0084
+    half_mature_phosphorus_fraction: float = 0.0032
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 0.42
+    min_harvest_index: float = 0.175
+    yield_nitrogen_fraction: float = 0.0316
+    yield_phosphorus_fraction: float = 0.0057
+
+
+@dataclass(kw_only=True)
+class TallFescue(CropData):
+    """crop data class with default values for tall fescue"""
+    species: str = "tall_fescue"
+    name: str = "default tall_fescue"
+    plant_code: str = "FESC"
+    scientific_name: str = "Festuca arundinaceae"
+    is_perennial: bool = True
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0.0
+    optimal_temperature: float = 15.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.80
+
+    light_use_efficiency: float = 30.0
+
+    emergence_nitrogen_fraction: float = 0.0560
+    half_mature_nitrogen_fraction: float = 0.0210
+    mature_nitrogen_fraction: float = 0.0120
+    emergence_phosphorus_fraction: float = 0.0099
+    half_mature_phosphorus_fraction: float = 0.0022
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 0.90
+    min_harvest_index: float = 0.90
+    yield_nitrogen_fraction: float = 0.0234
+    yield_phosphorus_fraction: float = 0.0033
+
+
+@dataclass(kw_only=True)
+class Alfalfa(CropData):
+    """crop data class with default values for alfalfa"""
+    species: str = "alfalfa"
+    name: str = "default alfalfa"
+    plant_code: str = "ALFA"
+    scientific_name: str = "Medicago sativa"
+    is_perennial: bool = True
+    is_nitrogen_fixer: bool = True
+
+    minimum_temperature: float = 4.0
+    optimal_temperature: float = 25.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 20.0
+
+    emergence_nitrogen_fraction: float = 0.0417
+    half_mature_nitrogen_fraction: float = 0.0290
+    mature_nitrogen_fraction: float = 0.0200
+    emergence_phosphorus_fraction: float = 0.0035
+    half_mature_phosphorus_fraction: float = 0.0028
+    mature_phosphorus_fraction: float = 0.0020
+
+    optimal_harvest_index: float = 0.90
+    min_harvest_index: float = 0.90
+    yield_nitrogen_fraction: float = 0.0250
+    yield_phosphorus_fraction: float = 0.0035
+
+
+@dataclass(kw_only=True)
+class Soybean(CropData):
+    """crop data class with default values for soy bean"""
+    species: str = "soybean"
+    name: str = "default soybean"
+    plant_code: str = "SOYB"
+    scientific_name: str = "Glycine max"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = True
+
+    minimum_temperature: float = 10.0
+    optimal_temperature: float = 25.0
+
+    max_leaf_area_index: float = 3.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.05
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 25.0
+
+    emergence_nitrogen_fraction: float = 0.0524
+    half_mature_nitrogen_fraction: float = 0.0265
+    mature_nitrogen_fraction: float = 0.0258
+    emergence_phosphorus_fraction: float = 0.0074
+    half_mature_phosphorus_fraction: float = 0.0037
+    mature_phosphorus_fraction: float = 0.0035
+
+    optimal_harvest_index: float = 0.31
+    min_harvest_index: float = 0.01
+    yield_nitrogen_fraction: float = 0.0650
+    yield_phosphorus_fraction: float = 0.0091
+
+
+@dataclass(kw_only=True)
+class SugarBeet(CropData):
+    """crop data class with default values for sugar beet"""
+    species: str = "sugar_beet"
+    name: str = "default sugar_beet"
+    plant_code: str = "SGBT"
+    scientific_name: str = "Beta vulgaris saccharifera"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 4.0
+    optimal_temperature: float = 18.0
+
+    max_leaf_area_index: float = 5.0
+    first_heat_fraction_point: float = 0.05
+    first_leaf_fraction_point: float = 0.05
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 30.0
+
+    emergence_nitrogen_fraction: float = 0.0550
+    half_mature_nitrogen_fraction: float = 0.0200
+    mature_nitrogen_fraction: float = 0.0120
+    emergence_phosphorus_fraction: float = 0.0060
+    half_mature_phosphorus_fraction: float = 0.0025
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 2.00
+    min_harvest_index: float = 1.10
+    yield_nitrogen_fraction: float = 0.0130
+    yield_phosphorus_fraction: float = 0.0020
+
+
+@dataclass(kw_only=True)
+class Potato(CropData):
+    """crop data class with default values for potato"""
+    species: str = "potato"
+    name: str = "default potato"
+    plant_code: str = "POTA"
+    scientific_name: str = "Solanum tuberosum"
+    is_perennial: bool = False
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 7.0
+    optimal_temperature: float = 22.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 25.0
+
+    emergence_nitrogen_fraction: float = 0.0550
+    half_mature_nitrogen_fraction: float = 0.0200
+    mature_nitrogen_fraction: float = 0.0120
+    emergence_phosphorus_fraction: float = 0.0060
+    half_mature_phosphorus_fraction: float = 0.0025
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 0.95
+    min_harvest_index: float = 0.95
+    yield_nitrogen_fraction: float = 0.0246
+    yield_phosphorus_fraction: float = 0.0023
+
+
+@dataclass(kw_only=True)
+class Triticale(CropData):
+    """crop data class with default values for triticale"""
+    # TODO: triticale has unknown parameters, since it is not present in SWAT database.
+    #     Duram wheat is likely the closest analog.

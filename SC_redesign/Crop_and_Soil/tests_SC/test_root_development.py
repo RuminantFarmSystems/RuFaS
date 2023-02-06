@@ -36,14 +36,7 @@ def test_determine_root_depth(maxd, heatfrac):
     assert RootDevelopment._determine_root_depth(maxd, heatfrac) == expect
 
 
-# ---- Test Class Functions ----
-def init_rootdev(**kwargs):
-    """helper function to initialize RootDevelopment object, with
-    specified attributes"""
-    rd = RootDevelopment()
-    for key, val in kwargs.items():
-        setattr(rd, key, val)
-    return rd
+# ---- Test Class Methods ----
 
 @pytest.mark.parametrize("maxd, heatfrac", [
     (1, 0.5),
@@ -57,11 +50,16 @@ def init_rootdev(**kwargs):
 def test_develop_roots(maxd, heatfrac):
     """integration test for main root development function develop_roots()"""
 
-    # rd = init_rootdev(heat_fraction=heatfrac, max_root_depth=maxd)
-    data = CropData(heat_fraction=heatfrac, max_root_depth=maxd)
-    rd = RootDevelopment(data)
+    # ---- perennial crop ----
+    data_perennial = CropData(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=True)
+    rd = RootDevelopment(data_perennial)
     rd.develop_roots()
-    assert data.root_fraction == \
-           RootDevelopment._determine_root_fraction(heatfrac)
-    assert data.root_depth == \
-           RootDevelopment._determine_root_depth(maxd, heatfrac)
+    assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
+    assert data_perennial.root_depth == RootDevelopment._determine_root_depth(maxd, heatfrac)
+
+    # ---- annual crop ----
+    data_annual = CropData(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=False)
+    rd = RootDevelopment(data_annual)
+    rd.develop_roots()
+    assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
+    assert data_annual.root_depth == maxd
