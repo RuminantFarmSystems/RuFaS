@@ -15,6 +15,8 @@ class LayerData:
     """bottom depth of the layer (mm)"""
     nitrate: float = 1.5
     """nitrate level of the layer (kg/ha)"""
+    phosphate: float = 0.05
+    """phosphate content of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary

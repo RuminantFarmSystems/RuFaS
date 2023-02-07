@@ -14,6 +14,7 @@ from typing import List, Optional
 
 # TODO: Should use an ENUM class to represent the supported species??
 
+
 class Crop:
     def __init__(self, crop_data: Optional[CropData] = None):
         """Creates a crop object, from a crop data specification object.
@@ -56,26 +57,25 @@ class Crop:
         #  composite design would require interdependence such that these
         #  common attributes remain in-sync. - GitHub Issue #255
 
-
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
                   layer_phosphates: List[float],
                   soil_water_factor: float,
-                  max_transpiration: float, air_temperature: float,
+                  max_transpiration: float,
                   incoming_light: float,
                   evaporation: float, transpiration: float,
                   max_evapotranspiration: float,
                   mean_air_temperature: float, min_air_temperature: float,
-                  max_air_temperature: float) -> None:
+                  max_air_temperature: float, adjusted_potential_evapotranspiration: float) -> None:
         """main function for growing the crop on a daily basis
 
         Args:
+            adjusted_potential_evapotranspiration:
             layer_nitrates: nitrates present in each layer of the soil profile (kg/ha)
             layer_depths: the maximum depth of each soil layer
             layer_phosphates: phosphates present in each layer of the soil profile (kg/ha)
             soil_water_factor: the soil water factor
 
             max_transpiration: maximum amount of transpiration possible (mm), as determined by soil, on this day
-            air_temperature: current air temperature (C)
 
             incoming_light: incoming light radiation energy (MJ/m)
 
@@ -96,10 +96,11 @@ class Crop:
         self.root_development.develop_roots()
         self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
         self.phosphorus_incorporation.incorporate_phosphorus(layer_phosphates, layer_depths)
-        self.growth_constraints.constrain_growth(max_transpiration, air_temperature)
+        self.growth_constraints.constrain_growth(max_transpiration, mean_air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
-        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration, )
+        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration,
+                                        adjusted_potential_evapotranspiration)
 
     @classmethod
     def plant_species(cls, species) -> Crop:
