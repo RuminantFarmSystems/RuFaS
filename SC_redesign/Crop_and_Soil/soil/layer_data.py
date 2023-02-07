@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects 
 to represent its soil
@@ -17,7 +18,7 @@ class LayerData:
     """nitrate level of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    soil_water_content: float = field(init=False)
+    soil_water_content:  Optional[float] = None  
     """volume of soil water in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm)"""
