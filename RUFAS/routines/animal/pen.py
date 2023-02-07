@@ -299,14 +299,14 @@ class Pen:
 
         Args:
             new_animals: list of new animals in the pen
-            animal_combination: an AnimalCombination Enum representating the type of the new animals
+            animal_combination: an AnimalCombination Enum representing the type of the new animals
         """
 
         for animal in new_animals:
             self.animals_in_pen.append(animal)
-        self.pen_populated = not (len(self.animals_in_pen) == 0)
-        self.stocking_density = len(
-            self.animals_in_pen) / self.num_stalls * 100
+
+        self.pen_populated = len(self.animals_in_pen) != 0
+        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
         self.calc_daily_walking_dist()
 
         # sets the current animal classes in the pen
@@ -382,7 +382,7 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
-        
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_ration.__name__, }
         om.add_variable("pen_ration_data", ration, info_map)
