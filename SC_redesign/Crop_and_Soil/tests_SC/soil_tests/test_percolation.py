@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.percolation import *
@@ -181,6 +181,7 @@ def helper_percolate_between_layers(excess_water, amount_to_percolate, acceptabl
     False,
 ])
 def test_percolate(high_seasonal_water_table):
+    """tests the main routine of percolation.py (percolate()) and check that it updates all values correctly"""
     # Initialize objects
     layers = [LayerData(top_depth=0, bottom_depth=39),
               LayerData(top_depth=39, bottom_depth=87),
@@ -189,17 +190,9 @@ def test_percolate(high_seasonal_water_table):
     layers[0].soil_water_content = 17
     layers[1].soil_water_content = 21
     layers[2].soil_water_content = 40
-    data = SoilData(soil_layers=layers)
+    data = SoilData(soil_layers=layers, vadose_zone_layer=LayerData(top_depth=100000, bottom_depth=200000,
+                                                                    soil_water_concentration=0))
     incorp = Percolation(data)
-
-    # TODO: the soil water content of the vadose zone should be 0, but it is 0.3. As of right now, it is a complete
-    #       mystery why this is happening. Since the purpose of this test (in part) is to check that water is properly
-    #       added to the soil water content of the vadose zone, a workaround is used to only check that.
-    #       To demonstrate the unexpected behavior, uncomment the below lines of code and run pytest with the
-    print("vadose water concentration: " + str(incorp.data.vadose_zone_layer.soil_water_concentration))
-    print("calculated vadose water content " + str(incorp.data.vadose_zone_layer.soil_water_concentration *
-                                                   incorp.data.vadose_zone_layer.layer_thickness))
-    print("vadose water content: " + str(incorp.data.vadose_zone_layer.soil_water_content))
 
     # Mock intermediate functions
     Percolation._determine_if_percolation_allowed = MagicMock(return_value=True)
@@ -213,9 +206,7 @@ def test_percolate(high_seasonal_water_table):
     # Third layer gains then loses 0.3 mm of water
     # Vadose zone starts empty, then gains 0.3 mm of water
     expect = [incorp.data.soil_layers[0].soil_water_content - 0.3, incorp.data.soil_layers[1].soil_water_content,
-              incorp.data.soil_layers[2].soil_water_content, incorp.data.vadose_zone_layer.soil_water_content + 0.3]
-    # expect = [incorp.data.soil_layers[0].soil_water_content - 0.3, incorp.data.soil_layers[1].soil_water_content,
-    #           incorp.data.soil_layers[2].soil_water_content, 0.3]
+              incorp.data.soil_layers[2].soil_water_content, 0.3]
 
     # Run function
     incorp.percolate(high_seasonal_water_table)

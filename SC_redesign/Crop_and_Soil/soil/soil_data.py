@@ -36,10 +36,7 @@ class SoilData:
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
 
     # ---- percolation
-    vadose_zone_layer: LayerData = LayerData(top_depth=100000, bottom_depth=200000, soil_water_concentration=0)
-    # print("vadose water content: " + str(vadose_zone_layer.soil_water_content))
-    # vadose_zone_layer.soil_water_content = 0
-    # print("vadose water content: " + str(vadose_zone_layer.soil_water_content))
+    vadose_zone_layer: Optional[LayerData] = None
     """Datalayer object that represents the vadose zone, arbitrary top and bottom depths, starts with no water"""
     time_step: float = 24
     """length of time step over which percolation occurs (hours) """
