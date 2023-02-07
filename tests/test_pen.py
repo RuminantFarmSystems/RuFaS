@@ -7,6 +7,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 
 import pytest
 from unittest.mock import MagicMock
+from pytest_mock.plugin import MockerFixture
 from typing import Set, List, Dict, Tuple
 from statistics import mean
 from pytest_lazyfixture import lazy_fixture
@@ -63,9 +64,36 @@ def test_set_milk_avgs(pen: Pen):
     assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk
 
 
-def test_update_animals():
+@pytest.fixture
+def mock_new_animals() -> List[MagicMock]:
+    animal_i = MagicMock()
+    animal_i['id'] = 1
+    animal_ii = MagicMock()
+    animal_ii['id'] = 2
+    animal_iii = MagicMock()
+    animal_iii['id'] = 3
+
+    return [animal_i, animal_ii, animal_iii]
+
+
+def test_update_animals(pen: Pen, mock_new_animals: List[MagicMock], mocker: MockerFixture):
     """Unit test for function update_animals in file routines/animal/pen.py"""
-    pass
+
+    mocker.patch('RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist')
+
+    animal_combination = Pen.AnimalCombination.CALF
+
+    pen.update_animals(mock_new_animals, animal_combination)
+
+    assert pen.pen_populated is True
+
+    assert pen.stocking_density == pytest.approx(3 / 100 * 100)
+
+    pen.calc_daily_walking_dist.assert_called_once()
+
+    assert mock_new_animals == pen.animals_in_pen
+
+    assert pen.animal_combination == Pen.AnimalCombination.CALF
 
 
 def test_call_animal_nutrient_rqmts():
