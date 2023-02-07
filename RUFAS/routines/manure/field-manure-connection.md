@@ -63,7 +63,7 @@ just be clear on what units you are reporting in, and we can handle conversion l
 * Manure amount:
   - mass
   - volume (necessary for liquid) and/or density (nice to have for solid)
-  - percent solid (for slurry; >= 20% is considered solid manure)
+  - percent solid (for slurry; >= 80% is considered solid manure)
 * Nutrient concentrations (percent of manure mass):
   - Nitrogen
   - Phosphorus
