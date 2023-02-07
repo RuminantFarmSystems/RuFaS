@@ -1,5 +1,5 @@
 Title: Field-manure connection design  
-Authors: Clay Morrow; Loi Pham; Varma  
+Authors: Clay Morrow; Loi Pham; Vempalli Sudharsan Varma  
 Date Created: 6 Feb 2023  
 Last update: 6 Feb 2023  
 
@@ -30,13 +30,12 @@ purposes of this document:
   * *sweep*
   * *disk*/*coulter*
 
-
 # Desired variables
 
-In order to keep the model flexible, we should anticipate all the future cases that RuFaS will need
+In order to keep the model flexible, we should probably anticipate all the future cases that RuFaS will need
 to handle (without necessarily implementing all possible scenarios at present). At the most complex, a farm may wish to
-engage in both *broadcasting* of solid manure and *injection* of liquid manure. Therefore, the manure should be
-partitioned into two kinds: **solid manure** and **manure slurry**. The default (and perhaps most common) scenario would
+utilize both solid manure and liquid manure separately. Therefore, the manure should perhaps be
+partitioned into two pools: **solid manure** and **manure slurry**. The default (and perhaps most common) scenario would
 be to only have slurry and no solid manure, but it is important to allow for both. The following example would easily
 allow for this extension in the future:
 
@@ -45,30 +44,27 @@ allow for this extension in the future:
 from typing import Optional
 from dataclasses import dataclass
 
-class SolidManureData:
-  """class for solid manure"""
-  
-class SlurryManureData:
-  """class for manure slurry"""
+class ManureData:
+  """class for tracking manure data"""
 
 @dataclass
-class ManureCollectionData:
-  """class containing the manure data, partitioned into solid and slurry. Defaults to liquid-only"""
-  liquid_manure: Optional[SlurryManureData] = SlurryManureData()
-  solid_manure: Optional[SolidManureData] = None
+class ManurePools:
+  """class containing the available manure, partitioned into solid and slurry. Defaults to liquid-only"""
+  liquid_manure: Optional[ManureData] = ManureData()
+  solid_manure: Optional[ManureData] = None
 ```
 
 Below are the variables that we anticipate the modules will need access to from the other module.
 
-#### SC variables used by manure module
+#### Manure variables used by SC module
 
-Both Solid and Slurry manure will need the following variables. The units don't matter for now (but should be metric), 
+The manure will need the following variables. The units don't matter for now (but should be metric), 
 just be clear on what units you are reporting in, and we can handle conversion later, if necessary.
 * Manure amount:
   - mass
-  - volume (necessary for liquid)
-  - density (nice to have for solid)
-* Nutrient concentrations (per unit of manure mass):
+  - volume (necessary for liquid) and/or density (nice to have for solid)
+  - percent solid (for slurry; >= 20% is considered solid manure)
+* Nutrient concentrations (percent of manure mass):
   - Nitrogen
   - Phosphorus
   - Potassium
@@ -78,7 +74,10 @@ just be clear on what units you are reporting in, and we can handle conversion l
   - Magnesium (if possible)
   - Sulfur (if possible)
 
+#### SC variables used by manure module
 
-These variables are only needed for Solid manure:
-
-#### Manure variables used by SC module
+In general, the SC variables that need to be tracked involve the desired amount of nutrients, which translate to
+manure requests. Then the amount of manure taken for the SC module should be removed from the manure module:
+* manure application day (scheduled)
+* required nutrient amounts (nitrogen, phosphorus, etc.) on application date
+* requested manure mass (from each pool) as determined by required nutrients
