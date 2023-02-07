@@ -135,9 +135,6 @@ class AnimalBase(object):
         Calculates this animal's daily phosphorus update.
         """
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.daily_p_update.__name__, }
-
         # Amount of P in diet greater than animal requirements (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
 
@@ -155,12 +152,6 @@ class AnimalBase(object):
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
             (self.dP_reserves - dP_reserves_prev)
         
-        daily_animal_p_update = {}
-        daily_animal_p_update["p_excess"] = self.p_excess
-        daily_animal_p_update["dP_reserves"] = self.dP_reserves
-        daily_animal_p_update["p_animal"] = self.p_animal
-        om.add_variable("daily_animal_p_update", daily_animal_p_update, info_map)
-
     def calc_base_manure(self):
         """
         Calculates the values needed for animal class manure calculations.
@@ -169,9 +160,6 @@ class AnimalBase(object):
             p_urine: amount of P required for urine production (g)
             p_feces_excrt: amount of P excreted by an animal (g)
         """
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_base_manure.__name__, }
 
         # amount of P required for urine production (g) (A.1G.B.1)
         p_urine = 0.000002 * self.body_weight * 1000
@@ -188,13 +176,6 @@ class AnimalBase(object):
                 self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
-
-        animal_base_manure = {}
-        animal_base_manure["p_urine"] = p_urine
-        animal_base_manure["p_excess"] = self.p_excess
-        animal_base_manure["p_feces_excrt"] = p_feces_excrt
-    
-        om.add_variable("animal_base_manure_calc", animal_base_manure, info_map)
 
         return p_urine, p_feces_excrt
 
