@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Optional
+from math import inf
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 """
@@ -36,6 +37,9 @@ class SoilData:
 
     # ---- percolation
     vadose_zone_layer: LayerData = LayerData(top_depth=100000, bottom_depth=200000, soil_water_concentration=0)
+    # print("vadose water content: " + str(vadose_zone_layer.soil_water_content))
+    # vadose_zone_layer.soil_water_content = 0
+    # print("vadose water content: " + str(vadose_zone_layer.soil_water_content))
     """Datalayer object that represents the vadose zone, arbitrary top and bottom depths, starts with no water"""
     time_step: float = 24
     """length of time step over which percolation occurs (hours) """
@@ -58,7 +62,7 @@ class SoilData:
         else:
             water_sum = 0
             for layer in self.soil_layers:
-                water_sum += min(0, (layer.soil_water_content - layer.wilting_point_content))
+                water_sum += max(0, (layer.soil_water_content - layer.wilting_point_content))
             return
 
     @property
