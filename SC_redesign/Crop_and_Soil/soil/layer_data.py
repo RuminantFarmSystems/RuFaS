@@ -84,7 +84,7 @@ class LayerData:
 
         SWAT Reference: 2:3.2.1, 2
         """
-        return min(0, self.soil_water_content - self.field_capacity_content)
+        return max(0, self.soil_water_content - self.field_capacity_content)
 
     @property
     def saturation_content(self) -> float:

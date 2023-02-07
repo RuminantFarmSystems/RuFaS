@@ -67,25 +67,111 @@ def test_determine_if_percolation_allowed(water_content, field_capacity_content,
         assert False == observe
 
 
-# --- Integration tests ----
-@pytest.mark.parametrize("upper,lower", [
-    (LayerData(top_depth=0, bottom_depth=15), LayerData(top_depth=15, bottom_depth=39)),
-    (LayerData(top_depth=39, bottom_depth=83), LayerData(top_depth=83, bottom_depth=143)),
-    (LayerData(top_depth=143, bottom_depth=567), LayerData(top_depth=567, bottom_depth=634)),
-])
-def test_percolate_between_layers(upper, lower):
-    travel_time = Percolation._determine_percolation_travel_time(upper.saturation_content, upper.field_capacity_content,
-                                                                 upper.saturated_hydraulic_conductivity)
-    percolation_amount = Percolation._determine_percolation_to_next_layer(upper.excess_water_available, 24, travel_time)
+def test_percolate_between_layers():
+    """this function tests _percolate_between_layers() in Percolation.py
 
-    if upper.excess_water_available <= 0:
-        expect = 0
-    elif lower.acceptable_percolation_amount < percolation_amount:
-        expect = lower.acceptable_percolation_amount
-    else:
-        expect = percolation_amount
+    It tests 3 different cases:
+        1: when the amount of water that can be percolated from the upper layer to the lower layer is greater than the
+            amount of water that the lower layer can absorb
+        2: when the amount of water that can be percolated from the upper layer to the lower layer is less than the
+            amount of water that the lower layer can absorb
+        3: when the upper layer does not not have any water that can be percolated to the lower layer
+    """
+    # Case 1: amount to percolate is greater than amount that can be accepted by lower layer
+    # Initialize objects
+    layers1 = [LayerData(top_depth=0, bottom_depth=39),
+               LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers1[0].soil_water_content = 15
+    layers1[1].soil_water_content = 3.8
+    data1 = SoilData(soil_layers=layers1)
+    incorp1 = Percolation(data1)
 
-    observe = Percolation._percolate_between_layers(24, upper, lower)
+    # Mock intermediate functions
+    Percolation._determine_percolation_travel_time = MagicMock(return_value=0.245)
+    Percolation._determine_percolation_to_next_layer = MagicMock(return_value=1.85)
+
+    # Determine expected return value
+    expect = helper_percolate_between_layers(incorp1.data.soil_layers[0].excess_water_available, 1.85,
+                                             incorp1.data.soil_layers[1].acceptable_percolation_amount)
+
+    # Run method
+    observe = incorp1._percolate_between_layers(incorp1.data.time_step, incorp1.data.soil_layers[0],
+                                                incorp1.data.soil_layers[1])
 
     # Assertions
     assert observe == expect
+    Percolation._determine_percolation_travel_time.assert_called_with(incorp1.data.soil_layers[0].saturation_content,
+                                                                      incorp1.data.soil_layers[
+                                                                          0].field_capacity_content,
+                                                                      incorp1.data.soil_layers[
+                                                                          0].saturated_hydraulic_conductivity)
+    Percolation._determine_percolation_to_next_layer.assert_called_with(
+        incorp1.data.soil_layers[0].excess_water_available,
+        incorp1.data.time_step, 0.245)
+
+    # Case 2: amount to percolate is less than amount that can be accepted by lower layer
+    # Initialize objects
+    layers2 = [LayerData(top_depth=0, bottom_depth=39),
+               LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers2[0].soil_water_content = 15
+    layers2[1].soil_water_content = 3.8
+    data2 = SoilData(layers2)
+    incorp2 = Percolation(data2)
+
+    # Only need to re-mock the amount that will be percolated to next layer
+    Percolation._determine_percolation_to_next_layer = MagicMock(return_value=0.85)
+
+    # Determine expected return value
+    expect = helper_percolate_between_layers(incorp2.data.soil_layers[0].excess_water_available, 0.85,
+                                             incorp2.data.soil_layers[1].acceptable_percolation_amount)
+
+    # Run method
+    observe = incorp2._percolate_between_layers(incorp2.data.time_step, incorp2.data.soil_layers[0],
+                                                incorp2.data.soil_layers[1])
+
+    # Assertions
+    assert observe == expect
+    Percolation._determine_percolation_travel_time.assert_called_with(incorp2.data.soil_layers[0].saturation_content,
+                                                                      incorp2.data.soil_layers[
+                                                                          0].field_capacity_content,
+                                                                      incorp2.data.soil_layers[
+                                                                          0].saturated_hydraulic_conductivity)
+    Percolation._determine_percolation_to_next_layer.assert_called_with(
+        incorp2.data.soil_layers[0].excess_water_available,
+        incorp2.data.time_step, 0.245)
+
+    # Case 3: amount to percolate is greater excess water available in upper layer
+    # Initialize objects
+    layers3 = [LayerData(top_depth=0, bottom_depth=39),
+               LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers3[0].soil_water_content = 8.9
+    layers3[1].soil_water_content = 3.8
+    data3 = SoilData(layers3)
+    incorp3 = Percolation(data3)
+
+    # Neither intermediate functions need to be re-mocked
+
+    # Determine expected return value
+    expect = helper_percolate_between_layers(incorp3.data.soil_layers[0].excess_water_available, 0.85,
+                                             incorp3.data.soil_layers[1].acceptable_percolation_amount)
+
+    # Run method
+    observe = incorp3._percolate_between_layers(incorp3.data.time_step, incorp3.data.soil_layers[0],
+                                                incorp3.data.soil_layers[1])
+
+    # Assertions
+    assert observe == expect
+    assert Percolation._determine_percolation_travel_time.call_count == 2
+    # Should only be called in the first two cases, not this one
+    assert Percolation._determine_percolation_to_next_layer.call_count == 1
+    # This method is not called in this test case, and is only called once after being re-mocked in the last test case
+
+
+def helper_percolate_between_layers(excess_water, amount_to_percolate, acceptable_percolation_amount):
+    """this is a helper function for test_percolate_between_layers() to eliminate repetitive code"""
+    expect = min(excess_water, amount_to_percolate)
+    if expect > acceptable_percolation_amount:
+        return acceptable_percolation_amount
+    return expect
+
+# --- Integration tests ----
