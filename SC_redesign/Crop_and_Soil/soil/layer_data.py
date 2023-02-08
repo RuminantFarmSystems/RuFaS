@@ -50,3 +50,14 @@ class LayerData:
     def saturation_content(self):
         """volume of water in layer when saturated in mm"""
         return self.saturation_point_water_concentration / self.layer_thickness
+
+    @property
+    def water_factor(self):
+        """volume of water in layer when saturated in mm"""
+        if self.soil_water_content <= self.field_capacity_content:
+            return (self.soil_water_content - self.wilting_point_content)/(
+                    self.field_capacity_content - self.wilting_point_content)
+        else:
+            return (self.saturation_content - self.soil_water_content) / (
+                        self.saturation_content - self.field_capacity_content)
+
