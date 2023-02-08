@@ -12,11 +12,12 @@ class Decomposition:
 
     def decompose(self, temp_average: float) -> None:
         """
-        Description: calculates temperature and moisture decomposition factors for
-            Carbon based on weather and soil profile.
-            "pseudocode_soil" S.6.A
+        Description: Updates and tracks all the related attributes in SoilData class
+
         Args:
-            temp_average:
+            temp_average: Average temperature to pass in the _calc_temp_factor(temp_average) function
+
+        Returns: None
 
         """
         self.data.decomposition_temperature_effect = self._calc_temp_factor(temp_average)
@@ -31,6 +32,8 @@ class Decomposition:
             defaults drawn from defac: course soil
         Args:
             temp_average: Average temperature
+
+        Returns: Unitless temperature effect
         """
         decomposition_inflection_x = 15.400
         decomposition_inflection_y = 11.750
@@ -50,7 +53,8 @@ class Decomposition:
             "pseudocode_soil" S.6.A.2
             defaults drawn from defac: course soil
         Args:
-            soil_layers:
+            soil_layers: Layer data
+        Returns: unitless moisture effect
         """
         dimensionless_empirical_factor_a = 0.55
         dimensionless_empirical_factor_b = 1.7

@@ -1,7 +1,6 @@
 import pytest
 import math
 
-from pytest_mock import MockerFixture
 from unittest.mock import MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.decomposition import Decomposition
@@ -15,7 +14,7 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
     88.8,  # arbitrary
 ])
 def test_calc_temp_factor(temp_average):
-    """ensure that temperature factor was calculated according to the formula in "pseudocode_soil" S.6.A"""
+    """ensures that temperature effect was calculated according to the formula in "pseudocode_soil" S.6.A.1"""
     decomposition_inflection_x = 15.400
     decomposition_inflection_y = 11.750
     max_min_distance = 29.700
@@ -28,6 +27,7 @@ def test_calc_temp_factor(temp_average):
                  (decomposition_inflection_y + (max_min_distance / math.pi) * math.atan(math.pi * inflection_slope * (
                          temp_average - decomposition_inflection_x))) / normalizer)
     assert decomp._calc_temp_factor(temp_average) == expect
+
 
 @pytest.mark.parametrize("layers", [
     [LayerData(top_depth=0, bottom_depth=4, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
@@ -50,6 +50,7 @@ def test_calc_temp_factor(temp_average):
                wilting_point_water_concentration=0.6)],
 ])
 def test_calc_temp_factor(layers):
+    """ensures that moisture effect was calculated according to the formula in "pseudocode_soil" S.6.A.2"""
     data = SoilData(soil_layers=layers)
     decomp = Decomposition(data)
 
@@ -69,12 +70,14 @@ def test_calc_temp_factor(layers):
     expect = hold
     assert decomp._calc_moisture_factor(layers) == hold
 
+
 @pytest.mark.parametrize("temp_average", [
     70,  # lower values
     150,  # higher values
     88.8,  # arbitrary
 ])
 def test_decompose(temp_average):
+    """ensures that all SoilData attributes were correctly updated"""
     data = SoilData()
     decomp = Decomposition(data)
     decomp._calc_moisture_factor = MagicMock(return_value=1.89)
@@ -87,8 +90,3 @@ def test_decompose(temp_average):
 
     assert data.decomposition_temperature_effect == 3.99
     assert data.decomposition_moisture_effect == 1.89
-
-
-
-
-
