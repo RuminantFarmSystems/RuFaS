@@ -20,9 +20,9 @@ class Decomposition:
             weather: an instance of the Weather class defined in classes.py
             time: an instance of the Time class defined in classes.py
         """
-        self.data.decomposition_temperature_effect = self.temp_factor(temp_average)
+        self.data.decomposition_temperature_effect = self.calc_temp_factor(temp_average)
 
-        self.data.decomposition_moisture_effect = self.moisture_factor(soil)
+        #self.data.decomposition_moisture_effect = self.moisture_factor(soil)
 
     @staticmethod
     def calc_temp_factor(temp_average: float) -> float:
@@ -31,7 +31,7 @@ class Decomposition:
             "pseudocode_soil" S.6.A.1
             defaults drawn from defac: course soil
         Args:
-            temp_average:
+            temp_average: Average temperature
         """
         decomposition_inflection_x = 15.400
         decomposition_inflection_y = 11.750
@@ -44,8 +44,8 @@ class Decomposition:
                    (decomposition_inflection_y + (max_min_distance / math.pi) * math.atan(math.pi * inflection_slope * (
                            temp_average - decomposition_inflection_x))) / normalizer)
 
-    @staticmethod
-    def calc_moisture_factor(soil) -> float:
+    #@staticmethod
+    def calc_moisture_factor(self) -> float:
         """
         Description: calculates the moisture factor for carbon decomposition
             "pseudocode_soil" S.6.A.2
@@ -53,16 +53,18 @@ class Decomposition:
         Args:
             soil
         """
-        a = 0.55
-        b = 1.7
-        c = -0.007
-        e1 = 6.648115
-        e2 = 3.22
+        dimensionless_empirical_factor_a = 0.55
+        dimensionless_empirical_factor_b = 1.7
+        dimensionless_empirical_factor_c = -0.007
+        dimensionless_empirical_factor_e1 = 6.648115
+        dimensionless_empirical_factor_e2 = 3.22
 
-        for layer in soil.soil_layers:
+        for layer in self.data.soil_layers:
             # S.6.A.5
-            base_1 = (layer.water_fac - b) / (a - b)
-            base_2 = (layer.water_fac - c) / (a - c)
-            hold = (base_1 ** e1) * (base_2 ** e2)
+            base_1 = (layer.water_fac - dimensionless_empirical_factor_b) / (dimensionless_empirical_factor_a -
+                                                                             dimensionless_empirical_factor_b)
+            base_2 = (layer.water_fac - dimensionless_empirical_factor_c) / (dimensionless_empirical_factor_a -
+                                                                             dimensionless_empirical_factor_c)
+            hold = (base_1 ** dimensionless_empirical_factor_e1) * (base_2 ** dimensionless_empirical_factor_e2)
 
         return hold
