@@ -302,15 +302,38 @@ class LifeCycleManager:
 
         total_animal_num = self._cull_cows_and_record_stats(sim_day, cows, calves_born,
                                                             ids_removed, total_animal_num)
-        # info_map = {"class": self.__class__.__name__,
-        #             "function": self.daily_update.__name__,
-        #             "date": date, }
-
-
+    
         self._calculate_herd_percentages(total_animal_num)
         self._calculate_cow_percentages()
         self._calculate_cull_reason_stats_percent()
         self._calculate_percent_cow_per_parity()
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.daily_update.__name__,
+                    "sim_day": sim_day, }
+
+        life_cycle_daily_herd_update = {}
+
+        life_cycle_daily_herd_update_keys = ["calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num",
+                                             "sold_heifer_num", "bought_heifer_num", "culled_heifer_num",
+                                             "culled_cow_num", "GnRH_injection_num_h", "GnRH_injection_num",
+                                             "PGF_injection_num", "PGF_injection_num_h", "ai_num", "preg_check_num",
+                                             "preg_check_num_h", "sold_calf_num", "daily_milk_production",
+                                             "open_cow_num", "vwp_cow_num", "preg_cow_num", "milking_cow_num",
+                                             "dry_cow_num", "avg_days_in_milk", "avg_days_in_preg",
+                                             "avg_cow_body_weight", "avg_parity_num", "avg_calving_interval",
+                                             "avg_breeding_to_preg_time", "avg_heifer_culling_age",
+                                             "avg_cow_culling_age", "avg_mature_body_weight"]
+
+        life_cycle_daily_herd_update = {key: vars(self)[key] for key in life_cycle_daily_herd_update_keys}
+
+        life_cycle_daily_herd_update["num_cow_for_parity"] = self.num_cow_for_parity
+        life_cycle_daily_herd_update["avg_age_for_parity"] = self.avg_age_for_parity
+        life_cycle_daily_herd_update["avg_age_for_calving"] = self.avg_age_for_calving
+        life_cycle_daily_herd_update["cull_reason_stats"] = self.cull_reason_stats
+        life_cycle_daily_herd_update["avg_calving_to_preg_time"] = self.avg_calving_to_preg_time
+
+        om.add_variable("life_cycle_daily_herd_update", life_cycle_daily_herd_update, info_map)
 
         return (animals_added, ids_removed, calves_born, calves, heiferIs,
                 heiferIIs, heiferIIIs, cows)
@@ -674,17 +697,6 @@ class LifeCycleManager:
 
             if new_born:
                 self._handle_new_born(sim_day, cow, calves_born)
-                # om.add_variable("average_cow_body_weight",
-                #                 self.avg_cow_body_weight, info_map)
-                # om.add_variable("average_mature_body_weight",
-                #                 self.avg_mature_body_weight, info_map)
-
-                # om.add_variable("daily_milk_production",
-                #                 self.daily_milk_production, info_map)
-                # om.add_variable("milking_cow_num",
-                #                 self.milking_cow_num, info_map)
-                # om.add_variable("average_days_in_milk",
-                #                 self.avg_days_in_milk, info_map)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num
