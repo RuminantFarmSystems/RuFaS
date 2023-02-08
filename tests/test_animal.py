@@ -4,16 +4,23 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
-
-from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+import numpy as np
 import pytest
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
+import RUFAS.routines.animal.clustering_pen_grouping
+
 
 def test_norm():
     """Unit test for function norm in file routines/animal/clustering_pen_grouping.py"""
-    pass
+    actual_case1 = RUFAS.routines.animal.clustering_pen_grouping.norm([1, 2, 3])
+    expected_case1 = [0, 0.5, 1]
+    expected_case1 = np.array(expected_case1)
+    actual_case2 = RUFAS.routines.animal.clustering_pen_grouping.norm([2, 2, 2, 2])
+    expected_case2 = [2, 2, 2, 2]
+    expected_case2 = np.array(expected_case2)
+    assert actual_case1.all() == expected_case1.all(), actual_case2.all() == expected_case2.all()
 
 
 def test_percentile_list():
@@ -160,15 +167,15 @@ def test___str__():
     "events_list, event_descriptions, expected_days",
     [
         (
-            [],
-            ['dummy'],
-            [-1]
+                [],
+                ['dummy'],
+                [-1]
         ),
         (
-            [(1, 2, 'event1'), (3, 4, 'event2'),
-             (5, 6, 'event1'), (7, 8, 'event3')],
-            ['event1', 'event2', 'event3', 'event0'],
-            [5, 3, 7, -1]
+                [(1, 2, 'event1'), (3, 4, 'event2'),
+                 (5, 6, 'event1'), (7, 8, 'event3')],
+                ['event1', 'event2', 'event3', 'event0'],
+                [5, 3, 7, -1]
         )
     ],
 )
@@ -816,6 +823,7 @@ def test_set_requirements():
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     pass
+
 
 def test_get_feed_data_from_feed_ids() -> None:
     """Unit test for function get_feed_data_from_feed_ids in file routines/animal/ration/ration_driver.py"""

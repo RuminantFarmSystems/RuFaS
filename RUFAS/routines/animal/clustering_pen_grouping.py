@@ -19,12 +19,13 @@ from scipy.stats import percentileofscore
 
 def norm(x):
     """
-        Helper function to normalize a list of values and returnthat normalized
+        Helper function to normalize a list of values and return that normalized
         list.
 
         Args:
             x: A list of values
     """
+    assert x != []
     x = np.array(x)
     if max(x) != min(x):
         normalized = (x - min(x)) / (max(x) - min(x))
