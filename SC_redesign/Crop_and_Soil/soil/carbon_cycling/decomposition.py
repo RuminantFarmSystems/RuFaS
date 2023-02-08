@@ -10,7 +10,7 @@ class Decomposition:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
-    def decomposite(self, temp_average: float) -> None:
+    def decompose(self, temp_average: float) -> None:
         """
         Description: calculates temperature and moisture decomposition factors for
             Carbon based on weather and soil profile.
@@ -21,7 +21,7 @@ class Decomposition:
         """
         self.data.decomposition_temperature_effect = self._calc_temp_factor(temp_average)
 
-        self.data.decomposition_moisture_effect = self.moisture_factor(self.data.soil_layers)
+        self.data.decomposition_moisture_effect = self._calc_moisture_factor(self.data.soil_layers)
 
     @staticmethod
     def _calc_temp_factor(temp_average: float) -> float:

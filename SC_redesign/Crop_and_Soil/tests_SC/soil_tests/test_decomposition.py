@@ -69,6 +69,26 @@ def test_calc_temp_factor(layers):
     expect = hold
     assert decomp._calc_moisture_factor(layers) == hold
 
+@pytest.mark.parametrize("temp_average", [
+    70,  # lower values
+    150,  # higher values
+    88.8,  # arbitrary
+])
+def test_decompose(temp_average):
+    data = SoilData()
+    decomp = Decomposition(data)
+    decomp._calc_moisture_factor = MagicMock(return_value=1.89)
+    decomp._calc_temp_factor = MagicMock(return_value=3.99)
+
+    decomp.decompose(temp_average)
+
+    decomp._calc_moisture_factor.assert_called_once()
+    decomp._calc_temp_factor.assert_called_once()
+
+    assert data.decomposition_temperature_effect == 3.99
+    assert data.decomposition_moisture_effect == 1.89
+
+
 
 
 
