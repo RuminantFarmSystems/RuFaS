@@ -38,6 +38,10 @@ class LayerData:
     available_water_capacity: float = 0.2
     """available water capacity expressed as fraction of total soil volume"""
 
+    # --- Temperature
+    bulk_density: float = 1.4
+    """bulk density of the soil layer (Mg per cubic meter)"""
+
     def __post_init__(self):
         """This function initializes all attributes in the dataclass that depend on"""
         self.soil_water_content = self.soil_water_concentration * self.layer_thickness

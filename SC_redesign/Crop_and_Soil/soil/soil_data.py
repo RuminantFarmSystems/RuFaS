@@ -108,3 +108,18 @@ class SoilData:
     #   - soil evaporation adjusted is always less than or equal to maximum soil evaporation
     #   - potential evapotranspiration adjusted is always less than or equal to maximum evapotranspiration
     #   - average slope fraction is always in the range 0 to 1 inclusive (I think)
+
+    @property
+    def profile_bulk_density(self):
+        """
+
+        Returns: average bulk density of the soil profile based on the bulk density of each soil layer and weighted by
+            the thickness of that layer
+
+        """
+        weighted_densities_sum = 0
+        weights_sum = 0
+        for layer in self.soil_layers:
+            weighted_densities_sum += (layer.layer_thickness * layer.bulk_density)
+            weights_sum += layer.layer_thickness
+        return weighted_densities_sum / weights_sum
