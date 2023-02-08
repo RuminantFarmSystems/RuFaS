@@ -60,10 +60,10 @@ class Decomposition:
 
         for layer in soil_layers:
             # S.6.A.5
-            base_1 = (layer.water_fac - dimensionless_empirical_factor_b) / (dimensionless_empirical_factor_a -
-                                                                             dimensionless_empirical_factor_b)
-            base_2 = (layer.water_fac - dimensionless_empirical_factor_c) / (dimensionless_empirical_factor_a -
-                                                                             dimensionless_empirical_factor_c)
+            base_1 = (layer.water_factor - dimensionless_empirical_factor_b) / (dimensionless_empirical_factor_a -
+                                                                                dimensionless_empirical_factor_b)
+            base_2 = (layer.water_factor - dimensionless_empirical_factor_c) / (dimensionless_empirical_factor_a -
+                                                                                dimensionless_empirical_factor_c)
             hold = (base_1 ** dimensionless_empirical_factor_e1) * (base_2 ** dimensionless_empirical_factor_e2)
 
         return hold

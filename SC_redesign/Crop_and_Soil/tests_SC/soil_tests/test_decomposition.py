@@ -30,7 +30,8 @@ def test_calc_temp_factor(temp_average):
     assert decomp._calc_temp_factor(temp_average) == expect
 
 @pytest.mark.parametrize("layers", [
-    [LayerData(water_fac = 10),
+    [LayerData(top_depth=0, bottom_depth=4, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+               wilting_point_water_concentration=0.9),
      LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
                wilting_point_water_concentration=0.8),
      LayerData(top_depth=12, bottom_depth=20, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
@@ -51,7 +52,22 @@ def test_calc_temp_factor(temp_average):
 def test_calc_temp_factor(layers):
     data = SoilData(soil_layers=layers)
     decomp = Decomposition(data)
-    decomp._calc_moisture_factor(layers)
+
+    dimensionless_empirical_factor_a = 0.55
+    dimensionless_empirical_factor_b = 1.7
+    dimensionless_empirical_factor_c = -0.007
+    dimensionless_empirical_factor_e1 = 6.648115
+    dimensionless_empirical_factor_e2 = 3.22
+
+    for layer in layers:
+        # S.6.A.5
+        base_1 = (layer.water_factor - dimensionless_empirical_factor_b) / (dimensionless_empirical_factor_a -
+                                                                            dimensionless_empirical_factor_b)
+        base_2 = (layer.water_factor - dimensionless_empirical_factor_c) / (dimensionless_empirical_factor_a -
+                                                                            dimensionless_empirical_factor_c)
+        hold = (base_1 ** dimensionless_empirical_factor_e1) * (base_2 ** dimensionless_empirical_factor_e2)
+    expect = hold
+    assert decomp._calc_moisture_factor(layers) == hold
 
 
 
