@@ -1,7 +1,8 @@
 import math
-from typing import Optional
+from typing import Optional, List
 
 from SC_redesign.Crop_and_Soil.soil import soil_data
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
@@ -16,16 +17,14 @@ class Decomposition:
             "pseudocode_soil" S.6.A
         Args:
             temp_average:
-            soil: an instance of the Soil class defined in soil.py
-            weather: an instance of the Weather class defined in classes.py
-            time: an instance of the Time class defined in classes.py
-        """
-        self.data.decomposition_temperature_effect = self.calc_temp_factor(temp_average)
 
-        #self.data.decomposition_moisture_effect = self.moisture_factor(soil)
+        """
+        self.data.decomposition_temperature_effect = self._calc_temp_factor(temp_average)
+
+        self.data.decomposition_moisture_effect = self.moisture_factor(self.data.soil_layers)
 
     @staticmethod
-    def calc_temp_factor(temp_average: float) -> float:
+    def _calc_temp_factor(temp_average: float) -> float:
         """
         Description: calculates the Temperature factor for carbon decomposition
             "pseudocode_soil" S.6.A.1
@@ -44,14 +43,14 @@ class Decomposition:
                    (decomposition_inflection_y + (max_min_distance / math.pi) * math.atan(math.pi * inflection_slope * (
                            temp_average - decomposition_inflection_x))) / normalizer)
 
-    #@staticmethod
-    def calc_moisture_factor(self) -> float:
+    @staticmethod
+    def _calc_moisture_factor(soil_layers: List[LayerData]) -> float:
         """
         Description: calculates the moisture factor for carbon decomposition
             "pseudocode_soil" S.6.A.2
             defaults drawn from defac: course soil
         Args:
-            soil
+            soil_layers:
         """
         dimensionless_empirical_factor_a = 0.55
         dimensionless_empirical_factor_b = 1.7
@@ -59,7 +58,7 @@ class Decomposition:
         dimensionless_empirical_factor_e1 = 6.648115
         dimensionless_empirical_factor_e2 = 3.22
 
-        for layer in self.data.soil_layers:
+        for layer in soil_layers:
             # S.6.A.5
             base_1 = (layer.water_fac - dimensionless_empirical_factor_b) / (dimensionless_empirical_factor_a -
                                                                              dimensionless_empirical_factor_b)
