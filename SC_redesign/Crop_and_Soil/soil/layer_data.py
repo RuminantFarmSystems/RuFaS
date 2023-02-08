@@ -33,10 +33,6 @@ class LayerData:
     # --- Percolation
     temperature: float = 15.05
     """temperature of soil layer (degrees Celsius)"""
-    bulk_density: float = 1.4
-    """density of the soil layer (milligrams per meter cubed)"""
-    percent_clay_content: float = 25
-    """percentage of soil layer content that is clay"""
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
     available_water_capacity: float = 0.2
@@ -60,24 +56,6 @@ class LayerData:
     def wilting_point_content(self) -> float:
         """volume of water in layer when at wilting point"""
         return self.wilting_point_water_concentration * self.layer_thickness
-
-    # TODO: figure out which of these wilting point equations we need or which should be used where
-
-    @property
-    def volumetric_wilting_point_content_as_fraction(self) -> float:
-        """permanent wilting point volumetric water content expressed as fraction of total soil volume
-
-        SWAT Reference: 2:3.1.5
-        """
-        return 0.40 * ((self.percent_clay_content * self.bulk_density) / 100)
-
-    @property
-    def field_capacity_content_as_volume_fraction(self):
-        """water content at field capacity expressed as fraction of total soil volume
-
-        SWAT Reference: 2:3.1.6
-        """
-        return self.volumetric_wilting_point_content_as_fraction + self.available_water_capacity
 
     @property
     def excess_water_available(self):
