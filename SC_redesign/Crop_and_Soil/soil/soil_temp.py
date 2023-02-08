@@ -466,3 +466,25 @@ class SoilTemp:
         """
         return cover_weighting_factor * previous_top_soil_layer_temp + \
             (1 - cover_weighting_factor) * bare_soil_surface_temp
+
+    @staticmethod
+    def _determine_average_soil_temperature(lag_coefficient: float, previous_day_soil_temp: float, depth_factor: float,
+                                            avg_annual_air_temp: float, soil_surface_temp: float) -> float:
+        """calculates daily average soil temperature at center of a given soil layer
+
+        Args:
+            lag_coefficient: coefficient that controls influence of previous day's temp on current day's temp in degrees C
+            previous_day_soil_temp: soil temperature in the layer from the previous day in degrees C
+            depth_factor: factor that quantifies the influence of depth below surface on soil temp (unitless)
+            avg_annual_air_temp: average annual air temperature in degrees C
+            soil_surface_temp: soil surface temp on current day degrees C
+
+        Returns:
+            soil temperature at given depth on given day in degrees C
+
+        SWAT Reference: 1:1.3.3
+        """
+        first_term = lag_coefficient * previous_day_soil_temp
+        second_term = (1 - lag_coefficient) * (depth_factor * (avg_annual_air_temp - soil_surface_temp)
+                                               + soil_surface_temp)
+        return first_term + second_term

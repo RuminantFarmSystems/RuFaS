@@ -125,3 +125,19 @@ def test_determine_soil_surface_temp(cover_factor, previous_top_layer_temp, bare
     observe = SoilTemp._determine_soil_surface_temp(cover_factor, previous_top_layer_temp, bare_surface_temp)
     expect = (cover_factor * previous_top_layer_temp) + ((1 - cover_factor) * bare_surface_temp)
     assert observe == expect
+
+
+@pytest.mark.parametrize("lag,prev_soil_temp,depth_factor,avg_annual_air_temp,soil_surface_temp", [
+    (0.8, 15, 0.5, 19, 16),
+    (0.78, -2, 0.18, 21, -4),
+    (0.80198, 12, 0.89, 22.9485, 20.3847),
+    (0.892, 17, 0.0989, 21.99843, 19.98332),
+    (0.677534, 13.9683, 0.892, 19.33854, 15.10393),
+])
+def test_determine_average_soil_temperature(lag, prev_soil_temp, depth_factor, avg_annual_air_temp, soil_surface_temp):
+    """tests _determine_average_soil_temperature() in soil_tests.py"""
+    observe = SoilTemp._determine_average_soil_temperature(lag, prev_soil_temp, depth_factor, avg_annual_air_temp,
+                                                           soil_surface_temp)
+    expect = (lag * prev_soil_temp) + ((1 - lag) * ((depth_factor * (avg_annual_air_temp - soil_surface_temp))
+                                                    + soil_surface_temp))
+    assert observe == expect
