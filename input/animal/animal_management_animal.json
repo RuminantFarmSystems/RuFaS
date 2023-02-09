@@ -29,8 +29,8 @@
 		"farm_level": {
 			"calf": {
 				"male_calf_rate_dairy_sexed_semen": 0.1,
-				"male_calf_rate_dairy_conventional_semen": 0.53,
-				"male_calf_rate_beef_conventional_semen": 0.53,
+				"male_calf_rate_dairy_conventional_semen": 0.5,
+				"male_calf_rate_beef_conventional_semen": 0.5,
 				"male_calf_rate_beef_sexed_semen": 0.9,
 				"keep_female_calf_rate": 1,
 				"wean_day": 60,
@@ -227,6 +227,42 @@
 		},
 		"pen8": {
 			"id": 8,
+			"vertical_dist_to_milking_parlor": 0.2,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 400,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall",
+			"manure_handling": "automatic_alley_scrapers",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "storage_pit_2"
+		},
+		"pen9": {
+			"id": 9,
+			"vertical_dist_to_milking_parlor": 0.2,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 400,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall",
+			"manure_handling": "automatic_alley_scrapers",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "storage_pit_2"
+		},
+		"pen10": {
+			"id": 10,
+			"vertical_dist_to_milking_parlor": 0.2,
+			"horizontal_dist_to_milking_parlor": 1.6,
+			"number_of_stalls": 400,
+			"housing_type": "open air barn",
+			"bedding_type": "sand",
+			"pen_type": "tiestall",
+			"manure_handling": "automatic_alley_scrapers",
+			"manure_separator": "rotary_screen",
+			"manure_storage": "storage_pit_2"
+		},
+		"pen11": {
+			"id": 11,
 			"vertical_dist_to_milking_parlor": 0.2,
 			"horizontal_dist_to_milking_parlor": 1.6,
 			"number_of_stalls": 400,
