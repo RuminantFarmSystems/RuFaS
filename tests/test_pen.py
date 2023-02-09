@@ -36,6 +36,20 @@ def pen() -> Pen:
     return pen
 
 
+@pytest.fixture
+def mock_animal_list() -> List[MagicMock]:
+    animal_i = MagicMock()
+    animal_ii = MagicMock()
+    animal_iii = MagicMock()
+
+    return [animal_i, animal_ii, animal_iii]
+
+
+@pytest.fixture
+def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
+    pen.animals_in_pen = mock_animal_list
+
+
 def test_set_avg_nutrient_rqmts(pen: Pen):
     """Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py"""
     avg_nutrient_rqmts = {'NEmaint': 22.739694446587276,
@@ -64,26 +78,14 @@ def test_set_milk_avgs(pen: Pen):
     assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk
 
 
-@pytest.fixture
-def mock_new_animals() -> List[MagicMock]:
-    animal_i = MagicMock()
-    animal_i['id'] = 1
-    animal_ii = MagicMock()
-    animal_ii['id'] = 2
-    animal_iii = MagicMock()
-    animal_iii['id'] = 3
-
-    return [animal_i, animal_ii, animal_iii]
-
-
-def test_update_animals(pen: Pen, mock_new_animals: List[MagicMock], mocker: MockerFixture):
+def test_update_animals(pen: Pen, mock_animal_list, mocker: MockerFixture):
     """Unit test for function update_animals in file routines/animal/pen.py"""
 
     mocker.patch('RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist')
 
     animal_combination = Pen.AnimalCombination.CALF
 
-    pen.update_animals(mock_new_animals, animal_combination)
+    pen.update_animals(mock_animal_list, animal_combination)
 
     assert pen.pen_populated is True
 
@@ -91,7 +93,7 @@ def test_update_animals(pen: Pen, mock_new_animals: List[MagicMock], mocker: Moc
 
     pen.calc_daily_walking_dist.assert_called_once()
 
-    assert mock_new_animals == pen.animals_in_pen
+    assert mock_animal_list == pen.animals_in_pen
 
     assert pen.animal_combination == Pen.AnimalCombination.CALF
 
