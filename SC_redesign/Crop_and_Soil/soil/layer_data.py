@@ -18,7 +18,7 @@ class LayerData:
     """nitrate level of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    soil_water_content:  Optional[float] = None  
+    water_content:  Optional[float] = None
     """volume of soil water in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
@@ -40,7 +40,7 @@ class LayerData:
 
     def __post_init__(self):
         """This function initializes all attributes in the dataclass that depend on"""
-        self.soil_water_content = self.soil_water_concentration * self.layer_thickness
+        self.water_content = self.soil_water_concentration * self.layer_thickness
 
     @property
     def layer_thickness(self) -> float:
@@ -63,7 +63,7 @@ class LayerData:
 
         SWAT Reference: 2:3.2.1, 2
         """
-        return max(0, self.soil_water_content - self.field_capacity_content)
+        return max(0, self.water_content - self.field_capacity_content)
 
     @property
     def saturation_content(self) -> float:
@@ -73,4 +73,4 @@ class LayerData:
     @property
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
-        return max(0, self.saturation_content - self.soil_water_content)
+        return max(0, self.saturation_content - self.water_content)

@@ -24,20 +24,20 @@ class Percolation:
             # special case at the bottom of the profile
             if current_layer == deepest_layer and current_layer.temperature > 0:
                 percolated_water = self._percolate_between_layers(24, current_layer, self.data.vadose_zone_layer)
-                current_layer.soil_water_content -= percolated_water
-                self.data.vadose_zone_layer.soil_water_content += percolated_water
+                current_layer.water_content -= percolated_water
+                self.data.vadose_zone_layer.water_content += percolated_water
                 continue  # done with this iteration
 
             # normal case for all other layers
             layer_below = self.data.layers[layer_number + 1]
-            can_percolate = self._determine_if_percolation_allowed(layer_below.soil_water_content,
-                                                                  layer_below.field_capacity_content,
-                                                                  layer_below.saturation_content,
-                                                                  has_seasonal_high_water_table)
+            can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
+                                                                   layer_below.field_capacity_content,
+                                                                   layer_below.saturation_content,
+                                                                   has_seasonal_high_water_table)
             if current_layer.temperature > 0 and can_percolate:
                 percolated_water = self._percolate_between_layers(24, current_layer, layer_below)
-                current_layer.soil_water_content -= percolated_water
-                layer_below.soil_water_content += percolated_water
+                current_layer.water_content -= percolated_water
+                layer_below.water_content += percolated_water
 
 
     def percolate_b(self, has_seasonal_high_water_table: bool):
@@ -62,14 +62,14 @@ class Percolation:
                 layer_below = self.data.vadose_zone_layer
 
             # check for percolation conditions
-            can_percolate = self._determine_if_percolation_allowed(layer_below.soil_water_content,
-                                                                  layer_below.field_capacity_content,
-                                                                  layer_below.saturation_content,
-                                                                  has_seasonal_high_water_table)
+            can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
+                                                                   layer_below.field_capacity_content,
+                                                                   layer_below.saturation_content,
+                                                                   has_seasonal_high_water_table)
             if current_layer.temperature > 0 and can_percolate:
                 percolated_water = self._percolate_between_layers(24, current_layer, layer_below)
-                current_layer.soil_water_content -= percolated_water
-                layer_below.soil_water_content += percolated_water
+                current_layer.water_content -= percolated_water
+                layer_below.water_content += percolated_water
 
 
 
