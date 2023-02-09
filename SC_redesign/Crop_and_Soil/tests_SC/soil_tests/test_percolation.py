@@ -217,5 +217,5 @@ def test_percolate(high_seasonal_water_table):
 
     # Assertions
     assert observe == expect
-    assert Percolation._determine_if_percolation_allowed.call_count == 2
+    assert Percolation._determine_if_percolation_allowed.call_count == 3
     assert Percolation._percolate_between_layers.call_count == 3

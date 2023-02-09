@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 from math import inf
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
@@ -39,7 +39,20 @@ class SoilData:
     vadose_zone_layer: Optional[LayerData] = None
     """Datalayer object that represents the vadose zone, arbitrary top and bottom depths, starts with no water"""
     time_step: float = 24
-    """length of time step over which percolation occurs (hours) """
+    """length of time step over which percolatigit adon occurs (hours) """
+
+    def __post_init__(self):
+        if self.soil_layers is None:
+            # sets the soil layers to a default set if user does not provide any
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=50, nitrate=0.5),
+                                LayerData(top_depth=50, bottom_depth=80, nitrate=1),
+                                LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
+
+        # configures the vadose zone LayerData object based on where the soil profile ends
+        self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
+                                           bottom_depth=10000000,    # bottom depth is 10,000 meters by default
+                                           soil_water_concentration=0,
+                                           saturation_point_water_concentration=inf)
 
     @property
     def profile_soil_water_content(self) -> float:
