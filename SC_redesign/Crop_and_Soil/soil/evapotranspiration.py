@@ -24,13 +24,13 @@ class Evapotranspiration:
         Args:
             extraterrestrial_radiation: radiation from the aliens, in MJ per square meter per day
                 TODO: better description
-            max_air_temp: maximum air temperature in degrees C
-            min_air_temp: minimum air temperature in degrees C
-            avg_air_temp: average air temperature in degrees C
-            above_ground_biomass: mass of plant above ground in kg per hectare
-            residue: biomass separated from plant on the ground in kg per hectare
-            snow_water_content: amount of water from snow in mm
-            initial_canopy_free_water: initial amount of free water held in canopy on a given day in mm
+            max_air_temp: maximum air temperature (degrees C)
+            min_air_temp: minimum air temperature (degrees C)
+            avg_air_temp: average air temperature (degrees C)
+            above_ground_biomass: mass of plant above ground (kg per hectare)
+            residue: biomass separated from plant on the ground (kg per hectare)
+            snow_water_content: amount of water from snow (mm)
+            initial_canopy_free_water: initial amount of free water held in canopy on a given day (mm)
 
         """
         self.data.potential_evapotranspiration = self._determine_potential_evapotranspiration(
@@ -58,10 +58,10 @@ class Evapotranspiration:
         """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
 
         Args:
-            initial_canopy_free_water: initial amount of free water held in canopy on a given day in mm
+            initial_canopy_free_water: initial amount of free water held in canopy on a given day (mm)
 
         Returns:
-            potential evapotranspiration adjusted for evaporation of free water in canopy in mm
+            potential evapotranspiration adjusted for evaporation of free water in canopy (mm)
 
         SWAT Reference: 2:2.3.1 (Whole section)
         """
@@ -110,14 +110,14 @@ class Evapotranspiration:
         """calculates the potential evapotranspiration for a given day
 
         Args:
-            extra_terrestrial_radiation: radiation from the aliens, in MJ per square meter per day
+            extra_terrestrial_radiation: radiation from the aliens (MJ per square meter per day)
                 TODO: better description
-            max_air_temp: maximum air temperature in degrees C
-            min_air_temp: minimum air temperature in degrees C
-            avg_air_temp: average air temperature in degrees C
+            max_air_temp: maximum air temperature (degrees C)
+            min_air_temp: minimum air temperature (degrees C)
+            avg_air_temp: average air temperature (degrees C)
 
         Returns:
-            potential evapotranspiration in mm per day
+            potential evapotranspiration (mm per day)
 
         SWAT Reference: 2:2.2.24
         """
@@ -136,10 +136,10 @@ class Evapotranspiration:
         """determine latent heat of vaporization for a given day
 
         Args:
-            avg_air_temp: average air temperature in degrees C
+            avg_air_temp: average air temperature (degrees C)
 
         Returns:
-            latent heat of vaporization in MJ per kg
+            latent heat of vaporization (MJ per kg)
 
         SWAT Reference: 1:2.3.6
         """
@@ -153,14 +153,14 @@ class Evapotranspiration:
         Calculate the maximum soil evaporation for this day
 
         Args:
-            above_ground_biomass: mass of plant above ground in kg per hectare
-            residue: biomass separated from plant on the ground in kg per hectare
-            snow_water_content: amount of water from snow in mm
+            above_ground_biomass: mass of plant above ground (kg per hectare)
+            residue: biomass separated from plant on the ground (kg per hectare)
+            snow_water_content: amount of water from snow (mm)
             potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
-                in canopy in mm
-            transpiration: transpiration in mm for a given day
+                in canopy (mm)
+            transpiration: transpiration for a given day (mm)
         Returns:
-            maximum soil evaporation in the day adjusted for plant water use
+            maximum soil evaporation in the day adjusted for plant water use (mm)
 
         SWAT Reference: 2:2.3.7, 9
         """
@@ -179,9 +179,9 @@ class Evapotranspiration:
         Calculate soil cover index
 
         Args:
-            above_ground_biomass: mass of plant above ground in kg per hectare
-            residue: biomass separated from plant on the ground in kg per hectare
-            snow_water_content: amount of water from snow in mm
+            above_ground_biomass: mass of plant above ground (kg per hectare)
+            residue: biomass separated from plant on the ground (kg per hectare)
+            snow_water_content: amount of water from snow (mm)
 
         Returns:
             soil cover index (unitless)
@@ -198,13 +198,13 @@ class Evapotranspiration:
         """Calculates the maximum amount of evaporation from soil in a given day
 
         Args:
-            soil_evaporation_adj: maximum soil evaporation adjusted for plant water use on a given day in mm
-            snow_water_content: amount of water in the snow pack on a given day prior to accounting for sublimation, in
-            mm TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-                (2:2.3.3) mean the same thing
+            soil_evaporation_adj: maximum soil evaporation adjusted for plant water use on a given day (mm)
+            snow_water_content: amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
+                TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
+                    (2:2.3.3) mean the same thing
 
         Returns:
-            maximum soil water evaporation on a given day in mm
+            maximum soil water evaporation on a given day (mm)
 
         SWAT Reference: 2:2.3.3.1
         """
@@ -218,12 +218,12 @@ class Evapotranspiration:
         """calculates evaporative demand
 
         Args:
-            max_soil_water_evaporation: maximum soil water evaporation on a given day in mm
-            depth: depth below the surface in mm
+            max_soil_water_evaporation: maximum soil water evaporation on a given day (mm)
+            depth: depth below the surface (mm)
                 TODO: check that it is actually in mm, SWAT page 137 does not explicitly say so
 
         Returns:
-            evaporative demand at the given depth in mm
+            evaporative demand at the given depth (mm)
 
         SWAT Reference: 2:2.3.16
         """
@@ -235,13 +235,13 @@ class Evapotranspiration:
         """calculates the evaporative demand for a given layer of soil
 
         Args:
-            max_soil_water_evaporation: maximum water evaporation from soil on given day in mm
-            top_depth: depth of top of layer to be analyzed in mm
-            bottom_depth: depth of bottom of layer to be analyzed in mm
-            compensation: soil evaporative compensation coefficient, unitless
+            max_soil_water_evaporation: maximum water evaporation from soil on given day (mm)
+            top_depth: depth of top of layer to be analyzed (mm)
+            bottom_depth: depth of bottom of layer to be analyzed (mm)
+            compensation: soil evaporative compensation coefficient (unitless)
 
         Returns:
-            evaporative demand for given layer of soil in mm
+            evaporative demand for given layer of soil (mm)
 
         SWAT Reference: 2:2.3.16, 17
         """
@@ -267,13 +267,13 @@ class Evapotranspiration:
         """calculates evaporative demand reduced for water content and field capacity
 
         Args:
-            evaporative_demand: evaporative demand for current soil layer in mm
-            soil_water_content: soil water content of given layer in mm
-            field_water_content: field capacity water content of given layer in mm
-            wilting_water_content: wilting point water content of given layer in mm
+            evaporative_demand: evaporative demand for current soil layer (mm)
+            soil_water_content: soil water content of given layer (mm)
+            field_water_content: field capacity water content of given layer (mm)
+            wilting_water_content: wilting point water content of given layer (mm)
 
         Returns:
-            reduced evaporative demand for current layer based on how much water is in layer in mm
+            reduced evaporative demand for current layer based on how much water is in layer (mm)
 
         SWAT Reference: 2:2.3.18, 19
         """
@@ -295,12 +295,12 @@ class Evapotranspiration:
         """calculates amount of water lost from soil layer from evaporation
 
         Args:
-            reduced_evaporative_demand: evaporative demand reduced for water content and field capacity in mm
-            soil_water_content: soil water content of given layer in mm
-            wilting_water_content: wilting point water content of given layer in mm
+            reduced_evaporative_demand: evaporative demand reduced for water content and field capacity (mm)
+            soil_water_content: soil water content of given layer (mm)
+            wilting_water_content: wilting point water content of given layer (mm)
 
         Returns:
-            amount of water removed from soil layer by evaporation in mm
+            amount of water removed from soil layer by evaporation (mm)
 
         SWAT Reference: 2:2.3.20
         """
