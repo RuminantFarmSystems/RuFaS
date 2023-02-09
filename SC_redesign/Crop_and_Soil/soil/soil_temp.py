@@ -325,11 +325,15 @@ from math import exp, log
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
-
+"""
+This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)
+"""
 class SoilTemp:
 
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()
+
+    def daily_soil_temperature_update(self) -> None:
 
     # --- Static methods ---
     @staticmethod
