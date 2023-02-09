@@ -28,7 +28,7 @@ class LayerData:
     """water concentration of soil layer at saturation point (mm)"""
     soil_evaporation_compensation_coefficient: float = 1
     """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless) 
-        (2:2.3.17)"""
+        (SWAT 2:2.3.17)"""
 
     # --- Percolation
     temperature: float = 15.05
