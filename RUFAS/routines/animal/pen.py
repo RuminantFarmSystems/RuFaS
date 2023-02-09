@@ -9,11 +9,19 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+from typing import List, Dict
+
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+
 from RUFAS import util, errors
 from enum import Enum
 
@@ -262,60 +270,95 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
-    def get_id(self):
-        """
-        Returns:
-            int : the id, the unique id number of the pen.
-        """
-        return self.id
-
-    def get_pen_type(self):
-        """
-        Returns:
-            string : the pen type: freestall or tiestall.
-        """
-        return self._pen_type
-
-    def set_id(self, pen_id):
-        """
-        Sets the pen's id to id.
-
-        Args:
-            pen_id: The pen's unique pen ID, obtained from the input file.
-        """
-        self.id = pen_id
-
-    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts):
+    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(self, avg_milk, avg_CP_milk):
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
 
-    def update_animals(self, new_animals, animal_combination):
+    def add_new_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]) -> None:
         """
-        Sets the list of animals to @new_animals and calculates the stocking
-        density and each animal's walking distance.
+        Adds all animals in new_animals to the pen.
 
         Args:
-            new_animals: list of new animals in the pen
-            animal_combination: an AnimalCombination Enum representing the type of the new animals
+            new_animals: list of new animals to be added to the pen
         """
+        self.animals_in_pen.extend(new_animals)
 
-        for animal in new_animals:
-            self.animals_in_pen.append(animal)
-
+    def update_pen_populated(self) -> None:
+        """
+        Updates whether or not the pen is populated
+        """
         self.pen_populated = len(self.animals_in_pen) != 0
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
-        self.calc_daily_walking_dist()
 
-        # sets the current animal classes in the pen
+    def update_stocking_density(self) -> None:
+        """
+        Updates the stocking density of the pen
+        """
+        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+
+    def set_animal_combination(self, animal_combination: AnimalCombination) -> None:
+        """
+        Sets the pen's animal combination to animal_combination
+        Args:
+            animal_combination: the new AnimalCombination
+        """
+        self.animal_combination = animal_combination
+
+    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum
+    def update_classes_in_pen(self) -> None:
+        """
+        Updates the classes contained within the pen
+        """
         self.classes_in_pen = set()
         for animal in self.animals_in_pen:
             stage = type(animal).__name__
             self.classes_in_pen.add(stage)
-        # updates the animal class this pen holds
-        self.animal_combination = animal_combination
+
+    def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+                       animal_combination: AnimalCombination):
+        """
+        Calls functions that will add new animals to the pen and update associated attributes.
+
+        Args:
+            new_animals: list of new animals to be added to the pen
+            animal_combination: an AnimalCombination Enum representing the type of the new animals
+        """
+
+        self.add_new_animals(new_animals)
+        self.update_pen_populated()
+        self.update_stocking_density()
+        self.calc_daily_walking_dist()
+        self.set_animal_combination(animal_combination)
+        self.update_classes_in_pen()
+
+    # def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+    #                    animal_combination: AnimalCombination):
+    #     """
+    #     Sets the list of animals to @new_animals and calculates the stocking
+    #     density and each animal's walking distance.
+    #
+    #     Args:
+    #         new_animals: list of new animals in the pen
+    #         animal_combination: an AnimalCombination Enum representing the type of the new animals
+    #     """
+    #
+    #     self.animals_in_pen.extend(new_animals)
+    #
+    #     self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+    #
+    #     self.calc_daily_walking_dist()
+    #
+    #     # updates the animal class this pen holds
+    #     self.animal_combination = animal_combination
+    #
+    #     # sets the current animal classes in the pen
+    #     # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum
+    #     self.classes_in_pen = set()
+    #     for animal in self.animals_in_pen:
+    #         stage = type(animal).__name__
+    #         self.classes_in_pen.add(stage)
 
     def calc_ration(self, feed, available_feeds):
         """
@@ -333,21 +376,26 @@ class Pen:
             # TODO: Instead of checking if animal is in a class, check pen tag
             # an error may be caused as result of heifers and dry cows in same pen
             # if we only simulate with 3 pens
+
+            # AnimalCombination.CALF
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
                 ration_vals = {'ME_tot': 0}
 
+            # AnimalCombination.GROWING
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, 'heifer', False)
 
+            # AnimalCombination.LAC_COW
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, 'cow', True)
 
+            # AnimalCombination.CLOSE_UP
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
@@ -530,6 +578,8 @@ class Pen:
             # TODO is there a better way?
             num_animals_before_additions = 1
 
+        # TODO: Question - is this necessary or can we assume that any newly
+        #   added animals will match the existing animal combination?
         class_name = type(animal).__name__
         self.classes_in_pen.add(class_name)
 
