@@ -81,8 +81,8 @@ def test_percolate_between_layers():
     # Initialize objects
     layers1 = [LayerData(top_depth=0, bottom_depth=39),
                LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
-    layers1[0].soil_water_content = 15
-    layers1[1].soil_water_content = 3.8
+    layers1[0].water_content = 15
+    layers1[1].water_content = 3.8
     data1 = SoilData(soil_layers=layers1)
     incorp1 = Percolation(data1)
 
@@ -113,8 +113,8 @@ def test_percolate_between_layers():
     # Initialize objects
     layers2 = [LayerData(top_depth=0, bottom_depth=39),
                LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
-    layers2[0].soil_water_content = 15
-    layers2[1].soil_water_content = 3.8
+    layers2[0].water_content = 15
+    layers2[1].water_content = 3.8
     data2 = SoilData(layers2)
     incorp2 = Percolation(data2)
 
@@ -144,8 +144,8 @@ def test_percolate_between_layers():
     # Initialize objects
     layers3 = [LayerData(top_depth=0, bottom_depth=39),
                LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
-    layers3[0].soil_water_content = 8.9
-    layers3[1].soil_water_content = 3.8
+    layers3[0].water_content = 8.9
+    layers3[1].water_content = 3.8
     data3 = SoilData(layers3)
     incorp3 = Percolation(data3)
 
@@ -187,9 +187,9 @@ def test_percolate(high_seasonal_water_table):
               LayerData(top_depth=39, bottom_depth=87),
               LayerData(top_depth=87, bottom_depth=217)]
     # Set soil water content of layers so that water actually percolates
-    layers[0].soil_water_content = 17
-    layers[1].soil_water_content = 21
-    layers[2].soil_water_content = 40
+    layers[0].water_content = 17
+    layers[1].water_content = 21
+    layers[2].water_content = 40
     data = SoilData(soil_layers=layers, vadose_zone_layer=LayerData(top_depth=100000, bottom_depth=200000,
                                                                     soil_water_concentration=0))
     incorp = Percolation(data)
@@ -205,17 +205,17 @@ def test_percolate(high_seasonal_water_table):
     # Second layer gains then loses 0.3 mm of water
     # Third layer gains then loses 0.3 mm of water
     # Vadose zone starts empty, then gains 0.3 mm of water
-    expect = [incorp.data.soil_layers[0].soil_water_content - 0.3, incorp.data.soil_layers[1].soil_water_content,
-              incorp.data.soil_layers[2].soil_water_content, 0.3]
+    expect = [incorp.data.soil_layers[0].water_content - 0.3, incorp.data.soil_layers[1].water_content,
+              incorp.data.soil_layers[2].water_content, 0.3]
 
     # Run function
     incorp.percolate(high_seasonal_water_table)
 
     # Collect results
-    observe = [incorp.data.soil_layers[0].soil_water_content, incorp.data.soil_layers[1].soil_water_content,
-               incorp.data.soil_layers[2].soil_water_content, incorp.data.vadose_zone_layer.soil_water_content]
+    observe = [incorp.data.soil_layers[0].water_content, incorp.data.soil_layers[1].water_content,
+               incorp.data.soil_layers[2].water_content, incorp.data.vadose_zone_layer.water_content]
 
     # Assertions
     assert observe == expect
-    assert Percolation._determine_if_percolation_allowed.call_count == 2
+    assert Percolation._determine_if_percolation_allowed.call_count == 3
     assert Percolation._percolate_between_layers.call_count == 3
