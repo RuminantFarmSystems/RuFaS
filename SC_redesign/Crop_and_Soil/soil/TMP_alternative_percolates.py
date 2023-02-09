@@ -52,6 +52,8 @@ class Percolation:
         layer_count = len(self.data)
         deepest_layer = layer_count - 1  # stupid pythonic counting
 
+        """ how dare thee!!! zero-based indexing is the hallmark of all *real* programming languages """
+
         for layer_number in range(layer_count):  # loop through each layer
             current_layer = self.data.layers[layer_number]
 
