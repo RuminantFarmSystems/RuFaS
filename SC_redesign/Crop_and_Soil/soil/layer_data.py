@@ -21,11 +21,11 @@ class LayerData:
     soil_water_content:  Optional[float] = None  
     """volume of soil water in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
-    """water concentration of soil layer at field capacity (mm)"""
+    """water concentration of soil layer at field capacity (mm water / mm soil)"""
     wilting_point_water_concentration: float = 0.2  # arbitrary
-    """water concentration of soil layer at wilting point (mm)"""
+    """water concentration of soil layer at wilting point (mm water / mm soil)"""
     saturation_point_water_concentration: float = 0.5
-    """water concentration of soil layer at saturation point (mm)"""
+    """water concentration of soil layer at saturation point (mm water / mm soil)"""
     soil_evaporation_compensation_coefficient: float = 1
     """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless) 
         (SWAT 2:2.3.17)"""
