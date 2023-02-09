@@ -62,12 +62,9 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "horizontal_dist_to_milking_parlor": 1.6,
             "number_of_stalls": 110,
             "housing_type": "open air barn",
-            "bedding_type": "sand",
             "pen_type": "freestall",
-            "manure_handling": "manual_scraping",
-            "manure_separator": "sedimentation",
-            "manure_storage": "storage_pit",
-            "max_stocking_density": 1.2
+            "max_stocking_density": 1.2,
+            "manure_management_scenario_id": 0
         },
         "pen1": {
             "id": 1,
@@ -76,12 +73,9 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "horizontal_dist_to_milking_parlor": 1.6,
             "number_of_stalls": 800,
             "housing_type": "open air barn",
-            "bedding_type": "organic",
             "pen_type": "freestall",
-            "manure_handling": "flush_system",
-            "manure_separator": "sedimentation",
-            "manure_storage": "storage_pit",
-            "max_stocking_density": 1.2
+            "max_stocking_density": 1.2,
+            "manure_management_scenario_id": 1
         },
         "pen2": {
             "id": 2,
@@ -90,12 +84,9 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "horizontal_dist_to_milking_parlor": 1.6,
             "number_of_stalls": 200,
             "housing_type": "open air barn",
-            "bedding_type": "organic",
             "pen_type": "tiestall",
-            "manure_handling": "automatic_alley_scrapers",
-            "manure_separator": "sedimentation",
-            "manure_storage": "storage_pit",
-            "max_stocking_density": 1.2
+            "max_stocking_density": 1.2,
+            "manure_management_scenario_id": 2
         },
         "pen3": {
             "id": 3,
@@ -104,14 +95,73 @@ def mock_pen_data() -> Dict[str, Dict[str, Union[str, float, int]]]:
             "horizontal_dist_to_milking_parlor": 1.6,
             "number_of_stalls": 850,
             "housing_type": "open air barn",
-            "bedding_type": "sand",
             "pen_type": "tiestall",
-            "manure_handling": "manual_scraping",
-            "manure_separator": "sedimentation",
-            "manure_storage": "anaerobic_lagoon",
-            "max_stocking_density": 1.2
+            "max_stocking_density": 1.2,
+            "manure_management_scenario_id": 3
         }
     }
+
+
+@pytest.fixture
+def mock_manure_management_scenarios() -> List[Dict[str, Union[str, int]]]:
+    return [
+        {
+            "scenario_id": 0,
+            "bedding_type": "sawdust",
+            "manure_handler": "manual scraping",
+            "manure_separator": "none",
+            "manure_treatment": "slurry storage underfloor"
+        },
+        {
+            "scenario_id": 1,
+            "bedding_type": "sawdust",
+            "manure_handler": "manual scraping",
+            "manure_separator": "none",
+            "manure_treatment": "slurry storage outdoor"
+        },
+        {
+            "scenario_id": 2,
+            "bedding_type": "sawdust",
+            "manure_handler": "manual scraping",
+            "manure_separator": "screw press",
+            "manure_treatment": "slurry storage outdoor"
+        },
+        {
+            "scenario_id": 3,
+            "bedding_type": "sawdust",
+            "manure_handler": "flush system",
+            "manure_separator": "none",
+            "manure_treatment": "anaerobic lagoon"
+        },
+        {
+            "scenario_id": 4,
+            "bedding_type": "sand",
+            "manure_handler": "flush system",
+            "manure_separator": "sand lane",
+            "manure_treatment": "anaerobic lagoon"
+        },
+        {
+            "scenario_id": 5,
+            "bedding_type": "sawdust",
+            "manure_handler": "manual scraping",
+            "manure_separator": "none",
+            "manure_treatment": "anaerobic digestion and lagoon"
+        },
+        {
+            "scenario_id": 6,
+            "bedding_type": "sawdust",
+            "manure_handler": "flush system",
+            "manure_separator": "rotary screen",
+            "manure_treatment": "anaerobic digestion and lagoon"
+        },
+        {
+            "scenario_id": 7,
+            "bedding_type": "sawdust",
+            "manure_handler": "flush system",
+            "manure_separator": "rotary screen",
+            "manure_treatment": "anaerobic digestion and lagoon with split"
+        }
+    ]
 
 
 @pytest.fixture
@@ -175,19 +225,23 @@ def test_get_animal_config():
 
 
 def test_init_pens(animal_management: AnimalManagement, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
-                   mock_herd_data: Dict[str, Union[str, int, bool]], mocker: MockerFixture) -> None:
+                   mock_herd_data: Dict[str, Union[str, int, bool]],
+                   mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
+                   mocker: MockerFixture) -> None:
     """Unit test for function init_pens in file routines/animal/animal_management.py"""
+    # Arrange
+    patch_for_init_default_pens = mocker.patch.object(animal_management, '_init_default_pens')
 
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._init_default_pens')
-
+    # Act
     # More than the minimum num of pens - 4 pens
-    animal_management.init_pens(mock_pen_data, mock_herd_data)
+    animal_management.init_pens(mock_pen_data, mock_herd_data, mock_manure_management_scenarios)
 
     actual = len(animal_management.all_pens)
     expected = 4
-    assert actual == expected
 
-    animal_management._init_default_pens.assert_called_once()
+    # Assert
+    assert actual == expected
+    patch_for_init_default_pens.assert_called_once_with(mock_herd_data['herd_num'])
 
 
 def test_init_default_pens(animal_management: AnimalManagement) -> None:
@@ -223,11 +277,25 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
             patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
         animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
-        herd_data = dict()
+        herd_data = {
+            "calf_num": 0,
+            "heiferI_num": 0,
+            "heiferII_num": 0,
+            "heiferIII_num": 0,
+            "cow_num": 0
+        }
 
         expected_info_map = {
             "class": "AnimalManagement",
             "function": "_print_animal_num_warnings",
+            "herd_data_animal_nums": {
+                "calf_num": 0,
+                "heiferI_num": 0,
+                "heiferII_num": 0,
+                "heiferIII_num": 0,
+                "cow_num": 0
+            },
+            "simulate_animals": True
         }
 
         # test for simulate_animals = True
@@ -239,16 +307,19 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement, mocker: 
 
         # test for warnings for every animal key and simulate_animals = False
         animal_management.simulate_animals = False
+
         for key in animal_keys:
             herd_data[key] = 1
+            expected_info_map['herd_data_animal_nums'][key] = 1
+        expected_info_map['simulate_animals'] = False
+
         animal_management._print_animal_num_warnings(herd_data)
 
         for key in animal_keys:
             add_warning.assert_any_call(f"invalid_{key}_warning",
-                                        f"Warning: herd_num is 0, but {key} is not.",
+                                        f"Warning: simulate_animals is false, but {key} is not.",
                                         expected_info_map)
 
-        # question: how to reset assert_called_once with
         add_log.assert_any_call("num_warnings_associated_with_simulate_animals",
                                 f"{len(animal_keys)} warnings were associated with simulate_animals",
                                 expected_info_map)

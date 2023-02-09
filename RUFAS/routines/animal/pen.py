@@ -241,6 +241,7 @@ class Pen:
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = {"U": 0,
+                                      "Urine": 0,
                                       "TAN_s": 0,
                                       "MN": 0,
                                       "Mkg": 0,

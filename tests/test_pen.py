@@ -208,6 +208,7 @@ def test_reset_manure(pen: Pen) -> None:
     pen.lactating_total = {}
 
     expected = {"U": 0,
+                "Urine": 0,
                 "TAN_s": 0,
                 "MN": 0,
                 "Mkg": 0,
