@@ -21,35 +21,27 @@ class Percolation:
 
         SWAT Reference: sections 2:3.1 and 2
         """
-        for layer_index in range(len(self.data.soil_layers)):
-            # iterate through each layer of soil in the soil profile
-            upper_layer = self.data.soil_layers[layer_index]
-            if layer_index != (len(self.data.soil_layers) - 1):
-                # upper layer is not the bottom layer of the soil profile
-                lower_layer = self.data.soil_layers[layer_index + 1]
-                is_percolation_allowed = self._determine_if_percolation_allowed(lower_layer.water_content,
-                                                                                lower_layer.field_capacity_content,
-                                                                                lower_layer.saturation_content,
-                                                                                has_seasonal_high_water_table)
-                if upper_layer.temperature > 0 and is_percolation_allowed:
-                    # percolation is allowed from upper to lower layer
-                    amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer, lower_layer)
-                else:
-                    # percolation not allowed from upper to lower layer
-                    continue
+        layer_count = len(self.data.soil_layers)
+        deepest_layer = layer_count - 1
+
+        for layer_number in range(layer_count):  # loop through each layer
+            current_layer = self.data.soil_layers[layer_number]
+
+            # get the appropriate underlying layer
+            if layer_number < deepest_layer:
+                layer_below = self.data.soil_layers[layer_number + 1]
             else:
-                # upper layer is the bottom layer of the soil profile, percolation goes into vadose zone which can
-                # accept infinite amount of water
-                if upper_layer.temperature > 0:
-                    # percolation is allowed from upper to lower layer
-                    lower_layer = self.data.vadose_zone_layer
-                    amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer, lower_layer)
-                else:
-                    # percolation not allowed from upper to lower layer
-                    break
-            if amount_to_percolate > 0:
-                upper_layer.water_content -= amount_to_percolate
-                lower_layer.water_content += amount_to_percolate
+                layer_below = self.data.vadose_zone_layer
+
+            # check for percolation conditions
+            can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
+                                                                   layer_below.field_capacity_content,
+                                                                   layer_below.saturation_content,
+                                                                   has_seasonal_high_water_table)
+            if current_layer.temperature > 0 and can_percolate:
+                percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
+                current_layer.water_content -= percolated_water
+                layer_below.water_content += percolated_water
 
     # --- Static methods ---
     @staticmethod
