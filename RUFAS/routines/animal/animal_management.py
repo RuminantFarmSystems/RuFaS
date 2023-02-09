@@ -438,7 +438,8 @@ class AnimalManagement:
                     available_feeds = ration_driver.AvailableFeeds()
                     available_feeds.feed_nutrients(feed)
                     self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
-                    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(self.all_pens[i].allocated_feeds)
+                    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(
+                        self.all_pens[i].allocated_feeds)
                     self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
             else:
                 if len(self.all_pens[i].animals_in_pen) > 0:
@@ -448,7 +449,7 @@ class AnimalManagement:
                         if key != 'status' and key != 'objective' and pen_population_before_additions[i] > 0:
                             self.all_pens[i].ration[key] = \
                                 (self.all_pens[i].ration[key] /
-                                    pen_population_before_additions[i]) * len(
+                                 pen_population_before_additions[i]) * len(
                                     self.all_pens[i].animals_in_pen)
 
         for calf in calves_born:
@@ -697,7 +698,7 @@ class AnimalManagement:
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
-            if pen.pen_populated:
+            if pen.populated:
                 pen.subset_class_feeds(feed)
                 pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
@@ -713,7 +714,7 @@ class AnimalManagement:
             methane_model: methane model used for methane emission calculations
         """
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.calc_manure(feed, methane_model)
             else:
                 pen.reset_manure()
@@ -765,7 +766,8 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(
+                a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
@@ -789,7 +791,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.call_p_rqmts()
 
     def daily_p_update(self):
@@ -799,7 +801,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.daily_p_update()
 
     def daily_updates(self, feed, weather, time):
@@ -817,7 +819,7 @@ class AnimalManagement:
         """
         if self.simulate_animals:
             for pen in self.all_pens:
-                pen.pen_populated = len(pen.animals_in_pen) > 0
+                pen.populated = len(pen.animals_in_pen) > 0
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
             self.heiferIIs, self.heiferIIIs, self.cows = \

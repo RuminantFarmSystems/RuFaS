@@ -12,6 +12,11 @@ from typing import Set, List, Dict, Tuple
 from statistics import mean
 from pytest_lazyfixture import lazy_fixture
 
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
 
 
@@ -46,8 +51,24 @@ def mock_animal_list() -> List[MagicMock]:
 
 
 @pytest.fixture
+def mock_animal_list_ii() -> List[MagicMock]:
+    animal_iv = MagicMock()
+    animal_v = MagicMock()
+    animal_vi = MagicMock()
+
+    return [animal_iv, animal_v, animal_vi]
+
+
+@pytest.fixture
+def mock_animal_list_combined(mock_animal_list, mock_animal_list_ii) -> List[MagicMock]:
+    return mock_animal_list + mock_animal_list_ii
+
+
+@pytest.fixture
 def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
     pen.animals_in_pen = mock_animal_list
+
+    return pen
 
 
 def test_set_avg_nutrient_rqmts(pen: Pen):
@@ -78,24 +99,79 @@ def test_set_milk_avgs(pen: Pen):
     assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk
 
 
-def test_update_animals(pen: Pen, mock_animal_list, mocker: MockerFixture):
+@pytest.mark.parametrize('pen_to_test, new_animals, expected_animals_in_pen',
+                         [
+                             (lazy_fixture('pen'), lazy_fixture('mock_animal_list'), lazy_fixture('mock_animal_list')),
+                             (lazy_fixture('pen_with_animals'), lazy_fixture('mock_animal_list_ii'),
+                              lazy_fixture('mock_animal_list_combined')),
+                         ])
+def test_add_new_animals(pen_to_test: Pen, mock_animal_list,
+                         new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+                         expected_animals_in_pen: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]):
+    """Unit test for function add_new_animals in file routines/animal/pen.py"""
+
+    pen_to_test.add_new_animals(new_animals)
+
+    assert pen_to_test.animals_in_pen == expected_animals_in_pen
+
+
+@pytest.mark.parametrize('pen_to_test, expected_pen_populated',
+                         [
+                             (lazy_fixture('pen'), False),
+                             (lazy_fixture('pen_with_animals'), True),
+                         ])
+def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool):
+    """Unit test for function update_pen_populated in file routines/animal/pen.py"""
+    pen_to_test.update_pen_populated()
+
+    assert pen_to_test.populated == expected_pen_populated
+
+
+@pytest.mark.parametrize('pen_to_test, expected_stocking_density',
+                         [
+                             (lazy_fixture('pen'), 0),
+                             (lazy_fixture('pen_with_animals'), 3),
+                         ])
+def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float):
+    """Unit test for function update_stocking_density in file routines/animal/pen.py"""
+    pen_to_test.update_stocking_density()
+
+    assert pen_to_test.stocking_density == expected_stocking_density
+
+
+@pytest.mark.parametrize('animal_combination ',
+                         [
+                             Pen.AnimalCombination.CALF,
+                             Pen.AnimalCombination.GROWING,
+                             Pen.AnimalCombination.LAC_COW,
+                             Pen.AnimalCombination.CLOSE_UP,
+                             Pen.AnimalCombination.GROWING_AND_CLOSE_UP,
+                         ])
+def test_set_animal_combination(pen: Pen, animal_combination: Pen.AnimalCombination):
+    """Unit test for function set_animal_combination in file routines/animal/pen.py"""
+    pen.set_animal_combination(animal_combination)
+
+    assert pen.animal_combination == animal_combination
+
+
+def test_update_animals(pen: Pen, mocker: MockerFixture):
     """Unit test for function update_animals in file routines/animal/pen.py"""
 
+    mocker.patch('RUFAS.routines.animal.pen.Pen.add_new_animals')
+    mocker.patch('RUFAS.routines.animal.pen.Pen.update_pen_populated')
+    mocker.patch('RUFAS.routines.animal.pen.Pen.update_stocking_density')
+    mocker.patch('RUFAS.routines.animal.pen.Pen.set_animal_combination')
     mocker.patch('RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist')
+    mocker.patch('RUFAS.routines.animal.pen.Pen.update_classes_in_pen')
 
-    animal_combination = Pen.AnimalCombination.CALF
+    pen.update_animals(MagicMock(), MagicMock())
 
-    pen.update_animals(mock_animal_list, animal_combination)
-
-    assert pen.pen_populated is True
-
-    assert pen.stocking_density == pytest.approx(3 / 100 * 100)
-
+    pen.add_new_animals.assert_called_once()
+    pen.update_pen_populated.assert_called_once()
+    pen.update_stocking_density.assert_called_once()
+    pen.set_animal_combination.assert_called_once()
     pen.calc_daily_walking_dist.assert_called_once()
-
-    assert mock_animal_list == pen.animals_in_pen
-
-    assert pen.animal_combination == Pen.AnimalCombination.CALF
+    pen.update_classes_in_pen.assert_called_once()
 
 
 def test_call_animal_nutrient_rqmts():
@@ -187,7 +263,7 @@ def avg_calf_daily_growth_values(calf_daily_growth_values: List[float]) -> float
 def test_calc_avg_growth(pen: Pen, pen_animals, pen_populated, expected) -> None:
     """Unit test for function calc_avg_growth in file routines/animal/pen.py"""
     pen.animals_in_pen = pen_animals
-    pen.pen_populated = pen_populated
+    pen.populated = pen_populated
     pen.calc_avg_growth()
 
     actual = pen.avg_growth
@@ -218,13 +294,13 @@ def test_clear(pen: Pen) -> None:
     """Unit test for function clear in file routines/animal/pen.py"""
     calves = [MagicMock()]
     pen.animals_in_pen = calves
-    pen.pen_populated = True
+    pen.populated = True
     pen.avg_p_animal = 1.0
 
     pen.clear()
 
     assert pen.animals_in_pen == []
-    assert pen.pen_populated is False
+    assert pen.populated is False
     assert pen.avg_p_animal == 0
 
 

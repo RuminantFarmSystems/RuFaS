@@ -92,7 +92,7 @@ class Pen:
     classes_in_pen : set
         The set (no repeats) of all the classes to which the animals in the pen belong.
 
-    pen_populated : bool
+    populated : bool
         True iff there is at least 1 animal in the pen, and false otherwise.
 
     avg_DBW : float
@@ -214,7 +214,7 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = []
-        self.pen_populated = False
+        self.populated = False
 
         self.classes_in_pen = set()
         self.stocking_density = 0.0
@@ -288,9 +288,9 @@ class Pen:
 
     def update_pen_populated(self) -> None:
         """
-        Updates whether or not the pen is populated
+        Updates whether the pen is populated
         """
-        self.pen_populated = len(self.animals_in_pen) != 0
+        self.populated = len(self.animals_in_pen) != 0
 
     def update_stocking_density(self) -> None:
         """
@@ -332,33 +332,6 @@ class Pen:
         self.calc_daily_walking_dist()
         self.set_animal_combination(animal_combination)
         self.update_classes_in_pen()
-
-    # def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
-    #                    animal_combination: AnimalCombination):
-    #     """
-    #     Sets the list of animals to @new_animals and calculates the stocking
-    #     density and each animal's walking distance.
-    #
-    #     Args:
-    #         new_animals: list of new animals in the pen
-    #         animal_combination: an AnimalCombination Enum representing the type of the new animals
-    #     """
-    #
-    #     self.animals_in_pen.extend(new_animals)
-    #
-    #     self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
-    #
-    #     self.calc_daily_walking_dist()
-    #
-    #     # updates the animal class this pen holds
-    #     self.animal_combination = animal_combination
-    #
-    #     # sets the current animal classes in the pen
-    #     # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum
-    #     self.classes_in_pen = set()
-    #     for animal in self.animals_in_pen:
-    #         stage = type(animal).__name__
-    #         self.classes_in_pen.add(stage)
 
     def calc_ration(self, feed, available_feeds):
         """
@@ -513,7 +486,7 @@ class Pen:
         Calculates the average growth of the animals in the pen.
         """
 
-        if not self.pen_populated:
+        if not self.populated:
             return
 
         total_growth = 0
@@ -660,7 +633,7 @@ class Pen:
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
         self.animals_in_pen = []
-        self.pen_populated = False
+        self.populated = False
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):
