@@ -21,14 +21,14 @@ class Percolation:
 
         SWAT Reference: sections 2:3.1 and 2
         """
-        for i in range(len(self.data.soil_layers)):
+        for layer_index in range(len(self.data.soil_layers)):
             # iterate through each layer of soil in the soil profile
-            upper_layer = self.data.soil_layers[i]
-            if i != (len(self.data.soil_layers) - 1):
+            upper_layer = self.data.soil_layers[layer_index]
+            if layer_index != (len(self.data.soil_layers) - 1):
                 # upper layer is not the bottom layer of the soil profile
-                lower_layer = self.data.soil_layers[i + 1]
+                lower_layer = self.data.soil_layers[layer_index + 1]
                 if upper_layer.temperature > 0 and self._determine_if_percolation_allowed(
-                        lower_layer.soil_water_content,
+                        lower_layer.water_content,
                         lower_layer.field_capacity_content,
                         lower_layer.saturation_content,
                         has_seasonal_high_water_table):
@@ -43,15 +43,13 @@ class Percolation:
                 if upper_layer.temperature > 0:
                     # percolation is allowed from upper to lower layer
                     lower_layer = self.data.vadose_zone_layer
-                    if upper_layer.temperature > 0:
-                        amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer,
-                                                                             lower_layer)
+                    amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer, lower_layer)
                 else:
                     # percolation not allowed from upper to lower layer
                     break
             if amount_to_percolate > 0:
-                upper_layer.soil_water_content -= amount_to_percolate
-                lower_layer.soil_water_content += amount_to_percolate
+                upper_layer.water_content -= amount_to_percolate
+                lower_layer.water_content += amount_to_percolate
 
     # --- Static methods ---
     @staticmethod
@@ -144,4 +142,4 @@ class Percolation:
                 amount_to_percolate = lower_layer.acceptable_percolation_amount
 
             # move water from upper layer to lower layer
-            return amount_to_percolate
+            return max(0, amount_to_percolate)

@@ -92,11 +92,11 @@ class Evapotranspiration:
                                                                           layer.top_depth, layer.bottom_depth,
                                                                           layer.soil_evaporation_compensation_coefficient)
             evaporative_demand_reduced = self._determine_evaporative_demand_reduced(evaporative_demand,
-                                                                                    layer.soil_water_content,
+                                                                                    layer.water_content,
                                                                                     layer.field_capacity_content,
                                                                                     layer.wilting_point_content)
             amount_water_removed = self._determine_amount_water_removed(evaporative_demand_reduced,
-                                                                        layer.soil_water_content,
+                                                                        layer.water_content,
                                                                         layer.wilting_point_content)
 
             # remove water from soil water content
