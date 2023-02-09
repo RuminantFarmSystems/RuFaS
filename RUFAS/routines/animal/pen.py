@@ -317,7 +317,7 @@ class Pen:
             self.classes_in_pen.add(stage)
 
     def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
-                       animal_combination: AnimalCombination):
+                       animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
 
