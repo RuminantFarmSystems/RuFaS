@@ -27,11 +27,11 @@ class Percolation:
             if layer_index != (len(self.data.soil_layers) - 1):
                 # upper layer is not the bottom layer of the soil profile
                 lower_layer = self.data.soil_layers[layer_index + 1]
-                if upper_layer.temperature > 0 and self._determine_if_percolation_allowed(
-                        lower_layer.water_content,
-                        lower_layer.field_capacity_content,
-                        lower_layer.saturation_content,
-                        has_seasonal_high_water_table):
+                is_percolation_allowed = self._determine_if_percolation_allowed(lower_layer.water_content,
+                                                                                lower_layer.field_capacity_content,
+                                                                                lower_layer.saturation_content,
+                                                                                has_seasonal_high_water_table)
+                if upper_layer.temperature > 0 and is_percolation_allowed:
                     # percolation is allowed from upper to lower layer
                     amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer, lower_layer)
                 else:
