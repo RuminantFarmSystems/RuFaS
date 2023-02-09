@@ -181,11 +181,15 @@ def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, 
     incorp._determine_radiation_factor.assert_called_with(radiation, incorp.data.albedo)
     incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
     incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
-    incorp._determine_soil_surface_temp.assert_called_with(0.5, incorp.data.soil_layers[0].previous_day_temperature)
-    # TODO: the hardcoded values here based off the number of layers in the default configuration for soil_layers,
-    #  should they be made dynamic that that the tests won't fail if the default soil profile is updated?
+    incorp._determine_soil_surface_temp.assert_called_with(0.5, incorp.data.soil_layers[0].previous_day_temperature,
+                                                           20)
+
+    # TODO: the hardcoded values below based off the number of layers in the default configuration for soil_layers,
+    #  should they be made dynamic that that the tests won't fail if the default soil profile is changed?
     assert incorp._determine_depth_factor.call_count == 3
     assert incorp._determine_average_soil_temperature.call_count == 3
+    for layer in incorp.data.soil_layers:
+        assert 14 == layer.temperature
 
     # Run method a second time for expanded code coverage
     incorp.daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, plant_cover, snow_cover,
@@ -200,6 +204,8 @@ def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, 
     incorp._determine_radiation_factor.assert_called_with(radiation, incorp.data.albedo)
     incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
     incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
-    incorp._determine_soil_surface_temp.assert_called_with(0.5, 14)
+    incorp._determine_soil_surface_temp.assert_called_with(0.5, 14, 20)
     assert incorp._determine_depth_factor.call_count == 6
     assert incorp._determine_average_soil_temperature.call_count == 6
+    for layer in incorp.data.soil_layers:
+        assert 14 == layer.temperature
