@@ -21,38 +21,27 @@ class Percolation:
 
         SWAT Reference: sections 2:3.1 and 2
         """
-        for i in range(len(self.data.soil_layers)):
-            """iterate through each layer of soil in the soil profile"""
-            upper_layer = self.data.soil_layers[i]
-            if i != (len(self.data.soil_layers) - 1):
-                """upper layer is not the bottom layer of the soil profile"""
-                lower_layer = self.data.soil_layers[i + 1]
-                if upper_layer.temperature > 0 and self._determine_if_percolation_allowed(
-                        lower_layer.soil_water_content,
-                        lower_layer.field_capacity_content,
-                        lower_layer.saturation_content,
-                        has_seasonal_high_water_table):
-                    """percolation is allowed from upper to lower layer"""
-                    amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer, lower_layer)
-                else:
-                    """percolation not allowed from upper to lower layer"""
-                    continue
+        layer_count = len(self.data.soil_layers)
+        deepest_layer = layer_count - 1
+
+        for layer_number in range(layer_count):  # loop through each layer
+            current_layer = self.data.soil_layers[layer_number]
+
+            # get the appropriate underlying layer
+            if layer_number < deepest_layer:
+                layer_below = self.data.soil_layers[layer_number + 1]
             else:
-                """upper layer is the bottom layer of the soil profile, percolation goes into vadose zone which can 
-                    accept infinite amount of water
-                """
-                if upper_layer.temperature > 0:
-                    """percolation is allowed from upper to lower layer"""
-                    lower_layer = self.data.vadose_zone_layer
-                    if upper_layer.temperature > 0:
-                        amount_to_percolate = self._percolate_between_layers(self.data.time_step, upper_layer,
-                                                                             lower_layer)
-                else:
-                    """percolation not allowed from upper to lower layer"""
-                    break
-            if amount_to_percolate > 0:
-                upper_layer.soil_water_content -= amount_to_percolate
-                lower_layer.soil_water_content += amount_to_percolate
+                layer_below = self.data.vadose_zone_layer
+
+            # check for percolation conditions
+            can_percolate = self._determine_if_percolation_allowed(layer_below.water_content,
+                                                                   layer_below.field_capacity_content,
+                                                                   layer_below.saturation_content,
+                                                                   has_seasonal_high_water_table)
+            if current_layer.temperature > 0 and can_percolate:
+                percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
+                current_layer.water_content -= percolated_water
+                layer_below.water_content += percolated_water
 
     # --- Static methods ---
     @staticmethod
@@ -61,12 +50,12 @@ class Percolation:
         """calculates the travel time for percolation
 
         Args:
-            saturation: amount of water in soil layer when completely saturated in mm
-            field_capacity_content: water content of the soil layer at field capacity in mm
-            saturated_hydraulic_conductivity: saturated hydraulic conductivity of the layer in mm per hour
+            saturation: amount of water in soil layer when completely saturated (mm)
+            field_capacity_content: water content of the soil layer at field capacity (mm)
+            saturated_hydraulic_conductivity: saturated hydraulic conductivity of the layer (mm per hour)
 
         Returns:
-            travel time for percolation in hours
+            travel time for percolation (hours)
 
         SWAT Reference: 2:3.2.4
         """
@@ -80,12 +69,12 @@ class Percolation:
         """calculates amount of water that percolates to soil layer below it on a given day
 
         Args:
-            drainable_volume_water: drainable volume of water in soil layer on a given day in mm
-            time_step: length of time step over which percolation occurs in hours
-            travel_time: travel time for percolation in hours
+            drainable_volume_water: drainable volume of water in soil layer on a given day (mm)
+            time_step: length of time step over which percolation occurs (hours)
+            travel_time: travel time for percolation (hours)
 
         Returns:
-            amount of water percolating to the underlying soil layer on a given day in mm
+            amount of water percolating to the underlying soil layer on a given day (mm)
 
         SWAT Reference: 2:3.2.3
         """
@@ -98,9 +87,9 @@ class Percolation:
         """determines if a layer of soil has enough available capacity to accept more water via percolation
 
         Args:
-            soil_water_content: water content of given soil layer in mm
-            field_capacity_content: water content of given soil layer at field capacity in mm
-            saturated_capacity_content: water content of given soil layer when completely saturated in mm
+            soil_water_content: water content of given soil layer (mm)
+            field_capacity_content: water content of given soil layer at field capacity (mm)
+            saturated_capacity_content: water content of given soil layer when completely saturated (mm)
             is_seasonal_high_water_table: if HRU has a seasonal high water table (true/false)
 
         Returns:
@@ -124,7 +113,10 @@ class Percolation:
         Args:
             upper_layer: given layer of soil to percolate from (LayerData object)
             lower_layer: given layer of soil to percolate to (LayerData object)
-            time_step: length of time over which percolation occurs in hours
+            time_step: length of time over which percolation occurs (hours)
+
+        Returns:
+            amount of water that will actually be percolated from upper layer to lower layer (mm)
 
         SWAT Reference: 2:3.2 (section)
         """
@@ -142,4 +134,4 @@ class Percolation:
                 amount_to_percolate = lower_layer.acceptable_percolation_amount
 
             # move water from upper layer to lower layer
-            return amount_to_percolate
+            return max(0, amount_to_percolate)
