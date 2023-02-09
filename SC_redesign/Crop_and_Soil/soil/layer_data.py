@@ -54,7 +54,7 @@ class LayerData:
 
     @property
     def wilting_point_content(self) -> float:
-        """volume of water in layer when at wilting point"""
+        """amount of water in layer when at wilting point (mm)"""
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
