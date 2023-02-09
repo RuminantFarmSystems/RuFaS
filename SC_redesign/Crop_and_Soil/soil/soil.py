@@ -7,6 +7,7 @@ from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 
+
 class Soil:
     def __init__(self, soil_data: Optional[SoilData] = None):
         data = soil_data or SoilData()
@@ -19,4 +20,3 @@ class Soil:
         """"""
         Warning("create from config file not yet implement, returning default Soil()")
         return Soil()
-
