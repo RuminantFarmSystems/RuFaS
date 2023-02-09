@@ -333,7 +333,57 @@ class SoilTemp:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()
 
-    def daily_soil_temperature_update(self) -> None:
+    def daily_soil_temperature_update(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
+                                      plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
+        """this is the main routine that updates the soil temperature
+
+        Args:
+            solar_radiation: solar radiation reaching the ground on a given day (MJ per square meter per day)
+            avg_temp: average temperature of a given day (degrees C)
+            min_temp: minimum temperature of a given day (degrees C)
+            max_temp: maximum temperature of a given day (degrees C)
+            plant_cover: total aboveground plant biomass and residue on a given day (kg per hectare)
+            snow_cover: water content of the snow cover on a given day (mm)
+            avg_annual_air_temp: average annual air temperature (degrees C)
+
+        Important: SWAT does not specify how to start the simulation i.e. it does not specify what to do on day 0, when
+            there is no previous day's temperature. Currently, the implementation just uses the temperature that the
+            soil starts (it sets the previous days temperature equal to the current day's temperature)
+
+        SWAT Reference: section 1:1.3.3
+        """
+        max_damping_depth = self._determine_maximum_damping_depth(self.data.profile_bulk_density)
+        scaling_factor = self._determine_scaling_factor(self.data.profile_soil_water_content,
+                                                        self.data.profile_bulk_density,
+                                                        self.data.soil_layers[-1].bottom_depth)
+        damping_depth = self._determine_damping_depth(max_damping_depth, scaling_factor)
+        radiation_factor = self._determine_radiation_factor(solar_radiation, self.data.albedo)
+        bare_soil_surface_temp = self._determine_bare_soil_surface_temp(radiation_factor, avg_temp, min_temp, max_temp)
+        cover_factor = self._determine_cover_weighting_factor(plant_cover, snow_cover)
+        if self.data.soil_layers[0].previous_day_temperature is not None:
+            actual_soil_surface_temp = self._determine_soil_surface_temp(cover_factor,
+                                                                         self.data.soil_layers[0].previous_day_temperature,
+                                                                         bare_soil_surface_temp)
+        else:
+            actual_soil_surface_temp = self._determine_soil_surface_temp(cover_factor,
+                                                                         self.data.soil_layers[0].temperature,
+                                                                         bare_soil_surface_temp)
+        for layer in self.data.soil_layers:
+            new_previous_temperature = layer.temperature
+            layer_depth_factor = self._determine_depth_factor(layer.depth_of_layer_center, damping_depth)
+            if layer.previous_day_temperature is not None:
+                layer.temperature = self._determine_average_soil_temperature(self.data.lag_coefficient,
+                                                                             layer.previous_day_temperature,
+                                                                             layer_depth_factor,
+                                                                             avg_annual_air_temp,
+                                                                             actual_soil_surface_temp)
+            else:
+                layer.temperature = self._determine_average_soil_temperature(self.data.lag_coefficient,
+                                                                             layer.temperature,
+                                                                             layer_depth_factor,
+                                                                             avg_annual_air_temp,
+                                                                             actual_soil_surface_temp)
+            layer.previous_day_temperature = new_previous_temperature
 
     # --- Static methods ---
     @staticmethod
@@ -341,10 +391,10 @@ class SoilTemp:
         """calculates maximum damping depth of a soil profile based on bulk density
 
         Args:
-            bulk_density: the soil profile bulk density in Mg per cubic meter
+            bulk_density: the soil profile bulk density (Mg per cubic meter)
 
         Returns:
-            the maximum damping depth in mm
+            the maximum damping depth (mm)
 
         SWAT Reference: 1:1.3.7
         """
@@ -357,9 +407,9 @@ class SoilTemp:
         """calculates the scaling factor for use in calculating the damping depth
 
         Args:
-            soil_water_content: amount of water in soil profile expressed as depth of water in profile in mm
-            bulk_density: bulk density of the soil profile in Mg per cubic meter
-            bottom_depth: depth from the soil surface of the bottom of the soil profile in mm
+            soil_water_content: amount of water in soil profile expressed as depth of water in profile (mm)
+            bulk_density: bulk density of the soil profile (Mg per cubic meter)
+            bottom_depth: depth from the soil surface of the bottom of the soil profile (mm)
 
         Returns:
             the scaling factor for calculating damping depth (unitless)
@@ -373,11 +423,11 @@ class SoilTemp:
         """calculates the daily value for the damping depth
 
         Args:
-            max_damping_depth: maximum_damping_depth in mm
+            max_damping_depth: maximum_damping_depth (mm)
             scaling_factor: scaling factor for soil water (unitless)
 
         Returns:
-            damping depth for the day in mm
+            damping depth for the day (mm)
 
         SWAT Reference: 1:1.3.8
         """
@@ -390,8 +440,8 @@ class SoilTemp:
         """calculates the depth factor for a given layer of soil
 
         Args:
-            center_depth: depth of the center of a given soil layer in mm
-            damping_depth: damping depth of soil profile in mm
+            center_depth: depth of the center of a given soil layer (mm)
+            damping_depth: damping depth of soil profile (mm)
 
         Returns:
             the depth factor for this layer of soil (unitless)
@@ -408,7 +458,7 @@ class SoilTemp:
         """calculates the radiation term for use in calculating the bare soil surface temp
 
         Args:
-            solar_radiation: solar radiation reaching the ground on a given day in MJ per square meter per day
+            solar_radiation: solar radiation reaching the ground on a given day (MJ per square meter per day)
             albedo: the albedo of the soil (Google says "ratio of reflected to incident solar radiation") (unitless?)
 
         Returns:
@@ -425,12 +475,12 @@ class SoilTemp:
 
         Args:
             radiation_factor: radiation factor for a given day (unitless)
-            avg_temp: average temperature of a given day in degrees C
-            min_temp: minimum temperature of a given day in degrees C
-            max_temp: maximum temperature of a given day in degrees C
+            avg_temp: average temperature of a given day (degrees C)
+            min_temp: minimum temperature of a given day (degrees C)
+            max_temp: maximum temperature of a given day (degrees C)
 
         Returns:
-            the temperature of the surface soil if it were bare in degrees C
+            the temperature of the surface soil if it were bare (degrees C)
 
         SWAT Reference: 1:1.3.9
         """
@@ -441,8 +491,8 @@ class SoilTemp:
         """calculates the weighting factor for use in calculating the soil surface temperature
 
         Args:
-            plant_cover: total aboveground plant biomass and residue on a given day in kg per hectare
-            snow_cover: water content of the snow cover on a given day in mm
+            plant_cover: total aboveground plant biomass and residue on a given day (kg per hectare)
+            snow_cover: water content of the snow cover on a given day (mm)
 
         Returns:
             weighting factor based either snow or plant matter soil cover (unitless)
@@ -460,11 +510,11 @@ class SoilTemp:
 
         Args:
             cover_weighting_factor: weighting factor for soil cover impacts (unitless)
-            previous_top_soil_layer_temp: temperature of the first layer of soil on the previous day in degrees C
-            bare_soil_surface_temp: temperature of the bare soil surface in degrees C
+            previous_top_soil_layer_temp: temperature of the first layer of soil on the previous day (degrees C)
+            bare_soil_surface_temp: temperature of the bare soil surface (degrees C)
 
         Returns:
-            soil surface temperature for a given day in degrees C
+            soil surface temperature for a given day (degrees C)
 
         SWAT Reference: 1:1.3.12
         """
@@ -477,14 +527,14 @@ class SoilTemp:
         """calculates daily average soil temperature at center of a given soil layer
 
         Args:
-            lag_coefficient: coefficient that controls influence of previous day's temp on current day's temp in degrees C
-            previous_day_soil_temp: soil temperature in the layer from the previous day in degrees C
+            lag_coefficient: coefficient that controls influence of previous day's temp on current day's temp (degrees C)
+            previous_day_soil_temp: soil temperature in the layer from the previous day (degrees C)
             depth_factor: factor that quantifies the influence of depth below surface on soil temp (unitless)
-            avg_annual_air_temp: average annual air temperature in degrees C
-            soil_surface_temp: soil surface temp on current day degrees C
+            avg_annual_air_temp: average annual air temperature (degrees C)
+            soil_surface_temp: soil surface temp on current day (degrees C)
 
         Returns:
-            soil temperature at given depth on given day in degrees C
+            soil temperature at given depth on given day (degrees C)
 
         SWAT Reference: 1:1.3.3
         """

@@ -1,7 +1,8 @@
 import pytest
 
+from unittest.mock import MagicMock
 from SC_redesign.Crop_and_Soil.soil.soil_temp import *
-
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 # --- Static function tests ---
 @pytest.mark.parametrize("bulk_density", [
@@ -141,3 +142,64 @@ def test_determine_average_soil_temperature(lag, prev_soil_temp, depth_factor, a
     expect = (lag * prev_soil_temp) + ((1 - lag) * ((depth_factor * (avg_annual_air_temp - soil_surface_temp))
                                                     + soil_surface_temp))
     assert observe == expect
+
+# ---- Integration tests ----
+@pytest.mark.parametrize("radiation,avg_temp,min_temp,max_temp,plant_cover,snow_cover,avg_annual_temp", [
+    (100.596, 20.6958, 16.395, 23.59568, 80.938, 2.3948, 9),
+    (0, 0, 0, 0, 0, 0, 0),  # apocalypse
+    (300, 28, 26, 31, 1200, 0, 12),
+    (170, 24, 20, 30, 400, 3, 8.95),
+])
+def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, plant_cover, snow_cover,
+                                       avg_annual_temp):
+    """tests that daily_soil_update() in soil_temp.py correctly uses and updates all functions"""
+    # Initialize objects
+    data = SoilData()
+    incorp = SoilTemp(data)
+
+    # Mock helper functions
+    incorp._determine_maximum_damping_depth = MagicMock(return_value=1000)
+    incorp._determine_scaling_factor = MagicMock(return_value=0.35)
+    incorp._determine_damping_depth = MagicMock(return_value=1995)
+    incorp._determine_radiation_factor = MagicMock(return_value=0.5)
+    incorp._determine_bare_soil_surface_temp = MagicMock(return_value=20)
+    incorp._determine_cover_weighting_factor = MagicMock(return_value=0.5)
+    incorp._determine_soil_surface_temp = MagicMock(return_value=18.5)
+    incorp._determine_depth_factor = MagicMock(return_value=0.5)
+    incorp._determine_average_soil_temperature = MagicMock(return_value=14)
+
+    # Run method
+    incorp.daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, plant_cover, snow_cover,
+                                         avg_annual_temp)
+
+    # Check everything
+    incorp._determine_maximum_damping_depth.assert_called_with(incorp.data.profile_bulk_density)
+    incorp._determine_scaling_factor.assert_called_with(incorp.data.profile_soil_water_content,
+                                                        incorp.data.profile_bulk_density,
+                                                        incorp.data.soil_layers[-1].bottom_depth)
+    incorp._determine_damping_depth.assert_called_with(1000, 0.35)
+    incorp._determine_radiation_factor.assert_called_with(radiation, incorp.data.albedo)
+    incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
+    incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
+    incorp._determine_soil_surface_temp.assert_called_with(0.5, incorp.data.soil_layers[0].previous_day_temperature)
+    # TODO: the hardcoded values here based off the number of layers in the default configuration for soil_layers,
+    #  should they be made dynamic that that the tests won't fail if the default soil profile is updated?
+    assert incorp._determine_depth_factor.call_count == 3
+    assert incorp._determine_average_soil_temperature.call_count == 3
+
+    # Run method a second time for expanded code coverage
+    incorp.daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, plant_cover, snow_cover,
+                                         avg_annual_temp)
+
+    # Re-check everything
+    incorp._determine_maximum_damping_depth.assert_called_with(incorp.data.profile_bulk_density)
+    incorp._determine_scaling_factor.assert_called_with(incorp.data.profile_soil_water_content,
+                                                        incorp.data.profile_bulk_density,
+                                                        incorp.data.soil_layers[-1].bottom_depth)
+    incorp._determine_damping_depth.assert_called_with(1000, 0.35)
+    incorp._determine_radiation_factor.assert_called_with(radiation, incorp.data.albedo)
+    incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
+    incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
+    incorp._determine_soil_surface_temp.assert_called_with(0.5, 14)
+    assert incorp._determine_depth_factor.call_count == 6
+    assert incorp._determine_average_soil_temperature.call_count == 6
