@@ -31,7 +31,7 @@ class SoilData:
     previous_retention_parameter: Optional[float] = None
     """retention parameter for the previous day (mm) (used in SWAT 2:1.1.9)"""
     average_slope_fraction: float = 0.05
-    """average slope fraction of the subbasin"""
+    """average slope fraction of the subbasin (unitless)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
 
@@ -46,7 +46,7 @@ class SoilData:
         """
 
         Returns: amount of water in the entire soil profile (excluding the amount of water held in the profile at the
-            wilting point) in mm
+            wilting point) (mm)
 
         Details: this method for calculating total soil water content assumes the lower bound of water to be 0. It also
             calculates the soil water content per layer, meaning that if one layer has water content greater than its
@@ -66,7 +66,7 @@ class SoilData:
     def profile_saturation(self) -> float:
         """
 
-        Returns: amount of water in the soil profile when completely saturated in mm
+        Returns: amount of water in the soil profile when completely saturated (mm)
 
         """
         if self.soil_layers is None:
@@ -81,7 +81,7 @@ class SoilData:
     def profile_field_capacity(self) -> float:
         """
 
-        Returns: total amount of water contained in the soil profile at field capacity (but not saturated) in mm
+        Returns: total amount of water contained in the soil profile at field capacity (but not saturated) (mm)
 
         """
         if self.soil_layers is None:
