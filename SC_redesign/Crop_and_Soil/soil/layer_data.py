@@ -36,7 +36,7 @@ class LayerData:
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
     available_water_capacity: float = 0.2
-    """available water capacity expressed as fraction of total soil volume"""
+    """available water capacity expressed as fraction of total soil volume (unitless)"""
 
     def __post_init__(self):
         """This function initializes all attributes in the dataclass that depend on"""
@@ -44,12 +44,12 @@ class LayerData:
 
     @property
     def layer_thickness(self) -> float:
-        """thickness of soil layer in mm"""
+        """thickness of soil layer (mm)"""
         return self.bottom_depth - self.top_depth
 
     @property
     def field_capacity_content(self) -> float:
-        """volume of water in layer when at field capacity in mm"""
+        """volume of water in layer when at field capacity (mm)"""
         return self.field_capacity_water_concentration * self.layer_thickness
 
     @property
@@ -59,7 +59,7 @@ class LayerData:
 
     @property
     def excess_water_available(self):
-        """volume of water available for percolation in the soil layer in mm
+        """volume of water available for percolation in the soil layer (mm)
 
         SWAT Reference: 2:3.2.1, 2
         """
@@ -67,10 +67,10 @@ class LayerData:
 
     @property
     def saturation_content(self) -> float:
-        """volume of water in layer when saturated in mm"""
+        """volume of water in layer when saturated (mm)"""
         return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
     def acceptable_percolation_amount(self) -> float:
-        """volume of water that can be accepted by layer before reaching saturation (in mm)"""
+        """volume of water that can be accepted by layer before reaching saturation (mm)"""
         return max(0, self.saturation_content - self.soil_water_content)
