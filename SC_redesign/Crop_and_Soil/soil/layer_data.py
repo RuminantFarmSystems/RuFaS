@@ -32,7 +32,7 @@ class LayerData:
 
     # --- Percolation
     temperature: float = 15.05
-    """temperature of soil layer (degrees Celsius)"""
+    """temperature of soil layer (degrees C)"""
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
     available_water_capacity: float = 0.2
@@ -41,6 +41,8 @@ class LayerData:
     # --- Temperature
     bulk_density: float = 1.4
     """bulk density of the soil layer (Mg per cubic meter)"""
+    previous_day_temperature: Optional[float] = None
+    """temperature of soil layer on the previous day (degrees C)"""
 
     def __post_init__(self):
         """This function initializes all attributes in the dataclass that depend on"""
@@ -50,6 +52,11 @@ class LayerData:
     def layer_thickness(self) -> float:
         """thickness of soil layer in mm"""
         return self.bottom_depth - self.top_depth
+
+    @property
+    def depth_of_layer_center(self) -> float:
+        """depth beneath the surface of the center this layer (mm)"""
+        return self.top_depth + (self.layer_thickness / 2)
 
     @property
     def field_capacity_content(self) -> float:
@@ -62,7 +69,7 @@ class LayerData:
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
-    def excess_water_available(self):
+    def excess_water_available(self) -> float:
         """volume of water available for percolation in the soil layer in mm
 
         SWAT Reference: 2:3.2.1, 2
@@ -76,5 +83,5 @@ class LayerData:
 
     @property
     def acceptable_percolation_amount(self) -> float:
-        """volume of water that can be accepted by layer before reaching saturation (in mm)"""
+        """volume of water that can be accepted by layer before reaching saturation (mm)"""
         return max(0, self.saturation_content - self.soil_water_content)
