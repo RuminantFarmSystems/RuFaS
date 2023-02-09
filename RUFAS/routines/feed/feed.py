@@ -20,7 +20,10 @@ from .feed_typed_dicts import PurchasedFeedTypedDict
 from ..animal.pen import Pen
 from ...database_reader import DatabaseReader
 from RUFAS.output_handler.reports.feed_storage_report import StorageReport
+from RUFAS.output_manager import OutputManager
 from typing import Dict, List, Union
+
+om = OutputManager()
 
 
 def daily_feed_routine(feed, fields, animal_management, feed_report):
@@ -123,6 +126,7 @@ class Feed:
         Description:
             Summarize nutrients and losses over the managed storage receptacles
         """
+
         for storage in self.storage_options.values():
             self.C += storage.C
             self.N += storage.C
@@ -134,6 +138,17 @@ class Feed:
             self.CP_loss += storage.CP_loss
 
             self.NPN += storage.NPN
+            info_map = {"class": self.__class__.__name__, "function": self.summarize_feed_storage.__name__, 
+                        "storage_type": storage}
+            nutrients_dict = {}
+            nutrients_dict["carbon"] = self.C
+            nutrients_dict["nitrogen"] = self.N
+            nutrients_dict["phosphorus"] = self.P
+            nutrients_dict["dry_matter"] = self.DM
+            nutrients_dict["crude_protein"] = self.CP
+            nutrients_dict["carbon_loss"] = self.C_loss
+            nutrients_dict["crude_protein_loss"] = self.CP_loss
+            om.add_variable("nutrients_summary", nutrients_dict, info_map)
 
     class Storage:
         def __init__(self, data):
@@ -732,6 +747,8 @@ class Feed:
                 self.available_storage.pop(storage_name)
 
             self.summarize_feed_storage()
+            
+
 
     def daily_feed_management(self, animal_management):
         """
