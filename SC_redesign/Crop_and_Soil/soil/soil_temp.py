@@ -142,7 +142,7 @@ class SoilTemp:
     @staticmethod
     def _determine_bare_soil_surface_temp(radiation_factor: float, avg_temp: float, min_temp: float,
                                           max_temp: float) -> float:
-        """calculates the temperature of the soil surface if it were bare
+        """calculates the temperature at the surface of bare soil.
 
         Args:
             radiation_factor: radiation factor for a given day (unitless)
@@ -151,7 +151,7 @@ class SoilTemp:
             max_temp: maximum temperature of a given day (degrees C)
 
         Returns:
-            the temperature of the surface soil if it were bare (degrees C)
+            bare soil surface temperature (degrees C)
 
         SWAT Reference: 1:1.3.9
         """
