@@ -24,6 +24,8 @@ others
 # only stores non-empty directories
 output/*
 !output/.keep
+RUFAS/routines/manure/output/*
+!RUFAS/routines/manure/output/.keep
 
 # ignore project files
 *.sublime-project
