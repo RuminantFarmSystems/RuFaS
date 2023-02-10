@@ -9,7 +9,7 @@ This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)
 class SoilTemp:
 
     def __init__(self, soil_data: Optional[SoilData] = None):
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData()     # Initialize with defaults, if not given
 
     def daily_soil_temperature_update(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
                                       plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
@@ -129,7 +129,7 @@ class SoilTemp:
         """calculates the radiation term for use in calculating the bare soil surface temp
 
         Args:
-            solar_radiation: solar radiation reaching the ground on a given day (MJ per square meter per day)
+            solar_radiation: solar radiation reaching the ground on the current day (MJ per square meter per day)
             albedo: proportion of solar radiation that is reflected by the soil surface (unitless)
 
         Returns:
@@ -146,9 +146,9 @@ class SoilTemp:
 
         Args:
             radiation_factor: radiation factor for a given day (unitless)
-            avg_temp: average temperature of a given day (degrees C)
-            min_temp: minimum temperature of a given day (degrees C)
-            max_temp: maximum temperature of a given day (degrees C)
+            avg_temp: average temperature of the current day (degrees C)
+            min_temp: minimum temperature of the current day (degrees C)
+            max_temp: maximum temperature of the current day (degrees C)
 
         Returns:
             the temperature of the surface soil if it were bare (degrees C)
@@ -162,8 +162,8 @@ class SoilTemp:
         """calculates the weighting factor for use in calculating the soil surface temperature
 
         Args:
-            plant_cover: total aboveground plant biomass and residue on a given day (kg per hectare)
-            snow_cover: water content of the snow cover on a given day (mm)
+            plant_cover: total aboveground plant biomass and residue on the current day (kg per hectare)
+            snow_cover: water content of the snow cover on the current day (mm)
 
         Returns:
             weighting factor based either snow or plant matter soil cover (unitless)
@@ -185,7 +185,7 @@ class SoilTemp:
             bare_soil_surface_temp: temperature of the bare soil surface (degrees C)
 
         Returns:
-            soil surface temperature for a given day (degrees C)
+            soil surface temperature for the current day (degrees C)
 
         SWAT Reference: 1:1.3.12
         """
@@ -198,14 +198,15 @@ class SoilTemp:
         """calculates daily average soil temperature at center of a given soil layer
 
         Args:
-            prev_temperature_effect: coefficient that controls influence of previous day's temp on current day's temp (unitless)
+            prev_temperature_effect: coefficient that controls influence of previous day's temp on the current day's
+                temp (unitless)
             previous_day_soil_temp: soil temperature in the layer from the previous day (degrees C)
             depth_factor: factor that quantifies the influence of depth below surface on soil temperature (unitless)
             avg_annual_air_temp: average annual air temperature (degrees C)
-            soil_surface_temp: soil surface temp on current day (degrees C)
+            soil_surface_temp: soil surface temp on the current day (degrees C)
 
         Returns:
-            soil temperature at given depth on given day (degrees C)
+            soil temperature at given depth on the current day (degrees C)
 
         SWAT Reference: 1:1.3.3
         """
