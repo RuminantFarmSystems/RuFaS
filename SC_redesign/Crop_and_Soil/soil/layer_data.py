@@ -35,8 +35,6 @@ class LayerData:
     """temperature of soil layer (degrees Celsius)"""
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
-    available_water_capacity: float = 0.2
-    """available water capacity expressed as fraction of total soil volume (unitless)"""
 
     def __post_init__(self):
         """This function initializes all attributes in the dataclass that depend on other attributes in the class"""

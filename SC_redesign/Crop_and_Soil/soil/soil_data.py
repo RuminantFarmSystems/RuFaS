@@ -37,9 +37,10 @@ class SoilData:
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
-    """Datalayer object that represents the vadose zone, arbitrary top and bottom depths, starts with no water"""
+    """Datalayer object that represents the vadose zone, top depth is set equal bottom depth of lowest soil layer and 
+    bottom depth is arbitrary, starts with no water"""
     time_step: float = 24
-    """length of time step over which percolatigit adon occurs (hours) """
+    """length of time step over which percolation occurs (hours) """
 
     def __post_init__(self):
         if self.soil_layers is None:
