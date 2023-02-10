@@ -384,8 +384,13 @@
 #     exp_part = exp(-35.835 * slope)
 #
 #     return 0.6 * (1 - exp_part)
+from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+
+"""
+This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1.1 of SWAT
+"""
 
 
 class SoilErosion:
