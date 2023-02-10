@@ -31,7 +31,8 @@ $W_{\text{def}}$ is the water deficiency factor (`water_deficiency`).
 
 Alternatively, the user can provide a **target harvest index** for the crop (`user_harvest_index`). When that occurs, the provided value is used in place of the **harvest index** (`harvest_index`) calculated with the previous method.  
 
-Once crops reach maturity (`heat_fraction`>= 1.0), the **above-ground biomass** is adjusted by the water losses due to the start of the dry-down process. The new above-ground biomass value is calculated using the pre-dry-down above-ground biomass and the dry-down fraction:
+Once crops reach maturity (`heat_fraction` $\geq 1.0$), the **above-ground biomass** is adjusted by the water losses due to the start of the dry-down process. The new above-ground biomass value is calculated using the pre-dry-down above-ground biomass and the dry-down fraction:
+
 
 $$ Biom_{\text{ag, dry}} = Biom_{\text{ag}}-(Biom_{\text{ag}}\times d)
 $$
