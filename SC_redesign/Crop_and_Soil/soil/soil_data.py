@@ -41,6 +41,15 @@ class SoilData:
     time_step: float = 24
     """length of time step over which percolation occurs (hours) """
 
+    # ---- temperature
+    albedo: float = 0.16
+    """ratio of reflected to solar radiation (unitless)"""
+    # TODO: check above definition with a SME because all I did to get it was google 'soil albedo'
+    previous_temperature_effect: float = 0.8
+    """variable that controls the influence of previous day's temperature on current day's temperature, range is from 0
+    to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
+    """
+
     def __post_init__(self):
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any
@@ -53,15 +62,6 @@ class SoilData:
                                            bottom_depth=10000000,    # bottom depth is 10,000 meters by default
                                            soil_water_concentration=0,
                                            saturation_point_water_concentration=inf)
-
-    # ---- temperature
-    albedo: float = 0.16
-    """ratio of reflected to solar radiation (unitless)"""
-    # TODO: check above definition with a SME because all I did to get it was google 'soil albedo'
-    lag_coefficient: float = 0.8
-    """variable that controls the influence of previous day's temperature on current day's temperature, range is from 0
-    to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
-    """
 
     @property
     def profile_soil_water_content(self) -> float:
