@@ -43,8 +43,7 @@ class SoilData:
 
     # ---- temperature
     albedo: float = 0.16
-    """ratio of reflected to solar radiation (unitless)"""
-    # TODO: check above definition with a SME because all I did to get it was google 'soil albedo'
+    """proportion of solar radiation that is reflected by the soil surface (unitless)"""
     previous_temperature_effect: float = 0.8
     """variable that controls the influence of previous day's temperature on current day's temperature, range is from 0
     to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
@@ -103,7 +102,7 @@ class SoilData:
     def profile_field_capacity(self) -> float:
         """
 
-        Returns: total amount of water contained in the soil profile at field capacity (but not saturated) (mm)
+        Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
 
         """
         if self.soil_layers is None:
@@ -133,11 +132,8 @@ class SoilData:
 
     @property
     def profile_bulk_density(self):
-        """
-
-        Returns: average bulk density of the soil profile based on the bulk density of each soil layer and weighted by
-            the thickness of that layer
-
+        """average bulk density of the soil profile based on the bulk density of each soil layer, weighted by
+            the thickness
         """
         weighted_densities_sum = 0
         weights_sum = 0
