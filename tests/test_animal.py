@@ -157,20 +157,20 @@ def test___str__():
 
 
 @pytest.mark.parametrize(
-    "events_list, event_descriptions, expected_days",
-    [
-        (
-            [],
-            ['dummy'],
-            [-1]
-        ),
-        (
-            [(1, 2, 'event1'), (3, 4, 'event2'),
-             (5, 6, 'event1'), (7, 8, 'event3')],
-            ['event1', 'event2', 'event3', 'event0'],
-            [5, 3, 7, -1]
-        )
-    ],
+        "events_list, event_descriptions, expected_days",
+        [
+            (
+                    [],
+                    ['dummy'],
+                    [-1]
+            ),
+            (
+                    [(1, 2, 'event1'), (3, 4, 'event2'),
+                     (5, 6, 'event1'), (7, 8, 'event3')],
+                    ['event1', 'event2', 'event3', 'event0'],
+                    [5, 3, 7, -1]
+            )
+        ],
 )
 def test_get_most_recent_date(events_list, event_descriptions, expected_days):
     """Unit test for function get_most_recent_date in file routines/animal/life_cycle/animal_events.py"""
@@ -653,11 +653,6 @@ def test_manure_calculations():
     pass
 
 
-def test_phosphorus_excreted():
-    """Unit test for function phosphorus_excreted in file routines/animal/manure/general_manure.py"""
-    pass
-
-
 def test_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/growing_heifer_manure_excretion.py"""
     pass
@@ -816,6 +811,7 @@ def test_set_requirements():
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     pass
+
 
 def test_get_feed_data_from_feed_ids() -> None:
     """Unit test for function get_feed_data_from_feed_ids in file routines/animal/ration/ration_driver.py"""

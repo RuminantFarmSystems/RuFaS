@@ -10,6 +10,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
@@ -234,21 +235,22 @@ class Pen:
         self.MEdiet = 0.0
 
         # template for manure, calf_total, etc.
-        self._manure_dict_template = {"U": 0,
-                                      "Urine": 0,
-                                      "TAN_s": 0,
-                                      "MN": 0,
-                                      "Mkg": 0,
-                                      "TSd": 0,
-                                      "VSd": 0,
-                                      "VSnd": 0,
-                                      "WIP_frac": 0,
-                                      "WOP_frac": 0,
-                                      "p_excrt_manure": 0,
-                                      "p_frac": 0,
-                                      "K_manure": 0,
-                                      "CH4_manure": 0
-                                      }
+        self._manure_dict_template = AnimalManureExcretions(
+                urea=0.0,
+                urine=0.0,
+                total_ammoniacal_nitrogen=0.0,
+                nitrogen=0.0,
+                manure_mass=0.0,
+                total_solids=0.0,
+                degradable_volatile_solids=0.0,
+                non_degradable_volatile_solids=0.0,
+                inorganic_phosphorus_fraction=0.0,
+                organic_phosphorus_fraction=0.0,
+                phosphorus=0.0,
+                phosphorus_fraction=0.0,
+                potassium=0.0,
+                methane=0.0
+        )
 
         # manure attributes are initialized in the reset_manure method
         self.manure = None

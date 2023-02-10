@@ -319,10 +319,12 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
 
     # Act
     manure_separator_daily_output, manure_treatment_daily_output = \
-        manure_management._handle_daily_update_for_simple_manure_treatment(simulation_day=simulation_day,
-                                                                           pen=mock_manure_management_pen,
-                                                                           manure_handler_daily_output=mock_manure_handler_daily_output,
-                                                                           reception_pit_daily_output=mock_reception_pit_daily_output)
+        manure_management._handle_daily_update_for_simple_manure_treatment(
+                simulation_day=simulation_day,
+                pen=mock_manure_management_pen,
+                manure_handler_daily_output=mock_manure_handler_daily_output,
+                reception_pit_daily_output=mock_reception_pit_daily_output
+        )
 
     # Assert
     if is_manure_separator_present:

@@ -295,19 +295,19 @@ class ManureStorage:
             self.bedding = pen.bedding_type
             self.separator = pen.manure_separator
             self.cow_num = len(pen.animals_in_pen)
-            self.raw_manure = pen.manure['Mkg']
+            self.raw_manure = pen.manure['manure_mass']
 
-            self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
-            self.TS_excreted = pen.manure['TSd']
-            self.N_excreted = pen.manure['MN']
-            self.P_excreted = pen.manure['p_excrt_manure']
-            self.WIP_frac = pen.manure['WIP_frac']
+            self.VS_excreted = pen.manure['degradable_volatile_solids'] + pen.manure['non_degradable_volatile_solids']
+            self.TS_excreted = pen.manure['total_solids']
+            self.N_excreted = pen.manure['nitrogen']
+            self.P_excreted = pen.manure['phosphorus']
+            self.WIP_frac = pen.manure['inorganic_phosphorus_fraction']
             self.WIP = self.raw_manure * self.WIP_frac
-            self.WOP_frac = pen.manure['WOP_frac']
+            self.WOP_frac = pen.manure['organic_phosphorus_fraction']
             self.WOP = self.raw_manure * self.WOP_frac
-            self.CH4 = pen.manure['CH4_manure']
+            self.CH4 = pen.manure['methane']
 
-            self.K_excreted = pen.manure['K_manure']
+            self.K_excreted = pen.manure['potassium']
 
             self.density = 994.0
 
@@ -333,17 +333,17 @@ class ManureStorage:
 
         def update_pen(self, animal_management):
             pen = animal_management.all_pens[self.pen_id]
-            self.raw_manure = pen.manure['Mkg']
-            self.VS_excreted = pen.manure['VSd'] + pen.manure['VSnd']
-            self.TS_excreted = pen.manure['TSd']
-            self.N_excreted = pen.manure['MN']
-            self.P_excreted = pen.manure['p_excrt_manure']
-            self.K_excreted = pen.manure['K_manure']
-            self.CH4 = pen.manure['CH4_manure']
+            self.raw_manure = pen.manure['manure_mass']
+            self.VS_excreted = pen.manure['degradable_volatile_solids'] + pen.manure['non_degradable_volatile_solids']
+            self.TS_excreted = pen.manure['total_solids']
+            self.N_excreted = pen.manure['nitrogen']
+            self.P_excreted = pen.manure['phosphorus']
+            self.K_excreted = pen.manure['potassium']
+            self.CH4 = pen.manure['methane']
 
-            self.WIP_frac = pen.manure['WIP_frac']
+            self.WIP_frac = pen.manure['inorganic_phosphorus_fraction']
             self.WIP = self.raw_manure * self.WIP_frac
-            self.WOP_frac = pen.manure['WOP_frac']
+            self.WOP_frac = pen.manure['organic_phosphorus_fraction']
             self.WOP = self.raw_manure * self.WOP_frac
 
         def calibrate_water_use(self):
