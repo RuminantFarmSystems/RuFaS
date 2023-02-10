@@ -25,7 +25,8 @@ The **crops supported by RUFAS** at present with available crop data classes wit
 - Soybean (*Glycine max*)
 - Sugar beet (*Beta vulgaris var. saccharifera*)
 - Potato (*Solanum tuberosum*)
-- Triticale (*x Triticosecale*)
+<!-- - Triticale (*x Triticosecale*) -->
+
 
 ---
 **References**: for more information visit [Sphinx][1] documentation (TBA). 
