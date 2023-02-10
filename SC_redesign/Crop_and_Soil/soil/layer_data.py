@@ -19,7 +19,7 @@ class LayerData:
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
     water_content:  Optional[float] = None
-    """volume of soil water in the layer (mm)"""
+    """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
     wilting_point_water_concentration: float = 0.2  # arbitrary
