@@ -88,8 +88,6 @@ class HeiferII(HeiferI):
         self.semen_proportion = AnimalBase.config['semen_proportion_h'] 
         self.avg_net_merit_cow = 0
         self.net_merit_list = []
-        self.calf_breed = None
-        self.calf_gender = None
 
     def get_bw_change(self):
         """
@@ -156,6 +154,8 @@ class HeiferII(HeiferI):
         # new calf related
         self.p_gest_for_calf = 0
         self.calf_birth_weight = 0
+        self.calf_gender = None
+        self.calf_breed = None
 
     def assign_heiferII_values(self, args):
         """
@@ -187,6 +187,8 @@ class HeiferII(HeiferI):
         # new calf related
         self.p_gest_for_calf = args['p_gest_for_calf']
         self.calf_birth_weight = args['calf_birth_weight']
+        self.calf_gender = args['calf_gender']
+        self.calf_breed = 'HO'
 
     def get_heiferII_values(self):
         """
@@ -218,7 +220,8 @@ class HeiferII(HeiferI):
             'days_in_preg': self.days_in_preg,
             'gestation_length': self.gestation_length,
             'p_gest_for_calf': self.p_gest_for_calf,
-            'calf_birth_weight': self.calf_birth_weight
+            'calf_birth_weight': self.calf_birth_weight,
+            'calf_gender': self.calf_gender,
         }
         return values
 
@@ -662,9 +665,9 @@ class HeiferII(HeiferI):
 
                 # generate calf breed according to semen type
                 if self.semen_type == "dairy_conventional" or self.semen_type == "dairy_sexed":
-                    self.calf_breed = 'HO'
+                    self.calf_breed = self.breed
                 elif self.semen_type == "beef_conventional" or self.semen_type == "beef_sexed":
-                    self.calf_breed = 'HO-AN'
+                    self.calf_breed = 'crossbred'
 
                 # generate calf gender according to semen type
                 if self.semen_type == "dairy_conventional":
@@ -706,6 +709,8 @@ class HeiferII(HeiferI):
                     self.body_weight -= self.conceptus_weight
                     self.conceptus_weight = 0
                     self.calf_birth_weight = 0
+                    self.calf_gender = None
+                    self.calf_breed = None      
                     self.p_gest_for_calf = 0
                     self.events.add_event(
                         self.days_born, sim_day, const.PREG_LOSS_BEFORE_1)
@@ -731,6 +736,8 @@ class HeiferII(HeiferI):
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
                 self.calf_birth_weight = 0
+                self.calf_gender = None
+                self.calf_breed = None
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_1_AND_2)
@@ -750,6 +757,8 @@ class HeiferII(HeiferI):
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
                 self.calf_birth_weight = 0
+                self.calf_gender = None
+                self.calf_breed = None
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)

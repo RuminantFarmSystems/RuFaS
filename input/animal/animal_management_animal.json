@@ -29,8 +29,8 @@
 		"farm_level": {
 			"calf": {
 				"male_calf_rate_dairy_sexed_semen": 0.1,
-				"male_calf_rate_dairy_conventional_semen": 0.5,
-				"male_calf_rate_beef_conventional_semen": 0.5,
+				"male_calf_rate_dairy_conventional_semen": 0.53,
+				"male_calf_rate_beef_conventional_semen": 0.53,
 				"male_calf_rate_beef_sexed_semen": 0.9,
 				"keep_female_calf_rate": 1,
 				"wean_day": 60,

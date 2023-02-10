@@ -99,7 +99,7 @@ class LifeCycleReport(BaseReportDriver):
                 'bought_heifer_num': ['life_cycle_manager.bought_heifer_num', '', []],
                 'culled_heifer_num': ['life_cycle_manager.culled_heifer_num', '', []],
                 'culled_cow_num': ['life_cycle_manager.culled_cow_num', '', []],
-                'do_not_breed_cow_num': ['life_cycle_manager.do_not_breed_num', '', []]
+                'do_not_breed_cow_num': ['life_cycle_manager.do_not_breed_num', '', []],
             }
             
             for parity in LifeCycleManager.num_cow_for_parity:
@@ -152,7 +152,8 @@ class LifeCycleReport(BaseReportDriver):
                 'sold_beef_female_calf_num': ['life_cycle_manager.sold_beef_female_calf_num', '', []],
                 'culled_heifer_age': ['life_cycle_manager.culled_heifer_age', '', []],
                 'heifer_open_time': ['life_cycle_manager.heifer_open_time', '', []],
-                'produced_female_num': ['life_cycle_manager.produced_female_num', '', []]
+                'produced_female_num': ['life_cycle_manager.produced_female_num', '', []],
+                'died_female_calf_num': ['life_cycle_manager.died_female_calf_num', '', []]
             }
 
             self.production_performance = {

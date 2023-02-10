@@ -16,6 +16,7 @@ import sqlite3
 from enum import IntEnum
 import pandas as pd
 from random import uniform
+from random import random
 
 
 class AnimalValues(IntEnum):
@@ -470,7 +471,8 @@ class AnimalInitialization:
                 'days_in_preg': int(row[AnimalValues.days_in_preg]),
                 'gestation_length': int(row[AnimalValues.gestation_length]),
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
-                'calf_birth_weight': float(row[AnimalValues.calf_birth_weight])
+                'calf_birth_weight': float(row[AnimalValues.calf_birth_weight]),
+                'calf_gender': self.determine_calf_gender(row)
             }
             heiferII = HeiferII(args)
             heiferIIs.append(heiferII)
@@ -523,7 +525,8 @@ class AnimalInitialization:
                 'days_in_preg': int(row[AnimalValues.days_in_preg]),
                 'gestation_length': int(row[AnimalValues.gestation_length]),
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
-                'calf_birth_weight': float(row[AnimalValues.calf_birth_weight])
+                'calf_birth_weight': float(row[AnimalValues.calf_birth_weight]),
+                'calf_gender': self.determine_calf_gender(row)
             }
             heiferIII = HeiferIII(args)
             heiferIIIs.append(heiferIII)
@@ -582,7 +585,8 @@ class AnimalInitialization:
                 #'resynch_method': row[AnimalValues.resynch_method],
                 'days_in_milk': int(row[AnimalValues.days_in_milk]),
                 'parity': int(row[AnimalValues.parity]),
-                'calving_interval': int(row[AnimalValues.calving_interval])
+                'calving_interval': int(row[AnimalValues.calving_interval]),
+                'calf_gender': self.determine_calf_gender(row)
             }
             cow = Cow(args)
             cows.append(cow)
@@ -637,6 +641,7 @@ class AnimalInitialization:
                 'gestation_length': int(row[AnimalValues.gestation_length]),
                 'p_gest_for_calf': int(row[AnimalValues.p_gest_for_calf]),
                 'calf_birth_weight': float(row[AnimalValues.calf_birth_weight]),
+                'calf_gender': self.determine_calf_gender(row)
                 #'presynch_method': row[AnimalValues.presynch_method],
                 #'tai_method_c': row[AnimalValues.tai_method_c],
                 #'resynch_method': row[AnimalValues.resynch_method]
@@ -807,3 +812,12 @@ class AnimalInitialization:
         proportion = (nm_upper_limit - nm_lower_limit) / (pt_upper_limit - pt_lower_limit)
         nm = round(nm_lower_limit + proportion * (nm_rand - pt_lower_limit))
         return nm
+
+    def determine_calf_gender(self, row):
+        calf_gender = None
+        if int(row[AnimalValues.days_in_preg]) > 0:
+            if random() < 0.5:
+                calf_gender = 'male'
+            else:
+                calf_gender = 'female'
+        return calf_gender

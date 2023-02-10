@@ -895,9 +895,9 @@ class Cow(HeiferIII):
 
                 # generate calf breed according to semen type
                 if self.semen_type == "dairy_conventional" or self.semen_type == "dairy_sexed":
-                    self.calf_breed = 'HO'
+                    self.calf_breed = self.breed
                 elif self.semen_type == "beef_conventional" or self.semen_type == "beef_sexed":
-                    self.calf_breed = 'HO-AN'
+                    self.calf_breed = 'crossbred'
 
                 # generate calf gender according to semen type
                 if self.semen_type == "dairy_conventional":
@@ -951,6 +951,8 @@ class Cow(HeiferIII):
                     self.body_weight -= self.conceptus_weight
                     self.conceptus_weight = 0
                     self.calf_birth_weight = 0
+                    self.calf_gender = None
+                    self.calf_breed = None
                     self.p_gest_for_calf = 0
                     self.events.add_event(
                         self.days_born, sim_day, const.PREG_LOSS_BEFORE_1)
@@ -977,6 +979,8 @@ class Cow(HeiferIII):
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
                 self.calf_birth_weight = 0
+                self.calf_gender = None
+                self.calf_breed = None
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_1_AND_2)
@@ -997,6 +1001,8 @@ class Cow(HeiferIII):
                 self.body_weight -= self.conceptus_weight
                 self.conceptus_weight = 0
                 self.calf_birth_weight = 0
+                self.calf_gender = None
+                self.calf_breed = None
                 self.p_gest_for_calf = 0
                 self.events.add_event(
                     self.days_born, sim_day, const.PREG_LOSS_BTWN_2_AND_3)
@@ -1058,8 +1064,8 @@ class Cow(HeiferIII):
                 if (AnimalBase.config['death_cull_prob'][i] <= death_date_random < AnimalBase.config['death_cull_prob'][i+1]):
                     death_lower_limit = AnimalBase.config['death_cull_prob'][i]
                     death_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
-                    death_time_lower_limit = AnimalBase.config['death_cull_prob'][i]
-                    death_time_upper_limit = AnimalBase.config['death_cull_prob'][i+1]
+                    death_time_lower_limit = AnimalBase.config['cull_day_count'][i]
+                    death_time_upper_limit = AnimalBase.config['cull_day_count'][i+1]
             n = (death_time_upper_limit-death_time_lower_limit) / (death_upper_limit-death_lower_limit)
             self.future_death_date = round(death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)
 

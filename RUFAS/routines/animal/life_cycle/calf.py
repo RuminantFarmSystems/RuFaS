@@ -75,7 +75,7 @@ class Calf(AnimalBase):
         self.wean_weight = 0
         self.p_animal = args['p_init']
 
-        if self.breed != 'HO':
+        if self.breed == 'crossbred':
             self.sold = True
         else:
             if self.gender == 'male':
