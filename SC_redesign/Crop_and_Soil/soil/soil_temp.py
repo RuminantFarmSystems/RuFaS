@@ -338,17 +338,19 @@ class SoilTemp:
         """this is the main routine that updates the soil temperature
 
         Args:
-            solar_radiation: solar radiation reaching the ground on a given day (MJ per square meter per day)
-            avg_temp: average temperature of a given day (degrees C)
-            min_temp: minimum temperature of a given day (degrees C)
-            max_temp: maximum temperature of a given day (degrees C)
-            plant_cover: total aboveground plant biomass and residue on a given day (kg per hectare)
-            snow_cover: water content of the snow cover on a given day (mm)
+            solar_radiation: solar radiation reaching the ground on the current day (MJ per square meter per day)
+            avg_temp: average temperature of the current day (degrees C)
+            min_temp: minimum temperature of the current day (degrees C)
+            max_temp: maximum temperature of the current day (degrees C)
+            plant_cover: total aboveground plant biomass and residue on the current day (kg per hectare)
+            snow_cover: water content of the snow cover on the current day (mm)
             avg_annual_air_temp: average annual air temperature (degrees C)
 
         Important: SWAT does not specify how to start the simulation i.e. it does not specify what to do on day 0, when
             there is no previous day's temperature. Currently, the implementation just uses the temperature that the
-            soil starts (it sets the previous days temperature equal to the current day's temperature)
+            soil starts (it sets the previous days temperature equal to the current day's temperature). This assumption
+            is fairly reasonable due to temporal auto-correlation, but does not account for the random fluctuations
+            that can occur throughout the year.
 
         SWAT Reference: section 1:1.3.3
         """
@@ -396,7 +398,7 @@ class SoilTemp:
         Returns:
             the maximum damping depth (mm)
 
-        SWAT Reference: 1:1.3.7
+        SWAT Reference: 1:1.3.6
         """
         top_term = 2500 * bulk_density
         bottom_term = bulk_density + (686 * exp(-5.63 * bulk_density))
@@ -529,7 +531,7 @@ class SoilTemp:
         Args:
             lag_coefficient: coefficient that controls influence of previous day's temp on current day's temp (degrees C)
             previous_day_soil_temp: soil temperature in the layer from the previous day (degrees C)
-            depth_factor: factor that quantifies the influence of depth below surface on soil temp (unitless)
+            depth_factor: factor that quantifies the influence of depth below surface on soil temperature (unitless)
             avg_annual_air_temp: average annual air temperature (degrees C)
             soil_surface_temp: soil surface temp on current day (degrees C)
 
