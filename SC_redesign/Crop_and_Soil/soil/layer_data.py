@@ -39,7 +39,7 @@ class LayerData:
     """available water capacity expressed as fraction of total soil volume (unitless)"""
 
     def __post_init__(self):
-        """This function initializes all attributes in the dataclass that depend on other attributes in the class"""
+        """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
     @property
