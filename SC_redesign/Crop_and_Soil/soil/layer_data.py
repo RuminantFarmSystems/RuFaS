@@ -32,7 +32,7 @@ class LayerData:
 
     # --- Percolation
     temperature: float = 15.05
-    """temperature of soil layer (degrees Celsius)"""
+    """current temperature of this soil layer (degrees Celsius)"""
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
     available_water_capacity: float = 0.2
