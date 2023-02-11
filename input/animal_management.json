@@ -2,10 +2,10 @@
     "config":
     {
         "start_date" : "2000:1",
-        "end_date" : "2020:1",
+        "end_date" : "2010:1",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
-        "set_seed": true,
+        "set_seed": false,
         "seed": 0
     },
     "weather": "barnyard_weather_20yr.csv",

@@ -91,6 +91,7 @@ class Calf(AnimalBase):
         self.culled = False
         self.sold = False
         self.gender = 'female'
+        self.breed = 'HO'
         self.birth_weight = args['birth_weight']
         self.body_weight = args['body_weight']
         self.wean_weight = args['wean_weight']

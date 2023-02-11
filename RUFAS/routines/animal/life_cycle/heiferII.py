@@ -661,7 +661,6 @@ class HeiferII(HeiferI):
                 elif self.breed == 'JE':
                     self.calf_birth_weight = truncnorm.rvs(-2, 2, \
                         AnimalBase.config['birth_weight_avg_je'], AnimalBase.config['birth_weight_std_je'])
-                self.events.add_event(self.days_born, sim_day, const.HEIFER_PREG)
 
                 # generate calf breed according to semen type
                 if self.semen_type == "dairy_conventional" or self.semen_type == "dairy_sexed":
@@ -682,6 +681,8 @@ class HeiferII(HeiferI):
                     self.calf_gender = 'male'
                 else:
                     self.calf_gender = 'female'
+
+                self.events.add_event(self.days_born, sim_day, const.HEIFER_PREG + self.calf_gender + self.calf_breed)
 
             else:
                 self.events.add_event(self.days_born, sim_day, const.HEIFER_NOT_PREG)

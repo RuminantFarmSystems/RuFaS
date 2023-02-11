@@ -86,15 +86,15 @@ class LifeCycleReport(BaseReportDriver):
                 'year': ['time.calendar_year', '', []],
                 'j_day': ['time.day', '', []],
                 'calf_num': ['life_cycle_manager.calf_num', '', []],
-                'calf_percent': ['life_cycle_manager.calf_percent', '%', []],
+                'calf_percent': ['life_cycle_manager.calf_percent', '', []],
                 'heiferI_num': ['life_cycle_manager.heiferI_num', '', []],
-                'heiferI_percent': ['life_cycle_manager.heiferI_percent', '%', []],
+                'heiferI_percent': ['life_cycle_manager.heiferI_percent', '', []],
                 'heiferII_num': ['life_cycle_manager.heiferII_num', '', []],
-                'heiferII_percent': ['life_cycle_manager.heiferII_percent', '%', []],
+                'heiferII_percent': ['life_cycle_manager.heiferII_percent', '', []],
                 'heiferIII_num': ['life_cycle_manager.heiferIII_num', '', []],
-                'heiferIII_percent': ['life_cycle_manager.heiferIII_percent', '%', []],
+                'heiferIII_percent': ['life_cycle_manager.heiferIII_percent', '', []],
                 'cow_num': ['life_cycle_manager.cow_num', '', []],
-                'cow_percent': ['life_cycle_manager.cow_percent', '%', []],
+                'cow_percent': ['life_cycle_manager.cow_percent', '', []],
                 'sold_heifer_num': ['life_cycle_manager.sold_heifer_num', '', []],
                 'bought_heifer_num': ['life_cycle_manager.bought_heifer_num', '', []],
                 'culled_heifer_num': ['life_cycle_manager.culled_heifer_num', '', []],
@@ -106,11 +106,11 @@ class LifeCycleReport(BaseReportDriver):
                 self.herd_structure['cow_num_for_parity_' + parity] = \
                     ['life_cycle_manager.num_cow_for_parity[\'' + parity + '\']', '', []]
                 self.herd_structure['cow_percent_for_parity_' + parity] = \
-                    ['life_cycle_manager.percent_cow_for_parity[\'' + parity + '\']', '%', []]
+                    ['life_cycle_manager.percent_cow_for_parity[\'' + parity + '\']', '', []]
                 self.herd_structure['avg_age_for_parity_' + parity] = \
-                    ['life_cycle_manager.avg_age_for_parity[\'' + parity + '\']', 'd', []]
+                    ['life_cycle_manager.avg_age_for_parity[\'' + parity + '\']', '', []]
                 self.herd_structure['avg_age_for_calving_' + parity] = \
-                    ['life_cycle_manager.avg_age_for_calving[\'' + parity + '\']', 'd', []]
+                    ['life_cycle_manager.avg_age_for_calving[\'' + parity + '\']', '', []]
 
             for cull_reason in LifeCycleManager.cull_reason_stats:
                 self.herd_structure[cull_reason + '_num'] = \
@@ -157,84 +157,84 @@ class LifeCycleReport(BaseReportDriver):
             }
 
             self.production_performance = {
-                'cumulated_milk_production': ['life_cycle_manager.daily_milk_production', 'kg', []]
+                'cumulated_milk_production': ['life_cycle_manager.daily_milk_production', '', []]
             }
 
             self.preg = {
                 'open_cow_num': ['life_cycle_manager.open_cow_num', '', []],
-                'non_preg_cow_percent': ['life_cycle_manager.non_preg_cow_percent', '%', []],
+                'non_preg_cow_percent': ['life_cycle_manager.non_preg_cow_percent', '', []],
                 'preg_cow_num': ['life_cycle_manager.preg_cow_num', '', []],
-                'preg_cow_percent': ['life_cycle_manager.preg_cow_percent', '%', []],
+                'preg_cow_percent': ['life_cycle_manager.preg_cow_percent', '', []],
                 'milking_cow_num': ['life_cycle_manager.milking_cow_num', '', []],
-                'milking_cow_percent': ['life_cycle_manager.milking_cow_percent', '%', []],
+                'milking_cow_percent': ['life_cycle_manager.milking_cow_percent', '', []],
                 'dry_cow_num': ['life_cycle_manager.dry_cow_num', '', []],
-                'dry_cow_percent': ['life_cycle_manager.dry_cow_percent', '%', []],
-                'average_days_in_milk': ['life_cycle_manager.avg_days_in_milk', 'd', []],
-                'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', 'd', []],
-                'average_cow_body_weight': ['life_cycle_manager.avg_cow_body_weight', 'kg', []],
+                'dry_cow_percent': ['life_cycle_manager.dry_cow_percent', '', []],
+                'average_days_in_milk': ['life_cycle_manager.avg_days_in_milk', '', []],
+                'average_days_in_preg': ['life_cycle_manager.avg_days_in_preg', '', []],
+                'average_cow_body_weight': ['life_cycle_manager.avg_cow_body_weight', '', []],
                 'average_parity_number': ['life_cycle_manager.avg_parity_num', '', []]
             }
 
             self.average_animal_profile = {
-                'avg_caving_interval': ['life_cycle_manager.avg_calving_interval', 'd', []],
-                'avg_breeding_to_preg_time': ['life_cycle_manager.avg_breeding_to_preg_time', 'd', []],
-                'avg_heifer_culling_age': ['life_cycle_manager.avg_heifer_culling_age', 'd', []],
-                'avg_cow_culling_age': ['life_cycle_manager.avg_cow_culling_age', 'd', []],
-                'avg_mature_body_weight': ['life_cycle_manager.avg_mature_body_weight', 'kg', []],
-                'daily_calf_body_weight_sum': ['life_cycle_manager.total_body_weight_calf', 'kg', []],
-                'daily_heifer_body_weight_sum': ['life_cycle_manager.total_body_weight_heifer', 'kg', []],
-                'daily_milking_cow_DMI_sum': ['life_cycle_manager.total_lactating_DMI', 'kg', []],
-                'daily_dry_cow_DMI_sum': ['life_cycle_manager.total_dry_DMI', 'kg', []],
-                'daily_culled_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_culled_cow', 'kg', []]
+                'avg_calving_interval': ['life_cycle_manager.avg_calving_interval', '', []],
+                'avg_breeding_to_preg_time': ['life_cycle_manager.avg_breeding_to_preg_time', '', []],
+                'avg_heifer_culling_age': ['life_cycle_manager.avg_heifer_culling_age', '', []],
+                'avg_cow_culling_age': ['life_cycle_manager.avg_cow_culling_age', '', []],
+                'avg_mature_body_weight': ['life_cycle_manager.avg_mature_body_weight', '', []],
+                'daily_calf_body_weight_sum': ['life_cycle_manager.total_body_weight_calf', '', []],
+                'daily_heifer_body_weight_sum': ['life_cycle_manager.total_body_weight_heifer', '', []],
+                'daily_milking_cow_DMI_sum': ['life_cycle_manager.total_lactating_DMI', '', []],
+                'daily_dry_cow_DMI_sum': ['life_cycle_manager.total_dry_DMI', '', []],
+                'daily_culled_cow_body_weight_sum': ['life_cycle_manager.total_body_weight_culled_cow', '', []]
             }
 
             self.econmic_cal = {
-                'cost_bought_heifer': ['life_cycle_manager.cost_bought_heifer', '$/d', []],
-                'cost_sold_heifer': ['life_cycle_manager.sold_heifer_cost', '$/d', []],
-                'income_sold_heifer': ['life_cycle_manager.income_sold_heifer', '$/d', []],
-                'income_sold_dairy_male_calf': ['life_cycle_manager.income_sold_dairy_male_calf', '$/d', []],
-                'income_sold_dairy_female_calf': ['life_cycle_manager.income_sold_dairy_female_calf', '$/d', []],
-                'income_sold_beef_male_calf': ['life_cycle_manager.income_sold_beef_male_calf', '$/d', []],
-                'income_sold_beef_female_calf': ['life_cycle_manager.income_sold_beef_female_calf', '$/d', []],
-                'income_culled_heifer': ['life_cycle_manager.income_culled_heifer', '$/d', []],
-                'income_culled_cow': ['life_cycle_manager.income_culled_cow', '$/d', []],
-                'income_milk': ['life_cycle_manager.income_milk', '$/d', []],
-                'cost_hormone': ['life_cycle_manager.cost_hormone', '$/d', []],
-                'cost_ed': ['life_cycle_manager.cost_ed', '$/d', []],
-                'cost_ai': ['life_cycle_manager.cost_ai', '$/d', []],
-                'cost_semen': ['life_cycle_manager.cost_semen', '$/d', []],
-                'cost_pc': ['life_cycle_manager.cost_pc', '$/d', []],
-                'cost_feed_milking_cow': ['life_cycle_manager.cost_feed_milking_cow', '$/d', []],
-                'cost_feed_dry_cow': ['life_cycle_manager.cost_feed_dry_cow', '$/d', []],
-                'cost_repro_cow': ['life_cycle_manager.repro_cost_cow', '$/d', []],                
-                'milk_income_over_feed_cost': ['life_cycle_manager.milk_income_over_feed_cost', '$/d', []],
-                'cost_hormone_heifer': ['life_cycle_manager.cost_hormone_heifer', '$/d', []],
-                'cost_ed_heifer': ['life_cycle_manager.cost_ed_heifer', '$/d', []],
-                'cost_ai_heifer': ['life_cycle_manager.cost_ai_heifer', '$/d', []],
-                'cost_semen_heifer': ['life_cycle_manager.cost_semen_heifer', '$/d', []],
-                'cost_pc_heifer': ['life_cycle_manager.cost_pc_heifer', '$/d', []],
-                'cost_repro_heifer': ['life_cycle_manager.repro_cost_heifer', '$/d', []],
-                'cost_feed_calf': ['life_cycle_manager.cost_feed_calf', '$/d', []],
-                'cost_feed_heifer': ['life_cycle_manager.cost_feed_heifer', '$/d', []],
-                'cost_feed': ['life_cycle_manager.feed_cost', '$/d', []],
-                'net_return': ['life_cycle_manager.net_return', '$/d', []],
-                'net_return_last_year': ['life_cycle_manager.net_return_last_year', '$/y', []],
-                'cost_hormone_heifer_more': ['life_cycle_manager.cost_hormone_heifer_more', '$/d', []],
-                'cost_ed_heifer_more': ['life_cycle_manager.cost_ed_heifer_more', '$/d', []],
-                'cost_ai_heifer_more': ['life_cycle_manager.cost_ai_heifer_more', '$/d', []],
-                'cost_semen_heifer_more': ['life_cycle_manager.cost_semen_heifer_more', '$/d', []],
-                'cost_pc_heifer_more': ['life_cycle_manager.cost_pc_heifer_more', '$/d', []],
-                'cost_repro_heifer_more': ['life_cycle_manager.repro_cost_heifer_more', '$/d', []],
-                'cost_feed_calf_more': ['life_cycle_manager.cost_feed_calf_more', '$/d', []],
-                'cost_feed_heifer_more': ['life_cycle_manager.cost_feed_heifer_more', '$/d', []],
-                'cost_feed_more': ['life_cycle_manager.feed_cost_more', '$/d', []],
-                'net_return_more_heifer': ['life_cycle_manager.net_return_more_heifer', '$/d', []],
-                'net_return_more_heifer_last_year': ['life_cycle_manager.net_return_more_heifer_last_year', '$/y', []],
+                'cost_bought_heifer': ['life_cycle_manager.cost_bought_heifer', '', []],
+                'cost_sold_heifer': ['life_cycle_manager.sold_heifer_cost', '', []],
+                'income_sold_heifer': ['life_cycle_manager.income_sold_heifer', '', []],
+                'income_sold_dairy_male_calf': ['life_cycle_manager.income_sold_dairy_male_calf', '', []],
+                'income_sold_dairy_female_calf': ['life_cycle_manager.income_sold_dairy_female_calf', '', []],
+                'income_sold_beef_male_calf': ['life_cycle_manager.income_sold_beef_male_calf', '', []],
+                'income_sold_beef_female_calf': ['life_cycle_manager.income_sold_beef_female_calf', '', []],
+                'income_culled_heifer': ['life_cycle_manager.income_culled_heifer', '', []],
+                'income_culled_cow': ['life_cycle_manager.income_culled_cow', '', []],
+                'income_milk': ['life_cycle_manager.income_milk', '', []],
+                'cost_hormone': ['life_cycle_manager.cost_hormone', '', []],
+                'cost_ed': ['life_cycle_manager.cost_ed', '', []],
+                'cost_ai': ['life_cycle_manager.cost_ai', '', []],
+                'cost_semen': ['life_cycle_manager.cost_semen', '', []],
+                'cost_pc': ['life_cycle_manager.cost_pc', '', []],
+                'cost_feed_milking_cow': ['life_cycle_manager.cost_feed_milking_cow', '', []],
+                'cost_feed_dry_cow': ['life_cycle_manager.cost_feed_dry_cow', '', []],
+                'cost_repro_cow': ['life_cycle_manager.repro_cost_cow', '', []],                
+                'milk_income_over_feed_cost': ['life_cycle_manager.milk_income_over_feed_cost', '', []],
+                'cost_hormone_heifer': ['life_cycle_manager.cost_hormone_heifer', '', []],
+                'cost_ed_heifer': ['life_cycle_manager.cost_ed_heifer', '', []],
+                'cost_ai_heifer': ['life_cycle_manager.cost_ai_heifer', '', []],
+                'cost_semen_heifer': ['life_cycle_manager.cost_semen_heifer', '', []],
+                'cost_pc_heifer': ['life_cycle_manager.cost_pc_heifer', '', []],
+                'cost_repro_heifer': ['life_cycle_manager.repro_cost_heifer', '', []],
+                'cost_feed_calf': ['life_cycle_manager.cost_feed_calf', '', []],
+                'cost_feed_heifer': ['life_cycle_manager.cost_feed_heifer', '', []],
+                'cost_feed': ['life_cycle_manager.feed_cost', '', []],
+                'net_return': ['life_cycle_manager.net_return', '', []],
+                'net_return_last_year': ['life_cycle_manager.net_return_last_year', '', []],
+                'cost_hormone_heifer_more': ['life_cycle_manager.cost_hormone_heifer_more', '', []],
+                'cost_ed_heifer_more': ['life_cycle_manager.cost_ed_heifer_more', '', []],
+                'cost_ai_heifer_more': ['life_cycle_manager.cost_ai_heifer_more', '', []],
+                'cost_semen_heifer_more': ['life_cycle_manager.cost_semen_heifer_more', '', []],
+                'cost_pc_heifer_more': ['life_cycle_manager.cost_pc_heifer_more', '', []],
+                'cost_repro_heifer_more': ['life_cycle_manager.repro_cost_heifer_more', '', []],
+                'cost_feed_calf_more': ['life_cycle_manager.cost_feed_calf_more', '', []],
+                'cost_feed_heifer_more': ['life_cycle_manager.cost_feed_heifer_more', '', []],
+                'cost_feed_more': ['life_cycle_manager.feed_cost_more', '', []],
+                'net_return_more_heifer': ['life_cycle_manager.net_return_more_heifer', '', []],
+                'net_return_more_heifer_last_year': ['life_cycle_manager.net_return_more_heifer_last_year', '', []],
             }
 
             for parity in LifeCycleManager.avg_calving_to_preg_time:
                 self.average_animal_profile['avg_calving_to_preg_time_for_parity_' + parity] = \
-                    ['life_cycle_manager.avg_calving_to_preg_time[\'' + parity + '\']', 'd', []]
+                    ['life_cycle_manager.avg_calving_to_preg_time[\'' + parity + '\']', '', []]
 
             for parity in LifeCycleManager.cow_open_time:
                 self.reproduction_performance['cow_open_time_for_parity_' + parity] = \
@@ -245,8 +245,8 @@ class LifeCycleReport(BaseReportDriver):
                     ['life_cycle_manager.culled_cow_dim[\'' + parity + '\']', '', []]
 
             self.genetic_performance = {
-                'net_merit_cow': ['life_cycle_manager.avg_net_merit_cow', '$', []],
-                'net_merit_heifer': ['life_cycle_manager.avg_net_merit_heifer', '$', []],
+                'net_merit_cow': ['life_cycle_manager.avg_net_merit_cow', '', []],
+                'net_merit_heifer': ['life_cycle_manager.avg_net_merit_heifer', '', []],
             }
 
             self.last_year_avg_vars = {

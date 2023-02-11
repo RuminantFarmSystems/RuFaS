@@ -441,7 +441,7 @@ class Cow(HeiferIII):
                 self.CI = self.days_born - last_time_given_birth
                 self.CI_history.append(self.CI)
             self.BW_at_calving = self.body_weight
-            self.events.add_event(self.days_born, sim_day, const.NEW_BIRTH)
+            self.events.add_event(self.days_born, sim_day, const.NEW_BIRTH + self.calf_gender + self.calf_breed)
             self.health_cull_update()
             self.death_update()
             new_born = True
@@ -913,7 +913,7 @@ class Cow(HeiferIII):
                 else:
                     self.calf_gender = 'female'
 
-                self.events.add_event(self.days_born, sim_day, const.COW_PREG)
+                self.events.add_event(self.days_born, sim_day, const.COW_PREG + self.calf_gender + self.calf_breed)
             else:
                 self.events.add_event(self.days_born, sim_day, const.COW_NOT_PREG) 
                 self.open_stage = True

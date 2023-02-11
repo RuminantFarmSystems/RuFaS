@@ -18,6 +18,7 @@ from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitial
 from RUFAS.routines.animal.life_cycle import animal_events_constants as const
 import numpy as np
 import warnings
+import random
 
 class LifeCycleManager:
     """
@@ -991,10 +992,11 @@ class LifeCycleManager:
             cow.net_merit_list = self.net_merit_list_cow
 
         if date % 30 == 0:
+            # heiferIIIs = sorted(heiferIIIs, key=lambda x: x.net_merit, reverse=True)
         # if the number of heifers is more than needed for the herd, sell those as replacement
         # print("cow list length:", len(cows), "heiferIII list length:", len(heiferIIIs))
             while self.cow_num + self.heiferIII_num > self.herd_num * 1.03 and len(heiferIIIs) > 0:
-                removed = heiferIIIs.pop()
+                removed = heiferIIIs.pop(random.randrange(len(heiferIIIs)))
                 self.sold_heifer_cost += removed.calf_cost + removed.heifer_feed_cost + removed.heifer_hormone_cost\
                     + removed.heifer_ed_cost + removed.heifer_ai_cost + removed.heifer_semen_cost +removed.heifer_pc_cost
                 self.sold_heifer_calf_cost += removed.calf_cost
