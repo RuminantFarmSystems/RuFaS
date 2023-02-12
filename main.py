@@ -39,9 +39,10 @@ def main():
     # Runs only 1 simulation in the case of a single input file
     #
     for input_file_path in input_file_list:
-        name = "dairy_conv"
+        # RUFAS.simulate(input_file_path)
+        name = "H1C1"
         os.mkdir('./save_directory/' + name)
-        for R in range(2):
+        for R in range(4):
             RUFAS.simulate(input_file_path)
 
             nn = "./save_directory/" + name + "/" + name + str(R) + ".csv"

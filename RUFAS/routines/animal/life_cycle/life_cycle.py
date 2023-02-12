@@ -560,7 +560,7 @@ class LifeCycleManager:
                 new_heiferI = HeiferI(args)
                 heiferIs.append(new_heiferI)
                 self.net_merit_heifer += new_heiferI.net_merit
-                self.net_merit_list_heifer.append(new_heiferI.net_merit)
+                # self.net_merit_list_heifer.append(new_heiferI.net_merit)
                 self.calf_idx_to_remove.append(index)
                 # del calves[index]
                 # print("wean", index)
@@ -600,13 +600,17 @@ class LifeCycleManager:
                     self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferI.mature_body_weight)
                 self.net_merit_heifer += heiferI.net_merit
-                self.net_merit_list_heifer.append(heiferI.net_merit)
+                # self.net_merit_list_heifer.append(heiferI.net_merit)
 
         for index in sorted(self.heiferI_idx_to_remove, reverse=True):
             del heiferIs[index]
 
+        for index, heiferII in enumerate(heiferIIs):
+            self.net_merit_list_heifer.append(heiferII.net_merit)
+
         # heiferII to heiferIII
         for index, heiferII in enumerate(heiferIIs):
+            heiferII.net_merit_list = self.net_merit_list_heifer
             cull_stage, third_stage = heiferII.update(date)
             # print("heiferII", heiferII.id, heiferII.days_in_preg, heiferII.calf_gender)
             if cull_stage:
@@ -665,7 +669,7 @@ class LifeCycleManager:
                 self.ed_period_h += heiferII.ED_days
                 
                 self.net_merit_heifer += heiferII.net_merit
-                self.net_merit_list_heifer.append(heiferII.net_merit)
+                # self.net_merit_list_heifer.append(heiferII.net_merit)
 
                 # caculate reproduction indications
             if date >= 1:
@@ -743,7 +747,7 @@ class LifeCycleManager:
                     self.calc_average(total_animal_num,
                                        self.avg_mature_body_weight, heiferIII.mature_body_weight)
                 self.net_merit_heifer += heiferIII.net_merit
-                self.net_merit_list_heifer.append(heiferIII.net_merit)
+                # self.net_merit_list_heifer.append(heiferIII.net_merit)
 
         for index in sorted(self.heiferIII_idx_to_remove, reverse=True):
             del heiferIIIs[index]
@@ -751,8 +755,13 @@ class LifeCycleManager:
         # print("today I have", self.calf_num, "calves, ", self.heiferI_num, "heiferIs, ", self.heiferII_num, "heiferIIs, ",
         # self.heiferIII_num, "heiferIIIs")
 
+        for index, cow in enumerate(cows):
+            self.net_merit_list_cow.append(cow.net_merit)
+
+
         # cow culling action and stats
         for index, cow in enumerate(cows):
+            cow.net_merit_list = self.net_merit_list_cow
             _, _, _, culled, new_born = cow.update(date, self.avg_CI)
 
             # culled cows, calculate slaughter value and record culling reasons
@@ -907,7 +916,7 @@ class LifeCycleManager:
                 self.ai_num += cow.AI_times
                 self.ed_period += cow.ED_days
                 self.net_merit_cow += cow.net_merit
-                self.net_merit_list_cow.append(cow.net_merit)
+                # self.net_merit_list_cow.append(cow.net_merit)
 
             top_sire_net_merit = (1309 + 0.2383 * date) * 2
             if new_born:
@@ -982,14 +991,14 @@ class LifeCycleManager:
         else:
             self.avg_net_merit_heifer = self.net_merit_heifer/self.heifer_total_num
 
-        self.net_merit_list_heifer = sorted(self.net_merit_list_heifer)
-        self.net_merit_list_cow = sorted(self.net_merit_list_cow)
-        for heiferII in heiferIIs:
-            heiferII.avg_net_merit_cow = self.avg_net_merit_cow
-            heiferII.net_merit_list = self.net_merit_list_heifer
-        for cow in cows:
-            cow.avg_net_merit_cow = self.avg_net_merit_cow
-            cow.net_merit_list = self.net_merit_list_cow
+        # self.net_merit_list_heifer = sorted(self.net_merit_list_heifer)
+        # self.net_merit_list_cow = sorted(self.net_merit_list_cow)
+        # for heiferII in heiferIIs:
+        #     heiferII.avg_net_merit_cow = self.avg_net_merit_cow
+        #     heiferII.net_merit_list = self.net_merit_list_heifer
+        # for cow in cows:
+        #     cow.avg_net_merit_cow = self.avg_net_merit_cow
+        #     cow.net_merit_list = self.net_merit_list_cow
 
         if date % 30 == 0:
             # heiferIIIs = sorted(heiferIIIs, key=lambda x: x.net_merit, reverse=True)
@@ -1011,7 +1020,7 @@ class LifeCycleManager:
                 self.sold_heifer_num += 1
                 self.heiferIII_num -= 1
                 self.net_merit_heifer -= removed.net_merit
-                self.net_merit_list_heifer.pop()
+                # self.net_merit_list_heifer.pop()
         
         # self.potential_cull_list = sorted(self.potential_cull_list,reverse=True)
         # while self.cow_num > self.herd_num * 1.03 and len(self.potential_cull_list) > 0:
@@ -1057,7 +1066,7 @@ class LifeCycleManager:
                 self.replacement_market[0].net_merit += date * 0.2022 * 2
                 animals_added.append(self.replacement_market[0])
                 self.net_merit_heifer += self.replacement_market[0].net_merit
-                self.net_merit_list_cow.append(self.replacement_market[0].net_merit)
+                # self.net_merit_list_cow.append(self.replacement_market[0].net_merit)
                 self.bought_heifer_num += 1
                 self.cow_num += 1
                 del self.replacement_market[0]
