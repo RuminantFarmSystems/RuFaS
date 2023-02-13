@@ -115,6 +115,7 @@ def test_determine_frozen_retention_parameter(max_retention_param, retention_par
     expect = max_retention_param * (1 - exp(-0.000862 * retention_param))
     assert expect == observe
 
+
 @pytest.mark.parametrize("slope_frac,curve_2,curve_3", [
     (0.01, 40.0, 38),
     (0.15, 51.3, 45.6),
@@ -126,6 +127,7 @@ def test_determine_curve_2_adjusted(slope_frac, curve_2, curve_3):
     observe = Infiltration._determine_second_moisture_condition_adjusted(slope_frac, curve_2, curve_3)
     expect = (((curve_3 - curve_2) / 3) * (1 - (2 * exp(-13.86 * slope_frac)))) + curve_2
     assert expect == observe
+
 
 @pytest.mark.parametrize("rainfall,retention_param", [
     (1.3, 12.5),
@@ -144,12 +146,14 @@ def test_determine_runoff(rainfall, retention_param):
         expect_bottom = rainfall + (0.8 * retention_param)
         assert (expect_top / expect_bottom) == observe
 
-@pytest.mark.parametrize("prev_retention_param,potential_evapotranspiration,max_retention_param,rainfall,runoff,coefficient",
-[
-    (12.4, 1.6, 16.8, 1.3, 0.4, 0.83), # all arbitrary coefficients
-    (14.8, 2.4, 20.1, 1.8, 1.1, 0.72),
-    (8.93, 1.02, 12.19, 0.3, 0.05, 0.91),
-])
+
+@pytest.mark.parametrize(
+    "prev_retention_param,potential_evapotranspiration,max_retention_param,rainfall,runoff,coefficient",
+    [
+        (12.4, 1.6, 16.8, 1.3, 0.4, 0.83),  # all arbitrary coefficients
+        (14.8, 2.4, 20.1, 1.8, 1.1, 0.72),
+        (8.93, 1.02, 12.19, 0.3, 0.05, 0.91),
+    ])
 def test_determine_updated_retention_parameter(prev_retention_param, potential_evapotranspiration, max_retention_param,
                                                rainfall, runoff, coefficient):
     """test _determine_updated_retention_parameter() in infiltration.py"""
@@ -158,6 +162,7 @@ def test_determine_updated_retention_parameter(prev_retention_param, potential_e
     expect = prev_retention_param + (potential_evapotranspiration * exp(((-1) * coefficient * prev_retention_param) /
                                                                         max_retention_param)) - rainfall + runoff
     assert pytest.approx(observe) == expect
+
 
 @pytest.mark.parametrize("retention_param", [
     25,
@@ -172,19 +177,25 @@ def test_determine_moisture_condition_parameter(retention_param):
     expect = 25400 / expect_bottom
     assert expect == observe
 
+
 # --- Integration tests ----
-@pytest.mark.parametrize("second_moisture_parameter,rainfall,frozen_top_layer,coefficient", [
+@pytest.mark.parametrize("second_moisture_parameter,rainfall,is_top_frozen,coefficient", [
     (40, 1.4, False, 0.91),
-    (59, 3.5, False, 0.4858),
+    (59, 3.5, True, 0.4858),
     (14, 2.5, False, 0.694),
-    (36, 0.3, True, 0.58392),
+    (36, 0.3, False, 0.58392),
     (96, 4.697, False, 0.5938),
-    (76, 2.45, True, 0.9694),
+    (76, 2.45, False, 0.9694),
 ])
-def test_infiltrate(second_moisture_parameter, rainfall, frozen_top_layer, coefficient):
+def test_infiltrate(second_moisture_parameter, rainfall, is_top_frozen, coefficient):
     """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
     # initialize objects
-    data = SoilData(potential_evapotranspiration=1.5, average_slope_fraction=0.07, previous_retention_parameter=27)
+    if is_top_frozen:
+        data = SoilData(potential_evapotranspiration=1.5, average_slope_fraction=0.07, previous_retention_parameter=27,
+                        soil_layers=[LayerData(top_depth=0, bottom_depth=10, temperature=-1)])
+    else:
+        data = SoilData(potential_evapotranspiration=1.5, average_slope_fraction=0.07, previous_retention_parameter=27,
+                        soil_layers=[LayerData(top_depth=0, bottom_depth=10, temperature=14)])
     incorp = Infiltration(data)
     assert incorp.data.potential_evapotranspiration == 1.5
     assert incorp.data.average_slope_fraction == 0.07
@@ -204,7 +215,7 @@ def test_infiltrate(second_moisture_parameter, rainfall, frozen_top_layer, coeff
     incorp._determine_moisture_condition_parameter = MagicMock(return_value=50)
 
     # run main method
-    incorp.infiltrate(second_moisture_parameter, rainfall, frozen_top_layer, coefficient)
+    incorp.infiltrate(second_moisture_parameter, rainfall, coefficient)
 
     # assertions
     assert incorp._determine_third_moisture_condition_parameter.call_count == 2
@@ -214,7 +225,7 @@ def test_infiltrate(second_moisture_parameter, rainfall, frozen_top_layer, coeff
     assert incorp._determine_second_shape_coefficient.call_count == 1
     assert incorp._determine_first_shape_coefficient.call_count == 1
     assert incorp._determine_retention_parameter.call_count == 1
-    if frozen_top_layer:
+    if is_top_frozen:
         assert incorp._determine_frozen_retention_parameter.call_count == 1
     else:
         assert incorp._determine_frozen_retention_parameter.call_count == 0

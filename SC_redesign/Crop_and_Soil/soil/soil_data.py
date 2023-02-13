@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
+from math import inf
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 """
@@ -30,16 +31,36 @@ class SoilData:
     previous_retention_parameter: Optional[float] = None
     """retention parameter for the previous day (mm) (used in SWAT 2:1.1.9)"""
     average_slope_fraction: float = 0.05
-    """average slope fraction of the subbasin"""
+    """average slope fraction of the subbasin (unitless)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
+
+    # ---- percolation
+    vadose_zone_layer: Optional[LayerData] = None
+    """LayerData object that represents the vadose zone layer, top depth is set equal bottom depth of lowest soil layer 
+        and bottom depth is arbitrary, starts with no water"""
+    time_step: float = 24
+    """length of time step over which percolation occurs (hours) """
+
+    def __post_init__(self):
+        if self.soil_layers is None:
+            # sets the soil layers to a default set if user does not provide any
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=50, nitrate=0.5),
+                                LayerData(top_depth=50, bottom_depth=80, nitrate=1),
+                                LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
+
+        # configures the vadose zone LayerData object based on where the soil profile ends
+        self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
+                                           bottom_depth=10000000,    # bottom depth is 10,000 meters by default
+                                           soil_water_concentration=0,
+                                           saturation_point_water_concentration=inf)
 
     @property
     def profile_soil_water_content(self) -> float:
         """
 
         Returns: amount of water in the entire soil profile (excluding the amount of water held in the profile at the
-            wilting point) in mm
+            wilting point) (mm)
 
         Details: this method for calculating total soil water content assumes the lower bound of water to be 0. It also
             calculates the soil water content per layer, meaning that if one layer has water content greater than its
@@ -52,14 +73,14 @@ class SoilData:
         else:
             water_sum = 0
             for layer in self.soil_layers:
-                water_sum += min(0, (layer.soil_water_content - layer.wilting_point_content))
+                water_sum += max(0, (layer.water_content - layer.wilting_point_content))
             return
 
     @property
     def profile_saturation(self) -> float:
         """
 
-        Returns: amount of water in the soil profile when completely saturated in mm
+        Returns: amount of water in the soil profile when completely saturated (mm)
 
         """
         if self.soil_layers is None:
@@ -74,7 +95,7 @@ class SoilData:
     def profile_field_capacity(self) -> float:
         """
 
-        Returns: total amount of water contained in the soil profile at field capacity (but not saturated) in mm
+        Returns: total amount of water contained in the soil profile at field capacity (but not saturated) (mm)
 
         """
         if self.soil_layers is None:
