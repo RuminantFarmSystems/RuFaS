@@ -64,7 +64,10 @@ class CropData:
     # stressed_light_use_efficiency  # UNUSED (BIOEHI, $RUE_{hi}$)
     # carbon_dioxide_stress_level = 660 # UNUSED (CO2HI, $CO_{2hi}$)
 
-    # SWAT Table A-6 UNUSED
+    # SWAT Table A-6
+    minimum_cover_management_factor: float = 0.2
+    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT 
+        Reference: 4:1.1.11"""
 
     # SWAT Table A-7
     emergence_nitrogen_fraction: float = 0.05

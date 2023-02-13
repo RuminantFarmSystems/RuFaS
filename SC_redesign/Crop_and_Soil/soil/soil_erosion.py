@@ -385,7 +385,7 @@
 #
 #     return 0.6 * (1 - exp_part)
 from typing import Optional
-from math import exp
+from math import exp, log, atan, sin
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
@@ -485,3 +485,78 @@ class SoilErosion:
         high_sand_factor = SoilErosion._determine_high_sand_factor(percent_sand_content)
         return coarse_sand_factor * clay_silt_factor * carbon_content_factor * high_sand_factor
 
+    @staticmethod
+    def _determine_cover_management_factor(minimum_cover_management_factor: float, surface_residue: float) -> float:
+        """calculates cover and management factor for use in calculating sediment yield
+
+        Args:
+            minimum_cover_management_factor: minimum value for cover and management factor for land cover (unitless)
+            surface_residue: amount of residue on the soil surface (kg per hectare)
+
+        Returns:
+            cover and management factor (unitless)
+
+        SWAT Reference: 4:1.1.10
+        """
+        if minimum_cover_management_factor <= 0:
+            raise ValueError("Minimum cover and management cannot be less than or equal to 0")
+        first_multiplicative_term = log(0.8) - log(minimum_cover_management_factor)
+        second_multiplicative_term = exp(-0.00115 * surface_residue)
+        second_additive_term = log(minimum_cover_management_factor)
+        return exp(first_multiplicative_term * second_multiplicative_term + second_additive_term)
+
+    @staticmethod
+    def _determine_support_practice_factor() -> float:
+        """TODO: implement this for version 2 (only applies to fields that are doing contour tillage/planting,
+            stripcropping, and/or terracing) SWAT Reference: section 4:1.1.3"""
+        return 1
+
+    @staticmethod
+    def _determine_exponential_term(average_subbasin_slope: float) -> float:
+        """calculates the exponential term, which is used to calculate the topographic factor
+
+        Args:
+            average_subbasin_slope: average slope fraction of the subbasin (unitless)
+
+        Returns:
+            the exponential term (unitless)
+
+        SWAT Reference: 4:1.1.13
+        """
+        return 0.6 * (1 - exp(-35.835 * average_subbasin_slope))
+
+    @staticmethod
+    def _determine_topographic_factor(slope_length: float, average_subbasin_slope: float) -> float:
+        """calculates expected ratio of soil loss per unit area from a field slope to that from a 22.1 m length of
+            uniform 9% slope under otherwise identical conditions (a.k.a the topographic factor)
+
+        Args:
+            slope_length: length of the slope (m)
+            average_subbasin_slope: average slope fraction of the subbasin (m rise over m run)
+
+        Returns:
+            the topographic factor (unitless)
+
+        SWAT Reference: 4:1.1.12
+        """
+        # Note: arctan(tan(x)) == x does not always hold, it is only true from -90 to 90 degrees, inclusive. It is safe
+        # to use here because there will never be a field at an angle < -90 or > 90 degrees
+        slope_angle_in_rad = atan(average_subbasin_slope)
+        exponential_term = SoilErosion._determine_exponential_term(average_subbasin_slope)
+        first_term = (slope_length / 22.1) ** exponential_term
+        second_term = 65.41 * (sin(slope_angle_in_rad) ** 2) + 4.56 * sin(slope_angle_in_rad) + 0.065
+        return first_term * second_term
+
+    @staticmethod
+    def _determine_coarse_fragment_factor(percent_rock_content: float) -> float:
+        """calculates coarse fragment factor for use in calculating sediment yield
+
+        Args:
+            percent_rock_content: percent rock in first soil layer
+
+        Returns:
+            coarse fragment factor (unitless)
+
+        SWAT Reference: 4:1.1.15
+        """
+        return exp(-0.053 * percent_rock_content)

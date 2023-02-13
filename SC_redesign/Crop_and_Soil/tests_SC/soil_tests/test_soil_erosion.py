@@ -1,5 +1,5 @@
 import pytest
-from math import exp
+from math import exp, log, atan, sin
 from unittest.mock import MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
@@ -113,3 +113,82 @@ def test_determine_soil_erodibility_factor(sand, silt, clay, carbon):
     SoilErosion._determine_carbon_content_factor.assert_called_once()
     SoilErosion._determine_high_sand_factor.assert_called_once()
     assert observe == (0.28 * 0.93 * 0.99 * 0.95)
+
+
+@pytest.mark.parametrize("min_cover,residue", [
+    (0.2, 800),
+    (0.001, 500),
+    (0.003, 80),
+    (0.01, 0),
+    (0.05, 928.948569),
+])
+def test_determine_cover_management_factor(min_cover, residue):
+    """tests _determine_cover_management_factor() in soil_erosion.py"""
+    observe = SoilErosion._determine_cover_management_factor(min_cover, residue)
+    expect = exp((log(0.8) - log(min_cover)) * exp(-0.00115 * residue) + log(min_cover))
+    assert observe == expect
+
+
+@pytest.mark.parametrize("min_cover,residue", [
+    (0, 0)
+])
+def test_error_determine_cover_management_factor(min_cover, residue):
+    """tests that _determine_cover_management_factor() correctly raises error for invalid inputs"""
+    with pytest.raises(Exception):
+        SoilErosion._determine_cover_management_factor(min_cover, residue)
+
+
+@pytest.mark.parametrize("average_slope", [
+    0.02,
+    0,
+    0.001,
+    0.05,
+    0.084595829,
+    0.12593,
+])
+def test_determine_exponential_term(average_slope):
+    """tests _determine_exponential_term() in soil_erosion.py"""
+    observe = SoilErosion._determine_exponential_term(average_slope)
+    exp_term = exp(-35.835 * average_slope)
+    expect = 0.6 * (1 - exp_term)
+    # print(str(observe))
+    assert observe == expect
+
+
+@pytest.mark.parametrize("length, avg_slope", [
+    (3, 0.02),
+    (0, 0),
+    (16, 0.11),
+    (19, 0.19),
+    (1, 0.28),
+    (8.194894, 0.089493),
+])
+def test_determine_topographic_factor(length, avg_slope):
+    """tests _determine_topographic_factor() in soil_erosion.py"""
+
+    # Mock helper function
+    SoilErosion._determine_exponential_term = MagicMock(return_value=0.45)
+
+    # Run method
+    observe = SoilErosion._determine_topographic_factor(length, avg_slope)
+
+    # Calculate expected return value
+    expect = ((length / 22.1) ** 0.45) * (65.41 * (sin(atan(avg_slope)) ** 2) + 4.56 * sin(atan(avg_slope)) + 0.065)
+
+    # Check everything
+    SoilErosion._determine_exponential_term.assert_called_with(avg_slope)
+    assert observe == expect
+
+
+@pytest.mark.parametrize("percent_rock", [
+    0,
+    0.5,
+    0.02194,
+    0.019493,
+    0.0492184949,
+    0.10495492330,
+])
+def test_determine_coarse_fragment_factor(percent_rock):
+    """tests _determine_coarse_fragment_factor() in soil_erosion.py"""
+    observe = SoilErosion._determine_coarse_fragment_factor(percent_rock)
+    expect = exp((-0.053) * percent_rock)
