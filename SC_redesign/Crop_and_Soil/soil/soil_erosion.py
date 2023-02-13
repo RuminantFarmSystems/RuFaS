@@ -385,6 +385,7 @@
 #
 #     return 0.6 * (1 - exp_part)
 from typing import Optional
+from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
@@ -395,4 +396,92 @@ This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1
 
 class SoilErosion:
     def __init__(self, soil_data: Optional[SoilData]):
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData() # Initialize with defaults, if not given
+
+    # --- Static methods ---
+    @staticmethod
+    def _determine_coarse_sand_factor(percent_sand_content: float, percent_silt_content: float) -> float:
+        """calculates factor based on sand content for use in determining soil erodibility factor
+
+        Args:
+            percent_sand_content: percent of soil content that is sand
+            percent_silt_content: percent of soil content that is silt
+
+        Returns:
+            factor based on sand content (unitless)
+
+        SWAT Reference: 4:1.1.6
+        """
+        return 0.2 + 0.3 * exp((-0.256) * percent_sand_content * (1 - (percent_silt_content / 100)))
+
+    @staticmethod
+    def _determine_clay_silt_ratio_factor(percent_silt_content: float, percent_clay_content: float) -> float:
+        """calculates factor based on the clay-silt ratio for use in calculating soil erodibility factor
+
+        Args:
+            percent_silt_content: percent of silt in the given layer of soil
+            percent_clay_content: percent of clay in the given layer of soil
+
+        Returns:
+            clay-silt ratio factor (unitless)
+
+        SWAT Reference: 4:1.1.7
+        """
+        if percent_silt_content == 0 and percent_clay_content == 0:
+            raise ValueError("Cannot have percent silt content and percent clay content both be 0")
+        return (percent_silt_content / (percent_clay_content + percent_silt_content)) ** 0.3
+
+    @staticmethod
+    def _determine_carbon_content_factor(percent_organic_carbon: float) -> float:
+        """calculates factor based on percent of organic carbon content for use in calculating soil erodibility factor
+
+        Args:
+            percent_organic_carbon: percent of organic carbon content in the given layer of soil
+
+        Returns:
+            organic carbon percent factor in the given layer of soil
+
+        SWAT Reference: 4:1.1.8
+        """
+        return 1 - ((0.25 * percent_organic_carbon) / (percent_organic_carbon +
+                                                       exp(3.72 - (2.95 * percent_organic_carbon))))
+
+    @staticmethod
+    def _determine_high_sand_factor(percent_sand_content: float) -> float:
+        """calculates factor based on percent sand content for use in calculating soil erodibility factor
+
+        Args:
+            percent_sand_content: percent of sand in the given layer of soil
+
+        Returns:
+            factor for adjusting soil erodibility factor based on high sand contents
+
+        SWAT Reference: 4:1.1.9
+        """
+        inverse_sand_percentage = 1 - (percent_sand_content / 100)
+        # TODO: better name for this variable
+        return 1 - ((0.7 * inverse_sand_percentage) / (inverse_sand_percentage + exp(-5.51 + 22.9 *
+                                                                                     inverse_sand_percentage)))
+
+    @staticmethod
+    def _determine_soil_erodibility_factor(percent_sand_content: float, percent_silt_content: float,
+                                           percent_clay_content: float, percent_organic_carbon_content: float) -> float:
+        """calculates the soil erodibility factor for use in calculating the sediment yield on a given day
+
+        Args:
+            percent_sand_content: percent of sand in the given layer of soil
+            percent_silt_content: percent of silt in the given layer of soil
+            percent_clay_content: percent of clay in the given layer of soil
+            percent_organic_carbon_content: percent of organic carbon content in the given layer of soil
+
+        Returns:
+            the soil erodibility factor (unitless)
+
+        SWAT Reference: 4:1.1.5
+        """
+        coarse_sand_factor = SoilErosion._determine_coarse_sand_factor(percent_sand_content, percent_silt_content)
+        clay_silt_factor = SoilErosion._determine_clay_silt_ratio_factor(percent_silt_content, percent_clay_content)
+        carbon_content_factor = SoilErosion._determine_carbon_content_factor(percent_organic_carbon_content)
+        high_sand_factor = SoilErosion._determine_high_sand_factor(percent_sand_content)
+        return coarse_sand_factor * clay_silt_factor * carbon_content_factor * high_sand_factor
+

@@ -43,6 +43,10 @@ class LayerData:
     previous_day_temperature: Optional[float] = None
     """temperature of soil layer on the previous day (degrees C)"""
 
+    # --- Erosion
+    percent_organic_carbon_content: float = 0.012
+    """percent organic carbon content of this layer"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -84,3 +88,14 @@ class LayerData:
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
         return max(0, self.saturation_content - self.water_content)
+
+    @property
+    def percent_organic_matter_content(self) -> float:
+        """percent organic matter content of this soil layer
+
+        TODO: remove this field from all the soil inputs, because the given values for OM_percent are not equal to value
+            that SWAT would calculate based on the percent organic carbon content
+
+        SWAT Reference: 4:1.1.4
+        """
+        return 1.72 * self.percent_organic_carbon_content
