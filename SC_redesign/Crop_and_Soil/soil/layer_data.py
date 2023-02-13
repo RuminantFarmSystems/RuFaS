@@ -40,7 +40,8 @@ class LayerData:
 
     # --- Temperature
     bulk_density: float = 1.4
-    """bulk density of the soil layer (Mg per cubic meter)"""
+    """bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for 
+        calculating this field as well)"""
     previous_day_temperature: Optional[float] = None
     """temperature of soil layer on the previous day (degrees C)"""
 
