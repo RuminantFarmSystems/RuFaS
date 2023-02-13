@@ -19,7 +19,7 @@ class LayerData:
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
     water_content:  Optional[float] = None
-    """volume of soil water in the layer (mm)"""
+    """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
     wilting_point_water_concentration: float = 0.2  # arbitrary
@@ -32,11 +32,9 @@ class LayerData:
 
     # --- Percolation
     temperature: float = 15.05
-    """temperature of soil layer (degrees C)"""
+    """current temperature of this soil layer (degrees Celsius)"""
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
-    available_water_capacity: float = 0.2
-    """available water capacity expressed as fraction of total soil volume (unitless)"""
 
     # --- Temperature
     bulk_density: float = 1.4
@@ -46,7 +44,7 @@ class LayerData:
     """temperature of soil layer on the previous day (degrees C)"""
 
     def __post_init__(self):
-        """This function initializes all attributes in the dataclass that depend on other attributes in the class"""
+        """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
     @property
