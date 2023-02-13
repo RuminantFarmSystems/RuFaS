@@ -32,6 +32,10 @@ class CropData:
     """is the plant perennial?"""
     is_nitrogen_fixer: bool = False
     """is the plant a nitrogen fixer?"""
+    priority: int = 1
+    """this crop's priority level when accessing shared resources in a field containing multiple crops"""
+    field_proportion: float = 1.0
+    """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
 
     # SWAT Table A-3
     minimum_temperature: float = 0
