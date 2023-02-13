@@ -24,27 +24,27 @@ class Crop:
             If crop_data is not given, the default specifications are used.
         """
         # Common data object that is updated throughout routines
-        data = crop_data or CropData()  # defaults if not given
+        self.data = crop_data or CropData()  # defaults if not given
         """reference to the crop data; tracks all crop variables through the simulation"""
 
         # growth process components
-        self.growth_constraints = GrowthConstraints(data)
+        self.growth_constraints = GrowthConstraints(self.data)
         """Process component controlling growth constraints, limits plant growth as a function of stressors"""
-        self.biomass_allocation = BiomassAllocation(data)
+        self.biomass_allocation = BiomassAllocation(self.data)
         """Process component controlling allocation of plant biomass as a function of growth and photosynthesis"""
-        self.water_dynamics = WaterDynamics(data)
+        self.water_dynamics = WaterDynamics(self.data)
         """Process component controlling plant water dynamics"""
-        self.nitrogen_incorporation = NitrogenIncorporation(data)
+        self.nitrogen_incorporation = NitrogenIncorporation(self.data)
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
-        self.phosphorus_incorporation = PhosphorusIncorporation(data)
+        self.phosphorus_incorporation = PhosphorusIncorporation(self.data)
         """Process component controlling plant phosphorus uptake and incorporation"""
-        self.heat_units = HeatUnits(data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
+        self.heat_units = HeatUnits(self.data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
         """Process component controlling plant heat accumulation"""
-        self.leaf_area_index = LeafAreaIndex(data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
+        self.leaf_area_index = LeafAreaIndex(self.data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
         """Process component controlling canopy growth, including leaf area index"""
-        self.root_development = RootDevelopment(data)
+        self.root_development = RootDevelopment(self.data)
         """Process component controlling plant root development"""
-        self.crop_yields = Yields(data)
+        self.crop_yields = Yields(self.data)
         """Process component controlling calculation of end-of-season production"""
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
@@ -82,6 +82,10 @@ class Crop:
             process sub-routines. It should be called every day that the crop
             is alive and growing in the simulation
         """
+
+        if not self.data.is_alive or not self.data.is_growing:  # don't perform growth if the plant can't grow
+            return
+
         self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
         self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
@@ -90,7 +94,7 @@ class Crop:
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
         self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration,
-                                        adjusted_potential_evapotranspiration)
+                                        adjusted_potential_evapotranspiration)  # TODO: call from Field instead?
 
     @classmethod
     def plant_species(cls, species) -> Crop:
@@ -100,22 +104,6 @@ class Crop:
         """
         pass
 
-    # TODO: implement cut() and kill() methods - GitHub Issue #248
-    #   the old versions are pasted in the comment blocks below.
-    #   these method (or a similar harvest method) will eventually need to call
-    #   obtain_yields()
-    def cut(self, fraction: float, mass=None) -> None:
-        """remove biomass from the plant (via cutting) as either a proportion (fraction) or fixed amount of biomass
-        (mass)"""
-        pass
-
-    def kill(self) -> None:
-        """kill the plant, preventing it from growing"""
-        pass
-
-    def harvest(self):
-        """harvests the crop's cut yield biomass"""
-        pass
 
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""

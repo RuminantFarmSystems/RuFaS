@@ -36,6 +36,8 @@ class CropData:
     """this crop's priority level when accessing shared resources in a field containing multiple crops"""
     field_proportion: float = 1.0
     """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
+    is_alive: bool = True
+    """is the crop currently alive in the field?"""
 
     # SWAT Table A-3
     minimum_temperature: float = 0
