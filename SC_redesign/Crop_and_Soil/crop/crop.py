@@ -46,14 +46,6 @@ class Crop:
         """Process component controlling plant root development"""
         self.crop_yields = Yields(data)
         """Process component controlling calculation of end-of-season production"""
-        # TODO: Loi recommended that a composition pattern might fit better
-        #  than multiple inheritance: A crop "has" a Growth constraint (system)
-        #  but is not itself a growth constraint. This pattern might be worth
-        #  looking into in the future. One problem I foresee is that because
-        #  individual attributes occur in multiple process classes
-        #  (e.g., nitrogen in GrowthConstraints and NitrogenIncorporation), a
-        #  composite design would require interdependence such that these
-        #  common attributes remain in-sync. - GitHub Issue #255
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
                   layer_phosphates: List[float],
