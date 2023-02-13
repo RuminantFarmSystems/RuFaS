@@ -42,6 +42,14 @@ class SoilData:
     time_step: float = 24
     """length of time step over which percolation occurs (hours) """
 
+    # ---- temperature
+    albedo: float = 0.16
+    """proportion of solar radiation that is reflected by the soil surface (unitless)"""
+    previous_temperature_effect: float = 0.8
+    """variable that controls the influence of previous day's temperature on current day's temperature, range is from 0
+    to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
+    """
+
     def __post_init__(self):
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any
@@ -95,7 +103,7 @@ class SoilData:
     def profile_field_capacity(self) -> float:
         """
 
-        Returns: total amount of water contained in the soil profile at field capacity (but not saturated) (mm)
+        Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
 
         """
         if self.soil_layers is None:
@@ -122,3 +130,15 @@ class SoilData:
     #   - soil evaporation adjusted is always less than or equal to maximum soil evaporation
     #   - potential evapotranspiration adjusted is always less than or equal to maximum evapotranspiration
     #   - average slope fraction is always in the range 0 to 1 inclusive (I think)
+
+    @property
+    def profile_bulk_density(self):
+        """average bulk density of the soil profile based on the bulk density of each soil layer, weighted by
+            the thickness
+        """
+        weighted_densities_sum = 0
+        weights_sum = 0
+        for layer in self.soil_layers:
+            weighted_densities_sum += (layer.layer_thickness * layer.bulk_density)
+            weights_sum += layer.layer_thickness
+        return weighted_densities_sum / weights_sum

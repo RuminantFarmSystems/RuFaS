@@ -36,6 +36,13 @@ class LayerData:
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
 
+    # --- Temperature
+    bulk_density: float = 1.4
+    """bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for 
+        calculating this field as well)"""
+    previous_day_temperature: Optional[float] = None
+    """temperature of soil layer on the previous day (degrees C)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -44,6 +51,11 @@ class LayerData:
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
         return self.bottom_depth - self.top_depth
+
+    @property
+    def depth_of_layer_center(self) -> float:
+        """depth beneath the surface of the center this layer (mm)"""
+        return self.top_depth + (self.layer_thickness / 2)
 
     @property
     def field_capacity_content(self) -> float:
@@ -56,7 +68,7 @@ class LayerData:
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
-    def excess_water_available(self):
+    def excess_water_available(self) -> float:
         """volume of water available for percolation in the soil layer (mm)
 
         SWAT Reference: 2:3.2.1, 2
