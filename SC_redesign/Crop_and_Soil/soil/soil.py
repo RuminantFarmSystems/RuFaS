@@ -1,18 +1,21 @@
 from __future__ import annotations
-from itertools import groupby
 from typing import Optional
 
-from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
-from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
+from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
+from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
+from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
 
 
 class Soil:
     def __init__(self, soil_data: Optional[SoilData] = None):
-        data = soil_data or SoilData()
-        self.evapotranspiration = Evapotranspiration(data)
-        self.infiltration = Infiltration(data)
+        self.data = soil_data or SoilData()
+        self.evapotranspiration = Evapotranspiration(self.data)
+        self.infiltration = Infiltration(self.data)
+        self.percolation = Percolation(self.data)
+        self.soil_temp = SoilTemp(self.data)
 
         # TODO: Find a way to set defaults for soil layers in SoilData
         self.data.soil_layers = [LayerData(top_depth=0, bottom_depth=5, nitrate=0.5),
@@ -24,4 +27,3 @@ class Soil:
         """"""
         Warning("create from config file not yet implement, returning default Soil()")
         return Soil()
-
