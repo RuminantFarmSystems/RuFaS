@@ -1,80 +1,63 @@
-### __Heat units__
+### __Heat units__ 
 
-**Heat units** are calculated on a daily basis by the `HeatUnits`class.
-Each crop has its own temperature range for growth (i.e., minimum, optimum, and maximum) and`
-HeatUnits` holds for each particular crop all the methods that determine the **absorption** 
-and **accumulation** of heat units. 
+The `HeatUnits`class manages the accumulation of heat units for a crop on a daily basis. Crops have its own temperature range for growth (*i.e.*, minimum, optimum, and maximum) and `HeatUnits` holds for each particular crop all the methods that determine the absorption and accumulation of heat units. 
 
-The main function, `absorb_heat_units()`, updates the **new heat units** absorbed on a given 
-day and its accumulation through the growing season.
+Its central method, `absorb_heat_units()`, executes all the methods that allow updating the **new heat units** absorbed on a given day and its accumulation through the growing season. 
 
-RuFaS provides two alternatives for calculating **new heat units**:
-1. **Main method**: the average air temperature is used as an input, and every degree above 
-crop's minimum temperature for growth is accumulated as heat units. With this method, heat 
-units accumulated are always equal to the average air temperature (when above the minimum 
-threshold). 
+The **accumulate heat units** method provides two alternatives for calculating **new heat units** on a given day:
 
-Using this method, **new heat units** represents the number of heat units accumulated on a 
-given day, where minimum temperature is dependant on the selected crop, using the equation:
+1. **Main method**: the mean air temperature (`mean_air_temperature`) is used as an input, and every degree above crop's minimum temperature for growth is accumulated as heat units. With  this method, where minimum temperature is dependant on the selected crop, heat units accumulated are always equal to the average air temperature (when above the minimum threshold). 
 
-```math
-  $$ hu = 
-  max(T_{\text{air}} - T_{\text{crop, min}}, 0)     
-$$
-```
-where $hu$ is `heat_units`, $T_{\text{air}}$ is `air_temperature`, the mean air temperature for a given day, and 
-$T_{\text{crop, min}}$ is `minimum_growth_temperature`, base or minimum temperature for the crop to growth.
+2. **Alternative method**: new heat units are defined using the **heat unit temperature** (`heat_unit_temperature`) instead of the mean air temperature (`mean_air_temperature`). The selection of this method involves the daily calculation of **minimum heat unit temperature** and **maximum heat unit temperature** to determine the **heat unit temperature** on a given day:
 
-2. **Alternative method**: `heat_unit_temperature` is used instead of `air_temperature`. 
-Heat units accumulated are defined using the `heat_unit_temperature` resulting from the 
-comparison between minimum and maximum daily temperatures of crop and air:
+**Minimum heat unit temperature** results from the comparison between the minimum air temperature and the crop's minimum temperature for growth:
 
-**Minimum heat unit temperature** calculates the minimum heat unit temperature on a given
-day using:
-```math
-  $$ T_{\text{min}} = 
+$$ T_{\text{hu, min}} = 
   max(T_{\text{air, min}}, T_{\text{crop, min}})     
-  $$
-```
-where $T_{\text{min}}$ is `minimum_heat_unit_temperature`, $T_{\text{air, min}}$ is `minimum_air_temperature`, the minimum temperature on 
-a given day, and $T_{\text{crop, min}}$ is `minimum_growth_temperature`, base or minimum temperature for the crop to growth.
+$$
 
+where $T_{\text{hu, min}}$ is the minimum heat unit temperature on a given day (`minimum_heat_unit_temperature`), $T_{\text{air, min}}$ is the minimum air temperature on a given day (`min_air_temperature`), and $T_{\text{crop, min}}$ is the base or minimum temperature for the crop to grow (`minimum_temperature`).
 
-**Maximum heat unit temperature** calculates the maximum heat unit temperature on a given
-day using:
+**Maximum heat unit temperature** results from the comparison between the maximum air temperature and the crop's maximum temperature for growth:
 
-```math
-  $$ T_{\text{max}} = 
+$$ T_{\text{hu, max}} = 
   min(T_{\text{air, max}}, T_{\text{crop, max}})     
 $$
-```
-where $T_{\text{max}}$ is `maximum_heat_unit_temperature`, $T_{\text{air, max}}$ is `maximum_air_temperature`, the maximum temperature 
-on a given day, and $T_{\text{crop, max}}$ is `maximum_growth_temperature`, maximum temperature for the crop to growth.
 
-Finally, **heat unit temperature**, which represents the temperature at which heat units 
-are accumulated on a given day when considering both crop and air thresholds, is calculated as follows:
+where $T_{\text{hu, max}}$ is the maximum heat unit temperature on a given day (`maximum_heat_unit_temperature`), $T_{\text{air, max}}$ is the maximum air temperature on a given day (`max_air_temperature`), and $T_{\text{crop, max}}$ is the maximum temperature for the crop to grow (`maximum_temperature`).
 
-```math
-  $$ hut = 
-     \frac{T_{\text{min}}+T_{\text{max}}}{2}  
+Finally, **heat unit temperature**, which represents the temperature at which heat units are accumulated on a given day when considering both crop and air 
+thresholds, is calculated as follows:
+
+$$ T_{\text{hu}} = 
+     \frac{T_{\text{hu, min}}+T_{\text{hu, max}}}{2}  
 $$
-```
-where $hut$ is `heat_unit_temperature`, $T_{\text{min}}$ is `minimum_heat_unit_temperature`, and $T_{\text{max}}$ is `maximum_heat_unit_temperature`.
 
-Using this alternative method, **new heat units** is calculated using the equation:
+where $T_{\text{hu}}$ is the heat unit temperature (`heat_unit_temperature`), $T_{\text{hu, min}}$ is the minimum heat unit temperature on a given day  
+(`minimum_heat_unit_temperature`), and $T_{\text{hu, max}}$ is the maximum heat unit temperature on a given day (`maximum_heat_unit_temperature`).
 
-```math
-  $$ hu = 
-  max(hut - T_{\text{crop, min}}, 0)     
+Once the accumulation method for heat units is defined, the **assign new heat unis** method calculates the new heat units on a given day:
+
+$$ hu = 
+\begin{cases}
+    max(T_{\text{air}} - T_{\text{crop, min}}, 0)                                        & \text{Main method } \\ 
+    max(T_{\text{hu}} - T_{\text{crop, min}}, 0)                                                   & \text{Alternative method}
+\end{cases} 
 $$
-```
-where $hu$ is `heat_units`, $hut$ is `heat_unit_temperature`, and $T_{\text{crop, min}}$ is `minimum_growth_temperature`, base or minimum temperature for the crop to growth.
 
-For both methods of heat unit accumulation, after calculation newly absorbed heat units are 
-added to the accumulated heat units every day. 
+where $hu$ are the new heat units accumulated on a given day (`heat_units`), $T_{\text{air}}$ is the mean air temperature on a given day (`mean_air_temperature`), $T_{\text{hu}}$ is the heat unit temperature (`heat_unit_temperature`), and $T_{\text{crop, min}}$ is the base or minimum temperature for the crop to grow 
+(`minimum_temperature`).
+
+Then, the newly acquired heat units are added to the accumulated heat units to date through the the **add heat units** method:
+
+$$ hu_{\text{ac, i}} = 
+     hu + hu_{\text{ac, i-1}}
+$$
+
+where $hu_{\text{ac, i}}$ are the total heat units accumulated on a given day (`accumulated_heat_units`), $hu$ are the new heat units accumulated on a given day (`heat_units`), and $hu_{\text{ac, i-1}}$ are the total heat units accumulated on the previous day (`accumulated_heat_units`). 
+
 
 ---
-**References**: this module is based upon the "Heat units" section of the [SWAT][1] model
-(5:1.1).
+**References**: this module is based upon the "Heat Units" section of the [SWAT][1] model (5:1.1).
 
 [1]:https://swat.tamu.edu/media/99192/swat2009-theory.pdf
