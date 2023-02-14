@@ -69,6 +69,8 @@ class SoilData:
     """area of the field which contains this soil (hectares)
         NOTE: the field is treated as its own HRU, so this attribute may be used as the area of the HRU
     """
+    snow_cover_water_content: float = 0
+    """water content of the snow cover (mm)"""
     eroded_sediment: float = 0
     """cumulative amount of sediment that has been eroded off of the field (metric tons)"""
 

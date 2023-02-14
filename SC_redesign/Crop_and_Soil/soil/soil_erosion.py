@@ -26,7 +26,7 @@ class SoilErosion:
                                                                      self.data.percent_silt_content,
                                                                      self.data.soil_layers[0].percent_clay_content,
                                                                      self.data.soil_layers[0]
-                                                                                        .percent_organic_carbon_content)
+                                                                     .percent_organic_carbon_content)
         cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)
         support_practice_factor = self._determine_support_practice_factor()
         topographic_factor = self._determine_topographic_factor(self.data.slope_length,
@@ -39,11 +39,11 @@ class SoilErosion:
         elif self.data.surface_runoff_volume is None:
             raise TypeError("SoilData surface_runoff_rate cannot be NoneType")
             return
-        self.data.eroded_sediment += self._determine_sediment_yield(self.data.surface_runoff_volume,
-                                                                   self.data.peak_runoff_rate, self.data.field_size,
-                                                                   erodibility_factor, cover_factor,
-                                                                   support_practice_factor, topographic_factor,
-                                                                   fragment_factor)
+        sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, self.data.peak_runoff_rate,
+                                                        self.data.field_size, erodibility_factor, cover_factor,
+                                                        support_practice_factor, topographic_factor, fragment_factor)
+        self.data.eroded_sediment += self._determine_adjusted_sediment_yield(sediment_yield,
+                                                                             self.data.snow_cover_water_content)
 
     # --- Static methods ---
     @staticmethod
@@ -234,3 +234,18 @@ class SoilErosion:
         term_with_exponent = (surface_area_runoff * peak_runoff_rate * field_area) ** 0.56
         return (11.8 * term_with_exponent * soil_erodibility_factor * cover_management_factor * support_practice_factor
                 * topographic_factor * coarse_fragment_factor)
+
+    @staticmethod
+    def _determine_adjusted_sediment_yield(sediment_yield: float, snow_water_content: float) -> float:
+        """adjusts the sediment yield based on how much snow cover there is
+
+        Args:
+            sediment_yield: sediment yield on a given day (metric tons)
+            snow_water_content: water content of the snow cover (mm)
+
+        Returns:
+            the sediment yield on a given day adjusted for water content of the snow cover
+
+        SWAT Reference: 4:1.3.1
+        """
+        return sediment_yield / exp((3 * snow_water_content) / 25.4)

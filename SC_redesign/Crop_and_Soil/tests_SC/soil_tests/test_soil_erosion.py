@@ -212,6 +212,19 @@ def test_determine_sediment_yield(surface_runoff, peak_runoff_rate, field_area, 
     assert observe == expect
 
 
+@pytest.mark.parametrize("sediment_yield,snow_content", [
+    (0.015, 1),
+    (0.03, 3),
+    (0.029385473, 2.49381),
+    (0.108481, 6.193943),
+])
+def test_determine_adjusted_sediment_yield(sediment_yield, snow_content):
+    """tests _determine_adjusted_sediment_yield() in soil_erosion.py"""
+    observe = SoilErosion._determine_adjusted_sediment_yield(sediment_yield, snow_content)
+    expect = sediment_yield / exp(3 * snow_content / 25.4)
+    assert observe == expect
+
+
 # --- Integration tests ---
 @pytest.mark.parametrize("min_cover_factor,residue", [
     (0.2, 800),
@@ -234,6 +247,7 @@ def test_erode(min_cover_factor, residue):
     incorp._determine_topographic_factor = MagicMock(return_value=0.95)
     incorp._determine_coarse_fragment_factor = MagicMock(return_value=0.95)
     incorp._determine_sediment_yield = MagicMock(return_value=0.05)
+    incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
 
     # Run method
     incorp.erode(min_cover_factor, residue)
@@ -245,4 +259,5 @@ def test_erode(min_cover_factor, residue):
     incorp._determine_topographic_factor.assert_called_once()
     incorp._determine_coarse_fragment_factor.assert_called_once()
     incorp._determine_sediment_yield.assert_called_once()
-    assert incorp.data.eroded_sediment == 0.05
+    incorp._determine_adjusted_sediment_yield.assert_called_once()
+    assert incorp.data.eroded_sediment == 0.0498

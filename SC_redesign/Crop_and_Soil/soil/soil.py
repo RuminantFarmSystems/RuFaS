@@ -7,6 +7,7 @@ from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
+from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 
 
 class Soil:
@@ -16,6 +17,7 @@ class Soil:
         self.infiltration = Infiltration(data)
         self.percolation = Percolation(data)
         self.soil_temp = SoilTemp(data)
+        self.soil_erosion = SoilErosion(data)
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
