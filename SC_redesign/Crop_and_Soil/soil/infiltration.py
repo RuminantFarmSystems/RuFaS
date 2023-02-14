@@ -15,7 +15,7 @@ class Infiltration:
 
     def infiltrate(self, second_moisture_condition_parameter: float, rainfall: float,
                    weighting_coefficient: float) -> None:
-        """main routine for determining accumulated_runoff and infiltration of soil for a given day"""
+        """main routine for determining runoff and infiltration of soil for a given day"""
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
                                                                                     second_moisture_condition_parameter)
 
@@ -112,10 +112,10 @@ class Infiltration:
 
     @staticmethod
     def _determine_retention_parameter_for_moisture_condition(moisture_condition_parameter: float) -> float:
-        """calculates the retention parameter used to determine accumulated_runoff
+        """calculates the retention parameter used to determine runoff
 
         Args:
-            moisture_condition_parameter: curve number for the day (from SCS accumulated_runoff equations (SWAT 2:1.1)) (unitless)
+            moisture_condition_parameter: curve number for the day (from SCS runoff equations (SWAT 2:1.1)) (unitless)
 
         Returns:
             retention parameter (mm)
@@ -234,14 +234,14 @@ class Infiltration:
 
     @staticmethod
     def _determine_accumulated_runoff(rainfall: float, retention_parameter: float) -> float:
-        """calculates accumulated accumulated_runoff or rainfall excess
+        """calculates accumulated runoff or rainfall excess
 
         Args:
             rainfall: rainfall depth of given day (mm)
             retention_parameter: retention parameter based on curve number (mm)
 
         Returns:
-            accumulated accumulated_runoff or rainfall excess (mm)
+            accumulated runoff or rainfall excess (mm)
 
         Details:
             Runoff only occurs when rainfall is greater than initial abstractions (about surface storage, interception,
@@ -269,7 +269,7 @@ class Infiltration:
             potential_evapotranspiration: potential evapotranspiration for current day (mm per day)
             max_retention_parameter: maximum retention parameter for the current day (mm)
             rainfall: rainfall depth of current day (mm)
-            runoff: surface accumulated_runoff of current day (mm)
+            runoff: surface runoff of current day (mm)
             weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
                 calculations dependent on plant evapotranspiration (unitless)
 
