@@ -34,6 +34,8 @@ class SoilData:
     """average slope fraction of the subbasin (unitless)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
+    accumulated_runoff: Optional[float] = None
+    """accumulated runoff or rainfall excess (mm)"""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
@@ -49,6 +51,26 @@ class SoilData:
     """variable that controls the influence of previous day's temperature on current day's temperature, range is from 0
     to 1, inclusive. SWAT sets the lag coefficient to 0.8 (paragraph between equations 1:1.3.3, 4) (unitless)
     """
+
+    # ---- Erosion
+    slope_length: float = 3
+    """length of the slope (meters)"""
+    percent_sand_content: float = 15
+    """percent sand content in the soil profile (unitless)"""
+    percent_silt_content: float = 65
+    """percent silt content in the soil profile (unitless)"""
+    percent_rock_content: float = 0.1
+    """percent rock content in the first layer of soil (unitless)"""
+    manning: float = 0.4
+    """the Manning roughness coefficient for this subbasin (unitless)"""
+    peak_runoff_rate: Optional[float] = None
+    """the peak runoff rate (meters cubed per second)"""
+    field_size: float = 1
+    """area of the field which contains this soil (hectares)
+        NOTE: the field is treated as its own HRU, so this attribute may be used as the area of the HRU
+    """
+    eroded_sediment: float = 0
+    """cumulative amount of sediment that has been eroded off of the field (metric tons)"""
 
     def __post_init__(self):
         if self.soil_layers is None:
@@ -82,14 +104,12 @@ class SoilData:
             water_sum = 0
             for layer in self.soil_layers:
                 water_sum += max(0, (layer.water_content - layer.wilting_point_content))
-            return
+            return water_sum
 
     @property
     def profile_saturation(self) -> float:
         """
-
         Returns: amount of water in the soil profile when completely saturated (mm)
-
         """
         if self.soil_layers is None:
             return 0
@@ -102,9 +122,7 @@ class SoilData:
     @property
     def profile_field_capacity(self) -> float:
         """
-
-        Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
-
+         Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
         """
         if self.soil_layers is None:
             return 0
@@ -115,10 +133,8 @@ class SoilData:
             return field_capacity_sum
 
     @property
-    def soil_water_factor(self):
-        """
-
-        Returns: the soil water factor (unitless)
+    def soil_water_factor(self) -> float:
+        """Returns: the soil water factor (unitless)
 
         SWAT Reference: 5:2.3.18
         """
@@ -132,9 +148,9 @@ class SoilData:
     #   - average slope fraction is always in the range 0 to 1 inclusive (I think)
 
     @property
-    def profile_bulk_density(self):
-        """average bulk density of the soil profile based on the bulk density of each soil layer, weighted by
-            the thickness
+    def profile_bulk_density(self) -> float:
+        """average bulk density of the soil profile based on the bulk density of each soil layer, weighted by the
+            thickness
         """
         weighted_densities_sum = 0
         weights_sum = 0
@@ -142,3 +158,13 @@ class SoilData:
             weighted_densities_sum += (layer.layer_thickness * layer.bulk_density)
             weights_sum += layer.layer_thickness
         return weighted_densities_sum / weights_sum
+
+    @property
+    def surface_runoff_volume(self) -> float:
+        """volume of surface runoff (mm per hectare)
+
+        Used in SWAT equation 4:1.1.1
+        """
+        if self.accumulated_runoff is None or self.field_size is None:
+            return None
+        return self.accumulated_runoff / self.field_size

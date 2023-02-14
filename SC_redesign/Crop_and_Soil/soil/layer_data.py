@@ -46,6 +46,8 @@ class LayerData:
     # --- Erosion
     percent_organic_carbon_content: float = 0.012
     """percent organic carbon content of this layer"""
+    percent_clay_content: float = 24
+    """percent clay content of this layer"""
 
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""

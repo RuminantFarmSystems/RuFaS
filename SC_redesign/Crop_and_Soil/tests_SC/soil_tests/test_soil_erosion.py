@@ -2,6 +2,7 @@ import pytest
 from math import exp, log, atan, sin
 from unittest.mock import MagicMock
 
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 
 
@@ -151,7 +152,6 @@ def test_determine_exponential_term(average_slope):
     observe = SoilErosion._determine_exponential_term(average_slope)
     exp_term = exp(-35.835 * average_slope)
     expect = 0.6 * (1 - exp_term)
-    # print(str(observe))
     assert observe == expect
 
 
@@ -192,3 +192,57 @@ def test_determine_coarse_fragment_factor(percent_rock):
     """tests _determine_coarse_fragment_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_coarse_fragment_factor(percent_rock)
     expect = exp((-0.053) * percent_rock)
+    assert observe == expect
+
+
+@pytest.mark.parametrize("surface_runoff,peak_runoff_rate,field_area,erodibility_factor,cover_factor,practice_factor,"
+                         "topographic_factor,fragment_factor", [
+                             (10, 0.15, 1, 0.98, 0.79, 1, 0.88, 0.93),
+                             (34.59648, 0.2139485, 3.2294823, 0.99, 0.784248, 0.109401, 0.728394, 0.6569382),
+                             (18.91918429, 0.09184013, 0.8391984, 0.8729485473, 0.8192847, 0.7348924, 0.89717392,
+                              0.459683)
+                         ])
+def test_determine_sediment_yield(surface_runoff, peak_runoff_rate, field_area, erodibility_factor, cover_factor,
+                                  practice_factor, topographic_factor, fragment_factor):
+    """tests _determine_sediment_yield() in soil_erosion.py"""
+    observe = SoilErosion._determine_sediment_yield(surface_runoff, peak_runoff_rate, field_area, erodibility_factor,
+                                                    cover_factor, practice_factor, topographic_factor, fragment_factor)
+    expect = (11.8 * ((surface_runoff * peak_runoff_rate * field_area) ** 0.56) * erodibility_factor * cover_factor *
+              practice_factor * topographic_factor * fragment_factor)
+    assert observe == expect
+
+
+# --- Integration tests ---
+@pytest.mark.parametrize("min_cover_factor,residue", [
+    (0.2, 800),
+    (0.001, 500),
+    (0.003, 80),
+    (0.01, 0),
+    (0.05, 928.948569),
+])
+def test_erode(min_cover_factor, residue):
+    """tests that erode() properly calls methods and stores values"""
+
+    # Initialize objects
+    data = SoilData(accumulated_runoff= 13,peak_runoff_rate=0.11)
+    incorp = SoilErosion(data)
+
+    # Mock helper function
+    incorp._determine_soil_erodibility_factor = MagicMock(return_value=0.95)
+    incorp._determine_cover_management_factor = MagicMock(return_value=0.95)
+    incorp._determine_support_practice_factor = MagicMock(return_value=0.95)
+    incorp._determine_topographic_factor = MagicMock(return_value=0.95)
+    incorp._determine_coarse_fragment_factor = MagicMock(return_value=0.95)
+    incorp._determine_sediment_yield = MagicMock(return_value=0.05)
+
+    # Run method
+    incorp.erode(min_cover_factor, residue)
+
+    # Check everything
+    incorp._determine_soil_erodibility_factor.assert_called_once()
+    incorp._determine_cover_management_factor.assert_called_once()
+    incorp._determine_support_practice_factor.assert_called_once()
+    incorp._determine_topographic_factor.assert_called_once()
+    incorp._determine_coarse_fragment_factor.assert_called_once()
+    incorp._determine_sediment_yield.assert_called_once()
+    assert incorp.data.eroded_sediment == 0.05
