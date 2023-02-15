@@ -48,14 +48,18 @@ class SoilErosion:
     # --- Static methods ---
     @staticmethod
     def _determine_coarse_sand_factor(percent_sand_content: float, percent_silt_content: float) -> float:
-        """calculates factor based on sand content for use in determining soil erodibility factor
+        """calculates the coarseness factor of soil erodbility
 
         Args:
             percent_sand_content: percent of soil content that is sand
             percent_silt_content: percent of soil content that is silt
+            
+        Details: 
+          The coarseness of a soil effects the overall erodibility of the soil. Specifically, soils with high-levels of 
+          coarse-sand content will have relatively low erodibility compared to soils with less sand. 
 
         Returns:
-            factor based on sand content (unitless)
+            coarseness factor of erodibility, based on sand content (unitless)
 
         SWAT Reference: 4:1.1.6
         """
