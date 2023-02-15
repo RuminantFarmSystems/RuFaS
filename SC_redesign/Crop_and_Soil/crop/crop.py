@@ -96,6 +96,7 @@ class Crop:
         self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration,
                                         adjusted_potential_evapotranspiration)  # TODO: call from Field instead?
 
+    # ---- Crop Management Methods
     @classmethod
     def plant_species(cls, species) -> Crop:
         """creates a crop instance with attributes determined by the species of the crop.
@@ -104,6 +105,49 @@ class Crop:
         """
         pass
 
+    def cut(self, fraction: float, allow_below_ground: bool = True, death_threshold: float = 0.0) -> float:
+        """Cuts the crop, removing cut biomass and returning the amount cut
+
+        Args:
+            fraction: the fraction of above-ground biomass to be cut
+            allow_below_ground: should fraction > 1 be allowed to remove from below-ground biomass?
+            death_threshold: the biomass threshold below which the plant will die (kg/ha)
+
+        Returns: The total biomass removed from the plant (kg/ha)
+
+        Details:
+            If fraction is greater than 1 and the roots are allowed to be cut, then all of the above ground
+            biomass is removed and any remainder is removed from the roots below ground. Otherwise, only the above
+            ground portion gets removed.
+
+            The output of this function is the biomass removed, which should be redirected depending on the use case
+            (i.e., converted to residue, removed as economic yield, consumed by grazer, stored in field to dry, etc.)
+        """
+        exceeds_available = fraction > 1.0
+
+        if exceeds_available and allow_below_ground:  # cut into entire plant
+            below_frac = fraction - 1.0
+            self.data.above_ground_biomass = 0.0
+            self.data.root_biomass -= max(self.data.root_biomass, below_frac*self.data.root_biomass)
+
+        else:  # don't cut more than available above ground
+            self.data.above_ground_biomass -= max(self.data.above_ground_biomass,
+                                                  fraction*self.data.above_ground_biomass)
+
+        # update biomass features
+        og_biomass = self.data.biomass  # original for comparison
+        self.data.biomass = self.data.above_ground_biomass + self.data.root_biomass
+
+        # kill the crop if too much biomass is removed
+        if self.data.biomass > death_threshold:
+            self.kill()
+
+        # return the cut biomass, in case other methods wish to use the result
+        return og_biomass - self.data.biomass
+
+    def kill(self) -> None:
+        """kill the plant, preventing it from growing"""
+        self.data.is_alive = False
 
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""
@@ -113,9 +157,6 @@ class Crop:
         """destoys the crop - Destructor class. This removes the crop instance from existence"""
         pass
 
-    def _list_all_parent_var_names(self):
-        """list all variables used by Crop"""
-        return vars(self)  # TODO: check for duplicates or conflicts among parents
 
 # ---- Old versions of cut() and kill()
 # def kill(crop_type, field_management, time):

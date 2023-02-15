@@ -60,22 +60,20 @@ class Field:
         if self.field_data.is_planting_day:
             self.plant_crops(self.current_crop_config)
 
-        # skip remaining tasks if no crops currently in field
-        if self.crops is None:  # empty crop list, early return (or similar)
-            return
+        # perform remaining tasks if crops currently in field
+        if self.crops is not None:
 
-        # allow crops to grow
+            # allow crops to grow
+            self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
+                            current_weather.mean_air_temperature, current_weather.max_air_temperature)
 
-        self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
-                        current_weather.mean_air_temperature, current_weather.max_air_temperature)
+            # allow grazing
+            if self.field_data.grazers_present:
+                self.graze_field()
 
-        # allow grazing
-        if self.field_data.grazers_present:
-            self.graze_field()
-
-        # conduct harvest routines
-        if self.field_data.is_cutting_day:
-            self.cut_crops()
+            # conduct harvest routines
+            if self.field_data.is_cutting_day:
+                self.cut_crops()
 
         pass
 
