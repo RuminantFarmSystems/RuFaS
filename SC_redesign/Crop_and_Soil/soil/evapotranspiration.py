@@ -100,7 +100,7 @@ class Evapotranspiration:
                                                                         layer.wilting_point_content)
 
             # remove water from soil water content
-            layer.soil_water_concentration -= amount_water_removed
+            layer.water_content -= amount_water_removed
 
     # --- static methods ---
     @staticmethod

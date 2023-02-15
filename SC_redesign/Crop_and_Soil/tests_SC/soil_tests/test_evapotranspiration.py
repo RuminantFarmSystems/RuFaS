@@ -273,7 +273,7 @@ def test_evaporate_from_soil(layers):
     # record expected values
     expect = []
     for layer in layers:
-        expect.append(layer.soil_water_concentration - 0.5)
+        expect.append(layer.water_content - 0.5)
 
     # run function
     incorp._evaporate_from_soil()
@@ -283,4 +283,4 @@ def test_evaporate_from_soil(layers):
     assert incorp._determine_evaporative_demand_reduced.call_count == len(layers)
     assert incorp._determine_amount_water_removed.call_count == len(layers)
     for i in range(len(layers)):
-        assert expect[i] == incorp.data.soil_layers[i].soil_water_concentration
+        assert expect[i] == incorp.data.soil_layers[i].water_content
