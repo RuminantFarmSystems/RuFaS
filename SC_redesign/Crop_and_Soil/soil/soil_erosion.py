@@ -179,9 +179,9 @@ class SoilErosion:
         return exp(first_multiplicative_term * second_multiplicative_term + second_additive_term)
 
     @staticmethod
-    def _determine_support_practice_factor() -> float:
-        """TODO: implement this for version 2 (only applies to fields that are doing contour tillage/planting,
-            stripcropping, and/or terracing) SWAT Reference: section 4:1.1.3 (GitHub issue #348)"""
+    def _determine_support_practice_factor() -> float:  # TODO: implement this for version 2 (GitHub issue #348)
+        """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
+            stripcropping, and/or terracing)"""
         return 1
 
     @staticmethod
