@@ -12,9 +12,11 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.pen import Pen
 
 
-def create_mock_object_list(attribute_dicts: List[Dict[str: Any]]) -> List[MagicMock]:
+def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
     mock_object_list = []
 
     for attribute_dict in attribute_dicts:
@@ -37,7 +39,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 2.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": []
+            "animals_in_pen": [100000, 100001]
         },
         {
             "id": 1,
@@ -45,7 +47,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 10.0,
             "stocking_density": 1.075,
             "num_stalls": 50,
-            "animals_in_pen": []
+            "animals_in_pen": [200000, 200001]
         },
         {
             "id": 2,
@@ -53,7 +55,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 8.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": []
+            "animals_in_pen": [300000, 300001]
         },
         {
             "id": 3,
@@ -61,7 +63,7 @@ def mock_pens() -> List[MagicMock]:
             "horizontal_dist_to_parlor": 4.0,
             "stocking_density": 1.075,
             "num_stalls": 200,
-            "animals_in_pen": []
+            "animals_in_pen": [400000, 400001]
         },
     ]
 
@@ -318,45 +320,81 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
-# install flake 8
-# make them different sizes
-@pytest.fixture()
-def animal_ids_in_pens():
+def pen_removal_info_dicts():
     return [
-        {"ids_in_pen": [128382, 173829, 183920, 113803, 120462], "removal_ids": [113803],
-         "expected_stocking_density": 1.075},
-        {"ids_in_pen": [149495, 189237, 128193, 145927, 156253], "removal_ids": [145927],
-         "expected_stocking_density": 1.075},
-        {"ids_in_pen": [161832, 182729, 162719, 152394, 182938], "removal_ids": [152394],
-         "expected_stocking_density": 1.075},
-        {"ids_in_pen": [2178392, 182738, 128374, 101239, 118389], "removal_ids": [101239],
-         "expected_stocking_density": 1.075},
+        {
+            "pen_data":
+                {"pen0":
+                     {"pen_id": 0, "ids_in_pen": [128382, 173829, 183920, 113803, 120462],
+                      "expected_stocking_density": 0.5, "num_stalls": 8},
+                 "pen1":
+                     {"pen_id": 1, "ids_in_pen": [149495, 189237, 128193, 145927, 156253],
+                      "expected_stocking_density": 0.5, "num_stalls": 8},
+                 "pen2":
+                     {"pen_id": 2, "ids_in_pen": [161832, 182729, 162719, 152394, 182938],
+                      "expected_stocking_density": 0.5, "num_stalls": 8},
+                 "pen3":
+                     {"pen_id": 3, "ids_in_pen": [217892, 182738, 128374, 101239, 118389],
+                      "expected_stocking_density": 0.5, "num_stalls": 8}
+                 },
+            "removal_set":
+                {113803, 145927, 152394, 101239},
+            "expected_map":
+                {128382: 0, 173829: 0, 183920: 0, 120462: 0, 149495: 1, 189237: 1, 128193: 1, 156253: 1,
+                 161832: 2, 182729: 2, 162719: 2, 182938: 2, 217892: 3, 182738: 3, 128374: 3, 118389: 3}
+        }
     ]
 
 
-def test_remove_animals_from_herd(animal_management_with_mock_pens: AnimalManagement, mock_animals_big: List[MagicMock],
-                                  mock_pens: List[MagicMock], animal_ids_in_pens) -> None:
-    """Unit test for function remove_animals_from_herd in file routines/animal/animal_management.py"""
+@pytest.mark.parametrize("info_dict", pen_removal_info_dicts())
+def test_remove_animals_from_herd(info_dict, animal_management) -> None:
+    args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born'}
+    config_dict = {'semen_type': 'dummy_semen_type'}
+    dummy_pen_info_dict = {
+        'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
+        'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
+        'housing_type': 'dummy_housing_type',
+        'bedding_type': 'dummy_bedding_type', 'pen_type': 'dummy_pen_type',
+        'manure_handling': 'dummy_manure_handling', 'manure_separator': 'dummy_manure_separator',
+        'manure_storage': 'dummy_manure_storage', 'animal_combination': 'dummy_animal_combination',
+        'max_stocking_density': 'dummy_max_stocking_density'
+    }
+    animals_removed = []
+    pen_list = []
+    for pen_num in info_dict['pen_data']:
+        dummy_pen_info_dict['id'] = info_dict['pen_data'][pen_num]['pen_id']
+        dummy_pen_info_dict['number_of_stalls'] = info_dict['pen_data'][pen_num]['num_stalls']
+        dummy_pen = Pen(dummy_pen_info_dict['id'], dummy_pen_info_dict['vertical_dist_to_milking_parlor'],
+                        dummy_pen_info_dict['horizontal_dist_to_milking_parlor'],
+                        dummy_pen_info_dict['number_of_stalls'],
+                        dummy_pen_info_dict['housing_type'], dummy_pen_info_dict['bedding_type'],
+                        dummy_pen_info_dict['pen_type'], dummy_pen_info_dict['manure_handling'],
+                        dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_storage'],
+                        dummy_pen_info_dict['animal_combination'], dummy_pen_info_dict['max_stocking_density'])
 
-    expected = animal_ids_in_pens()
-    # create a pen ( mocked or real) based on the ids in pen, then call the function with removal ids from dictionary above
-    # then calculate the stocking densitys and check if they match the expected ones in the dictionary above
-    # I will need to go inside that pen and make sure that the list of IDs and make sure that the removed IDs are gone
-    # This will also be checked from looking at the expected mapping dictionary and the one returned after the function
+        animal_list = []
+        for animal_id in info_dict['pen_data'][pen_num]["ids_in_pen"]:
+            args_dict['id'] = animal_id
+            AnimalBase.set_config(config_dict)
+            dummy_animal = AnimalBase(args_dict)
+            animal_list.append(dummy_animal)
+            animal_management.animal_to_pen_id_map[dummy_animal.id] = info_dict['pen_data'][pen_num]['pen_id']
+            if dummy_animal.id in info_dict['removal_set']:
+                animals_removed.append(dummy_animal)
 
-    # reach out to Doctor Reed about the animals_in_pen variable never being removed
-    animal_management_with_mock_pens.animal_to_pen_id_map = test_mapping_dict
+        dummy_pen.animals_in_pen = animal_list
 
-    animal_management_with_mock_pens.remove_animals_from_herd(removal_list)
+        pen_list.append(dummy_pen)
 
-    for id in removed_ids:
-        del expected[id]
+    animal_management.all_pens = pen_list
 
-    assert animal_management_with_mock_pens.animal_to_pen_id_map == expected
-    assert mock_pens[0].stocking_density == 0.02
-    assert mock_pens[1].stocking_density == 0.08
-    assert mock_pens[2].stocking_density == 0.02
-    assert mock_pens[3].stocking_density == 0.02
+    animal_management.remove_animals_from_herd(animals_removed)
+
+    assert animal_management.animal_to_pen_id_map == info_dict['expected_map']
+    assert animal_management.all_pens[0].stocking_density == info_dict['pen_data']['pen0']['expected_stocking_density']
+    assert animal_management.all_pens[1].stocking_density == info_dict['pen_data']['pen1']['expected_stocking_density']
+    assert animal_management.all_pens[2].stocking_density == info_dict['pen_data']['pen2']['expected_stocking_density']
+    assert animal_management.all_pens[3].stocking_density == info_dict['pen_data']['pen3']['expected_stocking_density']
 
 
 def test_track_former_pen_population():
