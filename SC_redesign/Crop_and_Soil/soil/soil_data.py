@@ -28,6 +28,8 @@ class SoilData:
     """maximum amount of evaporation from soil on a given day (mm)"""
 
     # ---- infiltration
+    second_moisture_condition_parameter: float = 85
+    """curve number for average moisture conditions (unitless)"""
     previous_retention_parameter: Optional[float] = None
     """retention parameter for the previous day (mm) (used in SWAT 2:1.1.9)"""
     average_slope_fraction: float = 0.05

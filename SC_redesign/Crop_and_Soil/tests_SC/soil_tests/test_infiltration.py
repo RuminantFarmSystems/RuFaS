@@ -179,15 +179,15 @@ def test_determine_moisture_condition_parameter(retention_param):
 
 
 # --- Integration tests ----
-@pytest.mark.parametrize("second_moisture_parameter,rainfall,is_top_frozen,coefficient", [
-    (40, 1.4, False, 0.91),
-    (59, 3.5, True, 0.4858),
-    (14, 2.5, False, 0.694),
-    (36, 0.3, False, 0.58392),
-    (96, 4.697, False, 0.5938),
-    (76, 2.45, False, 0.9694),
+@pytest.mark.parametrize("rainfall,is_top_frozen,coefficient", [
+    (1.4, False, 0.91),
+    (3.5, True, 0.4858),
+    (2.5, False, 0.694),
+    (0.3, False, 0.58392),
+    (4.697, False, 0.5938),
+    (2.45, False, 0.9694),
 ])
-def test_infiltrate(second_moisture_parameter, rainfall, is_top_frozen, coefficient):
+def test_infiltrate(rainfall, is_top_frozen, coefficient):
     """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
     # initialize objects
     if is_top_frozen:
@@ -215,7 +215,7 @@ def test_infiltrate(second_moisture_parameter, rainfall, is_top_frozen, coeffici
     incorp._determine_moisture_condition_parameter = MagicMock(return_value=50)
 
     # run main method
-    incorp.infiltrate(second_moisture_parameter, rainfall, coefficient)
+    incorp.infiltrate(rainfall, coefficient)
 
     # assertions
     assert incorp._determine_third_moisture_condition_parameter.call_count == 2
