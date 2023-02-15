@@ -12,12 +12,29 @@ from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 
 class Soil:
     def __init__(self, soil_data: Optional[SoilData] = None):
+        """creates a Soil object based on a SoilData object
+
+        Args:
+            soil_data: a SoilData object containing initial attribute values as well as attributes tracked and updated
+                throughout the simulation
+
+        Details:
+            If no SoilData object is passed, default configuration is used.
+        """
         data = soil_data or SoilData()
+        """object that tracks all soil variable throughout the simulation"""
+
+        # Process components
         self.evapotranspiration = Evapotranspiration(data)
+        """Process component that controls evapotranspiration from the soil"""
         self.infiltration = Infiltration(data)
+        """Process component that controls water infiltration from the soil surface into the profile"""
         self.percolation = Percolation(data)
+        """Process component that controls percolation of water from upper layers to lower layers"""
         self.soil_temp = SoilTemp(data)
+        """Process component that tracks and updates the temperatures within the soil profile"""
         self.soil_erosion = SoilErosion(data)
+        """Process component that track erosion from the soil profile"""
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
@@ -37,7 +54,6 @@ class Soil:
             plant_cover: total aboveground plant biomass and residue on the current day (kg per hectare)
             snow_cover: water content of the snow cover on the current day (mm)
             avg_annual_air_temp: average annual air temperature (degrees C)
-
         """
         self.soil_temp.daily_soil_temperature_update(solar_radiation, avg_temp, min_temp, max_temp, plant_cover,
                                                      snow_cover, avg_annual_air_temp)
@@ -66,7 +82,6 @@ class Soil:
             initial_canopy_free_water: initial amount of free water held in canopy on a given day (mm)
             minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
                 to land cover/plant (unitless)
-
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient)
         self.percolation.percolate(has_seasonal_high_water_table)

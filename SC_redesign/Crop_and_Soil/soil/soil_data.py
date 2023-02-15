@@ -77,17 +77,20 @@ class SoilData:
     """cumulative amount of sediment that has been eroded off of the field (metric tons)"""
 
     def __post_init__(self):
+        """this method initializes attributes that either cannot be set to a default above or depend on need other
+            attributes in the object to be set before they can be set"""
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any
             self.soil_layers = [LayerData(top_depth=0, bottom_depth=50, nitrate=0.5),
                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1),
                                 LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
 
-        # configures the vadose zone LayerData object based on where the soil profile ends
-        self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
-                                           bottom_depth=10000000,    # bottom depth is 10,000 meters by default
-                                           soil_water_concentration=0,
-                                           saturation_point_water_concentration=inf)
+        if self.vadose_zone_layer is None:
+            # configures the vadose zone LayerData object based on where the soil profile ends
+            self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
+                                               bottom_depth=10000000,  # bottom depth is 10,000 meters by default
+                                               soil_water_concentration=0,
+                                               saturation_point_water_concentration=inf)
 
     @property
     def profile_soil_water_content(self) -> float:
