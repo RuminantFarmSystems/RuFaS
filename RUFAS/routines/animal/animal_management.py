@@ -306,7 +306,7 @@ class AnimalManagement:
         """
 
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+            mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -353,6 +353,15 @@ class AnimalManagement:
         for animal in animals_removed:
             if animal.id in self.animal_to_pen_id_map:
                 pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
+                # only a concern if runtime would be significant from using the list
+                # order of entries in animals_in_pen probably doesn't matter but double-check
+                # grouping algorithm might rely on order
+                # if sets won't work, then we can create a new list from the old one with the intended value removed
+                # look into stocking density changes
+
+                # might be worth making a pen function for line 363
+
+                # pen.animals_in_pen.remove(animal)
                 pen.stocking_density = (len(pen.animals_in_pen) - 1) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 
@@ -439,7 +448,7 @@ class AnimalManagement:
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
-                                                                   original_pen_populations[pen_for_insert.id])
+                                                               original_pen_populations[pen_for_insert.id])
 
         self.calculate_pen_rations(original_pen_populations)
 
@@ -550,7 +559,6 @@ class AnimalManagement:
                 else:
                     del mixed_type_pens[pen.id]
                     del mixed_types[pen.id]
-
 
                 # Assigning pen to relevant pen list
                 if max_key[0].name == 'CALF':
@@ -741,7 +749,8 @@ class AnimalManagement:
         if len(animals) == 0:
             return 0
         else:
-            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(a.body_weight for a in animals)
+            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(
+                a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
@@ -796,7 +805,7 @@ class AnimalManagement:
                 pen.pen_populated = len(pen.animals_in_pen) > 0
 
             animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
