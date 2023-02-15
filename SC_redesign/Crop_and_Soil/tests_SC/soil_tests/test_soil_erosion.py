@@ -15,12 +15,11 @@ from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
     (12.339485, 61.1938549),
     (23.4958769, 58.1093485),
 ])
-def test_determine_coarse_sand_factor(sand, silt):
-    """tests _determine_coarse_sand_factor() in soil_erosion.py"""
+def test_determine_coarse_sand_factor(sand: float, silt: float) -> None:
+    """Tests _determine_coarse_sand_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_coarse_sand_factor(sand, silt)
     expect_exp_term = exp((-0.256) * sand * (1 - (silt / 100)))
     expect = 0.2 + 0.3 * expect_exp_term
-    # print(str(observe))
     assert observe == expect
 
 
@@ -31,21 +30,21 @@ def test_determine_coarse_sand_factor(sand, silt):
     (57.129485, 30.19485),
     (83.49482, 13.390458),
 ])
-def test_determine_clay_silt_ratio_factor(silt, clay):
-    """tests _determine_clay_silt_ratio_factor() in soil_erosion.py"""
+def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
+    """Tests _determine_clay_silt_ratio_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
     expect = silt / (clay + silt)
     expect = expect ** 0.3
-    # print(str(observe))
     assert observe == expect
 
 
 @pytest.mark.parametrize("silt,clay", [
     (0, 0),
 ])
-def test_error_clay_silt_ratio_factor(silt, clay):
-    """tests that _determine_clay_silt_ratio_factor() in soil_erosion.py correctly raises an error when invalid input is
-        given"""
+def test_error_clay_silt_ratio_factor(silt: float, clay: float) -> None:
+    """Tests that _determine_clay_silt_ratio_factor() in soil_erosion.py correctly raises an error when invalid input is
+        given
+    """
     with pytest.raises(Exception):
         SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
 
@@ -58,12 +57,11 @@ def test_error_clay_silt_ratio_factor(silt, clay):
     0.029684,
     0.01395986,
 ])
-def test_determine_carbon_content_factor(carbon):
-    """tests _determine_carbon_content_factor() in soil_erosion.py"""
+def test_determine_carbon_content_factor(carbon: float) -> None:
+    """Tests _determine_carbon_content_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_carbon_content_factor(carbon)
     expect_bottom_term = carbon + exp(3.72 - 2.95 * carbon)
     expect = 1 - ((0.25 * carbon) / expect_bottom_term)
-    # print(str(observe))
     assert observe == expect
 
 
@@ -78,14 +76,13 @@ def test_determine_carbon_content_factor(carbon):
     8.1019843912,
     4.1938402,
 ])
-def test_determine_high_sand_factor(sand):
-    """tests _determine_high_sand_factor() in soil_erosion.py"""
+def test_determine_high_sand_factor(sand: float) -> None:
+    """Tests _determine_high_sand_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_high_sand_factor(sand)
     top_term = 0.7 * (1 - (sand / 100))
     first_bottom_term = (1 - (sand / 100))
     second_bottom_term = exp(-5.51 + 22.9 * first_bottom_term)
     expect = 1 - (top_term / (first_bottom_term + second_bottom_term))
-    # print(str(observe))
     assert observe == expect
 
 
@@ -96,8 +93,8 @@ def test_determine_high_sand_factor(sand):
     (30.104958, 50.1918749, 25.1143534, 0.0123923984),
     (50, 30.1948591, 19.8939582, 0.01139495),
 ])
-def test_determine_soil_erodibility_factor(sand, silt, clay, carbon):
-    """tests _determine_soil_erodibility_factor() in soil_erosion.py"""
+def test_determine_soil_erodibility_factor(sand: float, silt: float, clay: float, carbon: float) -> None:
+    """Tests _determine_soil_erodibility_factor() in soil_erosion.py"""
 
     # Mock helper methods
     SoilErosion._determine_coarse_sand_factor = MagicMock(return_value=0.28)
@@ -123,8 +120,8 @@ def test_determine_soil_erodibility_factor(sand, silt, clay, carbon):
     (0.01, 0),
     (0.05, 928.948569),
 ])
-def test_determine_cover_management_factor(min_cover, residue):
-    """tests _determine_cover_management_factor() in soil_erosion.py"""
+def test_determine_cover_management_factor(min_cover: float, residue: float) -> None:
+    """Tests _determine_cover_management_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_cover_management_factor(min_cover, residue)
     expect = exp((log(0.8) - log(min_cover)) * exp(-0.00115 * residue) + log(min_cover))
     assert observe == expect
@@ -133,8 +130,8 @@ def test_determine_cover_management_factor(min_cover, residue):
 @pytest.mark.parametrize("min_cover,residue", [
     (0, 0)
 ])
-def test_error_determine_cover_management_factor(min_cover, residue):
-    """tests that _determine_cover_management_factor() correctly raises error for invalid inputs"""
+def test_error_determine_cover_management_factor(min_cover: float, residue: float) -> None:
+    """Tests that _determine_cover_management_factor() correctly raises error for invalid inputs"""
     with pytest.raises(Exception):
         SoilErosion._determine_cover_management_factor(min_cover, residue)
 
@@ -147,8 +144,8 @@ def test_error_determine_cover_management_factor(min_cover, residue):
     0.084595829,
     0.12593,
 ])
-def test_determine_exponential_term(average_slope):
-    """tests _determine_exponential_term() in soil_erosion.py"""
+def test_determine_exponential_term(average_slope: float) -> None:
+    """Tests _determine_exponential_term() in soil_erosion.py"""
     observe = SoilErosion._determine_exponential_term(average_slope)
     exp_term = exp(-35.835 * average_slope)
     expect = 0.6 * (1 - exp_term)
@@ -163,8 +160,8 @@ def test_determine_exponential_term(average_slope):
     (1, 0.28),
     (8.194894, 0.089493),
 ])
-def test_determine_topographic_factor(length, avg_slope):
-    """tests _determine_topographic_factor() in soil_erosion.py"""
+def test_determine_topographic_factor(length: float, avg_slope: float) -> None:
+    """Tests _determine_topographic_factor() in soil_erosion.py"""
 
     # Mock helper function
     SoilErosion._determine_exponential_term = MagicMock(return_value=0.45)
@@ -188,8 +185,8 @@ def test_determine_topographic_factor(length, avg_slope):
     0.0492184949,
     0.10495492330,
 ])
-def test_determine_coarse_fragment_factor(percent_rock):
-    """tests _determine_coarse_fragment_factor() in soil_erosion.py"""
+def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
+    """Tests _determine_coarse_fragment_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_coarse_fragment_factor(percent_rock)
     expect = exp((-0.053) * percent_rock)
     assert observe == expect
@@ -202,9 +199,10 @@ def test_determine_coarse_fragment_factor(percent_rock):
                              (18.91918429, 0.09184013, 0.8391984, 0.8729485473, 0.8192847, 0.7348924, 0.89717392,
                               0.459683)
                          ])
-def test_determine_sediment_yield(surface_runoff, peak_runoff_rate, field_area, erodibility_factor, cover_factor,
-                                  practice_factor, topographic_factor, fragment_factor):
-    """tests _determine_sediment_yield() in soil_erosion.py"""
+def test_determine_sediment_yield(surface_runoff: float, peak_runoff_rate: float, field_area: float,
+                                  erodibility_factor: float, cover_factor: float, practice_factor: float,
+                                  topographic_factor: float, fragment_factor: float) -> None:
+    """Tests _determine_sediment_yield() in soil_erosion.py"""
     observe = SoilErosion._determine_sediment_yield(surface_runoff, peak_runoff_rate, field_area, erodibility_factor,
                                                     cover_factor, practice_factor, topographic_factor, fragment_factor)
     expect = (11.8 * ((surface_runoff * peak_runoff_rate * field_area) ** 0.56) * erodibility_factor * cover_factor *
@@ -218,8 +216,8 @@ def test_determine_sediment_yield(surface_runoff, peak_runoff_rate, field_area, 
     (0.029385473, 2.49381),
     (0.108481, 6.193943),
 ])
-def test_determine_adjusted_sediment_yield(sediment_yield, snow_content):
-    """tests _determine_adjusted_sediment_yield() in soil_erosion.py"""
+def test_determine_adjusted_sediment_yield(sediment_yield: float, snow_content: float) -> float:
+    """Tests _determine_adjusted_sediment_yield() in soil_erosion.py"""
     observe = SoilErosion._determine_adjusted_sediment_yield(sediment_yield, snow_content)
     expect = sediment_yield / exp(3 * snow_content / 25.4)
     assert observe == expect
@@ -233,8 +231,8 @@ def test_determine_adjusted_sediment_yield(sediment_yield, snow_content):
     (0.01, 0),
     (0.05, 928.948569),
 ])
-def test_erode(min_cover_factor, residue):
-    """tests that erode() properly calls methods and stores values"""
+def test_erode(min_cover_factor: float, residue: float) -> float:
+    """Tests that erode() properly calls methods and stores values"""
 
     # Initialize objects
     data = SoilData(accumulated_runoff=13, peak_runoff_rate=0.11)
