@@ -224,14 +224,14 @@ def test_determine_adjusted_sediment_yield(sediment_yield: float, snow_content: 
 
 
 # --- Integration tests ---
-@pytest.mark.parametrize("min_cover_factor,residue", [
-    (0.2, 800),
-    (0.001, 500),
-    (0.003, 80),
-    (0.01, 0),
-    (0.05, 928.948569),
+@pytest.mark.parametrize("field_size,min_cover_factor,residue", [
+    (1, 0.2, 800),
+    (3, 0.001, 500),
+    (4.69, 0.003, 80),
+    (0.891, 0.01, 0),
+    (0.956, 0.05, 928.948569),
 ])
-def test_erode(min_cover_factor: float, residue: float) -> float:
+def test_erode(field_size: float, min_cover_factor: float, residue: float) -> float:
     """Tests that erode() properly calls methods and stores values"""
 
     # Initialize objects
@@ -248,7 +248,7 @@ def test_erode(min_cover_factor: float, residue: float) -> float:
     incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
 
     # Run method
-    incorp.erode(min_cover_factor, residue)
+    incorp.erode(field_size, min_cover_factor, residue)
 
     # Check everything
     incorp._determine_soil_erodibility_factor.assert_called_once()
