@@ -239,11 +239,11 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     incorp = SoilErosion(data)
 
     # Mock helper function
-    incorp._determine_soil_erodibility_factor = MagicMock(return_value=0.95)
+    incorp._determine_soil_erodibility_factor = MagicMock(return_value=0.87)
     incorp._determine_cover_management_factor = MagicMock(return_value=0.95)
-    incorp._determine_support_practice_factor = MagicMock(return_value=0.95)
-    incorp._determine_topographic_factor = MagicMock(return_value=0.95)
-    incorp._determine_coarse_fragment_factor = MagicMock(return_value=0.95)
+    incorp._determine_support_practice_factor = MagicMock(return_value=0.98)
+    incorp._determine_topographic_factor = MagicMock(return_value=0.79)
+    incorp._determine_coarse_fragment_factor = MagicMock(return_value=0.91)
     incorp._determine_sediment_yield = MagicMock(return_value=0.05)
     incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
 
