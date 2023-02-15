@@ -67,6 +67,7 @@ class SoilData:
     """the peak runoff rate (meters cubed per second)"""
     field_size: float = 1
     """area of the field which contains this soil (hectares)
+    
         NOTE: the field is treated as its own HRU, so this attribute may be used as the area of the HRU
     """
     snow_cover_water_content: float = 0
