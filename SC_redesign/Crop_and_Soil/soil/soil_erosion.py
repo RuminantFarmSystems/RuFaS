@@ -63,7 +63,7 @@ class SoilErosion:
 
     @staticmethod
     def _determine_clay_silt_ratio_factor(percent_silt_content: float, percent_clay_content: float) -> float:
-        """calculates factor based on the clay-silt ratio for use in calculating soil erodibility factor
+        """calculates the component factor of erodibility that is based on the clay-silt ratio.
 
         Args:
             percent_silt_content: percent of silt in the given layer of soil
