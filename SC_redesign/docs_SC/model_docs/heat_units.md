@@ -1,6 +1,7 @@
 ### __Heat units__ 
 
-The `HeatUnits`class manages the accumulation of heat units for a crop on a daily basis. Crops have its own temperature range for growth (*i.e.*, minimum, optimum, and maximum) and `HeatUnits` holds for each particular crop all the methods that determine the absorption and accumulation of heat units. 
+The `HeatUnits`class manages the accumulation of heat units for a crop on a daily basis. Crops have their own temperature range for growth (*i.e.*, minimum, optimum, and maximum) and `HeatUnits` holds, for each particular crop, all the methods that determine the absorption and accumulation of heat units. 
+
 
 Its central method, `absorb_heat_units()`, executes all the methods that allow updating the **new heat units** absorbed on a given day and its accumulation through the growing season. 
 
