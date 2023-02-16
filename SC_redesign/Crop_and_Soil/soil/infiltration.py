@@ -20,9 +20,9 @@ class Infiltration:
                                                                                     second_moisture_condition_parameter)
 
         # --- adjust moisture condition parameters for slope of soil, if necessary -------------------------------------
-        if abs(self.data.average_slope_fraction - 0.05) != 0:
+        if abs(self.data.average_subbasin_slope - 0.05) != 0:
             adjusted_second_moisture_condition_parameter = self._determine_second_moisture_condition_adjusted(
-                                                                                    self.data.average_slope_fraction,
+                                                                                    self.data.average_subbasin_slope,
                                                                                     second_moisture_condition_parameter,
                                                                                     third_moisture_condition_parameter)
             adjusted_third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
@@ -62,7 +62,7 @@ class Infiltration:
                                                                         retention_parameter)
         # --------------------------------------------------------------------------------------------------------------
 
-        runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
+        self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
 
         # --- Update previous retention parameter ----------------------------------------------------------------------
         if self.data.previous_retention_parameter is None:
@@ -73,7 +73,7 @@ class Infiltration:
                                                                         self.data.potential_evapotranspiration,
                                                                         first_moisture_condition_retention_parameter,
                                                                         rainfall,
-                                                                        runoff,
+                                                                        self.data.accumulated_runoff,
                                                                         weighting_coefficient)
         # --------------------------------------------------------------------------------------------------------------
 
