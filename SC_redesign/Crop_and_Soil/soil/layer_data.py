@@ -53,7 +53,9 @@ class LayerData:
 
     @property
     def water_factor(self):
-        """volume of water in layer when saturated in mm"""
+        """relative water saturation (%)"""
+
+        # pseudocode_soil S.4.B.1
         if self.soil_water_content <= self.field_capacity_content:
             return (self.soil_water_content - self.wilting_point_content)/(
                     self.field_capacity_content - self.wilting_point_content)
