@@ -106,12 +106,13 @@ class HeiferIIValuesTypedDict(TypedDict):
 
 
 class AnimalConfigTypedDict(TypedDict):
-    """
-    Keeps track of all the attributes stored in the animal config object used
+    """Keeps track of all the attributes stored in the animal config object used
     in `animal_management.py`.
 
     This list of attributes should also match the attributes provided by the
-    `animal_management_animal.json`.
+    `animal_management_animal.json`. To make it easier to access the attributes,
+    the animal config object in the AnimalManagement class has been flattened out
+    compared to the structure of the JSON object.
 
     """
     # management decisions
@@ -130,7 +131,7 @@ class AnimalConfigTypedDict(TypedDict):
     # farm level -> calf
     male_calf_rate_sexed_semen: float
     male_calf_rate_conventional_semen: float
-    keep_female_calf_rate: int
+    keep_female_calf_rate: float
     wean_day: int
     wean_length: int
     milk_type: str
@@ -160,20 +161,15 @@ class AnimalConfigTypedDict(TypedDict):
     cow_user_defined_tai_cr: float
     cow_resynch_protocol: str
     user_define_tai_length: int
+    tai_program_start_day: int
 
-    # TODO: For these two variables, either leave them like this or
-    # add another typed dict for each
     ED_related: Dict[str, Union[float, str]]
     TAI_related: Dict[str, Union[float, str]]
 
     # remaining attributes in farm level -> repro
     voluntary_waiting_period: int
-    tai_program_start_day: int
     conception_rate_decrease: float
-    avg_gestation_len: int
-    std_gestation_len: int
     prefresh_day: int
-    num_21_days_repro: int
     calving_interval: int
     use_input_calving_interval: bool
 
@@ -189,6 +185,8 @@ class AnimalConfigTypedDict(TypedDict):
     # from_literature -> repro
     avg_estrus_cycle_heifer: float
     std_estrus_cycle_heifer: float
+    avg_gestation_len: float
+    std_gestation_len: float
     preg_check_day_1: int
     preg_loss_rate_1: float
     preg_check_day_2: int
@@ -199,8 +197,8 @@ class AnimalConfigTypedDict(TypedDict):
     std_estrus_cycle_return: float
     avg_estrus_cycle_cow: float
     std_estrus_cycle_cow: float
-    avg_estrus_cycle_p: float
-    std_estrus_cycle_p: float
+    avg_estrus_cycle_after_pgf: float
+    std_estrus_cycle_after_pgf: float
 
     # from_literature -> milking
     wood_l: List[List[float]]
@@ -219,8 +217,8 @@ class AnimalConfigTypedDict(TypedDict):
     injury_cull_prob: List[float]
     disease_cull_prob: List[float]
     udder_cull_prob: List[float]
-    unkown_cull_prob: List[float]  # TODO: Fix this typo in `animal_management_animal.json` and here
-    cull_day_count: List[float]
+    unknown_cull_prob: List[float]
+    cull_day_count: List[int]
 
     # from_literature -> life_cycle
     still_birth_rate: float
