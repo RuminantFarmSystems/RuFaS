@@ -18,12 +18,12 @@ from typing import Type
 from typing import TypeVar
 from typing import Union
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
 from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_initialization import AnimalInitialization
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -31,6 +31,8 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.util import Utility
 
+# GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
+# 'bound' is used to restrict the type to only the classes listed in the union.
 GenericAnimal = TypeVar("GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
 
 om = OutputManager()
@@ -41,6 +43,7 @@ class LifeCycleManager:
     Manages the life cycles of the animals.
     """
     # The following class variables are used in HerdReport.
+    # TODO: Make these variables instance variables when HerdReport is refactored.
     num_cow_for_parity = {
         '1': 0,
         '2': 0,
@@ -214,9 +217,6 @@ class LifeCycleManager:
         self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
-    # TODO: In the animal_management_animal.json,
-    #  the use_input_calving_interval attribute is set to false while the
-    #  calving_interval attribute is present, maybe set that to true instead?
     def _set_avg_CI(self) -> None:
         if 'use_input_calving_interval' in self.animal_config and self.animal_config['use_input_calving_interval']:
             self.avg_CI = self.animal_config['calving_interval']
@@ -297,12 +297,11 @@ class LifeCycleManager:
         total_animal_num = self._evaluate_heiferIIIs_for_transitioning_to_cows(sim_day, heiferIIIs, cows,
                                                                                total_animal_num)
 
+        total_animal_num = self._cull_cows_and_record_stats(sim_day, cows, calves_born,
+                                                            ids_removed, total_animal_num)
         self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, ids_removed)
         self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
 
-        total_animal_num = self._cull_cows_and_record_stats(sim_day, cows, calves_born,
-                                                            ids_removed, total_animal_num)
-    
         self._calculate_herd_percentages(total_animal_num)
         self._calculate_cow_percentages()
         self._calculate_cull_reason_stats_percent()
@@ -311,8 +310,6 @@ class LifeCycleManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
                     "sim_day": sim_day, }
-
-        life_cycle_daily_herd_update = {}
 
         life_cycle_daily_herd_update_keys = ["calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num",
                                              "sold_heifer_num", "bought_heifer_num", "culled_heifer_num",

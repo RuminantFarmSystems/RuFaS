@@ -898,7 +898,7 @@ class Cow(HeiferIII):
                 AnimalBase.config['conception_rate_decrease']
             self.estrus_day = self.determine_estrus_day(
                 self.abortion_day, const.ESTRUS_AFTER_PGF_NOTE,
-                AnimalBase.config['avg_estrus_cycle_p'],
+                AnimalBase.config['avg_estrus_cycle_after_pgf'],
                 AnimalBase.config['std_estrus_cycle_p'], sim_day)
 
     # Preg methods
@@ -1113,7 +1113,7 @@ class Cow(HeiferIII):
                 cull_reason_cull_prob = AnimalBase.config['udder_cull_prob']
                 self.cull_reason = const.UDDER_CULL
             else:
-                cull_reason_cull_prob = AnimalBase.config['unkown_cull_prob']
+                cull_reason_cull_prob = AnimalBase.config['unknown_cull_prob']
                 self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()
