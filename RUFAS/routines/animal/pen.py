@@ -534,13 +534,13 @@ class Pen:
         self.classes_in_pen.add(class_name)
 
         if class_name == 'Cow':
-            requirements = req.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                          animal.days_in_preg, 'cow', animal.calves,
-                                          animal.CI, animal.mPrt, animal.fat_percent,
-                                          animal.lactose_milk,
-                                          animal.estimated_daily_milk_produced,
-                                          animal.days_in_milk,
-                                          animal.milking)
+            requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow', 
+                                          parity=animal.calves, calving_interval=animal.CI,
+                                          milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
+                                          milk_lactose=animal.lactose_milk,
+                                          milk_production=animal.estimated_daily_milk_produced,
+                                          days_in_milk=animal.days_in_milk, lactating=animal.milking)
             animal.NEmaint = requirements['NEmaint']
             animal.NEg = requirements['NEg']
             animal.NEpreg = requirements['NEpreg']
