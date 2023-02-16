@@ -59,7 +59,7 @@ class SoilData:
     """percent sand content in the soil profile (unitless)"""
     percent_silt_content: float = 65
     """percent silt content in the soil profile (unitless)"""
-    percent_rock_content: float = 0.1
+    first_rock_percent: float = 0.1
     """percent rock content in the first layer of soil (unitless)"""
     manning: float = 0.4
     """the Manning roughness coefficient for this subbasin (unitless)"""
