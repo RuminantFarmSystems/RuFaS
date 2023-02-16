@@ -4,7 +4,7 @@ from math import exp, log, atan, sin
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
-This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1.1 of SWAT
+This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1.1 of SWAT.
 """
 
 
@@ -12,35 +12,39 @@ class SoilErosion:
     def __init__(self, soil_data: Optional[SoilData]):
         self.data = soil_data or SoilData()  # Initialize with defaults, if not given
 
-    def erode(self, minimum_cover_management_factor: float, surface_residue: float) -> None:
-        """this is the main routine for SoilErosion. It is responsible for running all the necessary soil erosion
-            methods and updating attributes as necessary
+    def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float) -> None:
+        """This is the main routine for SoilErosion. It is responsible for running all the necessary soil erosion
+            methods and updating attributes as necessary.
 
         Args:
+            field_size: size of the field that contains this Soil object (hectares)
             minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
                 to land cover/plant (unitless)
             surface_residue: amount of residue on the soil surface (kg per hectare)
 
+        Details:
+            This method calculates the mass of soil that gets eroded from the soil profile based on the content of the
+            soil, how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into
+            the soil, and the geometry of the field.
         """
-        erodibility_factor = self._determine_soil_erodibility_factor(self.data.percent_sand_content,
-                                                                     self.data.percent_silt_content,
+        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_content,
+                                                                     self.data.soil_layers[0].percent_silt_content,
                                                                      self.data.soil_layers[0].percent_clay_content,
                                                                      self.data.soil_layers[0]
                                                                      .percent_organic_carbon_content)
         cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)
         support_practice_factor = self._determine_support_practice_factor()
         topographic_factor = self._determine_topographic_factor(self.data.slope_length,
-                                                                self.data.average_slope_fraction)
-        fragment_factor = self._determine_coarse_fragment_factor(self.data.percent_rock_content)
+                                                                self.data.average_subbasin_slope)
+        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
 
         if self.data.peak_runoff_rate is None:
             raise TypeError("SoilData peak_runoff_rate cannot be NoneType")
-            return
-        elif self.data.surface_runoff_volume is None:
-            raise TypeError("SoilData surface_runoff_rate cannot be NoneType")
-            return
+        elif self.data.accumulated_runoff is None:
+            raise TypeError("SoilData accumulated_runoff cannot be NoneType")
+        self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
         sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, self.data.peak_runoff_rate,
-                                                        self.data.field_size, erodibility_factor, cover_factor,
+                                                        field_size, erodibility_factor, cover_factor,
                                                         support_practice_factor, topographic_factor, fragment_factor)
         self.data.eroded_sediment += self._determine_adjusted_sediment_yield(sediment_yield,
                                                                              self.data.snow_cover_water_content)
@@ -48,14 +52,18 @@ class SoilErosion:
     # --- Static methods ---
     @staticmethod
     def _determine_coarse_sand_factor(percent_sand_content: float, percent_silt_content: float) -> float:
-        """calculates factor based on sand content for use in determining soil erodibility factor
+        """Calculates the coarseness factor of soil erodibility.
 
         Args:
             percent_sand_content: percent of soil content that is sand
             percent_silt_content: percent of soil content that is silt
+            
+        Details: 
+          The coarseness of a soil effects the overall erodibility of the soil. Specifically, soils with high-levels of 
+          coarse-sand content will have relatively low erodibility compared to soils with less sand. 
 
         Returns:
-            factor based on sand content (unitless)
+            coarseness factor of erodibility, based on sand content (unitless)
 
         SWAT Reference: 4:1.1.6
         """
@@ -63,14 +71,18 @@ class SoilErosion:
 
     @staticmethod
     def _determine_clay_silt_ratio_factor(percent_silt_content: float, percent_clay_content: float) -> float:
-        """calculates factor based on the clay-silt ratio for use in calculating soil erodibility factor
+        """Calculates the component factor of erodibility that is based on the clay-silt ratio.
 
         Args:
             percent_silt_content: percent of silt in the given layer of soil
             percent_clay_content: percent of clay in the given layer of soil
 
+        Details:
+            The clay-silt ratio effects the erodibility of the soil, specifically soils with a high ratio of clay to
+            silt are less susceptible to erosion than soils with lower ratios of clay to silt.
+
         Returns:
-            clay-silt ratio factor (unitless)
+            The clay-silt ratio factor, based on clay and silt content (unitless)
 
         SWAT Reference: 4:1.1.7
         """
@@ -80,13 +92,17 @@ class SoilErosion:
 
     @staticmethod
     def _determine_carbon_content_factor(percent_organic_carbon: float) -> float:
-        """calculates factor based on percent of organic carbon content for use in calculating soil erodibility factor
+        """Calculates factor based on percent of organic carbon content for use in calculating soil erodibility factor.
 
         Args:
             percent_organic_carbon: percent of organic carbon content in the given layer of soil
 
+        Details:
+            The amount of organic carbon content in the soil effects the erodibility of the soil, specifically soils
+            with higher amounts of organic carbon content will have less erosion than soils with less.
+
         Returns:
-            organic carbon percent factor in the given layer of soil
+            Carbon factor of erodibility based on organic carbon content of the soil (unitless)
 
         SWAT Reference: 4:1.1.8
         """
@@ -95,25 +111,27 @@ class SoilErosion:
 
     @staticmethod
     def _determine_high_sand_factor(percent_sand_content: float) -> float:
-        """calculates factor based on percent sand content for use in calculating soil erodibility factor
+        """Calculates factor based on percent sand content for use in calculating soil erodibility factor.
 
         Args:
             percent_sand_content: percent of sand in the given layer of soil
 
+        Details:
+            When a soil has an extremely high sand content, it reduces the erodibility of that soil.
+
         Returns:
-            factor for adjusting soil erodibility factor based on high sand contents
+            The high sand content factor of erodibility, based on the amount of sand in the soil (unitless)
 
         SWAT Reference: 4:1.1.9
         """
-        inverse_sand_percentage = 1 - (percent_sand_content / 100)
-        # TODO: better name for this variable
-        return 1 - ((0.7 * inverse_sand_percentage) / (inverse_sand_percentage + exp(-5.51 + 22.9 *
-                                                                                     inverse_sand_percentage)))
+        not_sand_fraction = 1 - (percent_sand_content / 100)
+        return 1 - ((0.7 * not_sand_fraction) / (not_sand_fraction + exp(-5.51 + 22.9 *
+                                                                         not_sand_fraction)))
 
     @staticmethod
     def _determine_soil_erodibility_factor(percent_sand_content: float, percent_silt_content: float,
                                            percent_clay_content: float, percent_organic_carbon_content: float) -> float:
-        """calculates the soil erodibility factor for use in calculating the sediment yield on a given day
+        """Calculates the soil erodibility factor for use in calculating the sediment yield on a given day
 
         Args:
             percent_sand_content: percent of sand in the given layer of soil
@@ -121,8 +139,13 @@ class SoilErosion:
             percent_clay_content: percent of clay in the given layer of soil
             percent_organic_carbon_content: percent of organic carbon content in the given layer of soil
 
+        Details:
+            Some soils are more prone to erosion than others, based on how much sand, silt, clay, and organic carbon
+            they contain.
+
         Returns:
-            the soil erodibility factor (unitless)
+            The soil erodibility factor based on its coarse sand content, clay-silt ratio, clay content, and organic
+            carbon content (compound unit, irrelevant)
 
         SWAT Reference: 4:1.1.5
         """
@@ -134,14 +157,19 @@ class SoilErosion:
 
     @staticmethod
     def _determine_cover_management_factor(minimum_cover_management_factor: float, surface_residue: float) -> float:
-        """calculates cover and management factor for use in calculating sediment yield
+        """Calculates cover and management factor for use in calculating sediment yield
 
         Args:
             minimum_cover_management_factor: minimum value for cover and management factor for land cover (unitless)
             surface_residue: amount of residue on the soil surface (kg per hectare)
 
+        Details:
+            This factor accounts for what is planted in and/or physically covering the field. Erodibility is effected by
+            this because rainfall energy is either reduced or entirely eliminated when it hits the plant canopy or
+            residue on the soil surface, which means less energy is transferred to soil when the water reaches it.
+
         Returns:
-            the cover and management factor (unitless)
+            The cover and management factor (unitless)
 
         SWAT Reference: 4:1.1.10
         """
@@ -153,20 +181,20 @@ class SoilErosion:
         return exp(first_multiplicative_term * second_multiplicative_term + second_additive_term)
 
     @staticmethod
-    def _determine_support_practice_factor() -> float:
-        """TODO: implement this for version 2 (only applies to fields that are doing contour tillage/planting,
-            stripcropping, and/or terracing) SWAT Reference: section 4:1.1.3"""
+    def _determine_support_practice_factor() -> float:  # TODO: implement this for version 2 (GitHub issue #348)
+        """SWAT Reference: section 4:1.1.3 (only applies to fields that are doing contour tillage/planting,
+            stripcropping, and/or terracing)"""
         return 1
 
     @staticmethod
     def _determine_exponential_term(average_subbasin_slope: float) -> float:
-        """calculates the exponential term, which is used to calculate the topographic factor
+        """Calculates the exponential term, which is used to calculate the topographic factor
 
         Args:
             average_subbasin_slope: average slope fraction of the subbasin (unitless)
 
         Returns:
-            the exponential term (unitless)
+            The exponential term (unitless)
 
         SWAT Reference: 4:1.1.13
         """
@@ -174,15 +202,22 @@ class SoilErosion:
 
     @staticmethod
     def _determine_topographic_factor(slope_length: float, average_subbasin_slope: float) -> float:
-        """calculates expected ratio of soil loss per unit area from a field slope to that from a 22.1 m length of
+        """Calculates expected ratio of soil loss per unit area from a field slope to that from a 22.1 m length of
             uniform 9% slope under otherwise identical conditions (a.k.a the topographic factor)
 
         Args:
             slope_length: length of the slope (m)
             average_subbasin_slope: average slope fraction of the subbasin (m rise over m run)
 
+        Details:
+            The length and slope of a soil have an effect on erodibility, with shorter lengths and steeper slopes
+            resulting in more soil erosion. A shorter length means more erosion because sediment does not have to travel
+            as far to reach channels and be removed from the soil. A steeper slope means that there is less
+            resistance against the gravitational forces acting on a piece of sediment as it moves down the slope,
+            resulting in the soil eroding more easily.
+
         Returns:
-            the topographic factor (unitless)
+            The topographic factor (unitless)
 
         SWAT Reference: 4:1.1.12
         """
@@ -196,13 +231,18 @@ class SoilErosion:
 
     @staticmethod
     def _determine_coarse_fragment_factor(percent_rock_content: float) -> float:
-        """calculates coarse fragment factor for use in calculating sediment yield
+        """Calculates coarse fragment factor for use in calculating sediment yield
 
         Args:
             percent_rock_content: percent rock in first soil layer
 
+        Details:
+            Since the mass of rocks are so much greater than particles of sand, silt, clay, etc., they require
+            significantly more force to move them off of a field, in other words erode them. So by having more rocks in
+            a soil, that soil erodes slower.
+
         Returns:
-            coarse fragment factor (unitless)
+            Coarse fragment factor based on the rock content of the soil (unitless)
 
         SWAT Reference: 4:1.1.15
         """
@@ -213,7 +253,7 @@ class SoilErosion:
                                   soil_erodibility_factor: float, cover_management_factor: float,
                                   support_practice_factor: float, topographic_factor: float,
                                   coarse_fragment_factor: float) -> float:
-        """calculates the sediment yield for a given day
+        """Calculates the sediment yield for a given day
 
         Args:
             surface_area_runoff: surface runoff volume (mm per hectare)
@@ -229,7 +269,7 @@ class SoilErosion:
             coarse_fragment_factor: factor that adjusts for percent rock in the first soil layer (unitless)
 
         Returns:
-            sediment yield on a given day (metric tons)
+            Sediment yield on a given day (metric tons)
         """
         term_with_exponent = (surface_area_runoff * peak_runoff_rate * field_area) ** 0.56
         return (11.8 * term_with_exponent * soil_erodibility_factor * cover_management_factor * support_practice_factor
@@ -237,14 +277,14 @@ class SoilErosion:
 
     @staticmethod
     def _determine_adjusted_sediment_yield(sediment_yield: float, snow_water_content: float) -> float:
-        """adjusts the sediment yield based on how much snow cover there is
+        """Adjusts the sediment yield based on how much snow cover there is
 
         Args:
             sediment_yield: sediment yield on a given day (metric tons)
             snow_water_content: water content of the snow cover (mm)
 
         Returns:
-            the sediment yield on a given day adjusted for water content of the snow cover
+            The sediment yield on a given day adjusted for water content of the snow cover
 
         SWAT Reference: 4:1.3.1
         """

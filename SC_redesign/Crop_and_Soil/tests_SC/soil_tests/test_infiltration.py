@@ -191,14 +191,14 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
     # initialize objects
     if is_top_frozen:
-        data = SoilData(potential_evapotranspiration=1.5, average_slope_fraction=0.07, previous_retention_parameter=27,
+        data = SoilData(potential_evapotranspiration=1.5, average_subbasin_slope=0.07, previous_retention_parameter=27,
                         soil_layers=[LayerData(top_depth=0, bottom_depth=10, temperature=-1)])
     else:
-        data = SoilData(potential_evapotranspiration=1.5, average_slope_fraction=0.07, previous_retention_parameter=27,
+        data = SoilData(potential_evapotranspiration=1.5, average_subbasin_slope=0.07, previous_retention_parameter=27,
                         soil_layers=[LayerData(top_depth=0, bottom_depth=10, temperature=14)])
     incorp = Infiltration(data)
     assert incorp.data.potential_evapotranspiration == 1.5
-    assert incorp.data.average_slope_fraction == 0.07
+    assert incorp.data.average_subbasin_slope == 0.07
     assert incorp.data.previous_retention_parameter == 27
 
     # mock helper functions

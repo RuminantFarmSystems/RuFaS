@@ -44,7 +44,7 @@ def test_config_factory_defaults():
     assert generic.maximum_soil_evaporation is None
     assert generic.second_moisture_condition_parameter == 85
     assert generic.previous_retention_parameter is None
-    assert generic.average_slope_fraction == 0.05
+    assert generic.average_subbasin_slope == 0.05
     assert generic.moisture_condition_parameter is None
     assert generic.accumulated_runoff is None
     assert generic.vadose_zone_layer == LayerData(top_depth=200, bottom_depth=10000000, soil_water_concentration=0,
@@ -52,9 +52,6 @@ def test_config_factory_defaults():
     assert generic.time_step == 24
     assert generic.previous_temperature_effect == 0.8
     assert generic.slope_length == 3
-    assert generic.percent_sand_content == 15
-    assert generic.percent_silt_content == 65
-    assert generic.percent_rock_content == 0.1
     assert generic.manning == 0.4
     assert generic.peak_runoff_rate is None
     assert generic.snow_cover_water_content == 0
@@ -66,7 +63,7 @@ def test_config_factory_defaults():
 
 @pytest.mark.parametrize("config,args_dict", [
     ("generic", {"name": "altered generic soil", "second_moisture_condition_parameter": "87",
-                 "average_slope_fraction": "0.12", "albedo": "0.11"})
+                 "average_subbasin_slope": "0.12", "albedo": "0.11"})
 ])
 def test_soil_factory_alterations(config: str, args_dict: Dict) -> None:
     """Test that SoilConfigFactory can properly create default SoilData objects with altered attributes"""
@@ -112,5 +109,5 @@ def test_manual_soil_data_configuration() -> None:
 
 # Unit tests for @property methods of SoilData
 
-@pytest.mark.parametrize()
+# @pytest.mark.parametrize()
 

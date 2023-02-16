@@ -35,8 +35,8 @@ class SoilData:
     """curve number for average moisture conditions (unitless)"""
     previous_retention_parameter: Optional[float] = None
     """retention parameter for the previous day (mm) (used in SWAT 2:1.1.9)"""
-    average_slope_fraction: float = 0.05
-    """average slope fraction of the subbasin (unitless)"""
+    average_subbasin_slope: float = 0.05
+    """average slope of the subbasin expressed as rise over run (meters / meters)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
@@ -60,24 +60,16 @@ class SoilData:
     # ---- Erosion
     slope_length: float = 3
     """length of the slope (meters)"""
-    percent_sand_content: float = 15
-    """percent sand content in the soil profile (unitless)"""
-    percent_silt_content: float = 65
-    """percent silt content in the soil profile (unitless)"""
-    percent_rock_content: float = 0.1
-    """percent rock content in the first layer of soil (unitless)"""
     manning: float = 0.4
     """the Manning roughness coefficient for this subbasin (unitless)"""
     peak_runoff_rate: Optional[float] = None
     """the peak runoff rate (meters cubed per second)"""
-    field_size: float = 1
-    """area of the field which contains this soil (hectares)
-        NOTE: the field is treated as its own HRU, so this attribute may be used as the area of the HRU
-    """
     snow_cover_water_content: float = 0
     """water content of the snow cover (mm)"""
     eroded_sediment: float = 0
     """cumulative amount of sediment that has been eroded off of the field (metric tons)"""
+    surface_volume_runoff: Optional[float] = None
+    """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
     def __post_init__(self):
         """this method initializes attributes that either cannot be set to a default above or depend on need other
@@ -168,13 +160,3 @@ class SoilData:
             weighted_densities_sum += (layer.layer_thickness * layer.bulk_density)
             weights_sum += layer.layer_thickness
         return weighted_densities_sum / weights_sum
-
-    @property
-    def surface_runoff_volume(self) -> float:
-        """volume of surface runoff (mm per hectare)
-
-        Used in SWAT equation 4:1.1.1
-        """
-        if self.accumulated_runoff is None or self.field_size is None:
-            return None
-        return self.accumulated_runoff / self.field_size
