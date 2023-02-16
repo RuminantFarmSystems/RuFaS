@@ -35,7 +35,7 @@ def test_invalid_crop_species_enum(invalid_species):
 
 def test_species_factory_defaults():
     """Ensure that each species come shipped with their factory-default settings. This is a check of the
-    CropSpeciesDataFactory.create_secies_data() method.
+    CropSpeciesDataFactory.create_species_data() method.
     """
     # ---- generic crop ----
     generic = CropSpeciesDataFactory.create_species_data()
