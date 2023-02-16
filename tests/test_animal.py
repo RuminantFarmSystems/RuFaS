@@ -2,35 +2,79 @@
 RUFAS: Ruminant Farm Systems Model
 File name: test_animal.py
 Description: Implements test cases
-Author(s): Pooya Hekmati, sh2235@cornell.edu
+Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
+
 import numpy as np
 import pytest
+from unittest.mock import MagicMock, patch
+from pytest_mock.plugin import MockerFixture
+from typing import List, Dict
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 
 import RUFAS.routines.animal.clustering_pen_grouping
 
 
+def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
+    mock_object_list = []
+
+    for attribute_dict in attribute_dicts:
+        mock_object = MagicMock()
+
+        for attribute, value in attribute_dict.items():
+            setattr(mock_object, attribute, value)
+
+        mock_object_list.append(mock_object)
+
+        return mock_object_list
+
+
 def test_norm():
     """Unit test for function norm in file routines/animal/clustering_pen_grouping.py"""
-    actual_case1 = RUFAS.routines.animal.clustering_pen_grouping.norm([1, 2, 3])
-    expected_case1 = [0, 0.5, 1]
-    expected_case1 = np.array(expected_case1)
-    actual_case2 = RUFAS.routines.animal.clustering_pen_grouping.norm([2, 2, 2, 2])
-    expected_case2 = [2, 2, 2, 2]
-    expected_case2 = np.array(expected_case2)
-    assert actual_case1.all() == expected_case1.all(), actual_case2.all() == expected_case2.all()
+    def actual_func(l): return RUFAS.routines.animal.clustering_pen_grouping.norm(l)
+
+    actual = actual_func([1, 2, 3])
+    expected = np.array([0, 0.5, 1])
+    assert actual.all() == expected.all()
+    actual = actual_func([10.9, 120.1, 7])
+    expected = np.array([0.03448276, 1, 0])
+    assert actual.all() == expected.all()
 
 
 def test_percentile_list():
     """Unit test for function percentile_list in file routines/animal/clustering_pen_grouping.py"""
-    pass
+    actual = RUFAS.routines.animal.clustering_pen_grouping.percentile_list([-2, 0, 4.7, 4.7])
+    expected = [0.25, 0.5, 0.875, 0.875]
+    assert actual == expected
+
+
+#@pytest.fixture
+def mock_lactating_cow_list() -> List[MagicMock]:
+    animal_attribute_dicts = [
+        {
+            "body_weight": 5.0,
+            "p_animal": 7.0
+        },
+        {
+            "body_weight": 1.0,
+            "p_animal": 8.0
+        },
+        {
+            "body_weight": 2.0,
+            "p_animal": 1.0
+        },
+    ]
+    return create_mock_object_list(animal_attribute_dicts)
 
 
 def test_grouping():
     """Unit test for function grouping in file routines/animal/clustering_pen_grouping.py"""
-    pass
+    #need to create magic mock function for a list of pen objects
+    cow_list = mock_lactating_cow_list()
+    actual = RUFAS.routines.animal.clustering_pen_grouping.grouping(cow_list, 10, 80)
+    #error, int object is not iterable, updated grouping.py to be more clear that the pen parameter is a list of pens
+    print(actual)
 
 
 def test_update_animals():
