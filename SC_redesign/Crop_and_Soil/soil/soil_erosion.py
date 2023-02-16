@@ -27,16 +27,16 @@ class SoilErosion:
             soil, how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into
             the soil, and the geometry of the field.
         """
-        erodibility_factor = self._determine_soil_erodibility_factor(self.data.percent_sand_content,
-                                                                     self.data.percent_silt_content,
+        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_content,
+                                                                     self.data.soil_layers[0].percent_silt_content,
                                                                      self.data.soil_layers[0].percent_clay_content,
                                                                      self.data.soil_layers[0]
                                                                      .percent_organic_carbon_content)
         cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)
         support_practice_factor = self._determine_support_practice_factor()
         topographic_factor = self._determine_topographic_factor(self.data.slope_length,
-                                                                self.data.average_slope_fraction)
-        fragment_factor = self._determine_coarse_fragment_factor(self.data.first_rock_percent)
+                                                                self.data.average_subbasin_slope)
+        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
 
         if self.data.peak_runoff_rate is None:
             raise TypeError("SoilData peak_runoff_rate cannot be NoneType")
