@@ -13,19 +13,15 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
     150,  # higher values
     88.8,  # arbitrary
 ])
-def test_calc_temp_factor(temp_average):
+def test_calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection: float = 11.75,
+                          point_distance: float = 29.7, inflection_slope=0.03,
+                          normalizer=20.80546):
     """ensures that temperature effect was calculated according to the formula in "pseudocode_soil" S.6.A.1"""
-    decomposition_inflection_x = 15.400
-    decomposition_inflection_y = 11.750
-    max_min_distance = 29.700
-    inflection_slope = 0.03
-    normalizer = 20.80546
     data = SoilData()
     decomp = Decomposition(data)
     decomp._calc_temp_factor(temp_average)
-    expect = max(0.0,
-                 (decomposition_inflection_y + (max_min_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-                         temp_average - decomposition_inflection_x))) / normalizer)
+    expect = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
+                                                                temp_average - x_inflection))) / normalizer
     assert decomp._calc_temp_factor(temp_average) == expect
 
 
@@ -49,7 +45,7 @@ def test_calc_temp_factor(temp_average):
      LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
                wilting_point_water_concentration=0.6)],
 ])
-def test_calc_temp_factor(layers):
+def test_calc_moisture_factor(layers):
     """ensures that moisture effect was calculated according to the formula in "pseudocode_soil" S.6.A.2"""
     data = SoilData(soil_layers=layers)
     decomp = Decomposition(data)
@@ -66,9 +62,8 @@ def test_calc_temp_factor(layers):
                                                                             dimensionless_empirical_factor_b)
         base_2 = (layer.water_factor - dimensionless_empirical_factor_c) / (dimensionless_empirical_factor_a -
                                                                             dimensionless_empirical_factor_c)
-        hold = (base_1 ** dimensionless_empirical_factor_e1) * (base_2 ** dimensionless_empirical_factor_e2)
-    expect = hold
-    assert decomp._calc_moisture_factor(layers) == hold
+
+    assert decomp._calc_moisture_factor(layers) == (base_1 ** dimensionless_empirical_factor_e1) * (base_2 ** dimensionless_empirical_factor_e2)
 
 
 @pytest.mark.parametrize("temp_average", [

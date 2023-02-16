@@ -28,49 +28,39 @@ class Decomposition:
         self.data.decomposition_moisture_effect = self._calc_moisture_factor(self.data.soil_layers)
 
     @staticmethod
-    def _calc_temp_factor(temp_average: float) -> float:
+    def _calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection: float = 11.75,
+                          point_distance: float = 29.7, inflection_slope=0.03,
+                          normalizer=20.80546) -> float:
         """
         Description: calculates the Temperature factor for carbon decomposition
             "pseudocode_soil" S.6.A.1
             defaults drawn from defac: course soil
         Args:
-            temp_average: Average temperature
+            temp_average: Average temperature (unitless)
 
-        Returns: Unitless temperature effect
+        Returns: temperature effect
         """
-        decomposition_inflection_x = 15.400
-        decomposition_inflection_y = 11.750
-        max_min_distance = 29.700
-        inflection_slope = 0.03
-        normalizer = 20.80546
-
         # S.6.A.4
-        return max(0.0,
-                   (decomposition_inflection_y + (max_min_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-                           temp_average - decomposition_inflection_x))) / normalizer)
+        return (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
+                                                                temp_average - x_inflection))) / normalizer
 
     @staticmethod
-    def _calc_moisture_factor(soil_layers: List[LayerData]) -> float:
+    def _calc_moisture_factor(soil_layers: List[LayerData.water_factor], a_term: float = 0.55, b_term: float = 1.7,
+                              c_term: float = -0.007, first_exponent=6.648115,
+                              second_exponent=3.22) -> float:
         """
         Description: calculates the moisture factor for carbon decomposition
             "pseudocode_soil" S.6.A.2
             defaults drawn from defac: course soil
         Args:
             soil_layers: Layer data
-        Returns: unitless moisture effect
+        Returns: moisture effect (unitless)
         """
-        dimensionless_empirical_factor_a = 0.55
-        dimensionless_empirical_factor_b = 1.7
-        dimensionless_empirical_factor_c = -0.007
-        dimensionless_empirical_factor_e1 = 6.648115
-        dimensionless_empirical_factor_e2 = 3.22
-
         for layer in soil_layers:
             # S.6.A.5
-            base_1 = (layer.water_factor - dimensionless_empirical_factor_b) / (dimensionless_empirical_factor_a -
-                                                                                dimensionless_empirical_factor_b)
-            base_2 = (layer.water_factor - dimensionless_empirical_factor_c) / (dimensionless_empirical_factor_a -
-                                                                                dimensionless_empirical_factor_c)
-            hold = (base_1 ** dimensionless_empirical_factor_e1) * (base_2 ** dimensionless_empirical_factor_e2)
+            base_1 = (layer.water_factor - b_term) / (a_term -
+                                                      b_term)
+            base_2 = (layer.water_factor - c_term) / (a_term -
+                                                      c_term)
 
-        return hold
+        return (base_1 ** first_exponent) * (base_2 ** second_exponent)
