@@ -30,8 +30,8 @@ class SoilData:
     # ---- infiltration
     previous_retention_parameter: Optional[float] = None
     """retention parameter for the previous day (mm) (used in SWAT 2:1.1.9)"""
-    average_slope_fraction: float = 0.05
-    """average slope fraction of the subbasin (unitless)"""
+    average_subbasin_slope: float = 0.05
+    """average slope of the subbasin expressed as rise over run (meters / meters)"""
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
@@ -55,12 +55,6 @@ class SoilData:
     # ---- Erosion
     slope_length: float = 3
     """length of the slope (meters)"""
-    percent_sand_content: float = 15
-    """percent sand content in the soil profile (unitless)"""
-    percent_silt_content: float = 65
-    """percent silt content in the soil profile (unitless)"""
-    first_rock_percent: float = 0.1
-    """percent rock content in the first layer of soil (unitless)"""
     manning: float = 0.4
     """the Manning roughness coefficient for this subbasin (unitless)"""
     peak_runoff_rate: Optional[float] = None

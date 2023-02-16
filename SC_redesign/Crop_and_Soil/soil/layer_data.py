@@ -46,10 +46,16 @@ class LayerData:
     """temperature of soil layer on the previous day (degrees C)"""
 
     # --- Erosion
-    percent_organic_carbon_content: float = 0.012
-    """percent organic carbon content of this layer"""
-    percent_clay_content: float = 24
-    """percent clay content of this layer"""
+    percent_organic_carbon_content: float = 1.2
+    """organic carbon content expressed as percent of soil in this layer (unitless)"""
+    percent_clay_content: float = 18.7
+    """clay content expressed as percent of soil in this layer (unitless)"""
+    percent_sand_content: float = 14.5
+    """sand content expressed as percent of soil in this layer (unitless)"""
+    percent_silt_content: float = 64.5
+    """silt content expressed as percent of soil in this layer (unitless)"""
+    percent_rock_content: float = 1
+    """rock content expressed as percent of soil in this layer (unitless)"""
 
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
