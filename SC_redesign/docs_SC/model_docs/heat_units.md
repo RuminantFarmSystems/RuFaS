@@ -7,7 +7,8 @@ Its central method, `absorb_heat_units()`, executes all the methods that allow u
 
 The **accumulate heat units** method provides two alternatives for calculating **new heat units** on a given day:
 
-1. **Main method**: the mean air temperature (`mean_air_temperature`) is used as an input, and every degree above crop's minimum temperature for growth is accumulated as heat units. With  this method, where minimum temperature is dependant on the selected crop, heat units accumulated are always equal to the average air temperature (when above the minimum threshold). 
+1. **Main method**: the mean air temperature (`mean_air_temperature`) is used as an input, and every degree above crop's minimum temperature for growth is accumulated as heat units. With this method, where minimum temperature is dependant on the selected crop, heat units accumulated are always equal to the average air temperature (when above the minimum threshold). 
+
 
 2. **Alternative method**: new heat units are defined using the **heat unit temperature** (`heat_unit_temperature`) instead of the mean air temperature (`mean_air_temperature`). The selection of this method involves the daily calculation of **minimum heat unit temperature** and **maximum heat unit temperature** to determine the **heat unit temperature** on a given day:
 
