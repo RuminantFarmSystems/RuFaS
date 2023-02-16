@@ -23,7 +23,9 @@ class SoilErosion:
             surface_residue: amount of residue on the soil surface (kg per hectare)
 
         Details:
-
+            This method calculates the mass of soil that gets eroded from the soil profile based on the content of the
+            soil, how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into
+            the soil, and the geometry of the field.
         """
         erodibility_factor = self._determine_soil_erodibility_factor(self.data.percent_sand_content,
                                                                      self.data.percent_silt_content,
