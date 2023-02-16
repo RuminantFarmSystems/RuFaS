@@ -85,10 +85,13 @@ def test_soil_factory_alterations(config: str, args_dict: Dict) -> None:
 @pytest.mark.parametrize("config,args_dict", [
     ("generic", {"is_mollisol": "False"}),  # Single invalid attribute
     ("generic", {"great_soil": "True", "is_tilled": "False"}),  # Multiple invalid attributes
-    ("generic", {"name": "altered generic soil", ""})
+    ("generic", {"name": "altered generic soil", "percent_asteroid_content": "0.21"}),  # Valid and invalid attributes
 ])
 def test_soil_factory_alteration_error(config: str, args_dict: Dict) -> None:
     """Test that SoilConfigFactory throws correct error when there is an attempt to set a nonexistent attribute"""
+    with pytest.raises(AttributeError) as e:
+        SoilConfigFactory.create_soil_data(SoilConfigurations(config), **args_dict)
+    assert "is not a valid attribute" in str(e.value)
 
 
 # --- Tests to verify correct behavior of SoilData module
@@ -107,4 +110,7 @@ def test_manual_soil_data_configuration() -> None:
     assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000, soil_water_concentration=0,
                                                     saturation_point_water_concentration=inf)
 
+# Unit tests for @property methods of SoilData
+
+@pytest.mark.parametrize()
 
