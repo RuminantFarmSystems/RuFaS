@@ -130,34 +130,14 @@ def cow_fixture() -> AnimalBase:
     cowfixture = AnimalBase(initsetup)
     return cowfixture
 
-
-def test_daily_p_update(cow_fixture: AnimalBase) -> None:
+@pytest.mark.parametrize("dP_reserves,p_intake,p_req,expected", [(0,1,0,0),(-10,10,1, -3.7),(10,10,1,0)])
+def test_daily_p_update(dP_reserves, p_intake, p_req, expected, cow_fixture: AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
-    cow_fixture.dP_reserves = 1
-    cow_fixture.p_intake = 0
-    cow_fixture.p_req = 1
-
-    # Case 1: intake is less than requirements
+    cow_fixture.dP_reserves = dP_reserves
+    cow_fixture.p_intake = p_intake
+    cow_fixture.p_req = p_req
     cow_fixture.daily_p_update()
-    actual = cow_fixture.dP_reserves
-    expected = 0
-    assert actual == expected
-
-    # Case 2: intake over requirements and reserves below 0
-    cow_fixture.dP_reserves = -10
-    cow_fixture.p_intake = 10
-    cow_fixture.p_req = 1
-    expected = 0.7 * max(cow_fixture.p_intake - cow_fixture.p_req, 0) + cow_fixture.dP_reserves
-    cow_fixture.daily_p_update()
-    actual = cow_fixture.dP_reserves
-    assert actual == expected
-
-    # Case 3: reserves are high, intake is over requirements
-    cow_fixture.dP_reserves = 10
-    cow_fixture.daily_p_update()
-    actual = cow_fixture.dP_reserves
-    expected = 0
-    assert actual == expected
+    assert cow_fixture.dP_reserves == expected
 
 
 def test_calc_base_manure():
@@ -172,14 +152,12 @@ def test_set_p_purchased():
 
 def test_update_pen_history(cow_fixture: AnimalBase) -> None:
     """Unit test for update_pen_history in file routines/animal/life_cycle/animal_base.py"""
-    curr_pen = 3
-    classes_in_pen = ['Cow']
-    curr_day = 2
 
     # Case 1
     # update hist with designated vals, using the time and the obj itself
     cow_fixture.update_pen_history(
-        curr_pen, curr_day, classes_in_pen)
+        3, 2, ['Cow'])
+    assert cow_fixture.pen_history[0].pen == 3
     assert cow_fixture.pen_history[-1].pen == 3
     assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
     assert cow_fixture.pen_history[-1].start_date == 2
@@ -190,7 +168,7 @@ def test_update_pen_history(cow_fixture: AnimalBase) -> None:
     cow_fixture.update_pen_history(
         4, 3, ['Cow'])
     # check previous history remains the same, then check newest
-    assert cow_fixture.pen_history[-2].pen == 3
+    assert cow_fixture.pen_history[0].pen == 3
     assert cow_fixture.pen_history[-1].pen == 4
     assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
     assert cow_fixture.pen_history[-1].start_date == 3
@@ -200,6 +178,7 @@ def test_update_pen_history(cow_fixture: AnimalBase) -> None:
     # check that the start date remains the date of the change
     cow_fixture.update_pen_history(
         4, 4, ['Cow'])
+    assert cow_fixture.pen_history[0].pen == 3
     assert cow_fixture.pen_history[-1].pen == 4
     assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
     assert cow_fixture.pen_history[-1].start_date == 3
@@ -229,29 +208,30 @@ def test_init_from_string():
     pass
 
 
-def test_add_event():
+def test_add_event()->None:
     """Unit test for function add_event in file routines/animal/life_cycle/animal_events.py"""
     animal_event = AnimalEvents()
     # Case 0 check that no events are found
     assert animal_event.events == {}
+
+    # Case 1: add an event
     animal_age = 100
     simulation_day = 200
     event_description = 'dummy'
-
-    # Case 1: add an event
     animal_event.add_event(animal_age, simulation_day, event_description)
-    assert animal_event.events == {100: ['simulation_day=200', 'dummy']}
+    assert animal_event.events[100] == ['simulation_day=200', 'dummy']
 
     # Case 2: another event on the next day
     animal_age = 101
     simulation_day = 201
+    event_description = 'dummy201'
     animal_event.add_event(animal_age, simulation_day, event_description)
-    assert animal_event.events[101] == ['simulation_day=201', 'dummy']
+    assert animal_event.events[101] == ['simulation_day=201', 'dummy201']
+
+    # Case 3: another event on the first day
     animal_age = 100
     simulation_day = 200
     event_description = 'dummy2'
-
-    # Case 3: another event on the first day
     animal_event.add_event(animal_age, simulation_day, event_description)
     assert animal_event.events[100] == [
         'simulation_day=200', 'dummy', 'dummy2']
@@ -789,14 +769,15 @@ def test_set_globals():
     pass
 
 
-def test_list_reconfig():
+@pytest.mark.parametrize(
+        "input,expected",
+        [([1, 2, 3, 4],[1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]),
+    (['1', '2', '3', '4'], ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4'])
+        ]
+)
+def test_list_reconfig(input, expected)->None:
     """Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py"""
-    result = list_reconfig([1, 2, 3, 4])
-    expected = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]
-    assert result == expected
-    result2 = list_reconfig(['1', '2', '3', '4'])
-    expected2 = ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4']
-    assert result2 == expected2
+    assert list_reconfig(input) == expected
 
 
 def test_objective():
