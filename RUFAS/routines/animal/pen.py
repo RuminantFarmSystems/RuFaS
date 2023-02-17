@@ -299,7 +299,7 @@ class Pen:
         """
         self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
 
-    def set_animal_combination(self, animal_combination: AnimalCombination) -> None:
+    def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
         Sets the pen's animal combination to animal_combination
         Args:
@@ -314,8 +314,8 @@ class Pen:
         """
         self.classes_in_pen = set()
         for animal in self.animals_in_pen:
-            stage = type(animal).__name__
-            self.classes_in_pen.add(stage)
+            life_cycle_stage = type(animal).__name__
+            self.classes_in_pen.add(life_cycle_stage)
 
     def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
                        animal_combination: AnimalCombination) -> None:
@@ -331,7 +331,7 @@ class Pen:
         self.update_pen_populated()
         self.update_stocking_density()
         self.calc_daily_walking_dist()
-        self.set_animal_combination(animal_combination)
+        self.update_animal_combination(animal_combination)
         self.update_classes_in_pen()
 
     def calc_ration(self, feed, available_feeds: DefaultDict[Any, Any]):
