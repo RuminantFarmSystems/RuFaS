@@ -262,3 +262,4 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     assert incorp.data.annual_eroded_sediment_total == 0.0498
     assert incorp.data.surface_runoff_volume == incorp.data.accumulated_runoff / field_size
     assert incorp.data.annual_surface_runoff_total == incorp.data.accumulated_runoff / field_size
+    
