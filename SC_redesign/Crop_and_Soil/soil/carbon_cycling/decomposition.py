@@ -38,9 +38,9 @@ class Decomposition:
             "pseudocode_soil" S.6.A.1
             defaults drawn from defac: course soil
         Args:
-            temp_average: Average temperature (unitless)
+            temp_average: Average temperature (celsius)
 
-        Returns: temperature effect
+        Returns: temperature effect (unitless)
         """
         # S.6.A.4
         return (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
@@ -55,7 +55,7 @@ class Decomposition:
             "pseudocode_soil" S.6.A.2
             defaults drawn from defac: course soil
         Args:
-            soil_layers: Layer data
+            water_factor: relative water saturation (%)
         Returns: moisture effect (unitless)
         """
         # S.6.A.5
