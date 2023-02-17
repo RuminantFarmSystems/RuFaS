@@ -47,12 +47,21 @@ class Evapotranspiration:
             snow_water_content,
             self.data.potential_evapotranspiration_adjusted,
             self.data.transpiration)
+        self.data.annual_adjusted_soil_evaporation_total += self.data.soil_evaporation_adjusted
         self.data.maximum_soil_evaporation = self._determine_maximum_soil_evaporation(
             self.data.soil_evaporation_adjusted,
             snow_water_content)
+        self.data.annual_maximum_soil_evaporation_total += self.data.maximum_soil_evaporation
         # TODO: snow water content needs to be tracked and adjusted as time goes by (in SoilData or by a weather
         #  monitor?) - issue #317
         self._evaporate_from_soil()
+
+        # Update annual totals
+        self.data.annual_potential_evapotranspiration_total += self.data.potential_evapotranspiration
+        self.data.annual_adjusted_potential_evapotranspiration_total += \
+                                                            self.data.annual_adjusted_potential_evapotranspiration_total
+        self.data.annual_adjusted_soil_evaporation_total += self.data.soil_evaporation_adjusted
+        self.data.annual_maximum_soil_evaporation_total += self.data.maximum_soil_evaporation
 
     def _determine_potential_evapotranspiration_adjusted(self, initial_canopy_free_water: float) -> float:
         """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
