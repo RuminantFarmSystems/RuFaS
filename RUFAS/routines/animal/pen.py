@@ -174,26 +174,39 @@ class Pen:
         GROWING_AND_CLOSE_UP = 4
         LAC_COW = 5
 
-    def __init__(self, pen_id, vertical_dist_to_milking_parlor, horizontal_dist_to_milking_parlor, number_of_stalls,
-                 housing_type,
-                 bedding_type, pen_type, manure_handling, manure_separator,
-                 manure_storage, animal_combination, max_stocking_density):
+    def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
+                 number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
+                 manure_separator: str, manure_storage: str, animal_combination: AnimalCombination,
+                 max_stocking_density: float) -> None:
         """
         Initializes a pen with the given arguments.
 
-        Args:
-            pen_id: the unique id number of the pen
-            vertical_dist_to_milking_parlor: vertical distance to milking parlor, km
-            horizontal_dist_to_milking_parlor: horizontal distance to milking parlor, km
-            number_of_stalls: number of stalls in the pen
-            housing_type: housing type of the pen
-            bedding_type: bedding type of the pen
-            pen_type: freestall or tiestall
-            manure_handling: the manure handling method used to clean the pen
-            manure_separator: the manure separator that processes manure excreted in this pen
-            manure_storage: the manure storage receptacle that stores manure excreted in this pen
-            animal_combination: the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
-            max_stocking_density: maximum stocking density allowed for pen
+        Parameters
+        ----------
+            pen_id: int
+                the unique id number of the pen
+            vertical_dist_to_milking_parlor: float
+                vertical distance to milking parlor, km
+            horizontal_dist_to_milking_parlor: float
+                horizontal distance to milking parlor, km
+            number_of_stalls: int
+                number of stalls in the pen
+            housing_type: str
+                housing type of the pen
+            bedding_type: str
+                bedding type of the pen
+            pen_type: str
+                freestall or tiestall
+            manure_handling: str
+                the manure handling method used to clean the pen
+            manure_separator: str
+                the manure separator that processes manure excreted in this pen
+            manure_storage: str
+                the manure storage receptacle that stores manure excreted in this pen
+            animal_combination: AnimalCombination
+                the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
+            max_stocking_density: float
+                maximum stocking density allowed for pen
         """
         self.id = pen_id
 
@@ -272,9 +285,27 @@ class Pen:
         self.animal_combination = animal_combination
 
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
+        """
+        Sets the pen's average nutrient requirements
+
+        Parameters
+        ----------
+        avg_nutrient_rqmts: Dict[str, float]
+            The new average nutrient requirements
+        """
         self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
 
     def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
+        """
+        Sets the pen's average milk and average CP milk
+
+        Parameters
+        ----------
+        avg_milk: float
+            The new average nutrient requirements
+        avg_CP_milk: float
+            The new average CP milk
+        """
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
 
@@ -282,8 +313,10 @@ class Pen:
         """
         Adds all animals in new_animals to the pen.
 
-        Args:
-            new_animals: list of new animals to be added to the pen
+        Parameters
+        ----------
+            new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
+                list of new animals to be added to the pen
         """
         self.animals_in_pen.extend(new_animals)
 
@@ -302,8 +335,11 @@ class Pen:
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
         Sets the pen's animal combination to animal_combination
-        Args:
-            animal_combination: the new AnimalCombination
+
+        Parameters
+        ----------
+            animal_combination: AnimalCombination
+                the new AnimalCombination
         """
         self.animal_combination = animal_combination
 
@@ -322,9 +358,12 @@ class Pen:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
 
-        Args:
-            new_animals: list of new animals to be added to the pen
-            animal_combination: an AnimalCombination Enum representing the type of the new animals
+        Parameters
+        ----------
+            new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
+                list of new animals to be added to the pen
+            animal_combination: AnimalCombination
+                an AnimalCombination Enum representing the type of the new animals
         """
 
         self.add_new_animals(new_animals)
