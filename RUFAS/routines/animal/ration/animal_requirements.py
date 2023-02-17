@@ -379,8 +379,6 @@ def calculate_NASEM_energy_growth_requirements(
 
     """
     MSBW = 0.96 * mature_body_weight
-    # TODO Edward: check this logic. We wrote it together, but I want to be sure that it's correct for cases
-    # e.g. parity = 0 or parity > 2
     if animal_type == 'cow':
         if parity == 1 and calving_interval != 0:
             average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
@@ -1132,8 +1130,7 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
     Calculates the net energy for activity requirement portion of the energy
     requirements for animals. This is separate because it must be calculated after
     grouping due to pen input args and cannot be used individually on an animal. The estimated energy requirements requirements for activity in megacalories per day are calculated following either NRC or NASEM guidelines
-    TODO Check this citation with Edward: NASEM (2001) using an estimated distance traveled based on the distance from the pen to the milking parlor
-
+    
     Parameters
     ----------
     body_weight : float
@@ -1141,8 +1138,8 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
     housing : str
         Housing type (Barn or Grazing)
     distance : float
-        #TODO NASEM: Estimated distance travels by the animal daily (meters)
-        #TODO NRC: Daily walking distance (km)
+        NASEM: Estimated distance travels by the animal daily (km)
+        NRC: Daily walking distance (km)
     
     Returns
     -------
@@ -1178,8 +1175,7 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
     elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
         if housing == 'Barn':
             net_energy_activity = distance * 0.00035 * \
-                body_weight  # TODO This logic is the same as NRC \
-            # following instructions by Edward C.G., but can or should be updated according to Kristan R.
+                body_weight
         elif housing == 'Grazing':
             # TODO This will be the DMI supplemented after grazing - requires grazing module implementation
             nonpasturekgDMI = 1
