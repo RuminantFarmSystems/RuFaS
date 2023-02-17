@@ -233,9 +233,13 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
     incorp._determine_soil_evaporation_adjusted.assert_called_once()
     incorp._determine_maximum_soil_evaporation.assert_called_once()
     assert data.potential_evapotranspiration == 1.89
+    assert data.annual_potential_evapotranspiration_total == 1.89
     assert data.potential_evapotranspiration_adjusted == 1.354
+    assert data.annual_adjusted_potential_evapotranspiration_total == 1.354
     assert data.soil_evaporation_adjusted == 2.845
+    assert data.annual_adjusted_soil_evaporation_total == 2.845
     assert data.maximum_soil_evaporation == 2.195
+    assert data.annual_maximum_soil_evaporation_total == 2.195
 
 
 @pytest.mark.parametrize("layers", [

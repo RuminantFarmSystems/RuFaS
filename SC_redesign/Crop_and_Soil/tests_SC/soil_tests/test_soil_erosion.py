@@ -259,3 +259,4 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     incorp._determine_sediment_yield.assert_called_once()
     incorp._determine_adjusted_sediment_yield.assert_called_once()
     assert incorp.data.eroded_sediment == 0.0498
+    assert incorp.data.annual_eroded_sediment_total == 0.0498

@@ -17,9 +17,11 @@ class SoilData:
     soil_layers: Optional[List[LayerData]] = None
     """list of soil layer data objects, top layer is 0th element, bottom is nth element"""
 
-    # Track annual water totals
+    # Track annual soil profile totals
     initial_water_content: float = None
-    """Soil water content at the beginning of a year, for use in determining annual change (mm)"""
+    """Total soil water content at the beginning of a year, for use in determining annual change (mm)"""
+    initial_nitrates_total: float = None
+    """Total soil nitrate amounts at the beginning of a year, for use in determining annual change (kg per hectare)"""
 
     # Track annual hydrological activity
     annual_potential_evapotranspiration_total: float = 0
@@ -94,7 +96,7 @@ class SoilData:
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
     def __post_init__(self):
-        """this method initializes attributes that either cannot be set to a default above or depend on need other
+        """This method initializes attributes that either cannot be set to a default above or depend on need other
             attributes in the object to be set before they can be set"""
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any
@@ -111,6 +113,24 @@ class SoilData:
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
+        self.initial_nitrates_total = self.profile_nitrates_total
+
+    def annual_reset(self) -> None:
+        """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
+        # Reset water totals
+        self.initial_water_content = self.profile_soil_water_content
+        self.initial_nitrates_total = self.profile_nitrates_total
+
+        # Reset hydrological activity
+        self.annual_potential_evapotranspiration_total = 0
+        self. annual_adjusted_potential_evapotranspiration_total = 0
+        self.annual_maximum_soil_evaporation_total = 0
+        self.annual_adjusted_soil_evaporation_total = 0
+        self.annual_runoff_total = 0
+
+        # Reset erosion activity
+        self.annual_eroded_sediment_total = 0
+        self.annual_surface_runoff_total = 0
 
     @property
     def profile_soil_water_content(self) -> float:
@@ -185,3 +205,14 @@ class SoilData:
             weighted_densities_sum += (layer.layer_thickness * layer.bulk_density)
             weights_sum += layer.layer_thickness
         return weighted_densities_sum / weights_sum
+
+    @property
+    def profile_nitrates_total(self) -> float:
+        """Calculates and returns the total amount of nitrates in the soil (kg per hectare)"""
+        if self.soil_layers is None:
+            return 0
+        else:
+            nitrates_sum = 0
+            for layer in self.soil_layers:
+                nitrates_sum += layer.nitrate
+            return nitrates_sum

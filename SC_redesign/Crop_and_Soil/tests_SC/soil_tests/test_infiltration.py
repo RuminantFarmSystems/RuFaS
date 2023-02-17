@@ -235,3 +235,4 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     assert incorp.data.previous_retention_parameter == 21.34
     assert incorp.data.moisture_condition_parameter == 50
     assert incorp.data.accumulated_runoff == 0.95
+    assert incorp.data.annual_runoff_total == 0.95
