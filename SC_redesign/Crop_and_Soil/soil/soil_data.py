@@ -17,6 +17,28 @@ class SoilData:
     soil_layers: Optional[List[LayerData]] = None
     """list of soil layer data objects, top layer is 0th element, bottom is nth element"""
 
+    # Track annual water totals
+    initial_water_content: float = None
+    """Soil water content at the beginning of a year, for use in determining annual change (mm)"""
+
+    # Track annual hydrological activity
+    annual_potential_evapotranspiration_total: float = 0
+    """Cumulative total of potential evapotranspiration that occurred in a year (mm)"""
+    annual_adjusted_potential_evapotranspiration_total: float = 0
+    """Cumulative total of adjusted potential evapotranspiration that occurred in a year (mm)"""
+    annual_maximum_soil_evaporation_total: float = 0
+    """Cumulative total of maximum soil evaporation that occurred in a year (mm)"""
+    annual_adjusted_soil_evaporation_total: float = 0
+    """Cumulative total of adjusted soil evaporation that occurred in a year (mm)"""
+    annual_runoff_total: float = 0
+    """Cumulative total of runoff that occurred in a year (mm)"""
+
+    # Track annual erosion activity
+    annual_eroded_sediment_total: float = 0
+    """Cumulative total of sediment that eroded in a year (metric tons)"""
+    annual_surface_runoff_total: float = 0
+    """Cumulative total of volume of surface runoff that occurred in a year (mm per hectare)"""
+
     # ---- evapotranspiration
     potential_evapotranspiration: Optional[float] = None
     """potential evapotranspiration for a given day (mm per day)"""
@@ -67,8 +89,8 @@ class SoilData:
     snow_cover_water_content: float = 0
     """water content of the snow cover (mm)"""
     eroded_sediment: float = 0
-    """cumulative amount of sediment that has been eroded off of the field (metric tons)"""
-    surface_volume_runoff: Optional[float] = None
+    """cumulative amount of sediment that has been eroded off of the field in a day (metric tons)"""
+    surface_runoff_volume: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
     def __post_init__(self):
@@ -86,6 +108,9 @@ class SoilData:
                                                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
                                                soil_water_concentration=0,
                                                saturation_point_water_concentration=inf)
+
+        # Set the initial water content for the first year of the simulation
+        self.initial_water_content = self.profile_soil_water_content
 
     @property
     def profile_soil_water_content(self) -> float:

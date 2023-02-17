@@ -84,6 +84,9 @@ class Infiltration:
 
         self.data.moisture_condition_parameter = self._determine_moisture_condition_parameter(retention_parameter)
 
+        # Update annual totals
+        self.data.annual_runoff_total += self.data.accumulated_runoff
+
     # --- static methods ---
     @staticmethod
     def _determine_first_moisture_condition_parameter(second_moisture_condition: float):
