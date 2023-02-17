@@ -289,7 +289,7 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
-    Chapter xx, pp. xx-xx, 2001.
+    Chapter 11 "Growth", pp. 234-243, 2001.
     """
     # Activity requirements
     # ---------------------
@@ -427,7 +427,7 @@ def calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy: Optional[int],
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx, pp. xx-xx, 2001.
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter 2 "Energy", pp. 21-22, 2001.
 
     """
     # Pregnancy requirement
@@ -526,7 +526,7 @@ def calculate_NRC_energy_lactation_requirements(animal_type: str, milk_fat: floa
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx, pp. xx-xx, 2001.
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter 2 "Energy", pp. 19, 2001.
 
     """
 
@@ -788,8 +788,8 @@ def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: f
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-        Chapter 6 "Minerals",pp. 106-109. 2001
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        Chapter 6 "Minerals",pp. 106-109. 2001.
 
     """
 
@@ -924,8 +924,8 @@ def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight
 
     References
     ----------
-    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press, Chapter xx "xxxxxx",pp. xx-xx;
-        Chapter 6 "Minerals",pp. 109-118. 2001
+    .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
+        Chapter 6 "Minerals",pp. 109-118. 2001.
     """
     P_growth = (1.2 + 4.635 * mature_body_weight ** 0.22 *
                 body_weight ** (-0.22)) * (average_daily_gain / 0.96)
