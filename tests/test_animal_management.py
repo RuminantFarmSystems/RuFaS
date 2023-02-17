@@ -320,7 +320,6 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
-@pytest.fixture()
 def setup_dummy_animal(animal_id):
     args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born',
                  'id': animal_id}
@@ -332,7 +331,6 @@ def setup_dummy_animal(animal_id):
     return dummy_animal
 
 
-@pytest.fixture()
 def setup_dummy_pen(pen_id, num_stalls, animal_list):
     dummy_pen_info_dict = {'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
