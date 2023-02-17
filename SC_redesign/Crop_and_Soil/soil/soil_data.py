@@ -37,8 +37,7 @@ class SoilData:
     # ---- decomposition
     decomposition_temperature_effect: Optional[float] = None
     """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-    decomposition_moisture_effect: Optional[float] = None
-    """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
+
 
 
     @property

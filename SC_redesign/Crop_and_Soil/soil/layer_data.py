@@ -25,6 +25,8 @@ class LayerData:
     """water concentration of soil layer at saturation point (mm)"""
     soil_evaporation_compensation_coefficient: float = 1
     """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (2:2.3.17)"""
+    decomposition_moisture_effect: Optional[float] = None
+    """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
 
     @property
     def layer_thickness(self):
