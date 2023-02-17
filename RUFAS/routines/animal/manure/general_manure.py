@@ -9,7 +9,7 @@ class AnimalManureExcretions(TypedDict):
 
     """
     urea: float
-    """Concentration of urea in manure, mol/L."""
+    """Concentration of urea in manure, g/L."""
 
     urine: float
     """Amount of urine excreted, kg."""
