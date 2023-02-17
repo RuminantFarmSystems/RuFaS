@@ -117,18 +117,18 @@ class SoilData:
 
     def annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
-        # Reset water totals
+        # Reset soil profile totals
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
 
-        # Reset hydrological activity
+        # Reset hydrological activity totals
         self.annual_potential_evapotranspiration_total = 0
         self. annual_adjusted_potential_evapotranspiration_total = 0
         self.annual_maximum_soil_evaporation_total = 0
         self.annual_adjusted_soil_evaporation_total = 0
         self.annual_runoff_total = 0
 
-        # Reset erosion activity
+        # Reset erosion activity totals
         self.annual_eroded_sediment_total = 0
         self.annual_surface_runoff_total = 0
 
