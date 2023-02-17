@@ -1,5 +1,3 @@
-from typing import Final
-from typing import Literal
 from typing import Tuple
 from typing import TypedDict
 
@@ -14,13 +12,13 @@ class AnimalManureExcretions(TypedDict):
     """Concentration of urea in manure, mol/L."""
 
     urine: float
-    """Amount of urine in manure, g."""
+    """Amount of urine excreted, kg."""
 
     total_ammoniacal_nitrogen: float
-    """Concentration of total ammoniacal nitrogen in the manure slurry, mol/L."""
+    """Concentration of total ammoniacal nitrogen in the manure slurry, g/L."""
 
     nitrogen: float
-    """Amount of nitrogen in manure, g."""
+    """Amount of nitrogen in manure, kg."""
 
     manure_mass: float
     """Amount of manure, kg."""
@@ -29,10 +27,10 @@ class AnimalManureExcretions(TypedDict):
     """Amount of total solids, kg."""
 
     degradable_volatile_solids: float
-    """Amount of degradable volatile solids, g."""
+    """Amount of degradable volatile solids, kg."""
 
     non_degradable_volatile_solids: float
-    """Amount of non-degradable volatile solids, g."""
+    """Amount of non-degradable volatile solids, kg."""
 
     inorganic_phosphorus_fraction: float
     """Fraction of water extractable inorganic phosphorus, unitless."""

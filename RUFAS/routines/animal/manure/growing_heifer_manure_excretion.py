@@ -8,6 +8,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 from typing import Tuple
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
@@ -52,20 +53,52 @@ def manure_calculations(ration_formulation,
     NDF_concentration = nutrient_concentrations['NDF']
     EE_concentration = nutrient_concentrations["EE"]
 
-    # Amount of manure, kg [A.3B.A.1]
+    # Total urine, kg [A.3B.A.1]
+    urine = 9.0
+
+    # Manure excretion
+    # Amount of feces and urine excreted daily by the growing heifer, kg [A.3B.A.2]
     total_manure_excreted = 3.886 * dry_matter_intake - 0.029 * body_weight + 5.641
 
-    # Total solids, kg/day [A.3B.A.2]
+    # Total solids excretion
+    # Amount of dry material excreted by the growing heifer, kg [A.3B.A.2]
     total_solids = 0.0084 * body_weight
 
-    # Nitrogen in liquid and solid manure, g/day [A.3D.B.1]
-    nitrogen = 78.390 * dry_matter_intake * CP_concentration / 100 + 51.35  # TODO: Divide by 1000?
+    # Total volatile solids, kg [A.3B.A.3]
+    total_volatile_solids = 0.0073 * body_weight
 
-    # Amount of potassium excreted, g/day [A.3D.B.3]
-    potassium = 1000 * dry_matter_intake * potassium_concentration / 100
+    # Degradable volatile solids, kg [A.3B.A.4]
+    degradable_volatile_solids = 0.9 * total_volatile_solids  # TODO: IMPORTANT! Is it 0.9 or 0.09?
 
-    # Methane Emissions [A.3B.C.1]
+    # Non-degradable volatile solids, kg
+    non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
+
+    # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
+    manure_nitrogen = 78.390 * dry_matter_intake * (CP_concentration / 100) + 51.35
+
+    # Nitrogen excretion in urine, kg [A.3F.B.2]
+    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 100)
+                      ) * GeneralConstants.GRAMS_TO_KG
+
+    # Nitrogen excretion in feces, kg [A.3F.B.3]
+    fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
+
+    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
+    # Key assumption: 1 kg of urine = 1 L of urine (CO)(NH2)2
+    urine_urea_nitrogen_concentration = -1.16 + 0.86 * ((urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine)
+
+    # Total ammoniacal nitrogen concentration in the manure slurry,
+    # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
+    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
+    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+
+    # Amount of potassium excreted, g [A.3D.B.3]
+    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+
+    # Methane emissions, g/day [A.3B.C.1]
+    # Methane model = Boadi
     methane_emission = (38.62 + 26.44 * dry_matter_intake) * 0.554
+    # TODO: Implement the other methane model - IPCC Tier 2
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
             daily_milk_production=0,
@@ -79,13 +112,13 @@ def manure_calculations(ration_formulation,
 
     manure_excretion_values = AnimalManureExcretions(
             urea=0.340,  # TODO: Implement with correct equation
-            urine=7,
-            total_ammoniacal_nitrogen=0.14,  # TODO: Implement with correct equation
-            nitrogen=nitrogen,
+            urine=urine,
+            total_ammoniacal_nitrogen=total_ammoniacal_nitrogen_concentration,
+            nitrogen=manure_nitrogen,
             manure_mass=total_manure_excreted,
             total_solids=total_solids,
-            degradable_volatile_solids=7087.413,  # TODO: Implement with correct equation
-            non_degradable_volatile_solids=859.390,  # TODO: Implement with correct equation
+            degradable_volatile_solids=degradable_volatile_solids,
+            non_degradable_volatile_solids=non_degradable_volatile_solids,
             inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
             organic_phosphorus_fraction=organic_phosphorus_fraction,
             phosphorus=manure_phosphorus_excreted,
