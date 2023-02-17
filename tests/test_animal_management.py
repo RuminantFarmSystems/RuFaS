@@ -320,6 +320,42 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
+@pytest.fixture()
+def setup_dummy_animal(animal_id):
+    args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born',
+                 'id': animal_id}
+    config_dict = {'semen_type': 'dummy_semen_type'}
+
+    AnimalBase.set_config(config_dict)
+    dummy_animal = AnimalBase(args_dict)
+
+    return dummy_animal
+
+
+@pytest.fixture()
+def setup_dummy_pen(pen_id, num_stalls, animal_list):
+    dummy_pen_info_dict = {'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
+                           'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
+                           'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
+                           'pen_type': 'dummy_pen_type', 'manure_handling': 'dummy_manure_handling',
+                           'manure_separator': 'dummy_manure_separator', 'manure_storage': 'dummy_manure_storage',
+                           'animal_combination': 'dummy_animal_combination',
+                           'max_stocking_density': 'dummy_max_stocking_density', 'id': pen_id,
+                           'number_of_stalls': num_stalls}
+
+    dummy_pen = Pen(dummy_pen_info_dict['id'], dummy_pen_info_dict['vertical_dist_to_milking_parlor'],
+                    dummy_pen_info_dict['horizontal_dist_to_milking_parlor'],
+                    dummy_pen_info_dict['number_of_stalls'],
+                    dummy_pen_info_dict['housing_type'], dummy_pen_info_dict['bedding_type'],
+                    dummy_pen_info_dict['pen_type'], dummy_pen_info_dict['manure_handling'],
+                    dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_storage'],
+                    dummy_pen_info_dict['animal_combination'], dummy_pen_info_dict['max_stocking_density'])
+
+    dummy_pen.animals_in_pen = animal_list
+
+    return dummy_pen
+
+
 def pen_removal_info_dicts():
     return [
         {
@@ -348,39 +384,20 @@ def pen_removal_info_dicts():
 
 @pytest.mark.parametrize("info_dict", pen_removal_info_dicts())
 def test_remove_animals_from_herd(info_dict, animal_management) -> None:
-    args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born'}
-    config_dict = {'semen_type': 'dummy_semen_type'}
-    dummy_pen_info_dict = {
-        'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
-        'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
-        'housing_type': 'dummy_housing_type',
-        'bedding_type': 'dummy_bedding_type', 'pen_type': 'dummy_pen_type',
-        'manure_handling': 'dummy_manure_handling', 'manure_separator': 'dummy_manure_separator',
-        'manure_storage': 'dummy_manure_storage', 'animal_combination': 'dummy_animal_combination',
-        'max_stocking_density': 'dummy_max_stocking_density'
-    }
     animals_removed = []
     pen_list = []
     for pen_num in info_dict['pen_data']:
-        dummy_pen_info_dict['id'] = info_dict['pen_data'][pen_num]['pen_id']
-        dummy_pen_info_dict['number_of_stalls'] = info_dict['pen_data'][pen_num]['num_stalls']
-        dummy_pen = Pen(dummy_pen_info_dict['id'], dummy_pen_info_dict['vertical_dist_to_milking_parlor'],
-                        dummy_pen_info_dict['horizontal_dist_to_milking_parlor'],
-                        dummy_pen_info_dict['number_of_stalls'],
-                        dummy_pen_info_dict['housing_type'], dummy_pen_info_dict['bedding_type'],
-                        dummy_pen_info_dict['pen_type'], dummy_pen_info_dict['manure_handling'],
-                        dummy_pen_info_dict['manure_separator'], dummy_pen_info_dict['manure_storage'],
-                        dummy_pen_info_dict['animal_combination'], dummy_pen_info_dict['max_stocking_density'])
-
         animal_list = []
         for animal_id in info_dict['pen_data'][pen_num]["ids_in_pen"]:
-            args_dict['id'] = animal_id
-            AnimalBase.set_config(config_dict)
-            dummy_animal = AnimalBase(args_dict)
+            dummy_animal = setup_dummy_animal(animal_id)
             animal_list.append(dummy_animal)
             animal_management.animal_to_pen_id_map[dummy_animal.id] = info_dict['pen_data'][pen_num]['pen_id']
             if dummy_animal.id in info_dict['removal_set']:
                 animals_removed.append(dummy_animal)
+
+        dummy_pen = setup_dummy_pen(info_dict['pen_data'][pen_num]['pen_id'],
+                                    info_dict['pen_data'][pen_num]['num_stalls'],
+                                    animal_list)
 
         dummy_pen.animals_in_pen = animal_list
 
@@ -397,8 +414,26 @@ def test_remove_animals_from_herd(info_dict, animal_management) -> None:
     assert animal_management.all_pens[3].stocking_density == info_dict['pen_data']['pen3']['expected_stocking_density']
 
 
-def test_track_former_pen_population():
+# pen_population_before_additions = [None] * len(self.all_pens)
+#
+# for index, pen in enumerate(self.all_pens):
+#     pen_population_before_additions[index] = len(pen.animals_in_pen)
+#
+# return pen_population_before_additions
+
+
+def test_track_former_pen_population(animal_management) -> None:
     """Unit test for function track_former_pen_population in file routines/animal/animal_management.py"""
+    dummy_pen_info_dict = {
+        'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
+        'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
+        'housing_type': 'dummy_housing_type',
+        'bedding_type': 'dummy_bedding_type', 'pen_type': 'dummy_pen_type',
+        'manure_handling': 'dummy_manure_handling', 'manure_separator': 'dummy_manure_separator',
+        'manure_storage': 'dummy_manure_storage', 'animal_combination': 'dummy_animal_combination',
+        'max_stocking_density': 'dummy_max_stocking_density'
+    }
+
     pass
 
 
