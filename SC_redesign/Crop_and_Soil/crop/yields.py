@@ -29,7 +29,7 @@ class Yields():
             parameters are used in the calculations (as in SWAT).
         """
         # Harvest Index
-        if self.data.has_given_harvest_index:
+        if self.data.has_custom_harvest_index:
             self.data.harvest_index = self.data.user_harvest_index
         else:
             self.data.potential_harvest_index = self._determine_potential_harvest_index(self.data.heat_fraction,
@@ -52,7 +52,7 @@ class Yields():
         self.data.yield_collected = self._determine_extracted_yield(self.data.crop_yield, self.data.harvest_efficiency)
 
         # Yield nutrient makeup
-        if self.data.has_given_harvest_index:
+        if self.data.has_custom_harvest_index:
             self.data.collected_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.7
             self.data.collected_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.8
         else:

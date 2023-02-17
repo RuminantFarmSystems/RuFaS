@@ -146,8 +146,28 @@ class Crop:
         return og_biomass - self.data.biomass
 
     def kill(self) -> None:
-        """kill the plant, preventing it from growing"""
+        """kill the plant, preventing it from growing
+
+        Details:
+            Swat says that "a kill operation converts all biomass to residue"
+        """
         self.data.is_alive = False
+
+    def harvest_without_killing(self):
+        """
+
+        Returns:
+
+
+        Details:
+            The expectation is that self.yields.obtain_yields() will be called before this method.
+
+            SWAT says that "this [similar] operation is most commonly used to cut hay or grass"
+        """
+        # TODO: I'm having a hard time deciding how to organize these methods. Yields and harvest opretations are
+        #   very closely related.
+        self.cut(self.data.harvest_index)
+
 
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""

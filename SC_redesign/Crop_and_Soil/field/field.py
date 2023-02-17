@@ -41,6 +41,10 @@ class Field:
 
         Details: **All the logic (after setup) will go in this function**
         """
+        # check the schedule to see what needs to be done today
+        self.check_schedule(day, year)
+
+
         # --- Soil Management---
         # nutrient amendments
         if self.field_data.is_amendment_day:
@@ -115,6 +119,22 @@ class Field:
 
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
+        pass
+    # </editor-fold>
+
+    # <editor-fold desc="--- Scheduling Methods ---">
+    def check_schedule(self, year: int, day: int) -> None:
+        """check if any scheduled activities need to be completed today.
+
+        Args:
+            year: the current year
+            day: the current day of the year
+
+        Details:
+            This method should check the dates on which certain actions should be performed against the year and day.
+            Then, the boolean attributes that trigger the relevant operations should be updated.
+            For example, if we need to plant a crop today, this method will set `self.field_data.is_planting_day=True`.
+         """
         pass
     # </editor-fold>
 

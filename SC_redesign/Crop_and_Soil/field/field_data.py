@@ -13,6 +13,9 @@ class FieldData:
     """should the soil be tilled today?"""
 
     # --- Crop management Variables ---
+    use_scheduled_harvest: bool = True
+    """Should harvesting be done according to user-defined schedule? False will trigger the alternative: heat unit 
+    scheduling, whereby harvest operations are conducted to maximize yield (based on heat unit accumulation)."""
     is_planting_day: bool = False
     """is today the day to plant new crops?"""
     is_cutting_day: bool = False

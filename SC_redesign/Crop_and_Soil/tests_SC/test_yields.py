@@ -149,7 +149,7 @@ def test_given_harvest_index_property(usr_index, expect):
     """test the class knows if harvest index override is specified"""
     data = CropData(user_harvest_index=usr_index)
     ylds = Yields(data)
-    assert data.has_given_harvest_index == expect
+    assert data.has_custom_harvest_index == expect
 
 
 @pytest.mark.parametrize("usr_index,heat_frac,harv_eff", [

@@ -334,7 +334,7 @@ class CropData:
         return self.heat_fraction >= 1.0
 
     @property
-    def has_given_harvest_index(self) -> bool:
+    def has_custom_harvest_index(self) -> bool:
         """was a user-defined harvest index is given? This triggers a harvest index override"""
         return self.user_harvest_index is not None
 
