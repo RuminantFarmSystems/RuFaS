@@ -106,3 +106,16 @@ def test_manual_soil_data_configuration() -> None:
     # Vadose zone layer gets initialized based on the bottom soil layer, so check that too
     assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000, soil_water_concentration=0,
                                                     saturation_point_water_concentration=inf)
+
+
+# --- Tests to verify the correct behavior fo the LayerData module
+@pytest.mark.parametrize("top,bottom", [
+    (0, 39),
+    (18, 918.10329843),
+    (182.9345038, 1509.92854),
+])
+def test_layer_thickness(top: float, bottom: float) -> None:
+    """Tests that the layer_thickness() in LayerData works as expected"""
+    layer = LayerData(top_depth=top, bottom_depth=bottom)
+    expect = bottom - top
+    assert layer.layer_thickness == expect
