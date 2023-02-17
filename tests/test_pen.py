@@ -147,9 +147,9 @@ def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: fl
                              Pen.AnimalCombination.CLOSE_UP,
                              Pen.AnimalCombination.GROWING_AND_CLOSE_UP,
                          ])
-def test_set_animal_combination(pen: Pen, animal_combination: Pen.AnimalCombination):
-    """Unit test for function set_animal_combination in file routines/animal/pen.py"""
-    pen.set_animal_combination(animal_combination)
+def test_update_animal_combination(pen: Pen, animal_combination: Pen.AnimalCombination):
+    """Unit test for function update_animal_combination in file routines/animal/pen.py"""
+    pen.update_animal_combination(animal_combination)
 
     assert pen.animal_combination == animal_combination
 
@@ -160,7 +160,7 @@ def test_update_animals(pen: Pen, mocker: MockerFixture):
     mocker.patch('RUFAS.routines.animal.pen.Pen.add_new_animals')
     mocker.patch('RUFAS.routines.animal.pen.Pen.update_pen_populated')
     mocker.patch('RUFAS.routines.animal.pen.Pen.update_stocking_density')
-    mocker.patch('RUFAS.routines.animal.pen.Pen.set_animal_combination')
+    mocker.patch('RUFAS.routines.animal.pen.Pen.update_animal_combination')
     mocker.patch('RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist')
     mocker.patch('RUFAS.routines.animal.pen.Pen.update_classes_in_pen')
 
@@ -169,7 +169,7 @@ def test_update_animals(pen: Pen, mocker: MockerFixture):
     pen.add_new_animals.assert_called_once()
     pen.update_pen_populated.assert_called_once()
     pen.update_stocking_density.assert_called_once()
-    pen.set_animal_combination.assert_called_once()
+    pen.update_animal_combination.assert_called_once()
     pen.calc_daily_walking_dist.assert_called_once()
     pen.update_classes_in_pen.assert_called_once()
 
