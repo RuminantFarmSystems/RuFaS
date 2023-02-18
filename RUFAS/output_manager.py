@@ -59,15 +59,16 @@ class OutputManager (object):
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
             pool[key] = self._pool_element_factory()
-        # reduced_info_map is identical to info_map without class and fucntion
-        # keys as they are already stored in element key and increase the final
-        # file size.
+        # reduced_info_map is identical to info_map without the class key and
+        # the function key; as they are already stored in element key and
+        # having them increases the final file size.
         reduced_info_map = {k: info_map[k]
                             for k in info_map.keys() - {'class', 'function'}}
         pool[key]['info_maps'].append(reduced_info_map)
         pool[key]['values'].append(value)
 
-    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
+    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]
+                     ) -> None:
         """
         Adds a variable to the pool.
 
@@ -121,7 +122,8 @@ class OutputManager (object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
 
-    def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]
+                    ) -> None:
         """
         Adds a warning message to the pool of warnings.
 
@@ -211,9 +213,9 @@ class OutputManager (object):
         Parameters
         ----------
         caller_class : str
-            The name of the class in which this key-value pair is originated
+            Name of the class in which the call to output manager is originated
         function : str
-            The name of the function in which this key-value pair is originated
+            Name of the function which called the output manager originated
 
         Returns
         -------
@@ -230,7 +232,8 @@ class OutputManager (object):
         except Exception as e:
             raise e
 
-    def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
+    def _generate_file_name(self, base_name: str, extension: str = "json"
+                            ) -> str:
         """
         Returns a file name using the given base_name and timestamp.
         """
@@ -239,7 +242,7 @@ class OutputManager (object):
 
     def save_variables(self, path: str) -> None:
         """
-        Saves the variables_pool into a json file in the given path to a directory.
+        Saves variables_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(
             path, self._generate_file_name("variables", "json"))
@@ -247,7 +250,7 @@ class OutputManager (object):
 
     def save_logs(self, path: str) -> None:
         """
-        Saves the logs_pool into a json file in the given path to a directory.
+        Saves logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(
             path, self._generate_file_name("logs", "json"))
@@ -255,7 +258,7 @@ class OutputManager (object):
 
     def save_warnings(self, path: str) -> None:
         """
-        Saves the warnings_pool into a json file in the given path to a directory.
+        Saves warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(
             path, self._generate_file_name("warnings", "json"))
@@ -263,7 +266,7 @@ class OutputManager (object):
 
     def save_errors(self, path: str) -> None:
         """
-        Saves the errors_pool into a json file in the given path to a directory.
+        Saves errors_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(
             path, self._generate_file_name("errors", "json"))
