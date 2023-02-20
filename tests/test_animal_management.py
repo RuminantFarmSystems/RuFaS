@@ -320,6 +320,64 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
+def pens_test_data_dict():
+    return [
+        {
+            "pen_data":
+                {"pen0":
+                     {"pen_id": 0,
+                      "ids_in_pen": [100283, 102779, 112701, 115078, 127686, 131248, 137254, 148550, 150007, 150905,
+                                     151340,
+                                     154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656, 186570, 189951,
+                                     194172],
+                      "expected_stocking_density": 0.525, "num_stalls": 40,
+                      "ration": {"dummy_feed1": 205, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
+                                 "dummy_feed4": 72, "dummy_feed5": 45, "dummy_feed6": 146, "dummy_feed7": 170.0,
+                                 "dummy_feed8": 5, "dummy_feed9": 0.0, "dummy_feed10": 200}},
+                 "pen1":
+                     {"pen_id": 1,
+                      "ids_in_pen": [100439, 106977, 111123, 111262, 111527, 112516, 120348, 153413, 156414, 193126],
+                      "expected_stocking_density": 0.25, "num_stalls": 36,
+                      "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56}}
+                    ,
+                 "pen2":
+                     {"pen_id": 2,
+                      "ids_in_pen": [115748, 118413, 129345, 139533, 148813, 156669, 158006, 161608, 162583, 163942,
+                                     176371, 187817, 189760, 189801, 198331, 199999],
+                      "expected_stocking_density": 0.10, "num_stalls": 150,
+                      "ration": {"dummy_feed1": 10, "dummy_feed2": 35, "dummy_feed3": 0.0,
+                                 "dummy_feed4": 84}},
+                 "pen3":
+                     {"pen_id": 3, "ids_in_pen": [126963, 133132, 156958, 158639, 160697, 162375, 164238, 198542],
+                      "expected_stocking_density": 0.20, "num_stalls": 35,
+                      "ration": {"dummy_feed1": 100.0, "status": "dummy_val"}}
+                 },
+            "removal_set":
+                {115078, 169062, 112516, 189801, 198542},
+            "expected_map":
+                {100283: 0, 102779: 0, 112701: 0, 127686: 0, 131248: 0, 137254: 0, 148550: 0, 150007: 0, 150905: 0,
+                 151340: 0, 154391: 0, 154438: 0, 156048: 0, 157528: 0, 165411: 0, 170598: 0, 182656: 0, 186570: 0,
+                 189951: 0, 194172: 0, 100439: 1, 106977: 1, 111123: 1, 111262: 1, 111527: 1, 120348: 1, 153413: 1,
+                 156414: 1,
+                 193126: 1, 115748: 2, 118413: 2, 129345: 2, 139533: 2, 148813: 2, 156669: 2, 158006: 2, 161608: 2,
+                 162583: 2, 163942: 2, 176371: 2, 187817: 2, 189760: 2, 198331: 2, 199999: 2, 126963: 3, 133132: 3,
+                 156958: 3,
+                 158639: 3, 160697: 3, 162375: 3, 164238: 3},
+            "expected_list": [22, 10, 16, 8],
+            "prior_pen_population_list": [20, 10, 20, 40],
+            "expected_ration_value_list": [{"dummy_feed1": 225.5, "dummy_feed2": 0.0, "dummy_feed3": 20.075,
+                                            "dummy_feed4": 79.2, "dummy_feed5": 49.5, "dummy_feed6": 160.6,
+                                            "dummy_feed7": 187,
+                                            "dummy_feed8": 5.5, "dummy_feed9": 0.0, "dummy_feed10": 220},
+                                           {"dummy_feed1": 0.0, "dummy_feed2": 56},
+                                           {"dummy_feed1": 8, "dummy_feed2": 28, "dummy_feed3": 0.0,
+                                            "dummy_feed4": 67.2},
+                                           {"dummy_feed1": 20, 'status': 'dummy_val'}]
+
+        },
+    ]
+
+
 def setup_dummy_animal(animal_id):
     args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born',
                  'id': animal_id}
@@ -354,48 +412,21 @@ def setup_dummy_pen(pen_id, num_stalls, animal_list):
     return dummy_pen
 
 
-def pen_removal_info_dicts():
-    return [
-        {
-            "pen_data":
-                {"pen0":
-                     {"pen_id": 0, "ids_in_pen": [128382, 173829, 183920, 113803, 120462],
-                      "expected_stocking_density": 0.5, "num_stalls": 8},
-                 "pen1":
-                     {"pen_id": 1, "ids_in_pen": [149495, 189237, 128193, 145927, 156253],
-                      "expected_stocking_density": 0.5, "num_stalls": 8},
-                 "pen2":
-                     {"pen_id": 2, "ids_in_pen": [161832, 182729, 162719, 152394, 182938],
-                      "expected_stocking_density": 0.5, "num_stalls": 8},
-                 "pen3":
-                     {"pen_id": 3, "ids_in_pen": [217892, 182738, 128374, 101239, 118389],
-                      "expected_stocking_density": 0.5, "num_stalls": 8}
-                 },
-            "removal_set":
-                {113803, 145927, 152394, 101239},
-            "expected_map":
-                {128382: 0, 173829: 0, 183920: 0, 120462: 0, 149495: 1, 189237: 1, 128193: 1, 156253: 1,
-                 161832: 2, 182729: 2, 162719: 2, 182938: 2, 217892: 3, 182738: 3, 128374: 3, 118389: 3}
-        }
-    ]
-
-
-@pytest.mark.parametrize("info_dict", pen_removal_info_dicts())
-def test_remove_animals_from_herd(info_dict, animal_management) -> None:
+def setup_dummy_animal_management_with_pens(animal_management, info_dict: dict, append_removals: bool):
     animals_removed = []
     pen_list = []
-    for pen_num in info_dict['pen_data']:
+    for pen_num, pen_dict in info_dict['pen_data'].items():
         animal_list = []
-        for animal_id in info_dict['pen_data'][pen_num]["ids_in_pen"]:
+        for animal_id in pen_dict["ids_in_pen"]:
             dummy_animal = setup_dummy_animal(animal_id)
             animal_list.append(dummy_animal)
-            animal_management.animal_to_pen_id_map[dummy_animal.id] = info_dict['pen_data'][pen_num]['pen_id']
-            if dummy_animal.id in info_dict['removal_set']:
+            animal_management.animal_to_pen_id_map[dummy_animal.id] = pen_dict['pen_id']
+            if append_removals and dummy_animal.id in info_dict['removal_set']:
                 animals_removed.append(dummy_animal)
 
-        dummy_pen = setup_dummy_pen(info_dict['pen_data'][pen_num]['pen_id'],
-                                    info_dict['pen_data'][pen_num]['num_stalls'],
-                                    animal_list)
+        dummy_pen = setup_dummy_pen(pen_dict['pen_id'], pen_dict['num_stalls'], animal_list)
+
+        dummy_pen.ration = pen_dict['ration']
 
         dummy_pen.animals_in_pen = animal_list
 
@@ -403,41 +434,45 @@ def test_remove_animals_from_herd(info_dict, animal_management) -> None:
 
     animal_management.all_pens = pen_list
 
-    animal_management.remove_animals_from_herd(animals_removed)
-
-    assert animal_management.animal_to_pen_id_map == info_dict['expected_map']
-    assert animal_management.all_pens[0].stocking_density == info_dict['pen_data']['pen0']['expected_stocking_density']
-    assert animal_management.all_pens[1].stocking_density == info_dict['pen_data']['pen1']['expected_stocking_density']
-    assert animal_management.all_pens[2].stocking_density == info_dict['pen_data']['pen2']['expected_stocking_density']
-    assert animal_management.all_pens[3].stocking_density == info_dict['pen_data']['pen3']['expected_stocking_density']
+    return {'animal_management_object': animal_management, 'animals_removed_list': animals_removed}
 
 
-# pen_population_before_additions = [None] * len(self.all_pens)
-#
-# for index, pen in enumerate(self.all_pens):
-#     pen_population_before_additions[index] = len(pen.animals_in_pen)
-#
-# return pen_population_before_additions
+@pytest.mark.parametrize("info_dict", pens_test_data_dict())
+def test_remove_animals_from_herd(info_dict, animal_management) -> None:
+    dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
+        'animal_management_object']
+    animals_removed = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
+        'animals_removed_list']
+
+    dummy_animal_management.remove_animals_from_herd(animals_removed)
+
+    assert dummy_animal_management.animal_to_pen_id_map == info_dict['expected_map']
+    for idx, pen_dict in enumerate(info_dict['pen_data'].values()):
+        assert dummy_animal_management.all_pens[idx].stocking_density == pen_dict['expected_stocking_density']
 
 
-def test_track_former_pen_population(animal_management) -> None:
+@pytest.mark.parametrize("info_dict", pens_test_data_dict())
+def test_track_former_pen_population(info_dict, animal_management) -> None:
     """Unit test for function track_former_pen_population in file routines/animal/animal_management.py"""
-    dummy_pen_info_dict = {
-        'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
-        'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
-        'housing_type': 'dummy_housing_type',
-        'bedding_type': 'dummy_bedding_type', 'pen_type': 'dummy_pen_type',
-        'manure_handling': 'dummy_manure_handling', 'manure_separator': 'dummy_manure_separator',
-        'manure_storage': 'dummy_manure_storage', 'animal_combination': 'dummy_animal_combination',
-        'max_stocking_density': 'dummy_max_stocking_density'
-    }
 
-    pass
+    dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
+        'animal_management_object']
+
+    former_population_dictionary = dummy_animal_management.track_former_pen_population()
+
+    assert former_population_dictionary == info_dict['expected_list']
 
 
-def test_calculate_pen_rations():
+@pytest.mark.parametrize("info_dict", pens_test_data_dict())
+def test_calculate_pen_rations(animal_management, info_dict):
     """Unit test for function calculate_pen_rations in file routines/animal/animal_management.py"""
-    pass
+    dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
+        'animal_management_object']
+
+    dummy_animal_management.calculate_pen_rations(info_dict['prior_pen_population_list'])
+
+    for idx, pen in enumerate(dummy_animal_management.all_pens):
+        assert pen.ration == info_dict['expected_ration_value_list'][idx]
 
 
 def test_daily_update_id_map():
