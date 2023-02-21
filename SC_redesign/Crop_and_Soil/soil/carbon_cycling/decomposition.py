@@ -1,8 +1,5 @@
 import math
 from typing import Optional, List
-
-from SC_redesign.Crop_and_Soil.soil import soil_data
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
@@ -16,10 +13,10 @@ class Decomposition:
 
     def decompose(self, temp_average: float) -> None:
         """
-        Description: Updates and tracks all the related attributes in SoilData class
+        Determines decomposition effect for each layers and temperature effect
 
         Args:
-            temp_average: Average temperature to pass in the _calc_temp_factor(temp_average) function
+            temp_average: Average temperature (Celsius)
 
         Returns: None
 
