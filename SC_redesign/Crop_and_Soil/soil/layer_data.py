@@ -61,11 +61,6 @@ class LayerData:
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
 
-    @property
-    def soil_water_content(self):
-        """volume of soil water in the layer in mm"""
-        return self.soil_water_concentration / self.layer_thickness
-
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -116,6 +111,10 @@ class LayerData:
         """
         return 1.72 * self.percent_organic_carbon_content
 
+    @property
+    def soil_water_content(self):
+        """volume of soil water in the layer in mm"""
+        return self.soil_water_concentration / self.layer_thickness
 
     @property
     def water_factor(self):
