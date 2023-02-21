@@ -14,10 +14,13 @@ class AnimalManureExcretions(TypedDict):
     urine: float
     """Amount of urine excreted, kg."""
 
-    total_ammoniacal_nitrogen: float
-    """Concentration of total ammoniacal nitrogen in the manure slurry, g/L."""
+    total_ammoniacal_nitrogen_concentration: float
+    """Concentration of total ammoniacal manure_nitrogen in the manure slurry, g/L."""
 
-    nitrogen: float
+    urine_nitrogen: float
+    """Amount of nitrogen in urine, kg."""
+
+    manure_nitrogen: float
     """Amount of nitrogen in manure, kg."""
 
     manure_mass: float
@@ -89,20 +92,20 @@ def calculate_phosphorus_excretion_values(daily_milk_production: float,
             total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
 
     # Water extractable Inorganic P (WIP) fraction - fraction of manure
-    # compromised of inorganic water extractable P (A.3.A.2)
+    # compromised of inorganic water extractable P [A.3.A.2]
     inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
 
     # Water extractable Organic P (WOP) fraction - fraction of maure
-    # compromised of organic water extractable P (A.3.A.3)
+    # compromised of organic water extractable P [A.3.A.3]
     organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
 
-    # amount of P in milk per animal (g) (A.3E.B.1)
+    # amount of P in milk per animal (g) [A.3E.B.1]
     phosphorus_in_milk = 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
 
-    # manure P excretion for manure module input (g) (A.3.B.2)
+    # manure P excretion for manure module input (g) [A.3.B.2]
     manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
 
-    # amount of P excreted by an animal (g) (A.3.B.3)
+    # amount of P excreted by an animal (g) [A.3.B.3]
     total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
 
     return (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,

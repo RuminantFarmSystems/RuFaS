@@ -10,6 +10,11 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
@@ -238,8 +243,9 @@ class Pen:
         self._manure_dict_template = AnimalManureExcretions(
                 urea=0.0,
                 urine=0.0,
-                total_ammoniacal_nitrogen=0.0,
-                nitrogen=0.0,
+                total_ammoniacal_nitrogen_concentration=0.0,
+                urine_nitrogen=0.0,
+                manure_nitrogen=0.0,
                 manure_mass=0.0,
                 total_solids=0.0,
                 degradable_volatile_solids=0.0,
@@ -429,21 +435,22 @@ class Pen:
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
+        # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal).__name__ == 'Calf':
+            if type(animal) == Calf:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Heifer':
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and not animal.milking:
+            elif type(animal) == Cow and not animal.milking:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and animal.milking:
+            elif type(animal) == Cow and animal.milking:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]

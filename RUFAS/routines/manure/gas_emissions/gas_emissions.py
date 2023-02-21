@@ -138,21 +138,21 @@ class GasEmissions:
         return num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
 
     @classmethod
-    def calc_ammonia_emission(cls, num_animals: int,
+    def calc_ammonia_emission(cls,
+                              num_animals: int,
                               barn_area: float,
-                              manure_urine_total_ammoniacal_nitrogen: float,
-                              manure_urine: float,
+                              total_ammoniacal_nitrogen: float,
+                              mass: float,
                               temperature_celsius: float,
-                              housing_specific_constant=(
-                                              GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT),
+                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
                               ) -> float:
         """Calculates NH3 storage emissions.
 
         Args:
             num_animals: Number of animals in the pen.
-            barn_area: surface area for treatment, m^2.
-            manure_urine_total_ammoniacal_nitrogen: total ammoniacal nitrogen in manure urine, kg N.
-            manure_urine: total amount of manure urine in exposed surface area, kg.
+            barn_area: Surface area for treatment, m^2.
+            total_ammoniacal_nitrogen: total ammoniacal nitrogen in urine or manure, kg N.
+            mass: total amount of urine or manure in exposed surface area, kg.
             temperature_celsius: temperature, C.
             housing_specific_constant: housing specific constant, s/m.
 
@@ -165,13 +165,88 @@ class GasEmissions:
         c = GeneralConstants.SECONDS_PER_DAY  # s/day
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
         r = cls._calc_barn_resistance(temperature_celsius, housing_specific_constant)
-        M = manure_urine / barn_area  # manure per area of exposed surface, kg/m^2
+        M = mass / barn_area  # manure per area of exposed surface, kg/m^2
         Q = cls._calc_Q(tempK, pH)
         if r * M * Q > 0:
-            return num_animals * barn_area * ((manure_urine_total_ammoniacal_nitrogen / barn_area) * c * p) / (
+            return num_animals * barn_area * ((total_ammoniacal_nitrogen / barn_area) * c * p) / (
                     r * M * Q)
         else:
             return 0.0
+
+    # TODO: Write unit tests for the following two functions and use them in handler and treatment classes
+    @classmethod
+    def calc_ammonia_housing_emission(cls,
+                                      num_animals: int,
+                                      barn_area: float,
+                                      urine_total_ammoniacal_nitrogen: float,
+                                      urine: float,
+                                      temperature_celsius: float,
+                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+                                      ) -> float:
+        """Calculates ammonia housing emissions for manure handlers.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals in the pen.
+        barn_area : float
+            Surface area per animal, m^2.
+        urine_total_ammoniacal_nitrogen : float
+            Total ammoniacal nitrogen in urine per animal, kg N.
+        urine : float
+            Total urine per animal, kg.
+        temperature_celsius : float
+            Current temperature, C.
+        housing_specific_constant : float, optional
+            Housing specific constant, s/m.
+            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
+
+        """
+        return cls.calc_ammonia_emission(
+            num_animals=num_animals,
+            barn_area=barn_area,
+            total_ammoniacal_nitrogen=urine_total_ammoniacal_nitrogen,
+            mass=urine,
+            temperature_celsius=temperature_celsius,
+            housing_specific_constant=housing_specific_constant
+        )
+
+    @classmethod
+    def calc_ammonia_storage_emission(cls,
+                                      num_animals: int,
+                                      barn_area: float,
+                                      manure_total_ammoniacal_nitrogen: float,
+                                      manure_mass: float,  # TODO: Decide to use volume or mass
+                                      temperature_celsius: float,
+                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+                                      ) -> float:
+        """Calculates ammonia storage emissions for manure treatments.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals in the pen.
+        barn_area : float
+            Surface area per animal, m^2.
+        manure_total_ammoniacal_nitrogen : float
+            Total ammoniacal nitrogen in manure per animal, kg N.
+        manure_mass : float
+            Manure mass per animal, kg.
+        temperature_celsius : float
+            Current temperature, C.
+        housing_specific_constant : float, optional
+            Housing specific constant, s/m.
+            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
+
+        """
+        return cls.calc_ammonia_emission(
+            num_animals=num_animals,
+            barn_area=barn_area,
+            total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+            mass=manure_mass,
+            temperature_celsius=temperature_celsius,
+            housing_specific_constant=housing_specific_constant
+        )
 
     # TODO: Be more descriptive
     @classmethod
@@ -223,7 +298,7 @@ class GasEmissions:
     def _calc_Q(cls, temperature_kelvin: float, pH: float) -> float:
         """Calculates Q, the equilibrium coefficient for the NH3 gas in the air.
 
-        This is calculated based on a given concentration of total_ammoniacal_nitrogen in the solution.
+        This is calculated based on a given concentration of total ammoniacal nitrogen in the solution.
 
         Args:
             temperature_kelvin: temperature in Kelvin, K.

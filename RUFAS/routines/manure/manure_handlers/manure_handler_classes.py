@@ -115,8 +115,8 @@ class BaseManureHandler:
         NH3_housing_emission = GasEmissions.calc_ammonia_emission(
             num_animals=pen.num_animals,
             barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-            manure_urine_total_ammoniacal_nitrogen=pen.manure.urine_ammoniacal_nitrogen,  # kg/animal
-            manure_urine=pen.manure.urine / pen.num_animals,  # kg/animal
+            total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg/animal
+            mass=pen.manure.urine / pen.num_animals,  # kg/animal
             temperature_celsius=self._get_current_day_average_temperature_in_celsius()
         )
         daily_output = ManureHandlerDailyOutput(
@@ -124,7 +124,7 @@ class BaseManureHandler:
             pen_id=pen.id,
             manure_urea=pen.manure.urea,
             liquid_manure_total_ammoniacal_nitrogen=(
-                max(0.0, pen.manure.total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
+                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,

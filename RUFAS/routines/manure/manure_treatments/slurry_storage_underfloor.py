@@ -56,7 +56,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
     def calc_ammonia_emission(self, num_animals: int, barn_area: float,
                               accumulated_manure_volume: float,
-                              accumulated_manure_total_ammoniacal_nitrogen: float) -> Tuple[float, float]:
+                              accumulated_manure_total_ammoniacal_nitrogen: float
+                              ) -> Tuple[float, float]:
         """Calculates the ammonia emission from the underfloor slurry storage.
 
         Args:
@@ -75,8 +76,8 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
         ammonia_loss = GasEmissions.calc_ammonia_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,
-                manure_urine_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-                manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+                total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+                mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
                 temperature_celsius=self._get_current_day_average_temperature_celsius()
         )
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \

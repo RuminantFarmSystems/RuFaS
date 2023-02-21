@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
@@ -27,11 +28,11 @@ class PenManure:
     urine: float = 0.0
     """Amount of urine in manure, kg."""
 
-    urine_ammoniacal_nitrogen: float = 0.0
-    """Concentration of ammoniacal nitrogen concentration in urine, g/L."""
+    urine_total_ammoniacal_nitrogen: float = 0.0
+    """Amount of ammoniacal nitrogen concentration in urine, kg."""
 
-    total_ammoniacal_nitrogen: float = 0.0
-    """Concentration of total ammoniacal nitrogen in manure slurry, g/L."""
+    manure_total_ammoniacal_nitrogen: float = 0.0
+    """Amount of total ammoniacal nitrogen in manure slurry, kg."""
 
     nitrogen: float = 0.0
     """Amount of nitrogen in manure, kg."""
@@ -67,7 +68,7 @@ class PenManure:
     """Amount of potassium in manure, kg."""
 
     methane: float = 0.0
-    """Amount of methane emission, g/day."""
+    """Amount of methane emission, kg/day."""
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
@@ -91,21 +92,27 @@ class PenManure:
             A PenManure object.
 
         """
+        manure_mass = animal_manure['manure_mass']  # kg
+        manure_volume = manure_mass / ManureConstants.MANURE_DENSITY  # L
+        total_ammoniacal_nitrogen = (
+                                            animal_manure['total_ammoniacal_nitrogen_concentration']  # g/L
+                                            * manure_volume  # L
+                                    ) * GeneralConstants.GRAMS_TO_KG  # kg
+
         return cls(
-                urea=animal_manure['urea'] / num_animals,
-                urine=animal_manure['urine'] / num_animals,
-                urine_ammoniacal_nitrogen=(
-                        animal_manure['total_ammoniacal_nitrogen'] * ManureConstants.URINE_TAN_FACTOR / num_animals),
-                total_ammoniacal_nitrogen=animal_manure['total_ammoniacal_nitrogen'],
-                nitrogen=animal_manure['nitrogen'],
-                manure_mass=animal_manure['manure_mass'],
-                total_solids=animal_manure['total_solids'],
-                degradable_volatile_solids=animal_manure['degradable_volatile_solids'],
-                non_degradable_volatile_solids=animal_manure['non_degradable_volatile_solids'],
-                inorganic_phosphorus_fraction=animal_manure['inorganic_phosphorus_fraction'] / num_animals,
-                organic_phosphorus_fraction=animal_manure['organic_phosphorus_fraction'] / num_animals,
-                phosphorus=animal_manure['phosphorus'],
-                phosphorus_fraction=animal_manure['phosphorus_fraction'] / num_animals,
-                potassium=animal_manure['potassium'],
-                methane=animal_manure['methane']
+            urea=animal_manure['urea'] / num_animals,
+            urine=animal_manure['urine'],
+            urine_total_ammoniacal_nitrogen=animal_manure['urine_nitrogen'] * ManureConstants.URINE_TAN_FACTOR,
+            manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen,
+            nitrogen=animal_manure['manure_nitrogen'],
+            manure_mass=manure_mass,
+            total_solids=animal_manure['total_solids'],
+            degradable_volatile_solids=animal_manure['degradable_volatile_solids'],
+            non_degradable_volatile_solids=animal_manure['non_degradable_volatile_solids'],
+            inorganic_phosphorus_fraction=animal_manure['inorganic_phosphorus_fraction'] / num_animals,
+            organic_phosphorus_fraction=animal_manure['organic_phosphorus_fraction'] / num_animals,
+            phosphorus=animal_manure['phosphorus'] * GeneralConstants.GRAMS_TO_KG,
+            phosphorus_fraction=animal_manure['phosphorus_fraction'] / num_animals,
+            potassium=animal_manure['potassium'] * GeneralConstants.GRAMS_TO_KG,
+            methane=animal_manure['methane'] * GeneralConstants.GRAMS_TO_KG,
         )
