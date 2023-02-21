@@ -375,6 +375,91 @@ def pens_test_data_dict():
                                            {"dummy_feed1": 20, 'status': 'dummy_val'}]
 
         },
+        {
+            "pen_data":
+                {"pen0":
+                     {"pen_id": 0,
+                      "ids_in_pen": [100919, 101115, 112752, 119921, 120297, 122798, 123120, 124011, 125663, 139048,
+                                     141097, 151564, 152876, 162678, 172095, 178379, 181144, 185339, 186287, 192840,
+                                     194279, 195286, 196169, 199241, 199441],
+                      "expected_stocking_density": 0.50, "num_stalls": 48,
+                      "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 8.25,
+                                 "dummy_feed4": 77, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
+                                 "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400}},
+                 "pen1":
+                     {"pen_id": 1,
+                      "ids_in_pen": [105602, 106140, 111756, 111796, 113310, 116100, 117695, 118217, 118719,
+                                     120822, 128176, 135993, 137493, 142972, 143069, 144943, 146486, 147352, 159225,
+                                     161732, 164778, 164961, 186796, 190033, 193035],
+                      "expected_stocking_density": 0.16, "num_stalls": 150,
+                      "ration": {"objective": "dummy_val", "dummy_feed2": 4.0, "dummy_feed3": 20.0,
+                                 "dummy_feed4": 362, "dummy_feed5": 3.8, "dummy_feed6": 800, "dummy_feed7": 0.0,
+                                 "dummy_feed8": 1.0, "dummy_feed9": 104, "dummy_feed10": 0.0}}
+                 },
+            "removal_set":
+                {181144, 185339, 186287, 164961},
+            "expected_map":
+                {100919: 0, 101115: 0, 112752: 0, 119921: 0, 120297: 0, 122798: 0, 123120: 0, 124011: 0, 125663: 0,
+                 139048: 0, 141097: 0, 151564: 0, 152876: 0, 162678: 0, 172095: 0, 178379: 0,
+                 192840: 0, 194279: 0, 195286: 0, 196169: 0, 199241: 0, 199441: 0,
+                 105602: 1, 106140: 1, 111756: 1, 111796: 1, 113310: 1, 116100: 1, 117695: 1, 118217: 1, 118719: 1,
+                 120822: 1, 128176: 1, 135993: 1, 137493: 1, 142972: 1, 143069: 1, 144943: 1, 146486: 1, 147352: 1,
+                 159225: 1, 161732: 1, 164778: 1, 186796: 1, 190033: 1, 193035: 1},
+            "expected_list": [25, 25],
+            "prior_pen_population_list": [20, 100],
+            "expected_ration_value_list": [{"status": "dummy_val", "dummy_feed2": 42.5, "dummy_feed3": 10.3125,
+                                            "dummy_feed4": 96.25, "dummy_feed5": 4, "dummy_feed6": 11.875,
+                                            "dummy_feed7": 0.0, "dummy_feed8": 15.25, "dummy_feed9": 12.375,
+                                            "dummy_feed10": 500},
+                                           {"objective": "dummy_val", "dummy_feed2": 1.0, "dummy_feed3": 5.0,
+                                            "dummy_feed4": 90.5, "dummy_feed5": 0.95, "dummy_feed6": 200,
+                                            "dummy_feed7": 0.0, "dummy_feed8": 0.25, "dummy_feed9": 26,
+                                            "dummy_feed10": 0.0}]
+
+        },
+        {
+            "pen_data":
+                {"pen0":
+                     {"pen_id": 0,
+                      "ids_in_pen": [115259, 138228, 142905, 144752, 156434, 157064, 164638, 167179, 168371, 192382],
+                      "expected_stocking_density": 0.5, "num_stalls": 18,
+                      "ration": {"dummy_feed1": 200, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
+                                 "dummy_feed4": 98, "dummy_feed5": 3.5}},
+                 "pen1":
+                     {"pen_id": 1,
+                      "ids_in_pen": [112121, 117953, 138864, 144952, 145016, 146409, 166665, 175830, 182621, 190070],
+                      "expected_stocking_density": 0.25, "num_stalls": 36,
+                      "ration": {"dummy_feed1": 1, "dummy_feed2": 100, "dummy_feed3": 77.23,
+                                 "dummy_feed4": 60.5, "dummy_feed5": 42}}
+                    ,
+                 "pen2":
+                     {"pen_id": 2,
+                      "ids_in_pen": [114067, 119819, 133865, 142331, 155315, 166593, 168618, 183594, 193905, 197376],
+                      "expected_stocking_density": 0.10, "num_stalls": 90,
+                      "ration": {"dummy_feed1": 62.9, "dummy_feed2": 123, "dummy_feed3": 8.9,
+                                 "dummy_feed4": 2222, "dummy_feed5": 0.0}},
+                 "pen3":
+                     {"pen_id": 3, "ids_in_pen": [],
+                      "expected_stocking_density": 0.00, "num_stalls": 10,
+                      "ration": {"status": "dummy_value", "objective": "dummy_value"}}
+                 },
+            "removal_set":
+                {138864, 166665, 183594, 192382},
+            "expected_map":
+                {115259: 0, 138228: 0, 142905: 0, 144752: 0, 156434: 0, 157064: 0, 164638: 0, 167179: 0, 168371: 0,
+                 112121: 1, 117953: 1, 144952: 1, 145016: 1, 146409: 1, 175830: 1, 182621: 1, 190070: 1,
+                 114067: 2, 119819: 2, 133865: 2, 142331: 2, 155315: 2, 166593: 2, 168618: 2, 193905: 2, 197376: 2},
+            "expected_list": [10, 10, 10, 0],
+            "prior_pen_population_list": [20, 5, 10, 10],
+            "expected_ration_value_list": [{"dummy_feed1": 100, "dummy_feed2": 0.0, "dummy_feed3": 4.25,
+                                            "dummy_feed4": 49, "dummy_feed5": 1.75},
+                                           {"dummy_feed1": 2, "dummy_feed2": 200, "dummy_feed3": 154.46,
+                                            "dummy_feed4": 121, "dummy_feed5": 84},
+                                           {"dummy_feed1": 62.9, "dummy_feed2": 123, "dummy_feed3": 8.9,
+                                            "dummy_feed4": 2222, "dummy_feed5": 0.0},
+                                           {"status": "dummy_value", "objective": "dummy_value"}]
+
+        },
     ]
 
 
