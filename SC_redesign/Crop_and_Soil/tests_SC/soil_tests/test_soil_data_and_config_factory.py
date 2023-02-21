@@ -2,6 +2,7 @@ import pytest
 from typing import Dict
 from math import inf
 from dataclasses import asdict
+from unittest.mock import patch, PropertyMock
 
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigurations, SoilConfigFactory
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -115,7 +116,147 @@ def test_manual_soil_data_configuration() -> None:
     (182.9345038, 1509.92854),
 ])
 def test_layer_thickness(top: float, bottom: float) -> None:
-    """Tests that the layer_thickness() in LayerData works as expected"""
+    """Test that the layer_thickness() in LayerData works as expected"""
     layer = LayerData(top_depth=top, bottom_depth=bottom)
     expect = bottom - top
     assert layer.layer_thickness == expect
+
+
+@pytest.mark.parametrize("top,bottom", [
+    (-43, 89),  # Invalid top depth
+    (0, -24),  # Invalid bottom depth
+    (-13, -23),  # Invalid top and bottom depths
+    (76, 43),  # Bottom depth is above top depth
+])
+def test_layer_thickness_error(top: float, bottom: float) -> None:
+    """Test that layer_thickness() in LayerData throws errors when given invalid data"""
+    with pytest.raises(ValueError):
+        LayerData(top_depth=top, bottom_depth=bottom)
+
+
+@pytest.mark.parametrize("top,bottom,concentration", [
+    (40, 106.39, 0.36),
+    (23.9, 90.19, 0.41),
+    (50, 178, 0.11),
+])
+def test_post_init(top: float, bottom: float, concentration: float) -> None:
+    """Test that __post_init__() runs and correctly initializes attributes in LayerData"""
+    # Initialize object
+    layer = LayerData(top_depth=top, bottom_depth=bottom, soil_water_concentration=concentration)
+    observe = layer.water_content  # water content is currently the only attribute that is initialized by __post_init__
+
+    # Calculate expected value
+    expect = layer.layer_thickness * concentration
+
+    # Check everything
+    assert observe == expect
+
+
+@pytest.mark.parametrize("top,bottom", [
+    (13, 40),
+    (188, 560.9328),
+    (101.450, 1039.1948),
+])
+def test_depth_of_layer_center(top: float, bottom: float) -> None:
+    """Test that depth_of_layer_center() in LayerData correctly determine the center depth"""
+    layer = LayerData(top_depth=top, bottom_depth=bottom)
+    observe = layer.depth_of_layer_center
+    expect = bottom - ((bottom - top) / 2)
+    assert observe == expect
+
+
+@pytest.mark.parametrize("top,bottom,field_concentration", [
+    (13, 40, 0.47),
+    (188, 560.9328, 0.54472),
+    (101.450, 1039.1948, 0.4990291094),
+])
+def test_field_capacity_content(top: float, bottom: float, field_concentration: float) -> None:
+    """Test that field_capacity_content() in LayerData correctly calculates the field water content of the layer"""
+    layer = LayerData(top_depth=top, bottom_depth=bottom, field_capacity_water_concentration=field_concentration)
+    observe = layer.field_capacity_content
+    expect = field_concentration * layer.layer_thickness
+    assert observe == expect
+
+
+@pytest.mark.parametrize("top,bottom,wilt_concentration", [
+    (13, 40, 0.11),
+    (188, 560.9328, 0.091019834),
+    (101.450, 1039.1948, 0.179384383),
+])
+def test_wilting_point_content(top: float, bottom: float, wilt_concentration: float) -> None:
+    """Test that wilting_point_content() in LayerData calculates the wilting point content correctly"""
+    layer = LayerData(top_depth=top, bottom_depth=bottom, wilting_point_water_concentration=wilt_concentration)
+    observe = layer.wilting_point_content
+    expect = wilt_concentration * layer.layer_thickness
+    assert observe == expect
+
+
+@pytest.mark.parametrize("saturation_concentration,layer_thickness", [
+    (0.55, 45),
+    (1.011292, 76.2),
+    (0.9847, 146.3)
+])
+def test_saturation_content(saturation_concentration, layer_thickness):
+    """Test that saturation_content() in LayerData calculates the saturation content of a soil layer correctly"""
+    with patch.multiple('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData',
+                        layer_thickness=PropertyMock(return_value=layer_thickness)):
+        layer = LayerData(top_depth=0, bottom_depth=30, saturation_point_water_concentration=saturation_concentration)
+        observe = layer.saturation_content
+        expect = saturation_concentration * layer_thickness
+        assert observe == expect
+
+
+@pytest.mark.parametrize("water_content,field_capacity_content", [
+    (0.11, 0.08),
+    (0.99, 0.56),
+    (0.19, 0.36),
+    (0.21, 0.21),
+])
+def test_excess_water_available(water_content: float, field_capacity_content: float) -> None:
+    """Test that excess_water_available() in LayerData correctly calculates the amount of excess water available in a
+        layer"""
+    with patch.multiple('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData',
+                        water_content=PropertyMock(return_value=water_content),
+                        field_capacity_content=PropertyMock(return_value=field_capacity_content)):
+        layer = LayerData(top_depth=0, bottom_depth=30)
+        observe = layer.excess_water_available
+        if water_content >= field_capacity_content:
+            expect = water_content - field_capacity_content
+        else:
+            expect = 0
+        assert observe == expect
+
+
+@pytest.mark.parametrize("water_content,saturation_content", [
+    (0.45, 0.66),
+    (0.99, 0.87),
+    (0.19, 0.45697),
+    (0.546, 0.546),
+])
+def test_acceptable_percolation_amount(water_content, saturation_content):
+    """Test that acceptable_percolation_amount() in LayerData correctly calculates the maximum amount of water that can
+        be percolated into it"""
+    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+                        water_content=PropertyMock(return_value=water_content),
+                        saturation_content=PropertyMock(return_value=saturation_content)):
+        layer = LayerData(top_depth=0, bottom_depth=30)
+        observe = layer.acceptable_percolation_amount
+        if saturation_content > water_content:
+            expect = saturation_content - water_content
+        else:
+            expect = 0
+        assert observe == expect
+
+
+@pytest.mark.parametrize("percent_organic_carbon_content", [
+    0.98,
+    1.82,
+    2.49585
+])
+def test_percent_organic_matter_content(percent_organic_carbon_content):
+    """Test that percent_organic_matter_content() in LayerData correctly calculates the percent of organic matter
+        content in a layer of soil"""
+    layer = LayerData(top_depth=0, bottom_depth=30, percent_organic_carbon_content=percent_organic_carbon_content)
+    observe = layer.percent_organic_matter_content
+    expect = 1.72 * percent_organic_carbon_content
+    assert observe == expect
