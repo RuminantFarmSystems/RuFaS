@@ -76,3 +76,4 @@ def test_decompose(temp_average, layers):
     assert data.decomposition_temperature_effect == 3.99
     for layer in data.soil_layers:
         assert layer.decomposition_moisture_effect == 1.89
+
