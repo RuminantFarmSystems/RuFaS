@@ -299,7 +299,7 @@ class ManureStorage:
 
             self.VS_excreted = pen.manure['degradable_volatile_solids'] + pen.manure['non_degradable_volatile_solids']
             self.TS_excreted = pen.manure['total_solids']
-            self.N_excreted = pen.manure['nitrogen']
+            self.N_excreted = pen.manure['manure_nitrogen']
             self.P_excreted = pen.manure['phosphorus']
             self.WIP_frac = pen.manure['inorganic_phosphorus_fraction']
             self.WIP = self.raw_manure * self.WIP_frac
@@ -336,7 +336,7 @@ class ManureStorage:
             self.raw_manure = pen.manure['manure_mass']
             self.VS_excreted = pen.manure['degradable_volatile_solids'] + pen.manure['non_degradable_volatile_solids']
             self.TS_excreted = pen.manure['total_solids']
-            self.N_excreted = pen.manure['nitrogen']
+            self.N_excreted = pen.manure['manure_nitrogen']
             self.P_excreted = pen.manure['phosphorus']
             self.K_excreted = pen.manure['potassium']
             self.CH4 = pen.manure['methane']

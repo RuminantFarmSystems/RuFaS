@@ -66,7 +66,8 @@ def manure_calculations(ration_formulation,
     nutrient_amounts, nutrient_concentrations = ration_report(ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     CP_concentration = nutrient_concentrations['CP']
-    nitrogen = 112.55 * dry_matter_intake * (CP_concentration / 100)
+    manure_nitrogen = 112.55 * dry_matter_intake * (CP_concentration / 100)
+    urine_nitrogen = 0.45 * manure_nitrogen
 
     # Methane emissions, g/day [A.3A.C.1]
     methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
@@ -84,8 +85,9 @@ def manure_calculations(ration_formulation,
     manure_excretion_values = AnimalManureExcretions(
             urea=0.340,  # TODO: Implement with correct equation
             urine=2,
-            total_ammoniacal_nitrogen=0.14,  # TODO: Implement with correct equation
-            nitrogen=nitrogen,
+            total_ammoniacal_nitrogen_concentration=0.14,  # TODO: Implement with correct equation
+            urine_nitrogen=urine_nitrogen,
+            manure_nitrogen=manure_nitrogen,
             manure_mass=total_manure_excreted,
             total_solids=total_solids,
             degradable_volatile_solids=degradable_volatile_solids,

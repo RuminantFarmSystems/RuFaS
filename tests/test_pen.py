@@ -77,8 +77,9 @@ def test_reset_manure(pen: Pen) -> None:
     expected = AnimalManureExcretions(
             urea=0.0,
             urine=0.0,
-            total_ammoniacal_nitrogen=0.0,
-            nitrogen=0.0,
+            total_ammoniacal_nitrogen_concentration=0.0,
+            urine_nitrogen=0.0,
+            manure_nitrogen=0.0,
             manure_mass=0.0,
             total_solids=0.0,
             degradable_volatile_solids=0.0,
