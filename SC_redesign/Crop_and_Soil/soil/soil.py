@@ -7,20 +7,17 @@ from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
+from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 
 
 class Soil:
     def __init__(self, soil_data: Optional[SoilData] = None):
-        self.data = soil_data or SoilData()
-        self.evapotranspiration = Evapotranspiration(self.data)
-        self.infiltration = Infiltration(self.data)
-        self.percolation = Percolation(self.data)
-        self.soil_temp = SoilTemp(self.data)
-
-        # TODO: Find a way to set defaults for soil layers in SoilData
-        self.data.soil_layers = [LayerData(top_depth=0, bottom_depth=5, nitrate=0.5),
-                                 LayerData(top_depth=5, bottom_depth=8, nitrate=1),
-                                 LayerData(top_depth=8, bottom_depth=20, nitrate=5)]
+        data = soil_data or SoilData()
+        self.evapotranspiration = Evapotranspiration(data)
+        self.infiltration = Infiltration(data)
+        self.percolation = Percolation(data)
+        self.soil_temp = SoilTemp(data)
+        self.soil_erosion = SoilErosion(data)
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
