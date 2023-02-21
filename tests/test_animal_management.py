@@ -320,7 +320,22 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
-def pens_test_data_dict() -> dict[Any]:
+def pens_test_data_dict() -> List[dict[Any]]:
+    """
+    A list of dictionaries containing the data needed to create several Pen objects for testing purposes.
+
+    Creates a list of data dictionaries holding the data required for several unit tests below, where each
+    dictionary is a separate test case due to the parametrization of test functions.
+
+    Returns:
+        Returns a list of dictionaries, where each dictionary contains the data needed for individual
+        AnimalManagement test cases. The dictionaries include data needed to set up AnimalManagement
+        instances for testing purposes, such as pen IDs and the animal IDs to be placed into pens. They also
+        contain the expected results for various unit tests, such as the expected stocking density for a pen
+        which is tested in test_remove_animals_from_herd()
+
+    """
+
     return [
         {
             "pen_data":
@@ -464,6 +479,21 @@ def pens_test_data_dict() -> dict[Any]:
 
 
 def setup_dummy_animal(animal_id: int) -> AnimalBase:
+    """
+    Sets up a dummy AnimalBase object for testing purposes.
+
+    Creates an AnimalBase object with filler required variables, except 'id,' which is passed in
+    as an argument to the function.
+
+    Args:
+        animal_id: an integer animal ID number, uniquely signed to the AnimalBase object being made
+
+    Returns:
+        An AnimalBase object that has the 'id' variable specified by the animal_id argument and dummy
+        values for all other required variables.
+
+    """
+
     args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born',
                  'id': animal_id}
     config_dict = {'semen_type': 'dummy_semen_type'}
@@ -475,6 +505,23 @@ def setup_dummy_animal(animal_id: int) -> AnimalBase:
 
 
 def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase]) -> Pen:
+    """
+    Sets up a dummy Pen object for testing purposes.
+
+    Creates a Pen object with filler required variables, except 'id' and 'number_of_stalls,' which are passed in
+    as arguments to the function. The Pen's 'animals_in_pen' variable gets set to the animal_list passed in as
+    an argument.
+
+    Args:
+        pen_id: an integer pen ID number, uniquely signed to the Pen object being made
+        num_stalls: an integer pertaining to the number of stalls within the Pen being made
+        animal_list: a list of AnimalBase objects that will be living inside the Pen
+
+    Returns:
+        A Pen object that has the 'id' and 'number_of_stalls' variable specified by the pen_id and num_stalls
+        arguments and dummy values for all other required variables.
+    """
+
     dummy_pen_info_dict = {'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
                            'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
@@ -498,7 +545,27 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
 
 
 def setup_dummy_animal_management_with_pens(animal_management: AnimalManagement, info_dict: dict[Any],
-                                            append_removals: bool) -> AnimalManagement:
+                                            append_removals: bool = False) -> AnimalManagement:
+    """
+    Prepares a dummy AnimalManagement object for testing purposes.
+
+    Using the data held within the information dictionary passed in as input, this function populates several
+    of the AnimalManagement object's variables. This is done by creating AnimalBase objects and placing them into
+    Pen objects' 'animals_in_pen' variables, as well as configuring the Pen's ration variable before then
+    appending individual Pen objects to the AnimalManagement object's 'all_pens' variable.
+
+
+    Args:
+        animal_management: An AnimalManagement object
+        info_dict: A dictionary containing the data needed to fully create the
+        append_removals: A boolean that is set to True if a list of animals to be removed needs to be true,
+            False otherwise
+
+    Returns:
+        A dictionary containing the edited AnimalManagement object via the 'animal_management_object'
+        key, and a list of AnimalBase objects to be removed via the 'animals_removed_list' key
+    """
+
     animals_removed = []
     pen_list = []
     for pen_num, pen_dict in info_dict['pen_data'].items():
