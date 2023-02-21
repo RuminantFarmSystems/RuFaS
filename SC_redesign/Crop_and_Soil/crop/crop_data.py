@@ -154,6 +154,8 @@ class CropData:
     """total heat units accumulated to date (unitless)"""
     is_growing: bool = True  # TODO: not currently using; SWAT 5:2.1.4
     """is the crop currently growing?"""
+    is_dormant: bool = False
+    """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
     """should the alternative heat unit method be used? 
     Determines if heat unit temperature will be used for heat unit  accumulation."""
@@ -317,15 +319,15 @@ class CropData:
     harvest_index: Optional[float] = None
     """harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
     (unitless)"""
-    crop_yield: Optional[float] = None
+    cut_biomass: Optional[float] = None
     """total amount of the desired crop product (kg/ha)"""
     yield_collected: Optional[float] = None
     """amount of the desired crop product to be removed from the field (kg/ha)"""
     yield_residue: Optional[float] = None
     """amount of residue created; unharvested yield (kg/ha)"""
-    collected_nitrogen: Optional[float] = None
+    yield_nitrogen: Optional[float] = None
     """nitrogen contained in the harvested yield (kg/ha)"""
-    collected_phosphorus: Optional[float] = None
+    yield_phosphorus: Optional[float] = None
     """phosphorus contained in the harvested yield (kg/ha)"""
 
     @property
@@ -334,7 +336,7 @@ class CropData:
         return self.heat_fraction >= 1.0
 
     @property
-    def has_custom_harvest_index(self) -> bool:
+    def do_harvest_index_override(self) -> bool:
         """was a user-defined harvest index is given? This triggers a harvest index override"""
         return self.user_harvest_index is not None
 

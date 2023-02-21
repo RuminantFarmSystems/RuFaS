@@ -7,7 +7,7 @@ from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
-from SC_redesign.Crop_and_Soil.crop.yields import Yields
+from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from typing import List, Optional
@@ -44,7 +44,7 @@ class Crop:
         """Process component controlling canopy growth, including leaf area index"""
         self.root_development = RootDevelopment(self.data)
         """Process component controlling plant root development"""
-        self.crop_yields = Yields(self.data)
+        self.crop_management = CropManagement(self.data)
         """Process component controlling calculation of end-of-season production"""
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
@@ -83,9 +83,12 @@ class Crop:
             is alive and growing in the simulation
         """
 
-        if not self.data.is_alive or not self.data.is_growing:  # don't perform growth if the plant can't grow
+        # don't perform growth if the plant can't grow
+        cannot_grow = not self.data.is_alive or not self.data.is_growing or self.data.is_dormant
+        if cannot_grow:
             return
 
+        # grow otherwise
         self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
         self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
@@ -105,70 +108,6 @@ class Crop:
         """
         pass
 
-    def cut(self, fraction: float, allow_below_ground: bool = True, death_threshold: float = 0.0) -> float:
-        """Cuts the crop, removing cut biomass and returning the amount cut
-
-        Args:
-            fraction: the fraction of above-ground biomass to be cut
-            allow_below_ground: should fraction > 1 be allowed to remove from below-ground biomass?
-            death_threshold: the biomass threshold below which the plant will die (kg/ha)
-
-        Returns: The total biomass removed from the plant (kg/ha)
-
-        Details:
-            If fraction is greater than 1 and the roots are allowed to be cut, then all of the above ground
-            biomass is removed and any remainder is removed from the roots below ground. Otherwise, only the above
-            ground portion gets removed.
-
-            The output of this function is the biomass removed, which should be redirected depending on the use case
-            (i.e., converted to residue, removed as economic yield, consumed by grazer, stored in field to dry, etc.)
-        """
-        exceeds_available = fraction > 1.0
-
-        if exceeds_available and allow_below_ground:  # cut into entire plant
-            below_frac = fraction - 1.0
-            self.data.above_ground_biomass = 0.0
-            self.data.root_biomass -= max(self.data.root_biomass, below_frac*self.data.root_biomass)
-
-        else:  # don't cut more than available above ground
-            self.data.above_ground_biomass -= max(self.data.above_ground_biomass,
-                                                  fraction*self.data.above_ground_biomass)
-
-        # update biomass features
-        og_biomass = self.data.biomass  # original for comparison
-        self.data.biomass = self.data.above_ground_biomass + self.data.root_biomass
-
-        # kill the crop if too much biomass is removed
-        if self.data.biomass > death_threshold:
-            self.kill()
-
-        # return the cut biomass, in case other methods wish to use the result
-        return og_biomass - self.data.biomass
-
-    def kill(self) -> None:
-        """kill the plant, preventing it from growing
-
-        Details:
-            Swat says that "a kill operation converts all biomass to residue"
-        """
-        self.data.is_alive = False
-
-    def harvest_without_killing(self):
-        """
-
-        Returns:
-
-
-        Details:
-            The expectation is that self.yields.obtain_yields() will be called before this method.
-
-            SWAT says that "this [similar] operation is most commonly used to cut hay or grass"
-        """
-        # TODO: I'm having a hard time deciding how to organize these methods. Yields and harvest opretations are
-        #   very closely related.
-        self.cut(self.data.harvest_index)
-
-
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""
         pass
@@ -176,6 +115,11 @@ class Crop:
     def destroy(self):  # Needed?
         """destoys the crop - Destructor class. This removes the crop instance from existence"""
         pass
+
+    def assess_dormancy(self):  # TODO: implement dormancy method
+        if self.data.is_perennial:
+            pass
+
 
 
 # ---- Old versions of cut() and kill()
