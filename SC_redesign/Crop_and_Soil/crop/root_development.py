@@ -18,8 +18,7 @@ class RootDevelopment:
             is perennial.
         """
         # update root fraction
-        self.data.root_fraction = \
-            self._determine_root_fraction(self.data.heat_fraction)
+        self.data.root_fraction = self._determine_root_fraction(self.data.heat_fraction)
 
         # update root depth
         if self.data.is_perennial:

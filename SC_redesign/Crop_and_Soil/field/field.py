@@ -4,6 +4,7 @@ from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from typing import Optional, List, Dict
+from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 # TODO: delete/replace the note block below once satisfied with the design
 """ 
@@ -44,7 +45,6 @@ class Field:
         # check the schedule to see what needs to be done today
         self.check_schedule(day, year)
 
-
         # --- Soil Management---
         # nutrient amendments
         if self.field_data.is_amendment_day:
@@ -76,8 +76,8 @@ class Field:
                 self.graze_field()
 
             # conduct harvest routines
-            if self.field_data.is_cutting_day:
-                self.cut_crops()
+            if self.field_data.is_harvest_day:
+                self.harvest_crops()
 
         pass
 
@@ -213,20 +213,17 @@ class Field:
                 max_air_temperature=max_air_temperature
             )
 
-    def cut_crops(self):
-        """cut all crops in the field, either removing the cut biomass as harvest or leaving it in the field as
-        residue to be incorporated into the soil depending upon 'harvest_percent'
-        """
-        cuttings = [this_crop.cut(fraction=self.field_data.cut_fraction) for this_crop in self.crops]
-        if self.field_data.harvest_proportion > 0:  # NOTE: this logic could simply go in the cut() method.
-            # ... remove cut biomass from field
-            pass
-        else:
-            # ... leave cut biomass in field as residue
-            pass
+    def harvest_crops(self):
+        """perform the harvest operation on all crops in the field, depending on the harvest operation"""
+        for crop in self.crops:
 
-        # ... kill crops if not perennial
-        pass
+            if self.field_data.harvest_type == HarvestOperation.HARVEST:
+                crop.crop_management.manage_harvest(cut=True, collect=True, kill=True)
+
+            if self.field_data.harvest_type == HarvestOperation.HARVEST_NOKILL:
+                crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
+
+            # TODO: future method to cut crops, leave them in the field to dry prior to harvest?
 
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
         """allow grazers to graze in the field during the current day"""
