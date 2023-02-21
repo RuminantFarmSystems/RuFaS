@@ -57,6 +57,11 @@ class LayerData:
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
+
+    # --- Decomposition
+    decomposition_moisture_effect: Optional[float] = None
+    """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
+    
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -84,7 +89,6 @@ class LayerData:
     @property
     def excess_water_available(self) -> float:
         """volume of water available for percolation in the soil layer (mm)
-
         SWAT Reference: 2:3.2.1, 2
         """
         return max(0, self.water_content - self.field_capacity_content)
@@ -95,6 +99,7 @@ class LayerData:
         return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
+
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
         return max(0, self.saturation_content - self.water_content)
@@ -102,10 +107,28 @@ class LayerData:
     @property
     def percent_organic_matter_content(self) -> float:
         """percent organic matter content of this soil layer
-
         TODO: remove this field from all the soil inputs, because the given values for OM_percent are not equal to value
             that SWAT would calculate based on the percent organic carbon content
-
         SWAT Reference: 4:1.1.4
         """
         return 1.72 * self.percent_organic_carbon_content
+
+    @property
+    def soil_water_content(self):
+        """volume of soil water in the layer in mm"""
+        return self.soil_water_concentration / self.layer_thickness
+
+    @property
+    def water_factor(self):
+        """relative water saturation (%)"""
+
+        # pseudocode_soil S.4.B.1
+        if self.soil_water_content <= self.field_capacity_content:
+            return (self.soil_water_content - self.wilting_point_content) / (
+                    self.field_capacity_content - self.wilting_point_content)
+        else:
+            return (self.saturation_content - self.soil_water_content) / (
+                    self.saturation_content - self.field_capacity_content)
+
+
+
