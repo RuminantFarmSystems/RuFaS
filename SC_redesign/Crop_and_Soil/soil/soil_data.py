@@ -123,7 +123,7 @@ class SoilData:
 
         # Reset hydrological activity totals
         self.annual_potential_evapotranspiration_total = 0
-        self. annual_adjusted_potential_evapotranspiration_total = 0
+        self.annual_adjusted_potential_evapotranspiration_total = 0
         self.annual_maximum_soil_evaporation_total = 0
         self.annual_adjusted_soil_evaporation_total = 0
         self.annual_runoff_total = 0
@@ -196,9 +196,8 @@ class SoilData:
 
     @property
     def profile_bulk_density(self) -> float:
-        """average bulk density of the soil profile based on the bulk density of each soil layer, weighted by the
-            thickness
-        """
+        """Average bulk density of the soil profile based on the bulk density of each soil layer, weighted by the
+            thickness"""
         weighted_densities_sum = 0
         weights_sum = 0
         for layer in self.soil_layers:
