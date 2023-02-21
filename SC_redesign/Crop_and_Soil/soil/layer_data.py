@@ -130,10 +130,5 @@ class LayerData:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
 
-        TODO: remove this field from all the soil inputs, because the given values for OM_percent are not equal to value
-            that SWAT would calculate based on the percent organic carbon content
 
-        SWAT Reference: 4:1.1.4
-        """
-        return 1.72 * self.percent_organic_carbon_content
 
