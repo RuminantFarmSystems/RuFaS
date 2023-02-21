@@ -320,7 +320,7 @@ def test_fully_update_animal_to_pen_id_map():
     pass
 
 
-def pens_test_data_dict():
+def pens_test_data_dict() -> dict[Any]:
     return [
         {
             "pen_data":
@@ -463,7 +463,7 @@ def pens_test_data_dict():
     ]
 
 
-def setup_dummy_animal(animal_id):
+def setup_dummy_animal(animal_id: int) -> AnimalBase:
     args_dict = {'breed': 'dummy_breed', 'birth_date': 'dummy_birth_date', 'days_born': 'dummy_days_born',
                  'id': animal_id}
     config_dict = {'semen_type': 'dummy_semen_type'}
@@ -474,7 +474,7 @@ def setup_dummy_animal(animal_id):
     return dummy_animal
 
 
-def setup_dummy_pen(pen_id, num_stalls, animal_list):
+def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase]) -> Pen:
     dummy_pen_info_dict = {'vertical_dist_to_milking_parlor': 'dummy_vertical_dist_to_milking_parlor',
                            'horizontal_dist_to_milking_parlor': 'dummy_horizontal_dist_to_milking_parlor',
                            'housing_type': 'dummy_housing_type', 'bedding_type': 'dummy_bedding_type',
@@ -497,7 +497,8 @@ def setup_dummy_pen(pen_id, num_stalls, animal_list):
     return dummy_pen
 
 
-def setup_dummy_animal_management_with_pens(animal_management, info_dict: dict, append_removals: bool):
+def setup_dummy_animal_management_with_pens(animal_management: AnimalManagement, info_dict: dict[Any],
+                                            append_removals: bool) -> AnimalManagement:
     animals_removed = []
     pen_list = []
     for pen_num, pen_dict in info_dict['pen_data'].items():
@@ -523,7 +524,7 @@ def setup_dummy_animal_management_with_pens(animal_management, info_dict: dict, 
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_remove_animals_from_herd(info_dict, animal_management) -> None:
+def test_remove_animals_from_herd(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
     dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
         'animal_management_object']
     animals_removed = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
@@ -537,7 +538,7 @@ def test_remove_animals_from_herd(info_dict, animal_management) -> None:
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_track_former_pen_population(info_dict, animal_management) -> None:
+def test_track_former_pen_population(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
     """Unit test for function track_former_pen_population in file routines/animal/animal_management.py"""
 
     dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
@@ -549,7 +550,7 @@ def test_track_former_pen_population(info_dict, animal_management) -> None:
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_calculate_pen_rations(animal_management, info_dict):
+def test_calculate_pen_rations(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
     """Unit test for function calculate_pen_rations in file routines/animal/animal_management.py"""
     dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
         'animal_management_object']
