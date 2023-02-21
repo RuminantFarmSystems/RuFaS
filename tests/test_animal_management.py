@@ -331,22 +331,22 @@ def pens_test_data_dict() -> dict[Any]:
                                      154391, 154438, 156048, 157528, 165411, 169062, 170598, 182656, 186570, 189951,
                                      194172],
                       "expected_stocking_density": 0.525, "num_stalls": 40,
-                      "ration": {"dummy_feed1": 205, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
-                                 "dummy_feed4": 72, "dummy_feed5": 45, "dummy_feed6": 146, "dummy_feed7": 170.0,
-                                 "dummy_feed8": 5, "dummy_feed9": 0.0, "dummy_feed10": 200}},
+                      "ration": {"dummy_feed1": 205.0, "dummy_feed2": 0.0, "dummy_feed3": 18.25,
+                                 "dummy_feed4": 72.0, "dummy_feed5": 45.0, "dummy_feed6": 146.0, "dummy_feed7": 170.0,
+                                 "dummy_feed8": 5.0, "dummy_feed9": 0.0, "dummy_feed10": 200.0}},
                  "pen1":
                      {"pen_id": 1,
                       "ids_in_pen": [100439, 106977, 111123, 111262, 111527, 112516, 120348, 153413, 156414, 193126],
                       "expected_stocking_density": 0.25, "num_stalls": 36,
-                      "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56}}
+                      "ration": {"dummy_feed1": 0.0, "dummy_feed2": 56.0}}
                     ,
                  "pen2":
                      {"pen_id": 2,
                       "ids_in_pen": [115748, 118413, 129345, 139533, 148813, 156669, 158006, 161608, 162583, 163942,
                                      176371, 187817, 189760, 189801, 198331, 199999],
                       "expected_stocking_density": 0.10, "num_stalls": 150,
-                      "ration": {"dummy_feed1": 10, "dummy_feed2": 35, "dummy_feed3": 0.0,
-                                 "dummy_feed4": 84}},
+                      "ration": {"dummy_feed1": 10.0, "dummy_feed2": 35.0, "dummy_feed3": 0.0,
+                                 "dummy_feed4": 84.0}},
                  "pen3":
                      {"pen_id": 3, "ids_in_pen": [126963, 133132, 156958, 158639, 160697, 162375, 164238, 198542],
                       "expected_stocking_density": 0.20, "num_stalls": 35,
@@ -367,12 +367,12 @@ def pens_test_data_dict() -> dict[Any]:
             "prior_pen_population_list": [20, 10, 20, 40],
             "expected_ration_value_list": [{"dummy_feed1": 225.5, "dummy_feed2": 0.0, "dummy_feed3": 20.075,
                                             "dummy_feed4": 79.2, "dummy_feed5": 49.5, "dummy_feed6": 160.6,
-                                            "dummy_feed7": 187,
-                                            "dummy_feed8": 5.5, "dummy_feed9": 0.0, "dummy_feed10": 220},
-                                           {"dummy_feed1": 0.0, "dummy_feed2": 56},
-                                           {"dummy_feed1": 8, "dummy_feed2": 28, "dummy_feed3": 0.0,
+                                            "dummy_feed7": 187.0,
+                                            "dummy_feed8": 5.5, "dummy_feed9": 0.0, "dummy_feed10": 220.0},
+                                           {"dummy_feed1": 0.0, "dummy_feed2": 56.0},
+                                           {"dummy_feed1": 8.0, "dummy_feed2": 28.0, "dummy_feed3": 0.0,
                                             "dummy_feed4": 67.2},
-                                           {"dummy_feed1": 20, 'status': 'dummy_val'}]
+                                           {"dummy_feed1": 20.0, 'status': 'dummy_val'}]
 
         },
         {
@@ -384,8 +384,8 @@ def pens_test_data_dict() -> dict[Any]:
                                      194279, 195286, 196169, 199241, 199441],
                       "expected_stocking_density": 0.50, "num_stalls": 48,
                       "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 8.25,
-                                 "dummy_feed4": 77, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
-                                 "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400}},
+                                 "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
+                                 "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
                  "pen1":
                      {"pen_id": 1,
                       "ids_in_pen": [105602, 106140, 111756, 111796, 113310, 116100, 117695, 118217, 118719,
@@ -393,8 +393,8 @@ def pens_test_data_dict() -> dict[Any]:
                                      161732, 164778, 164961, 186796, 190033, 193035],
                       "expected_stocking_density": 0.16, "num_stalls": 150,
                       "ration": {"objective": "dummy_val", "dummy_feed2": 4.0, "dummy_feed3": 20.0,
-                                 "dummy_feed4": 362, "dummy_feed5": 3.8, "dummy_feed6": 800, "dummy_feed7": 0.0,
-                                 "dummy_feed8": 1.0, "dummy_feed9": 104, "dummy_feed10": 0.0}}
+                                 "dummy_feed4": 362.0, "dummy_feed5": 3.8, "dummy_feed6": 800.0, "dummy_feed7": 0.0,
+                                 "dummy_feed8": 1.0, "dummy_feed9": 104.0, "dummy_feed10": 0.0}}
                  },
             "removal_set":
                 {181144, 185339, 186287, 164961},
@@ -408,12 +408,12 @@ def pens_test_data_dict() -> dict[Any]:
             "expected_list": [25, 25],
             "prior_pen_population_list": [20, 100],
             "expected_ration_value_list": [{"status": "dummy_val", "dummy_feed2": 42.5, "dummy_feed3": 10.3125,
-                                            "dummy_feed4": 96.25, "dummy_feed5": 4, "dummy_feed6": 11.875,
+                                            "dummy_feed4": 96.25, "dummy_feed5": 4.0, "dummy_feed6": 11.875,
                                             "dummy_feed7": 0.0, "dummy_feed8": 15.25, "dummy_feed9": 12.375,
-                                            "dummy_feed10": 500},
+                                            "dummy_feed10": 500.0},
                                            {"objective": "dummy_val", "dummy_feed2": 1.0, "dummy_feed3": 5.0,
-                                            "dummy_feed4": 90.5, "dummy_feed5": 0.95, "dummy_feed6": 200,
-                                            "dummy_feed7": 0.0, "dummy_feed8": 0.25, "dummy_feed9": 26,
+                                            "dummy_feed4": 90.5, "dummy_feed5": 0.95, "dummy_feed6": 200.0,
+                                            "dummy_feed7": 0.0, "dummy_feed8": 0.25, "dummy_feed9": 26.0,
                                             "dummy_feed10": 0.0}]
 
         },
@@ -423,21 +423,21 @@ def pens_test_data_dict() -> dict[Any]:
                      {"pen_id": 0,
                       "ids_in_pen": [115259, 138228, 142905, 144752, 156434, 157064, 164638, 167179, 168371, 192382],
                       "expected_stocking_density": 0.5, "num_stalls": 18,
-                      "ration": {"dummy_feed1": 200, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
-                                 "dummy_feed4": 98, "dummy_feed5": 3.5}},
+                      "ration": {"dummy_feed1": 200.0, "dummy_feed2": 0.0, "dummy_feed3": 8.5,
+                                 "dummy_feed4": 98.0, "dummy_feed5": 3.5}},
                  "pen1":
                      {"pen_id": 1,
                       "ids_in_pen": [112121, 117953, 138864, 144952, 145016, 146409, 166665, 175830, 182621, 190070],
                       "expected_stocking_density": 0.25, "num_stalls": 36,
-                      "ration": {"dummy_feed1": 1, "dummy_feed2": 100, "dummy_feed3": 77.23,
-                                 "dummy_feed4": 60.5, "dummy_feed5": 42}}
+                      "ration": {"dummy_feed1": 1.0, "dummy_feed2": 100.0, "dummy_feed3": 77.23,
+                                 "dummy_feed4": 60.5, "dummy_feed5": 42.0}}
                     ,
                  "pen2":
                      {"pen_id": 2,
                       "ids_in_pen": [114067, 119819, 133865, 142331, 155315, 166593, 168618, 183594, 193905, 197376],
-                      "expected_stocking_density": 0.10, "num_stalls": 90,
-                      "ration": {"dummy_feed1": 62.9, "dummy_feed2": 123, "dummy_feed3": 8.9,
-                                 "dummy_feed4": 2222, "dummy_feed5": 0.0}},
+                      "expected_stocking_density": 0.10, "num_stalls": 90.0,
+                      "ration": {"dummy_feed1": 62.9, "dummy_feed2": 123.0, "dummy_feed3": 8.9,
+                                 "dummy_feed4": 2222.0, "dummy_feed5": 0.0}},
                  "pen3":
                      {"pen_id": 3, "ids_in_pen": [],
                       "expected_stocking_density": 0.00, "num_stalls": 10,
@@ -451,12 +451,12 @@ def pens_test_data_dict() -> dict[Any]:
                  114067: 2, 119819: 2, 133865: 2, 142331: 2, 155315: 2, 166593: 2, 168618: 2, 193905: 2, 197376: 2},
             "expected_list": [10, 10, 10, 0],
             "prior_pen_population_list": [20, 5, 10, 10],
-            "expected_ration_value_list": [{"dummy_feed1": 100, "dummy_feed2": 0.0, "dummy_feed3": 4.25,
-                                            "dummy_feed4": 49, "dummy_feed5": 1.75},
-                                           {"dummy_feed1": 2, "dummy_feed2": 200, "dummy_feed3": 154.46,
-                                            "dummy_feed4": 121, "dummy_feed5": 84},
-                                           {"dummy_feed1": 62.9, "dummy_feed2": 123, "dummy_feed3": 8.9,
-                                            "dummy_feed4": 2222, "dummy_feed5": 0.0},
+            "expected_ration_value_list": [{"dummy_feed1": 100.0, "dummy_feed2": 0.0, "dummy_feed3": 4.25,
+                                            "dummy_feed4": 49.0, "dummy_feed5": 1.75},
+                                           {"dummy_feed1": 2.0, "dummy_feed2": 200.0, "dummy_feed3": 154.46,
+                                            "dummy_feed4": 121.0, "dummy_feed5": 84.0},
+                                           {"dummy_feed1": 62.9, "dummy_feed2": 123.0, "dummy_feed3": 8.9,
+                                            "dummy_feed4": 2222.0, "dummy_feed5": 0.0},
                                            {"status": "dummy_value", "objective": "dummy_value"}]
 
         },
@@ -525,6 +525,8 @@ def setup_dummy_animal_management_with_pens(animal_management: AnimalManagement,
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
 def test_remove_animals_from_herd(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
+    """Unit test for function remove_animals_from_herd in file routines/animal/animal_management.py"""
+
     dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
         'animal_management_object']
     animals_removed = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
@@ -552,6 +554,7 @@ def test_track_former_pen_population(info_dict: dict[Any], animal_management: An
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
 def test_calculate_pen_rations(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
     """Unit test for function calculate_pen_rations in file routines/animal/animal_management.py"""
+
     dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
         'animal_management_object']
 
