@@ -146,7 +146,7 @@ class Yields():
 
         Args:
             above_ground_biomass: plant biomass stored above ground (i.e., non-root biomass; kg)
-            harvest_index: potential harvest index for a given day
+            harvest_index: harvest index for a given day
 
         Details: Yield is calculated as a proportion of above ground biomass
 
@@ -162,7 +162,7 @@ class Yields():
 
         Args:
             biomass: total plant biomass  (kg)
-            harvest_index: potential harvest index for a given day
+            harvest_index: harvest index for a given day
 
         Details: Yield is calculated as a proportion of above ground biomass
 
