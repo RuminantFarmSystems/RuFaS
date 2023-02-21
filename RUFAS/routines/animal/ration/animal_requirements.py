@@ -274,8 +274,8 @@ def calc_rqmts(BW, MW, DOP, animal_type, parity=None, CI=None , TP_Milk=None, Fa
         else:
             DMIest = ((1.97 - 0.75 * math.exp(0.16 * (DOP - 280))) / 100) * BW
     elif animal_type == 'heifer':
-        #TODO: Actual calculation for DMIest
-        DMIest = 0
+        #TODO: Actual calculation for DMIest: JCW fix for currently missing DMI
+        DMIest = ((1.97 - 0.75 * math.exp(0.16 * (0 - 280))) / 100) * BW
     # Requirements summary dictionary
     return {'NEmaint': NEmaint, 'NEg': NEg, 'NEpreg': NEpreg,
             'NEl': NEl, 'MP_req': MP_req, 'Ca_req': Ca_req, 'P_req': P_req,

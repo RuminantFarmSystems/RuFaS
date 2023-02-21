@@ -513,6 +513,10 @@ def userbounds():
             rationtouse = ration_cow_dry
     elif animal_type == 'heifer':
         rationtouse = ration_all_heifers
+        chanchodebug = False
+        if chanchodebug:
+            print('heiferfound')
+            print(ration_all_heifers)
     else: 
         rationtouse = ration_calf
     values2= []
@@ -527,6 +531,7 @@ def userbounds():
     for key in uniqueset2:
         if key in rationtouse.keys():
             target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
+            # target = rationtouse[key]
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
@@ -536,7 +541,7 @@ def userbounds():
             tribounds.append((0,0))
     return tribounds
 
-def optimize():
+def optimize(user_defined_ration):
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -556,7 +561,6 @@ def optimize():
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    user_defined_ration = True
     if user_defined_ration:
         bnds = userbounds()
     else:    
@@ -598,7 +602,32 @@ def optimize():
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
     if user_defined_ration:
-        return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)
+        usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)
+        if usermod.success == False:
+            print(animal_type)
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con1)
+            print('bound 1 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con2)
+            print('bound 2 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con3)
+            print('bound 3 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con4)
+            print('bound 4 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con5)
+            print('bound 5 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con6)
+            print('bound 6 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con7)
+            print('bound 7 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con8)
+            print('bound 8 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con9)
+            print('bound 9 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con10)
+            print('bound 10 ' + str(bound1check.success))
+            bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con11)
+            print('bound 11 ' + str(bound1check.success))
+        return usermod
     elif animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':

@@ -10,12 +10,11 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
-from RUFAS.routines.animal.ration import pyomo_solver as pslv
 import statistics as stat
 import math
 
 
-def optimization(requirements, available_feeds, animal_type, cow_type):
+def optimization(requirements, available_feeds, animal_type, cow_type, user_defined_ration=False):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -57,7 +56,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize()
+            solution = NLP.optimize(user_defined_ration)
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
@@ -97,21 +96,22 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
 
-    ###
-    # Pyomo Nutrients Stuff
-    # available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
-    # req.pyomo_req['BW'] = BW
-    # pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
-    ####
-
-    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
+    user_defined_ration = True
+    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
+        overridecheck = 0
         while not solution.success:
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
             NEl_con = NLP.NEl_constraint(solution.x)
+            
+            # >>>>>>>> use pen.avg_milk as reference??
+            ### if overridecheck ==0:
+            ####     NEl_reference = NEl_con
+            
+            
             # TODO refactor this logic, and fix it to a set percentage of estimated milk production
             # Once this is implemented, if the user defined ration is wanted, we can determine a cutoff for lowest production
             # then if reached, we can add option (or force as default) that warnings are produced, but ration is set to the user ration
@@ -119,12 +119,18 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
                 reduction = 3 * (-NEl_con)
             else:
                 reduction = 1.5
-
+            
             for animal in pen.animals_in_pen:
                 animal.estimated_daily_milk_produced -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
+            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type,user_defined_ration)
+            overridecheck += 1
+            # print(overridecheck)
+            #### # if NEl_con < 0.75*NEl_reference:
+            if overridecheck > 2:
+                solution.success = True
+                break
 
     if solution != None:
         ration = {}
@@ -231,8 +237,7 @@ class Requirements:
         # TODO: add documentation for avg_milk and avg_CP_milk
         self.avg_milk = 0
         self.avg_CP_milk = 0
-        # pyomo requirements dictionary
-        self.pyomo_req = {}
+
 
     def set_requirements(self, pen, animal_type, recalc):
         """
@@ -372,17 +377,6 @@ class Requirements:
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
 
-        # pyomo requirements dictionary
-        self.pyomo_req['NEmaint'] = self.NEmaint
-        self.pyomo_req['NEa'] = self.NEa
-        self.pyomo_req['NEg'] = self.NEg
-        self.pyomo_req['NEpreg'] = self.NEpreg
-        self.pyomo_req['NEl'] = self.NEl
-        self.pyomo_req['MP_req'] = self.MP_req
-        self.pyomo_req['Ca_req'] = self.Ca_req
-        self.pyomo_req['P_req'] = self.P_req
-        self.pyomo_req['DMIest'] = self.DMIest
-
 
 class AvailableFeeds:
     """
@@ -438,8 +432,6 @@ class AvailableFeeds:
         self.heiferI_limit = []
         # calf limit
         self.calf_limit = []
-        # pyomo dictionary structure
-        self.pyomo_data = {}
         # list of the feeds used in this ration
         self.feeds = []
 
@@ -482,61 +474,3 @@ class AvailableFeeds:
             else:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
-
-    def pyomo_nutrients_data(self, feed, animal_type, cow_type):
-        """
-        Class function that manipulates the available feeds nutrient information
-        into a valid data input for the pyomo structured solver.
-
-        Arg(s):
-            feed: an instance of the Feed class object
-            animal_type: string representation  of the animal type
-            cow_type: boolean, True if cow is lactating
-        """
-        # available feeds dictionary from the feed module
-        available_feeds = feed.available_feeds
-        # dictionary of feed costs
-        feed_costs = feed.feed_costs
-        # list of parameters for non-LP
-        params = ['TDN', 'DE', 'EE', 'is_fat', 'calcium',
-                  'phosphorus', 'NDF', 'is_wetforage', 'Kd', 'N_A', 'N_B',
-                  'CP', 'dRUP']
-        # list of different energy types feed decision variable are split across
-        enrg = ['mact', 'lact', 'growth']
-        # structuring empty data container
-        for p in params:
-            self.pyomo_data[p] = {}
-        self.pyomo_data['price'] = {}
-        self.pyomo_data['ftype'] = {}
-        self.pyomo_data['limit'] = {}
-        feeds = []
-        # iterating through each feed available in formulation
-        for key, feed in available_feeds.items():
-            feeds.append(key)
-            # price and type data
-            for s in enrg:
-                self.pyomo_data['price'][key, s] = feed_costs[key]
-                self.pyomo_data['ftype'][key, s] = feed['type']
-            # iterating through all param values for non-LP
-            for p in params:
-                self.pyomo_data[p][key, 'mact'] = feed[p]
-                self.pyomo_data[p][key, 'lact'] = feed[p]
-                self.pyomo_data[p][key, 'growth'] = feed[p]
-            # checking if grown feed available and pop
-            if isinstance(feed['limit'], dict):
-                if cow_type:
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = \
-                            feed['limit']['lactating_cows']
-                elif animal_type == 'cow':
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = feed['limit']['dry_cows']
-                else:
-                    for s in enrg:
-                        self.pyomo_data['limit'][key, s] = feed['limit']['heiferIIIs']
-            # if there are not farm grown feeds in diet
-            else:
-                for s in enrg:
-                    self.pyomo_data['limit'][key, s] = feed['limit']
-        # populating feeds list class variable
-        self.feeds = feeds
