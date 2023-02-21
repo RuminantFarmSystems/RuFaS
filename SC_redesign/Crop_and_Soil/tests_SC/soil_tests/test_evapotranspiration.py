@@ -88,7 +88,7 @@ def test_determine_soil_cover_index(above_ground_biomass, residue, snow_water):
         expect = exp((-0.00005) * (above_ground_biomass + residue))
     observe = Evapotranspiration._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
     assert expect == observe
-    
+
 
 @pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
     (1.3, 3.2),
