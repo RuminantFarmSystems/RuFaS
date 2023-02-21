@@ -32,6 +32,10 @@ class CropData:
     """is the plant perennial?"""
     is_nitrogen_fixer: bool = False
     """is the plant a nitrogen fixer?"""
+    priority: int = 1
+    """this crop's priority level when accessing shared resources in a field containing multiple crops"""
+    field_proportion: float = 1.0
+    """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
 
     # SWAT Table A-3
     minimum_temperature: float = 0
@@ -64,7 +68,10 @@ class CropData:
     # stressed_light_use_efficiency  # UNUSED (BIOEHI, $RUE_{hi}$)
     # carbon_dioxide_stress_level = 660 # UNUSED (CO2HI, $CO_{2hi}$)
 
-    # SWAT Table A-6 UNUSED
+    # SWAT Table A-6
+    minimum_cover_management_factor: float = 0.2
+    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT 
+        Reference: 4:1.1.11)"""
 
     # SWAT Table A-7
     emergence_nitrogen_fraction: float = 0.05
