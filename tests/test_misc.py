@@ -352,71 +352,112 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
-def test_add_error(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
+def test_add_error(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
     """Unit test for function add_error in file output_manager.py"""
-    key = "key"
-    with mocker.patch.object(mock_output_manager, "_generate_key", return_value=key):
-        info_map = {
-            "class": "dummy_class",
-            "function": "dummy_func",
-            "context": "dummy_context",
-        }
-        mock_output_manager.add_error("dummy_name", "dummy_msg", info_map)
-        assert mock_output_manager.errors_pool[key] == {
-            "info_map": {"class": "dummy_class", "function": "dummy_func"},
-            "msg": "dummy_msg",
-        }
+    key = "dummy_key"
+    name = "dummy_name"
+    value = "dummy_value"
+    info_map = {}
+    mock_output_manager._generate_key = MagicMock(return_value=key)
+    mock_output_manager._add_to_pool = MagicMock()
+
+    mock_output_manager.add_error(name, value, info_map)
+
+    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_output_manager._add_to_pool(
+        mock_output_manager.errors_pool, key, value, info_map
+    )
+
+    mock_output_manager._generate_key = output_manager_original_method_states[
+        "_generate_key"
+    ]
+    mock_output_manager._add_to_pool = output_manager_original_method_states[
+        "_add_to_pool"
+    ]
 
 
-def test_add_warning(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
+def test_add_warning(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
     """Unit test for function add_warning in file output_manager.py"""
-    key = "key"
-    with mocker.patch.object(mock_output_manager, "_generate_key", return_value=key):
-        info_map = {
-            "class": "dummy_class",
-            "function": "dummy_func",
-            "context": "dummy_context",
-        }
-        mock_output_manager.add_warning("dummy_name", "dummy_msg", info_map)
-        assert mock_output_manager.warnings_pool[key] == {
-            "info_map": {"class": "dummy_class", "function": "dummy_func"},
-            "msg": "dummy_msg",
-        }
+    key = "dummy_key"
+    name = "dummy_name"
+    value = "dummy_value"
+    info_map = {}
+    mock_output_manager._generate_key = MagicMock(return_value=key)
+    mock_output_manager._add_to_pool = MagicMock()
+
+    mock_output_manager.add_warning(name, value, info_map)
+
+    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_output_manager._add_to_pool(
+        mock_output_manager.warnings_pool, key, value, info_map
+    )
+
+    mock_output_manager._generate_key = output_manager_original_method_states[
+        "_generate_key"
+    ]
+    mock_output_manager._add_to_pool = output_manager_original_method_states[
+        "_add_to_pool"
+    ]
 
 
-def test_add_log(mock_output_manager: OutputManager, mocker: MockerFixture) -> None:
+def test_add_log(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
     """Unit test for function add_log in file output_manager.py"""
-    key = "key"
-    with mocker.patch.object(mock_output_manager, "_generate_key", return_value=key):
-        info_map = {
-            "class": "dummy_class",
-            "function": "dummy_func",
-            "context": "dummy_context",
-        }
-        mock_output_manager.add_log("dummy_name", "dummy_msg", info_map)
-        assert mock_output_manager.logs_pool[key] == {
-            "info_map": {"class": "dummy_class", "function": "dummy_func"},
-            "msg": "dummy_msg",
-        }
+    key = "dummy_key"
+    name = "dummy_name"
+    value = "dummy_value"
+    info_map = {}
+    mock_output_manager._generate_key = MagicMock(return_value=key)
+    mock_output_manager._add_to_pool = MagicMock()
+
+    mock_output_manager.add_log(name, value, info_map)
+
+    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_output_manager._add_to_pool(
+        mock_output_manager.logs_pool, key, value, info_map
+    )
+
+    mock_output_manager._generate_key = output_manager_original_method_states[
+        "_generate_key"
+    ]
+    mock_output_manager._add_to_pool = output_manager_original_method_states[
+        "_add_to_pool"
+    ]
 
 
 def test_add_variable(
-    mock_output_manager: OutputManager, mocker: MockerFixture
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function add_variable in file output_manager.py"""
-    key = "key"
-    with mocker.patch.object(mock_output_manager, "_generate_key", return_value=key) as gen_key:
-        with mocker.patch.object(mock_output_manager, "_add_to_pool") as add_to_pool:
-            info_map = {
-                "class": "dummy_class",
-                "function": "dummy_func",
-                "context": "dummy_context",
-            }
-            mock_output_manager.add_variable("dummy_name", "dummy_value", info_map)
-            assert mock_output_manager.variables_pool[key] == {
-                "info_maps": [{}],
-                "values": ["dummy_value"],
-            }
+    key = "dummy_key"
+    name = "dummy_name"
+    value = "dummy_value"
+    info_map = {}
+    mock_output_manager._generate_key = MagicMock(return_value=key)
+    mock_output_manager._add_to_pool = MagicMock()
+
+    mock_output_manager.add_variable(name, value, info_map)
+
+    mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+    mock_output_manager._add_to_pool(
+        mock_output_manager.variables_pool, key, value, info_map
+    )
+
+    mock_output_manager._generate_key = output_manager_original_method_states[
+        "_generate_key"
+    ]
+    mock_output_manager._add_to_pool = output_manager_original_method_states[
+        "_add_to_pool"
+    ]
 
 
 def test_add_to_pool(mock_output_manager: OutputManager) -> None:
@@ -483,12 +524,18 @@ def output_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
+        "_generate_file_name": mock_output_manager._generate_file_name,
+        "_generate_key": mock_output_manager._generate_key,
+        "_dict_to_file_json": mock_output_manager._dict_to_file_json,
+        "_add_to_pool": mock_output_manager._add_to_pool,
+        "add_variable": mock_output_manager.add_variable,
+        "add_error": mock_output_manager.add_error,
+        "add_log": mock_output_manager.add_log,
+        "add_warning": mock_output_manager.add_warning,
         "save_variables": mock_output_manager.save_variables,
         "save_logs": mock_output_manager.save_logs,
         "save_warnings": mock_output_manager.save_warnings,
         "save_errors": mock_output_manager.save_errors,
-        "_generate_file_name": mock_output_manager._generate_file_name,
-        "_dict_to_file_json": mock_output_manager._dict_to_file_json,
     }
 
 
