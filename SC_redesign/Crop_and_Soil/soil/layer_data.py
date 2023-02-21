@@ -64,6 +64,12 @@ class LayerData:
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
+        if self.top_depth < 0:
+            raise ValueError("Top depth of a soil layer cannot be less that 0")
+        elif self.bottom_depth <= 0:
+            raise ValueError("Bottom depth of a soil layer cannot be above or at the top of the soil surface")
+        elif self.top_depth >= self.bottom_depth:
+            raise ValueError("Top depth of a soil layer cannot be at or below the bottom depth of the layer")
         return self.bottom_depth - self.top_depth
 
     @property
@@ -82,17 +88,17 @@ class LayerData:
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
+    def saturation_content(self) -> float:
+        """volume of water in layer when saturated (mm)"""
+        return self.saturation_point_water_concentration * self.layer_thickness
+
+    @property
     def excess_water_available(self) -> float:
         """volume of water available for percolation in the soil layer (mm)
 
         SWAT Reference: 2:3.2.1, 2
         """
         return max(0, self.water_content - self.field_capacity_content)
-
-    @property
-    def saturation_content(self) -> float:
-        """volume of water in layer when saturated (mm)"""
-        return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
     def acceptable_percolation_amount(self) -> float:
