@@ -67,6 +67,8 @@ class LayerData:
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
+
+
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
