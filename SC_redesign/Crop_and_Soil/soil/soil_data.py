@@ -197,7 +197,7 @@ class SoilData:
     @property
     def profile_bulk_density(self) -> float:
         """Average bulk density of the soil profile based on the bulk density of each soil layer, weighted by the
-            thickness"""
+            thickness (Mg per cubic meter)"""
         weighted_densities_sum = 0
         weights_sum = 0
         for layer in self.soil_layers:
