@@ -57,6 +57,12 @@ class LayerData:
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
+    # --- Phosphorous
+    labile_phosphorus_concentration: float = 2.7
+    """Concentration of labile phosphorus in soil layer at beginning of simulation (kg P / kg soil)"""
+    labile_phosphorus_content: Optional[float] = None
+    """Content of labile phosphorus (kg / ha)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
