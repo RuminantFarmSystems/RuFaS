@@ -488,19 +488,19 @@ def test_add_to_pool(mock_output_manager: OutputManager) -> None:
 def test_output_manager_singleton(mocker: MockerFixture) -> None:
     """Test case to ensure output_manager is singleton"""
     key = "key1"
-    with mocker.patch.object(OutputManager, "_generate_key", return_value=key):
-        om1 = OutputManager()
-        om2 = OutputManager()
-        info_map = {
-            "class": "dummy_class",
-            "function": "dummy_func",
-            "context": "dummy_context",
-        }
-        om1.add_variable("dummy_name", "dummy_value", info_map)
-        assert om2.variables_pool[key] == {
-            "info_maps": [{"context": "dummy_context"}],
-            "values": ["dummy_value"],
-        }
+    om1 = OutputManager()
+    om2 = OutputManager()
+    mocker.patch.object(om1, "_generate_key", return_value=key)
+    info_map = {
+        "class": "dummy_class",
+        "function": "dummy_func",
+        "context": "dummy_context",
+    }
+    om1.add_variable("dummy_name", "dummy_value", info_map)
+    assert om2.variables_pool[key] == {
+        "info_maps": [{"context": "dummy_context"}],
+        "values": ["dummy_value"],
+    }
 
 
 def test_flush_pools() -> None:
