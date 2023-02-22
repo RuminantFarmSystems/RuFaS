@@ -64,12 +64,9 @@ class LayerData:
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
-        if self.top_depth < 0:
-            raise ValueError("Top depth of a soil layer cannot be less that 0")
-        elif self.bottom_depth <= 0:
-            raise ValueError("Bottom depth of a soil layer cannot be above or at the top of the soil surface")
-        elif self.top_depth >= self.bottom_depth:
-            raise ValueError("Top depth of a soil layer cannot be at or below the bottom depth of the layer")
+        if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
+            raise ValueError(f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                             f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.")
         return self.bottom_depth - self.top_depth
 
     @property

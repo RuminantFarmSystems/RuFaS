@@ -268,8 +268,10 @@ def test_layer_thickness(top: float, bottom: float) -> None:
 ])
 def test_layer_thickness_error(top: float, bottom: float) -> None:
     """Test that layer_thickness() in LayerData throws errors when given invalid data"""
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as e:
         LayerData(top_depth=top, bottom_depth=bottom)
+    assert str(e.value) == f"Expected positive values for top and bottom depths of soil layer where top < bottom, " \
+                           f"received top: '{top}', bottom: '{bottom}'."
 
 
 @pytest.mark.parametrize("top,bottom,concentration", [
