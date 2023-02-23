@@ -63,12 +63,21 @@ class LayerData:
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
 
     # --- pool_gas_partition
-    AG_met_to_active_carbon_CO2: Optional[float] = None
-    AG_met_to_C_active_loss: Optional[float] = None
-    AG_met_to_C_active_act: Optional[float] = None
-    AG_structural_to_active_carbon_CO2: Optional[float] = None
-    AG_struct_to_C_active_loss: Optional[float] = None
-    AG_struct_to_C_active_act: Optional[float] = None
+    plant_metabolic_active_carbon_usage: Optional[float] = None
+    plant_metabolic_active_carbon_loss: Optional[float] = None
+    plant_metabolic_active_carbon_remaining: Optional[float] = None
+
+    plant_structural_active_carbon_usage: Optional[float] = None
+    plant_structural_active_carbon_loss: Optional[float] = None
+    plant_structural_active_carbon_remaining: Optional[float] = None
+
+    plant_structural_slow_carbon_usage: Optional[float] = None
+    plant_structural_slow_carbon_loss: Optional[float] = None
+    plant_structural_slow_carbon_remaining: Optional[float] = None
+
+    soil_metabolic_active_carbon_usage: Optional[float] = None
+    soil_metabolic_active_carbon_loss: Optional[float] = None
+    soil_metabolic_active_carbon_remaining: Optional[float] = None
 
     
     def __post_init__(self):
