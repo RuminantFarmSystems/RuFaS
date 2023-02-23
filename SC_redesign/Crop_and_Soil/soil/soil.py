@@ -38,7 +38,7 @@ class Soil:
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
-        """"""
+        """Creates a soil profile with attributes specified in the soil_config passed"""
         Warning("create from config file not yet implement, returning default Soil()")
         return Soil()
 
