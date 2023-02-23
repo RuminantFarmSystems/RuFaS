@@ -68,7 +68,7 @@ def manure_calculations(ration_formulation,
     total_volatile_solids = 0.0073 * body_weight
 
     # Degradable volatile solids, kg [A.3B.A.4]
-    degradable_volatile_solids = 0.9 * total_volatile_solids  # TODO: IMPORTANT! Is it 0.9 or 0.09?
+    degradable_volatile_solids = 0.9 * total_volatile_solids
 
     # Non-degradable volatile solids, kg
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids

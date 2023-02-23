@@ -34,6 +34,9 @@ class PenManure:
     manure_total_ammoniacal_nitrogen: float = 0.0
     """Amount of total ammoniacal nitrogen in manure slurry, kg."""
 
+    urine_nitrogen: float = 0.0
+    """Amount of nitrogen in urine, kg."""
+
     nitrogen: float = 0.0
     """Amount of nitrogen in manure, kg."""
 
@@ -93,7 +96,7 @@ class PenManure:
 
         """
         manure_mass = animal_manure['manure_mass']  # kg
-        manure_volume = manure_mass / ManureConstants.MANURE_DENSITY  # L
+        manure_volume = manure_mass * GeneralConstants.KG_TO_GRAMS / ManureConstants.MANURE_DENSITY  # L
         total_ammoniacal_nitrogen = (
                                             animal_manure['total_ammoniacal_nitrogen_concentration']  # g/L
                                             * manure_volume  # L
@@ -102,6 +105,7 @@ class PenManure:
         return cls(
             urea=animal_manure['urea'] / num_animals,
             urine=animal_manure['urine'],
+            urine_nitrogen=animal_manure['urine_nitrogen'],
             urine_total_ammoniacal_nitrogen=animal_manure['urine_nitrogen'] * ManureConstants.URINE_TAN_FACTOR,
             manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen,
             nitrogen=animal_manure['manure_nitrogen'],

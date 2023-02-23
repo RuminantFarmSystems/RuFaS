@@ -177,31 +177,50 @@ def manure_calculations(ration_formulation,
         methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565  # [A.3E.C.4]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
-            daily_milk_production=daily_milk_production,
-            total_manure_excreted=total_manure_excreted,
-            fecal_phosphorus=fecal_phosphorus,
-            urine_phosphorus_required=urine_phosphorus_required
+        daily_milk_production=daily_milk_production,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
     )
 
     (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
      manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-            urea=urine_urea_nitrogen_concentration,
-            urine=urine,
-            total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
-            urine_nitrogen=urine_nitrogen,
-            manure_nitrogen=manure_nitrogen,
-            manure_mass=total_manure_excreted,
-            total_solids=fecal_solids,
-            degradable_volatile_solids=degradable_volatile_solids,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            phosphorus=manure_phosphorus_excreted,
-            phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=potassium,
-            methane=methane_emission
+        urea=urine_urea_nitrogen_concentration,
+        urine=urine,
+        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=total_manure_excreted,
+        total_solids=fecal_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=manure_phosphorus_excreted,
+        phosphorus_fraction=manure_phosphorus_fraction,
+        potassium=potassium,
+        methane=methane_emission
     )
 
-    return total_phosphorus_excreted, manure_excretion_values
+    # This part is not unit tested.
+    default_manure_excretion_values = AnimalManureExcretions(
+        urea=0.15,  # g/L
+        urine=21.0,  # kg
+        total_ammoniacal_nitrogen_concentration=4.63,  # g/L
+        urine_nitrogen=0.25,  # kg
+        manure_nitrogen=0.45,  # kg
+        manure_mass=68.0,  # kg
+        total_solids=8.9,  # kg
+        degradable_volatile_solids=8.01,  # kg
+        non_degradable_volatile_solids=0.89,  # kg
+        inorganic_phosphorus_fraction=0.0,  # kg
+        organic_phosphorus_fraction=0.0,  # kg
+        phosphorus=0.078 * GeneralConstants.KG_TO_GRAMS,  # kg
+        phosphorus_fraction=0.0,  # kg
+        potassium=0.13 * GeneralConstants.KG_TO_GRAMS,  # kg
+        methane=0.5 * GeneralConstants.KG_TO_GRAMS  # kg
+    )
+
+    return total_phosphorus_excreted, default_manure_excretion_values
