@@ -61,6 +61,15 @@ class LayerData:
     # --- Decomposition
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
+
+    # --- pool_gas_partition
+    AG_met_to_active_carbon_CO2: Optional[float] = None
+    AG_met_to_C_active_loss: Optional[float] = None
+    AG_met_to_C_active_act: Optional[float] = None
+    AG_structural_to_active_carbon_CO2: Optional[float] = None
+    AG_struct_to_C_active_loss: Optional[float] = None
+    AG_struct_to_C_active_act: Optional[float] = None
+
     
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
