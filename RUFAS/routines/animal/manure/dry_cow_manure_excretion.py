@@ -113,8 +113,8 @@ def manure_calculations(ration_formulation,
     fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
 
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
-    # Key assumption: 1 kg of urine = 1 L of urine (CO)(NH2)2
-    urine_urea_nitrogen_concentration = -1.16 + 0.86 * ((urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine)
+    urinary_nitrogen_concentration = (urine_nitrogen * 100) / urine
+    urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
