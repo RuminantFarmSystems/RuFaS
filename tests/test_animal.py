@@ -112,7 +112,7 @@ def heifer_b() -> dict:
     return heifer_b_dict
 
 
-def test_calculate_NRC_energy_maintenance_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_energy_maintenance_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_energy_maintenance_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEmaint, result_CW, result_CBW = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_maintenance_requirements(
@@ -143,7 +143,7 @@ def test_calculate_NRC_energy_maintenance_requirements(cow_a, cow_b, heifer_a, h
         (19.07, 0, 43.92), rel=5e-1)
 
 
-def test_calculate_NRC_energy_growth_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_energy_growth_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_energy_growth_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEg, result_ADG, result_EQSBW = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_growth_requirements(
@@ -174,7 +174,7 @@ def test_calculate_NRC_energy_growth_requirements(cow_a, cow_b, heifer_a, heifer
         (2.9, 0.9, 232.171), rel=1e-1)
 
 
-def test_calculate_NRC_energy_pregnancy_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_energy_pregnancy_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_energy_pregnancy_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEpreg = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_pregnancy_requirements(
         cow_a['day_of_pregnancy'], 40)
@@ -193,7 +193,7 @@ def test_calculate_NRC_energy_pregnancy_requirements(cow_a, cow_b, heifer_a, hei
     assert (result_NEpreg) == pytest.approx((0), rel=1e-1)
 
 
-def test_calculate_NRC_energy_lactation_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_energy_lactation_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_energy_lactation_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEl = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_lactation_requirements(
         cow_a['animal_type'], cow_a['Fat_Milk'], cow_a['milk_protein'],
@@ -216,7 +216,7 @@ def test_calculate_NRC_energy_lactation_requirements(cow_a, cow_b, heifer_a, hei
     assert (result_NEl) == pytest.approx((0), rel=1e-1)
 
 
-def test_calculate_NRC_protein_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_protein_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_protein_requirements in file routines/animal/ration/animal_requirements.py"""
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_protein_requirements(
         cow_a['body_weight'], 22, cow_a['day_of_pregnancy'], cow_a['animal_type'],
@@ -239,7 +239,7 @@ def test_calculate_NRC_protein_requirements(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_MP_req) == pytest.approx((301), rel=1e-1)
 
 
-def test_calculate_NRC_calcium_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_calcium_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_calcium_requirements in file routines/animal/ration/animal_requirements.py"""
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_calcium_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], cow_a['animal_type'],
@@ -262,7 +262,7 @@ def test_calculate_NRC_calcium_requirements(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_Ca_req) == pytest.approx((17.5), rel=1e-1)
 
 
-def test_calculate_NRC_phosphorus_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_phosophorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], cow_a['Milk'],
@@ -285,7 +285,7 @@ def test_calculate_NRC_phosphorus_requirements(cow_a, cow_b, heifer_a, heifer_b)
     assert (result_P_req) == pytest.approx((6.9), rel=1e-1)
 
 
-def test_calculate_NRC_DMI(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_DMI in file routines/animal/ration/animal_requirements.py"""
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         cow_a['animal_type'], cow_a['body_weight'], cow_a['day_of_pregnancy'], cow_a['DIM'], cow_a['lactating'],
@@ -308,7 +308,7 @@ def test_calculate_NRC_DMI(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_DMIest) == pytest.approx((0), rel=1e-1)
 
 
-def test_calculate_NASEM_energy_lactation_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_energy_lactation_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_energy_lactation_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEl = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_energy_lactation_requirements(
         cow_a['animal_type'], cow_a['Fat_Milk'], cow_a['milk_protein'], cow_a['Lactose_Milk'], cow_a['Milk'])
@@ -327,7 +327,7 @@ def test_calculate_NASEM_energy_lactation_requirements(cow_a, cow_b, heifer_a, h
     assert (result_NEl) == pytest.approx((0), rel=1e-1)
 
 
-def test_calculate_NASEM_DMI(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_DMI in file routines/animal/ration/animal_requirements.py"""
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_DMI(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['DIM'], cow_a['lactating'],
@@ -350,7 +350,7 @@ def test_calculate_NASEM_DMI(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_DMIest) == pytest.approx((8), rel=1e-1)
 
 
-def test_calculate_NASEM_energy_maintenance_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_energy_maintenance_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_energy_maintenance_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEmaint, result_GrUterW, result_UterW = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_energy_maintenance_requirements(
@@ -377,7 +377,7 @@ def test_calculate_NASEM_energy_maintenance_requirements(cow_a, cow_b, heifer_a,
         (6.3, 77.71, 10.25), rel=1e-1)
 
 
-def test_calculate_NASEM_energy_growth_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_energy_growth_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_energy_growth_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEg, result_ADG, result_frame_weight_gain = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_energy_growth_requirements(
@@ -408,7 +408,7 @@ def test_calculate_NASEM_energy_growth_requirements(cow_a, cow_b, heifer_a, heif
         (4.1, 0.9, 0.35), rel=1e-1)
 
 
-def test_calculate_NASEM_energy_pregnancy_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_energy_pregnancy_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_energy_pregnancy_requirements in file routines/animal/ration/animal_requirements.py"""
     result_NEpreg, result_GrUterWGain = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_energy_pregnancy_requirements(
         cow_a['lactating'], cow_a['day_of_pregnancy'], cow_a['DIM'], 49, 0.2)
@@ -431,7 +431,7 @@ def test_calculate_NASEM_energy_pregnancy_requirements(cow_a, cow_b, heifer_a, h
         (4.9, 1.2), rel=1e-1)
 
 
-def test_calculate_NASEM_protein_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_protein_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_protein_requirements in file routines/animal/ration/animal_requirements.py"""
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_protein_requirements(
         cow_a['lactating'], cow_a['body_weight'], 1, 0.1, 22,
@@ -454,7 +454,7 @@ def test_calculate_NASEM_protein_requirements(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_MP_req) == pytest.approx((586), rel=1e-1)
 
 
-def test_calculate_NASEM_calcium_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_calcium_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_calcium_requirements in file routines/animal/ration/animal_requirements.py"""
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], 1,
@@ -477,7 +477,7 @@ def test_calculate_NASEM_calcium_requirements(cow_a, cow_b, heifer_a, heifer_b):
     assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
 
 
-def test_calculate_NASEM_phosphorus_requirements(cow_a, cow_b, heifer_a, heifer_b):
+def test_calculate_NASEM_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NASEM_phosphorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['animal_type'], cow_a['day_of_pregnancy'], 1, 20,

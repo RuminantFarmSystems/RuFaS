@@ -33,41 +33,41 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
     animal class)
     Parameters
     ----------
-        body_weight: float
-            Body weight (kg)
-        mature_body_weight: float
-            Mature body weight(kg)
-        animal_type: str
-            the type of animal
-        day_of_pregnancy: str, optional
-            Day of pregnancy (d) (except Heifer Is)
+    body_weight: float
+        Body weight (kg)
+    mature_body_weight: float
+        Mature body weight(kg)
+    animal_type: str
+        the type of animal
+    day_of_pregnancy: str, optional
+        Day of pregnancy (d) (except Heifer Is)
     # parameters for just cow requirements)
-        parity: int, optional
-            Number of parity
-        calving_interval: int, optional
-            Calving interval (d)
-        milk_true_protein: float, optional
-            Milk true protein content  (% of milk)
-        milk_fat: float, optional
-            Milk fat content (% of milk)
-        milk_lactose: float, optional
-            Milk lactose content (% of milk)
-        milk_production: float, optional
-            Milk production (kg)
-        days_in_milk: int, optional
-            Days in milk
-        lactating: bool, optional
-            Boolean value which is true for lactating cows and false for dry cows
+    parity: int, optional
+        Number of parity
+    calving_interval: int, optional
+        Calving interval (d)
+    milk_true_protein: float, optional
+        Milk true protein content  (% of milk)
+    milk_fat: float, optional
+        Milk fat content (% of milk)
+    milk_lactose: float, optional
+        Milk lactose content (% of milk)
+    milk_production: float, optional
+        Milk production (kg)
+    days_in_milk: int, optional
+        Days in milk
+    lactating: bool, optional
+        Boolean value which is true for lactating cows and false for dry cows
     # parameters for just heifer requirements
-        body_condition_score_5: int, optional
-            Body Condition Score (1-5 basis)
-        previous_temperature: float, optional
-            Average daily temperature of last month, °C
-        average_daily_gain_heifer: float, optional
-            Average daily gain of a heifer
+    body_condition_score_5: int, optional
+        Body Condition Score (1-5 basis)
+    previous_temperature: float, optional
+        Average daily temperature of last month, °C
+    average_daily_gain_heifer: float, optional
+        Average daily gain of a heifer
     Returns
     -------
-    req: Dict[str, float]
+    Dict[str, float]
         dictionary of requirement values, see individual functions for each key value pair
     """
     if AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NRC':
@@ -171,22 +171,18 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     Chapter 2 "Energy",pp. 18-25, 2001.
 
     """
-    calf_birth_weight = mature_body_weight * 0.06275
-    if day_of_pregnancy == None:
-        conceptus_weight = 0.0
-        calf_birth_weight = 0.0
-    elif day_of_pregnancy > 190:
+    calf_birth_weight = mature_body_weight * 0.06275 if day_of_pregnancy else 0.0
+    conceptus_weight = 0.0
+    if day_of_pregnancy and day_of_pregnancy > 190:
         conceptus_weight = (18 + (day_of_pregnancy - 190)
                             * 0.665) * (calf_birth_weight / 45)
-    else:
-        conceptus_weight = 0.0
     if animal_type == 'cow':
         net_energy_maintenance = (
             0.08 * (body_weight - conceptus_weight) ** 0.75)
     elif animal_type == 'heifer':
-        BCDS9 = (body_condition_score_5 - 1) * 2 + 1
+        body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
         net_energy_maintenance = (body_weight-conceptus_weight)**(0.75) * \
-            (0.086*(0.8 + (BCDS9 - 1) * 0.5)) + \
+            (0.086*(0.8 + (body_condition_score_9 - 1) * 0.5)) + \
             0.0007*(20-previous_temperature)
     return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
@@ -235,8 +231,8 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition."
         National Academic Press, Chapter 3 "Energy", pp. 29, 2021.
     """
-    if day_of_pregnancy == None:
-        net_energy_maintenance = 0.10*(body_weight)**0.75
+    if day_of_pregnancy is None:
+        net_energy_maintenance = 0.10*body_weight**0.75
         gravid_utertine_weight = 0.0
         utertine_weight = 0.0
     else:

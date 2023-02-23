@@ -75,9 +75,13 @@ class HeiferIII(HeiferII):
         """
         Calculates this heiferIII's nutrient requirements.
         """
-        req = calc_rqmts(body_weight=self.body_weight, mature_body_weight=self.mature_body_weight,
-                         day_of_pregnancy=self.days_in_preg, animal_type='heifer', body_condition_score_5=3,
-                         previous_temperature=temp, average_daily_gain_heifer=self.daily_growth)
+        req = calc_rqmts(body_weight=self.body_weight,
+                         mature_body_weight=self.mature_body_weight,
+                         day_of_pregnancy=self.days_in_preg,
+                         animal_type='heifer',
+                         body_condition_score_5=3,
+                         previous_temperature=temp,
+                         average_daily_gain_heifer=self.daily_growth)
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
         self.NEpreg = req['NEpreg']
