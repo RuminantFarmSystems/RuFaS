@@ -96,8 +96,6 @@ class Crop:
         self.growth_constraints.constrain_growth(max_transpiration, mean_air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
-        self.water_dynamics.cycle_water(evaporation, transpiration, max_evapotranspiration,
-                                        adjusted_potential_evapotranspiration)  # TODO: call from Field instead?
 
     # ---- Crop Management Methods
     @classmethod

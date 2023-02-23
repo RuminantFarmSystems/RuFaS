@@ -239,5 +239,7 @@ class Field:
          than in both the crop and soil classes. Water uptake by the crop will likely be an exception that should
          take place during a crop's grow() method. Other exceptions may come up as these modules develop.
          """
+        for crop in self.crops:
+            crop.water_dynamics.cycle_water()  # TODO: tweak this once water method sare more solidified.
         pass
     # </editor-fold>
