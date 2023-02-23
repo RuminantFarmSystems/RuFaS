@@ -110,7 +110,7 @@ def test_pen_manure_init() -> None:
     num_animals = 2
     expected_total_ammoniacal_nitrogen = (
             total_ammoniacal_nitrogen_concentration *
-            manure_mass /
+            manure_mass * GeneralConstants.KG_TO_GRAMS /
             ManureConstants.MANURE_DENSITY
     ) * GeneralConstants.GRAMS_TO_KG
     expected_urine_ammoniacal_nitrogen = urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
@@ -121,6 +121,7 @@ def test_pen_manure_init() -> None:
     # Assert
     assert manure.urea == approx(animal_manure['urea'] / num_animals)
     assert manure.urine == approx(animal_manure['urine'])
+    assert manure.urine_nitrogen == approx(animal_manure['urine_nitrogen'])
     assert manure.urine_total_ammoniacal_nitrogen == approx(expected_urine_ammoniacal_nitrogen)
     assert manure.manure_total_ammoniacal_nitrogen == approx(expected_total_ammoniacal_nitrogen)
     assert manure.nitrogen == approx(animal_manure['manure_nitrogen'])
