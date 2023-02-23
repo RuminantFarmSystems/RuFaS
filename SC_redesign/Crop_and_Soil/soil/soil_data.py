@@ -79,6 +79,12 @@ class SoilData:
                                            soil_water_concentration=0,
                                            saturation_point_water_concentration=inf)
 
+    # ---- decomposition
+    decomposition_temperature_effect: Optional[float] = None
+    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
+
+
+
     @property
     def profile_soil_water_content(self) -> float:
         """
