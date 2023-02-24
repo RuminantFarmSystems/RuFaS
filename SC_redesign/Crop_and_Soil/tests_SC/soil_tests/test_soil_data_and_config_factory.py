@@ -61,7 +61,8 @@ def test_config_factory_defaults():
     assert generic.snow_cover_water_content == 0
     assert generic.eroded_sediment == 0
 
-    # TODO: would this maybe be a cleaner, easier way to test the validity of the SoilData object that gets returned?
+    # Note: this kind of test (overall equality between objects) should be done IN ADDITION TO all the individual tests
+    #       above
     assert generic == SoilData()
 
 
@@ -141,7 +142,7 @@ def test_annual_reset() -> None:
         assert soil_data.annual_surface_runoff_total != 0
 
         # Run method
-        soil_data.annual_reset()
+        soil_data.do_annual_reset()
 
         # Check that annual totals were reset correctly
         assert soil_data.initial_water_content == soil_data.profile_soil_water_content

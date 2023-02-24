@@ -59,7 +59,7 @@ class Soil:
                                                      snow_cover, avg_annual_air_temp)
 
     def daily_soil_water_routine(self, rainfall: float, weighting_coefficient: float,
-                                 has_seasonal_high_water_table: bool, extraterrestrial_radiation: float,
+                                 has_seasonal_high_water_table: bool, solar_radiation: float,
                                  max_air_temp: float, min_air_temp: float,
                                  avg_air_temp: float, above_ground_biomass: float, residue: float,
                                  snow_water_content: float, initial_canopy_free_water: float,
@@ -84,7 +84,7 @@ class Soil:
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient)
         self.percolation.percolate(has_seasonal_high_water_table)
-        self.evapotranspiration.evapotranspirate(extraterrestrial_radiation, max_air_temp, min_air_temp, avg_air_temp,
+        self.evapotranspiration.evapotranspirate(solar_radiation, max_air_temp, min_air_temp, avg_air_temp,
                                                  above_ground_biomass, residue, snow_water_content,
                                                  initial_canopy_free_water)
         self.soil_erosion.erode(minimum_cover_management_factor, residue)
