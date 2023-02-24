@@ -1,6 +1,7 @@
 from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 """
 This module is primarily based upon the "Crop Yield" (5:2.4) and "General Managmeent" (6:1) sections of the SWAT model
@@ -12,20 +13,16 @@ class CropManagement:
         """crop data object on which crop management operations will be conducted"""
 
     # ---- Main Methods ----
-    def manage_harvest(self, cut: bool = True, collect_yield: bool = True, kill: bool = True):
+    def manage_harvest(self, harvest_op: HarvestOperation):
         self.determine_harvest_index()
 
-        if cut and collect_yield:  # harvest
+        if harvest_op == HarvestOperation.HARVEST:  # harvest and kill the crop
+            self.cut_crop(collected_fraction=self.data.harvest_efficiency)
+            self.kill()
+
+        if harvest_op == HarvestOperation.HARVEST_NOKILL: # harvest but don't kill the crop
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
-        if cut and not collect_yield:  # cut and leave in field
-            self.cut_crop(collected_fraction=0)
-
-        # if not cut and collect_yield:  # collect yield previously left in the field
-        #     self.collect_cut_yield(collected_fraction=self.data.harvest_efficiency)
-
-        if kill:
-            self.kill()
 
     def graze(self):  # TODO: implement grazing method (SWAT 6:1.3)
         pass

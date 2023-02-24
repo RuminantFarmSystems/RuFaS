@@ -135,7 +135,7 @@ class HeatUnits:
         """
         return min(max_air_temp, max_growth_temp)
 
-    # TODO: Dormancy! SWAT 5:1.2
+    # TODO: Dormancy! SWAT 5:1.2 - GitHub PR #365
 
-    # TODO: Heat scheduling? SWAT 5:1.1.1
+    # TODO: Heat scheduling? SWAT 5:1.1.1 - GitHub Issue #368
 
