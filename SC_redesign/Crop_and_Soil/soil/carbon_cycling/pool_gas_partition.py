@@ -16,6 +16,7 @@ class PoolGasPartition:
             soil: an instance of the Soil class defined in soil.py
         """
         for layer in self.data.soil_layers:
+            # ---- plants
             layer.plant_metabolic_active_carbon_loss = self._plant_metabolic_active_carbon_loss(
                 layer.plant_metabolic_active_carbon_usage)
             layer.plant_metabolic_active_carbon_remaining = self._plant_metabolic_active_carbon_remaining(
@@ -32,18 +33,22 @@ class PoolGasPartition:
             layer.plant_structural_slow_carbon_remaining = self._plant_structural_slow_carbon_remaining(
                 layer.plant_structural_slow_carbon_usage)
 
-            # below ground metabolic C
+            # ----- soil
             layer.soil_metabolic_active_carbon_loss = self._soil_metabolic_active_carbon_loss(
                 layer.soil_metabolic_active_carbon_usage)
             layer.soil_metabolic_active_carbon_remaining = self._soil_metabolic_active_carbon_remaining(
                 layer.soil_metabolic_active_carbon_usage)
 
             # below ground structural C
-            layer.BG_struct_to_C_active_loss = layer.BG_struct_to_C_active * fr_CO2_struct_to_active
-            layer.BG_struct_to_C_active_act = layer.BG_struct_to_C_active * (1 - fr_CO2_struct_to_active)
+            layer.soil_structural_active_carbon_loss = self._soil_structural_active_carbon_loss(
+                layer.soil_structural_active_carbon_usage)
+            layer.soil_structural_active_carbon_remaining = self._soil_structural_active_carbon_remaining(
+                layer.soil_structural_active_carbon_usage)
 
-            layer.BG_struct_to_C_slow_loss = layer.BG_struct_to_C_slow * fr_CO2_struct_to_slow
-            layer.BG_struct_to_C_slow_act = layer.BG_struct_to_C_slow * (1 - fr_CO2_struct_to_slow)
+            layer.soil_structural_slow_carbon_loss = self._soil_structural_slow_carbon_loss(
+                layer.soil_structural_slow_carbon_usage)
+            layer.soil_structural_slow_carbon_remaining = self._soil_structural_slow_carbon_remaining(
+                layer.soil_structural_slow_carbon_usage)
 
             K5 = 0.14
             # S.6.C.2
@@ -89,9 +94,9 @@ class PoolGasPartition:
             # aggregate active carbon pool flux
             # S.6.C.11
             layer.C_active += (
-                                          layer.plant_metabolic_active_carbon_remaining + layer.plant_structural_active_carbon_remaining +
-                                          layer.BG_met_to_C_active_act + layer.BG_struct_to_C_active_act +
-                                          layer.C_passive_to_active + layer.C_slow_to_active) - layer.C_active_decomp
+                                      layer.plant_metabolic_active_carbon_remaining + layer.plant_structural_active_carbon_remaining +
+                                      layer.BG_met_to_C_active_act + layer.BG_struct_to_C_active_act +
+                                      layer.C_passive_to_active + layer.C_slow_to_active) - layer.C_active_decomp
 
             # aggregate slow carbon pool flux
             # S.6.C.12
@@ -142,3 +147,23 @@ class PoolGasPartition:
     def _soil_metabolic_active_carbon_remaining(soil_metabolic_active_carbon_usage: float,
                                                 metabolic_active_carbon_loss_rate: float = 0.55) -> float:
         return soil_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
+
+    @staticmethod
+    def _soil_structural_active_carbon_loss(soil_structural_active_carbon_usage: float,
+                                            structural_active_carbon_loss_rate: float = 0.45) -> float:
+        return soil_structural_active_carbon_usage * structural_active_carbon_loss_rate
+
+    @staticmethod
+    def _soil_structural_active_carbon_remaining(soil_structural_active_carbon_usage: float,
+                                                 structural_active_carbon_loss_rate: float = 0.45) -> float:
+        return soil_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
+
+    @staticmethod
+    def _soil_structural_slow_carbon_loss(soil_structural_slow_carbon_usage: float,
+                                          structural_slow_carbon_loss_rate: float = 0.3) -> float:
+        return soil_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
+
+    @staticmethod
+    def _soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage: float,
+                                               structural_slow_carbon_loss_rate: float = 0.3) -> float:
+        return soil_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
