@@ -56,7 +56,7 @@ class SoilData:
 
     # ---- infiltration
     second_moisture_condition_parameter: float = 85
-    """curve number for average moisture conditions (unitless)"""
+    """'curve number' parameter for average moisture conditions equation (unitless)"""
     previous_retention_parameter: Optional[float] = None
     """retention parameter for the previous day (mm) (used in SWAT 2:1.1.9)"""
     average_subbasin_slope: float = 0.05
@@ -96,7 +96,7 @@ class SoilData:
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
     def __post_init__(self):
-        """This method initializes attributes that either cannot be set to a default above or depend on need other
+        """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set"""
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any
