@@ -14,9 +14,12 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
+import collections
+
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
@@ -24,7 +27,7 @@ from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 import random
 from statistics import mean
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List, Optional
 
 om = OutputManager()
 
@@ -318,7 +321,7 @@ class AnimalManagement:
         """
 
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+            mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -490,6 +493,335 @@ class AnimalManagement:
             self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
                                                     feed, temp, pen_population_before_additions[pen.id])
             # self.all_pens[pen].animals_in_pen.append(calf)
+
+    @classmethod
+    def _get_lactating_cows(cls, cows: List[Cow]) -> List[Cow]:
+        """Returns a list of lactating cows from a list of cows.
+
+        Parameters
+        ----------
+        cows : List[Cow]
+            List of cows to filter lactating cows from.
+
+        Returns
+        -------
+        List[Cow]
+            List of lactating cows.
+
+        """
+
+        return list(filter(lambda cow: cow.milking, cows))
+
+    @classmethod
+    def _get_dry_cows(cls, cows: List[Cow]) -> List[Cow]:
+        """Returns a list of dry cows from a list of cows.
+
+        Parameters
+        ----------
+        cows : List[Cow]
+            List of cows to filter dry cows from.
+
+        Returns
+        -------
+        List[Cow]
+            List of dry cows.
+
+        """
+        return list(filter(lambda cow: not cow.milking, cows))
+
+    @classmethod
+    def _group_pens_by_animal_combination(cls, all_pens: List[Pen]) -> Dict[Pen.AnimalCombination, List[Pen]]:
+        pen_group_by_animal_combination = collections.defaultdict(list)
+        for pen in all_pens:
+            pen_group_by_animal_combination[pen.animal_combination].append(pen)
+        return pen_group_by_animal_combination
+
+    @classmethod
+    def _calculate_total_maximum_stocking_density(cls, pens: List[Pen]) -> int:
+        """Calculates the total maximum stocking density for a given list of pens.
+
+        Parameters
+        ----------
+        pens : List[Pen]
+            List of pens to calculate the total maximum stocking density for.
+
+        Returns
+        -------
+        int
+            Total maximum stocking density for the given list of pens.
+
+        """
+        return int(sum(pen.num_stalls * pen.max_stocking_density for pen in pens))
+
+    @classmethod
+    def _calculate_stall_shortage(cls,
+                                  num_animals: int,
+                                  pens: List[Pen]) -> int:
+        """Calculates the stall shortage for a given number of animals and pens.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals to be placed in the pens.
+        pens : List[Pen]
+            List of pens to place the animals in.
+
+        Returns
+        -------
+        int
+            Stall shortage for the given number of animals and pens.
+
+        """
+        total_max_stocking_density = cls._calculate_total_maximum_stocking_density(pens)
+        return num_animals - total_max_stocking_density
+
+    @classmethod
+    def _calculate_stall_shortages_for_main_animal_combinations(cls,
+                                                                pens_by_animal_combination: Dict[
+                                                                    Pen.AnimalCombination, List[Pen]],
+                                                                num_calves: int,
+                                                                num_heiferIs: int,
+                                                                num_heiferIIs: int,
+                                                                num_heiferIIIs: int,
+                                                                num_dry_cows: int,
+                                                                num_lactating_cows: int
+                                                                ) -> Dict[Pen.AnimalCombination, int]:
+        """Calculates the stall shortage for each of the main animal combinations.
+
+        Parameters
+        ----------
+        pens_by_animal_combination : Dict[Pen.AnimalCombination, List[Pen]]
+            Dictionary of pens grouped by animal combination.
+        num_calves : int
+            Number of calves.
+        num_heiferIs : int
+            Number of heifer I.
+        num_heiferIIs : int
+            Number of heifer II.
+        num_heiferIIIs : int
+            Number of heifer III.
+        num_dry_cows : int
+            Number of dry cows.
+        num_lactating_cows : int
+            Number of lactating cows.
+
+        """
+        return {
+            Pen.AnimalCombination.CALF: cls._calculate_stall_shortage(
+                num_calves,
+                pens_by_animal_combination[Pen.AnimalCombination.CALF]
+            ),
+            Pen.AnimalCombination.GROWING: cls._calculate_stall_shortage(
+                num_heiferIs + num_heiferIIs,
+                pens_by_animal_combination[Pen.AnimalCombination.GROWING]
+            ),
+            Pen.AnimalCombination.CLOSE_UP: cls._calculate_stall_shortage(
+                num_heiferIIIs + num_dry_cows,
+                pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP]
+            ),
+            Pen.AnimalCombination.LAC_COW: cls._calculate_stall_shortage(
+                num_lactating_cows,
+                pens_by_animal_combination[Pen.AnimalCombination.LAC_COW]
+            )
+        }
+
+    @classmethod
+    def _find_pen_with_max_stalls_for_animal_combination(cls,
+                                                         animal_combination: Pen.AnimalCombination,
+                                                         mixed_type_by_pen_id: Dict[int, List[Pen.AnimalCombination]],
+                                                         mixed_type_pen_by_pen_id: Dict[int, Pen]) -> Optional[Pen]:
+        """Finds the pen with the maximum number of stalls that can house the given animal combination.
+
+        Parameters
+        ----------
+        animal_combination : Pen.AnimalCombination
+            The animal combination to find a pen for.
+        mixed_type_by_pen_id : Dict[int, List[Pen.AnimalCombination]]
+            A dictionary mapping pen IDs to the animal combinations that can be housed in that pen.
+        mixed_type_pen_by_pen_id : Dict[int, Pen]
+            A dictionary mapping pen IDs to the pen objects.
+
+        Returns
+        -------
+        Optional[Pen]
+            The pen with the maximum number of stalls that can house the given animal combination.
+            If no pen can house the given animal combination, returns None.
+
+        """
+        max_stalls_found = 0
+        pen: Optional[Pen] = None
+        for pen_id, animal_combinations in mixed_type_by_pen_id.items():
+            if animal_combination in animal_combinations \
+                    and mixed_type_pen_by_pen_id[pen_id].num_stalls > max_stalls_found:
+                pen = mixed_type_pen_by_pen_id[pen_id]
+                max_stalls_found = pen.num_stalls
+        return pen
+
+    def _create_default_pen(self, number_of_stalls: int, animal_combination: Pen.AnimalCombination) -> Pen:
+        """Creates a default pen with the given number of stalls and animal combination.
+
+        Parameters
+        ----------
+        number_of_stalls : int
+            The number of stalls in the pen.
+        animal_combination : Pen.AnimalCombination
+            The animal combination that can be housed in the pen.
+
+        Returns
+        -------
+        Pen
+            The pen with the given number of stalls and animal combination.
+
+        """
+        return Pen(
+            pen_id=len(self.all_pens),
+            vertical_dist_to_milking_parlor=0.1,
+            horizontal_dist_to_milking_parlor=1.6,
+            number_of_stalls=number_of_stalls,
+            housing_type='open air barn',
+            bedding_type='straw',
+            pen_type='tiestall',
+            manure_handling='manual_scraping',
+            manure_separator='sedimentation',
+            manure_storage='storage_pit',
+            animal_combination=animal_combination,
+            max_stocking_density=1.2
+        )
+
+    @classmethod
+    def _remove_pen_from_dicts_by_id(cls,
+                                     pen_id: int,
+                                     dicts: List[Dict[int, Any]]) -> None:
+        """Removes the pen with the given ID from the given dictionaries.
+
+        Parameters
+        ----------
+        pen_id : int
+            The ID of the pen to remove.
+        dicts : List[Dict[int, Any]]
+            A list of dictionaries to remove the pen from.
+
+        """
+        for d in dicts:
+            if pen_id in d:
+                del d[pen_id]
+
+    @classmethod
+    def _recalculate_stall_shortages(cls,
+                                     stall_shortages: Dict[Pen.AnimalCombination, int],
+                                     animal_combination: Pen.AnimalCombination,
+                                     pen: Pen) -> None:
+        """Updates the stall shortage for the given animal combination.
+
+        Subtract the maximum stocking density of the given pen from the stall shortage for the given animal combination.
+
+        Parameters
+        ----------
+        stall_shortages : Dict[Pen.AnimalCombination, int]
+            A dictionary mapping animal combinations to the number of stalls that are still needed for that animal combination.
+        animal_combination : Pen.AnimalCombination
+            The animal combination to update the stall shortages for.
+        pen : Pen
+            The pen to calculate the maximum stocking density for.
+
+        """
+        if animal_combination in stall_shortages:
+            stall_shortages[animal_combination] -= cls._calculate_total_maximum_stocking_density([pen])
+
+    def _accommodate_stall_shortages(self,
+                                     num_dry_cows: int,
+                                     num_lactating_cows: int,
+                                     mixed_type_by_pen_id: Dict[int, List[Pen.AnimalCombination]],
+                                     mixed_type_pen_by_pen_id: Dict[int, Pen]) -> None:
+        """Accommodates the stall shortages for the main animal combinations.
+
+        Parameters
+        ----------
+        num_dry_cows : int
+            The number of dry cows.
+        num_lactating_cows : int
+            The number of lactating cows.
+        mixed_type_by_pen_id : Dict[int, List[Pen.AnimalCombination]]
+            A dictionary mapping pen IDs to the animal combinations that can be housed in that pen.
+        mixed_type_pen_by_pen_id : Dict[int, Pen]
+            A dictionary mapping pen IDs to the pen objects.
+
+        """
+        stall_shortages = self._calculate_stall_shortages_for_main_animal_combinations(
+            self.pens_by_animal_combination,
+            len(self.calves),
+            len(self.heiferIs),
+            len(self.heiferIIs),
+            len(self.heiferIIIs),
+            num_dry_cows,
+            num_lactating_cows
+        )
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.allocate_all_pens.__name__,
+                    "all_pens": self.all_pens, }
+
+        current_max_shortage = max(stall_shortages.values())
+
+        # This while loop runs up to a maximum number of times that is equal to
+        # the number of animal combinations in the stall_shortages dictionary (4).
+        while current_max_shortage > 0:
+            animal_combination_with_max_shortage = max(stall_shortages, key=stall_shortages.get)
+            pen = self._find_pen_with_max_stalls_for_animal_combination(
+                animal_combination_with_max_shortage,
+                mixed_type_by_pen_id,
+                mixed_type_pen_by_pen_id
+            )
+            if not pen:
+                om.add_warning("pen_shortage_warning",
+                               f"Warning: shortage of {animal_combination_with_max_shortage.name} pens," + " initializing new pen,",
+                               info_map)
+                pen = self._create_default_pen(number_of_stalls=current_max_shortage,
+                                               animal_combination=animal_combination_with_max_shortage)
+                self.all_pens.append(pen)
+            else:
+                self._remove_pen_from_dicts_by_id(pen.pen_id, [mixed_type_by_pen_id, mixed_type_pen_by_pen_id])
+            self.pens_by_animal_combination[animal_combination_with_max_shortage].append(pen)
+            self._recalculate_stall_shortages(stall_shortages, animal_combination_with_max_shortage, pen)
+            current_max_shortage = max(stall_shortages.values())
+
+    # Note: This function will replace allocate_all_pens eventually.
+    def allocate_all_pens_2(self):
+        lactating_cows = self._get_lactating_cows(self.cows)
+        dry_cows = self._get_dry_cows(self.cows)
+        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
+        calf_pens = self.pens_by_animal_combination[Pen.AnimalCombination.CALF]
+        growing_pens = self.pens_by_animal_combination[Pen.AnimalCombination.GROWING]
+        close_up_pens = self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP]
+        lac_cow_pens = self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW]
+
+        mixed_type_pens = (self.pens_by_animal_combination[Pen.AnimalCombination.NONE] +
+                           self.pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP])
+        # key is pen id, value is pen object
+        mixed_type_pen_by_pen_id: Dict[int, Pen] = {pen.id: pen for pen in mixed_type_pens}
+
+        mixed_type_equivalent_for_animal_combination_none = [Pen.AnimalCombination.CALF,
+                                                             Pen.AnimalCombination.GROWING,
+                                                             Pen.AnimalCombination.CLOSE_UP,
+                                                             Pen.AnimalCombination.LAC_COW]
+        # key is pen id, value is list of animal combination(s)
+        mixed_type_by_pen_id = {pen.id: mixed_type_equivalent_for_animal_combination_none
+                                for pen in self.pens_by_animal_combination[Pen.AnimalCombination.NONE]} | \
+                               {pen.id: [Pen.AnimalCombination.GROWING_AND_CLOSE_UP]
+                                for pen in self.pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP]}
+
+        self._accommodate_stall_shortages(
+            num_dry_cows=len(dry_cows),
+            num_lactating_cows=len(lactating_cows),
+            mixed_type_by_pen_id=mixed_type_by_pen_id,
+            mixed_type_pen_by_pen_id=mixed_type_pen_by_pen_id
+        )
+
+        # Still in progress
+        # TODO: self._allocate_calves_to_calf_pens(...)
+        # TODO: self._allocate_heiferIs_and_heiferIIs_to_growing_pens(...)
+        # TODO: self._allocate_heiferIIIs_to_dry_cows_to_close_up_pens(...)
+        # TODO: self._allocate_lactating_cows_to_lac_cow_pens(...)
 
     def allocate_all_pens(self):
         # TODO: Refactor this function, currently nearly 200 lines long
@@ -836,7 +1168,7 @@ class AnimalManagement:
                 pen.populated = len(pen.animals_in_pen) > 0
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
