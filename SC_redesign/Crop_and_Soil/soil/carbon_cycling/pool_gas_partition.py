@@ -106,11 +106,14 @@ class PoolGasPartition:
             # aggregate passive carbon pool flux
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
-#   # ---- S.6.C.2
+
+    # ---- S.6.C.3
     @staticmethod
-    def _active_carbon_to_slow_rate(silt_clay_content: float,
-                                    max_carbon_decomp_rate: float = 0.14) -> float:
-        return max_carbon_decomp_rate * (1 - 0.75 * silt_clay_content)
+    def _active_carbon_to_slow_rate(moisture_effect: float, temperature_effect: float, active_carbon: float,
+                                    silt_clay_content: float, max_carbon_decomposition_rate: float = 0.14) -> float:
+        active_carbon_to_slow_rate = max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
+        # S.6.C.2
+        return active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
 
     # ----  S.6.C.1
     @staticmethod
