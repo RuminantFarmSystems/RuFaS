@@ -55,6 +55,8 @@ class Soil:
             snow_cover: water content of the snow cover on the current day (mm)
             avg_annual_air_temp: average annual air temperature (degrees C)
         """
+        # TODO: if no other daily update methods are added here, this method should be removed and Field should call
+        #       this method directly
         self.soil_temp.daily_soil_temperature_update(solar_radiation, avg_temp, min_temp, max_temp, plant_cover,
                                                      snow_cover, avg_annual_air_temp)
 
