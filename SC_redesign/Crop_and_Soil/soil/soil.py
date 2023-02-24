@@ -21,19 +21,19 @@ class Soil:
         Details:
             If no SoilData object is passed, default configuration is used.
         """
-        data = soil_data or SoilData()
+        self.data = soil_data or SoilData()
         """object that tracks all soil variable throughout the simulation"""
 
         # Process components
-        self.evapotranspiration = Evapotranspiration(data)
+        self.evapotranspiration = Evapotranspiration(self.data)
         """Process component that controls evapotranspiration from the soil"""
-        self.infiltration = Infiltration(data)
+        self.infiltration = Infiltration(self.data)
         """Process component that controls water infiltration from the soil surface into the profile"""
-        self.percolation = Percolation(data)
+        self.percolation = Percolation(self.data)
         """Process component that controls percolation of water from upper layers to lower layers"""
-        self.soil_temp = SoilTemp(data)
+        self.soil_temp = SoilTemp(self.data)
         """Process component that tracks and updates the temperatures within the soil profile"""
-        self.soil_erosion = SoilErosion(data)
+        self.soil_erosion = SoilErosion(self.data)
         """Process component that track erosion from the soil profile"""
 
     @classmethod
