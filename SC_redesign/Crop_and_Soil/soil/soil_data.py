@@ -66,6 +66,11 @@ class SoilData:
     surface_volume_runoff: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
+    # --- pool gas partition
+    silt_clay_content: Optional[float] = None
+
+
+
     def __post_init__(self):
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any

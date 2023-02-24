@@ -50,8 +50,8 @@ class PoolGasPartition:
             layer.soil_structural_slow_carbon_remaining = self._soil_structural_slow_carbon_remaining(
                 layer.soil_structural_slow_carbon_usage)
 
-            K5 = 0.14
             # S.6.C.2
+            K5 = 0.14
             C_active_decomp_rate = K5 * (1 - 0.75 * soil.silt_to_clay_percent)
 
             # S.6.C.3
@@ -106,8 +106,13 @@ class PoolGasPartition:
             # aggregate passive carbon pool flux
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
+#   # ---- S.6.C.2
+    @staticmethod
+    def _active_carbon_to_slow_rate(silt_clay_content: float,
+                                    max_carbon_decomp_rate: float = 0.14) -> float:
+        return max_carbon_decomp_rate * (1 - 0.75 * silt_clay_content)
 
-    # ---- # S.6.C.1
+    # ----  S.6.C.1
     @staticmethod
     def _plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage: float,
                                             metabolic_active_carbon_loss_rate: float = 0.55) -> float:
