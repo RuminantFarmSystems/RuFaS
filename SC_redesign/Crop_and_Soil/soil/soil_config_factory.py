@@ -8,7 +8,7 @@ based on the CropSpeciesDataFactory model, and should contain all equivalent fun
 """
 
 
-class SoilConfigurations(Enum):
+class SoilConfiguration(Enum):
     """Enum of all currently support soil configurations"""
     GENERIC = "generic"
     # TODO: implement additional soil types
@@ -16,12 +16,12 @@ class SoilConfigurations(Enum):
 
 class SoilConfigFactory:
     @staticmethod
-    def create_soil_data(config: SoilConfigurations = SoilConfigurations("generic"), **kwargs) -> SoilData:
+    def create_soil_data(config: SoilConfiguration = SoilConfiguration("generic"), **kwargs) -> SoilData:
         """Creates a soil data object from a SoilConfiguration enum, with the defaults from that configurations and the
             optional ability to modify attributes
         """
         configuration_by_type = {
-            SoilConfigurations.GENERIC: SoilData
+            SoilConfiguration.GENERIC: SoilData
         }
         config_class = configuration_by_type[config]
         config_instance = config_class()
