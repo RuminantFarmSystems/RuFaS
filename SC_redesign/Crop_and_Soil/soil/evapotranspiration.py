@@ -54,7 +54,7 @@ class Evapotranspiration:
         #  monitor?) - issue #317
         self._evaporate_from_soil()
 
-        # Update annual totals
+        # Update accumulated (annual) totals
         self.data.annual_potential_evapotranspiration_total += self.data.potential_evapotranspiration
         self.data.annual_adjusted_potential_evapotranspiration_total += \
             self.data.potential_evapotranspiration_adjusted
