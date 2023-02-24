@@ -49,7 +49,7 @@ class SoilErosion:
         self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield,
                                                                             self.data.snow_cover_water_content)
 
-        # TODO: the soil profile needs to have mass removed from it as it gets eroded - Issue #351
+        # TODO: does the soil profile needs to have mass removed from it as it gets eroded? - Issue #351
 
         # Update annual totals
         self.data.annual_eroded_sediment_total += self.data.eroded_sediment

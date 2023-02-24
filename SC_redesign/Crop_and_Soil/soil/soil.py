@@ -51,7 +51,7 @@ class Soil:
             avg_temp: average temperature of the current day (degrees C)
             min_temp: minimum temperature of the current day (degrees C)
             max_temp: maximum temperature of the current day (degrees C)
-            plant_cover: total aboveground plant biomass and residue on the current day (kg per hectare)
+            plant_cover: total above-ground plant biomass and residue on the current day (kg per hectare)
             snow_cover: water content of the snow cover on the current day (mm)
             avg_annual_air_temp: average annual air temperature (degrees C)
         """
@@ -71,8 +71,7 @@ class Soil:
             weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
                 calculations dependent on plant evapotranspiration (unitless)
             has_seasonal_high_water_table: if the HRU has a seasonal high water table (true/false)
-            extraterrestrial_radiation: radiation from the aliens, in MJ per square meter per day
-                TODO: better description
+            solar_radiation: incoming solar, in MJ per square meter per day
             max_air_temp: maximum air temperature (degrees C)
             min_air_temp: minimum air temperature (degrees C)
             avg_air_temp: average air temperature (degrees C)

@@ -11,6 +11,7 @@ based on the CropSpeciesDataFactory model, and should contain all equivalent fun
 class SoilConfigurations(Enum):
     """Enum of all currently support soil configurations"""
     GENERIC = "generic"
+    # TODO: implement additional soil types
 
 
 class SoilConfigFactory:
