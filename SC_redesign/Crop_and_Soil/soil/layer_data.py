@@ -71,6 +71,7 @@ class LayerData:
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
+        # --- Initialize phosphorus characteristics ---
         # This is the conversion from (kg P / kg soil) to (kg P / ha) defined in equation [S.5.A.2] in 'pseudocode_soil'
         self.labile_phosphorus_content = self.labile_phosphorus_concentration * \
                                          (self.bulk_density * (10 ** (-9))) * \
