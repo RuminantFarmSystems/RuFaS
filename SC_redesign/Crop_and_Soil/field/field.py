@@ -54,7 +54,7 @@ class Field:
         # daily soil routine
 
         # determine total amount of residue and above-ground biomass present on the given day
-        total_plant_cover = self.field_data.current_residue + self._total_above_ground_biomass()
+        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
 
         self.soil.daily_soil_routine(current_weather.incoming_light, current_weather.mean_air_temperature,
                                      current_weather.min_air_temperature, current_weather.max_air_temperature,
@@ -257,11 +257,11 @@ class Field:
         self.soil.daily_soil_water_routine(current_weather.rainfall, 1, self.field_data.seasonal_high_water_table,
                                            current_weather.incoming_light, current_weather.max_air_temperature,
                                            current_weather.min_air_temperature, current_weather.mean_air_temperature,
-                                           self._total_above_ground_biomass(), self.field_data.current_residue,
+                                           self._determine_total_above_ground_biomass(), self.field_data.current_residue,
                                            current_weather.snow_fall, total_initial_canopy_free_water, 0.2)
         pass
 
-    def _total_above_ground_biomass(self) -> float:
+    def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
         for crop in self.crops:
@@ -274,7 +274,6 @@ class Field:
     def perform_annual_reset(self) -> None:
         """Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
             file, and then reset all annual totals"""
-        # TODO: come up with design pattern that allows SoilData objects to be accessed by the Soil object that is a
-        #       part of this class, so that its do_annual_reset() method can be called
+        self.soil.data.do_annual_reset()
 
         pass
