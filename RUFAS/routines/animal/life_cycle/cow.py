@@ -272,10 +272,18 @@ class Cow(HeiferIII):
         """
         Calculates this Cow's nutrient requirements.
         """
-        req = calc_rqmts(self.body_weight, self.mature_body_weight, self.days_in_preg,
-                        'cow', self.calves, self.CI, self.mPrt, self.fat_percent,
-                        self.lactose_milk, self.estimated_daily_milk_produced,
-                        self.days_in_milk, self.milking)
+        req = calc_rqmts(body_weight=self.body_weight,
+                         mature_body_weight=self.mature_body_weight,
+                         day_of_pregnancy=self.days_in_preg,
+                         animal_type='cow',
+                         parity=self.calves,
+                         calving_interval=self.CI,
+                         milk_true_protein=self.mPrt,
+                         milk_fat=self.fat_percent,
+                         milk_lactose=self.lactose_milk,
+                         milk_production=self.estimated_daily_milk_produced,
+                         days_in_milk=self.days_in_milk,
+                         lactating=self.milking)
                         
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
