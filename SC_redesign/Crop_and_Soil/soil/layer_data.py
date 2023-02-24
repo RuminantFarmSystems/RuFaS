@@ -79,6 +79,14 @@ class LayerData:
     soil_metabolic_active_carbon_loss: Optional[float] = None
     soil_metabolic_active_carbon_remaining: Optional[float] = None
 
+    soil_structural_active_carbon_usage: Optional[float] = None
+    soil_structural_active_carbon_loss: Optional[float] = None
+    soil_structural_active_carbon_remaining: Optional[float] = None
+
+    soil_structural_slow_carbon_usage: Optional[float] = None
+    soil_structural_slow_carbon_loss: Optional[float] = None
+    soil_structural_slow_carbon_remaining: Optional[float] = None
+
     
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
