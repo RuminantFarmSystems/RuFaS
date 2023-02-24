@@ -58,9 +58,6 @@ class PoolGasPartition:
             K7 = 0.00013
             C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
 
-            # S.6.B.6
-            Es = 0.85 - 0.68 * soil.silt_to_clay_percent
-
             # S.6.C.7
             layer.active_carbon_to_slow_amount = self._active_carbon_to_slow_ampunt(
                 layer.decomposition_moisture_effect,
@@ -115,7 +112,12 @@ class PoolGasPartition:
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
 
-    # ---- S.6.C.7=8
+    @staticmethod
+    def __slow_carbon_to_active_amount() -> float:
+
+        return slow_carbon_to_active_passive_co2 * (1 - percent_CO2_to_C_slow_loss - percent_C_slow_to_passive)
+
+    # ---- S.6.C.8
     @staticmethod
     def _active_carbon_to_passive_amount(moisture_effect: float, temperature_effect: float, active_carbon: float,
                                          silt_clay_content: float,
@@ -137,6 +139,7 @@ class PoolGasPartition:
         # S.6.C.3
         active_carbon_decomposition_amount = \
             active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
+        # S.6.C.4
         carbon_lost_adjusted_factor = 0.85 - 0.68 * silt_clay_content
 
         return active_carbon_decomposition_amount * carbon_lost_adjusted_factor
@@ -150,6 +153,7 @@ class PoolGasPartition:
         # S.6.C.3
         active_carbon_decomposition_amount = \
             active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
+        # S.6.C.4
         carbon_lost_adjusted_factor = 0.85 - 0.68 * silt_clay_content
 
         return active_carbon_decomposition_amount * (1 - carbon_lost_adjusted_factor - 0.004)
