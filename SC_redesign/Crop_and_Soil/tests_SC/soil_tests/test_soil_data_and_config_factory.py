@@ -4,7 +4,7 @@ from math import inf
 from dataclasses import asdict
 from unittest.mock import patch, PropertyMock
 
-from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigurations, SoilConfigFactory
+from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
@@ -14,11 +14,11 @@ from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 
 # --- Tests to validate Soil Config Factory module ---
 @pytest.mark.parametrize("config,expected", [
-    ("generic", SoilConfigurations.GENERIC),
+    ("generic", SoilConfiguration.GENERIC),
 ])
-def test_soil_config_enum(config: str, expected: SoilConfigurations) -> None:
-    """Tests that SoilConfigurations properly enumerates accepted configuration names"""
-    soil_config = SoilConfigurations(config)
+def test_soil_config_enum(config: str, expected: SoilConfiguration) -> None:
+    """Tests that SoilConfiguration properly enumerates accepted configuration names"""
+    soil_config = SoilConfiguration(config)
     assert soil_config == expected
 
 
@@ -27,10 +27,10 @@ def test_soil_config_enum(config: str, expected: SoilConfigurations) -> None:
     "indoor floor",
 ])
 def test_invalid_soil_config_enum(invalid_config: str) -> None:
-    """Tests that SoilConfigurations raises an error correctly when an invalid configuration name is passed"""
+    """Tests that SoilConfiguration raises an error correctly when an invalid configuration name is passed"""
     with pytest.raises(ValueError) as e:
-        SoilConfigurations(invalid_config)
-    assert str(e.value) == f"'{invalid_config}' is not a valid SoilConfigurations"
+        SoilConfiguration(invalid_config)
+    assert str(e.value) == f"'{invalid_config}' is not a valid SoilConfiguration"
 
 
 def test_config_factory_defaults():
@@ -72,13 +72,13 @@ def test_config_factory_defaults():
 def test_soil_factory_alterations(config: str, args_dict: Dict) -> None:
     """Test that SoilConfigFactory can properly create default SoilData objects with altered attributes"""
     # Create soil object
-    altered_soil = SoilConfigFactory.create_soil_data(SoilConfigurations(config), **args_dict)
+    altered_soil = SoilConfigFactory.create_soil_data(SoilConfiguration(config), **args_dict)
     # Check altered characteristics
     for key, val in args_dict.items():
         assert getattr(altered_soil, key) == val
     # Check that all unaltered attributes have been initialized to their defaults
     unaltered_attributes = asdict(altered_soil).keys() - args_dict.keys()
-    default_soil = SoilConfigFactory.create_soil_data(SoilConfigurations(config))
+    default_soil = SoilConfigFactory.create_soil_data(SoilConfiguration(config))
     for key in unaltered_attributes:
         assert getattr(altered_soil, key) == getattr(default_soil, key)
 
@@ -91,7 +91,7 @@ def test_soil_factory_alterations(config: str, args_dict: Dict) -> None:
 def test_soil_factory_alteration_error(config: str, args_dict: Dict) -> None:
     """Test that SoilConfigFactory throws correct error when there is an attempt to set a nonexistent attribute"""
     with pytest.raises(AttributeError) as e:
-        SoilConfigFactory.create_soil_data(SoilConfigurations(config), **args_dict)
+        SoilConfigFactory.create_soil_data(SoilConfiguration(config), **args_dict)
     assert "is not a valid attribute" in str(e.value)
 
 
