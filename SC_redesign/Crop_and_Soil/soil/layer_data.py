@@ -87,6 +87,14 @@ class LayerData:
     soil_structural_slow_carbon_loss: Optional[float] = None
     soil_structural_slow_carbon_remaining: Optional[float] = None
 
+    active_carbon_amount: Optional[float] = None
+    """active carbon amount (kg/ha) (pseudocode_soil S.6.C.3)"""
+    active_carbon_to_slow_amount: Optional[float] = None
+    active_carbon_to_slow_loss: Optional[float] = None
+    active_carbon_to_passive_amount: Optional[float] = None
+
+
+
     
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""

@@ -66,6 +66,10 @@ class SoilData:
     surface_volume_runoff: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
+    # ---- decomposition
+    decomposition_temperature_effect: Optional[float] = None
+    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
+
     # --- pool gas partition
     silt_clay_content: Optional[float] = None
 
@@ -83,11 +87,6 @@ class SoilData:
                                            bottom_depth=10000000,    # bottom depth is 10,000 meters by default
                                            soil_water_concentration=0,
                                            saturation_point_water_concentration=inf)
-
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
 
 
     @property
