@@ -58,6 +58,7 @@ class CropSpeciesDataFactory:
             # set new name to indicate that the class has been altered.
             name_key_absent = "name" not in kwargs.keys()
             id_is_only_key = (len(kwargs) == 1 and "id" in kwargs.keys())
+            # If only the id is being changed, the crop is still a default so its name should not be changed
             if name_key_absent and not id_is_only_key:
                 species_instance.name = species_instance.name.replace("default", "altered")
 
