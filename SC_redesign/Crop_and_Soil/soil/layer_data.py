@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 
@@ -57,7 +57,6 @@ class LayerData:
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
-
     # --- Decomposition
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
@@ -69,6 +68,9 @@ class LayerData:
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
+        if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
+            raise ValueError(f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                             f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.")
         return self.bottom_depth - self.top_depth
 
     @property
@@ -87,6 +89,11 @@ class LayerData:
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
+    def saturation_content(self) -> float:
+        """volume of water in layer when saturated (mm)"""
+        return self.saturation_point_water_concentration * self.layer_thickness
+
+    @property
     def excess_water_available(self) -> float:
         """volume of water available for percolation in the soil layer (mm)
         SWAT Reference: 2:3.2.1, 2
@@ -99,7 +106,6 @@ class LayerData:
         return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
-
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
         return max(0, self.saturation_content - self.water_content)

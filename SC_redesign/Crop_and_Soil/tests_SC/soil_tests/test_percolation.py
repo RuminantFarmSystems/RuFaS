@@ -115,7 +115,7 @@ def test_percolate_between_layers():
                LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
     layers2[0].water_content = 15
     layers2[1].water_content = 3.8
-    data2 = SoilData(layers2)
+    data2 = SoilData(soil_layers=layers2)
     incorp2 = Percolation(data2)
 
     # Only need to re-mock the amount that will be percolated to next layer
@@ -146,7 +146,7 @@ def test_percolate_between_layers():
                LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
     layers3[0].water_content = 8.9
     layers3[1].water_content = 3.8
-    data3 = SoilData(layers3)
+    data3 = SoilData(soil_layers=layers3)
     incorp3 = Percolation(data3)
 
     # Neither intermediate functions need to be re-mocked
