@@ -122,6 +122,7 @@ def objective(x):
     Args:
         x: The decision vector of the NLP
     """
+    print(np.multiply(x, price))
     return sum(np.multiply(x, price))
 
 
@@ -513,8 +514,8 @@ def userbounds():
             rationtouse = ration_cow_dry
     elif animal_type == 'heifer':
         rationtouse = ration_all_heifers
-        chanchodebug = False
-        if chanchodebug:
+        chancho_debug = False
+        if chancho_debug:
             print('heiferfound')
             print(ration_all_heifers)
     else: 
@@ -601,8 +602,13 @@ def optimize(user_defined_ration):
     #        writer.writerow(data)
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
+    import matplotlib.pyplot as plt
     if user_defined_ration:
+        # accumulator = []
         usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)
+        # plt.plot(accumulator[:, 0], accumulator[:, 1])
+        # plt.show()
+        print(usermod)
         if usermod.success == False:
             print(animal_type)
             bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con1)
@@ -627,6 +633,8 @@ def optimize(user_defined_ration):
             print('bound 10 ' + str(bound1check.success))
             bound1check = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con11)
             print('bound 11 ' + str(bound1check.success))
+        else:
+            print('success!\n\n\n\n\n\n')
         return usermod
     elif animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
