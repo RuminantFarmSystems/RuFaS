@@ -115,7 +115,7 @@ class SoilData:
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
 
-    def annual_reset(self) -> None:
+    def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
         # Reset soil profile totals
         self.initial_water_content = self.profile_soil_water_content
@@ -135,8 +135,6 @@ class SoilData:
     # ---- decomposition
     decomposition_temperature_effect: Optional[float] = None
     """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
-
 
     @property
     def profile_soil_water_content(self) -> float:

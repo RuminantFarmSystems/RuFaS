@@ -129,6 +129,12 @@ class Crop:
         """list all variables used by Crop"""
         return vars(self)  # TODO: check for duplicates or conflicts among parents
 
+    @property
+    def crop_data(self) -> CropData:
+        """returns data for this crop so that data stored in it can be used in other methods"""
+        # TODO: this is a bad design for accessing the CropData object in a Crop object, come up with better one
+        return self.crop_data
+
 # ---- Old versions of cut() and kill()
 # def kill(crop_type, field_management, time):
 #     """

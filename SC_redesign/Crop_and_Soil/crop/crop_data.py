@@ -288,6 +288,11 @@ class CropData:
     """water deficiency factor for the plant (unitless)"""
     max_transpiration: Optional[float] = None
     """maximum transpiration on a given day (mm)"""
+    evapotranspiration_weighting_coefficient: float = 1
+    """plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive(?).
+        Used in SWAT equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)"""
+    initial_canopy_free_water: float = 0    # TODO: track this - Issue #316
+    """initial amount of free water held in the canopy on a given day (mm)"""
 
     # ---- yields
     # constant attributes
