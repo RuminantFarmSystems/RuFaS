@@ -12,7 +12,7 @@ class Dormancy:
     def __int__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData
 
-
+    # TODO: It might be better calculate the two values in FieldData (e.g., post_init), since they don't change?
     @staticmethod
     def _find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:
         """calculates the threshold daylength for dormancy
