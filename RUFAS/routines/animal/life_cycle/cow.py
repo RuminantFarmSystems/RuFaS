@@ -899,7 +899,7 @@ class Cow(HeiferIII):
             self.estrus_day = self.determine_estrus_day(
                 self.abortion_day, const.ESTRUS_AFTER_PGF_NOTE,
                 AnimalBase.config['avg_estrus_cycle_after_pgf'],
-                AnimalBase.config['std_estrus_cycle_p'], sim_day)
+                AnimalBase.config['std_estrus_cycle_after_pgf'], sim_day)
 
     # Preg methods
     def open(self, sim_day):
