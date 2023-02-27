@@ -349,11 +349,18 @@ class CropData:
     """phosphorus contained in the harvested yield (kg/ha)"""
 
     # ---- dormancy
-    is_dormant = False
-    """is the crop dormant?"""
-    dormancy_loss_fraction = 0.1
-    """fraction of biomass the crop loses when it goes dormant. Always 10% for perennials, varies for trees
+    dormancy_loss_fraction: Optional[float] = 0.1
+    """Fraction of biomass the crop loses when it goes dormant. Default 10% for perennials, 30% for trees
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
+    # TODO: implement __post_init__() to set default based on plant type
+    residue: float = 0
+    """Total amount of residue from this crop that is currently on the soil surface (kg / ha)"""
+    minimum_lai_during_dormancy: Optional[float] = 0.75
+    """Minimum leaf area index for plants (perennials and trees only) during dormancy (unitless)"""
+    # TODO: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
+    #  now allowed to modify this value. But it does not provide values for any of the listed plant species and gives no
+    #  information about how this value can be measured or calculated. Also, if leaf area index is less than the minium
+    #  before going into dormancy, should it just stay at its current leaf area index?
 
     @property
     def is_mature(self) -> bool:
@@ -373,7 +380,7 @@ class CropData:
     @property
     def is_perennial(self) -> bool:
         """Returns whether the plant is perennial"""
-        if self.plant_type == PlantTypes.PERENNIAL.value or self.plant_type == PlantTypes.PERENNIAL_LEGUME.value:
+        if self.plant_type == PlantTypes.PERENNIAL or self.plant_type == PlantTypes.PERENNIAL_LEGUME:
             return True
         return False
 
