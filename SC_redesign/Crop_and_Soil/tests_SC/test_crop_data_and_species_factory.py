@@ -432,7 +432,7 @@ def test_manual_custom_crop_data():
     ("cereal_rye", {"biomass": 100}),  # change attribute declared only in CropData
     ("spring_barley", {"name": "fancy barley",  # custom new variety/subspecies
                        "plant_code": "FBAR", "scientific_name" : "Hordeum vulgare regalis"}),
-    ("fall_oats", {"plant_type": "perennial"}),  # perennial version of oats
+    ("fall_oats", {"plant_type": PlantTypes("perennial")}),  # perennial version of oats
     ("tall_fescue", {"is_nitrogen_fixer": True}),  # magical nitrogen-fixing grass (egads!)
     ("alfalfa", {"yield_nitrogen_fraction": 0.03}),  # this alfalfa has increased nitrogen in harvest
     ("soybean", {"max_leaf_area_index": 2.4, "light_use_efficiency": 10.8,  # various alterations

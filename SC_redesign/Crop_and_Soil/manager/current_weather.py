@@ -15,6 +15,8 @@ class CurrentWeather:
     """average air temperature for the day (C)"""
     max_air_temperature: Optional[float] = None
     """maximum air temperature for the day (C)"""
+    daylength: Optional[float] = None
+    """Length of time from sunup to sundown on the day (hours)"""
 
     @classmethod
     def check_current_weather(cls, weather: Weather):  # NOTE: How to specify the correct return type?

@@ -1,5 +1,6 @@
 import pytest
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantTypes
 
 
 # --- Static function tests ---
@@ -9,7 +10,7 @@ from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
     (14, 17),
     (16.218347349, 16.329438502)
 ])
-def test_find_threshold_daylength(min_daylength: float, dormancy_threshold: float) -> float:
+def test_find_threshold_daylength(min_daylength: float, dormancy_threshold: float) -> None:
     """Tests that _find_threshold_daylength() in Dormancy module works correctly"""
     observe = Dormancy._find_threshold_daylength(min_daylength, dormancy_threshold)
     expect = min_daylength + dormancy_threshold
@@ -23,7 +24,7 @@ def test_find_threshold_daylength(min_daylength: float, dormancy_threshold: floa
     17.9238487592,
     56.2948349202,
 ])
-def test_find_dormancy_threshold(latitude: float) -> float:
+def test_find_dormancy_threshold(latitude: float) -> None:
     """Tests that _find_dormancy_threshold() in Dormancy module works correctly"""
     observe = Dormancy._find_dormancy_threshold(latitude)
     if latitude > 40:
@@ -33,3 +34,31 @@ def test_find_dormancy_threshold(latitude: float) -> float:
     else:
         expect = 0
     assert observe == expect
+
+# --- Integration tests ---
+@pytest.mark.parametrize("biomass,residue,lai,min_lai,plant_type,loss_frac", [
+    (800, 150, 0.87, 0.75, PlantTypes("perennial"), 0.1),       # Perennial with defaults
+    (2000, 70, 0.91, 0.56, PlantTypes("tree"), 0.3),            # Tree with tree defaults
+    (1100, 210, 0.78, None, PlantTypes("cool_annual"), None),   # Cool annual
+    (980, 145, 0.8891, None, PlantTypes("warm_annual_legume"), None),  # plant that should not go into dormancy at all
+])
+def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: float, plant_type: PlantTypes,
+                          loss_frac: float) -> None:
+    # Initialize objects
+    data = CropData(biomass=biomass, residue=residue, leaf_area_index=lai, minimum_lai_during_dormancy=min_lai,
+                    plant_type=plant_type, dormancy_loss_fraction=loss_frac)
+    incorp = Dormancy(data)
+
+    # Run method
+    incorp.go_into_dormancy()
+
+    # Check everything
+    if incorp.data.plant_type == PlantTypes.WARM_ANNUAL_LEGUME or PlantTypes.WARM_ANNUAL:
+        assert incorp.data.is_dormant is False
+    else:
+        assert incorp.data.is_dormant is True
+        if incorp.data.plant_type == PlantTypes.PERENNIAL or PlantTypes.PERENNIAL_LEGUME or PlantTypes.TREE:
+            assert incorp.data.biomass == (biomass * (1 - loss_frac))
+            assert incorp.data.residue == (residue + (biomass * loss_frac))
+            assert incorp.data.leaf_area_index == min(lai, min_lai)
+

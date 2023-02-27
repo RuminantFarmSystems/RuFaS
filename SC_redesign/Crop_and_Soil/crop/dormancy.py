@@ -1,6 +1,6 @@
 from typing import Optional
 
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantTypes
 
 
 """
@@ -9,7 +9,7 @@ This module is based on the "Dormancy" module of SWAT (5:1.2)
 
 
 class Dormancy:
-    def __int__(self, crop_data: Optional[CropData] = None):
+    def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData
 
     def go_into_dormancy(self) -> None:
@@ -19,8 +19,22 @@ class Dormancy:
             When method is called, the crop's status is set to dormant and biomass is removed from plant and converted
             to residue
         """
+        if self.data.plant_type == PlantTypes.WARM_ANNUAL or PlantTypes.WARM_ANNUAL_LEGUME:
+            # These types of plants do not go into dormancy
+            return
+
         self.data.is_dormant = True
-        # self.data.residue =
+        if self.data.plant_type == PlantTypes.TREE or self.data.is_perennial:
+            # Cool annuals and cool annual legumes do not lose any biomass or get their leaf area index reset
+
+            # Some fraction of biomass falls off the plant and becomes residue
+            self.data.residue += (self.data.biomass * self.data.dormancy_loss_fraction)
+            self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
+            # Leaf area index gets set to minimum leaf area index, if it is less than the current leaf area index
+            if self.data.minimum_lai_during_dormancy < self.data.leaf_area_index:
+                self.data.leaf_area_index = self.data.minimum_lai_during_dormancy
+
+
 
 
     # TODO: It might be better calculate the two values in FieldData (e.g., post_init), since they don't change?
