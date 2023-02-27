@@ -51,14 +51,14 @@ def test_develop_roots(maxd, heatfrac):
     """integration test for main root development function develop_roots()"""
 
     # ---- perennial crop ----
-    data_perennial = CropData(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=True)
+    data_perennial = CropData(heat_fraction=heatfrac, max_root_depth=maxd, plant_type="perennial")
     rd = RootDevelopment(data_perennial)
     rd.develop_roots()
     assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
     assert data_perennial.root_depth == maxd
 
     # ---- annual crop ----
-    data_annual = CropData(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=False)
+    data_annual = CropData(heat_fraction=heatfrac, max_root_depth=maxd, plant_type="warm_annual")
     rd = RootDevelopment(data_annual)
     rd.develop_roots()
     assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)

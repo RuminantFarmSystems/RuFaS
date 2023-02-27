@@ -1,5 +1,7 @@
+from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List
+
 
 # TODO: defaults need to be reviewed and updated. See the SWAT crop database for values
 
@@ -28,8 +30,10 @@ class CropData:
     """4-letter plant code (used by SWAT)"""
     scientific_name: Optional[str] = None
     """taxonomic name of the plant"""
-    is_perennial: bool = False
-    """is the plant perennial?"""
+    plant_type: Optional[str] = "cool_annual"
+    """Classification of the plant (Reference SWAT crop.dat file, IDC variable"""
+    # is_perennial: bool = False
+    # """is the plant perennial?"""
     is_nitrogen_fixer: bool = False
     """is the plant a nitrogen fixer?"""
     priority: int = 1
@@ -124,7 +128,7 @@ class CropData:
     """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     root_biomass: Optional[float] = None
     """biomass stored in roots (kg/ha)"""
-    
+
     # ---- growth constraints
     water_uptake: float = 18
     """water taken up by the plant for the day (mm)"""
@@ -348,6 +352,24 @@ class CropData:
         """check if the plant is in senescence"""
         return self.heat_fraction > self.senescent_heat_fraction
 
+    @property
+    def is_perennial(self) -> bool:
+        """Returns whether the plant is perennial"""
+        if self.plant_type == PlantTypes.PERENNIAL or self.plant_type == PlantTypes.PERENNIAL_LEGUME:
+            return True
+        return False
+
+
+class PlantTypes(Enum):
+    """Enum of all plant types supported by RuFaS. Listed for supported plant types in SWAT Appendix A, table A-1"""
+    WARM_ANNUAL_LEGUME = "warm_annual_legume"
+    COLD_ANNUAL_LEGUME = "cold_annual_legume"
+    PERENNIAL_LEGUME = "perennial_legume"
+    WARM_ANNUAL = "warm_annual"
+    COOL_ANNUAL = "cool_annual"
+    PERENNIAL = "perennial"
+    TREE = "tree"
+
 
 """
 The species child classes provide default configuration for the supported CropSpecies. 
@@ -369,7 +391,8 @@ class Corn(CropData):
     name: str = "default corn"
     plant_code: str = "CORN"
     scientific_name: str = "Zea mays"
-    is_perennial: bool = False
+    plant_type: str = "warm_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 8.0
@@ -404,7 +427,8 @@ class SpringWheat(CropData):
     name: str = "default spring_wheat"
     plant_code: str = "SWHT"
     scientific_name: str = "Triticum aestivum"
-    is_perennial: bool = False
+    plant_type: str = "cool_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -439,7 +463,8 @@ class WinterWheat(CropData):
     name: str = "default winter_wheat"
     plant_code: str = "WWHT"
     scientific_name: str = "Triticum aestivum"
-    is_perennial: bool = False
+    plant_type: str = "cool_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -474,7 +499,8 @@ class CerealRye(CropData):
     name: str = "default cereal_rye"
     plant_code: str = "RYE"
     scientific_name: str = "Secale cereale"
-    is_perennial: bool = False
+    plant_type: str = "cool_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0
@@ -509,7 +535,8 @@ class SpringBarley(CropData):
     name: str = "default spring_barley"
     plant_code: str = "BARL"
     scientific_name: str = "Hordeum vulgare"
-    is_perennial: bool = False
+    plant_type: str = "cool_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -544,7 +571,8 @@ class FallOats(CropData):
     name: str = "default fall_oats"
     plant_code: str = "OATS"
     scientific_name: str = "Avena sativa"
-    is_perennial: bool = False
+    plant_type: str = "cool_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -579,7 +607,8 @@ class TallFescue(CropData):
     name: str = "default tall_fescue"
     plant_code: str = "FESC"
     scientific_name: str = "Festuca arundinaceae"
-    is_perennial: bool = True
+    plant_type: str = "perennial"
+    # is_perennial: bool = True
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -614,7 +643,8 @@ class Alfalfa(CropData):
     name: str = "default alfalfa"
     plant_code: str = "ALFA"
     scientific_name: str = "Medicago sativa"
-    is_perennial: bool = True
+    plant_type: str = "perennial_legume"
+    # is_perennial: bool = True
     is_nitrogen_fixer: bool = True
 
     minimum_temperature: float = 4.0
@@ -649,7 +679,8 @@ class Soybean(CropData):
     name: str = "default soybean"
     plant_code: str = "SOYB"
     scientific_name: str = "Glycine max"
-    is_perennial: bool = False
+    plant_type: str = "warm_annual_legume"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = True
 
     minimum_temperature: float = 10.0
@@ -684,7 +715,8 @@ class SugarBeet(CropData):
     name: str = "default sugar_beet"
     plant_code: str = "SGBT"
     scientific_name: str = "Beta vulgaris saccharifera"
-    is_perennial: bool = False
+    plant_type: str = "warm_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 4.0
@@ -719,7 +751,8 @@ class Potato(CropData):
     name: str = "default potato"
     plant_code: str = "POTA"
     scientific_name: str = "Solanum tuberosum"
-    is_perennial: bool = False
+    plant_type: str = "cool_annual"
+    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 7.0
@@ -751,4 +784,4 @@ class Potato(CropData):
 class Triticale(CropData):
     """crop data class with default values for triticale"""
     # TODO: triticale has unknown parameters, since it is not present in SWAT database.
-    #     Duram wheat is likely the closest analog.
+    #     Durum wheat is likely the closest analog.

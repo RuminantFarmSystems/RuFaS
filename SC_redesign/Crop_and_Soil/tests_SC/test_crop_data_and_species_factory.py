@@ -44,7 +44,8 @@ def test_species_factory_defaults():
     assert generic.id == 0
     assert generic.plant_code is None
     assert generic.scientific_name is None
-    assert generic.is_perennial is False
+    assert generic.plant_type == "cool_annual"
+    # assert generic.is_perennial is False
     assert generic.is_nitrogen_fixer is False
     assert generic.minimum_temperature == 0
     assert generic.optimal_temperature == 25
@@ -78,7 +79,8 @@ def test_species_factory_defaults():
     assert corn.id == 12
     assert corn.plant_code == "CORN"
     assert corn.scientific_name == "Zea mays"
-    assert corn.is_perennial is False
+    assert corn.plant_type == "warm_annual"
+    # assert corn.is_perennial is False
     assert corn.is_nitrogen_fixer is False
     assert corn.minimum_temperature == 8.0
     assert corn.optimal_temperature == 25.0
@@ -107,7 +109,8 @@ def test_species_factory_defaults():
     assert spring_wheat.id == 85
     assert spring_wheat.plant_code == "SWHT"
     assert spring_wheat.scientific_name == "Triticum aestivum"
-    assert spring_wheat.is_perennial is False
+    assert spring_wheat.plant_type == "cool_annual"
+    # assert spring_wheat.is_perennial is False
     assert spring_wheat.is_nitrogen_fixer is False
     assert spring_wheat.minimum_temperature == 0.0
     assert spring_wheat.optimal_temperature == 18.0
@@ -136,7 +139,8 @@ def test_species_factory_defaults():
     assert winter_wheat.id == 1000
     assert winter_wheat.plant_code == "WWHT"
     assert winter_wheat.scientific_name == "Triticum aestivum"
-    assert winter_wheat.is_perennial is False
+    assert winter_wheat.plant_type == "cool_annual"
+    # assert winter_wheat.is_perennial is False
     assert winter_wheat.is_nitrogen_fixer is False
     assert winter_wheat.minimum_temperature == 0.0
     assert winter_wheat.optimal_temperature == 18.0
@@ -165,7 +169,8 @@ def test_species_factory_defaults():
     assert cereal_rye.id == 123
     assert cereal_rye.plant_code == "RYE"
     assert cereal_rye.scientific_name == "Secale cereale"
-    assert cereal_rye.is_perennial is False
+    assert cereal_rye.plant_type == "cool_annual"
+    # assert cereal_rye.is_perennial is False
     assert cereal_rye.is_nitrogen_fixer is False
     assert cereal_rye.minimum_temperature == 0.0
     assert cereal_rye.optimal_temperature == 12.5
@@ -194,7 +199,8 @@ def test_species_factory_defaults():
     assert spring_barley.id == 42  # this is everything
     assert spring_barley.plant_code == "BARL"
     assert spring_barley.scientific_name == "Hordeum vulgare"
-    assert spring_barley.is_perennial is False
+    assert spring_barley.plant_type == "cool_annual"
+    # assert spring_barley.is_perennial is False
     assert spring_barley.is_nitrogen_fixer is False
     assert spring_barley.minimum_temperature == 0.0
     assert spring_barley.optimal_temperature == 25.0
@@ -223,7 +229,8 @@ def test_species_factory_defaults():
     assert fall_oats.id == 9001  # it is, indeed, over 9000
     assert fall_oats.plant_code == "OATS"
     assert fall_oats.scientific_name == "Avena sativa"
-    assert fall_oats.is_perennial is False
+    assert fall_oats.plant_type == "cool_annual"
+    # assert fall_oats.is_perennial is False
     assert fall_oats.is_nitrogen_fixer is False
     assert fall_oats.minimum_temperature == 0.0
     assert fall_oats.optimal_temperature == 15.0
@@ -252,7 +259,8 @@ def test_species_factory_defaults():
     assert tall_fescue.id == -1  # who would do this?
     assert tall_fescue.plant_code == "FESC"
     assert tall_fescue.scientific_name == "Festuca arundinaceae"
-    assert tall_fescue.is_perennial is True
+    assert tall_fescue.plant_type == "perennial"
+    # assert tall_fescue.is_perennial is True
     assert tall_fescue.is_nitrogen_fixer is False
     assert tall_fescue.minimum_temperature == 0.0
     assert tall_fescue.optimal_temperature == 15.0
@@ -281,7 +289,8 @@ def test_species_factory_defaults():
     assert alfalfa.id == 7
     assert alfalfa.plant_code == "ALFA"
     assert alfalfa.scientific_name == "Medicago sativa"
-    assert alfalfa.is_perennial is True
+    assert alfalfa.plant_type == "perennial_legume"
+    # assert alfalfa.is_perennial is True
     assert alfalfa.is_nitrogen_fixer is True
     assert alfalfa.minimum_temperature == 4.0
     assert alfalfa.optimal_temperature == 25.0
@@ -310,7 +319,8 @@ def test_species_factory_defaults():
     assert soybean.id == 999
     assert soybean.plant_code == "SOYB"
     assert soybean.scientific_name == "Glycine max"
-    assert soybean.is_perennial is False
+    assert soybean.plant_type == "warm_annual_legume"
+    # assert soybean.is_perennial is False
     assert soybean.is_nitrogen_fixer is True
     assert soybean.minimum_temperature == 10.0
     assert soybean.optimal_temperature == 25.0
@@ -339,7 +349,8 @@ def test_species_factory_defaults():
     assert sugar_beet.id == 5
     assert sugar_beet.plant_code == "SGBT"
     assert sugar_beet.scientific_name == "Beta vulgaris saccharifera"
-    assert sugar_beet.is_perennial is False
+    assert sugar_beet.plant_type == "warm_annual"
+    # assert sugar_beet.is_perennial is False
     assert sugar_beet.is_nitrogen_fixer is False
     assert sugar_beet.minimum_temperature == 4.0
     assert sugar_beet.optimal_temperature == 18.0
@@ -368,7 +379,8 @@ def test_species_factory_defaults():
     assert potato.id == 2
     assert potato.plant_code == "POTA"
     assert potato.scientific_name == "Solanum tuberosum"
-    assert potato.is_perennial is False
+    assert potato.plant_type == "cool_annual"
+    # assert potato.is_perennial is False
     assert potato.is_nitrogen_fixer is False
     assert potato.minimum_temperature == 7.0
     assert potato.optimal_temperature == 22.0
@@ -398,14 +410,15 @@ def test_manual_custom_crop_data():
     """checks (and demonstrates) the alternate way of customizing a crop"""
     # setup custom crop
     aspen = CropData(name="custom crop: aspen", species="aspen", scientific_name="Populus tremuloides",
-                     plant_code="PTREM", is_perennial=True, is_nitrogen_fixer=False, max_leaf_area_index=5.0)
+                     plant_code="PTREM", plant_type="tree", is_nitrogen_fixer=False, max_leaf_area_index=5.0)
 
     # check that each attribute is set appropriately
     assert aspen.name == "custom crop: aspen"
     assert aspen.species == "aspen"
     assert aspen.scientific_name == "Populus tremuloides"
     assert aspen.plant_code == "PTREM"
-    assert aspen.is_perennial is True
+    assert aspen.plant_type == "tree"
+    # assert aspen.is_perennial is True
     assert aspen.is_nitrogen_fixer is False
     assert aspen.max_leaf_area_index == 5.0
 
@@ -419,7 +432,7 @@ def test_manual_custom_crop_data():
     ("cereal_rye", {"biomass": 100}),  # change attribute declared only in CropData
     ("spring_barley", {"name": "fancy barley",  # custom new variety/subspecies
                        "plant_code": "FBAR", "scientific_name" : "Hordeum vulgare regalis"}),
-    ("fall_oats", {"is_perennial": True}),  # perennial version of oats
+    ("fall_oats", {"plant_type": "perennial"}),  # perennial version of oats
     ("tall_fescue", {"is_nitrogen_fixer": True}),  # magical nitrogen-fixing grass (egads!)
     ("alfalfa", {"yield_nitrogen_fraction": 0.03}),  # this alfalfa has increased nitrogen in harvest
     ("soybean", {"max_leaf_area_index": 2.4, "light_use_efficiency": 10.8,  # various alterations
