@@ -355,7 +355,7 @@ class CropData:
     @property
     def is_perennial(self) -> bool:
         """Returns whether the plant is perennial"""
-        if self.plant_type == PlantTypes.PERENNIAL or self.plant_type == PlantTypes.PERENNIAL_LEGUME:
+        if self.plant_type == PlantTypes.PERENNIAL.value or self.plant_type == PlantTypes.PERENNIAL_LEGUME.value:
             return True
         return False
 
