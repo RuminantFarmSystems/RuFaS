@@ -12,6 +12,17 @@ class Dormancy:
     def __int__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData
 
+    def go_into_dormancy(self) -> None:
+        """This method performs the actual transition from active to dormant in a crop.
+
+        Details:
+            When method is called, the crop's status is set to dormant and biomass is removed from plant and converted
+            to residue
+        """
+        self.data.is_dormant = True
+        # self.data.residue =
+
+
     # TODO: It might be better calculate the two values in FieldData (e.g., post_init), since they don't change?
     @staticmethod
     def _find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:

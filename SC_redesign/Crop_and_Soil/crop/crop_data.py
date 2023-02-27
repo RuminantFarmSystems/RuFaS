@@ -337,6 +337,13 @@ class CropData:
     yield_phosphorus: Optional[float] = None
     """phosphorus contained in the harvested yield (kg/ha)"""
 
+    # ---- dormancy
+    is_dormant = False
+    """is the crop dormant?"""
+    dormancy_loss_fraction = 0.1
+    """fraction of biomass the crop loses when it goes dormant. Always 10% for perennials, varies for trees
+        Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
+
     @property
     def is_mature(self) -> bool:
         """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
