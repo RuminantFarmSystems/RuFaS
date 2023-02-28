@@ -15,15 +15,16 @@ class Dormancy:
         """This method performs the actual transition from active to dormant in a crop.
 
         Details:
-            When method is called, the crop's status is set to dormant and biomass is removed from plant and converted
-            to residue
+            When method is called, the crop's status is set to dormant, biomass is removed from plant and converted
+            to residue, and the leaf area index is reset (if the current leaf area index is greater than the minimum
+            leaf area index during dormancy for this crop).
         """
         if self.data.plant_type == PlantTypes.WARM_ANNUAL or PlantTypes.WARM_ANNUAL_LEGUME:
             # These types of plants do not go into dormancy
             return
 
         if self.data.is_dormant:
-            # Crop is already dormant, should not re-perform any dormancy operations on it
+            # Crop is already dormant, so it should not re-lose biomass or have its leaf area index reset again
             return
 
         # TODO: should is_growing be set here?
@@ -36,9 +37,12 @@ class Dormancy:
             self.data.yield_residue += (self.data.biomass * self.data.dormancy_loss_fraction)
             self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
             # Leaf area index gets set to minimum leaf area index, if it is less than the current leaf area index
+            # TODO: verify this is correct behavior for case when current leaf area index is less than the minimum leaf
+            #   area index during dormancy
             self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
 
     # TODO: It might be better calculate the two values in FieldData (e.g., post_init), since they don't change?
+    #   Update: these are used in the post_init in FieldData, should they have protected status (i.e., _) removed?
     @staticmethod
     def _find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:
         """calculates the threshold daylength for dormancy
