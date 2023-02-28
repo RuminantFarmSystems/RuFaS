@@ -167,7 +167,8 @@ class CropData:
     """total heat units required for the plant to reach maturity (unitless)"""
     accumulated_heat_units: float = 0  # accumulator
     """total heat units accumulated to date (unitless)"""
-    is_growing: bool = True  # TODO: not currently using; SWAT 5:2.1.4
+    is_growing: bool = True
+    # TODO: not currently using; SWAT 5:2.1.4 (pretty sure this is a section, not equation, reference)
     """is the crop currently growing?"""
     is_dormant: bool = False
     """is the crop currently dormant?"""
@@ -346,16 +347,22 @@ class CropData:
     """phosphorus contained in the harvested yield (kg/ha)"""
 
     # ---- dormancy
-    dormancy_loss_fraction: Optional[float] = 0.1
-    """Fraction of biomass the crop loses when it goes dormant. Default 10% for perennials, 30% for trees
+    dormancy_loss_fraction: Optional[float] = None
+    """Fraction of biomass the crop loses when it goes dormant. Default 0.1 for perennials, 0.3 for trees
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
-    # TODO: implement __post_init__() to set default based on plant type
     minimum_lai_during_dormancy: Optional[float] = 0.75
     """Minimum leaf area index for plants (perennials and trees only) during dormancy (unitless)"""
     # TODO: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
     #  now allowed to modify this value. But it does not provide values for any of the listed plant species and gives no
     #  information about how this value can be measured or calculated. Also, if leaf area index is less than the minium
     #  before going into dormancy, should it just stay at its current leaf area index?
+
+    def __post_init__(self):
+        """Initialize all attributes with defaults that depend on other attributes"""
+        if self.plant_type == PlantTypes.PERENNIAL or PlantTypes.PERENNIAL_LEGUME:
+            self.dormancy_loss_fraction = 0.1
+        elif self.plant_type == PlantTypes.TREE:
+            self.dormancy_loss_fraction = 0.3
 
     @property
     def is_mature(self) -> bool:
@@ -374,7 +381,7 @@ class CropData:
 
     @property
     def is_perennial(self) -> bool:
-        """Returns whether the plant is perennial"""
+        """Returns True if the plant is a perennial"""
         if self.plant_type == PlantTypes.PERENNIAL or self.plant_type == PlantTypes.PERENNIAL_LEGUME:
             return True
         return False
