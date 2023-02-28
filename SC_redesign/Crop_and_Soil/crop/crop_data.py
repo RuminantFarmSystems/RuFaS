@@ -402,7 +402,6 @@ class Corn(CropData):
     plant_code: str = "CORN"
     scientific_name: str = "Zea mays"
     plant_type: PlantTypes = PlantTypes("warm_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 8.0
@@ -438,7 +437,6 @@ class SpringWheat(CropData):
     plant_code: str = "SWHT"
     scientific_name: str = "Triticum aestivum"
     plant_type: PlantTypes = PlantTypes("cool_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -474,7 +472,6 @@ class WinterWheat(CropData):
     plant_code: str = "WWHT"
     scientific_name: str = "Triticum aestivum"
     plant_type: PlantTypes = PlantTypes("cool_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -510,7 +507,6 @@ class CerealRye(CropData):
     plant_code: str = "RYE"
     scientific_name: str = "Secale cereale"
     plant_type: PlantTypes = PlantTypes("cool_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0
@@ -546,7 +542,6 @@ class SpringBarley(CropData):
     plant_code: str = "BARL"
     scientific_name: str = "Hordeum vulgare"
     plant_type: PlantTypes = PlantTypes("cool_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -582,7 +577,6 @@ class FallOats(CropData):
     plant_code: str = "OATS"
     scientific_name: str = "Avena sativa"
     plant_type: PlantTypes = PlantTypes("cool_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -618,7 +612,6 @@ class TallFescue(CropData):
     plant_code: str = "FESC"
     scientific_name: str = "Festuca arundinaceae"
     plant_type: PlantTypes = PlantTypes("perennial")
-    # is_perennial: bool = True
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -654,7 +647,6 @@ class Alfalfa(CropData):
     plant_code: str = "ALFA"
     scientific_name: str = "Medicago sativa"
     plant_type: PlantTypes = PlantTypes("perennial_legume")
-    # is_perennial: bool = True
     is_nitrogen_fixer: bool = True
 
     minimum_temperature: float = 4.0
@@ -690,7 +682,6 @@ class Soybean(CropData):
     plant_code: str = "SOYB"
     scientific_name: str = "Glycine max"
     plant_type: PlantTypes = PlantTypes("warm_annual_legume")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = True
 
     minimum_temperature: float = 10.0
@@ -726,7 +717,6 @@ class SugarBeet(CropData):
     plant_code: str = "SGBT"
     scientific_name: str = "Beta vulgaris saccharifera"
     plant_type: PlantTypes = PlantTypes("warm_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 4.0
@@ -762,7 +752,6 @@ class Potato(CropData):
     plant_code: str = "POTA"
     scientific_name: str = "Solanum tuberosum"
     plant_type: PlantTypes = PlantTypes("cool_annual")
-    # is_perennial: bool = False
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 7.0
