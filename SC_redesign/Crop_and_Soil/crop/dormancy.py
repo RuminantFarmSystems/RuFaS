@@ -23,6 +23,12 @@ class Dormancy:
             # These types of plants do not go into dormancy
             return
 
+        if self.data.is_dormant:
+            # Crop is already dormant, should not re-perform any dormancy operations on it
+            return
+
+        # TODO: should is_growing be set here?
+
         self.data.is_dormant = True
         if self.data.plant_type == PlantTypes.TREE or self.data.is_perennial:
             # Cool annuals and cool annual legumes do not lose any biomass or get their leaf area index reset
@@ -31,8 +37,7 @@ class Dormancy:
             self.data.yield_residue += (self.data.biomass * self.data.dormancy_loss_fraction)
             self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
             # Leaf area index gets set to minimum leaf area index, if it is less than the current leaf area index
-            if self.data.minimum_lai_during_dormancy < self.data.leaf_area_index:
-                self.data.leaf_area_index = self.data.minimum_lai_during_dormancy
+            self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
 
 
 

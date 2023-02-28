@@ -67,6 +67,10 @@ class Field:
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
 
+            # put crops into dormancy if daylength is as or below dormancy daylength threshold
+            if current_weather.daylength <= self.field_data.dormancy_threshold_daylength:
+                self.start_dormancy()
+
             # allow crops to grow
             self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
                             current_weather.mean_air_temperature, current_weather.max_air_temperature)
@@ -112,7 +116,7 @@ class Field:
         pass
     # </editor-fold>
 
-    # <editor-fold desc="--- Soil Managemeet Methods ---">
+    # <editor-fold desc="--- Soil Management Methods ---">
     def till_soil(self) -> None:
         """till the soil"""
         pass
@@ -228,6 +232,11 @@ class Field:
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
         """allow grazers to graze in the field during the current day"""
         pass
+
+    def start_dormancy(self) -> None:
+        """Set all crops that can go dormant to being dormant"""
+        for crop in self.crops:
+            crop.assess_dormancy()
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">

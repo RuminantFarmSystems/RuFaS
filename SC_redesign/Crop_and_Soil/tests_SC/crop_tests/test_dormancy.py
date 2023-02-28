@@ -37,10 +37,10 @@ def test_find_dormancy_threshold(latitude: float) -> None:
 
 # --- Integration tests ---
 @pytest.mark.parametrize("biomass,residue,lai,min_lai,plant_type,loss_frac", [
-    (800, 150, 0.87, 0.75, PlantTypes("perennial"), 0.1),       # Perennial with defaults
-    (2000, 70, 0.91, 0.56, PlantTypes("tree"), 0.3),            # Tree with tree defaults
-    (1100, 210, 0.78, None, PlantTypes("cool_annual"), None),   # Cool annual
-    (980, 145, 0.8891, None, PlantTypes("warm_annual_legume"), None),  # plant that should not go into dormancy at all
+    (800, 150, 0.87, 0.75, PlantTypes("perennial"), 0.1),               # Perennial with defaults
+    (2000, 70, 0.91, 0.56, PlantTypes("tree"), 0.3),                    # Tree with tree defaults
+    (1100, 210, 0.78, None, PlantTypes("cool_annual"), None),           # Cool annual
+    (980, 145, 0.8891, None, PlantTypes("warm_annual_legume"), None),   # plant that should not go into dormancy at all
 ])
 def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: float, plant_type: PlantTypes,
                           loss_frac: float) -> None:
