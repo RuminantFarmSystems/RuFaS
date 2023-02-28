@@ -8,7 +8,7 @@ from typing import Optional, List
 class PlantTypes(Enum):
     """Enum of all plant types supported by RuFaS. Listed for supported plant types in SWAT Appendix A, table A-1"""
     WARM_ANNUAL_LEGUME = "warm_annual_legume"
-    COLD_ANNUAL_LEGUME = "cold_annual_legume"
+    COOL_ANNUAL_LEGUME = "cool_annual_legume"
     PERENNIAL_LEGUME = "perennial_legume"
     WARM_ANNUAL = "warm_annual"
     COOL_ANNUAL = "cool_annual"

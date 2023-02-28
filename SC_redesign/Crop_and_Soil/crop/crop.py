@@ -8,6 +8,7 @@ from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
 from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
 from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
+from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from typing import List, Optional
@@ -46,6 +47,8 @@ class Crop:
         """Process component controlling plant root development"""
         self.crop_management = CropManagement(self.data)
         """Process component controlling calculation of end-of-season production"""
+        self.dormancy = Dormancy(self.data)
+        """Process component performing dormancy operations"""
 
     def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
                   layer_phosphates: List[float],
@@ -111,12 +114,11 @@ class Crop:
         pass
 
     def destroy(self):  # Needed?
-        """destoys the crop - Destructor class. This removes the crop instance from existence"""
+        """destroys the crop - Destructor class. This removes the crop instance from existence"""
         pass
 
-    def assess_dormancy(self):  # TODO: implement dormancy method
-        if self.data.is_perennial:
-            pass
+    def assess_dormancy(self):  # TODO: implement dormancy method - handled in CropData
+        self.dormancy.go_into_dormancy()
 
 
 
