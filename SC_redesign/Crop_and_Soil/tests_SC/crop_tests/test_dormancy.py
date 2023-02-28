@@ -45,7 +45,7 @@ def test_find_dormancy_threshold(latitude: float) -> None:
 def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: float, plant_type: PlantTypes,
                           loss_frac: float) -> None:
     # Initialize objects
-    data = CropData(biomass=biomass, residue=residue, leaf_area_index=lai, minimum_lai_during_dormancy=min_lai,
+    data = CropData(biomass=biomass, yield_residue=residue, leaf_area_index=lai, minimum_lai_during_dormancy=min_lai,
                     plant_type=plant_type, dormancy_loss_fraction=loss_frac)
     incorp = Dormancy(data)
 

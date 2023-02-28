@@ -353,8 +353,6 @@ class CropData:
     """Fraction of biomass the crop loses when it goes dormant. Default 10% for perennials, 30% for trees
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
     # TODO: implement __post_init__() to set default based on plant type
-    residue: float = 0
-    """Total amount of residue from this crop that is currently on the soil surface (kg / ha)"""
     minimum_lai_during_dormancy: Optional[float] = 0.75
     """Minimum leaf area index for plants (perennials and trees only) during dormancy (unitless)"""
     # TODO: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
