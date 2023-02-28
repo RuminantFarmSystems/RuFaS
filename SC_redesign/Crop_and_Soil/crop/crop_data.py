@@ -29,9 +29,6 @@ class CropData:
       The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
       but will have its values set to different defaults.
     """
-
-    # TODO: do we want to add a mechanism to strictly enforce attribute type annotations?
-
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
     """the species of the crop"""

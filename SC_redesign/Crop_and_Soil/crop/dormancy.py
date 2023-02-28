@@ -79,3 +79,4 @@ class Dormancy:
         # Middle
         if 20 <= abs_latitude <= 40:
             return (abs_latitude - 20.0) / 20.0
+        
