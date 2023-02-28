@@ -2,7 +2,6 @@ from typing import Optional
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantTypes
 
-
 """
 This module is based on the "Dormancy" module of SWAT (5:1.2)
 """
@@ -38,9 +37,6 @@ class Dormancy:
             self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
             # Leaf area index gets set to minimum leaf area index, if it is less than the current leaf area index
             self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
-
-
-
 
     # TODO: It might be better calculate the two values in FieldData (e.g., post_init), since they don't change?
     @staticmethod
@@ -79,4 +75,3 @@ class Dormancy:
         # Middle
         if 20 <= abs_latitude <= 40:
             return (abs_latitude - 20.0) / 20.0
-        
