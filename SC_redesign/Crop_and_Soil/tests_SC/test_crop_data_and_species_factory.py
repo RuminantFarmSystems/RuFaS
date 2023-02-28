@@ -478,7 +478,7 @@ def test_is_perennial(plant_type: PlantTypes) -> None:
     # Determine observed and expected results
     observe = crop.is_perennial
     perennial_set = {PlantTypes.PERENNIAL, PlantTypes.PERENNIAL_LEGUME}
-    expect = type in perennial_set
+    expect = plant_type in perennial_set
 
     # Check results
     assert observe == expect

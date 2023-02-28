@@ -6,12 +6,12 @@ from SC_redesign.Crop_and_Soil.field.field import Field
 
 # TODO: all methods in field.py need to be added here
 
-def test_grow_crops():
-    assert False
-
-
-def test_harvest_crops():
-    assert False
+# def test_grow_crops():
+#     assert False
+#
+#
+# def test_harvest_crops():
+#     assert False
 
 
 # TODO: make this test more rigorous once a testing pattern has been established for testing Field
