@@ -70,6 +70,10 @@ class Field:
             # put crops into dormancy if daylength is as or below dormancy daylength threshold
             if current_weather.daylength <= self.field_data.dormancy_threshold_daylength:
                 self.start_dormancy()
+            else:
+                # Bring all crops out of dormancy
+                for crop in self.crops:
+                    crop.data.is_dormant = False
 
             # allow crops to grow
             self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
