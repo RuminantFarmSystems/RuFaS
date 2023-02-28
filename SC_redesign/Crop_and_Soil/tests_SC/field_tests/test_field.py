@@ -14,6 +14,7 @@ def test_harvest_crops():
     assert False
 
 
+# TODO: make this test more rigorous once a testing pattern has been established for testing Field
 def test_start_dormancy():
     """Tests that each crop's dormancy method is called"""
     # Initialize objects
