@@ -29,6 +29,9 @@ class CropData:
       The upside is that this facilitates dataclass inheritance. For example, the CornData class inherits from CropData
       but will have its values set to different defaults.
     """
+
+    # TODO: do we want to add a mechanism to strictly enforce attribute type annotations?
+
     # ID variables (SWAT Table A-1 ish)
     species: Optional[str] = "generic"
     """the species of the crop"""
@@ -42,9 +45,6 @@ class CropData:
     """taxonomic name of the plant"""
     plant_type: PlantTypes = PlantTypes("cool_annual")
     """Classification of the plant (Reference SWAT crop.dat file, IDC variable"""
-    # TODO: figure out how to only make impossible to initialize with value that is not in the PlantTypes enum
-    # is_perennial: bool = False
-    # """is the plant perennial?"""
     is_nitrogen_fixer: bool = False
     """is the plant a nitrogen fixer?"""
     priority: int = 1
