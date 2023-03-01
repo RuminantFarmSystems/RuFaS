@@ -139,7 +139,7 @@ def manure_calculations(ration_formulation,
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
-    urinary_nitrogen_concentration = (urine_nitrogen * 100) / urine
+    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
     # Total ammoniacal nitrogen concentration in the manure slurry,
