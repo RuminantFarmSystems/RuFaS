@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock
 
+import pytest
+
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.field.field import Field
 
@@ -15,18 +17,25 @@ from SC_redesign.Crop_and_Soil.field.field import Field
 
 
 # TODO: make this test more rigorous once a testing pattern has been established for testing Field
-def test_start_dormancy():
+@pytest.mark.parametrize("daylength,threshold_daylength", [
+    (14, 8),
+    (17.20948239, 9.19183294),
+    (7.293485893, 8.234850920),
+])
+def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     """Tests that each crop's dormancy method is called"""
     # Initialize objects
     crop = Crop()
     field = Field()
+    field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
 
     # Mock functions used
     crop.dormancy.go_into_dormancy = MagicMock()
 
     # Run method being tested
-    field.start_dormancy()
+    field.assess_dormancy(daylength)
 
-    # Check that subroutines were called
-    assert crop.dormancy.go_into_dormancy.call_count == 1
+    # Check that subroutines were called correct number of times
+    if daylength <= threshold_daylength:
+        assert crop.dormancy.go_into_dormancy.call_count == 1
