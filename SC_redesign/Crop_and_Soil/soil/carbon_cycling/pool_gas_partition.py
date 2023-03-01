@@ -80,10 +80,7 @@ class PoolGasPartition:
 
             # S.6.C.8
             layer.active_carbon_to_passive_amount = self._active_carbon_to_passive_amount(
-                layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
-                layer.active_carbon_amount,
-                self.data.silt_clay_content
+                layer.active_carbon_decomposition_amount
             )
 
             # S.6.C.10
@@ -126,15 +123,7 @@ class PoolGasPartition:
 
     # ---- S.6.C.8
     @staticmethod
-    def _active_carbon_to_passive_amount(moisture_effect: float, temperature_effect: float, active_carbon: float,
-                                         silt_clay_content: float,
-                                         max_carbon_decomposition_rate: float = 0.14) -> float:
-        # S.6.C.2
-        active_carbon_to_slow_rate = max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
-        # S.6.C.3
-        active_carbon_decomposition_amount = \
-            active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
-
+    def _active_carbon_to_passive_amount(active_carbon_decomposition_amount: float) -> float:
         return active_carbon_decomposition_amount * 0.004
 
     # ---- S.6.C.7
