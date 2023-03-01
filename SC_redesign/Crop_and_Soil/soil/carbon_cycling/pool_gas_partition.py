@@ -50,9 +50,7 @@ class PoolGasPartition:
             layer.soil_structural_slow_carbon_remaining = self._soil_structural_slow_carbon_remaining(
                 layer.soil_structural_slow_carbon_usage)
 
-            # S.6.C.5
-            K7 = 0.00013
-            C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
+
 
             # S.6.C.2
             self.data.active_carbon_decomposition_rate = self._active_carbon_decomposition_rate(
@@ -68,6 +66,11 @@ class PoolGasPartition:
             layer.slow_carbon_decomposition_amount = self._slow_carbon_decomposition_amount(
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
                 layer.slow_carbon_amount)
+
+            # S.6.C.5
+            layer.passive_carbon_decomposition_amount = self._passive_carbon_decomposition_amount(
+                layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+                layer.passive_carbon_amount)
 
             # S.6.C.6
             self.data.carbon_lost_adjusted_factor = self._carbon_lost_adjusted_factor(self.data.silt_clay_content)
@@ -113,6 +116,19 @@ class PoolGasPartition:
             # aggregate passive carbon pool flux
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
+
+            # S.6.C.5
+            K7 = 0.00013
+            C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
+
+    # S.6.C.5
+    @staticmethod
+    def _passive_carbon_decomposition_amount(
+            decomposition_moisture_effect: float, decomposition_temperature_effect: float,
+            passive_carbon_amount: float, passive_carbon_decomposition_factor=0.00013) -> float:
+        return decomposition_moisture_effect*decomposition_temperature_effect*passive_carbon_amount*\
+               passive_carbon_decomposition_factor
+
 
     # S.6.C.4
     @staticmethod
