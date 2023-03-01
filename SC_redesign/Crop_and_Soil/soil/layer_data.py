@@ -89,6 +89,9 @@ class LayerData:
 
     """active carbon amount (kg/ha) (pseudocode_soil S.6.C.3)"""  # TODO: fix unit
     active_carbon_decomposition_amount: Optional[float] = None
+    """active carbon amount (kg/ha) (pseudocode_soil S.6.C.4)"""  # TODO: fix unit
+    slow_carbon_amount: Optional[float] = None
+    slow_carbon_decomposition_amount: Optional[float] = None
 
     active_carbon_amount: Optional[float] = None
     """active carbon amount (kg/ha) (pseudocode_soil S.6.C.3)"""

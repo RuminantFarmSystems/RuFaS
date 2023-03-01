@@ -50,10 +50,6 @@ class PoolGasPartition:
             layer.soil_structural_slow_carbon_remaining = self._soil_structural_slow_carbon_remaining(
                 layer.soil_structural_slow_carbon_usage)
 
-            # S.6.C.4
-            K6 = 0.0038
-            C_slow_decomp = K6 * layer.M_d * soil.T_d * layer.C_slow
-
             # S.6.C.5
             K7 = 0.00013
             C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
@@ -67,6 +63,11 @@ class PoolGasPartition:
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
                 layer.active_carbon_amount, self.data.active_carbon_decomposition_rate
             )
+
+            # S.6.C.4
+            layer.slow_carbon_decomposition_amount = self._slow_carbon_decomposition_amount(
+                layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+                layer.slow_carbon_amount)
 
             # S.6.C.6
             self.data.carbon_lost_adjusted_factor = self._carbon_lost_adjusted_factor(self.data.silt_clay_content)
@@ -82,7 +83,15 @@ class PoolGasPartition:
             layer.active_carbon_to_passive_amount = self._active_carbon_to_passive_amount(
                 layer.active_carbon_decomposition_amount
             )
+            # S.6.C.9
+            percent_CO2_to_C_slow_loss = 0.55
+            percent_C_slow_to_passive = 0.03
 
+            layer.C_slow_to_active = layer.C_slow_decomp * (1 - percent_CO2_to_C_slow_loss - percent_C_slow_to_passive)
+            layer.C_slow_loss = layer.C_slow_decomp * percent_CO2_to_C_slow_loss
+            layer.C_slow_to_passive = layer.C_slow_decomp * percent_C_slow_to_passive
+
+            percent_CO2_to_C_passive_loss = 0.55
             # S.6.C.10
             layer.C_passive_to_active = C_passive_decomp * (1 - percent_CO2_to_C_passive_loss)
             layer.C_passive_loss = C_passive_decomp * percent_CO2_to_C_passive_loss
@@ -105,21 +114,13 @@ class PoolGasPartition:
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
 
+    # S.6.C.4
     @staticmethod
-    def _slow_carbon_to_active_amount() -> float:
-        # TODO:Find out why these numbers are set as this
-        slow_carbon_co2_lost_rate = 0.55
-        slow_carbon_passive_rate = 0.03
-
-        # S.6.C.9
-        layer.C_slow_to_active = C_slow_decomp * (1 - slow_carbon_co2_lost_rate - slow_carbon_passive_rate)
-        layer.C_slow_loss = C_slow_decomp * slow_carbon_co2_lost_rate
-        layer.C_slow_to_passive = C_slow_decomp * slow_carbon_passive_rate
-
-        active_carbon_decomposition_amount = \
-            active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
-
-        return slow_carbon_to_active_passive_co2 * (1 - slow_carbon_co2_lost_rate - slow_carbon_passive_rate)
+    def _slow_carbon_decomposition_amount(
+            decomposition_moisture_effect: float, decomposition_temperature_effect: float,
+            slow_carbon_amount: float, slow_carbon_decomposition_factor=0.0038) -> float:
+        return decomposition_moisture_effect * decomposition_temperature_effect * slow_carbon_amount * \
+               slow_carbon_decomposition_factor
 
     # ---- S.6.C.8
     @staticmethod
