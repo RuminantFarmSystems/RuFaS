@@ -118,7 +118,7 @@ class Crop:
         """destroys the crop - Destructor class. This removes the crop instance from existence"""
         pass
 
-    def assess_dormancy(self):
+    def start_dormancy(self):
         """Calls the main routine in Dormancy"""
         self.dormancy.go_into_dormancy()
 

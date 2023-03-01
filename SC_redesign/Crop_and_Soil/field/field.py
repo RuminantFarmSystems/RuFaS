@@ -67,13 +67,9 @@ class Field:
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
 
-            # put crops into dormancy if daylength is as or below dormancy daylength threshold
-            if current_weather.daylength <= self.field_data.dormancy_threshold_daylength:
-                self.start_dormancy()
-            else:
-                # Bring all crops out of dormancy
-                for crop in self.crops:
-                    crop.data.is_dormant = False
+            #
+            self.start_dormancy(current_weather.daylength)
+
 
             # allow crops to grow
             self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
@@ -237,10 +233,22 @@ class Field:
         """allow grazers to graze in the field during the current day"""
         pass
 
-    def start_dormancy(self) -> None:
-        """Set all crops that can go dormant to being dormant"""
-        for crop in self.crops:
-            crop.assess_dormancy()
+    def assess_dormancy(self, daylength: float) -> None:
+        """Set all crops that can go dormant to being dormant
+
+        Args:
+            daylength: length of time from sunup to sundown on the current day (hours)
+
+        """
+        if daylength <= self.field_data.dormancy_threshold_daylength:
+            # put crops into dormancy if daylength is as or below dormancy daylength threshold
+            for crop in self.crops:
+                crop.start_dormancy()
+        else:
+            # Bring all crops out of dormancy
+            for crop in self.crops:
+                crop.data.is_dormant = False
+
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
