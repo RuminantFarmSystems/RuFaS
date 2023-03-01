@@ -68,14 +68,14 @@ class Dormancy:
 
         Returns: the dormancy threshold for this latitude
         """
-        # Near poles
-        if abs_latitude > 40:
+        is_near_pole = abs_latitude > 40
+        if is_near_pole:
             return 1.0
 
-        # Near equator
-        if abs_latitude < 20:
+        is_near_equator = abs_latitude < 20
+        if is_near_equator:
             return 0.0
 
-        # Middle
-        if 20 <= abs_latitude <= 40:
+        is_middle = 20 <= abs_latitude <= 40
+        if is_middle:
             return (abs_latitude - 20.0) / 20.0
