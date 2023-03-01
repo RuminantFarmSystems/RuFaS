@@ -58,19 +58,25 @@ class PoolGasPartition:
             K7 = 0.00013
             C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
 
-            # S.6.C.7
-            layer.active_carbon_to_slow_amount = self._active_carbon_to_slow_ampunt(
-                layer.decomposition_moisture_effect,
-                self.data. decomposition_temperature_effect,
-                layer.active_carbon_amount,
+            # S.6.C.2
+            self.data.active_carbon_decomposition_rate = self._active_carbon_decomposition_rate(
                 self.data.silt_clay_content)
 
-            layer.active_carbon_to_slow_loss = self._active_carbon_to_slow_loss(
-                layer.decomposition_moisture_effect,
-                self.data.decomposition_temperature_effect,
-                layer.active_carbon_amount,
-                self.data.silt_clay_content
+            # S.6.C.3
+            layer.active_carbon_decomposition_amount = self._active_carbon_decomposition_amount(
+                layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
+                layer.active_carbon_amount, self.data.active_carbon_decomposition_rate
             )
+
+            # S.6.C.6
+            self.data.carbon_lost_adjusted_factor = self._carbon_lost_adjusted_factor(self.data.silt_clay_content)
+
+            # S.6.C.7
+            layer.active_carbon_to_slow_amount = self._active_carbon_to_slow_amount(
+                layer.active_carbon_decomposition_amount, self.data.carbon_lost_adjusted_factor)
+
+            layer.active_carbon_to_slow_loss = self._active_carbon_to_slow_loss(
+                layer.active_carbon_decomposition_amount, self.data.carbon_lost_adjusted_factor)
 
             # S.6.C.8
             layer.active_carbon_to_passive_amount = self._active_carbon_to_passive_amount(
@@ -79,16 +85,6 @@ class PoolGasPartition:
                 layer.active_carbon_amount,
                 self.data.silt_clay_content
             )
-
-            percent_CO2_to_C_slow_loss = 0.55
-            percent_C_slow_to_passive = 0.03
-
-            # S.6.C.9
-            layer.C_slow_to_active = C_slow_decomp * (1 - percent_CO2_to_C_slow_loss - percent_C_slow_to_passive)
-            layer.C_slow_loss = C_slow_decomp * percent_CO2_to_C_slow_loss
-            layer.C_slow_to_passive = C_slow_decomp * percent_C_slow_to_passive
-
-            percent_CO2_to_C_passive_loss = 0.55
 
             # S.6.C.10
             layer.C_passive_to_active = C_passive_decomp * (1 - percent_CO2_to_C_passive_loss)
@@ -113,9 +109,20 @@ class PoolGasPartition:
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
 
     @staticmethod
-    def __slow_carbon_to_active_amount() -> float:
+    def _slow_carbon_to_active_amount() -> float:
+        # TODO:Find out why these numbers are set as this
+        slow_carbon_co2_lost_rate = 0.55
+        slow_carbon_passive_rate = 0.03
 
-        return slow_carbon_to_active_passive_co2 * (1 - percent_CO2_to_C_slow_loss - percent_C_slow_to_passive)
+        # S.6.C.9
+        layer.C_slow_to_active = C_slow_decomp * (1 - slow_carbon_co2_lost_rate - slow_carbon_passive_rate)
+        layer.C_slow_loss = C_slow_decomp * slow_carbon_co2_lost_rate
+        layer.C_slow_to_passive = C_slow_decomp * slow_carbon_passive_rate
+
+        active_carbon_decomposition_amount = \
+            active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
+
+        return slow_carbon_to_active_passive_co2 * (1 - slow_carbon_co2_lost_rate - slow_carbon_passive_rate)
 
     # ---- S.6.C.8
     @staticmethod
@@ -132,31 +139,32 @@ class PoolGasPartition:
 
     # ---- S.6.C.7
     @staticmethod
-    def _active_carbon_to_slow_loss(moisture_effect: float, temperature_effect: float, active_carbon: float,
-                                    silt_clay_content: float, max_carbon_decomposition_rate: float = 0.14) -> float:
-        # S.6.C.2
-        active_carbon_to_slow_rate = max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
-        # S.6.C.3
-        active_carbon_decomposition_amount = \
-            active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
-        # S.6.C.4
-        carbon_lost_adjusted_factor = 0.85 - 0.68 * silt_clay_content
-
+    def _active_carbon_to_slow_loss(active_carbon_decomposition_amount: float, carbon_lost_adjusted_factor: float,
+                                    ) -> float:
         return active_carbon_decomposition_amount * carbon_lost_adjusted_factor
 
     # ---- S.6.C.7
     @staticmethod
-    def _active_carbon_to_slow_amount(moisture_effect: float, temperature_effect: float, active_carbon: float,
-                                      silt_clay_content: float, max_carbon_decomposition_rate: float = 0.14) -> float:
-        # S.6.C.2
-        active_carbon_to_slow_rate = max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
-        # S.6.C.3
-        active_carbon_decomposition_amount = \
-            active_carbon_to_slow_rate * moisture_effect * temperature_effect * active_carbon
-        # S.6.C.4
-        carbon_lost_adjusted_factor = 0.85 - 0.68 * silt_clay_content
-
+    def _active_carbon_to_slow_amount(active_carbon_decomposition_amount: float, carbon_lost_adjusted_factor: float,
+                                      ) -> float:
         return active_carbon_decomposition_amount * (1 - carbon_lost_adjusted_factor - 0.004)
+
+    # ---- S.6.C.6
+    @staticmethod
+    def _carbon_lost_adjusted_factor(silt_clay_content: float) -> float:
+        return 0.85 - 0.68 * silt_clay_content
+
+    # ---- S.6.C.3,
+    @staticmethod
+    def _active_carbon_decomposition_amount(moisture_effect: float, temperature_effect: float,
+                                            active_carbon: float, active_carbon_decomposition_rate: float, ) -> float:
+        return active_carbon_decomposition_rate * moisture_effect * temperature_effect * active_carbon
+
+    # ---- S.6.C.2,
+    @staticmethod
+    def _active_carbon_decomposition_rate(silt_clay_content: float,
+                                          max_carbon_decomposition_rate: float = 0.14) -> float:
+        return max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
 
     # ----  S.6.C.1
     @staticmethod

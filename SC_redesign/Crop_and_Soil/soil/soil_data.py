@@ -72,6 +72,9 @@ class SoilData:
 
     # --- pool gas partition
     silt_clay_content: Optional[float] = None
+    """active carbon amount (kg/ha) (pseudocode_soil S.6.C.2)""" #TODO: fix unit
+    active_carbon_decomposition_rate: Optional[float] = None
+    carbon_lost_adjusted_factor: Optional[float] = None
 
 
 
