@@ -17,6 +17,7 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 
 class Field:
     """object representing an agricultural field"""
+
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
@@ -50,9 +51,20 @@ class Field:
         if self.field_data.is_tillage_day:
             self.till_soil()
 
+        # daily soil routine
+
+        # determine total amount of residue and above-ground biomass present on the given day
+        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
+
+        self.soil.daily_soil_routine(current_weather.incoming_light, current_weather.mean_air_temperature,
+                                     current_weather.min_air_temperature, current_weather.max_air_temperature,
+                                     total_plant_cover, current_weather.snow_fall,  # TODO: track snow cover on soil
+                                     current_weather.annual_mean_air_temperature)   #       surface somewhere - Issue
+                                                                                    #       #317
+
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self.cycle_water()
+        self.cycle_water(current_weather)
         # ... Other ...
 
         # --- Crop Management ---
@@ -76,6 +88,11 @@ class Field:
         # conduct harvest routines
         if self.field_data.is_cutting_day:
             self.cut_crops()
+
+        # If current day is a year after the start of the simulation, or is a year after the last annual reset, do the
+        # annual reset
+        if False:   # TODO: check if annual reset should be done
+            self.perform_annual_reset()
 
         pass
 
@@ -108,7 +125,7 @@ class Field:
     def setup_crop_schedule(self, crop_config):
         """sets up the cropping schedule (species, planting/harvest dates, etc)"""
         pass
-    # </editor-fold>
+        # </editor-fold>
 
     # <editor-fold desc="--- Soil Managemeet Methods ---">
     def till_soil(self) -> None:
@@ -118,6 +135,7 @@ class Field:
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
         pass
+
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
@@ -213,16 +231,49 @@ class Field:
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
         """allow grazers to graze in the field during the current day"""
         pass
+
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def cycle_water(self):
+    def cycle_water(self, current_weather: CurrentWeather):
         """allow the water to cycle through the field.
+
+         Args:
+             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
+                for field processes.
 
          Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
          whole-field. Therefore, it makes most sense for this process to take place within the field class rather
          than in both the crop and soil classes. Water uptake by the crop will likely be an exception that should
          take place during a crop's grow() method. Other exceptions may come up as these modules develop.
          """
+        total_initial_canopy_free_water = 0
+        for crop in self.crops:
+            total_initial_canopy_free_water += crop.crop_data.initial_canopy_free_water
+
+        # TODO: track snow cover on soil surface somewhere - Issue #317
+        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
+        # TODO: figure out how to determine minimum cover management factor when there are multiple crops in the field
+        self.soil.daily_soil_water_routine(current_weather.rainfall, 1, self.field_data.seasonal_high_water_table,
+                                           current_weather.incoming_light, current_weather.max_air_temperature,
+                                           current_weather.min_air_temperature, current_weather.mean_air_temperature,
+                                           self._determine_total_above_ground_biomass(), self.field_data.current_residue,
+                                           current_weather.snow_fall, total_initial_canopy_free_water, 0.2)
         pass
+
+    def _determine_total_above_ground_biomass(self) -> float:
+        """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
+        total_above_ground_biomass = 0
+        for crop in self.crops:
+            total_above_ground_biomass += crop.crop_data.above_ground_biomass
+        return total_above_ground_biomass
+
     # </editor-fold>
+
+    # <editor-fold desc="--- Annual Reset Methods ---">
+    def perform_annual_reset(self) -> None:
+        """Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
+            file, and then reset all annual totals"""
+        self.soil.data.do_annual_reset()
+
+        pass

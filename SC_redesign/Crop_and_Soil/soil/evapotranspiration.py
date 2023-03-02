@@ -54,6 +54,13 @@ class Evapotranspiration:
         #  monitor?) - issue #317
         self._evaporate_from_soil()
 
+        # Update accumulated (annual) totals
+        self.data.annual_potential_evapotranspiration_total += self.data.potential_evapotranspiration
+        self.data.annual_adjusted_potential_evapotranspiration_total += \
+            self.data.potential_evapotranspiration_adjusted
+        self.data.annual_adjusted_soil_evaporation_total += self.data.soil_evaporation_adjusted
+        self.data.annual_maximum_soil_evaporation_total += self.data.maximum_soil_evaporation
+
     def _determine_potential_evapotranspiration_adjusted(self, initial_canopy_free_water: float) -> float:
         """Calculates the potential evapotranspiration adjusted for evaporation of free water in the canopy
 
@@ -100,7 +107,7 @@ class Evapotranspiration:
                                                                         layer.wilting_point_content)
 
             # remove water from soil water content
-            layer.soil_water_concentration -= amount_water_removed
+            layer.water_content -= amount_water_removed
 
     # --- static methods ---
     @staticmethod
