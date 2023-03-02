@@ -250,7 +250,7 @@ class LifeCycleReport(BaseReportDriver):
             }
 
             self.last_year_avg_vars = {
-                'culling_rate': ['life_cycle_manager.cull_rate', '%', []],
+                'culling_rate': ['life_cycle_manager.cull_rate', '', []],
                 'sold_calf_total_last_year': ['life_cycle_manager.sold_calf_total_last_year', '', []],
                 'sold_dairy_male_calf_num_last_year': ['life_cycle_manager.sold_dairy_male_calf_num_last_year', '', []],
                 'sold_dairy_female_calf_num_last_year': ['life_cycle_manager.sold_dairy_female_calf_num_last_year', '', []],
@@ -261,6 +261,18 @@ class LifeCycleReport(BaseReportDriver):
                 'culled_heifer_last_year': ['life_cycle_manager.culled_heifer_last_year', '', []]
             }
 
+            self.checking_service_vars = {
+                'heiferII_num_check':['life_cycle_manager.heiferII_num', '', []],
+                '21_open_heifer': ['life_cycle_manager.num_heifer_open_acc_21_days', '', []], 
+                '21_ai_heifer':['life_cycle_manager.num_ai_21_days_heifer', '', []],
+                'service_rate_each_21_d_heifer': ['life_cycle_manager.service_rate_each_21_d_heifer', '', []],
+                'cow_num_check':['life_cycle_manager.cow_num', '', []],
+                '21_open_cow':['life_cycle_manager.num_cow_open_acc_21_days', '', []], 
+                '21_ai_cow': ['life_cycle_manager.num_ai_21_days', '', []], 
+                'service_rate_each_21_d_cow': ['life_cycle_manager.service_rate_each_21_d', '', []]
+
+            }
+
             self.daily_variables = {
                 **self.herd_structure, 
                 **self.reproduction_performance, 
@@ -269,7 +281,8 @@ class LifeCycleReport(BaseReportDriver):
                 **self.average_animal_profile,
                 **self.econmic_cal,
                 **self.genetic_performance,
-                **self.last_year_avg_vars
+                **self.last_year_avg_vars,
+                **self.checking_service_vars
             }
             
             self.annual_variables = {'year': ['time.calendar_year', '', []]}

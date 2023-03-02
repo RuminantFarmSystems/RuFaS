@@ -170,7 +170,9 @@ class LifeCycleManager:
     ed_period = 0
 
     count_21_days = 0
-    count_21_period = 0
+    count_21_days_heifer = 0
+    # count_21_period = 0
+    # count_21_period_heifer = 0
 
     num_ai_21_days = 0
     num_cow_open_acc_21_days = 0
@@ -685,10 +687,18 @@ class LifeCycleManager:
         
         # Jan 12th by Yijing: added check for division of 0
         #caculate service rate and conception rate
+        if date == 105:
+            self.num_ai_21_days_heifer = 0
+            self.num_heifer_open_acc_21_days = 0
+            self.num_preg_21_days_heifer = 0
+            self.num_ai_21_days = 0
+            self.num_cow_open_acc_21_days = 0
+            self.num_preg_21_days = 0
+
         if date >= 106:
-            self.count_21_days += 1
-            if self.count_21_days % 21 == 0 and self.count_21_days != 0:
-                self.count_21_period += 1
+            self.count_21_days_heifer += 1
+            if self.count_21_days_heifer % 21 == 0:
+                # self.count_21_period_heifer += 1
                 if self.num_heifer_open_acc_21_days == 0:
                     self.service_rate_each_21_d_heifer = np.nan
                 else:
@@ -1079,8 +1089,8 @@ class LifeCycleManager:
         #caculate service rate and conception rate
         if date >= 106:
             self.count_21_days += 1
-            if self.count_21_days % 21 == 0 and self.count_21_days != 0:
-                self.count_21_period += 1
+            if self.count_21_days % 21 == 0:
+                # self.count_21_period += 1
                 if self.num_cow_open_acc_21_days == 0:
                     self.service_rate_each_21_d = np.nan
                 else:
@@ -1090,9 +1100,9 @@ class LifeCycleManager:
                     self.conception_rate_each_21_d = np.nan
                 else:
                     self.conception_rate_each_21_d = float(self.num_preg_21_days) / float(self.num_ai_21_days)  
-                self.num_ai_21_days = 0
-                self.num_cow_open_acc_21_days = 0
-                self.num_preg_21_days = 0
+                # self.num_ai_21_days = 0
+                # self.num_cow_open_acc_21_days = 0
+                # self.num_preg_21_days = 0
                 self.avg_service_rate, self.service_rate_21_d = self.moving_average(self.service_rate_each_21_d, 15, self.service_rate_21_d)
                 self.avg_conception_rate, self.conception_rate_21_d = self.moving_average(self.conception_rate_each_21_d, 15, self.conception_rate_21_d)
                 self.pregnancy_rate = self.avg_service_rate * self.avg_conception_rate

@@ -2,7 +2,7 @@
     "config":
     {
         "start_date" : "2000:1",
-        "end_date" : "2010:1",
+        "end_date" : "2002:1",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
         "set_seed": false,
