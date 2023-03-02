@@ -656,17 +656,11 @@ def test_calculate_stall_shortages_for_main_combinations(mocker: MockerFixture) 
     # Assert
     assert actual_stall_storages == expected_stall_shortages
     patch_for_calculate_stall_shortage.assert_has_calls([
-        mocker.call(num_calves, mock_calf_pens),
-        mocker.call(num_heiferIs + num_heiferIIs, mock_growing_pens),
-        mocker.call(num_heiferIIIs + num_dry_cows, mock_close_up_pens),
-        mocker.call(num_lactating_cows, mock_lac_cow_pens),
+        mocker.call(num_animals=num_calves, pens=mock_calf_pens),
+        mocker.call(num_animals=num_heiferIs + num_heiferIIs, pens=mock_growing_pens),
+        mocker.call(num_animals=num_heiferIIIs + num_dry_cows, pens=mock_close_up_pens),
+        mocker.call(num_animals=num_lactating_cows, pens=mock_lac_cow_pens),
     ])
-
-
-def test_find_pen_with_max_stalls_for_animal_combination(mocker: MockerFixture) -> None:
-    mock_mixed_type_by_pen_id = {}
-    mock_mixed_type_pen_by_pen_id = {}
-    pass
 
 
 @pytest.mark.parametrize(
@@ -712,24 +706,24 @@ def test_create_default_pen(animal_combination: Pen.AnimalCombination,
     )
 
 
-def test_remove_pen_from_dicts_by_id(mocker: MockerFixture) -> None:
-    """Unit test for function _remove_pen_from_dicts_by_id() in file routines/animal/animal_management.py"""
+def test_remove_items_from_dicts_by_id() -> None:
+    """Unit test for function _remove_items_from_dicts_by_id() in file routines/animal/animal_management.py"""
     # Case 1: Given empty list of dictionaries, then nothing should be removed
     # Arrange
-    pen_id = 1
+    item_id = 1
     dicts = []
 
     # Act
-    AnimalManagement._remove_pen_from_dicts_by_id(pen_id, dicts)
+    AnimalManagement._remove_items_from_dicts_by_id(item_id, dicts)
 
     # Assert
     assert dicts == []
 
     # -------------------------------------------------------------------------
     # Case 2: Given list of dictionaries, then those dictionaries that contain
-    #         the given pen_id should be removed
+    #         the given item_id should be removed
     # Arrange
-    pen_id = 1
+    item_id = 1
     dicts = [
         {1: 'a', 2: 'b'},
         {3: 'c', 4: 'd'},
@@ -737,7 +731,7 @@ def test_remove_pen_from_dicts_by_id(mocker: MockerFixture) -> None:
     ]
 
     # Act
-    AnimalManagement._remove_pen_from_dicts_by_id(pen_id, dicts)
+    AnimalManagement._remove_items_from_dicts_by_id(item_id, dicts)
 
     # Assert
     assert dicts == [
@@ -748,9 +742,9 @@ def test_remove_pen_from_dicts_by_id(mocker: MockerFixture) -> None:
 
     # -------------------------------------------------------------------------
     # Case 3: Given list of dictionaries, if no dictionary contains the given
-    #         pen_id, then nothing should be removed
+    #         item_id, then nothing should be removed
     # Arrange
-    pen_id = 1
+    item_id = 1
     dicts = [
         {2: 'b'},
         {3: 'c', 4: 'd'},
@@ -758,7 +752,7 @@ def test_remove_pen_from_dicts_by_id(mocker: MockerFixture) -> None:
     ]
 
     # Act
-    AnimalManagement._remove_pen_from_dicts_by_id(pen_id, dicts)
+    AnimalManagement._remove_items_from_dicts_by_id(item_id, dicts)
 
     # Assert
     assert dicts == [
