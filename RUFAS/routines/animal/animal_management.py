@@ -552,6 +552,65 @@ class AnimalManagement:
         return pen_group_by_animal_combination
 
     @classmethod
+    def _get_mixed_type_pens(cls, pens_by_animal_combination: Dict[Pen.AnimalCombination, List[Pen]]) -> List[Pen]:
+        """Returns a list of mixed type pens.
+
+        Parameters
+        ----------
+        pens_by_animal_combination : Dict[Pen.AnimalCombination, List[Pen]]
+            A dictionary mapping animal combinations to the pens that can house that animal combination.
+
+        Returns
+        -------
+        List[Pen]
+            A list of mixed type pens.
+
+        """
+        return (pens_by_animal_combination[Pen.AnimalCombination.NONE] +
+                pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP])
+
+    @classmethod
+    def _get_dict_for_mixed_type_by_pen_id(cls, mixed_type_pens: List[Pen]) -> Dict[int, List[Pen.AnimalCombination]]:
+        """Returns a dictionary mapping each mixed-type pen's ID to a list of equivalent animal combinations.
+
+        A mixed-type pen is a pen with the animal combination NONE or GROWING_AND_CLOSE_UP.
+
+        Parameters
+        ----------
+        mixed_type_pens : List[Pen]
+            A list of mixed-type pens.
+
+        Returns
+        -------
+        Dict[int, List[Pen.AnimalCombination]]
+            A dictionary mapping each mixed-type pen's ID to a list of equivalent animal combinations.
+
+        Raises
+        ------
+        ValueError
+            If the animal combination of a mixed-type pen is not NONE or GROWING_AND_CLOSE_UP.
+
+        """
+        mixed_type_equivalent_for_animal_combination_none = [Pen.AnimalCombination.CALF,
+                                                             Pen.AnimalCombination.GROWING,
+                                                             Pen.AnimalCombination.CLOSE_UP,
+                                                             Pen.AnimalCombination.LAC_COW]
+
+        mixed_type_equivalent_for_animal_combination_growing_and_close_up = [Pen.AnimalCombination.GROWING,
+                                                                             Pen.AnimalCombination.CLOSE_UP]
+
+        mixed_type_by_pen_id: Dict[int, List[Pen.AnimalCombination]] = {}
+        for pen in mixed_type_pens:
+            if pen.animal_combination == Pen.AnimalCombination.NONE:
+                mixed_type_by_pen_id[pen.id] = mixed_type_equivalent_for_animal_combination_none
+            elif pen.animal_combination == Pen.AnimalCombination.GROWING_AND_CLOSE_UP:
+                mixed_type_by_pen_id[pen.id] = mixed_type_equivalent_for_animal_combination_growing_and_close_up
+            else:
+                raise ValueError(f'Unexpected animal combination: {pen.animal_combination.name}')
+
+        return mixed_type_by_pen_id
+
+    @classmethod
     def _calculate_total_maximum_stocking_density(cls, pens: List[Pen]) -> int:
         """Calculates the total maximum stocking density for a given list of pens.
 
@@ -623,33 +682,33 @@ class AnimalManagement:
         """
         return {
             Pen.AnimalCombination.CALF: cls._calculate_stall_shortage(
-                num_calves,
-                pens_by_animal_combination[Pen.AnimalCombination.CALF]
+                num_animals=num_calves,
+                pens=pens_by_animal_combination[Pen.AnimalCombination.CALF]
             ),
             Pen.AnimalCombination.GROWING: cls._calculate_stall_shortage(
-                num_heiferIs + num_heiferIIs,
-                pens_by_animal_combination[Pen.AnimalCombination.GROWING]
+                num_animals=num_heiferIs + num_heiferIIs,
+                pens=pens_by_animal_combination[Pen.AnimalCombination.GROWING]
             ),
             Pen.AnimalCombination.CLOSE_UP: cls._calculate_stall_shortage(
-                num_heiferIIIs + num_dry_cows,
-                pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP]
+                num_animals=num_heiferIIIs + num_dry_cows,
+                pens=pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP]
             ),
             Pen.AnimalCombination.LAC_COW: cls._calculate_stall_shortage(
-                num_lactating_cows,
-                pens_by_animal_combination[Pen.AnimalCombination.LAC_COW]
+                num_animals=num_lactating_cows,
+                pens=pens_by_animal_combination[Pen.AnimalCombination.LAC_COW]
             )
         }
 
     @classmethod
     def _find_pen_with_max_stalls_for_animal_combination(cls,
-                                                         animal_combination: Pen.AnimalCombination,
+                                                         target_animal_combination: Pen.AnimalCombination,
                                                          mixed_type_by_pen_id: Dict[int, List[Pen.AnimalCombination]],
                                                          mixed_type_pen_by_pen_id: Dict[int, Pen]) -> Optional[Pen]:
         """Finds the pen with the maximum number of stalls that can house the given animal combination.
 
         Parameters
         ----------
-        animal_combination : Pen.AnimalCombination
+        target_animal_combination : Pen.AnimalCombination
             The animal combination to find a pen for.
         mixed_type_by_pen_id : Dict[int, List[Pen.AnimalCombination]]
             A dictionary mapping pen IDs to the animal combinations that can be housed in that pen.
@@ -666,7 +725,7 @@ class AnimalManagement:
         max_stalls_found = 0
         pen: Optional[Pen] = None
         for pen_id, animal_combinations in mixed_type_by_pen_id.items():
-            if animal_combination in animal_combinations \
+            if target_animal_combination in animal_combinations \
                     and mixed_type_pen_by_pen_id[pen_id].num_stalls > max_stalls_found:
                 pen = mixed_type_pen_by_pen_id[pen_id]
                 max_stalls_found = pen.num_stalls
@@ -709,22 +768,22 @@ class AnimalManagement:
         )
 
     @classmethod
-    def _remove_pen_from_dicts_by_id(cls,
-                                     pen_id: int,
-                                     dicts: List[Dict[int, Any]]) -> None:
-        """Removes the pen with the given ID from the given dictionaries.
+    def _remove_items_from_dicts_by_id(cls,
+                                       item_id: int,
+                                       dicts: List[Dict[int, Any]]) -> None:
+        """Removes the item with the given ID from the given dictionaries.
 
         Parameters
         ----------
-        pen_id : int
-            The ID of the pen to remove.
+        item_id : int
+            The ID of the item to remove.
         dicts : List[Dict[int, Any]]
-            A list of dictionaries to remove the pen from.
+            A list of dictionaries to remove the items from.
 
         """
         for d in dicts:
-            if pen_id in d:
-                del d[pen_id]
+            if item_id in d:
+                del d[item_id]
 
     @classmethod
     def _update_stall_shortage_for_animal_combination(cls,
@@ -790,43 +849,35 @@ class AnimalManagement:
             The number of lactating cows.
         mixed_type_by_pen_id : Dict[int, List[Pen.AnimalCombination]]
             A dictionary mapping pen IDs to the animal combinations that can be housed in that pen.
-            If a pen of mixed type is selected to accommodate a stall shortage, the pen will be removed from this dictionary,
-            and gets stored in one of the return values.
+            If a pen of mixed type is selected to accommodate a stall shortage, it will be removed from this dictionary,
+            and its animal combination will be also changed.
         mixed_type_pen_by_pen_id : Dict[int, Pen]
             A dictionary mapping pen IDs to the pen objects.
-            If a pen of mixed type is selected to accommodate a stall shortage, the pen will be removed from this dictionary,
-            and gets stored in one of the return values.
+            If a pen of mixed type is selected to accommodate a stall shortage, it will be removed from this dictionary,
+            and its animal combination will be also changed.
         pens_by_animal_combination : Dict[Pen.AnimalCombination, List[Pen]]
             A dictionary mapping animal combinations to the pens that can house that animal combination.
 
         Returns
         -------
-        Tuple[List[Pen], List[Pen]]
-            A tuple containing two lists of pens.
-            The first list contains the pens that were created to accommodate the stall shortages.
-            The second list contains the pre-existing pens that can be used to accommodate the stall shortages.
+        List[Pen]
+            A list of default pens (if any) that were created to accommodate the stall shortages.
 
         """
         stall_shortages = cls._calculate_stall_shortages_for_main_animal_combinations(
-            pens_by_animal_combination,
-            num_calves,
-            num_heiferIs,
-            num_heiferIIs,
-            num_heiferIIIs,
-            num_dry_cows,
-            num_lactating_cows
+            pens_by_animal_combination, num_calves, num_heiferIs, num_heiferIIs,
+            num_heiferIIIs, num_dry_cows, num_lactating_cows
         )
         default_pens_created: List[Pen] = []
-        existing_pens_used: List[Pen] = []  # type: ignore
 
-        info_map = {"class": cls.__name__,
-                    "function": cls._accommodate_stall_shortages.__name__,
-                    "all_pens": all_pens, }
+        info_map = {
+            "class": cls.__name__,
+            "function": cls._accommodate_stall_shortages.__name__,
+            "all_pens": all_pens,
+        }
 
         current_max_shortage = max(stall_shortages.values())
 
-        # This while loop runs up to a maximum number of times that is equal to
-        # the number of animal combinations in the stall_shortages dictionary (4).
         while current_max_shortage > 0:
             animal_combination_with_max_shortage = max(stall_shortages, key=stall_shortages.get)
             pen = cls._find_pen_with_max_stalls_for_animal_combination(
@@ -836,7 +887,8 @@ class AnimalManagement:
             )
             if pen is None:
                 om.add_warning("pen_shortage_warning",
-                               f"Warning: shortage of {animal_combination_with_max_shortage.name} pens," + " initializing new pen,",
+                               f"Warning: shortage of {animal_combination_with_max_shortage.name} pens, "
+                               f"initializing new pen,",
                                info_map)
                 pen = cls._create_default_pen(
                     pen_id=len(all_pens) + len(default_pens_created),
@@ -845,69 +897,31 @@ class AnimalManagement:
                 )
                 default_pens_created.append(pen)
             else:
-                # Note: The previous version didn't reassign the pen's animal combination from a mixed type to the
-                # animal combination with the max shortage.
-                # TODO: Check if this is correct.
-                pen.animal_combination = animal_combination_with_max_shortage
-                existing_pens_used.append(pen)  # type: ignore
-                cls._remove_pen_from_dicts_by_id(pen.pen_id, [mixed_type_by_pen_id, mixed_type_pen_by_pen_id])
+                # Previously, we didn't reassign the pen's animal combination from a mixed type (NONE,
+                # GROWING_AND_CLOSEUP) to the animal combination with the max shortage.
+                pen.update_animal_combination(animal_combination_with_max_shortage)
+                cls._remove_items_from_dicts_by_id(pen.pen_id, [mixed_type_by_pen_id, mixed_type_pen_by_pen_id])
 
             stall_shortages = cls._update_stall_shortage_for_animal_combination(stall_shortages,
                                                                                 animal_combination_with_max_shortage,
                                                                                 pen)
             current_max_shortage = max(stall_shortages.values())
 
-        return default_pens_created, existing_pens_used
-
-    @classmethod
-    def _remove_pen_from_list_by_id(cls, pen_id: int, pens: List[Pen]) -> List[Pen]:
-        """Removes a pen from a list of pens by pen ID.
-
-        Parameters
-        ----------
-        pen_id : int
-            The pen ID.
-        pens : List[Pen]
-            A list of pens.
-
-        Returns
-        -------
-        List[Pen]
-            A list of pens with the pen with the specified pen ID removed.
-
-        """
-        return list(filter(lambda pen: pen.pen_id != pen_id, pens))
-
+        return default_pens_created
 
     # Note: This function will replace allocate_all_pens eventually.
     def allocate_all_pens_2(self):
+        """TODO: Add docstring when finished."""
+
         lactating_cows = self._get_lactating_cows(self.cows)
         dry_cows = self._get_dry_cows(self.cows)
         self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
-        calf_pens = self.pens_by_animal_combination[Pen.AnimalCombination.CALF]
-        growing_pens = self.pens_by_animal_combination[Pen.AnimalCombination.GROWING]
-        close_up_pens = self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP]
-        lac_cow_pens = self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW]
 
-        mixed_type_pens = (self.pens_by_animal_combination[Pen.AnimalCombination.NONE] +
-                           self.pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP])
-        # key is pen id, value is pen object
+        mixed_type_pens = self._get_mixed_type_pens(self.pens_by_animal_combination)
         mixed_type_pen_by_pen_id: Dict[int, Pen] = {pen.id: pen for pen in mixed_type_pens}
+        mixed_type_by_pen_id = self._get_dict_for_mixed_type_by_pen_id(mixed_type_pens)
 
-        mixed_type_equivalent_for_animal_combination_none = [Pen.AnimalCombination.CALF,
-                                                             Pen.AnimalCombination.GROWING,
-                                                             Pen.AnimalCombination.CLOSE_UP,
-                                                             Pen.AnimalCombination.LAC_COW]
-        mixed_type_equivalent_for_animal_combination_growing_and_close_up = [Pen.AnimalCombination.GROWING,
-                                                                             Pen.AnimalCombination.CLOSE_UP]
-        # The "|" (union) operator is used to concatenate two dictionaries.
-        # key is pen id, value is list of animal combination(s)
-        mixed_type_by_pen_id = {pen.id: mixed_type_equivalent_for_animal_combination_none
-                                for pen in self.pens_by_animal_combination[Pen.AnimalCombination.NONE]} | \
-                               {pen.id: mixed_type_equivalent_for_animal_combination_growing_and_close_up
-                                for pen in self.pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP]}
-
-        default_pens_created, existing_pens_used = self._accommodate_stall_shortages(
+        default_pens_created = self._accommodate_stall_shortages(
             all_pens=self.all_pens,
             num_calves=len(self.calves),
             num_heiferIs=len(self.heiferIs),
@@ -921,19 +935,16 @@ class AnimalManagement:
         )
 
         self.all_pens += default_pens_created
-        # Update pens_by_animal_combination for default pens created and existing pens used
-        for pen in default_pens_created + existing_pens_used:
-            self.pens_by_animal_combination[pen.animal_combination].append(pen)
+        # Since we potentially have some new pens and some mixed-type pens with their animal combination updated,
+        # we need to do another grouping.
+        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
 
-        # Remove used pens from type NONE and GROWING_AND_CLOSE_UP
-        # TODO: Simplify this
-        for pen in existing_pens_used:
-            self.pens_by_animal_combination[Pen.AnimalCombination.NONE] = \
-                self._remove_pen_from_list_by_id(pen.pen_id, self.pens_by_animal_combination[Pen.AnimalCombination.NONE])
-            self.pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP] = \
-                self._remove_pen_from_list_by_id(pen.pen_id, self.pens_by_animal_combination[Pen.AnimalCombination.GROWING_AND_CLOSE_UP])
+        calf_pens = self.pens_by_animal_combination[Pen.AnimalCombination.CALF]
+        growing_pens = self.pens_by_animal_combination[Pen.AnimalCombination.GROWING]
+        close_up_pens = self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP]
+        lac_cow_pens = self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW]
 
-        # Still in progress
+        # Upcoming PRs
         # TODO: self._allocate_calves_to_calf_pens(...)
         # TODO: self._allocate_heiferIs_and_heiferIIs_to_growing_pens(...)
         # TODO: self._allocate_heiferIIIs_to_dry_cows_to_close_up_pens(...)
