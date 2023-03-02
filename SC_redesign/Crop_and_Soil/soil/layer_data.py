@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 from math import log
 
@@ -67,6 +67,10 @@ class LayerData:
     stable_inorganic_phosphorus: Optional[float] = None
     """Stable phosphorus content of the soil layer (kg P / kg soil)"""
 
+    # --- Decomposition
+    decomposition_moisture_effect: Optional[float] = None
+    """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -91,6 +95,9 @@ class LayerData:
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
+        if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
+            raise ValueError(f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                             f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.")
         return self.bottom_depth - self.top_depth
 
     @property
@@ -109,9 +116,13 @@ class LayerData:
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
+    def saturation_content(self) -> float:
+        """volume of water in layer when saturated (mm)"""
+        return self.saturation_point_water_concentration * self.layer_thickness
+
+    @property
     def excess_water_available(self) -> float:
         """volume of water available for percolation in the soil layer (mm)
-
         SWAT Reference: 2:3.2.1, 2
         """
         return max(0, self.water_content - self.field_capacity_content)
@@ -129,10 +140,8 @@ class LayerData:
     @property
     def percent_organic_matter_content(self) -> float:
         """percent organic matter content of this soil layer
-
         TODO: remove this field from all the soil inputs, because the given values for OM_percent are not equal to value
             that SWAT would calculate based on the percent organic carbon content
-
         SWAT Reference: 4:1.1.4
         """
         return 1.72 * self.percent_organic_carbon_content
@@ -145,3 +154,20 @@ class LayerData:
         """
         return -0.045 * log(self.percent_clay_content) + 0.001 * self.labile_phosphorus_content - \
             0.035 * self.percent_organic_carbon_content + 0.43
+
+    @property
+    def soil_water_content(self) -> float:
+        """volume of soil water in the layer in mm"""
+        return self.soil_water_concentration / self.layer_thickness
+
+    @property
+    def water_factor(self):
+        """relative water saturation (%)"""
+
+        # pseudocode_soil S.4.B.1
+        if self.soil_water_content <= self.field_capacity_content:
+            return (self.soil_water_content - self.wilting_point_content) / (
+                    self.field_capacity_content - self.wilting_point_content)
+        else:
+            return (self.saturation_content - self.soil_water_content) / (
+                    self.saturation_content - self.field_capacity_content)

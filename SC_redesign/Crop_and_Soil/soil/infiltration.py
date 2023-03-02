@@ -13,22 +13,27 @@ class Infiltration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()
 
-    def infiltrate(self, second_moisture_condition_parameter: float, rainfall: float,
-                   weighting_coefficient: float) -> None:
-        """main routine for determining runoff and infiltration of soil for a given day"""
+    def infiltrate(self, rainfall: float, weighting_coefficient: float) -> None:
+        """main routine for determining runoff and infiltration of soil for a given day
+
+        rainfall: rainfall depth of current day (mm)
+        weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
+            calculations dependent on plant evapotranspiration (unitless)
+
+        """
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
-                                                                                    second_moisture_condition_parameter)
+                                                                        self.data.second_moisture_condition_parameter)
 
         # --- adjust moisture condition parameters for slope of soil, if necessary -------------------------------------
         if abs(self.data.average_subbasin_slope - 0.05) != 0:
             adjusted_second_moisture_condition_parameter = self._determine_second_moisture_condition_adjusted(
-                                                                                    self.data.average_subbasin_slope,
-                                                                                    second_moisture_condition_parameter,
-                                                                                    third_moisture_condition_parameter)
+                                                                        self.data.average_subbasin_slope,
+                                                                        self.data.second_moisture_condition_parameter,
+                                                                        third_moisture_condition_parameter)
             adjusted_third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
                                                                         adjusted_second_moisture_condition_parameter)
         else:
-            adjusted_second_moisture_condition_parameter = second_moisture_condition_parameter
+            adjusted_second_moisture_condition_parameter = self.data.second_moisture_condition_parameter
             adjusted_third_moisture_condition_parameter = third_moisture_condition_parameter
         # --------------------------------------------------------------------------------------------------------------
         adjusted_first_moisture_condition_parameter = self._determine_first_moisture_condition_parameter(
@@ -78,6 +83,9 @@ class Infiltration:
         # --------------------------------------------------------------------------------------------------------------
 
         self.data.moisture_condition_parameter = self._determine_moisture_condition_parameter(retention_parameter)
+
+        # Update annual totals
+        self.data.annual_runoff_total += self.data.accumulated_runoff
 
     # --- static methods ---
     @staticmethod
