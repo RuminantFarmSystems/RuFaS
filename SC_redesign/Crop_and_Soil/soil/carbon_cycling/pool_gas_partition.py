@@ -101,11 +101,14 @@ class PoolGasPartition:
 
             # aggregate active carbon pool flux
             # S.6.C.11
-            layer.C_active += (
-                                      layer.plant_metabolic_active_carbon_remaining + layer.plant_structural_active_carbon_remaining +
-                                      layer.BG_met_to_C_active_act + layer.BG_struct_to_C_active_act +
-                                      layer.C_passive_to_active + layer.C_slow_to_active) - layer.C_active_decomp
-
+            layer.plant_active_decompose_carbon = self._plant_active_decompose_carbon(
+                layer.plant_metabolic_active_carbon_remaining, layer.plant_structural_active_carbon_remaining)
+            layer.soil_active_decompose_carbon = self._soil_active_decompose_carbon(
+                layer.plant_metabolic_active_carbon_remaining, layer.soil_structural_active_carbon_remaining)
+            layer.active_carbon_amount = self._soil_active_carbon_amount(
+                layer.active_carbon_amount, layer.plant_active_decompose_carbon, layer.soil_active_decompose_carbon,
+                layer.passive_to_active_carbon_amount, layer.slow_to_active_carbon_amount,
+                layer.active_carbon_decomposition_amount)
             # aggregate slow carbon pool flux
             # S.6.C.12
             layer.C_slow += (layer.AG_struct_to_C_slow_act + layer.BG_struct_to_C_slow_act +
@@ -115,7 +118,26 @@ class PoolGasPartition:
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
 
-    # --- S.6.C.10
+    # ---- S.6.C.11
+    @staticmethod
+    def _plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining: float,
+                                       plant_structural_active_carbon_remaining: float) -> float:
+        return plant_metabolic_active_carbon_remaining + plant_structural_active_carbon_remaining
+
+    @staticmethod
+    def _soil_active_decompose_carbon(soil_metabolic_active_carbon_remaining: float,
+                                      soil_structural_active_carbon_remaining: float) -> float:
+        return soil_metabolic_active_carbon_remaining + soil_structural_active_carbon_remaining
+
+    @staticmethod
+    def _soil_active_carbon_amount(active_carbon_amount: float, plant_active_decompose_carbon: float,
+                                   soil_active_decompose_carbon: float, passive_to_active_carbon_amount: float,
+                                   slow_to_active_carbon_amount: float,
+                                   active_carbon_decomposition_amount: float) -> float:
+        return active_carbon_amount + plant_active_decompose_carbon + soil_active_decompose_carbon \
+               + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
+
+    # ---- S.6.C.10
     @staticmethod
     def _passive_to_active_carbon_amount(passive_carbon_decomposition_amount: float,
                                          passive_carbon_co2_lost_rate=0.55) -> float:
