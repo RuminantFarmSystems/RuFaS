@@ -110,13 +110,23 @@ class PoolGasPartition:
                 layer.passive_to_active_carbon_amount, layer.slow_to_active_carbon_amount,
                 layer.active_carbon_decomposition_amount)
             # aggregate slow carbon pool flux
-            # S.6.C.12
-            layer.C_slow += (layer.AG_struct_to_C_slow_act + layer.BG_struct_to_C_slow_act +
-                             layer.C_active_to_slow) - C_slow_decomp
 
+            # S.6.C.12
+            layer.slow_carbon_amount = self._soil_slow_carbon_amount(
+                layer.slow_carbon_amount, layer.plant_structural_slow_carbon_remaining,
+                layer.soil_structural_slow_carbon_remaining, layer.active_carbon_to_slow_amount,
+                layer.active_carbon_decomposition_amount)
             # aggregate passive carbon pool flux
             # S.6.C.13
             layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
+
+    # ---- S.6.C.12
+    @staticmethod
+    def _soil_slow_carbon_amount(slow_carbon_amount: float, plant_structural_slow_carbon_remaining: float,
+                                 soil_structural_slow_carbon_remaining: float, active_carbon_to_slow_amount: float,
+                                 active_carbon_decomposition_amount: float):
+        return slow_carbon_amount + plant_structural_slow_carbon_remaining + soil_structural_slow_carbon_remaining +\
+               active_carbon_to_slow_amount - active_carbon_decomposition_amount
 
     # ---- S.6.C.11
     @staticmethod
