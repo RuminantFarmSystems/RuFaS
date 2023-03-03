@@ -93,6 +93,7 @@ class LayerData:
     slow_carbon_amount: Optional[float] = None
     passive_carbon_amount: Optional[float] = None
     slow_carbon_decomposition_amount: Optional[float] = None
+    """active carbon amount (kg/ha) (pseudocode_soil S.6.C.5)"""
     passive_carbon_decomposition_amount: Optional[float] = None
 
 
@@ -105,6 +106,10 @@ class LayerData:
     slow_to_active_carbon_amount: Optional[float] = None
     slow_carbon_co2_lost_amount: Optional[float] = None
     slow_to_passive_carbon_amount: Optional[float] = None
+    """active carbon amount (kg/ha) (pseudocode_soil S.6.C.10)"""
+    passive_to_active_carbon_amount: Optional[float] = None
+    passive_carbon_co2_lost_amount: Optional[float] = None
+
 
 
 
