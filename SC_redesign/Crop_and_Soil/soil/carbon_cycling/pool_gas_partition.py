@@ -255,6 +255,8 @@ class PoolGasPartition:
                                                   structural_active_carbon_loss_rate: float = 0.45) -> float:
         return plant_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
 
+    # TODO:---------test everything above
+
     @staticmethod
     def _plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage: float,
                                            structural_slow_carbon_loss_rate: float = 0.3) -> float:
