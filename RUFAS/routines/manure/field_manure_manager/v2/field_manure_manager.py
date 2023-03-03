@@ -300,6 +300,14 @@ class FieldManureManager:
         self.use(self._field_manure_data)
 
     @classmethod
+    def calc_minimum_fraction_needed_to_meet_liquid_nutrient_requirements(
+            cls, nutrients: FieldManureDataLiquidNutrients) -> float:
+        """Calculates the minimum fraction of the liquid manure needed to meet the given nutrient requirements.
+        """
+        pass
+
+
+    @classmethod
     def calc_liquid_manure_volume_needed(cls, nutrients: FieldManureDataLiquidNutrients) \
             -> float:
         """Calculates the volume of liquid manure needed to meet the given nutrient requirements.
