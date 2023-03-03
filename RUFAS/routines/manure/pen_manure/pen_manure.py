@@ -96,7 +96,7 @@ class PenManure:
 
         """
         manure_mass = animal_manure['manure_mass']  # kg
-        manure_volume = manure_mass * GeneralConstants.KG_TO_GRAMS / ManureConstants.MANURE_DENSITY  # L
+        manure_volume = (manure_mass / ManureConstants.MANURE_DENSITY) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
                                             animal_manure['total_ammoniacal_nitrogen_concentration']  # g/L
                                             * manure_volume  # L
