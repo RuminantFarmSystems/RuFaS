@@ -95,6 +95,26 @@ class SoilData:
     surface_runoff_volume: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
+    # ---- Fertilizer (Phosphorus Cycling)
+    cover_type: str = "BARE"      # TODO: implement enum for different cover types?
+    """The cover type of the soil surface, can be bare, residue covered, or grassed"""
+    cover_factor: Optional[float] = None
+    """The cover factor for use in determining the sorption percent, based on cover_type. Can be 0.5333, 0.6667, 
+        or 0.8 (unitless)
+    """
+    available_phosphorus_pool: float = 0
+    """Amount of phosphorus available for soil adsorption and leaching via runoff before the first rainfall event after 
+        application (kg)
+    """
+    recalcitrant_phosphorus_pool: float = 0
+    """Amount of phosphorus available for soil adsorption and leaching via runoff after the first rainfall event (kg)"""
+    runoff_phosphorus_pool: float = 0
+    """Amount of solubilized phosphorus that has been leached off the field by runoff (kg)"""
+    days_since_application: int = 0
+    """Number of days since phosphorus was applied to field via fertilizer"""
+    rain_events_counter: int = 0
+    """Number of rain events that have occurred since phosphorus was applied to field via fertilizer"""
+
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set"""
@@ -114,6 +134,17 @@ class SoilData:
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
+
+        # Sets the cover factor based on the cover type
+        if self.cover_type == "BARE":
+            self.cover_factor = 0.5333
+        elif self.cover_type == "RESIDUE_COVER":
+            self.cover_factor = 0.6667
+        elif self.cover_type == "GRASSED":
+            self.cover_factor = 0.8
+        else:
+            raise ValueError(f"Expected cover type to be \'BARE\', \'RESIDUE_COVER\', or \'GRASSED\', "
+                             f"received: '{self.cover_type}'.")
 
     def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
