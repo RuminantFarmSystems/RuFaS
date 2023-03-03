@@ -109,6 +109,9 @@ class LayerData:
     """active carbon amount (kg/ha) (pseudocode_soil S.6.C.10)"""
     passive_to_active_carbon_amount: Optional[float] = None
     passive_carbon_co2_lost_amount: Optional[float] = None
+    """active carbon amount (kg/ha) (pseudocode_soil S.6.C.11)"""
+    plant_active_decompose_carbon: Optional[float] = None
+    soil_active_decompose_carbon: Optional[float] = None
 
 
 
