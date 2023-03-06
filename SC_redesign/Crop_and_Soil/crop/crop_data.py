@@ -108,10 +108,11 @@ class CropData:
     min_harvest_index: float = 0.2
     """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
     allowed for the plant (unitless)"""
-    yield_nitrogen_fraction: float = 0.2
+    yield_nitrogen_fraction: Optional[float] = 0.2
     """crop-specific expected fraction of nitrogen in yield (unitless)"""
-    yield_phosphorus_fraction: float = 0.003
+    yield_phosphorus_fraction: Optional[float] = 0.003
     """crop-specific expected fraction of phosphorus in yield (unitless)"""
+
 
     # ---- biomass allocation
     light_extinction: float = 0.65
@@ -306,6 +307,10 @@ class CropData:
     """nitrogen contained in the harvested yield (kg/ha)"""
     yield_phosphorus: Optional[float] = None
     """phosphorus contained in the harvested yield (kg/ha)"""
+    residue_nitrogen: Optional[float] = None
+    """amount of nitrogen in the residue from this plant (kg/ha)"""
+    residue_phosphorus: Optional[float] = None
+    """amount of phosphorus in the residue from this plant (kg/ha)"""
 
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None

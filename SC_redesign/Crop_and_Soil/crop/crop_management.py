@@ -23,14 +23,14 @@ class CropManagement:
         if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
-
     def graze(self):  # TODO: implement grazing method (SWAT 6:1.3)
         pass
 
     # ---- Sub Methods ----
-    def collect_cut_yield(self, collected_fraction):  # TODO: implement for in-field drying - GitHub Issue #162
+    def collect_cut_yield(self, collected_fraction):  # TODO: implement for in-field drying - needed? GitHub Issue #162
         """collect yield that has been previously cut and left in the field"""
         pass
+
     def kill(self) -> None:
         """kills the plant, preventing it from growing, and converts all biomass to residue
 
@@ -42,6 +42,7 @@ class CropManagement:
         """
         self.data.is_alive = False
         self.data.yield_residue += self.data.biomass
+
     def determine_harvest_index(self):
         """sets the crop's harvest index
 
@@ -60,6 +61,7 @@ class CropManagement:
             self.data.harvest_index = self._adjust_harvest_index(self.data.potential_harvest_index,
                                                                  self.data.min_harvest_index,
                                                                  self.data.water_deficiency)
+
     def dry_down(self):
         """adjusts crop biomass for water loss during dry-down process
 
