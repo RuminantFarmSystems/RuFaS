@@ -68,6 +68,9 @@ class LayerData:
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
+        if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
+            raise ValueError(f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                             f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.")
         return self.bottom_depth - self.top_depth
 
     @property
@@ -84,6 +87,11 @@ class LayerData:
     def wilting_point_content(self) -> float:
         """amount of water in layer when at wilting point (mm)"""
         return self.wilting_point_water_concentration * self.layer_thickness
+
+    @property
+    def saturation_content(self) -> float:
+        """volume of water in layer when saturated (mm)"""
+        return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
     def excess_water_available(self) -> float:

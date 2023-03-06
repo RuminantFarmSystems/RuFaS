@@ -36,7 +36,8 @@ class FieldData:
     """Shortest day of the year for this watershed (hours)"""
     dormancy_threshold_daylength: Optional[float] = None
     """Threshold daylength to initiate dormancy in a plant (hours)"""
-
+    current_residue: float = 0
+    """total amount of residue on the current day (kg per hectare)"""
 
     # --- Field-level Variables ---
     evaporation: Optional[float] = None
@@ -52,6 +53,8 @@ class FieldData:
     """adjusted max evapotranspiration (mm)"""
     grazers_present: bool = False
     """are grazers currently in the field? is grazing occurring?"""
+    seasonal_high_water_table: bool = False
+    """if the HRU has a seasonal high water table (true/false)"""
 
     def __post_init__(self):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""
