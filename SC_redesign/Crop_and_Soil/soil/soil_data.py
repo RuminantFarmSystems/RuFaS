@@ -41,6 +41,10 @@ class SoilData:
     annual_surface_runoff_total: float = 0
     """Cumulative total of volume of surface runoff that occurred in a year (mm per hectare)"""
 
+    # Track annual nutrient activity
+    annual_runoff_fertilizer_phosphorus: float = 0  # TODO: add this to annual reset method
+    """Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff"""
+
     # ---- evapotranspiration
     potential_evapotranspiration: Optional[float] = None
     """potential evapotranspiration for a given day (mm per day)"""
@@ -96,11 +100,15 @@ class SoilData:
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
     # ---- Fertilizer (Phosphorus Cycling)
-    cover_type: str = "BARE"      # TODO: implement enum for different cover types?
+    cover_type: str = "BARE"  # TODO: implement enum for different cover types?
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
     cover_factor: Optional[float] = None
     """The cover factor for use in determining the sorption percent, based on cover_type. Can be 0.5333, 0.6667, 
         or 0.8 (unitless)
+    """
+    full_available_phosphorus_pool: float = 0
+    """Starting value of the available phosphorus pool (kg). This value does not change when phosphorus is removed from
+        the available phosphorus pool, but does change when a new application of fertilizer phosphorus is applied.
     """
     available_phosphorus_pool: float = 0
     """Amount of phosphorus available for soil adsorption and leaching via runoff before the first rainfall event after 
