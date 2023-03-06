@@ -336,7 +336,7 @@ class CropData:
         # set Fixation status
         if self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
                 self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
-                self.plant_category == PlantCategory.COOL_ANNUAL:
+                self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
             self.is_nitrogen_fixer = True
 
     @property
