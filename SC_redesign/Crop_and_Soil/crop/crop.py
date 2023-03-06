@@ -114,10 +114,6 @@ class Crop:
         """resets some attributes for perennial crops at the start of the new growing season"""
         pass
 
-    def destroy(self):  # Needed?
-        """destroys the crop - Destructor class. This removes the crop instance from existence"""
-        pass
-
     def start_dormancy(self):
         """Calls the main routine in Dormancy"""
         self.dormancy.go_into_dormancy()
