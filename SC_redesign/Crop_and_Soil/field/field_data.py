@@ -55,6 +55,6 @@ class FieldData:
 
     def __post_init__(self):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""
-        dormancy_threshold = Dormancy._find_dormancy_threshold(self.absolute_latitude)
-        self.dormancy_threshold_daylength = Dormancy._find_threshold_daylength(self.minimum_daylength,
-                                                                               dormancy_threshold)
+        self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
+        self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
+                                                                              self.dormancy_threshold)

@@ -31,11 +31,11 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     field.crops = [crop]
 
     # Mock functions used
-    crop.dormancy.go_into_dormancy = MagicMock()
+    crop.dormancy.enter_dormancy = MagicMock()
 
     # Run method being tested
     field.assess_dormancy(daylength)
 
     # Check that subroutines were called correct number of times
     if daylength <= threshold_daylength:
-        assert crop.dormancy.go_into_dormancy.call_count == 1
+        assert crop.dormancy.enter_dormancy.call_count == 1
