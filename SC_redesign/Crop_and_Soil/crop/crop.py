@@ -114,12 +114,6 @@ class Crop:
         """resets some attributes for perennial crops at the start of the new growing season"""
         pass
 
-    def start_dormancy(self):
-        """Calls the main routine in Dormancy"""
-        self.dormancy.go_into_dormancy()
-
-
-
 # ---- Old versions of cut() and kill()
 # def kill(crop_type, field_management, time):
 #     """

@@ -101,7 +101,7 @@ class SoilData:
         else:
             water_sum = 0
             for layer in self.soil_layers:
-                water_sum += max(0, (layer.water_content - layer.wilting_point_content))
+                water_sum += max(0.0, (layer.water_content - layer.wilting_point_content))
             return water_sum
 
     @property
