@@ -16,11 +16,11 @@ class CropManagement:
     def manage_harvest(self, harvest_op: HarvestOperation):
         self.determine_harvest_index()
 
-        if harvest_op == HarvestOperation.HARVEST:  # harvest and kill the crop
+        if harvest_op == HarvestOperation.HARVEST:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
             self.kill()
 
-        if harvest_op == HarvestOperation.HARVEST_NOKILL: # harvest but don't kill the crop
+        if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
 

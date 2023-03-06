@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 
@@ -57,7 +57,6 @@ class LayerData:
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
-
     # --- Decomposition
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
@@ -91,7 +90,7 @@ class LayerData:
         """volume of water available for percolation in the soil layer (mm)
         SWAT Reference: 2:3.2.1, 2
         """
-        return max(0, self.water_content - self.field_capacity_content)
+        return max(0.0, self.water_content - self.field_capacity_content)
 
     @property
     def saturation_content(self) -> float:
@@ -99,10 +98,9 @@ class LayerData:
         return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
-
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
-        return max(0, self.saturation_content - self.water_content)
+        return max(0.0, self.saturation_content - self.water_content)
 
     @property
     def percent_organic_matter_content(self) -> float:
@@ -129,6 +127,3 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
-
-
-

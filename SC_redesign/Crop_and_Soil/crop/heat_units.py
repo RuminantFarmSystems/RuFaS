@@ -5,9 +5,9 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 This module primarily follows the Heat Units section of the SWAT model (5:3.1)
 """
 
+
 class HeatUnits:
-    def __init__(self, crop_data: Optional[CropData] = None,
-                 use_heat_unit_temperature: bool = False):
+    def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     def absorb_heat_units(self, mean_air_temperature: float = None,
@@ -135,7 +135,4 @@ class HeatUnits:
         """
         return min(max_air_temp, max_growth_temp)
 
-    # TODO: Dormancy! SWAT 5:1.2 - GitHub PR #365
-
     # TODO: Heat scheduling? SWAT 5:1.1.1 - GitHub Issue #368
-

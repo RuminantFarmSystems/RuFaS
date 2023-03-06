@@ -66,6 +66,10 @@ class SoilData:
     surface_volume_runoff: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
+    # ---- decomposition
+    decomposition_temperature_effect: Optional[float] = None
+    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
+
     def __post_init__(self):
         if self.soil_layers is None:
             # sets the soil layers to a default set if user does not provide any
@@ -78,12 +82,6 @@ class SoilData:
                                            bottom_depth=10000000,    # bottom depth is 10,000 meters by default
                                            soil_water_concentration=0,
                                            saturation_point_water_concentration=inf)
-
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
-
 
     @property
     def profile_soil_water_content(self) -> float:
@@ -103,7 +101,7 @@ class SoilData:
         else:
             water_sum = 0
             for layer in self.soil_layers:
-                water_sum += max(0, (layer.water_content - layer.wilting_point_content))
+                water_sum += max(0.0, (layer.water_content - layer.wilting_point_content))
             return water_sum
 
     @property

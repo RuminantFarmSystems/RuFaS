@@ -1,6 +1,7 @@
 from typing import Optional
 from dataclasses import dataclass
 from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 
 
 
@@ -28,7 +29,14 @@ class FieldData:
     harvest_proportion: float = 1.0
     """proportion of the cut biomass to be removed from the field after the next/current cut event (unitless)"""
     harvest_type: Optional[HarvestOperation] = HarvestOperation("default")
-    "the HarvestOperation, specifying which harvest operation to use"
+    """the HarvestOperation, specifying which harvest operation to use"""
+    absolute_latitude: float = 43.5     # TODO: set default to somewhere other than Wisconsin, or no default?
+    """The absolute latitude value (degrees above or below equator) where field is located (degrees)"""
+    minimum_daylength: float = 6.33     # TODO: set default to somewhere other than Wisconsin, or no default?
+    """Shortest day of the year for this watershed (hours)"""
+    dormancy_threshold_daylength: Optional[float] = None
+    """Threshold daylength to initiate dormancy in a plant (hours)"""
+
 
     # --- Field-level Variables ---
     evaporation: Optional[float] = None
@@ -45,5 +53,8 @@ class FieldData:
     grazers_present: bool = False
     """are grazers currently in the field? is grazing occurring?"""
 
-
-
+    def __post_init__(self):
+        """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""
+        self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
+        self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
+                                                                              self.dormancy_threshold)

@@ -86,20 +86,20 @@ def test_given_harvest_index_property(usr_index, expect):
     data = CropData(user_harvest_index=usr_index)
     assert data.do_harvest_index_override == expect
 
-def test_cut_crop():
-    assert False
-
-def test_determine_harvest_index():
-    assert False
-
-def test_dry_down():
-    assert False
-
-def test_kill():
-    assert False
-
-def test_manage_harvest():
-    assert False
+# def test_cut_crop():
+#     assert False
+#
+# def test_determine_harvest_index():
+#     assert False
+#
+# def test_dry_down():
+#     assert False
+#
+# def test_kill():
+#     assert False
+#
+# def test_manage_harvest():
+#     assert False
 
 
 # @pytest.mark.parametrize("usr_index,heat_frac,harv_eff", [

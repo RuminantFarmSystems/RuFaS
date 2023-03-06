@@ -5,6 +5,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 This module is based upon the "Root Development" section of the SWAT model (5.2.1.3)
 """
 
+
 class RootDevelopment:
     def __init__(self, crop_data: Optional[CropData] = None):
         # data reference
@@ -22,7 +23,7 @@ class RootDevelopment:
 
         # update root depth
         if self.data.is_perennial:
-            self.data.root_depth = self.data.max_root_depth  # TODO: assumption by SWAT - valid perhaps after 1st year?
+            self.data.root_depth = self.data.max_root_depth  # Note: assumption of SWAT
         else:
             self.data.root_depth = self._determine_root_depth(self.data.max_root_depth, self.data.heat_fraction)
 
