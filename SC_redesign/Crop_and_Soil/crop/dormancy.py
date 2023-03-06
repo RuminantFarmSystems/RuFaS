@@ -1,6 +1,6 @@
 from typing import Optional
 
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantTypes
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
 
 """
 This module is based on the "Dormancy" module of SWAT (5:1.2)
@@ -11,15 +11,15 @@ class Dormancy:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData
 
-    def go_into_dormancy(self) -> None:
-        """This method performs the actual transition from active to dormant in a crop.
+    def enter_dormancy(self) -> None:
+        """Performs the actual transition from active to dormant in a crop.
 
         Details:
             When method is called, the crop's status is set to dormant, biomass is removed from plant and converted
             to residue, and the leaf area index is reset (if the current leaf area index is greater than the minimum
             leaf area index during dormancy for this crop).
         """
-        if self.data.plant_type == PlantTypes.WARM_ANNUAL or PlantTypes.WARM_ANNUAL_LEGUME:
+        if self.data.plant_category == PlantCategory.WARM_ANNUAL or PlantCategory.WARM_ANNUAL_LEGUME:
             # These types of plants do not go into dormancy
             return
 
@@ -27,24 +27,18 @@ class Dormancy:
             # Crop is already dormant, so it should not re-lose biomass or have its leaf area index reset again
             return
 
-        # TODO: should is_growing be set here?
-
         self.data.is_dormant = True
-        if self.data.plant_type == PlantTypes.TREE or self.data.is_perennial:
+        if self.data.plant_category == PlantCategory.TREE or self.data.is_perennial:
             # Cool annuals and cool annual legumes do not lose any biomass or get their leaf area index reset
 
             # Some fraction of biomass falls off the plant and becomes residue
             self.data.yield_residue += (self.data.biomass * self.data.dormancy_loss_fraction)
             self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
             # Leaf area index gets set to minimum leaf area index, if it is less than the current leaf area index
-            # TODO: verify this is correct behavior for case when current leaf area index is less than the minimum leaf
-            #   area index during dormancy
             self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
 
-    # TODO: It might be better calculate the two values in FieldData (e.g., post_init), since they don't change?
-    #   Update: these are used in the post_init in FieldData, should they have protected status (i.e., _) removed?
     @staticmethod
-    def _find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:
+    def find_threshold_daylength(minimum_daylength: float, dormancy_threshold: float) -> float:
         """calculates the threshold daylength for dormancy
 
         Args:
@@ -58,7 +52,7 @@ class Dormancy:
         return minimum_daylength + dormancy_threshold
 
     @staticmethod
-    def _find_dormancy_threshold(abs_latitude: float) -> float:
+    def find_dormancy_threshold(abs_latitude: float) -> float:
         """calculates the dormancy threshold based on the absolute latitude
 
         Args:
