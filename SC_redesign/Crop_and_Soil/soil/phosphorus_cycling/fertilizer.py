@@ -23,45 +23,63 @@ class Fertilizer:
             field_size: size of the field (ha)
 
         """
-
         if rainfall > 0:
-            self.data.rain_events_counter += 1
+            self.data.rain_events_after_fertilizer_application += 1
 
-        # ---- Phosphorus loss that occurs before or during first rainfall event
-        no_phosphorus_absorbed = self.data.rain_events_counter == self.data.days_since_application == 0
+        if self.data.rain_events_after_fertilizer_application <= 1:
+            self._update_before_and_at_first_rain(rainfall, runoff, field_size)
+        else:
+            self._update_after_first_rain(rainfall, runoff, field_size)
+
+        self.data.days_since_application += 1
+
+    def _update_before_and_at_first_rain(self, rainfall: float, runoff: float, field_size: float) -> None:
+        """Decides which operations to perform on fertilizer phosphorus on all days before the first rainfall after the
+            last application of fertilizer phosphorus, and on the day of the first rainfall.
+
+        Args:
+            rainfall: amount of rainfall on this day (mm)
+            runoff: amount of runoff on this day (mm)
+            field_size: size of the field (ha)
+
+        """
+        no_phosphorus_absorbed = self.data.rain_events_after_fertilizer_application == \
+                                 self.data.days_since_application == 0
         if no_phosphorus_absorbed:
-            self.data.days_since_application += 1
             return
 
-        phosphorus_absorbed_only = self.data.rain_events_counter == 0 and self.days_since_application > 0 \
-                                   and self.data.available_phosphorus_pool > 0
+        phosphorus_absorbed_only = self.data.rain_events_after_fertilizer_application == 0 \
+                                   and self.days_since_application > 0 and self.data.available_phosphorus_pool > 0
         if phosphorus_absorbed_only:
             self._absorb_phosphorus_from_available_pool(field_size)
-            self.data.days_since_application += 1
             return
 
-        first_rainfall_occurred = self.data.rain_events_counter == 1 and self.data.available_phosphorus_pool > 0
+        first_rainfall_occurred = self.data.rain_events_after_fertilizer_application == 1 \
+                                  and self.data.available_phosphorus_pool > 0
 
         if first_rainfall_occurred and runoff == 0:
             self._add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
             self.data.available_phosphorus_pool = 0
-            self.data.days_since_application += 1
             return
         elif first_rainfall_occurred and runoff > 0:
             self._leach_available_phosphorus(rainfall, runoff, field_size)
-            self.data.days_since_application += 1
             return
 
-        # ---- Phosphorus loss that occurs during all rain events after the first
+    def _update_after_first_rain(self, rainfall: float, runoff: float, field_size: float) -> None:
+        """Decides which operations to perform on fertilizer phosphorus on all days after the first rainfall event.
+
+        Args:
+            rainfall: amount of rainfall on this day (mm)
+            runoff: amount of runoff on this day (mm)
+            field_size: size of the field (ha)
+
+        """
         if rainfall == 0:
-            self.data.days_since_application += 1
             return
         elif runoff == 0:
             self._absorb_phosphorus_from_recalcitrant_pool(field_size)
         else:
             self._leach_recalcitrant_phosphorus(rainfall, runoff, field_size)
-        self.data.days_since_application += 1
-        return
 
     def add_fertilizer_phosphorus(self, fertilizer_phosphorus_applied: float) -> None:
         """Resets counters and adds to phosphorous pools when new fertilizer phosphorus is applied to the fields.
@@ -71,7 +89,7 @@ class Fertilizer:
 
         Details:
             When fertilizer phosphorus is applied to the field this method resets both the days_since_application and
-            rain_events_counter to 0, and adds the new phosphorus to the available and recalcitrant pools. It also
+            rain_events_after_fertilizer_application to 0, and adds the new phosphorus to the available and recalcitrant pools. It also
             updates the starting available phosphorus value to the new available phosphorus pool value.
 
         """
@@ -79,7 +97,7 @@ class Fertilizer:
         self.data.full_available_phosphorus_pool = self.data.available_phosphorus_pool
         self.data.recalcitrant_phosphorus_pool += 0.25 * fertilizer_phosphorus_applied
         self.data.days_since_application = 0
-        self.data.rain_events_counter = 0
+        self.data.rain_events_after_fertilizer_application = 0
 
     def _absorb_phosphorus_from_available_pool(self, field_size: float) -> None:
         """This function transfers phosphorus from the available pool to the labile pool
@@ -113,7 +131,7 @@ class Fertilizer:
             field_size: size of the field (ha)
 
         """
-        if self.data.rain_events_counter == 2:
+        if self.data.rain_events_after_fertilizer_application == 2:
             solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.4
         else:
             solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.075
@@ -144,35 +162,14 @@ class Fertilizer:
         runoff_in_liters = runoff * field_size * 10000
         runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
 
-        # runoff_phosphorus_kg = min(self.data.available_phosphorus_pool, runoff_phosphorus_kg)
-        # self.data.available_phosphorus_pool -= runoff_phosphorus_kg
-        #
-        # if self.data.rain_events_counter == 2:
-        #     solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.4
-        # else:
-        #     solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.075
-        # self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
-
         solubilized_phosphorus = phosphorus_pool * solubilizing_factor
         phosphorus_pool -= solubilized_phosphorus
-
-        # self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_kg
-        # self._add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
-        # self.data.available_phosphorus_pool = 0
-        #
-        # phosphorus_to_runoff_kg = min(solubilized_phosphorus, phosphorus_to_runoff_kg)
-        # self.data.annual_runoff_fertilizer_phosphorus += phosphorus_to_runoff_kg
-        #
-        # solubilized_phosphorus -= phosphorus_to_runoff_kg
-        # if solubilized_phosphorus > 0:
-        #     self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
 
         runoff_phosphorus_kg = min(solubilized_phosphorus, runoff_phosphorus_kg)
         solubilized_phosphorus -= runoff_phosphorus_kg
         self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_kg
         if solubilized_phosphorus > 0:
             self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
-
 
     def _leach_available_phosphorus(self, rainfall: float, runoff: float, field_size: float) -> None:
         """This method handles phosphorus removal from the available phosphorus pool (i.e., all phosphorus removal that
@@ -215,7 +212,7 @@ class Fertilizer:
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
         rainfall_in_liters = rainfall * field_size * 10000
 
-        if self.data.rain_events_counter == 2:
+        if self.data.rain_events_after_fertilizer_application == 2:
             dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
                 recalcitrant_phosphorus_in_mg, 0.4, distribution_factor, rainfall_in_liters)
         else:
@@ -225,7 +222,7 @@ class Fertilizer:
         runoff_in_liters = runoff * field_size * 10000
         phosphorus_to_runoff_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
 
-        if self.data.rain_events_counter == 2:
+        if self.data.rain_events_after_fertilizer_application == 2:
             solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.4
         else:
             solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.075

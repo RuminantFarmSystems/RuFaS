@@ -120,7 +120,7 @@ class SoilData:
     """Amount of solubilized phosphorus that has been leached off the field by runoff (kg)"""
     days_since_application: int = 0
     """Number of days since phosphorus was applied to field via fertilizer"""
-    rain_events_counter: int = 0
+    rain_events_after_fertilizer_application: int = 0
     """Number of rain events that have occurred since phosphorus was applied to field via fertilizer"""
 
     def __post_init__(self):
