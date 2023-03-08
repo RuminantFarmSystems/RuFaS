@@ -3,6 +3,7 @@ from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIncorporation
+from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
@@ -102,13 +103,20 @@ class Crop:
         self.biomass_allocation.allocate_biomass(incoming_light)
 
     # ---- Crop Management Methods
-    @classmethod
-    def plant_species(cls, species) -> Crop:
+    @staticmethod
+    def plant_species(species: str) -> Crop:
         """creates a crop instance with attributes determined by the species of the crop.
 
-        Details: species attributes are read from species configuration files/classes
+        Args:
+            species: one of the supported species
+
+        Details: species attributes are read from species configuration files/classes. This method of creating
+            a crop does not allow for customizing crop values. It is limited to creating the default crops
+            supported by the CropSpecies Enum.
         """
-        pass
+        crop_species = CropSpecies(species)
+        crop_data = CropSpeciesDataFactory.create_species_data(crop_species)
+        return Crop(crop_data)
 
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""
