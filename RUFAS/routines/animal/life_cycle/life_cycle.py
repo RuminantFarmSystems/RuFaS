@@ -107,15 +107,15 @@ class LifeCycleManager:
         self.preg_check_num = 0
         self.CIDR_count = 0
         self.GnRH_injection_num_h = 0
-        self.PGF_injection_num_h = 0
         self.GnRH_injection_num = 0
+        self.PGF_injection_num_h = 0
         self.PGF_injection_num = 0
 
         self.ai_num_h = 0
-        self.semen_num_h = 0
-        self.ed_period_h = 0
         self.ai_num = 0
+        self.semen_num_h = 0
         self.semen_num = 0
+        self.ed_period_h = 0
 
         self.open_cow_num = 0
         self.preg_cow_num = 0
@@ -255,7 +255,7 @@ class LifeCycleManager:
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
             -> Tuple[List[Cow], List[int], List[Calf], List[Calf],
-                     List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+            List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.
 
@@ -284,6 +284,7 @@ class LifeCycleManager:
         total_animal_num = 0
         preg_heifer_num = 0  # TODO: Seems unused after calculation
 
+        self._reset_daily_stats()
         self._reset_parity()
         self._reset_cull_reason_stats()
 
@@ -334,6 +335,64 @@ class LifeCycleManager:
 
         return (animals_added, ids_removed, calves_born, calves, heiferIs,
                 heiferIIs, heiferIIIs, cows)
+
+    def _reset_daily_stats(self) -> None:
+        """Resets daily-based attributes."""
+        # TODO: Maybe break this list down into smaller lists
+        self.calf_num = 0
+        self.heiferI_num = 0
+        self.heiferII_num = 0
+        self.heiferIII_num = 0
+        self.cow_num = 0
+
+        self.sold_calf_num = 0
+        self.sold_heifer_num = 0
+        self.bought_heifer_num = 0
+        self.culled_heifer_num = 0
+        self.culled_cow_num = 0
+
+        self.calf_percent = 0.0
+        self.heiferI_percent = 0.0
+        self.heiferII_percent = 0.0
+        self.heiferIII_percent = 0.0
+        self.cow_percent = 0.0
+
+        # TODO: Check if all the following variables need to reset daily
+        self.CIDR_count = 0
+        self.preg_check_num_h = 0
+        self.preg_check_num = 0
+        self.GnRH_injection_num_h = 0
+        self.GnRH_injection_num = 0
+        self.PGF_injection_num_h = 0
+        self.PGF_injection_num = 0
+        self.ai_num_h = 0
+        self.ai_num = 0
+        self.semen_num_h = 0
+        self.semen_num = 0
+        self.ed_period_h = 0
+
+        self.open_cow_num = 0
+        self.preg_cow_num = 0
+        self.vwp_cow_num = 0
+        self.milking_cow_num = 0
+        self.dry_cow_num = 0
+
+        self.preg_cow_percent = 0.0
+        self.dry_cow_percent = 0.0
+        self.milking_cow_percent = 0.0
+        self.non_preg_cow_percent = 0.0
+
+        self.daily_milk_production = 0.0
+        self.avg_days_in_milk = 0.0
+        self.avg_days_in_preg = 0.0
+        self.avg_cow_body_weight = 0.0
+        self.avg_parity_num = 0.0
+
+        self.avg_calving_interval = 0.0
+        self.avg_breeding_to_preg_time = 0.0
+        self.avg_heifer_culling_age = 0.0
+        self.avg_cow_culling_age = 0.0
+        self.avg_mature_body_weight = 0.0
 
     def _reset_parity(self) -> None:
         """Resets parity-based attributes."""
@@ -726,9 +785,9 @@ class LifeCycleManager:
 
         """
         _, self.avg_cow_body_weight = Utility.calc_average(
-                self.cow_num, self.avg_cow_body_weight, cow.body_weight)
+            self.cow_num, self.avg_cow_body_weight, cow.body_weight)
         self.cow_num, self.avg_parity_num = Utility.calc_average(
-                self.cow_num, self.avg_parity_num, cow.calves)
+            self.cow_num, self.avg_parity_num, cow.calves)
 
         total_animal_num, self.avg_mature_body_weight = \
             Utility.calc_average(total_animal_num, self.avg_mature_body_weight, cow.mature_body_weight)
@@ -867,7 +926,7 @@ class LifeCycleManager:
 
     def _calculate_cull_reason_stats_percent(self) -> None:
         """Calculates the percentage of culled cows for each cull reason."""
-        denominator = self.cow_num if self.cow_num > 0 else 1
+        denominator = self.culled_cow_num if self.culled_cow_num > 0 else 1
         pc = Utility.percent_calculator(denominator)
         for cull_reason in LifeCycleManager.cull_reason_stats:
             self.cull_reason_stats_percent[cull_reason] = pc(LifeCycleManager.cull_reason_stats[cull_reason])

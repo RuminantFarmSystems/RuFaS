@@ -31,11 +31,11 @@ def life_cycle_manager(mocker: MockerFixture) -> LifeCycleManager:
 
 
 @pytest.mark.parametrize(
-        'user_input_calving_interval, custom_avg_CI, cow_avg_CI',
-        [
-            (True, 400.0, -1.0),
-            (False, -1.0, 500.0)
-        ]
+    'user_input_calving_interval, custom_avg_CI, cow_avg_CI',
+    [
+        (True, 400.0, -1.0),
+        (False, -1.0, 500.0)
+    ]
 )
 def test_set_avg_CI(mocker: MockerFixture,
                     life_cycle_manager: LifeCycleManager,
@@ -74,8 +74,8 @@ def test_set_avg_CI(mocker: MockerFixture,
 
 
 @pytest.mark.parametrize(
-        'animal_type',
-        [Calf, HeiferI, HeiferII, HeiferIII, Cow])
+    'animal_type',
+    [Calf, HeiferI, HeiferII, HeiferIII, Cow])
 def test_get_animals(mocker: MockerFixture,
                      life_cycle_manager: LifeCycleManager,
                      animal_type: Type[GenericAnimal]) -> None:
@@ -1165,25 +1165,25 @@ def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCyc
         assert life_cycle_manager.non_preg_cow_percent == approx(0.0)
 
 
-@pytest.mark.parametrize('cow_num', [0, 50, 100])
+@pytest.mark.parametrize('culled_cow_num', [0, 50, 100])
 def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manager: LifeCycleManager,
-                                        cow_num: int) -> None:
+                                        culled_cow_num: int) -> None:
     """Unit test for function _calculate_cull_reason_stats_percent() in file life_cycle.py."""
     # Arrange
-    life_cycle_manager.cow_num = cow_num
+    life_cycle_manager.culled_cow_num = culled_cow_num
     num_reasons = len(LifeCycleManager.cull_reason_stats)
     LifeCycleManager.cull_reason_stats.update({
-        animal_constants.DEATH_CULL: int(cow_num / num_reasons),
-        animal_constants.LOW_PROD_CULL: int(cow_num / num_reasons),
-        animal_constants.LAMENESS_CULL: int(cow_num / num_reasons),
-        animal_constants.INJURY_CULL: int(cow_num / num_reasons),
-        animal_constants.MASTITIS_CULL: int(cow_num / num_reasons),
-        animal_constants.DISEASE_CULL: int(cow_num / num_reasons),
-        animal_constants.UDDER_CULL: int(cow_num / num_reasons),
+        animal_constants.DEATH_CULL: int(culled_cow_num / num_reasons),
+        animal_constants.LOW_PROD_CULL: int(culled_cow_num / num_reasons),
+        animal_constants.LAMENESS_CULL: int(culled_cow_num / num_reasons),
+        animal_constants.INJURY_CULL: int(culled_cow_num / num_reasons),
+        animal_constants.MASTITIS_CULL: int(culled_cow_num / num_reasons),
+        animal_constants.DISEASE_CULL: int(culled_cow_num / num_reasons),
+        animal_constants.UDDER_CULL: int(culled_cow_num / num_reasons),
         animal_constants.UNKNOWN_CULL: 0  # Initialized with 0
     })
     LifeCycleManager.cull_reason_stats[animal_constants.UNKNOWN_CULL] = \
-        cow_num - sum(LifeCycleManager.cull_reason_stats.values())
+        culled_cow_num - sum(LifeCycleManager.cull_reason_stats.values())
 
     spy_calc_cull_reason_stats_percent = mocker.spy(life_cycle_manager, '_calculate_cull_reason_stats_percent')
 
@@ -1193,10 +1193,10 @@ def test_calc_cull_reason_stats_percent(mocker: MockerFixture, life_cycle_manage
     # Assert
     spy_calc_cull_reason_stats_percent.assert_called_once()
     for cull_reason in life_cycle_manager.cull_reason_stats_percent:
-        if cow_num > 0:
+        if culled_cow_num > 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == \
-                   approx(LifeCycleManager.cull_reason_stats[cull_reason] * 100.0 / cow_num)
-        elif cow_num == 0:
+                   approx(LifeCycleManager.cull_reason_stats[cull_reason] * 100.0 / culled_cow_num)
+        elif culled_cow_num == 0:
             assert life_cycle_manager.cull_reason_stats_percent[cull_reason] == approx(0.0)
 
 
@@ -1280,23 +1280,23 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     patch_for_cull_cow = mocker.patch.object(life_cycle_manager, '_cull_cow')
 
     patch_for_handle_cow_body_weight_and_parity = mocker.patch.object(
-            life_cycle_manager,
-            '_handle_cow_body_weight_and_parity',
-            side_effect=total_animal_num_side_effect
+        life_cycle_manager,
+        '_handle_cow_body_weight_and_parity',
+        side_effect=total_animal_num_side_effect
     )
     patch_for_handle_cow_milking = mocker.patch.object(life_cycle_manager, '_handle_cow_milking')
     patch_for_handle_cow_days_in_preg = mocker.patch.object(life_cycle_manager, '_handle_cow_days_in_preg')
     patch_for_handle_cow_calves = mocker.patch.object(life_cycle_manager, '_handle_cow_calves')
     patch_for_handle_cow_CI = mocker.patch.object(
-            life_cycle_manager,
-            '_handle_cow_CI',
-            return_value=calving_interval_avail_num
+        life_cycle_manager,
+        '_handle_cow_CI',
+        return_value=calving_interval_avail_num
     )
     patch_for_extract_repro_stats_from_cow = mocker.patch.object(life_cycle_manager, '_extract_repro_stats_from_cow')
 
     patch_for_handle_new_born = mocker.patch.object(life_cycle_manager, '_handle_new_born')
     patch_for_remove_items_from_list_by_indices = mocker.patch(
-            'RUFAS.routines.animal.life_cycle.life_cycle.Utility.remove_items_from_list_by_indices')
+        'RUFAS.routines.animal.life_cycle.life_cycle.Utility.remove_items_from_list_by_indices')
 
     # Act
     actual_total_animal_num = life_cycle_manager._cull_cows_and_record_stats(sim_day, mock_cows,
@@ -1331,20 +1331,120 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     assert patch_for_extract_repro_stats_from_cow.call_count == num_cows_not_culled
     assert patch_for_handle_new_born.call_count == num_new_born
 
-    # for mock_cow in mock_cows_original:
-    #     _, _, _, is_culled, has_new_born = mock_cow.update.return_value
-    #     if is_culled:
-    #         patch_for_cull_cow.assert_called_once_with(mock_cow)
-    #         assert mock_cow.id in ids_removed
-    #         assert mock_cow.id in removed_cows_idx
-    #     else:
-    #         patch_for_handle_cow_body_weight_and_parity.assert_called_once_with(
-    #                 mock_cow, total_animal_num_side_effect.pop(0))
-    #         patch_for_handle_cow_calves.assert_called_once_with(mock_cow)
-    #         patch_for_handle_cow_CI.assert_called_once_with(mock_cow, calving_interval_avail_num)
-    #         patch_for_extract_repro_stats_from_cow.assert_called_once_with(mock_cow)
-    #     if has_new_born:
-    #         patch_for_handle_new_born.assert_called_once_with(sim_day, mock_cow, calves_born)
-    #
     patch_for_remove_items_from_list_by_indices.assert_called_once_with(mock_cows_original, removed_cows_idx)
     assert actual_total_animal_num == current_total_animal_num
+
+
+def test_reset_daily_stats(life_cycle_manager: LifeCycleManager) -> None:
+    # Arrange
+    life_cycle_manager.calf_num = 1
+    life_cycle_manager.heiferI_num = 2
+    life_cycle_manager.heiferII_num = 3
+    life_cycle_manager.heiferIII_num = 4
+    life_cycle_manager.cow_num = 5
+
+    life_cycle_manager.sold_calf_num = 6
+    life_cycle_manager.sold_heifer_num = 7
+    life_cycle_manager.bought_heifer_num = 8
+    life_cycle_manager.culled_heifer_num = 9
+    life_cycle_manager.culled_cow_num = 10
+
+    life_cycle_manager.calf_percent = 11.0
+    life_cycle_manager.heiferI_percent = 12.0
+    life_cycle_manager.heiferII_percent = 13.0
+    life_cycle_manager.heiferIII_percent = 14.0
+    life_cycle_manager.cow_percent = 15.0
+
+    life_cycle_manager.CIDR_count = 16
+    life_cycle_manager.preg_check_num_h = 17
+    life_cycle_manager.preg_check_num = 18
+    life_cycle_manager.GnRH_injection_num_h = 19
+    life_cycle_manager.GnRH_injection_num = 20
+    life_cycle_manager.PGF_injection_num_h = 21
+    life_cycle_manager.PGF_injection_num = 22
+    life_cycle_manager.ai_num_h = 23
+    life_cycle_manager.ai_num = 24
+    life_cycle_manager.semen_num_h = 25
+    life_cycle_manager.semen_num = 26
+    life_cycle_manager.ed_period_h = 27
+
+    life_cycle_manager.open_cow_num = 28
+    life_cycle_manager.preg_cow_num = 29
+    life_cycle_manager.vwp_cow_num = 30
+    life_cycle_manager.milking_cow_num = 31
+    life_cycle_manager.dry_cow_num = 32
+
+    life_cycle_manager.preg_cow_percent = 33
+    life_cycle_manager.dry_cow_percent = 34
+    life_cycle_manager.milking_cow_percent = 35
+    life_cycle_manager.non_preg_cow_percent = 36
+
+    life_cycle_manager.daily_milk_production = 37
+    life_cycle_manager.avg_days_in_milk = 38
+    life_cycle_manager.avg_days_in_preg = 39
+    life_cycle_manager.avg_cow_body_weight = 40
+    life_cycle_manager.avg_parity_num = 41
+
+    life_cycle_manager.avg_calving_interval = 42
+    life_cycle_manager.avg_breeding_to_preg_time = 43
+    life_cycle_manager.avg_heifer_culling_age = 44
+    life_cycle_manager.avg_cow_culling_age = 45
+    life_cycle_manager.avg_mature_body_weight = 46
+
+    # Act
+    life_cycle_manager._reset_daily_stats()
+
+    # Assert
+    assert life_cycle_manager.calf_num == 0
+    assert life_cycle_manager.heiferI_num == 0
+    assert life_cycle_manager.heiferII_num == 0
+    assert life_cycle_manager.heiferIII_num == 0
+    assert life_cycle_manager.cow_num == 0
+
+    assert life_cycle_manager.sold_calf_num == 0
+    assert life_cycle_manager.sold_heifer_num == 0
+    assert life_cycle_manager.bought_heifer_num == 0
+    assert life_cycle_manager.culled_heifer_num == 0
+    assert life_cycle_manager.culled_cow_num == 0
+
+    assert life_cycle_manager.calf_percent == approx(0.0)
+    assert life_cycle_manager.heiferI_percent == approx(0.0)
+    assert life_cycle_manager.heiferII_percent == approx(0.0)
+    assert life_cycle_manager.heiferIII_percent == approx(0.0)
+    assert life_cycle_manager.cow_percent == approx(0.0)
+
+    assert life_cycle_manager.CIDR_count == 0
+    assert life_cycle_manager.preg_check_num_h == 0
+    assert life_cycle_manager.preg_check_num == 0
+    assert life_cycle_manager.GnRH_injection_num_h == 0
+    assert life_cycle_manager.GnRH_injection_num == 0
+    assert life_cycle_manager.PGF_injection_num_h == 0
+    assert life_cycle_manager.PGF_injection_num == 0
+    assert life_cycle_manager.ai_num_h == 0
+    assert life_cycle_manager.ai_num == 0
+    assert life_cycle_manager.semen_num_h == 0
+    assert life_cycle_manager.semen_num == 0
+    assert life_cycle_manager.ed_period_h == 0
+
+    assert life_cycle_manager.open_cow_num == 0
+    assert life_cycle_manager.preg_cow_num == 0
+    assert life_cycle_manager.vwp_cow_num == 0
+    assert life_cycle_manager.milking_cow_num == 0
+    assert life_cycle_manager.dry_cow_num == 0
+
+    assert life_cycle_manager.preg_cow_percent == approx(0.0)
+    assert life_cycle_manager.dry_cow_percent == approx(0.0)
+    assert life_cycle_manager.milking_cow_percent == approx(0.0)
+    assert life_cycle_manager.non_preg_cow_percent == approx(0.0)
+
+    assert life_cycle_manager.daily_milk_production == approx(0.0)
+    assert life_cycle_manager.avg_days_in_milk == approx(0.0)
+    assert life_cycle_manager.avg_days_in_preg == approx(0.0)
+    assert life_cycle_manager.avg_cow_body_weight == approx(0.0)
+    assert life_cycle_manager.avg_parity_num == approx(0.0)
+
+    assert life_cycle_manager.avg_calving_interval == approx(0.0)
+    assert life_cycle_manager.avg_breeding_to_preg_time == approx(0.0)
+    assert life_cycle_manager.avg_heifer_culling_age == approx(0.0)
+    assert life_cycle_manager.avg_cow_culling_age == approx(0.0)
+    assert life_cycle_manager.avg_mature_body_weight == approx(0.0)
