@@ -104,18 +104,33 @@ class Crop:
 
     # ---- Crop Management Methods
     @staticmethod
-    def plant_species(species: str) -> Crop:
+    def plant_species(species: str, **specs) -> Crop:
         """creates a crop instance with attributes determined by the species of the crop.
 
         Args:
             species: one of the supported species
+            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
+              crop species
 
         Details: species attributes are read from species configuration files/classes. This method of creating
             a crop does not allow for customizing crop values. It is limited to creating the default crops
             supported by the CropSpecies Enum.
         """
         crop_species = CropSpecies(species)
-        crop_data = CropSpeciesDataFactory.create_species_data(crop_species)
+        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
+        return Crop(crop_data)
+
+    @staticmethod
+    def plant_custom_crop(**specs) -> Crop:
+        """creates a crop instance with customized attributes.
+
+        Args:
+            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
+              crop species
+
+        Details, this can be used to create a new ('unsupported') crop species/type
+        """
+        crop_data = CropData(**specs)
         return Crop(crop_data)
 
     def reset_perennial(self):
