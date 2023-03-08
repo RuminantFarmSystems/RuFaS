@@ -102,10 +102,6 @@ class SoilData:
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"  # TODO: implement enum for different cover types?
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
-    cover_factor: Optional[float] = None
-    """The cover factor for use in determining the sorption percent, based on cover_type. Can be 0.5333, 0.6667, 
-        or 0.8 (unitless)
-    """
     full_available_phosphorus_pool: float = 0
     """Starting value of the available phosphorus pool (kg). This value does not change when phosphorus is removed from
         the available phosphorus pool, but does change when a new application of fertilizer phosphorus is applied.
@@ -142,17 +138,6 @@ class SoilData:
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
-
-        # Sets the cover factor based on the cover type
-        if self.cover_type == "BARE":
-            self.cover_factor = 0.5333
-        elif self.cover_type == "RESIDUE_COVER":
-            self.cover_factor = 0.6667
-        elif self.cover_type == "GRASSED":
-            self.cover_factor = 0.8
-        else:
-            raise ValueError(f"Expected cover type to be \'BARE\', \'RESIDUE_COVER\', or \'GRASSED\', "
-                             f"received: '{self.cover_type}'.")
 
     def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
@@ -258,3 +243,43 @@ class SoilData:
             for layer in self.soil_layers:
                 nitrates_sum += layer.nitrate
             return nitrates_sum
+
+    @property
+    def cover_factor(self) -> float:
+        """Returns the cover factor based on the cover type, for use in determining how much phosphorus is absorbed by
+            the soil from surface applied fertilizer before the first rainfall event after application (unitless).
+
+        Raises:
+            ValueError: If cover type is not one of the three acceptable types ("BARE", "RESIDUE_COVER", or "GRASSED")
+
+        References:
+            pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants differ between these documents, defer to
+            pseudocode_soil and old code)
+
+        """
+        if self.cover_type == "BARE":
+            return 0.5333
+        elif self.cover_type == "RESIDUE_COVER":
+            return 0.6667
+        elif self.cover_type == "GRASSED":
+            return 0.8
+        raise ValueError(f"Expected cover type to be \'BARE\', \'RESIDUE_COVER\', or \'GRASSED\', "
+                         f"received: '{self.cover_type}'.")
+
+    @property
+    def solubilizing_factor(self) -> float:
+        """Returns the fraction of fertilizer phosphorus that is removed from the available fertilizer phosphorus pool
+            (when number of rain events is 1) or the recalcitrant fertilizer phosphorus pool (when number of rain events
+            is greater than or equal to 2) (unitless).
+
+            References:
+                SurPhos paragraph just below [16]
+        """
+        if self.rain_events_after_fertilizer_application == 0:
+            return None
+        elif self.rain_events_after_fertilizer_application == 1:
+            return 1
+        elif self.rain_events_after_fertilizer_application == 2:
+            return 0.40
+        else:
+            return 0.075
