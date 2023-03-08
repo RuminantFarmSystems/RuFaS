@@ -122,7 +122,9 @@ def objective(x):
     Args:
         x: The decision vector of the NLP
     """
-    print(np.multiply(x, price))
+    chanchodebug = False
+    if chanchodebug:
+        print(np.multiply(x, price))
     return sum(np.multiply(x, price))
 
 
