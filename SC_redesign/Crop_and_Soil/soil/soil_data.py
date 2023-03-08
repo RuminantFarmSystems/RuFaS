@@ -269,15 +269,13 @@ class SoilData:
     @property
     def solubilizing_factor(self) -> float:
         """Returns the fraction of fertilizer phosphorus that is removed from the available fertilizer phosphorus pool
-            (when number of rain events is 1) or the recalcitrant fertilizer phosphorus pool (when number of rain events
-            is greater than or equal to 2) (unitless).
+            (when number of rain events is less than or equal to 1) or the recalcitrant fertilizer phosphorus pool
+            (when number of rain events is greater than or equal to 2) (unitless).
 
             References:
                 SurPhos paragraph just below [16]
         """
-        if self.rain_events_after_fertilizer_application == 0:
-            return None
-        elif self.rain_events_after_fertilizer_application == 1:
+        if self.rain_events_after_fertilizer_application <= 1:
             return 1
         elif self.rain_events_after_fertilizer_application == 2:
             return 0.40

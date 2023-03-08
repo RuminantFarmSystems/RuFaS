@@ -1,7 +1,9 @@
-from typing import Optional
+from typing import Optional, Dict
 from math import log, exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
+    LITERS_TO_CUBIC_MILLIMETERS, KILOGRAMS_TO_MILLIGRAMS
 
 """
 This module incorporates equations from the SurPhos model to simulate the leaching of Phosphorus from fertilizer applied 
@@ -61,7 +63,13 @@ class Fertilizer:
             self.data.available_phosphorus_pool = 0
             return
         elif first_rainfall_occurred and runoff > 0:
-            self._leach_phosphorus(rainfall, runoff, field_size, self.data.available_phosphorus_pool)
+            amounts_to_remove = self._determine_leached_phosphorus(rainfall, runoff, field_size,
+                                                                   self.data.available_phosphorus_pool)
+            runoff_phosphorus_to_remove = amounts_to_remove["runoff_phosphorus"]
+            absorbed_phosphorus_to_remove = amounts_to_remove["absorbed_phosphorus"]
+            self.data.available_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
+            self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
+            self._add_to_labile_phosphorus(absorbed_phosphorus_to_remove)
             return
 
     def _update_after_first_rain(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -134,9 +142,10 @@ class Fertilizer:
         self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
         self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
 
-    def _leach_phosphorus(self, rainfall: float, runoff: float, field_size: float, phosphorus_pool: float) -> None:
-        """This method handles the removal of phosphorus from the pool passed to it and partitions the phosphorus
-            removed to be absorbed by the soil or removed from the field.
+    def _determine_leached_phosphorus(self, rainfall: float, runoff: float, field_size: float, phosphorus_pool: float) \
+            -> Dict[float, float]:
+        """This method determines the amount of phosphorus removed from the pool passed to it and partitions the amount
+            of phosphorus lost in total between soil absorption and runoff loss.
 
         Args:
             rainfall: amount of rainfall on this day (mm)
@@ -144,81 +153,30 @@ class Fertilizer:
             field_size: size of the field (ha)
             phosphorus_pool: either the available or recalcitrant pool of fertilizer phosphorus (kg)
 
+        Returns:
+            Dictionary with amounts of phosphorus lost to runoff and soil absorption (both in kg)
+
         """
-        phosphorus_in_mg = phosphorus_pool * 1000000
+        phosphorus_in_mg = phosphorus_pool * (1 / KILOGRAMS_TO_MILLIGRAMS)
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
-        rainfall_in_liters = rainfall * field_size * 10000
+        rainfall_in_liters = rainfall * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
+                             (1 / LITERS_TO_CUBIC_MILLIMETERS)
+        solubilized_phosphorus = phosphorus_pool * self.data.solubilizing_factor
 
         dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
             phosphorus_in_mg, self.data.solubilizing_factor, distribution_factor, rainfall_in_liters)
 
-        runoff_in_liters = runoff * field_size * 10000
-        runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
-
-        solubilized_phosphorus = phosphorus_pool * self.data.solubilizing_factor
-        phosphorus_pool -= solubilized_phosphorus
+        runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
+                           (1 / LITERS_TO_CUBIC_MILLIMETERS)
+        runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) * (1 / KILOGRAMS_TO_MILLIGRAMS)
 
         runoff_phosphorus_kg = min(solubilized_phosphorus, runoff_phosphorus_kg)
-        solubilized_phosphorus -= runoff_phosphorus_kg
-        self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_kg
-        if solubilized_phosphorus > 0:
-            self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
+        return_dict = {"runoff_phosphorus": runoff_phosphorus_kg}
 
-    def _leach_available_phosphorus(self, rainfall: float, runoff: float, field_size: float) -> None:
-        """This method handles phosphorus removal from the available phosphorus pool (i.e., all phosphorus removal that
-            occurs on the day of the first rainfall event)
+        absorbed_phosphorus = solubilized_phosphorus - runoff_phosphorus_kg
+        return_dict["absorbed_phosphorus"] = absorbed_phosphorus
 
-        Args:
-            rainfall: amount of rainfall on this day (mm)
-            runoff: amount of runoff on this day (mm)
-            field_size: size of the field (ha)
-
-        """
-        available_phosphorus_in_mg = self.data.available_phosphorus_pool * 1000000
-        distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
-        rainfall_in_liters = rainfall * field_size * 10000
-
-        dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
-            available_phosphorus_in_mg, self.data.solubilizing_factor, distribution_factor, rainfall_in_liters)
-
-        runoff_in_liters = runoff * field_size * 10000
-        runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
-
-        runoff_phosphorus_kg = min(self.data.available_phosphorus_pool, runoff_phosphorus_kg)
-        self.data.available_phosphorus_pool -= runoff_phosphorus_kg
-        self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_kg
-        self._add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
-        self.data.available_phosphorus_pool = 0
-        return
-
-    def _leach_recalcitrant_phosphorus(self, rainfall: float, runoff: float, field_size: float) -> None:
-        """This method handles phosphorus removal from the recalcitrant phosphorous pool (i.e., all phosphorus removal
-            that occurs after the first rainfall event)
-
-        Args:
-            rainfall: amount of rainfall on this day (mm)
-            runoff: amount of runoff on this day (mm)
-            field_size: size of the field (ha)
-
-        """
-        recalcitrant_phosphorus_in_mg = self.data.recalcitrant_phosphorus_pool * 1000000
-        distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
-        rainfall_in_liters = rainfall * field_size * 10000
-
-        dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
-            recalcitrant_phosphorus_in_mg, self.data.solubilizing_factor, distribution_factor, rainfall_in_liters)
-
-        runoff_in_liters = runoff * field_size * 10000
-        phosphorus_to_runoff_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
-        solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * self.data.solubilizing_factor
-        self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
-
-        phosphorus_to_runoff_kg = min(solubilized_phosphorus, phosphorus_to_runoff_kg)
-        self.data.annual_runoff_fertilizer_phosphorus += phosphorus_to_runoff_kg
-
-        solubilized_phosphorus -= phosphorus_to_runoff_kg
-        if solubilized_phosphorus > 0:
-            self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
+        return return_dict
 
     def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil

@@ -102,3 +102,68 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
     fert._determine_fraction_phosphorus_remaining.assert_called_with(fert.data.cover_factor,
                                                                      days_since_application)
     assert fert.data.available_phosphorus_pool == expected_remaining_pool_amount
+
+
+@pytest.mark.parametrize("field_size,recalcitrant_amount,rainfall_events", [
+    (1, 20, 2),
+    (2.34, 17.837, 2),
+    (1.87, 10.39548, 3),
+    (1.09, 3.294, 5)
+])
+def test_absorb_phosphorus_from_recalcitrant_pool(field_size: float, recalcitrant_amount: float,
+                                                  rainfall_events: int) -> None:
+    """Tests that correct amount of phosphorus is removed from the recalcitrant pool and is added to the top soil
+        layer's labile phosphorus content"""
+    data = SoilData(recalcitrant_phosphorus_pool=recalcitrant_amount,
+                    rain_events_after_fertilizer_application=rainfall_events)
+    fert = Fertilizer(data)
+
+    fert._add_to_labile_phosphorus = MagicMock()
+
+    expected_amount_to_remove = recalcitrant_amount * fert.data.solubilizing_factor
+    expected_remaining_amount = recalcitrant_amount - expected_amount_to_remove
+
+    fert._absorb_phosphorus_from_recalcitrant_pool(field_size)
+    observe = fert.data.recalcitrant_phosphorus_pool
+
+    fert._add_to_labile_phosphorus.assert_called_with(expected_amount_to_remove, field_size)
+    assert observe == expected_remaining_amount
+
+
+@pytest.mark.parametrize("pool_amount,days_since_application,rainfall_events,rainfall,runoff,field_size", [
+    (30, 0, 1, 30, 2, 3),
+    (15.434, 1, 1, 14, 1.9899, 2.9384),
+    (0.98321, 15, 1, 7, 0.35, 1.342),
+    (10, 13, 2, 9, 0.818, 0.95),
+    (17, 21, 3, 11, 1.3, 3.45)
+])
+def test_leach_phosphorus(pool_amount: float, days_since_application: float,
+                          rainfall_events: int, rainfall: float, runoff: float, field_size: float) -> None:
+    """Tests that the correct amounts of phosphorus to be removed by runoff and soil absorption are calculated."""
+    data = SoilData(days_since_application=days_since_application,
+                    rain_events_after_fertilizer_application=rainfall_events)
+    if rainfall_events == 1:
+        data.available_phosphorus_pool = pool_amount
+    else:
+        data.recalcitrant_phosphorus_pool = pool_amount
+    fert = Fertilizer(data)
+
+    fert._determine_phosphorus_distribution_factor = MagicMock(return_value=0.05)
+    fert._determine_dissolved_phosphorus_concentration = MagicMock(return_value=0.05)
+
+    pool_amount_mg = pool_amount * 1000000
+    solubilized_amount = pool_amount * fert.data.solubilizing_factor
+    concentration = 0.05    # Matches what is mocked for _determine_dissolved_phosphorus_concentration()
+    rainfall_liters = rainfall * field_size * 10000
+    runoff_liters = runoff * field_size * 10000
+    dissolved_phosphorus_runoff_mg = runoff_liters * concentration
+    dissolved_phosphorus_runoff_kg = dissolved_phosphorus_runoff_mg / 1000000
+    adsorbed_phosphorus_kg = max(0, solubilized_amount - dissolved_phosphorus_runoff_kg)
+    expected = {"runoff_phosphorus": dissolved_phosphorus_runoff_kg, "absorbed_phosphorus": adsorbed_phosphorus_kg}
+
+    observed = fert._determine_leached_phosphorus(rainfall, runoff, field_size, pool_amount)
+
+    fert._determine_phosphorus_distribution_factor.assert_called_with(rainfall, runoff)
+    fert._determine_dissolved_phosphorus_concentration(pool_amount_mg, fert.data.solubilizing_factor, 0.05,
+                                                       rainfall_liters)
+    assert observed == pytest.approx(expected)
