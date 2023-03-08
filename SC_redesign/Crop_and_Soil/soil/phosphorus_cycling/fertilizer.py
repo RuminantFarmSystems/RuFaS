@@ -56,13 +56,12 @@ class Fertilizer:
 
         first_rainfall_occurred = self.data.rain_events_after_fertilizer_application == 1 \
                                   and self.data.available_phosphorus_pool > 0
-
         if first_rainfall_occurred and runoff == 0:
             self._add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
             self.data.available_phosphorus_pool = 0
             return
         elif first_rainfall_occurred and runoff > 0:
-            self._leach_available_phosphorus(rainfall, runoff, field_size)
+            self._leach_phosphorus(rainfall, runoff, field_size, self.data.available_phosphorus_pool)
             return
 
     def _update_after_first_rain(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -79,7 +78,7 @@ class Fertilizer:
         elif runoff == 0:
             self._absorb_phosphorus_from_recalcitrant_pool(field_size)
         else:
-            self._leach_recalcitrant_phosphorus(rainfall, runoff, field_size)
+            self._leach_phosphorus(rainfall, runoff, field_size, self.data.recalcitrant_phosphorus_pool)
 
     def add_fertilizer_phosphorus(self, fertilizer_phosphorus_applied: float) -> None:
         """Resets counters and adds to phosphorous pools when new fertilizer phosphorus is applied to the fields.
@@ -89,8 +88,8 @@ class Fertilizer:
 
         Details:
             When fertilizer phosphorus is applied to the field this method resets both the days_since_application and
-            rain_events_after_fertilizer_application to 0, and adds the new phosphorus to the available and recalcitrant pools. It also
-            updates the starting available phosphorus value to the new available phosphorus pool value.
+            rain_events_after_fertilizer_application to 0, and adds the new phosphorus to the available and recalcitrant
+            pools. It also updates the starting available phosphorus value to the new available phosphorus pool value.
 
         """
         self.data.available_phosphorus_pool += 0.75 * fertilizer_phosphorus_applied
@@ -131,25 +130,19 @@ class Fertilizer:
             field_size: size of the field (ha)
 
         """
-        if self.data.rain_events_after_fertilizer_application == 2:
-            solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.4
-        else:
-            solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.075
+        solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * self.data.solubilizing_factor
         self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
         self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
 
-    def _leach_phosphorus(self, rainfall: float, runoff: float, field_size: float, phosphorus_pool: float,
-                          solubilizing_factor: float) -> None:
-        """
+    def _leach_phosphorus(self, rainfall: float, runoff: float, field_size: float, phosphorus_pool: float) -> None:
+        """This method handles the removal of phosphorus from the pool passed to it and partitions the phosphorus
+            removed to be absorbed by the soil or removed from the field.
 
         Args:
-            rainfall:
-            runoff:
-            field_size:
-            phosphorus_pool:
-            solubilizing_factor:
-
-        Returns:
+            rainfall: amount of rainfall on this day (mm)
+            runoff: amount of runoff on this day (mm)
+            field_size: size of the field (ha)
+            phosphorus_pool: either the available or recalcitrant pool of fertilizer phosphorus (kg)
 
         """
         phosphorus_in_mg = phosphorus_pool * 1000000
@@ -157,12 +150,12 @@ class Fertilizer:
         rainfall_in_liters = rainfall * field_size * 10000
 
         dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
-            phosphorus_in_mg, 1, distribution_factor, rainfall_in_liters)
+            phosphorus_in_mg, self.data.solubilizing_factor, distribution_factor, rainfall_in_liters)
 
         runoff_in_liters = runoff * field_size * 10000
         runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
 
-        solubilized_phosphorus = phosphorus_pool * solubilizing_factor
+        solubilized_phosphorus = phosphorus_pool * self.data.solubilizing_factor
         phosphorus_pool -= solubilized_phosphorus
 
         runoff_phosphorus_kg = min(solubilized_phosphorus, runoff_phosphorus_kg)
@@ -186,7 +179,7 @@ class Fertilizer:
         rainfall_in_liters = rainfall * field_size * 10000
 
         dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
-            available_phosphorus_in_mg, 1, distribution_factor, rainfall_in_liters)
+            available_phosphorus_in_mg, self.data.solubilizing_factor, distribution_factor, rainfall_in_liters)
 
         runoff_in_liters = runoff * field_size * 10000
         runoff_phosphorus_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
@@ -212,20 +205,12 @@ class Fertilizer:
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
         rainfall_in_liters = rainfall * field_size * 10000
 
-        if self.data.rain_events_after_fertilizer_application == 2:
-            dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
-                recalcitrant_phosphorus_in_mg, 0.4, distribution_factor, rainfall_in_liters)
-        else:
-            dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
-                recalcitrant_phosphorus_in_mg, 0.075, distribution_factor, rainfall_in_liters)
+        dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
+            recalcitrant_phosphorus_in_mg, self.data.solubilizing_factor, distribution_factor, rainfall_in_liters)
 
         runoff_in_liters = runoff * field_size * 10000
         phosphorus_to_runoff_kg = (dissolved_phosphorus_concentration * runoff_in_liters) / 1000
-
-        if self.data.rain_events_after_fertilizer_application == 2:
-            solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.4
-        else:
-            solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * 0.075
+        solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * self.data.solubilizing_factor
         self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
 
         phosphorus_to_runoff_kg = min(solubilized_phosphorus, phosphorus_to_runoff_kg)
@@ -267,7 +252,7 @@ class Fertilizer:
 
         References:
             pseudocode_soil [S.5.C.I.1], SurPhos [14] (Note: constants differ between the documents, prefer the ones
-        from pseudocode_soil)
+            from pseudocode_soil)
 
         Details:
             The minimum fraction that can be returned is 0
