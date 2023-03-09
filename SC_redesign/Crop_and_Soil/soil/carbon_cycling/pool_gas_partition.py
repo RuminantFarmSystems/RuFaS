@@ -233,6 +233,7 @@ class PoolGasPartition:
     def _active_carbon_decomposition_rate(silt_clay_content: float,
                                           max_carbon_decomposition_rate: float = 0.14) -> float:
         return max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
+    # TODO:---------test everything above
 
     # ----  S.6.C.1
     @staticmethod
@@ -254,8 +255,6 @@ class PoolGasPartition:
     def _plant_structural_active_carbon_remaining(plant_structural_active_carbon_usage: float,
                                                   structural_active_carbon_loss_rate: float = 0.45) -> float:
         return plant_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
-
-    # TODO:---------test everything above
 
     @staticmethod
     def _plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage: float,
