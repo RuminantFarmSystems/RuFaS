@@ -94,3 +94,47 @@ def test_plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage):
     structural_slow_carbon_loss_rate = 0.3
     expect = plant_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
     assert expect == PoolGasPartition._plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage)
+
+
+@pytest.mark.parametrize("plant_structural_active_carbon_usage", [
+    17,  # lower values
+    90,  # higher values
+    55.7,  # arbitrary
+])
+def test_plant_structural_active_carbon_remaining(plant_structural_active_carbon_usage):
+    structural_active_carbon_loss_rate = 0.45
+    expected = plant_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
+    assert expected == PoolGasPartition._plant_structural_active_carbon_remaining(plant_structural_active_carbon_usage)
+
+
+@pytest.mark.parametrize("plant_structural_active_carbon_usage", [
+    17,  # lower values
+    90,  # higher values
+    55.7,  # arbitrary
+])
+def test_plant_structural_active_carbon_loss(plant_structural_active_carbon_usage):
+    structural_active_carbon_loss_rate = 0.45
+    expected = plant_structural_active_carbon_usage * structural_active_carbon_loss_rate
+    assert expected == PoolGasPartition._plant_structural_active_carbon_loss(plant_structural_active_carbon_usage)
+
+
+@pytest.mark.parametrize("plant_metabolic_active_carbon_usage", [
+    3,  # lower values
+    102,  # higher values
+    51.8,  # arbitrary
+])
+def test_plant_metabolic_active_carbon_remaining(plant_metabolic_active_carbon_usage):
+    metabolic_active_carbon_loss_rate = 0.55
+    expected = plant_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
+    assert expected == PoolGasPartition._plant_metabolic_active_carbon_remaining(plant_metabolic_active_carbon_usage)
+
+
+@pytest.mark.parametrize("plant_metabolic_active_carbon_usage", [
+    3,  # lower values
+    102,  # higher values
+    51.8,  # arbitrary
+])
+def test_plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage):
+    metabolic_active_carbon_loss_rate = 0.55
+    expected = plant_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
+    assert expected == PoolGasPartition._plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage)
