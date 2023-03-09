@@ -6,7 +6,7 @@ from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE
     LITERS_TO_CUBIC_MILLIMETERS, KILOGRAMS_TO_MILLIGRAMS
 
 """
-This module incorporates equations from the SurPhos model to simulate the leaching of Phosphorus from fertilizer applied 
+This module incorporates equations from the SurPhos model to simulate the leaching of Phosphorus from fertilizer applied
 to the soil surface being absorbed into the soil and/or removed from the field by runoff.
 """
 
@@ -47,19 +47,20 @@ class Fertilizer:
             field_size: size of the field (ha)
 
         """
-        no_phosphorus_absorbed = (self.data.rain_events_after_fertilizer_application ==
-                                  self.data.days_since_application == 0) or self.data.available_phosphorus_pool == 0
+        no_phosphorus_absorbed = \
+            (self.data.rain_events_after_fertilizer_application == self.data.days_since_application == 0) \
+            or self.data.available_phosphorus_pool == 0
         if no_phosphorus_absorbed:
             return
 
         phosphorus_absorbed_only = self.data.rain_events_after_fertilizer_application == 0 \
-                                   and self.data.days_since_application > 0 and self.data.available_phosphorus_pool > 0
+            and self.data.days_since_application > 0 and self.data.available_phosphorus_pool > 0
         if phosphorus_absorbed_only:
             self._absorb_phosphorus_from_available_pool()
             return
 
         first_rainfall_occurred = self.data.rain_events_after_fertilizer_application == 1 \
-                                  and self.data.available_phosphorus_pool > 0
+            and self.data.available_phosphorus_pool > 0
         if first_rainfall_occurred and runoff == 0:
             self._add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
             self.data.available_phosphorus_pool = 0
@@ -136,7 +137,7 @@ class Fertilizer:
                                                                          self.data.days_since_application)
 
         phosphorus_removed = self.data.available_phosphorus_pool - \
-                             (sorption_percent * self.data.full_available_phosphorus_pool)
+            (sorption_percent * self.data.full_available_phosphorus_pool)
         if phosphorus_removed < 0:
             phosphorus_removed = self.data.available_phosphorus_pool
 
@@ -160,7 +161,7 @@ class Fertilizer:
         phosphorus_in_mg = phosphorus_pool * (1 / KILOGRAMS_TO_MILLIGRAMS)
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
         rainfall_in_liters = rainfall * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-                             (1 / LITERS_TO_CUBIC_MILLIMETERS)
+            (1 / LITERS_TO_CUBIC_MILLIMETERS)
         solubilized_phosphorus = phosphorus_pool * self.data.solubilizing_factor
 
         dissolved_phosphorus_concentration = self._determine_dissolved_phosphorus_concentration(
