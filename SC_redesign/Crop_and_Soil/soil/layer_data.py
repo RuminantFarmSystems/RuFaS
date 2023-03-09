@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
-from math import log
+
 
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects 
@@ -20,7 +20,7 @@ class LayerData:
     """phosphate content of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    water_content: Optional[float] = None
+    water_content:  Optional[float] = None
     """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
@@ -57,40 +57,13 @@ class LayerData:
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
-    # --- Phosphorous
-    labile_phosphorus_concentration: float = 2.7
-    """Concentration of labile phosphorus in soil layer at beginning of simulation (kg P / kg soil)"""
-    labile_phosphorus_content: Optional[float] = None
-    """Content of labile phosphorus (kg / ha)"""
-    active_inorganic_phosphorus: Optional[float] = None
-    """Active phosphorus content of the soil layer (kg P / kg soil)"""
-    stable_inorganic_phosphorus: Optional[float] = None
-    """Stable phosphorus content of the soil layer (kg P / kg soil)"""
-
     # --- Decomposition
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
-
+    
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
-
-        # --- Initialize phosphorus characteristics ---
-        # This is the conversion from (kg P / kg soil) to (kg P / ha) defined in equation [S.5.A.2] in 'pseudocode_soil'
-        self.labile_phosphorus_content = self.labile_phosphorus_concentration * \
-                                         (self.bulk_density * (10 ** (-9))) * \
-                                         (self.layer_thickness * 10) * 0.1
-        # Note:
-        # 10 ** -9 is the conversion factor from (Mg per cubic meter) to (g per cubic cm)
-        # 10 is the conversion factor from mm to cm
-
-        # Calculate active inorganic phosphorus using 'pseudocode_soil' equation [S.5.A.3], SurPhos Theoretical
-        #   Documentation equation [17]
-        self.active_inorganic_phosphorus = (self.labile_phosphorus_content * (1 - self.phosphorus_sorption_parameter)) \
-                                           / self.phosphorus_sorption_parameter
-        # Calculate stable inorganic phosphorus using 'pseudocode_soil' equation [S.5.A.4], SurPhos Theoretical
-        #   Documentation equation [19]
-        self.stable_inorganic_phosphorus = self.active_inorganic_phosphorus * 4
 
     @property
     def layer_thickness(self) -> float:
@@ -102,7 +75,7 @@ class LayerData:
 
     @property
     def depth_of_layer_center(self) -> float:
-        """depth beneath the surface of the center of this layer (mm)"""
+        """depth beneath the surface of the center this layer (mm)"""
         return self.top_depth + (self.layer_thickness / 2)
 
     @property
@@ -147,16 +120,7 @@ class LayerData:
         return 1.72 * self.percent_organic_carbon_content
 
     @property
-    def phosphorus_sorption_parameter(self) -> float:
-        """Calculates the phosphorus sorption parameter (unitless)
-
-        Reference: 'pseudocode_soil' equation [S.5.A.1], SurPhos Technical Documentation [18]
-        """
-        return -0.045 * log(self.percent_clay_content) + 0.001 * self.labile_phosphorus_content - \
-            0.035 * self.percent_organic_carbon_content + 0.43
-
-    @property
-    def soil_water_content(self) -> float:
+    def soil_water_content(self):
         """volume of soil water in the layer in mm"""
         return self.soil_water_concentration / self.layer_thickness
 
@@ -171,3 +135,6 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
+
+
+
