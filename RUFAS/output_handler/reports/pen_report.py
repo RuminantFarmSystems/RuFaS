@@ -135,7 +135,7 @@ class PenReport(BaseReportDriver):
 
                 self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.ration.keys() else 0' % (
+                        'pen.ration[\'%s\'] if pen.populated and \'%s\' in pen.ration.keys() else 0' % (
                             feed_id, feed_id), units,
                         []]
 
