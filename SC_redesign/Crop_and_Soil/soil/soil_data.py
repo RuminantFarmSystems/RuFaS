@@ -100,7 +100,7 @@ class SoilData:
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
     # ---- Fertilizer (Phosphorus Cycling)
-    cover_type: str = "BARE"  # TODO: implement enum for different cover types?
+    cover_type: str = "BARE"
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
     full_available_phosphorus_pool: float = 0
     """Starting value of the available phosphorus pool (kg). This value does not change when phosphorus is removed from
