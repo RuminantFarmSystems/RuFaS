@@ -6,9 +6,8 @@ Description: Determines manure excretion with information from the ration
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from typing import Tuple
-
 import math
+from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
@@ -202,25 +201,6 @@ def manure_calculations(ration_formulation,
         phosphorus_fraction=manure_phosphorus_fraction,
         potassium=potassium,
         methane=methane_emission
-    )
-
-    # This part is not unit tested.
-    default_manure_excretion_values = AnimalManureExcretions(
-        urea=0.15,  # g/L
-        urine=21.0,  # kg
-        total_ammoniacal_nitrogen_concentration=4.63,  # g/L
-        urine_nitrogen=0.25,  # kg
-        manure_nitrogen=0.45,  # kg
-        manure_mass=68.0,  # kg
-        total_solids=8.9,  # kg
-        degradable_volatile_solids=8.01,  # kg
-        non_degradable_volatile_solids=0.89,  # kg
-        inorganic_phosphorus_fraction=0.0,  # kg
-        organic_phosphorus_fraction=0.0,  # kg
-        phosphorus=0.078 * GeneralConstants.KG_TO_GRAMS,  # kg
-        phosphorus_fraction=0.0,  # kg
-        potassium=0.13 * GeneralConstants.KG_TO_GRAMS,  # kg
-        methane=0.5 * GeneralConstants.KG_TO_GRAMS  # kg
     )
 
     return total_phosphorus_excreted, manure_excretion_values

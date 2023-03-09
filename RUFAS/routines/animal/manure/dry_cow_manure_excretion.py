@@ -6,9 +6,8 @@ Description: Determines manure excretion with information from the ration
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from typing import Tuple
-
 import math
+from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
@@ -51,11 +50,6 @@ def manure_calculations(ration_formulation,
         A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
-    # TODO: Further calculations to account for entire diet:
-    DMI: dry matter intake, kg
-    DM: dietary dry matter, % of diet
-    CP: dietary crude protein, % of DM
-
     """
     # TODO: Add TypedDicts for ration_formulation and available feeds
     # TODO: Pass in available feeds directly instead of a Feed object
@@ -70,6 +64,10 @@ def manure_calculations(ration_formulation,
     EE_concentration = nutrient_concentrations["EE"]  # TODO: Unused
     ADF_concentration = nutrient_concentrations['ADF']
     starch_concentration = nutrient_concentrations['starch']
+    # TODO: Further calculations to account for entire diet:
+    # DMI: dry matter intake, kg
+    # DM: dietary dry matter, % of diet
+    # CP: dietary crude protein, % of DM
 
     # Total urine, kg [A.3F.A.1]
     urine = 15.4
@@ -131,31 +129,31 @@ def manure_calculations(ration_formulation,
     # TODO: Implement the other methane model - IPCC Tier 2. But need to pass in a methane_model parameter first.
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
-            daily_milk_production=daily_milk_production,
-            total_manure_excreted=total_manure_excreted,
-            fecal_phosphorus=fecal_phosphorus,
-            urine_phosphorus_required=urine_phosphorus_required
+        daily_milk_production=daily_milk_production,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
     )
 
     (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
      manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-            urea=urine_urea_nitrogen_concentration,
-            urine=urine,
-            total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
-            urine_nitrogen=urine_nitrogen,
-            manure_nitrogen=manure_nitrogen,
-            manure_mass=total_manure_excreted,
-            total_solids=total_solids,
-            degradable_volatile_solids=degradable_volatile_solids,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            phosphorus=manure_phosphorus_excreted,
-            phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=potassium,
-            methane=methane_emission
+        urea=urine_urea_nitrogen_concentration,
+        urine=urine,
+        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=total_manure_excreted,
+        total_solids=total_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=manure_phosphorus_excreted,
+        phosphorus_fraction=manure_phosphorus_fraction,
+        potassium=potassium,
+        methane=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values

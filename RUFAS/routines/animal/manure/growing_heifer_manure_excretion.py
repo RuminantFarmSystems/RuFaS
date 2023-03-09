@@ -101,31 +101,31 @@ def manure_calculations(ration_formulation,
     # TODO: Implement the other methane model - IPCC Tier 2
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
-            daily_milk_production=0,
-            total_manure_excreted=total_manure_excreted,
-            fecal_phosphorus=fecal_phosphorus,
-            urine_phosphorus_required=urine_phosphorus_required
+        daily_milk_production=0,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
     )
 
     (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
      manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-            urea=urine_urea_nitrogen_concentration,
-            urine=urine,
-            total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
-            urine_nitrogen=urine_nitrogen,
-            manure_nitrogen=manure_nitrogen,
-            manure_mass=total_manure_excreted,
-            total_solids=total_solids,
-            degradable_volatile_solids=degradable_volatile_solids,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            phosphorus=manure_phosphorus_excreted,
-            phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=potassium,
-            methane=methane_emission
+        urea=urine_urea_nitrogen_concentration,
+        urine=urine,
+        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=total_manure_excreted,
+        total_solids=total_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=manure_phosphorus_excreted,
+        phosphorus_fraction=manure_phosphorus_fraction,
+        potassium=potassium,
+        methane=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values
