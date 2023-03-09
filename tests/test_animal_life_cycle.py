@@ -1156,8 +1156,7 @@ def test_calc_cow_percentages(mocker: MockerFixture, life_cycle_manager: LifeCyc
         assert life_cycle_manager.dry_cow_percent == approx(dry_cow_num * 100.0 / cow_num)
         assert life_cycle_manager.milking_cow_percent == approx(milking_cow_num * 100.0 / cow_num)
         assert life_cycle_manager.preg_cow_percent == approx(preg_cow_num * 100.0 / cow_num)
-        assert life_cycle_manager.non_preg_cow_percent == approx((open_cow_num + vwp_cow_num)
-                                                                 * 100.0 / cow_num)
+        assert life_cycle_manager.non_preg_cow_percent == approx(open_cow_num * 100.0 / cow_num)
     elif cow_num == 0:
         assert life_cycle_manager.dry_cow_percent == approx(0.0)
         assert life_cycle_manager.milking_cow_percent == approx(0.0)

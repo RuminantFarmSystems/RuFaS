@@ -922,7 +922,7 @@ class LifeCycleManager:
         self.dry_cow_percent = pc(self.dry_cow_num)
         self.milking_cow_percent = pc(self.milking_cow_num)
         self.preg_cow_percent = pc(self.preg_cow_num)
-        self.non_preg_cow_percent = pc(self.open_cow_num + self.vwp_cow_num)
+        self.non_preg_cow_percent = pc(self.open_cow_num)
 
     def _calculate_cull_reason_stats_percent(self) -> None:
         """Calculates the percentage of culled cows for each cull reason."""
