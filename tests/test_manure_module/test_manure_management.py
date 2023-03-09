@@ -295,6 +295,10 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
     mock_time = mocker.MagicMock()
     mock_manure_management_config = mocker.MagicMock()
 
+    mocker.patch(
+        'RUFAS.routines.manure.manure_management.ManureManagement.__init__',
+        return_value=None,
+    )
     manure_management = ManureManagement(
             animal_management=mock_animal_management,
             weather=mock_weather,
@@ -363,6 +367,10 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     mock_time = mocker.MagicMock()
     mock_manure_management_config = mocker.MagicMock()
 
+    mocker.patch(
+        'RUFAS.routines.manure.manure_management.ManureManagement.__init__',
+        return_value=None,
+    )
     manure_management = ManureManagement(
             animal_management=mock_animal_management,
             weather=mock_weather,
@@ -451,6 +459,10 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
     mock_manure_management_config = mocker.MagicMock()
+    mocker.patch(
+        'RUFAS.routines.manure.manure_management.ManureManagement.__init__',
+        return_value=None,
+    )
     manure_management = ManureManagement(
             animal_management=mock_animal_management,
             weather=mock_weather,
@@ -537,6 +549,10 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
     mock_manure_management_config = mocker.MagicMock()
+    mocker.patch(
+        'RUFAS.routines.manure.manure_management.ManureManagement.__init__',
+        return_value=None,
+    )
     manure_management = ManureManagement(
             animal_management=mock_animal_management,
             weather=mock_weather,
@@ -602,8 +618,11 @@ def test_manure_management_daily_update(is_last_day_of_simulation: bool,
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
     mock_time.is_last_day_of_simulation = is_last_day_of_simulation
-
     mock_manure_management_config = mocker.MagicMock()
+    mocker.patch(
+        'RUFAS.routines.manure.manure_management.ManureManagement.__init__',
+        return_value=None,
+    )
     manure_management = ManureManagement(
             animal_management=mock_animal_management_init,
             weather=mock_weather,
@@ -619,6 +638,7 @@ def test_manure_management_daily_update(is_last_day_of_simulation: bool,
     mock_manure_management_output_handler.sort_by_pen_id_and_simulation_day.return_value = None
     mock_manure_management_output_handler.export_to_csv.return_value = None
     manure_management.manure_management_output_handler = mock_manure_management_output_handler
+    manure_management.time = mock_time
 
     # Act
     manure_management.daily_update(mock_animal_management)
