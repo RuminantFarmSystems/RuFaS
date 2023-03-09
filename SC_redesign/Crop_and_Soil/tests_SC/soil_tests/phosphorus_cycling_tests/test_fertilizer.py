@@ -212,14 +212,14 @@ def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rai
         assert fert.data.recalcitrant_phosphorus_pool == recalcitrant_pool
     elif rainfall and not runoff:
         fert._add_to_labile_phosphorus.assert_called_with(recalcitrant_pool * fert.data.solubilizing_factor, field_size)
-        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool -
-                                                          (recalcitrant_pool * fert.data.solubilizing_factor))
+        assert fert.data.recalcitrant_phosphorus_pool == \
+               (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
     else:
         fert._determine_leached_phosphorus.assert_called_with(rainfall, runoff, field_size, recalcitrant_pool)
         fert._add_to_labile_phosphorus.assert_called_with(0.5 * (recalcitrant_pool * fert.data.solubilizing_factor),
                                                           field_size)
-        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool -
-                                                          (recalcitrant_pool * fert.data.solubilizing_factor))
+        assert fert.data.recalcitrant_phosphorus_pool == \
+               (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
 
 
 # --- Top-level routine tests ---
