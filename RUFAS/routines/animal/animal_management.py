@@ -712,7 +712,7 @@ class AnimalManagement:
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
-            if pen.pen_populated:
+            if pen.populated:
                 pen.subset_class_feeds(feed)
                 pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
@@ -728,7 +728,7 @@ class AnimalManagement:
             methane_model: methane model used for methane emission calculations
         """
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.calc_manure(feed, methane_model)
             else:
                 pen.reset_manure()
@@ -781,7 +781,7 @@ class AnimalManagement:
             return 0
         else:
             return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(
-                    a.body_weight for a in animals)
+                a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
@@ -805,7 +805,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.call_p_rqmts()
 
     def daily_p_update(self):
@@ -815,7 +815,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.daily_p_update()
 
     def daily_updates(self, feed, weather, time):
@@ -833,7 +833,7 @@ class AnimalManagement:
         """
         if self.simulate_animals:
             for pen in self.all_pens:
-                pen.pen_populated = len(pen.animals_in_pen) > 0
+                pen.populated = len(pen.animals_in_pen) > 0
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
             self.heiferIIs, self.heiferIIIs, self.cows = \
@@ -1017,14 +1017,14 @@ class AnimalManagement:
             animals.append((animal, 'cow', is_cow))
 
         indices = random.sample(
-                range(len(self.life_cycle_manager.sold_heifers)), num_animals)
+            range(len(self.life_cycle_manager.sold_heifers)), num_animals)
         for i in indices:
             animal, is_cow, output['sold_heifers'][i] = \
                 self.generate_animal_output('sold_heifer', i)
             animals.append((animal, 'sold_heifer', is_cow))
 
         indices = random.sample(
-                range(len(self.life_cycle_manager.culled_cows)), num_animals)
+            range(len(self.life_cycle_manager.culled_cows)), num_animals)
         for i in indices:
             animal, is_cow, output['culled_cows'][i] = \
                 self.generate_animal_output('culled_cow', i)
