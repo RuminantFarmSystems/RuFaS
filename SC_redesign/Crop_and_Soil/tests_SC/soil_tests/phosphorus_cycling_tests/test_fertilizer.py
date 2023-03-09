@@ -94,40 +94,13 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
     amount_to_remove = available_pool_amount - (initial_pool_amount * fraction_to_remain_in_pool)
     if amount_to_remove < 0:
         amount_to_remove = available_pool_amount
-    expected_remaining_pool_amount = available_pool_amount - amount_to_remove
 
-    fert._absorb_phosphorus_from_available_pool(field_size)
+    observe = fert._absorb_phosphorus_from_available_pool()
 
-    fert._add_to_labile_phosphorus.assert_called_with(amount_to_remove, field_size)
+    # fert._add_to_labile_phosphorus.assert_called_with(amount_to_remove, field_size)
     fert._determine_fraction_phosphorus_remaining.assert_called_with(fert.data.cover_factor,
                                                                      days_since_application)
-    assert fert.data.available_phosphorus_pool == expected_remaining_pool_amount
-
-
-@pytest.mark.parametrize("field_size,recalcitrant_amount,rainfall_events", [
-    (1, 20, 2),
-    (2.34, 17.837, 2),
-    (1.87, 10.39548, 3),
-    (1.09, 3.294, 5)
-])
-def test_absorb_phosphorus_from_recalcitrant_pool(field_size: float, recalcitrant_amount: float,
-                                                  rainfall_events: int) -> None:
-    """Tests that correct amount of phosphorus is removed from the recalcitrant pool and is added to the top soil
-        layer's labile phosphorus content"""
-    data = SoilData(recalcitrant_phosphorus_pool=recalcitrant_amount,
-                    rain_events_after_fertilizer_application=rainfall_events)
-    fert = Fertilizer(data)
-
-    fert._add_to_labile_phosphorus = MagicMock()
-
-    expected_amount_to_remove = recalcitrant_amount * fert.data.solubilizing_factor
-    expected_remaining_amount = recalcitrant_amount - expected_amount_to_remove
-
-    fert._absorb_phosphorus_from_recalcitrant_pool(field_size)
-    observe = fert.data.recalcitrant_phosphorus_pool
-
-    fert._add_to_labile_phosphorus.assert_called_with(expected_amount_to_remove, field_size)
-    assert observe == expected_remaining_amount
+    assert observe == amount_to_remove
 
 
 @pytest.mark.parametrize("pool_amount,days_since_application,rainfall_events,rainfall,runoff,field_size", [
@@ -153,7 +126,7 @@ def test_leach_phosphorus(pool_amount: float, days_since_application: float,
 
     pool_amount_mg = pool_amount * 1000000
     solubilized_amount = pool_amount * fert.data.solubilizing_factor
-    concentration = 0.05    # Matches what is mocked for _determine_dissolved_phosphorus_concentration()
+    concentration = 0.05  # Matches what is mocked for _determine_dissolved_phosphorus_concentration()
     rainfall_liters = rainfall * field_size * 10000
     runoff_liters = runoff * field_size * 10000
     dissolved_phosphorus_runoff_mg = runoff_liters * concentration
@@ -167,3 +140,150 @@ def test_leach_phosphorus(pool_amount: float, days_since_application: float,
     fert._determine_dissolved_phosphorus_concentration(pool_amount_mg, fert.data.solubilizing_factor, 0.05,
                                                        rainfall_liters)
     assert observed == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("rainfall,runoff,field_size,rain_events,full_available_pool,available_pool,"
+                         "days_since_application", [
+                             (0, 0, 1, 0, 100, 100, 0),  # Day of application, no rain
+                             (13, 0, 1.8, 1, 100, 100, 0),  # Day of application, rain but no runoff
+                             (13, 3, 0.95, 1, 100, 100, 0),  # Day of application, rain and runoff
+                             (0, 0, 3.2, 0, 100, 35.7, 3),  # Some days after application, no rain
+                             (12, 0, 2.85, 1, 100, 46.73, 8),  # Some days after application, rain but no runoff
+                             (12, 1.4, 2.123, 1, 100, 25.63, 13),  # Some days after application, rain and runoff
+                         ])
+def test_update_before_and_at_first_rain(rainfall: float, runoff: float, field_size: float, rain_events: int,
+                                         full_available_pool: float, available_pool: float,
+                                         days_since_application: int) -> None:
+    """Test that _update_before_and_at_first_rain() chooses correct operations to perform on the available phosphorus
+        pool based on day's conditions and temporal counters
+    """
+    data = SoilData(rain_events_after_fertilizer_application=rain_events,
+                    full_available_phosphorus_pool=full_available_pool, available_phosphorus_pool=available_pool,
+                    days_since_application=days_since_application)
+    fert = Fertilizer(data)
+
+    fert._add_to_labile_phosphorus = MagicMock()
+    fert._absorb_from_available_pool = MagicMock(return_value=10)
+    fert._determine_leached_phosphorus = MagicMock(return_value={"runoff_phosphorus": (0.5 * available_pool),
+                                                                 "absorbed_phosphorus": (0.5 * available_pool)})
+
+    fert._update_before_and_at_first_rain(rainfall, runoff, field_size)
+
+    if not rainfall and not days_since_application:
+        assert fert._add_to_labile_phosphorus.call_count == 0
+        assert fert._absorb_from_available_pool.call_count == 0
+        assert fert._determine_leached_phosphorus.call_count == 0
+        assert fert.data.available_phosphorus_pool == full_available_pool
+    elif rainfall and not runoff and not days_since_application:
+        fert._add_to_labile_phosphorus.assert_called_with(available_pool, field_size)
+        assert fert.data.available_phosphorus_pool == 0
+    elif rainfall and runoff and not days_since_application:
+        fert._determine_leached_phosphorus.assert_called_with(rainfall, runoff, field_size, available_pool)
+        fert._add_to_labile_phosphorus.assert_called_with(0.5 * available_pool, field_size)
+        assert fert.data.annual_runoff_fertilizer_phosphorus == 0.5 * available_pool
+        assert fert.data.available_phosphorus_pool == 0
+
+
+@pytest.mark.parametrize("recalcitrant_pool,rain_events,rainfall,runoff,field_size", [
+    (0, 8, 8, 0.5, 1.3),  # No phosphorus in recalcitrant pool
+    (20, 5, 0, 0, 3),  # No rainfall
+    (25, 2, 13, 0, 1),  # Rainfall, no runoff
+    (32, 3, 11, 1.8, 0.8),  # Rainfall and runoff
+])
+def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rainfall: float, runoff: float,
+                                 field_size: float) -> None:
+    """Test that _update_after_first_rain() correctly removes phosphorus from the recalcitrant pool and correctly calls
+        all subroutines.
+    """
+    data = SoilData(recalcitrant_phosphorus_pool=recalcitrant_pool,
+                    rain_events_after_fertilizer_application=rain_events)
+    fert = Fertilizer(data)
+
+    fert._add_to_labile_phosphorus = MagicMock()
+    fert._determine_leached_phosphorus = MagicMock(
+        return_value={"runoff_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
+                      "absorbed_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor))})
+
+    fert._update_after_first_rain(rainfall, runoff, field_size)
+
+    if not rainfall:
+        assert fert._add_to_labile_phosphorus.call_count == 0
+        assert fert._determine_leached_phosphorus.call_count == 0
+        assert fert.data.recalcitrant_phosphorus_pool == recalcitrant_pool
+    elif rainfall and not runoff:
+        fert._add_to_labile_phosphorus.assert_called_with(recalcitrant_pool * fert.data.solubilizing_factor, field_size)
+        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool -
+                                                          (recalcitrant_pool * fert.data.solubilizing_factor))
+    else:
+        fert._determine_leached_phosphorus.assert_called_with(rainfall, runoff, field_size, recalcitrant_pool)
+        fert._add_to_labile_phosphorus.assert_called_with(0.5 * (recalcitrant_pool * fert.data.solubilizing_factor),
+                                                          field_size)
+        assert fert.data.recalcitrant_phosphorus_pool == (recalcitrant_pool -
+                                                          (recalcitrant_pool * fert.data.solubilizing_factor))
+
+
+# --- Top-level routine tests ---
+@pytest.mark.parametrize("available_pool,full_available_pool,recalcitrant_pool,rain_events,days_since_application,"
+                         "added_phosphorus", [
+                             (35.495, 80, 28.4, 0, 4, 75),
+                             (0, 70, 17.8, 1, 5, 60),
+                             (0, 60, 12.394, 3, 8, 35),
+                             (67.193, 100, 28.39, 0, 5, 0),  # No phosphorus added
+                         ])
+def test_add_fertilizer_phosphorus(available_pool: float, full_available_pool: float, recalcitrant_pool: float,
+                                   rain_events: int, days_since_application: int, added_phosphorus: float) -> None:
+    """Tests that when a new application of phosphorus is applied, it correctly adds to existing pools and resets the
+        temporal counters.
+    """
+    data = SoilData(available_phosphorus_pool=available_pool, full_available_phosphorus_pool=full_available_pool,
+                    recalcitrant_phosphorus_pool=recalcitrant_pool,
+                    rain_events_after_fertilizer_application=rain_events, days_since_application=days_since_application)
+    fert = Fertilizer(data)
+
+    fert.add_fertilizer_phosphorus(added_phosphorus)
+
+    if not added_phosphorus:
+        assert fert.data.available_phosphorus_pool == available_pool
+        assert fert.data.full_available_phosphorus_pool == full_available_pool
+        assert fert.data.recalcitrant_phosphorus_pool == recalcitrant_pool
+        assert fert.data.days_since_application == days_since_application
+        assert fert.data.rain_events_after_fertilizer_application == rain_events
+    else:
+        assert fert.data.available_phosphorus_pool == (0.75 * added_phosphorus + available_pool)
+        assert fert.data.full_available_phosphorus_pool == fert.data.available_phosphorus_pool
+        assert fert.data.recalcitrant_phosphorus_pool == (0.25 * added_phosphorus + recalcitrant_pool)
+        assert fert.data.days_since_application == 0
+        assert fert.data.rain_events_after_fertilizer_application == 0
+
+
+@pytest.mark.parametrize("rain_events,days_since_application,rainfall,runoff,field_size", [
+    (0, 0, 0, 0, 3),  # No rainfall, day of application
+    (0, 0, 11, 1.8, 1.5),  # First rainfall, day of application
+    (3, 7, 0, 0, 2.3),  # No rainfall, no rain events, after day of application
+    (0, 5, 13, 0, 4),  # First rainfall, after day of application
+    (2, 3, 17, 4, 1.8),  # Not first rainfall, after day of application
+    (3, 8, 0, 0, 2.1),    # No rainfall, some rain events, after day of application
+])
+def test_do_fertilizer_phosphorus_operations(rain_events: int, days_since_application: int, rainfall: float,
+                                             runoff: float, field_size: float) -> None:
+    """Tests that correct action is taken on fertilizer phosphorus in the system, and that temporal counters are
+        incremented correctly.
+    """
+    data = SoilData(rain_events_after_fertilizer_application=rain_events, days_since_application=days_since_application)
+    fert = Fertilizer(data)
+
+    fert._update_before_and_at_first_rain = MagicMock()
+    fert._update_after_first_rain = MagicMock()
+
+    fert.do_fertilizer_phosphorus_operations(rainfall, runoff, field_size)
+
+    assert fert.data.days_since_application == days_since_application + 1
+    if rainfall:
+        assert fert.data.rain_events_after_fertilizer_application == rain_events + 1
+        rain_events += 1
+    if rain_events == 0 or (rainfall and rain_events == 1):
+        fert._update_before_and_at_first_rain.assert_called_with(rainfall, runoff, field_size)
+        assert fert._update_after_first_rain.call_count == 0
+    elif rain_events >= 2:
+        assert fert._update_before_and_at_first_rain.call_count == 0
+        fert._update_after_first_rain.assert_called_with(rainfall, runoff, field_size)
