@@ -46,7 +46,7 @@ class Field:
 
         Details: **All the logic (after setup) will go in this function**
         """
-        # check the schedule to see what needs to be done today
+        # What needs to be done today?
         self.check_schedule(day, year)
 
         # --- Soil Management---
@@ -82,24 +82,19 @@ class Field:
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
 
-            #
             self.assess_dormancy(current_weather.daylength)
 
-            # allow crops to grow
             self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
                             current_weather.mean_air_temperature, current_weather.max_air_temperature)
 
-            # allow grazing
             if self.field_data.grazers_present:
                 self.graze_field()
 
-            # conduct harvest routines
             if self.field_data.is_harvest_day:
                 self.harvest_crops()
 
-        # If current day is a year after the start of the simulation, or is a year after the last annual reset, do the
-        # annual reset
-        if self.is_last_day_of_the_year:   # TODO: check if annual reset should be done
+        # annual resets
+        if self.is_last_day_of_the_year:
             self.perform_annual_reset()
 
         pass
