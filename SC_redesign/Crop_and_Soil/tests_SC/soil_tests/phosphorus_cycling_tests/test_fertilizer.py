@@ -283,7 +283,7 @@ def test_do_fertilizer_phosphorus_operations(rain_events: int, days_since_applic
         rain_events += 1
     if rain_events == 0 or (rainfall and rain_events == 1):
         fert._update_before_and_at_first_rain.assert_called_with(rainfall, runoff, field_size)
-        assert fert._update_after_first_rain.call_count == 0
+        fert._update_after_first_rain.assert_not_called()
     elif rain_events >= 2:
-        assert fert._update_before_and_at_first_rain.call_count == 0
+        fert._update_before_and_at_first_rain.assert_not_called()
         fert._update_after_first_rain.assert_called_with(rainfall, runoff, field_size)
