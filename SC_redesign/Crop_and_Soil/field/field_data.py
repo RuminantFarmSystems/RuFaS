@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, Dict
 from dataclasses import dataclass
 from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
@@ -38,6 +38,9 @@ class FieldData:
     """Threshold daylength to initiate dormancy in a plant (hours)"""
     current_residue: float = 0
     """total amount of residue on the current day (kg per hectare)"""
+    current_crop_config: Optional[List[Dict]] = None
+    """list of dictionaries to configure crops to be planted in the field. The dicts should contain 
+    attribute-value pairs, with attributes matching those of CropData."""
 
     # --- Field-level Variables ---
     evaporation: Optional[float] = None

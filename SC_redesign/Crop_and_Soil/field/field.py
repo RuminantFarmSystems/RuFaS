@@ -1,5 +1,6 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.field.crop_planting_config import CropPlantingConfig
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
@@ -77,7 +78,7 @@ class Field:
         # --- Crop Management ---
         # planting
         if self.field_data.is_planting_day:
-            self.plant_crops(self.current_crop_config)
+            self.plant_crops(self.field_data.current_crop_config)
 
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
@@ -103,11 +104,6 @@ class Field:
             self.perform_annual_reset()
 
         pass
-
-    @property
-    def current_crop_config(self) -> CropPlantingConfig:
-        """get/build the current crop species/configuration for this day"""
-        return CropPlantingConfig()  # TODO: placeholder to satisfy typing; needs true implementation
 
     @property
     def _composition_sums_to_one(self) -> bool:
@@ -163,28 +159,89 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def plant_crops(self, current_crop_config: CropPlantingConfig) -> None:
-        """plant the current crop(s) into the filed"""
-        for sp in current_crop_config.species:
-            self.add_crop(sp)
-        pass
+    def plant_crops(self, crops_config: List[Dict]) -> None:
+        """adds all crop(s) into the field from the current configuration specs
 
-    def add_crop(self, species: str, field_cover: float = 1.0,
-                 priority: int = 1) -> None:
+        Args:
+            crops_config: a list of crop config dictionaries (see make_crop_from_config_dict), one for each crop to be
+                planted
+        """
+        for config in crops_config:
+            crop = self.make_crop_from_config_dict(config)
+            self.add_crop(crop)
+
+    @staticmethod
+    def make_crop_from_config_dict(config: Dict) -> Crop:
+        """Initializes a new crop from a configuration dictionary
+
+        Args:
+            config: a dictionary containing specifications for the crop to be initialized.
+
+        Details: if the "species" key is present in the dictionary, that value is checked against the supported
+            crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
+            created (with 'custom' prepended to species name, if given).
+
+        Returns: a Crop object, initialized with the desired attribute values.
+        """
+        if "species" in config.keys():
+            accepted_species = set(item.value for item in CropSpecies)
+            species = config.pop("species")
+
+            if species in accepted_species:
+                return Field.make_supported_crop(species=config["species"], **config)
+            else:
+                config["species"] = "custom " + str(config["species"])
+
+        return Field.make_custom_crop(**config)
+
+    @staticmethod
+    def make_supported_crop(species: str, **specs) -> Crop:
+        """creates a crop instance with attributes determined by the species of the crop.
+
+        Args:
+            species: one of the supported species
+            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
+              crop species
+
+        Details: species attributes are read from species configuration files/classes. This method of creating
+            a crop does not allow for customizing crop values. It is limited to creating the default crops
+            supported by the CropSpecies Enum.
+
+        Returns: a Crop object, initialized with the desired attribute values.
+        """
+        crop_species = CropSpecies(species)
+        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
+        return Crop(crop_data)
+
+    @staticmethod
+    def make_custom_crop(**specs) -> Crop:
+        """creates a crop instance with customized attributes.
+
+        Args:
+            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
+              crop species
+
+        Details, this can be used to create a new ('unsupported') crop species/type
+        """
+        crop_data = CropData(**specs)
+        return Crop(crop_data)
+
+
+    def add_crop(self, crop: Crop, field_cover: float = 1.0) -> None:
         """add a crop to the field's current crop list and update relevant attributes
 
         Args:
-            species: the species of crop to plant  - TODO perhaps a Crop or CropData object instead?
+            crop: the crop object to add to the field
             field_cover: the desired proportion of the field for this crop to occupy, must be space available.
-            priority: the crop's priority level for resource acquisition
+
+        Raises: ValueError if there is no room in the field for the desired field_cover of this crop
         """
-        # check if there's room for the desired cover in the field
         if sum([crop.field_proportion for crop in self.crops]) + field_cover > 1:
-            ValueError("Desired proportion of field not available")
-        # plant the crop
-        self.crops.append(Crop.plant_species(species))
-        # ... update field_proportions of all crops
-        # ... set the priority of this new crop
+            raise ValueError("Desired proportion of field not available")
+        self.crops.append(crop)
+
+    def reset_perennial(self):
+        """resets some attributes for perennial crops at the start of the new growing season"""
         pass
 
     def _get_soil_layer_attributes_for_crop_growth(self) -> Dict[str, List[float]]:
