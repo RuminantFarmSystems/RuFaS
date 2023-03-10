@@ -63,7 +63,7 @@ class Crop:
 
         Args:
             adjusted_potential_evapotranspiration: potential evapotranspiration adjusted for evaporation of free water
-                in canopy in mm
+                in canopy (mm)
             layer_nitrates: nitrates present in each layer of the soil profile (kg/ha)
             layer_depths: the maximum depth of each soil layer
             layer_phosphates: phosphates present in each layer of the soil profile (kg/ha)
