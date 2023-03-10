@@ -14,17 +14,17 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from collections import deque
+
 import random
-from typing import Tuple
 from statistics import mean
+from typing import Any, Dict, Tuple
 
 om = OutputManager()
 
@@ -152,7 +152,7 @@ class AnimalManagement:
         self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
-            self.init_animals(data['herd_information'], config)
+            self.init_animals(config, data['herd_information'])
 
             self.init_nutrient_rqmts(weather, time, feed)
 
@@ -160,7 +160,7 @@ class AnimalManagement:
 
         self._print_animal_num_warnings(data['herd_information'])
 
-    def init_pens(self, all_pen_data, herd_data, manure_management_scenarios):
+    def init_pens(self, all_pen_data, herd_data: Dict[str, Any], manure_management_scenarios):
         """
         Populates the list of pens with the information from the input json file.
         Args:
@@ -218,7 +218,7 @@ class AnimalManagement:
                                       Pen.AnimalCombination.NONE, 1.2)
                 self.all_pens.append(new_default_pen)
 
-    def init_animals(self, herd_data, config):
+    def init_animals(self, config, herd_data: Dict[str, Any]):
         """
         Populates the list of animals with the information from the
         input JSON file: constructs the calves, heiferI’s, heiferII’s,
@@ -233,11 +233,10 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
-        herd_data['config'] = config
         self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows \
-            = self.life_cycle_manager.initialize_herd(**herd_data)
+            = self.life_cycle_manager.initialize_herd(config, herd_data)
 
-    def _print_animal_num_warnings(self, herd_data):
+    def _print_animal_num_warnings(self, herd_data: Dict[str, Any]):
         """
         If simulate_animals is false, creates warnings if there are more than 0 animals for any of the animal types,
             and logs how many warnings were generated
@@ -247,18 +246,23 @@ class AnimalManagement:
             herd_data: dictionary containing information about the herd
         """
 
+        animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._print_animal_num_warnings.__name__, }
+            "function": self._print_animal_num_warnings.__name__,
+            "simulate_animals": self.simulate_animals,
+            "herd_data_animal_nums": {key: herd_data[key] for key in animal_keys}
+        }
 
         counter = 0
 
         if not self.simulate_animals:
-            animal_keys = {"calf_num", "heiferI_num", "heiferII_num", "heiferIII_num", "cow_num"}
+
             for key in animal_keys:
                 if herd_data[key] != 0:
                     om.add_warning(f"invalid_{key}_warning",
-                                   f"Warning: herd_num is 0, but {key} is not.",
+                                   f"Warning: simulate_animals is false, but {key} is not.",
                                    info_map)
                     counter += 1
             om.add_log("num_warnings_associated_with_simulate_animals",
@@ -460,7 +464,7 @@ class AnimalManagement:
                             self.all_pens[i].ration[key] = \
                                 (self.all_pens[i].ration[key] /
                                  pen_population_before_additions[i]) * len(
-                                        self.all_pens[i].animals_in_pen)
+                                    self.all_pens[i].animals_in_pen)
 
         for calf in calves_born:
             # getting valid pen to place calves in
@@ -708,7 +712,7 @@ class AnimalManagement:
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
-            if pen.pen_populated:
+            if pen.populated:
                 pen.subset_class_feeds(feed)
                 pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
@@ -724,7 +728,7 @@ class AnimalManagement:
             methane_model: methane model used for methane emission calculations
         """
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.calc_manure(feed, methane_model)
             else:
                 pen.reset_manure()
@@ -777,7 +781,7 @@ class AnimalManagement:
             return 0
         else:
             return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(
-                    a.body_weight for a in animals)
+                a.body_weight for a in animals)
 
     def calc_all_p_conc(self):
         """
@@ -801,7 +805,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.call_p_rqmts()
 
     def daily_p_update(self):
@@ -811,7 +815,7 @@ class AnimalManagement:
         """
 
         for pen in self.all_pens:
-            if pen.pen_populated:
+            if pen.populated:
                 pen.daily_p_update()
 
     def daily_updates(self, feed, weather, time):
@@ -829,7 +833,7 @@ class AnimalManagement:
         """
         if self.simulate_animals:
             for pen in self.all_pens:
-                pen.pen_populated = len(pen.animals_in_pen) > 0
+                pen.populated = len(pen.animals_in_pen) > 0
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
             self.heiferIIs, self.heiferIIIs, self.cows = \
@@ -1013,14 +1017,14 @@ class AnimalManagement:
             animals.append((animal, 'cow', is_cow))
 
         indices = random.sample(
-                range(len(self.life_cycle_manager.sold_heifers)), num_animals)
+            range(len(self.life_cycle_manager.sold_heifers)), num_animals)
         for i in indices:
             animal, is_cow, output['sold_heifers'][i] = \
                 self.generate_animal_output('sold_heifer', i)
             animals.append((animal, 'sold_heifer', is_cow))
 
         indices = random.sample(
-                range(len(self.life_cycle_manager.culled_cows)), num_animals)
+            range(len(self.life_cycle_manager.culled_cows)), num_animals)
         for i in indices:
             animal, is_cow, output['culled_cows'][i] = \
                 self.generate_animal_output('culled_cow', i)
