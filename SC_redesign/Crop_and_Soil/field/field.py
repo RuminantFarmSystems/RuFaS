@@ -312,7 +312,7 @@ class Field:
 
         Details:
             If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
-            should be put into dormancy. If the length is greater than the greater than the threshold length, all crops
+            should be put into dormancy. If the length is greater than the threshold length, all crops
             should be brought out of dormancy.
 
         """
