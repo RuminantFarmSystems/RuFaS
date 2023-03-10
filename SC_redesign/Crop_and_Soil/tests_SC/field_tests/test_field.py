@@ -2,7 +2,7 @@ import warnings
 from unittest.mock import MagicMock
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpeciesDataFactory
+from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpeciesDataFactory, CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
 
 
@@ -97,13 +97,25 @@ def test_add_crop():
 
 @pytest.mark.parametrize("config", [
     {"species": "corn"},  # supported species
-    {"species": "corn", "minimum_temperature": -2.0},  # supported species, with alterations
+    {"species": "corn", "minimum_temperature": -2.0, "is_perennial": True},  # supported species, with alterations
     {"species": "grass"},  # unsupported species, generic attributes
     {"species": "cottonwood", "is_perennial": True},  # custom species and attributes
     {"minimum_temperature": -2.0},  # generic custom crop, with alterations
 ])
 def test_make_crop_from_config_dict(config: dict):
-    assert False
+    supported_crops = set(item.value for item in CropSpecies)
+    Field.make_supported_crop = MagicMock()
+    Field.make_custom_crop = MagicMock()
+
+    Field.make_crop_from_config_dict(config)
+
+    if "species" in config.keys() and str(config["species"]) in supported_crops:
+        Field.make_supported_crop.assert_called_once()
+        Field.make_custom_crop.assert_not_called()
+    else:
+        Field.make_supported_crop.assert_not_called()
+        Field.make_custom_crop.assert_called_once()
+
 
 
 def test_plant_crops():
