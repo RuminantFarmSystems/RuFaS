@@ -39,3 +39,23 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     # Check that subroutines were called correct number of times
     if daylength <= threshold_daylength:
         assert crop.dormancy.enter_dormancy.call_count == 1
+
+
+def test_plant_crops():
+    assert False
+
+
+def test_make_crop_from_config_dict():
+    assert False
+
+
+def test_make_supported_crop():
+    assert False
+
+
+def test_make_custom_crop():
+    assert False
+
+
+def test_add_crop():
+    assert False

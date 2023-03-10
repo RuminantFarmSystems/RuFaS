@@ -183,9 +183,9 @@ class Field:
             species = config.pop("species")
 
             if species in accepted_species:
-                return Field.make_supported_crop(species=config["species"], **config)
+                return Field.make_supported_crop(species=species, **config)
             else:
-                config["species"] = "custom " + str(config["species"])
+                config["species"] = "custom " + str(species)
 
         return Field.make_custom_crop(**config)
 
