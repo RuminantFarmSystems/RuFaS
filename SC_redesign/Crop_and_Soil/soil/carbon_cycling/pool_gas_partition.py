@@ -206,6 +206,8 @@ class PoolGasPartition:
     def _carbon_lost_adjusted_factor(silt_clay_content: float) -> float:
         return 0.85 - 0.68 * silt_clay_content
 
+    # TODO:---------test everything above
+
     # ---- S.6.C.5
     @staticmethod
     def _passive_carbon_decomposition_amount(
@@ -213,8 +215,6 @@ class PoolGasPartition:
             passive_carbon_amount: float, passive_carbon_decomposition_factor=0.00013) -> float:
         return decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
                passive_carbon_decomposition_factor
-
-    # TODO:---------test everything above
 
     # ---- S.6.C.4
     @staticmethod
