@@ -12,6 +12,7 @@ from typing import Set, List, Dict, Tuple
 from statistics import mean
 from pytest_lazyfixture import lazy_fixture
 
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -207,21 +208,23 @@ def test_reset_manure(pen: Pen) -> None:
     pen.dry_total = {}
     pen.lactating_total = {}
 
-    expected = {"U": 0,
-                "Urine": 0,
-                "TAN_s": 0,
-                "MN": 0,
-                "Mkg": 0,
-                "TSd": 0,
-                "VSd": 0,
-                "VSnd": 0,
-                "WIP_frac": 0,
-                "WOP_frac": 0,
-                "p_excrt_manure": 0,
-                "p_frac": 0,
-                "K_manure": 0,
-                "CH4_manure": 0
-                }
+    expected = AnimalManureExcretions(
+            urea=0.0,
+            urine=0.0,
+            total_ammoniacal_nitrogen_concentration=0.0,
+            urine_nitrogen=0.0,
+            manure_nitrogen=0.0,
+            manure_mass=0.0,
+            total_solids=0.0,
+            degradable_volatile_solids=0.0,
+            non_degradable_volatile_solids=0.0,
+            inorganic_phosphorus_fraction=0.0,
+            organic_phosphorus_fraction=0.0,
+            phosphorus=0.0,
+            phosphorus_fraction=0.0,
+            potassium=0.0,
+            methane=0.0
+    )
 
     pen.reset_manure()
 
