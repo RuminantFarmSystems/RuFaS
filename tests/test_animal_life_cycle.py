@@ -131,7 +131,6 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         'herd_num': 1000,
         'herd_init': False,
         'breed': breed,
-        'config': mock_config
     }
 
     life_cycle_manager.animal_config = mocker.MagicMock(autospec=AnimalConfigTypedDict)
@@ -145,7 +144,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     patch_set_avg_CI = mocker.patch.object(life_cycle_manager, '_set_avg_CI')
     patch_get_animals = mocker.patch.object(life_cycle_manager, '_get_animals')
 
-    results = life_cycle_manager.initialize_herd(**herd_data)
+    results = life_cycle_manager.initialize_herd(mock_config, herd_data)
 
     assert life_cycle_manager.herd_num == herd_data['herd_num']
     patch_set_avg_CI.assert_called_once()
