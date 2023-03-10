@@ -104,12 +104,13 @@ def test_add_crop():
 ])
 def test_make_crop_from_config_dict(config: dict):
     supported_crops = set(item.value for item in CropSpecies)
+    has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
     Field.make_supported_crop = MagicMock()
     Field.make_custom_crop = MagicMock()
 
     Field.make_crop_from_config_dict(config)
 
-    if "species" in config.keys() and str(config["species"]) in supported_crops:
+    if has_supported_species:
         Field.make_supported_crop.assert_called_once()
         Field.make_custom_crop.assert_not_called()
     else:
