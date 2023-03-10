@@ -185,14 +185,6 @@ class PoolGasPartition:
                                        slow_carbon_passive_decompose_rate=0.03) -> float:
         return slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
 
-    # ---- S.6.C.5
-    @staticmethod
-    def _passive_carbon_decomposition_amount(
-            decomposition_moisture_effect: float, decomposition_temperature_effect: float,
-            passive_carbon_amount: float, passive_carbon_decomposition_factor=0.00013) -> float:
-        return decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
-               passive_carbon_decomposition_factor
-
     # ---- S.6.C.8
     @staticmethod
     def _active_carbon_to_passive_amount(active_carbon_decomposition_amount: float) -> float:
@@ -213,6 +205,14 @@ class PoolGasPartition:
     @staticmethod
     def _carbon_lost_adjusted_factor(silt_clay_content: float) -> float:
         return 0.85 - 0.68 * silt_clay_content
+
+    # ---- S.6.C.5
+    @staticmethod
+    def _passive_carbon_decomposition_amount(
+            decomposition_moisture_effect: float, decomposition_temperature_effect: float,
+            passive_carbon_amount: float, passive_carbon_decomposition_factor=0.00013) -> float:
+        return decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
+               passive_carbon_decomposition_factor
 
     # TODO:---------test everything above
 

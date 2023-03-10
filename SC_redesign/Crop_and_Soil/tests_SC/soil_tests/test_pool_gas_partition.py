@@ -178,3 +178,19 @@ def test_slow_carbon_decomposition_amount(decomposition_moisture_effect, decompo
     assert expected == PoolGasPartition._slow_carbon_decomposition_amount(decomposition_moisture_effect,
                                                                           decomposition_temperature_effect,
                                                                           slow_carbon_amount)
+
+
+@pytest.mark.parametrize("decomposition_moisture_effect, decomposition_temperature_effect,passive_carbon_amount", [
+    (0.2, 1.3, 44),
+    (0.5, 1.8, 23),
+    (1.8, 1.1, 1),
+    (1.1, 2.3, 50),
+])
+def test_passive_carbon_decomposition_amount(decomposition_moisture_effect, decomposition_temperature_effect,
+                                             passive_carbon_amount):
+    passive_carbon_decomposition_factor = 0.00013
+    expected = decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
+               passive_carbon_decomposition_factor
+    assert expected == PoolGasPartition._passive_carbon_decomposition_amount(decomposition_moisture_effect,
+                                                                             decomposition_temperature_effect,
+                                                                             passive_carbon_amount)
