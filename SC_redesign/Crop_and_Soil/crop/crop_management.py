@@ -4,7 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 """
-This module is primarily based upon the "Crop Yield" (5:2.4) and "General Managmeent" (6:1) sections of the SWAT model
+This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
 """
 
 class CropManagement:
