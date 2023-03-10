@@ -221,20 +221,19 @@ class PoolGasPartition:
     @staticmethod
     def _carbon_lost_adjusted_factor(silt_clay_content: float) -> float:
         return 0.85 - 0.68 * silt_clay_content
+    # TODO:---------test everything above
 
     # ---- S.6.C.3
     @staticmethod
     def _active_carbon_decomposition_amount(moisture_effect: float, temperature_effect: float,
                                             active_carbon: float, active_carbon_decomposition_rate: float) -> float:
         return active_carbon_decomposition_rate * moisture_effect * temperature_effect * active_carbon
-    # TODO:---------test everything above
 
     # ---- S.6.C.2
     @staticmethod
     def _active_carbon_decomposition_rate(silt_clay_content: float,
                                           max_carbon_decomposition_rate: float = 0.14) -> float:
         return max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
-
 
     # ----  S.6.C.1
     @staticmethod

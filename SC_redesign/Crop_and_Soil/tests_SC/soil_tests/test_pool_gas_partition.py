@@ -139,6 +139,7 @@ def test_plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage)
     expected = plant_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
     assert expected == PoolGasPartition._plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage)
 
+
 @pytest.mark.parametrize("silt_clay_content", [
     5,  # lower values
     100,  # higher values
@@ -148,3 +149,16 @@ def test_active_carbon_decomposition_rate(silt_clay_content):
     max_carbon_decomposition_rate = 0.14
     expected = max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
     assert expected == PoolGasPartition._active_carbon_decomposition_rate(silt_clay_content)
+
+
+@pytest.mark.parametrize("moisture_effect, temperature_effect, active_carbon, active_carbon_decomposition_rate", [
+    (3, 4, 5, 6),  # lower values
+    (50, 89, 90, 0.7),  # higher value
+    (1.8, 1.1, 1, 0.5),  # arbitrary values
+])
+def test__active_carbon_decomposition_amount(moisture_effect, temperature_effect,
+                                             active_carbon, active_carbon_decomposition_rate):
+    expected = active_carbon_decomposition_rate * moisture_effect * temperature_effect * active_carbon
+    assert expected == PoolGasPartition._active_carbon_decomposition_amount(moisture_effect, temperature_effect,
+                                                                            active_carbon,
+                                                                            active_carbon_decomposition_rate)
