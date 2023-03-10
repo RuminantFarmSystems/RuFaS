@@ -7,7 +7,8 @@ Details:
         1. Write names of constants in all caps, with words separated by underscores.
         2. Use the full name of units, not abbreviations. This avoids confusion in cases where case matters (for
             example, megagrams (Mg) and milligrams (mg).)
-        3. Do not include the constants for reverse conversion directions.
+        3. For conversion constants, do not include the value for reverse conversion directions. 
+            To convert in the opposite direction, simply divide instead of multiply.
         4. Prefer constants that are greater than one.
 """
 # Area
