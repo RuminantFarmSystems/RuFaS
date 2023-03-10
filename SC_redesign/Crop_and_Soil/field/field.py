@@ -259,13 +259,17 @@ class Field:
         Args:
             daylength: length of time from sunup to sundown on the current day (hours)
 
+        Details:
+            If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant 
+            should be put into dormancy. If the length is greater than the greater than the threshold length, all crops should
+            be brought out of dormancy.
+            
         """
         if daylength <= self.field_data.dormancy_threshold_daylength:
-            # put crops into dormancy if daylength is as or below dormancy daylength threshold
+       
             for crop in self.crops:
                 crop.dormancy.enter_dormancy()
         else:
-            # Bring all crops out of dormancy
             for crop in self.crops:
                 crop.data.is_dormant = False
     # </editor-fold>
