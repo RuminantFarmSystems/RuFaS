@@ -1,23 +1,11 @@
 import warnings
 from unittest.mock import MagicMock
-
 import pytest
-
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
+from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpeciesDataFactory
 from SC_redesign.Crop_and_Soil.field.field import Field
 
 
-# TODO: all methods in field.py need to be added here
-
-# def test_grow_crops():
-#     assert False
-#
-#
-# def test_harvest_crops():
-#     assert False
-
-
-# TODO: make this test more rigorous once a testing pattern has been established for testing Field
 @pytest.mark.parametrize("daylength,threshold_daylength", [
     (14, 8),
     (17.20948239, 9.19183294),
@@ -42,24 +30,78 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
         assert crop.dormancy.enter_dormancy.call_count == 1
 
 
+@pytest.mark.parametrize("species,specs", [
+    ("corn", {}),  # no additional arguments
+    ("alfalfa", {"minimum_temperature": -2.1, "id": 123})  # supported species, with alteration
+])
+def test_make_supported_crop(species: str, specs: dict):
+    """ensure that supported crops are properly created."""
+    # check that attributes are correct
+    crop = Field.make_supported_crop(species, **specs)
+    assert crop.data.species == species
+    for key, val in specs.items():
+        assert getattr(crop.data, key) == val
+
+    if len(specs) > 0:
+        assert "altered" in crop.data.name
+    else:
+        assert "default" in crop.data.name
+
+    # failing cases
+    with pytest.raises(Exception):
+        Field.make_supported_crop("fake_crop")
+    with pytest.raises(Exception):
+        Field.make_supported_crop("corn", bad_attr=17.35)
+
+
+@pytest.mark.parametrize("config", [
+    {"species": "grass"},  # custom species, with generic defaults
+    {"species": "cottonwood", "is_perennial": True},  # custom species and attribute
+    {"minimum_temperature": -10},  # no species name
+])
+def test_make_custom_crop(config: dict):
+    """checks that custom crop attributes are set correctly"""
+    crop = Field.make_custom_crop(**config)
+    for key, val in config.items():
+        assert getattr(crop.data, key) == val
+
+
+def test_add_crop():
+    field = Field()
+
+    # --- first case: no cover specification ----
+    for i in range(5):
+        crop = Crop()
+        field.add_crop(crop)
+        assert type(field.crops[i]) is Crop
+    for crop in field.crops:
+        assert crop.data.field_proportion == 1/5
+    assert len(field.crops) == 5
+
+    # ---- second case: specific covers
+    new_field = Field()
+    new_field.add_crop(Crop(), 0.10)
+    new_field.add_crop(Crop(), 0.20)
+    new_field.add_crop(Crop(), 0.33)
+    assert new_field.crops[0].data.field_proportion == 0.10
+    assert new_field.crops[1].data.field_proportion == 0.20
+    assert new_field.crops[2].data.field_proportion == 0.33
+
+    # --- failing cases ---
+    newer_field = Field()
+    with pytest.raises(Exception):
+        newer_field.add_crop(Crop(), 1.1)  # over 1
+        new_field.add_crop(Crop(), 0.5)  # total is over 1
+
+
+
+
+
 def test_plant_crops():
-    assert False
+   assert False
 
 
 def test_make_crop_from_config_dict():
     assert False
 
-
-def test_make_supported_crop():
-    assert False
-
-
-def test_make_custom_crop():
-    assert False
-
-
-def test_add_crop():
-    assert False
-
-def test_reset_perennial():
-    warnings.warn("no method to reset perennials implemented")
+# TODO: All field methods need to be tested in future PRs.

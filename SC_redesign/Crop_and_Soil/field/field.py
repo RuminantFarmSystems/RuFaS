@@ -30,7 +30,7 @@ class Field:
         """the soil component of the field"""
 
         # crop attributes
-        self.crops: Optional[List[Crop]] = None  # empty crop list
+        self.crops: List[Crop] = list()  # empty crop list
         """crops currently in the field"""
 
         self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
@@ -154,16 +154,21 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def plant_crops(self, crops_config: List[Dict]) -> None:
+    def plant_crops(self, crops_config: List[Dict], coverage: Optional[List[float]] = None) -> None:
         """adds all crop(s) into the field from the current configuration specs
 
         Args:
             crops_config: a list of crop config dictionaries (see make_crop_from_config_dict), one for each crop to be
                 planted
+            coverage: a list of field coverages for each crop (% of the field); must sum to less than 1
         """
-        for config in crops_config:
+        if coverage is not None:
+            if sum(coverage) > 1.0:
+                raise ValueError("the sum of coverage is greater than 1.0")
+
+        for config, cover in zip(crops_config, coverage):
             crop = self.make_crop_from_config_dict(config)
-            self.add_crop(crop)
+            self.add_crop(crop, cover)
 
     @staticmethod
     def make_crop_from_config_dict(config: Dict) -> Crop:
@@ -221,18 +226,28 @@ class Field:
         crop_data = CropData(**specs)
         return Crop(crop_data)
 
-    def add_crop(self, crop: Crop, field_cover: float = 1.0) -> None:
+    def add_crop(self, crop: Crop, field_cover: Optional[float] = None) -> None:
         """add a crop to the field's current crop list and update relevant attributes
 
         Args:
             crop: the crop object to add to the field
-            field_cover: the desired proportion of the field for this crop to occupy, must be space available.
+            field_cover: the desired proportion of the field for this crop to occupy, must be space available. If not
+                provided, each crop will occupy an equal proportion of the field.
 
         Raises: ValueError if there is no room in the field for the desired field_cover of this crop
         """
-        if sum([crop.field_proportion for crop in self.crops]) + field_cover > 1:
-            raise ValueError("Desired proportion of field not available")
-        self.crops.append(crop)
+
+        if field_cover is None:
+            self.crops.append(crop)
+            for this_crop in self.crops:
+                this_crop.data.field_proportion = 1 / len(self.crops)
+        else:
+            crop.data.field_proportion = field_cover
+            self.crops.append(crop)
+
+        total_cover = sum([crp.data.field_proportion for crp in self.crops])
+        if total_cover > 1.0:
+            raise ValueError("more than 100% of the field is occupied")
 
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""
@@ -297,8 +312,6 @@ class Field:
 
             if self.field_data.harvest_type == HarvestOperation.HARVEST_NOKILL:
                 crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
-
-            # TODO: future method to cut crops, leave them in the field to dry prior to harvest?
 
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
         """allow grazers to graze in the field during the current day"""
