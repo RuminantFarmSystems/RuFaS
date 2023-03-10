@@ -52,7 +52,6 @@ def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: f
     # Run method
     incorp.enter_dormancy()
 
-    # Check everything
     if incorp.data.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or PlantCategory.WARM_ANNUAL:
         assert incorp.data.is_dormant is False
     else:
