@@ -1,3 +1,4 @@
+import warnings
 from unittest.mock import MagicMock
 
 import pytest
@@ -59,3 +60,6 @@ def test_make_custom_crop():
 
 def test_add_crop():
     assert False
+
+def test_reset_perennial():
+    warnings.warn("no method to reset perennials implemented")
