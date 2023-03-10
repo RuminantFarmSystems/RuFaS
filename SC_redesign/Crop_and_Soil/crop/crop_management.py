@@ -73,7 +73,7 @@ class CropManagement:
         #   (Not Used)
         self.data.above_ground_biomass -= (self.data.above_ground_biomass * self.data.dry_down_fraction)
 
-    def cut_crop(self, collected_fraction: float = 0):
+    def cut_crop(self, collected_fraction: float = 0) -> None:
         """performs a cut operation on the crop and, optionally, collects yield
 
         Args:
@@ -158,7 +158,7 @@ class CropManagement:
 
         Details: Harvest Index is the ratio of grain to total shoot dry matter
 
-        Returns: potential harvest index for the day
+        Returns: potential harvest index for the day (unitless)
         """
         heat_percent = 100 * heat_fraction
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
