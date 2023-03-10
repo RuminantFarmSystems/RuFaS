@@ -8,10 +8,10 @@ from typing import Optional, List, Dict
 from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 # TODO: delete/replace the note block below once satisfied with the design
-""" 
-The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm 
+"""
+The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm
 manager classes. The field class, as laid out here, handles the management actions and scenarios that can be performed
-in an agricultural field. 
+in an agricultural field.
 
 Note that some of the field-level attributes will be tracked by the FieldData class
 """
@@ -221,7 +221,6 @@ class Field:
         crop_data = CropData(**specs)
         return Crop(crop_data)
 
-
     def add_crop(self, crop: Crop, field_cover: float = 1.0) -> None:
         """add a crop to the field's current crop list and update relevant attributes
 
@@ -312,13 +311,13 @@ class Field:
             daylength: length of time from sunup to sundown on the current day (hours)
 
         Details:
-            If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant 
-            should be put into dormancy. If the length is greater than the greater than the threshold length, all crops should
-            be brought out of dormancy.
-            
+            If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
+            should be put into dormancy. If the length is greater than the greater than the threshold length, all crops
+            should be brought out of dormancy.
+
         """
         if daylength <= self.field_data.dormancy_threshold_daylength:
-       
+
             for crop in self.crops:
                 crop.dormancy.enter_dormancy()
         else:
