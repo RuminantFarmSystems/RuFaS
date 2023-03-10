@@ -4,13 +4,23 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 """
-This module is primarily based upon the "Crop Yield" (5:2.4) and "General Managmeent" (6:1) sections of the SWAT model
+This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
 """
 
 class CropManagement:
     def __init__(self, crop_data: Optional[CropData] = None):
+        """Create a crop management object from CropData
+
+        Parameters
+        ----------
+        crop_data: CropData
+            the data class containing crop specifications and tracked attributes
+
+        Attributes
+        ----------
+        data: a reference to crop_data, on which crop management operations will be conducted
+        """
         self.data = crop_data or CropData()  # initialize with defaults, if not given
-        """crop data object on which crop management operations will be conducted"""
 
     # ---- Main Methods ----
     def manage_harvest(self, harvest_op: HarvestOperation):
@@ -70,10 +80,10 @@ class CropManagement:
             species-specific water content.
         """
         # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
-        #   (Not Used)
+        #   The dry down method is not currently used
         self.data.above_ground_biomass -= (self.data.above_ground_biomass * self.data.dry_down_fraction)
 
-    def cut_crop(self, collected_fraction: float = 0):
+    def cut_crop(self, collected_fraction: float = 0) -> None:
         """performs a cut operation on the crop and, optionally, collects yield
 
         Args:
@@ -104,9 +114,8 @@ class CropManagement:
 
             This method is meant to be called from one of the various harvest operations.
         """
-        # argument validation
         if not 0 <= collected_fraction <= 1.0:
-            raise ValueError("collected_fraction must be between 0 and 1 (inclusive)")
+            raise ValueError(f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'.")
 
         # Biomass removed from plant
         if self.data.harvest_index <= 1.0:
@@ -158,7 +167,7 @@ class CropManagement:
 
         Details: Harvest Index is the ratio of grain to total shoot dry matter
 
-        Returns: potential harvest index for the day
+        Returns: potential harvest index for the day (unitless)
         """
         heat_percent = 100 * heat_fraction
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
@@ -169,23 +178,23 @@ class CropManagement:
 
         Args:
             min_harvest_index: harvest index in drought conditions; minimum possible harvest index for the plant,
-                [0, Inf)
-            harvest_index: potential harvest index for the day, [min_harvest_index, Inf)
-            water_deficiency: water deficiency factor for the plant
+                (unitless, must be positive)
+            harvest_index: potential harvest index for the day, (unitless, must be greater than min_harvest_index)
+            water_deficiency: water deficiency factor for the plant (unitless)
 
         Details: values of min_harvest_index and harvest_index are input below their bounds, they are updated to
         equal their lower bounds.
 
         SWAT Reference: 5:3.3.1
 
-        Returns: actual harvest index, adjusted for water deficiency
+        Returns: actual harvest index, adjusted for water deficiency (unitless)
         """
-        harvest_index = max(harvest_index, 0)  # bound to zero
-        harvest_index = max(harvest_index, min_harvest_index)  # prevent harvest_index < min_harvest_index
+        harvest_index = max(harvest_index, 0)
+        harvest_index = max(harvest_index, min_harvest_index)
 
         adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / \
                             (water_deficiency + exp(6.13 - 0.883 * water_deficiency)) + min_harvest_index
-        return max(adj_harvest_index, 0)  # bounded at zero
+        return max(adj_harvest_index, 0)
 
     @staticmethod
     def _determine_biomass_cut_from_whole_plant(biomass: float, harvest_index: float) -> float:

@@ -3,16 +3,19 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
 
 """
-This module is based on the "Dormancy" module of SWAT (5:1.2)
+This module is based on the "Dormancy" section of SWAT (5:1.2)
 """
 
 
 class Dormancy:
     def __init__(self, crop_data: Optional[CropData] = None):
+        """Sets data field to a crop data object on which Dormancy operations will be conducted. 
+            Initialized with defaults if none given.
+        """
         self.data = crop_data or CropData
 
     def enter_dormancy(self) -> None:
-        """Performs the actual transition from active to dormant in a crop.
+        """Performs the transition from active to dormant in a crop.
 
         Details:
             When method is called, the crop's status is set to dormant, biomass is removed from plant and converted
@@ -31,10 +34,9 @@ class Dormancy:
         if self.data.plant_category == PlantCategory.TREE or self.data.is_perennial:
             # Cool annuals and cool annual legumes do not lose any biomass or get their leaf area index reset
 
-            # Some fraction of biomass falls off the plant and becomes residue
             self.data.yield_residue += (self.data.biomass * self.data.dormancy_loss_fraction)
             self.data.biomass *= (1 - self.data.dormancy_loss_fraction)
-            # Leaf area index gets set to minimum leaf area index, if it is less than the current leaf area index
+
             self.data.leaf_area_index = min(self.data.leaf_area_index, self.data.minimum_lai_during_dormancy)
 
     @staticmethod
@@ -60,7 +62,7 @@ class Dormancy:
 
         SWAT Reference: 5:1.2.2 - 5:1.2.4
 
-        Returns: the dormancy threshold for this latitude
+        Returns: the dormancy threshold for this latitude (hours)
         """
         is_near_pole = abs_latitude > 40
         if is_near_pole:

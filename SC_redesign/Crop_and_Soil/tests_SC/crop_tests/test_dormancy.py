@@ -11,7 +11,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
     (16.218347349, 16.329438502)
 ])
 def test_find_threshold_daylength(min_daylength: float, dormancy_threshold: float) -> None:
-    """Tests that _find_threshold_daylength() in Dormancy module works correctly"""
+    """Tests that the dormancy threshold daylength is calculated correctly."""
     observe = Dormancy.find_threshold_daylength(min_daylength, dormancy_threshold)
     expect = min_daylength + dormancy_threshold
     assert observe == expect
@@ -25,7 +25,7 @@ def test_find_threshold_daylength(min_daylength: float, dormancy_threshold: floa
     56.2948349202,
 ])
 def test_find_dormancy_threshold(latitude: float) -> None:
-    """Tests that _find_dormancy_threshold() in Dormancy module works correctly"""
+    """Tests that the dormancy threshold is correctly calculated based on the latitude."""
     observe = Dormancy.find_dormancy_threshold(latitude)
     if latitude > 40:
         expect = 1
@@ -44,15 +44,15 @@ def test_find_dormancy_threshold(latitude: float) -> None:
 ])
 def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: float, plant_type: PlantCategory,
                           loss_frac: float) -> None:
-    # Initialize objects
+    """Tests that crops are correctly set to be dormant, and when set to being dormant lose the correct 
+         amount of biomass and have their leaf area index reset to the correct value.
+    """
     data = CropData(biomass=biomass, yield_residue=residue, leaf_area_index=lai, minimum_lai_during_dormancy=min_lai,
                     plant_category=plant_type, dormancy_loss_fraction=loss_frac)
     incorp = Dormancy(data)
 
-    # Run method
     incorp.enter_dormancy()
 
-    # Check everything
     if incorp.data.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or PlantCategory.WARM_ANNUAL:
         assert incorp.data.is_dormant is False
     else:
