@@ -19,7 +19,7 @@ from typing import TypeVar
 from typing import Union
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict
+from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.animal_typed_dicts import InitializationDBSummaryTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -176,45 +176,36 @@ class LifeCycleManager:
         self.animal_initializer: Optional[AnimalInitialization] = None
 
     # TODO: Annotate config after removing all the imports in all the __init__.py files
-    def initialize_herd(self, herd_num: int, calf_num: int, heiferI_num: int, heiferII_num: int,
-                        heiferIII_num: int, cow_num: int, replace_num: int, herd_init: bool, breed: str,
-                        config) -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
-        """
-        Generates a replacement herd to simulate the market, for the herd to get
-         replacements. Initializes the herd.
+    def initialize_herd(self, config, herd_data: HerdInfoTypedDict) \
+            -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
+        """Generates a replacement herd to simulate the market, for the herd to get replacements.
 
-        Args:
-            breed: The breed of the herd.
-            config: stores (among other things) information on whether the seed
-                has been set by the user
-            herd_init: boolean - true to populate database with new animals,
-                false to use current database
-            herd_num: what the number of cows should be maintained at
-            calf_num: the number of calves to start the simulation with
-            heiferI_num: the number of heiferIs to start the simulation with
-            heiferII_num: the number of heiferIIs to start the simulation with
-            heiferIII_num: the number of heiferIIIs to start the simulation with
-            cow_num: the number of cows to start the simulation with
-            replace_num: replacements in the market
+        Parameters
+        ----------
+        config
+            stores (among other things) information on whether the seed has been set by the user
+        herd_data : HerdInfoTypedDict
+            The data for the herd to be initialized
 
-        Returns:
-            calves: list of calves for the simulation
-            heiferIs: list of heiferIs for the simulation
-            heiferIIs: list of heiferIIs for the simulation
-            heiferIIIs: list of heiferIIIs for the simulation
-            cows: list of cows for the simulation
+        Returns
+        -------
+        Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]
+            A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
+
         """
-        self.animal_initializer = AnimalInitialization(self.animal_config['calving_interval'], breed,
-                                                       config.set_seed, herd_init)
-        self.herd_num = herd_num
+        self.animal_initializer = AnimalInitialization(self.animal_config['calving_interval'],
+                                                       herd_data['breed'],
+                                                       config.set_seed,
+                                                       herd_data['herd_init'])
+        self.herd_num = herd_data['herd_num']
         self._set_avg_CI()
 
-        calves = self._get_animals(Calf, calf_num, breed)
-        heiferIs = self._get_animals(HeiferI, heiferI_num, breed)
-        heiferIIs = self._get_animals(HeiferII, heiferII_num, breed)
-        heiferIIIs = self._get_animals(HeiferIII, heiferIII_num, breed)
-        cows = self._get_animals(Cow, cow_num, breed)
-        self.replacement_market = self.animal_initializer.get_replacement_cows(replace_num, breed)
+        calves = self._get_animals(Calf, herd_data['calf_num'], herd_data['breed'])
+        heiferIs = self._get_animals(HeiferI, herd_data['heiferI_num'], herd_data['breed'])
+        heiferIIs = self._get_animals(HeiferII, herd_data['heiferII_num'], herd_data['breed'])
+        heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num'], herd_data['breed'])
+        cows = self._get_animals(Cow, herd_data['cow_num'], herd_data['breed'])
+        self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'], herd_data['breed'])
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
