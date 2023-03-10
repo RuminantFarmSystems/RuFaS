@@ -19,8 +19,8 @@
 build
 others
 
-# Ignore contents of output directory, except for .keep file
-# This is because we want to keep the output direcectory, and git
+# Ignore contents of output directories, except for .keep files
+# This is because we want to keep the output directories, and git
 # only stores non-empty directories
 output/*
 !output/.keep
@@ -37,7 +37,6 @@ RUFAS/routines/manure/output/*
 .idea/**
 env/
 venv/
-pycallexp.py
 
 # ignore .DS_store
 .DS_store

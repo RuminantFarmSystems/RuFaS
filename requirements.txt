@@ -7,5 +7,6 @@ pytest
 pytest-mock
 scipy
 pytest-lazy-fixture
+typing_extensions
 sphinx
 sphinx-rtd-theme
