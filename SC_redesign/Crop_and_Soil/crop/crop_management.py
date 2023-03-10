@@ -106,7 +106,7 @@ class CropManagement:
         """
         # argument validation
         if not 0 <= collected_fraction <= 1.0:
-            raise ValueError("collected_fraction must be between 0 and 1 (inclusive)")
+            raise ValueError(f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'.")
 
         # Biomass removed from plant
         if self.data.harvest_index <= 1.0:
