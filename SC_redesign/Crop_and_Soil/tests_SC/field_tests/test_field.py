@@ -67,6 +67,7 @@ def test_make_custom_crop(config: dict):
 
 
 def test_add_crop():
+    """checks that crops are added to the field properly"""
     field = Field()
 
     # --- first case: no cover specification ----
@@ -94,14 +95,18 @@ def test_add_crop():
         new_field.add_crop(Crop(), 0.5)  # total is over 1
 
 
-
+@pytest.mark.parametrize("config", [
+    {"species": "corn"},  # supported species
+    {"species": "corn", "minimum_temperature": -2.0},  # supported species, with alterations
+    {"species": "grass"},  # unsupported species, generic attributes
+    {"species": "cottonwood", "is_perennial": True},  # custom species and attributes
+    {"minimum_temperature": -2.0},  # generic custom crop, with alterations
+])
+def test_make_crop_from_config_dict(config: dict):
+    assert False
 
 
 def test_plant_crops():
    assert False
-
-
-def test_make_crop_from_config_dict():
-    assert False
 
 # TODO: All field methods need to be tested in future PRs.
