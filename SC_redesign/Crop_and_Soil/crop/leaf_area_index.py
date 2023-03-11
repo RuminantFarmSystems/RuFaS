@@ -66,8 +66,6 @@ class LeafAreaIndex:
         SWAT Reference: 5:2.1.18"""
         self.data.leaf_area_index = max(0., self.data.previous_leaf_area_index + self.data.leaf_area_added)
 
-
-
     @staticmethod
     def determine_canopy_height(max_canopy_height: float, optimal_leaf_area_fraction: float) -> float:
         """sets the current height of the canopy, in meters
