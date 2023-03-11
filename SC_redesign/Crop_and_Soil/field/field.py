@@ -103,7 +103,7 @@ class Field:
     @property
     def _composition_sums_to_one(self) -> bool:
         """ensure that the crop_proportions values sum to 1"""
-        return sum([crop.field_proportion for crop in self.crops]) == 1.0
+        return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
     # <editor-fold desc="--- Setup Methods ---">
     def setup_field(self, soil_config, tillage_config, amendment_config, crop_config):
@@ -166,9 +166,11 @@ class Field:
             if sum(coverage) > 1.0:
                 raise ValueError("the sum of coverage is greater than 1.0")
 
-        for config, cover in zip(crops_config, coverage):
-            crop = self.make_crop_from_config_dict(config)
-            self.add_crop(crop, cover)
+        for i in range(len(crops_config)):
+            conf = crops_config[i]
+            cov = coverage[i] if coverage is not None else None
+            crop = self.make_crop_from_config_dict(conf)
+            self.add_crop(crop, cov)
 
     @staticmethod
     def make_crop_from_config_dict(config: Dict) -> Crop:

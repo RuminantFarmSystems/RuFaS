@@ -1,4 +1,5 @@
 import warnings
+from typing import Optional, List, Dict
 from unittest.mock import MagicMock
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
@@ -117,9 +118,15 @@ def test_make_crop_from_config_dict(config: dict):
         Field.make_supported_crop.assert_not_called()
         Field.make_custom_crop.assert_called_once()
 
-
-
-def test_plant_crops():
-   assert False
+@pytest.mark.parametrize("config_list,coverages",[
+    ([{"species": "corn"}], None),
+    ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
+    ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
+    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1/3, 1/3, 1/3])
+])
+def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
+    field = Field()
+    field.plant_crops(config_list, coverages)
+    assert len(field.crops) == len(config_list)
 
 # TODO: All field methods need to be tested in future PRs.
