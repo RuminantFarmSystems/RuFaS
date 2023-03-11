@@ -4,6 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, Corn, Alfalfa, Ce
 from SC_redesign.Crop_and_Soil.crop.crop_data import SpringBarley, SpringWheat, SugarBeet, TallFescue, Triticale
 from SC_redesign.Crop_and_Soil.crop.crop_data import WinterWheat
 
+
 class CropSpecies(Enum):
     """Enum of all the crop types supported by RUFAS"""
     GENERIC = "generic"  # generic crop
@@ -63,4 +64,3 @@ class CropSpeciesDataFactory:
                 species_instance.name = species_instance.name.replace("default", "altered")
 
         return species_instance
-

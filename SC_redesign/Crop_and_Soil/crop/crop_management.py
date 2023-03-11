@@ -7,6 +7,7 @@ from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
 """
 
+
 class CropManagement:
     def __init__(self, crop_data: Optional[CropData] = None):
         """Create a crop management object from CropData
@@ -115,7 +116,9 @@ class CropManagement:
             This method is meant to be called from one of the various harvest operations.
         """
         if not 0 <= collected_fraction <= 1.0:
-            raise ValueError(f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'.")
+            raise ValueError(
+                f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
+            )
 
         # Biomass removed from plant
         if self.data.harvest_index <= 1.0:
@@ -134,7 +137,8 @@ class CropManagement:
         self.data.yield_collected = self.data.cut_biomass * collected_fraction  # SWAT 5:3.3.4
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.7
-            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.8
+            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
+                self.data.yield_collected  # SWAT 5:2.4.8
         else:
             self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_collected  # SWAT 5:2.4.5
             self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_collected  # SWAT 5:2.4.6

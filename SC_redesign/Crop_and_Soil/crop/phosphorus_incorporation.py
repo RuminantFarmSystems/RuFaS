@@ -8,8 +8,8 @@ from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorp
 """
 This module is based upon the 'Phosphorus Uptake" section (5:2.3.2) of of the SWAT model documentation
 
-Also: Since much of the functionality is similar to nitrogen (5:2.3.2), many of the static Nitrogen functions are 
-called directly. 
+Also: Since much of the functionality is similar to nitrogen (5:2.3.2), many of the static Nitrogen functions are
+called directly.
 """
 
 
@@ -131,7 +131,8 @@ class PhosphorusIncorporation:
         Details: the layer_phosphates list is updated in place. Actual phosphorus uptake values are subtracted from
         each layer
         """
-        layer_phosphates[:] = [max(src - snk, 0) for src, snk in zip(layer_phosphates, self.data.actual_phosphorus_uptakes)]
+        layer_phosphates[:] = [max(src - snk, 0) for src, snk in zip(layer_phosphates,
+                                                                     self.data.actual_phosphorus_uptakes)]
 
     def tally_total_phosphorus_uptake(self) -> None:
         """determines total phosphorus extracted from soil by summing actual uptake from each layer"""
