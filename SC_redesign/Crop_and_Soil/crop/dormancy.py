@@ -9,7 +9,7 @@ This module is based on the "Dormancy" section of SWAT (5:1.2)
 
 class Dormancy:
     def __init__(self, crop_data: Optional[CropData] = None):
-        """Sets data field to a crop data object on which Dormancy operations will be conducted. 
+        """Sets data field to a crop data object on which Dormancy operations will be conducted.
             Initialized with defaults if none given.
         """
         self.data = crop_data or CropData

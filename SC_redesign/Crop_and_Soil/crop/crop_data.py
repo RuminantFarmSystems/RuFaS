@@ -61,16 +61,16 @@ class CropData:
     max_leaf_area_index: float = 4.0
     """maximum leaf area index for the plant (unitless)"""
     first_heat_fraction_point: float = 0.15
-    """fraction of the growing season corresponding to the first point on the optimal leaf development 
+    """fraction of the growing season corresponding to the first point on the optimal leaf development
     curve (unitless)"""
     first_leaf_fraction_point: float = 0.01
-    """fraction of max leaf area index corresponding to the first point on the optimal leaf development 
+    """fraction of max leaf area index corresponding to the first point on the optimal leaf development
     curve (unitless)"""
     second_heat_fraction_point: float = 0.50
-    """fraction of the growing season corresponding to the second point on the optimal leaf development 
+    """fraction of the growing season corresponding to the second point on the optimal leaf development
     curve (unitless)"""
     second_leaf_fraction_point: float = 0.95
-    """fraction of max leaf area index corresponding to the second point on the optimal leaf development 
+    """fraction of max leaf area index corresponding to the second point on the optimal leaf development
         curve (unitless)"""
     senescent_heat_fraction: float = 0.9
     """the fraction of potential heat units above which the plant goes enters senescence (unitless)"""
@@ -84,8 +84,9 @@ class CropData:
 
     # SWAT Table A-6
     minimum_cover_management_factor: float = 0.2
-    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT 
-        Reference: 4:1.1.11)"""
+    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT
+        Reference: 4:1.1.11)
+    """
 
     # SWAT Table A-7
     emergence_nitrogen_fraction: float = 0.05
@@ -112,7 +113,6 @@ class CropData:
     """crop-specific expected fraction of nitrogen in yield (unitless)"""
     yield_phosphorus_fraction: Optional[float] = 0.003
     """crop-specific expected fraction of phosphorus in yield (unitless)"""
-
 
     # ---- biomass allocation
     light_extinction: float = 0.65
@@ -171,7 +171,7 @@ class CropData:
     is_dormant: bool = False
     """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
-    """should the alternative heat unit method be used? 
+    """should the alternative heat unit method be used?
     Determines if heat unit temperature will be used for heat unit  accumulation."""
     new_heat_units: Optional[float] = None
     """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
@@ -289,7 +289,7 @@ class CropData:
 
     # ---- yields
     harvest_efficiency: float = 1.0
-    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field 
+    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field
     (unitless; [0, 1])"""
     dry_down_fraction: float = 0.2
     """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
@@ -323,7 +323,7 @@ class CropData:
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
     minimum_lai_during_dormancy: Optional[float] = 0.75
     """Minimum leaf area index for plants (perennials and trees only) during dormancy (unitless)
-    
+
     Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
     now allowed to modify this value. But it does not provide values for any of the listed plant species and gives no
     information about how this value can be measured or calculated.
@@ -366,7 +366,7 @@ class CropData:
 
 
 """
-The species child classes provide default configuration for the supported CropSpecies. 
+The species child classes provide default configuration for the supported CropSpecies.
 Only values that differ from the default CropData need to be declared by default in these species classes.
 
 Users should be able also be able to modify specific variables by including them in the signature when calling
