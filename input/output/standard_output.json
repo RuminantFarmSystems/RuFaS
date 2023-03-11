@@ -104,7 +104,7 @@
         "produce_csv": true,
         "produce_graphics": false,
         "report_name": "feed_storage_report",
-        "storage_report": {
+        "feed_storage_report": {
             "produce_csv": true,
             "produce_graphics": false,
             "report_name": "storage_report"

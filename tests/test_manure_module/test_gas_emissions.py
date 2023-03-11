@@ -3,7 +3,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants.general_constants import GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 
@@ -134,8 +134,8 @@ def test_calc_carbon_dioxide_housing_emission(ambient_temp: float, mocker: Mocke
 
 
 @pytest.mark.parametrize('sign_of_RMQ', [-1, 1])
-def test_calc_ammonia_housing_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
-    """Tests calc_ammonia_housing_emission() in gas_emissions.py."""
+def test_calc_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
+    """Tests calc_ammonia_emission() in gas_emissions.py."""
 
     # Arrange
     num_animals = 100
@@ -166,7 +166,7 @@ def test_calc_ammonia_housing_emission(sign_of_RMQ: int, mocker: MockerFixture) 
     expected = num_animals * barn_area * ((manure_urine_total_ammoniacal_nitrogen / barn_area) * c * p) / (r * M * Q)
 
     # Act
-    actual = GasEmissions.calc_ammonia_housing_emission(num_animals, barn_area, manure_urine_total_ammoniacal_nitrogen, manure_urine, tempC, hsc)
+    actual = GasEmissions.calc_ammonia_emission(num_animals, barn_area, manure_urine_total_ammoniacal_nitrogen, manure_urine, tempC, hsc)
 
     # Assert
     patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)

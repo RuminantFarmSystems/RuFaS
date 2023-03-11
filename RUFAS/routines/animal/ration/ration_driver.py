@@ -10,8 +10,10 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
-import statistics as stat
+from typing import Dict, List, Set
+import collections
 import math
+import statistics as stat
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type, user_defined_ration=False):
@@ -25,25 +27,25 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
         animal_type: string representation of the animal
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-    price = NLP.list_reconfig(available_feeds.price)
-    TDN = NLP.list_reconfig(available_feeds.TDN)
-    DE = NLP.list_reconfig(available_feeds.DE)
-    EE = NLP.list_reconfig(available_feeds.EE)
-    is_fat = NLP.list_reconfig(available_feeds.is_fat)
-    calcium = NLP.list_reconfig(available_feeds.calcium)
-    phosphorus = NLP.list_reconfig(available_feeds.phosphorus)
-    NDF = NLP.list_reconfig(available_feeds.NDF)
-    feed_type = NLP.list_reconfig(available_feeds.type)
-    is_wetforage = NLP.list_reconfig(available_feeds.is_wetforage)
-    Kd = NLP.list_reconfig(available_feeds.Kd)
-    N_A = NLP.list_reconfig(available_feeds.N_A)
-    N_B = NLP.list_reconfig(available_feeds.N_B)
-    CP = NLP.list_reconfig(available_feeds.CP)
-    dRUP = NLP.list_reconfig(available_feeds.dRUP)
+    price = NLP.list_reconfig(available_feeds['price'])
+    TDN = NLP.list_reconfig(available_feeds['TDN'])
+    DE = NLP.list_reconfig(available_feeds['DE'])
+    EE = NLP.list_reconfig(available_feeds['EE'])
+    is_fat = NLP.list_reconfig(available_feeds['is_fat'])
+    calcium = NLP.list_reconfig(available_feeds['calcium'])
+    phosphorus = NLP.list_reconfig(available_feeds['phosphorus'])
+    NDF = NLP.list_reconfig(available_feeds['NDF'])
+    feed_type = NLP.list_reconfig(available_feeds['type'])
+    is_wetforage = NLP.list_reconfig(available_feeds['is_wetforage'])
+    Kd = NLP.list_reconfig(available_feeds['Kd'])
+    N_A = NLP.list_reconfig(available_feeds['N_A'])
+    N_B = NLP.list_reconfig(available_feeds['N_B'])
+    CP = NLP.list_reconfig(available_feeds['CP'])
+    dRUP = NLP.list_reconfig(available_feeds['dRUP'])
     if cow_type:
-        limit = NLP.list_reconfig(available_feeds.lactating_cow_limit)
+        limit = NLP.list_reconfig(available_feeds['lactating_cow_limit'])
     else:
-        limit = NLP.list_reconfig(available_feeds.dry_cow_limit)
+        limit = NLP.list_reconfig(available_feeds['dry_cow_limit'])
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
                     requirements.Ca_req, requirements.P_req,
@@ -78,7 +80,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     return solution, ration_vals
 
 
-def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
+def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -134,12 +136,12 @@ def ration_formulation(pen, feed, available_feeds, animal_type, cow_type):
 
     if solution != None:
         ration = {}
-        for feed_id in range(len(available_feeds.feed_id)):
+        for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
             num = solution.x[i]
             num += solution.x[i + 1]
             num += solution.x[i + 2]
-            ration[available_feeds.feed_key[feed_id]] = round(num, 6)
+            ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
         return ration, ration_vals
@@ -270,26 +272,23 @@ class Requirements:
             for animal in pen.animals_in_pen:
                 a_type = type(animal).__name__
                 if a_type == 'HeiferI':
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, None, animal_type='heifer',
-                                                         BCS5=3, PrevTemp=15,
-                                                         ADG_heifer=animal.daily_growth,
-                                                         Age=animal.days_born
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = None, animal_type='heifer',
+                                                         body_condition_score_5=3, previous_temperature=15,
+                                                         average_daily_gain_heifer=animal.daily_growth
                                                          )
                 elif a_type == 'HeiferII' or a_type == 'HeiferIII':
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, animal.days_in_preg,
-                                                         animal_type='heifer', BCS5=3, PrevTemp=15,
-                                                         ADG_heifer=animal.daily_growth,
-                                                         Age=animal.days_born
-                                                         )
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type='heifer', body_condition_score_5=3, previous_temperature=15,
+                                                         average_daily_gain_heifer=animal.daily_growth)
                 else:
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, animal.days_in_preg,
-                                                         'cow', animal.calves, animal.CI,
-                                                         animal.mPrt, animal.fat_percent, animal.lactose_milk,
-                                                         animal.estimated_daily_milk_produced,
-                                                         animal.days_in_milk, animal.milking
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type = 'cow', parity = animal.calves, calving_interval = animal.CI,
+                                                         milk_true_protein= animal.mPrt, milk_fat = animal.fat_percent, milk_lactose = animal.lactose_milk,
+                                                         milk_production = animal.estimated_daily_milk_produced,
+                                                         days_in_milk = animal.days_in_milk, lactating = animal.milking
                                                          )
 
                 animal.NEmaint = req['NEmaint']
@@ -432,8 +431,10 @@ class AvailableFeeds:
         self.heiferI_limit = []
         # calf limit
         self.calf_limit = []
-        # list of the feeds used in this ration
-        self.feeds = []
+        # key = feed_id, val = index of that feed_id in self.feed_id list
+        self._feed_id_to_list_idx_dict = {}
+        # key = feed_id, val = index of that feed_id in self.feed_id list
+        self._feed_id_to_list_idx_dict = {}
 
     def feed_nutrients(self, feed):
         """
@@ -474,3 +475,37 @@ class AvailableFeeds:
             else:
                 self.lactating_cow_limit.append(feed['limit'])
                 self.dry_cow_limit.append(feed['limit'])
+
+    def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
+        """
+        Returns a subset of data from all the available feeds based on the
+        given set of feed ids.
+
+        Args
+        ----
+        feed_ids: a set of feed ids
+
+        Returns
+        -------
+        A dictionary that contains a subset of data from all the available feeds based on the
+        given set of feed ids
+        """
+        # An explanation of code seen below can be found in Basecamp with the following path:
+        # RuFaS > Docs & Files > Animal Module > Ration Driver Logic
+
+        if not self._feed_id_to_list_idx_dict:
+            self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
+
+        excluded_keys = ['_feed_id_to_list_idx_dict']
+        result = collections.defaultdict(list)
+        for key, vals in self.__dict__.items():
+            if key in excluded_keys:
+                continue
+            if not vals:
+                result[key] = []
+                continue
+            for feed_id in sorted(list(feed_ids)):
+                # Get the list index of the feed_id in self.feed_id list.
+                idx = self._feed_id_to_list_idx_dict[int(feed_id)]
+                result[key].append(vals[idx])
+        return result

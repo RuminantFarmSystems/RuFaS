@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUFAS.routines.manure.reception_pits package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RUFAS.routines.manure_storage package" href="RUFAS.routines.manure_storage.html" />
+    <link rel="prev" title="RUFAS.routines.manure.protocols package" href="RUFAS.routines.manure.protocols.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">GitHub</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="RUFAS.html">RUFAS package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="RUFAS.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.output_handler.html">RUFAS.output_handler package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="RUFAS.routines.html">RUFAS.routines package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.classes">RUFAS.classes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.database_reader">RUFAS.database_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.user_prompt">RUFAS.user_prompt module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fileReader.html">fileReader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">tests package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
+          <li class="breadcrumb-item"><a href="RUFAS.routines.manure.html">RUFAS.routines.manure package</a></li>
+      <li class="breadcrumb-item active">RUFAS.routines.manure.reception_pits package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/RUFAS.routines.manure.reception_pits.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rufas-routines-manure-reception-pits-package">
+<h1>RUFAS.routines.manure.reception_pits package<a class="headerlink" href="#rufas-routines-manure-reception-pits-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-RUFAS.routines.manure.reception_pits.reception_pit">
+<span id="rufas-routines-manure-reception-pits-reception-pit-module"></span><h2>RUFAS.routines.manure.reception_pits.reception_pit module<a class="headerlink" href="#module-RUFAS.routines.manure.reception_pits.reception_pit" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit.ReceptionPit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.reception_pits.reception_pit.</span></span><span class="sig-name descname"><span class="pre">ReceptionPit</span></span><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit.ReceptionPit" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for a reception pit.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit.ReceptionPit.daily_update">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">daily_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_handler_daily_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput" title="RUFAS.routines.manure.manure_handlers.manure_handler_daily_output.ManureHandlerDailyOutput"><span class="pre">ManureHandlerDailyOutput</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.pen.html#RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen" title="RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen"><span class="pre">ManureManagementPen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BaseBedding" title="RUFAS.routines.manure.beddings.bedding_classes.BaseBedding"><span class="pre">BaseBedding</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput" title="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput"><span class="pre">ReceptionPitDailyOutput</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit.ReceptionPit.daily_update" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates and stores the daily output of the reception pit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>manure_handler_daily_output: The daily output of a manure handler.
+pen: A ManureManagementPen object.
+bedding: A BaseBedding object.</p>
+</dd>
+<dt>Returns:</dt><dd><p>The daily output of the reception pit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.reception_pits.reception_pit_daily_output">
+<span id="rufas-routines-manure-reception-pits-reception-pit-daily-output-module"></span><h2>RUFAS.routines.manure.reception_pits.reception_pit_daily_output module<a class="headerlink" href="#module-RUFAS.routines.manure.reception_pits.reception_pit_daily_output" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.reception_pits.reception_pit_daily_output.</span></span><span class="sig-name descname"><span class="pre">ReceptionPitDailyOutput</span></span><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="RUFAS.routines.manure.protocols.html#RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol" title="RUFAS.routines.manure.protocols.liquid_manure_portion_protocol.LiquidManurePortionProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiquidManurePortionProtocol</span></code></a></p>
+<p>Daily output of a reception pit.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>pen_id: ID of the pen that this output is associated with.
+simulation_day: Number of days into the simulation.
+manure_urea: Urea concentration in manure, g/L.
+liquid_manure_total_ammoniacal_nitrogen: Total ammoniacal nitrogen, kg.
+liquid_manure_nitrogen: Amount of nitrogen in manure, kg.
+liquid_manure_total_solids: Total amount of solids from the manure and the bedding, kg.
+manure_degradable_volatile_solids: Amount of degradable volatile solids, kg.
+manure_non_degradable_volatile_solids: Amount of non-degradable volatile solids, kg.
+liquid_manure_total_volatile_solids: Total amount of volatile solids, kg.
+liquid_manure_phosphorus: Amount of phosphorus excreted in manure, kg.
+liquid_manure_potassium: Amount of potassium in manure, kg.
+total_daily_manure_volume: Total amount of manure, bedding, and water combined, m^3.
+liquid_manure_daily_volume: Same as total_daily_manure_volume.
+Used for satisfying the LiquidManurePortionProtocol.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_daily_volume">
+<span class="sig-name descname"><span class="pre">liquid_manure_daily_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_daily_volume" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_nitrogen" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_phosphorus">
+<span class="sig-name descname"><span class="pre">liquid_manure_phosphorus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_phosphorus" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_potassium">
+<span class="sig-name descname"><span class="pre">liquid_manure_potassium</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_potassium" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_total_ammoniacal_nitrogen">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_ammoniacal_nitrogen</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_total_ammoniacal_nitrogen" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_total_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_total_solids" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_total_volatile_solids">
+<span class="sig-name descname"><span class="pre">liquid_manure_total_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.liquid_manure_total_volatile_solids" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.manure_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">manure_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.manure_degradable_volatile_solids" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.manure_non_degradable_volatile_solids">
+<span class="sig-name descname"><span class="pre">manure_non_degradable_volatile_solids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.manure_non_degradable_volatile_solids" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.manure_urea">
+<span class="sig-name descname"><span class="pre">manure_urea</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.manure_urea" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.pen_id">
+<span class="sig-name descname"><span class="pre">pen_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.pen_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.simulation_day">
+<span class="sig-name descname"><span class="pre">simulation_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.simulation_day" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.total_daily_manure_volume">
+<span class="sig-name descname"><span class="pre">total_daily_manure_volume</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#RUFAS.routines.manure.reception_pits.reception_pit_daily_output.ReceptionPitDailyOutput.total_daily_manure_volume" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-RUFAS.routines.manure.reception_pits">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-RUFAS.routines.manure.reception_pits" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="RUFAS.routines.manure.protocols.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.protocols package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure_storage.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure_storage package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

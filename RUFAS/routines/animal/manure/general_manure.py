@@ -1,37 +1,113 @@
-def phosphorus_excreted(milk_prod, total_manure, p_feces_excrt, p_urine):
+from typing import Tuple
+from typing import TypedDict
+
+from RUFAS.general_constants import GeneralConstants
+
+
+class AnimalManureExcretions(TypedDict):
+    """A TypedDict class that specifies the structure of the dictionary of animal manure excretion values.
+
     """
-    Calculates the phosphorus excreted by the animal.
+    urea: float
+    """Concentration of urea in manure, g/L."""
 
-    Args:
-        milk_prod: daily milk production (kg) (if this function is called for
-            a non-cow animal, this value is 0
-        total_manure: amount of manure excreted by animal (kg)
-        p_feces_excrt: amount of P excreted by an animal (g)
-        p_urine: amount of P required for urine production (g)
+    urine: float
+    """Amount of urine excreted, kg."""
 
-    Returns:
-        P excreted by animal
-        WIP (water extractable inorganic P) fraction
-        WOP (water extractable organic P) fraction
+    total_ammoniacal_nitrogen_concentration: float
+    """Concentration of total ammoniacal manure_nitrogen in the manure slurry, g/L."""
+
+    urine_nitrogen: float
+    """Amount of nitrogen in urine, kg."""
+
+    manure_nitrogen: float
+    """Amount of nitrogen in manure, kg."""
+
+    manure_mass: float
+    """Amount of manure, kg."""
+
+    total_solids: float
+    """Amount of total solids, kg."""
+
+    degradable_volatile_solids: float
+    """Amount of degradable volatile solids, kg."""
+
+    non_degradable_volatile_solids: float
+    """Amount of non-degradable volatile solids, kg."""
+
+    inorganic_phosphorus_fraction: float
+    """Fraction of water extractable inorganic phosphorus, unitless."""
+
+    organic_phosphorus_fraction: float
+    """Fraction of water extractable organic phosphorus, unitless."""
+
+    phosphorus: float
+    """Amount of phosphorus excreted in manure, g."""
+
+    phosphorus_fraction: float
+    """Fraction of phosphorus in manure, unitless."""
+
+    potassium: float
+    """Amount of potassium in manure, g."""
+
+    methane: float
+    """Amount of methane emissions, g/day."""
+
+
+def calculate_phosphorus_excretion_values(daily_milk_production: float,
+                                          total_manure_excreted: float,
+                                          fecal_phosphorus: float,
+                                          urine_phosphorus_required: float) \
+        -> Tuple[float, float, float, float, float]:
+    """Calculates a set of phosphorus excretion values produced by a given animal.
+
+    Parameters
+    ----------
+    daily_milk_production : float
+        Amount of daily milk produced by the animal, kg.
+        This parameter should be set to 0 if this function is called for a non-cow animal.
+    total_manure_excreted : float
+        Amount of manure excreted by the animal, kg.
+    fecal_phosphorus : float
+        Amount of fecal phosphorus excreted by the animal, g.
+    urine_phosphorus_required : float
+        Amount of phosphorus required for urine production, g.
+
+    Returns
+    -------
+    float
+        Total amount of phosphorus excreted by the animal, g.
+    float
+        Fraction of extractable inorganic phosphorus, unitless.
+    float
+        Fraction of water extractable organic phosphorus, unitless.
+    float
+        Amount of manure phosphorus excreted, g.
+    float
+        Fraction of phosphorus in the manure, unitless.
+
     """
     # P fraction of manure (A.3.A.1)
-    p_frac = (p_feces_excrt + p_urine) / (total_manure * 1000)
+    manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
+            total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
 
     # Water extractable Inorganic P (WIP) fraction - fraction of manure
-    # compromised of inorganic water extractable P (A.3.A.2)
-    WIP_frac = 0.50 * p_frac
+    # compromised of inorganic water extractable P [A.3.A.2]
+    inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
 
     # Water extractable Organic P (WOP) fraction - fraction of maure
-    # compromised of organic water extractable P (A.3.A.3)
-    WOP_frac = 0.05 * p_frac
+    # compromised of organic water extractable P [A.3.A.3]
+    # TODO: Is it 0.05 or 0.50?
+    organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
 
-    # amount of P in milk per animal (g) (A.3E.B.1)
-    p_milk = 0.0009 * milk_prod * 1000
+    # amount of P in milk per animal (g) [A.3E.B.1]
+    phosphorus_in_milk = 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
 
-    # manure P excretion for manure module input (g) (A.3.B.2)
-    p_excrt_manure = p_feces_excrt + p_urine
-    
-    # amount of P excreted by an animal (g) (A.3.B.3)
-    p_excrt = p_milk + p_feces_excrt + p_urine
-    
-    return p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac
+    # manure P excretion for manure module input (g) [A.3.B.2]
+    manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
+
+    # amount of P excreted by an animal (g) [A.3.B.3]
+    total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
+
+    return (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
+            manure_phosphorus_excreted, manure_phosphorus_fraction)

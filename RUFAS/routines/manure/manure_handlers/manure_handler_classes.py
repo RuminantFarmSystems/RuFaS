@@ -15,12 +15,16 @@ from typing import Dict
 from typing import Optional
 from typing import Type
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+
+
+om = OutputManager()
 
 
 class ManureHandlerType(DefaultEnum):
@@ -54,19 +58,37 @@ class BaseManureHandler:
                 specific to the choice of manure handler.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    "weather": vars(weather),
+                    "time": vars(time),
+                    "config": vars(manure_handler_config),
+                    }
+
         self.weather = weather
         self.time = time
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
+
+        om.add_variable("milking_parlor", vars(self.milking_parlor), info_map)
 
     def _get_current_day_average_temperature_in_celsius(self) -> float:
         """Gets the average temperature of the day, in Celsius.
 
         Returns:
             The average temperature of the day, in Celsius.
-
         """
-        return self.weather.T_avg[self.time.year - 1][self.time.day - 1]
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._get_current_day_average_temperature_in_celsius.__name__,
+                    }
+
+        avg_temp = self.weather.T_avg[self.time.year - 1][self.time.day - 1]
+
+        om.add_variable(
+            "current_day_average_temperature_in_celsius", avg_temp, info_map)
+
+        return avg_temp
 
     def daily_update(self,
                      pen: ManureManagementPen,
@@ -84,37 +106,48 @@ class BaseManureHandler:
 
         Returns:
             A ManureHandlerDailyOutput object.
-
         """
-        NH3_housing_emission = GasEmissions.calc_ammonia_housing_emission(
-                num_animals=pen.num_animals,
-                barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-                manure_urine_total_ammoniacal_nitrogen=pen.manure.urine_ammoniacal_nitrogen,  # kg/animal
-                manure_urine=pen.manure.urine / pen.num_animals,  # kg/animal
-                temperature_celsius=self._get_current_day_average_temperature_in_celsius()
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.daily_update.__name__,
+                    "bedding": vars(bedding),
+                    "sim_day": sim_day, }
+
+        NH3_housing_emission = GasEmissions.calc_ammonia_emission(
+            num_animals=pen.num_animals,
+            barn_area=pen.barn_area_from_pen_type,  # m^2/animal
+            total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg/animal
+            mass=pen.manure.urine / pen.num_animals,  # kg/animal
+            temperature_celsius=self._get_current_day_average_temperature_in_celsius()
         )
         daily_output = ManureHandlerDailyOutput(
-                simulation_day=sim_day,
-                pen_id=pen.id,
-                manure_urea=pen.manure.urea,
-                liquid_manure_total_ammoniacal_nitrogen=(
-                    max(0.0, pen.manure.total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
-                liquid_manure_nitrogen=pen.manure.nitrogen,
-                liquid_manure_total_solids=pen.manure.total_solids,
-                manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
-                manure_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
-                liquid_manure_phosphorus=pen.manure.phosphorus,
-                liquid_manure_potassium=pen.manure.potassium,
-                housing_methane=GasEmissions.calc_methane_housing_emission(pen.num_animals, pen.barn_area_from_pen_type),
-                housing_carbon_dioxide=GasEmissions.calc_carbon_dioxide_housing_emission(pen.num_animals, pen.barn_area_from_pen_type),
-                housing_ammonia=NH3_housing_emission,
-                manure_volume=pen.manure.manure_volume,
-                cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
-                total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals),
-                total_water_volume_in_milking_parlor=(
-                    self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
-                tempC=self._get_current_day_average_temperature_in_celsius()
+            simulation_day=sim_day,
+            pen_id=pen.id,
+            manure_urea=pen.manure.urea,
+            liquid_manure_total_ammoniacal_nitrogen=(
+                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
+            liquid_manure_nitrogen=pen.manure.nitrogen,
+            liquid_manure_total_solids=pen.manure.total_solids,
+            manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
+            manure_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
+            liquid_manure_phosphorus=pen.manure.phosphorus,
+            liquid_manure_potassium=pen.manure.potassium,
+            housing_methane=GasEmissions.calc_methane_housing_emission(
+                pen.num_animals, pen.barn_area_from_pen_type),
+            housing_carbon_dioxide=GasEmissions.calc_carbon_dioxide_housing_emission(
+                pen.num_animals, pen.barn_area_from_pen_type),
+            housing_ammonia=NH3_housing_emission,
+            manure_volume=pen.manure.manure_volume,
+            cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
+                pen.num_animals),
+            total_bedding_volume=bedding.calc_total_bedding_volume(
+                pen.num_animals),
+            total_water_volume_in_milking_parlor=(
+                self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
+            tempC=self._get_current_day_average_temperature_in_celsius()
         )
+
+        om.add_variable("daily_output", vars(daily_output), info_map)
+
         return daily_output
 
     def calc_cleaning_water_volume_in_main_barn(self, num_animals: int) -> float:
@@ -127,7 +160,17 @@ class BaseManureHandler:
             Volume of cleaning water needed for the given pen, L.
 
         """
-        return num_animals * self.config.cleaning_water_use_rate
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
+                    }
+
+        clean_water_volume = num_animals * self.config.cleaning_water_use_rate
+
+        om.add_variable(
+            "cleaning_water_volume_in_main_barn", clean_water_volume, info_map)
+
+        return clean_water_volume
 
 
 class FlushSystem(BaseManureHandler):
@@ -179,13 +222,13 @@ class DefaultManureHandlerConfigFactory:
     """Class for creating default manure handler configurations."""
 
     FLUSH_SYSTEM_CONFIG = ManureHandlerConfig(
-            cleaning_water_use_rate=757.0,
+        cleaning_water_use_rate=757.0,
     )
     MANUAL_SCRAPING_CONFIG = ManureHandlerConfig(
-            cleaning_water_use_rate=10.0,
+        cleaning_water_use_rate=10.0,
     )
     ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
-            cleaning_water_use_rate=10.0,
+        cleaning_water_use_rate=10.0,
     )
 
     @classmethod
@@ -199,12 +242,21 @@ class DefaultManureHandlerConfigFactory:
             A default ManureHandlerConfig object for the given manure handler type.
 
         """
+        info_map = {"class": cls.__name__,
+                    "function": cls.get_instance.__name__,
+                    }
+
         manure_handler_config_by_type = {
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
             ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG
         }
-        return manure_handler_config_by_type[manure_handler_type]
+
+        manure_handler_config = manure_handler_config_by_type[manure_handler_type]
+        om.add_variable("manure_handler_config",
+                        vars(manure_handler_config), info_map)
+
+        return manure_handler_config
 
 
 class ManureHandlerFactory:
@@ -236,12 +288,19 @@ class ManureHandlerFactory:
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
         }
 
-        manure_handler_type = ManureHandlerType.get_type(manure_handler_type_name)
+        manure_handler_type = ManureHandlerType.get_type(
+            manure_handler_type_name)
         manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
         if custom_manure_handler_config:
-            return manure_handler_class(weather, time, custom_manure_handler_config)
+            manure_handler_subtype = manure_handler_class(
+                weather, time, custom_manure_handler_config)
+
+            return manure_handler_subtype
         else:
             default_manure_handler_config = DefaultManureHandlerConfigFactory.get_instance(
-                    manure_handler_type)
-            return manure_handler_class(weather, time, default_manure_handler_config)
+                manure_handler_type)
+            manure_handler_subtype = manure_handler_class(
+                weather, time, default_manure_handler_config)
+
+            return manure_handler_subtype
