@@ -306,7 +306,8 @@ class Cow(HeiferIII):
         csvline = [self.id, self.body_weight, self.CI, self.DMIest, self.Ca_req, self.days_in_milk,
                     self.days_born, self.days_in_preg]
         import csv
-        with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/test.csv', 'a', newline='') as file:
+        #with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/test.csv', 'a', newline='') as file:
+        with open('C:/Users/joecw/RUFAS/NASEM.csv', 'a', newline='') as file:
             csvout = csv.writer(file)
             csvout.writerow(csvline)
         # JCW PRINTING
