@@ -144,7 +144,7 @@ class Fertilizer:
         Returns:
             Dictionary with amounts of phosphorus lost to runoff and soil absorption (both in kg)
         """
-        phosphorus_in_mg = phosphorus_pool * (1 / KILOGRAMS_TO_MILLIGRAMS)
+        phosphorus_in_mg = phosphorus_pool * KILOGRAMS_TO_MILLIGRAMS
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
         rainfall_in_liters = rainfall * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
             (1 / LITERS_TO_CUBIC_MILLIMETERS)

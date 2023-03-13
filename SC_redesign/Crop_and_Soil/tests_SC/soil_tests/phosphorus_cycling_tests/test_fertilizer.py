@@ -97,7 +97,6 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
 
     observe = fert._absorb_phosphorus_from_available_pool()
 
-    # fert._add_to_labile_phosphorus.assert_called_with(amount_to_remove, field_size)
     fert._determine_fraction_phosphorus_remaining.assert_called_with(fert.data.cover_factor,
                                                                      days_since_application)
     assert observe == amount_to_remove
@@ -110,7 +109,7 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
     (10, 13, 2, 9, 0.818, 0.95),
     (17, 21, 3, 11, 1.3, 3.45)
 ])
-def test_leach_phosphorus(pool_amount: float, days_since_application: float,
+def test_leach_phosphorus(pool_amount: float, days_since_application: int,
                           rainfall_events: int, rainfall: float, runoff: float, field_size: float) -> None:
     """Tests that the correct amounts of phosphorus to be removed by runoff and soil absorption are calculated."""
     data = SoilData(days_since_application=days_since_application,
@@ -127,7 +126,7 @@ def test_leach_phosphorus(pool_amount: float, days_since_application: float,
     pool_amount_mg = pool_amount * 1000000
     solubilized_amount = pool_amount * fert.data.solubilizing_factor
     concentration = 0.05  # Matches what is mocked for _determine_dissolved_phosphorus_concentration()
-    rainfall_liters = rainfall * field_size * 10000
+    rainfall_liters = rainfall * (field_size * 10000000000) * (1 / 1000000)
     runoff_liters = runoff * field_size * 10000
     dissolved_phosphorus_runoff_mg = runoff_liters * concentration
     dissolved_phosphorus_runoff_kg = dissolved_phosphorus_runoff_mg / 1000000
@@ -136,9 +135,10 @@ def test_leach_phosphorus(pool_amount: float, days_since_application: float,
 
     observed = fert._determine_leached_phosphorus(rainfall, runoff, field_size, pool_amount)
 
-    fert._determine_phosphorus_distribution_factor.assert_called_with(rainfall, runoff)
-    fert._determine_dissolved_phosphorus_concentration(pool_amount_mg, fert.data.solubilizing_factor, 0.05,
-                                                       rainfall_liters)
+    fert._determine_phosphorus_distribution_factor.assert_called_once_with(rainfall, runoff)
+    fert._determine_dissolved_phosphorus_concentration.assert_called_once_with(pool_amount_mg,
+                                                                               fert.data.solubilizing_factor, 0.05,
+                                                                               rainfall_liters)
     assert observed == pytest.approx(expected)
 
 
@@ -175,11 +175,11 @@ def test_update_before_and_at_first_rain(rainfall: float, runoff: float, field_s
         assert fert._determine_leached_phosphorus.call_count == 0
         assert fert.data.available_phosphorus_pool == full_available_pool
     elif rainfall and not runoff and not days_since_application:
-        fert._add_to_labile_phosphorus.assert_called_with(available_pool, field_size)
+        fert._add_to_labile_phosphorus.assert_called_once_with(available_pool, field_size)
         assert fert.data.available_phosphorus_pool == 0
     elif rainfall and runoff and not days_since_application:
-        fert._determine_leached_phosphorus.assert_called_with(rainfall, runoff, field_size, available_pool)
-        fert._add_to_labile_phosphorus.assert_called_with(0.5 * available_pool, field_size)
+        fert._determine_leached_phosphorus.assert_called_once_with(rainfall, runoff, field_size, available_pool)
+        fert._add_to_labile_phosphorus.assert_called_once_with(0.5 * available_pool, field_size)
         assert fert.data.annual_runoff_fertilizer_phosphorus == 0.5 * available_pool
         assert fert.data.available_phosphorus_pool == 0
 
@@ -211,13 +211,15 @@ def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rai
         assert fert._determine_leached_phosphorus.call_count == 0
         assert fert.data.recalcitrant_phosphorus_pool == recalcitrant_pool
     elif rainfall and not runoff:
-        fert._add_to_labile_phosphorus.assert_called_with(recalcitrant_pool * fert.data.solubilizing_factor, field_size)
+        fert._add_to_labile_phosphorus.assert_called_once_with(recalcitrant_pool * fert.data.solubilizing_factor,
+                                                               field_size)
         assert fert.data.recalcitrant_phosphorus_pool == \
                (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
     else:
-        fert._determine_leached_phosphorus.assert_called_with(rainfall, runoff, field_size, recalcitrant_pool)
-        fert._add_to_labile_phosphorus.assert_called_with(0.5 * (recalcitrant_pool * fert.data.solubilizing_factor),
-                                                          field_size)
+        fert._determine_leached_phosphorus.assert_called_once_with(rainfall, runoff, field_size, recalcitrant_pool)
+        fert._add_to_labile_phosphorus.assert_called_once_with(0.5 *
+                                                               (recalcitrant_pool * fert.data.solubilizing_factor),
+                                                               field_size)
         assert fert.data.recalcitrant_phosphorus_pool == \
                (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
 
@@ -262,7 +264,7 @@ def test_add_fertilizer_phosphorus(available_pool: float, full_available_pool: f
     (3, 7, 0, 0, 2.3),  # No rainfall, no rain events, after day of application
     (0, 5, 13, 0, 4),  # First rainfall, after day of application
     (2, 3, 17, 4, 1.8),  # Not first rainfall, after day of application
-    (3, 8, 0, 0, 2.1),    # No rainfall, some rain events, after day of application
+    (3, 8, 0, 0, 2.1),  # No rainfall, some rain events, after day of application
 ])
 def test_do_fertilizer_phosphorus_operations(rain_events: int, days_since_application: int, rainfall: float,
                                              runoff: float, field_size: float) -> None:
