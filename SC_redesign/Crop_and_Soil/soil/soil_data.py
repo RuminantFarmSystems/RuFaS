@@ -160,7 +160,6 @@ class SoilData:
         self.annual_eroded_sediment_total = 0
         self.annual_surface_runoff_total = 0
 
-
         # Reset phosphorus fertilizer total
         self.annual_runoff_fertilizer_phosphorus = 0
 
