@@ -1,6 +1,8 @@
-from SC_redesign.Crop_and_Soil.crop.root_development import *
+from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.crop_data import PlantCategory
 import pytest
+
 
 # ---- Test Static Functions ----
 @pytest.mark.parametrize("heatfrac,expect", [

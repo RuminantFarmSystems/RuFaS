@@ -6,6 +6,8 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 """
 This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)
 """
+
+
 class SoilTemp:
 
     def __init__(self, soil_data: Optional[SoilData] = None):
@@ -193,8 +195,9 @@ class SoilTemp:
             (1 - cover_weighting_factor) * bare_soil_surface_temp
 
     @staticmethod
-    def _determine_average_soil_temperature(prev_temperature_effect: float, previous_day_soil_temp: float, depth_factor: float,
-                                            avg_annual_air_temp: float, soil_surface_temp: float) -> float:
+    def _determine_average_soil_temperature(prev_temperature_effect: float, previous_day_soil_temp: float,
+                                            depth_factor: float, avg_annual_air_temp: float,
+                                            soil_surface_temp: float) -> float:
         """calculates daily average soil temperature at center of a given soil layer
 
         Args:

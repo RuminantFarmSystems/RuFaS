@@ -73,7 +73,7 @@ def test_species_factory_defaults():
 
     # ---- corn ----
     corn = CropSpeciesDataFactory.create_species_data(CropSpecies("corn"), id=12)
-    assert corn.species == "corn"  
+    assert corn.species == "corn"
     assert corn.name == "default corn"
     assert corn.id == 12
     assert corn.plant_code == "CORN"
@@ -102,7 +102,7 @@ def test_species_factory_defaults():
 
     # ---- spring wheat ----
     spring_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("spring_wheat"), id=85)
-    assert spring_wheat.species == "spring_wheat"  
+    assert spring_wheat.species == "spring_wheat"
     assert spring_wheat.name == "default spring_wheat"
     assert spring_wheat.id == 85
     assert spring_wheat.plant_code == "SWHT"
@@ -131,7 +131,7 @@ def test_species_factory_defaults():
 
     # ---- winter wheat ----
     winter_wheat = CropSpeciesDataFactory.create_species_data(CropSpecies("winter_wheat"), id=1000)
-    assert winter_wheat.species == "winter_wheat"  
+    assert winter_wheat.species == "winter_wheat"
     assert winter_wheat.name == "default winter_wheat"
     assert winter_wheat.id == 1000
     assert winter_wheat.plant_code == "WWHT"
@@ -160,7 +160,7 @@ def test_species_factory_defaults():
 
     # ---- cereal rye ----
     cereal_rye = CropSpeciesDataFactory.create_species_data(CropSpecies("cereal_rye"), id=123)
-    assert cereal_rye.species == "cereal_rye"  
+    assert cereal_rye.species == "cereal_rye"
     assert cereal_rye.name == "default cereal_rye"
     assert cereal_rye.id == 123
     assert cereal_rye.plant_code == "RYE"
@@ -189,7 +189,7 @@ def test_species_factory_defaults():
 
     # ---- spring barley ----
     spring_barley = CropSpeciesDataFactory.create_species_data(CropSpecies("spring_barley"), id=42)
-    assert spring_barley.species == "spring_barley"  
+    assert spring_barley.species == "spring_barley"
     assert spring_barley.name == "default spring_barley"
     assert spring_barley.id == 42  # this is everything
     assert spring_barley.plant_code == "BARL"
@@ -218,7 +218,7 @@ def test_species_factory_defaults():
 
     # ---- fall oats ----
     fall_oats = CropSpeciesDataFactory.create_species_data(CropSpecies("fall_oats"), id=9001)
-    assert fall_oats.species == "fall_oats"  
+    assert fall_oats.species == "fall_oats"
     assert fall_oats.name == "default fall_oats"
     assert fall_oats.id == 9001  # it is, indeed, over 9000
     assert fall_oats.plant_code == "OATS"
@@ -247,7 +247,7 @@ def test_species_factory_defaults():
 
     # ---- tall fescue ----
     tall_fescue = CropSpeciesDataFactory.create_species_data(CropSpecies("tall_fescue"), id=-1)
-    assert tall_fescue.species == "tall_fescue"  
+    assert tall_fescue.species == "tall_fescue"
     assert tall_fescue.name == "default tall_fescue"
     assert tall_fescue.id == -1  # who would do this?
     assert tall_fescue.plant_code == "FESC"
@@ -276,7 +276,7 @@ def test_species_factory_defaults():
 
     # ---- alfalfa ----
     alfalfa = CropSpeciesDataFactory.create_species_data(CropSpecies("alfalfa"), id=7)
-    assert alfalfa.species == "alfalfa"  
+    assert alfalfa.species == "alfalfa"
     assert alfalfa.name == "default alfalfa"
     assert alfalfa.id == 7
     assert alfalfa.plant_code == "ALFA"
@@ -305,7 +305,7 @@ def test_species_factory_defaults():
 
     # ---- soybeans ----
     soybean = CropSpeciesDataFactory.create_species_data(CropSpecies("soybean"), id=999)
-    assert soybean.species == "soybean"  
+    assert soybean.species == "soybean"
     assert soybean.name == "default soybean"
     assert soybean.id == 999
     assert soybean.plant_code == "SOYB"
@@ -334,7 +334,7 @@ def test_species_factory_defaults():
 
     # ---- sugar beet ----
     sugar_beet = CropSpeciesDataFactory.create_species_data(CropSpecies("sugar_beet"), id=5)
-    assert sugar_beet.species == "sugar_beet"  
+    assert sugar_beet.species == "sugar_beet"
     assert sugar_beet.name == "default sugar_beet"
     assert sugar_beet.id == 5
     assert sugar_beet.plant_code == "SGBT"
@@ -363,7 +363,7 @@ def test_species_factory_defaults():
 
     # ---- potato ----
     potato = CropSpeciesDataFactory.create_species_data(CropSpecies("potato"), id=2)
-    assert potato.species == "potato"  
+    assert potato.species == "potato"
     assert potato.name == "default potato"
     assert potato.id == 2
     assert potato.plant_code == "POTA"
@@ -398,7 +398,8 @@ def test_manual_custom_crop_data():
     """checks (and demonstrates) the alternate way of customizing a crop"""
     # setup custom crop
     aspen = CropData(name="custom crop: aspen", species="aspen", scientific_name="Populus tremuloides",
-                     plant_code="PTREM", plant_category=PlantCategory("tree"), is_nitrogen_fixer=False, max_leaf_area_index=5.0)
+                     plant_code="PTREM", plant_category=PlantCategory("tree"), is_nitrogen_fixer=False,
+                     max_leaf_area_index=5.0)
 
     # check that each attribute is set appropriately
     assert aspen.name == "custom crop: aspen"
@@ -418,7 +419,7 @@ def test_manual_custom_crop_data():
                       "min_harvest_index": 0.98}),
     ("cereal_rye", {"biomass": 100}),  # change attribute declared only in CropData
     ("spring_barley", {"name": "fancy barley",  # custom new variety/subspecies
-                       "plant_code": "FBAR", "scientific_name" : "Hordeum vulgare regalis"}),
+                       "plant_code": "FBAR", "scientific_name": "Hordeum vulgare regalis"}),
     ("fall_oats", {"plant_category": PlantCategory("perennial")}),  # perennial version of oats
     ("tall_fescue", {"is_nitrogen_fixer": True}),  # magical nitrogen-fixing grass (egads!)
     ("alfalfa", {"yield_nitrogen_fraction": 0.03}),  # this alfalfa has increased nitrogen in harvest
@@ -481,4 +482,3 @@ def test_is_perennial(plant_type: PlantCategory) -> None:
 
     # Check results
     assert observe == expect
-

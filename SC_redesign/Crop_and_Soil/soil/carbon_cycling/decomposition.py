@@ -1,11 +1,11 @@
 import math
-from typing import Optional, List
+from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 # TODO: the equations for this model, referenced in the soil psuedocode, are derived from the excel file
 #   located on basecamp: https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358
-#   but the meaning (and validity) of the terms is extremely unclear from either source. The 
+#   but the meaning (and validity) of the terms is extremely unclear from either source. The
 #   documentation cannot be adequately completed without a better understanding of these methods.
 class Decomposition:
     def __init__(self, soil_data: Optional[SoilData] = None):

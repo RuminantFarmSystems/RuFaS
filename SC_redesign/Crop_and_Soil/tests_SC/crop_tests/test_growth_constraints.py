@@ -1,4 +1,5 @@
-from SC_redesign.Crop_and_Soil.crop.growth_constraints import *
+from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 import pytest
 from math import exp
 

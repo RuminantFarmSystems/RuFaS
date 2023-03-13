@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
 to represent its soil
