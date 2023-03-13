@@ -1,8 +1,7 @@
-from typing import Optional
+from typing import Optional, List, Dict
 from dataclasses import dataclass
 from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
-
 
 
 @dataclass(kw_only=True)
@@ -17,7 +16,7 @@ class FieldData:
 
     # --- Crop management Variables ---
     use_scheduled_harvest: bool = True
-    """Should harvesting be done according to user-defined schedule? False will trigger the alternative: heat unit 
+    """Should harvesting be done according to user-defined schedule? False will trigger the alternative: heat unit
     scheduling, whereby harvest operations are conducted to maximize yield (based on heat unit accumulation)."""
     is_planting_day: bool = False
     """is today the day to plant new crops?"""
@@ -38,6 +37,9 @@ class FieldData:
     """Threshold daylength to initiate dormancy in a plant (hours)"""
     current_residue: float = 0
     """total amount of residue on the current day (kg per hectare)"""
+    current_crop_config: Optional[List[Dict]] = None
+    """list of dictionaries to configure crops to be planted in the field. The dicts should contain
+    attribute-value pairs, with attributes matching those of CropData."""
 
     # --- Field-level Variables ---
     evaporation: Optional[float] = None
@@ -47,7 +49,7 @@ class FieldData:
     max_transpiration: Optional[float] = None  # TODO: should probably not default to None
     """maximum possible amount of water that could be lost to transpiration in the field for the current day (mm)"""
     max_evapotranspiration: Optional[float] = None  # TODO: should probably not default to None
-    """maximum possible amount of water that could be lost to evapotranspiration in the field for the current day 
+    """maximum possible amount of water that could be lost to evapotranspiration in the field for the current day
     (mm)"""
     potential_evapotranspiration_adjusted: Optional[float] = None  # TODO, needed?
     """adjusted max evapotranspiration (mm)"""

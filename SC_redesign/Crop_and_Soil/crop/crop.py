@@ -100,16 +100,3 @@ class Crop:
         self.growth_constraints.constrain_growth(max_transpiration, mean_air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
-
-    # ---- Crop Management Methods
-    @classmethod
-    def plant_species(cls, species) -> Crop:
-        """creates a crop instance with attributes determined by the species of the crop.
-
-        Details: species attributes are read from species configuration files/classes
-        """
-        pass
-
-    def reset_perennial(self):
-        """resets some attributes for perennial crops at the start of the new growing season"""
-        pass
