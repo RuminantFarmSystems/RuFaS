@@ -366,12 +366,17 @@ class Field:
         # TODO: track snow cover on soil surface somewhere - Issue #317
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
         # TODO: figure out how to determine minimum cover management factor when there are multiple crops in the field
-        self.soil.daily_soil_water_routine(current_weather.rainfall, 1, self.field_data.seasonal_high_water_table,
-                                           current_weather.incoming_light, current_weather.max_air_temperature,
-                                           current_weather.min_air_temperature, current_weather.mean_air_temperature,
-                                           self._determine_total_above_ground_biomass(),
-                                           self.field_data.current_residue, current_weather.snow_fall,
-                                           total_initial_canopy_free_water, 0.2)
+        self.soil.daily_soil_water_routine(rainfall=current_weather.rainfall, weighting_coefficient=1,
+                                           has_seasonal_high_water_table=self.field_data.seasonal_high_water_table,
+                                           solar_radiation=current_weather.incoming_light,
+                                           max_air_temp=current_weather.max_air_temperature,
+                                           min_air_temp=current_weather.min_air_temperature,
+                                           avg_air_temp=current_weather.mean_air_temperature,
+                                           above_ground_biomass=self._determine_total_above_ground_biomass(),
+                                           residue=self.field_data.current_residue,
+                                           snow_water_content=current_weather.snow_fall,
+                                           initial_canopy_free_water=total_initial_canopy_free_water,
+                                           minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
 
     def _determine_total_above_ground_biomass(self) -> float:
