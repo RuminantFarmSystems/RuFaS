@@ -2,12 +2,12 @@ from __future__ import annotations
 from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
+from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
 
 
 class Soil:
@@ -20,6 +20,7 @@ class Soil:
 
         Details:
             If no SoilData object is passed, default configuration is used.
+
         """
         self.data = soil_data or SoilData()
         """object that tracks all soil variable throughout the simulation"""
@@ -35,6 +36,8 @@ class Soil:
         """Process component that tracks and updates the temperatures within the soil profile"""
         self.soil_erosion = SoilErosion(self.data)
         """Process component that track erosion from the soil profile"""
+        self.fertilizer_phosphorus = Fertilizer(self.data)
+        """Process component that tracks fertilizer added to the soil via """
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
@@ -65,7 +68,7 @@ class Soil:
                                  max_air_temp: float, min_air_temp: float,
                                  avg_air_temp: float, above_ground_biomass: float, residue: float,
                                  snow_water_content: float, initial_canopy_free_water: float,
-                                 minimum_cover_management_factor: float) -> None:
+                                 minimum_cover_management_factor: float, field_size: float) -> None:
         """this method calls all water related daily update routines
 
         Args:
@@ -83,6 +86,7 @@ class Soil:
             initial_canopy_free_water: initial amount of free water held in canopy on a given day (mm)
             minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
                 to land cover/plant (unitless)
+            field_size: size of the field (ha)
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient)
         self.percolation.percolate(has_seasonal_high_water_table)
@@ -90,3 +94,6 @@ class Soil:
                                                  above_ground_biomass, residue, snow_water_content,
                                                  initial_canopy_free_water)
         self.soil_erosion.erode(minimum_cover_management_factor, residue)
+        self.fertilizer_phosphorus.do_fertilizer_phosphorus_operations(rainfall,
+                                                                       self.data.accumulated_runoff * field_size,
+                                                                       field_size)
