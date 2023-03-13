@@ -1,7 +1,17 @@
+from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List
 
-# TODO: defaults need to be reviewed and updated. See the SWAT crop database for values
+
+class PlantCategory(Enum):
+    """Enum of all plant types supported by RuFaS. Listed for supported plant types in SWAT Appendix A, table A-1"""
+    WARM_ANNUAL_LEGUME = "warm_annual_legume"
+    COOL_ANNUAL_LEGUME = "cool_annual_legume"
+    PERENNIAL_LEGUME = "perennial_legume"
+    WARM_ANNUAL = "warm_annual"
+    COOL_ANNUAL = "cool_annual"
+    PERENNIAL = "perennial"
+    TREE = "tree"
 
 
 @dataclass(kw_only=True)
@@ -28,14 +38,18 @@ class CropData:
     """4-letter plant code (used by SWAT)"""
     scientific_name: Optional[str] = None
     """taxonomic name of the plant"""
-    is_perennial: bool = False
-    """is the plant perennial?"""
+    plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
+    """Classification of the plant (Reference SWAT crop.dat file, IDC variable"""
+    is_perennial: Optional[bool] = False
+    """is this plant perennial?"""
     is_nitrogen_fixer: bool = False
     """is the plant a nitrogen fixer?"""
     priority: int = 1
     """this crop's priority level when accessing shared resources in a field containing multiple crops"""
     field_proportion: float = 1.0
     """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
+    is_alive: bool = True
+    """is the crop currently alive in the field?"""
 
     # SWAT Table A-3
     minimum_temperature: float = 0
@@ -47,16 +61,16 @@ class CropData:
     max_leaf_area_index: float = 4.0
     """maximum leaf area index for the plant (unitless)"""
     first_heat_fraction_point: float = 0.15
-    """fraction of the growing season corresponding to the first point on the optimal leaf development 
+    """fraction of the growing season corresponding to the first point on the optimal leaf development
     curve (unitless)"""
     first_leaf_fraction_point: float = 0.01
-    """fraction of max leaf area index corresponding to the first point on the optimal leaf development 
+    """fraction of max leaf area index corresponding to the first point on the optimal leaf development
     curve (unitless)"""
     second_heat_fraction_point: float = 0.50
-    """fraction of the growing season corresponding to the second point on the optimal leaf development 
+    """fraction of the growing season corresponding to the second point on the optimal leaf development
     curve (unitless)"""
     second_leaf_fraction_point: float = 0.95
-    """fraction of max leaf area index corresponding to the second point on the optimal leaf development 
+    """fraction of max leaf area index corresponding to the second point on the optimal leaf development
         curve (unitless)"""
     senescent_heat_fraction: float = 0.9
     """the fraction of potential heat units above which the plant goes enters senescence (unitless)"""
@@ -70,8 +84,9 @@ class CropData:
 
     # SWAT Table A-6
     minimum_cover_management_factor: float = 0.2
-    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT 
-        Reference: 4:1.1.11)"""
+    """minimum value for cover and management factor for water erosion applicable to land cover/plant (unitless) (SWAT
+        Reference: 4:1.1.11)
+    """
 
     # SWAT Table A-7
     emergence_nitrogen_fraction: float = 0.05
@@ -94,9 +109,9 @@ class CropData:
     min_harvest_index: float = 0.2
     """expected species-specific harvest index for the plant under drought conditions; represents minimum harvest index
     allowed for the plant (unitless)"""
-    yield_nitrogen_fraction: float = 0.2
+    yield_nitrogen_fraction: Optional[float] = 0.2
     """crop-specific expected fraction of nitrogen in yield (unitless)"""
-    yield_phosphorus_fraction: float = 0.003
+    yield_phosphorus_fraction: Optional[float] = 0.003
     """crop-specific expected fraction of phosphorus in yield (unitless)"""
 
     # ---- biomass allocation
@@ -122,7 +137,7 @@ class CropData:
     """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     root_biomass: Optional[float] = None
     """biomass stored in roots (kg/ha)"""
-    
+
     # ---- growth constraints
     water_uptake: float = 18
     """water taken up by the plant for the day (mm)"""
@@ -134,8 +149,6 @@ class CropData:
     """phosphorus stored in plant biomass (kg/ha)"""
     optimal_phosphorus: float = 80
     """optimal amount of phosphorus stored in the plant for the current growth stage (kg/ha)"""
-
-    ##growth_factor: float = 1.0  # duplicate
     water_stress: Optional[float] = None
     """water stress for the day (unitless; [0, 1])"""
     temp_stress: Optional[float] = None
@@ -146,17 +159,19 @@ class CropData:
     """phosphorus stress for the day (unitless; [0, 1])"""
 
     # ---- heat_units
-    ##minimum_temperature: float = 20 # duplicate
     maximum_temperature: float = 38
     """maximum temperature above which plant growth cannot occur (Celsius)"""
     potential_heat_units: float = 800
     """total heat units required for the plant to reach maturity (unitless)"""
     accumulated_heat_units: float = 0  # accumulator
     """total heat units accumulated to date (unitless)"""
-    is_growing: bool = True  # TODO: not currently using; SWAT 5:2.1.4
+    is_growing: bool = True
+    # TODO: not currently used; SWAT 5:2.1.4 (pretty sure this is a section, not equation, reference)
     """is the crop currently growing?"""
+    is_dormant: bool = False
+    """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
-    """should the alternative heat unit method be used? 
+    """should the alternative heat unit method be used?
     Determines if heat unit temperature will be used for heat unit  accumulation."""
     new_heat_units: Optional[float] = None
     """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
@@ -172,15 +187,8 @@ class CropData:
     """fraction of potential heat units on the previous day (unitless)"""
 
     # ---- leaf area index
-    # fixed attributes (unchanged during simulations)
     max_canopy_height: float = 2.5  # m
     """maximum canopy height for the plant (m)"""
-    ##growth_factor = 1.0  #duplicate
-
-    # variable attributes (change throughout simulations)
-    ##leaf_area_index = 0 # duplicate
-    ##heat_fraction = 0.73 # duplicate
-    # empty variables
     _lai_shapes: Optional[float] = None
     """shape coefficients used to calculate fraction of max leaf area index (unitless)."""
     optimal_leaf_area_fraction: Optional[float] = None
@@ -197,7 +205,6 @@ class CropData:
     """optimal leaf area fraction on the previous day (unitless)"""
 
     # ---- nitrogen incorporation
-    # constant declarations with defaults (unchanged during simulations)
     half_mature_heat_fraction: float = 0.5
     """expected fraction of potential heat units when the plant is half-way to maturity (unitless)"""
     mature_heat_fraction: float = 1.0
@@ -206,23 +213,14 @@ class CropData:
     """expected fraction of plant biomass comprised of nitrogen for the plant at near-maturity (unitless)"""
     nitrogen_distro_param: float = 10
     """nitrogen uptake distribution parameter (unitless)"""
-
-    # current declarations with defaults (change throughout simulations)
-    # TODO: what module sets/updates these variables?
-    ##nitrogen = 0 # duplicate
-    ##heat_fraction = 0.73  # duplicate
-    ##biomass = 12.5  # duplicate
-    ##biomass_growth_max = 100  # duplicate
     root_depth: float = 1  # arbitrary
     """current depth of the plant roots in the soil (mm)"""
-    # empty declarations
     nitrogen_shapes: Optional[List[float]] = None
     """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
     previous_nitrogen: Optional[float] = None
     """nitrogen stored in plant biomass on the previous day (kg/ha)"""
     optimal_nitrogen_fraction: Optional[float] = None
     """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
-    ##optimal_nitrogen = None # duplicate
     potential_nitrogen_uptake: Optional[float] = None
     """potential nitrogen to be taken up by the plant under ideal circumstances for the current day (kg/ha)"""
     total_soil_layers: Optional[int] = None
@@ -255,7 +253,6 @@ class CropData:
     """expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless)"""
     phosphorus_distro_param: float = 10
     """phosphorus uptake distribution parameter (unitless)"""
-
     phosphorus_shapes: Optional[List[float]] = None
     """first and second shape coefficients for the nitrogen uptake equations (unitless)"""
     previous_phosphorus: Optional[float] = None
@@ -268,12 +265,8 @@ class CropData:
     """actual phosphorus to be taken up by the plant from each soil layer (kg/ha)"""
 
     # ---- root development
-    ##heat_fraction = 1 / 3 #duplicate
     max_root_depth: float = 20
     """maximum depth of roots in the soil (mm)"""
-
-    ##root_depth = None # duplicate
-    ##root_fraction = None #duplicate
 
     # ---- water dynamics
     cumulative_evaporation: Optional[float] = None
@@ -295,27 +288,13 @@ class CropData:
     """initial amount of free water held in the canopy on a given day (mm)"""
 
     # ---- yields
-    # constant attributes
-
-    # is_residue_added: bool = False ## not needed?
     harvest_efficiency: float = 1.0
-    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field 
+    """efficiency of the harvest operation: the proportion of yield that will be extracted from the field
     (unitless; [0, 1])"""
-
-    # temporally variable attributes
-    ##heat_fraction = 0.6  # duplicate
-    ##water_deficiency = 0.2  # duplicate
-    ##above_ground_biomass: float = 15  # kg
-    ##biomass = 25  # duplicate
     dry_down_fraction: float = 0.2
     """proportion of plant biomass that is lost to dry-down (unitless; [0, 1])"""
-    ##nitrogen = 15  # duplicate
-    ##phosphorus = 8  # duplicate
-    ##biomass = 100  # duplicate
-    ##optimal_nitrogen_fraction = 0.162  # duplicate
     optimal_phosphorus_fraction: float = 0.073
     """optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless)"""
-    # Empty declarations
     user_harvest_index: Optional[float] = None  # TODO: handle user input for this. - GitHub Issue #246
     """a user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered"""
     potential_harvest_index: Optional[float] = None
@@ -323,16 +302,52 @@ class CropData:
     harvest_index: Optional[float] = None
     """harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
     (unitless)"""
-    crop_yield: Optional[float] = None
+    cut_biomass: Optional[float] = None
     """total amount of the desired crop product (kg/ha)"""
     yield_collected: Optional[float] = None
     """amount of the desired crop product to be removed from the field (kg/ha)"""
     yield_residue: Optional[float] = None
     """amount of residue created; unharvested yield (kg/ha)"""
-    collected_nitrogen: Optional[float] = None
+    yield_nitrogen: Optional[float] = None
     """nitrogen contained in the harvested yield (kg/ha)"""
-    collected_phosphorus: Optional[float] = None
+    yield_phosphorus: Optional[float] = None
     """phosphorus contained in the harvested yield (kg/ha)"""
+    residue_nitrogen: Optional[float] = None
+    """amount of nitrogen in the residue from this plant (kg/ha)"""
+    residue_phosphorus: Optional[float] = None
+    """amount of phosphorus in the residue from this plant (kg/ha)"""
+
+    # ---- dormancy
+    dormancy_loss_fraction: Optional[float] = None
+    """Fraction of biomass the crop loses when it goes dormant. Default 0.1 for perennials, 0.3 for trees
+        Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description"""
+    minimum_lai_during_dormancy: Optional[float] = 0.75
+    """Minimum leaf area index for plants (perennials and trees only) during dormancy (unitless)
+
+    Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
+    now allowed to modify this value. But it does not provide values for any of the listed plant species and gives no
+    information about how this value can be measured or calculated.
+    """
+
+    def __post_init__(self):
+        """Initialize all attributes with defaults that depend on other attributes"""
+
+        # Set dormancy loss
+        if self.plant_category == PlantCategory.PERENNIAL or PlantCategory.PERENNIAL_LEGUME:
+            self.dormancy_loss_fraction = 0.1
+        elif self.plant_category == PlantCategory.TREE:
+            self.dormancy_loss_fraction = 0.3
+
+        # Set perennial status
+        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
+                self.plant_category == PlantCategory.TREE:
+            self.is_perennial = True
+
+        # set Fixation status
+        if self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
+                self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
+                self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
+            self.is_nitrogen_fixer = True
 
     @property
     def is_mature(self) -> bool:
@@ -340,7 +355,7 @@ class CropData:
         return self.heat_fraction >= 1.0
 
     @property
-    def has_given_harvest_index(self) -> bool:
+    def do_harvest_index_override(self) -> bool:
         """was a user-defined harvest index is given? This triggers a harvest index override"""
         return self.user_harvest_index is not None
 
@@ -351,7 +366,7 @@ class CropData:
 
 
 """
-The species child classes provide default configuration for the supported CropSpecies. 
+The species child classes provide default configuration for the supported CropSpecies.
 Only values that differ from the default CropData need to be declared by default in these species classes.
 
 Users should be able also be able to modify specific variables by including them in the signature when calling
@@ -370,7 +385,7 @@ class Corn(CropData):
     name: str = "default corn"
     plant_code: str = "CORN"
     scientific_name: str = "Zea mays"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("warm_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 8.0
@@ -405,7 +420,7 @@ class SpringWheat(CropData):
     name: str = "default spring_wheat"
     plant_code: str = "SWHT"
     scientific_name: str = "Triticum aestivum"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -440,7 +455,7 @@ class WinterWheat(CropData):
     name: str = "default winter_wheat"
     plant_code: str = "WWHT"
     scientific_name: str = "Triticum aestivum"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -475,7 +490,7 @@ class CerealRye(CropData):
     name: str = "default cereal_rye"
     plant_code: str = "RYE"
     scientific_name: str = "Secale cereale"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0
@@ -510,7 +525,7 @@ class SpringBarley(CropData):
     name: str = "default spring_barley"
     plant_code: str = "BARL"
     scientific_name: str = "Hordeum vulgare"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -545,7 +560,7 @@ class FallOats(CropData):
     name: str = "default fall_oats"
     plant_code: str = "OATS"
     scientific_name: str = "Avena sativa"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -580,7 +595,7 @@ class TallFescue(CropData):
     name: str = "default tall_fescue"
     plant_code: str = "FESC"
     scientific_name: str = "Festuca arundinaceae"
-    is_perennial: bool = True
+    plant_category: PlantCategory = PlantCategory("perennial")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 0.0
@@ -615,7 +630,7 @@ class Alfalfa(CropData):
     name: str = "default alfalfa"
     plant_code: str = "ALFA"
     scientific_name: str = "Medicago sativa"
-    is_perennial: bool = True
+    plant_category: PlantCategory = PlantCategory("perennial_legume")
     is_nitrogen_fixer: bool = True
 
     minimum_temperature: float = 4.0
@@ -650,7 +665,7 @@ class Soybean(CropData):
     name: str = "default soybean"
     plant_code: str = "SOYB"
     scientific_name: str = "Glycine max"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("warm_annual_legume")
     is_nitrogen_fixer: bool = True
 
     minimum_temperature: float = 10.0
@@ -685,7 +700,7 @@ class SugarBeet(CropData):
     name: str = "default sugar_beet"
     plant_code: str = "SGBT"
     scientific_name: str = "Beta vulgaris saccharifera"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("warm_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 4.0
@@ -720,7 +735,7 @@ class Potato(CropData):
     name: str = "default potato"
     plant_code: str = "POTA"
     scientific_name: str = "Solanum tuberosum"
-    is_perennial: bool = False
+    plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
     minimum_temperature: float = 7.0
@@ -752,4 +767,4 @@ class Potato(CropData):
 class Triticale(CropData):
     """crop data class with default values for triticale"""
     # TODO: triticale has unknown parameters, since it is not present in SWAT database.
-    #     Duram wheat is likely the closest analog.
+    #     Durum wheat is likely the closest analog.

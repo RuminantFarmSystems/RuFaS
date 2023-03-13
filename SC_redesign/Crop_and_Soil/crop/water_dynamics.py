@@ -1,4 +1,3 @@
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
@@ -24,8 +23,9 @@ class WaterDynamics:
         self.data.cumulative_evaporation += evaporation
         self.data.cumulative_transpiration += transpiration
         self.data.cumulative_potential_evapotranspiration += potential_evapotranspiration
-        self.data.cumulative_evapotranspiration += self._determine_evapotranspiration(self.data.cumulative_evaporation,
-                                                                                      self.data.cumulative_transpiration)
+        self.data.cumulative_evapotranspiration += \
+            self._determine_evapotranspiration(self.data.cumulative_evaporation,
+                                               self.data.cumulative_transpiration)
         self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
                                                                       self.data.cumulative_potential_evapotranspiration)
         # TODO: cumulative evaporation, transpiration, evapotranspiration, and maximum cumulative
@@ -90,3 +90,4 @@ class WaterDynamics:
 
     # TODO: Further functions water files need to be translated (into soil methods?) - GitHub Issue #303
     #    RUFAS/routines/field/crop/transpiration.py
+    #    No water uptake yet?

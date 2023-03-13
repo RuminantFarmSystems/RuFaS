@@ -35,7 +35,6 @@ class GrowthConstraints:
                                                                              self.data.nitrogen_stress,
                                                                              self.data.phosphorus_stress)
 
-
     @staticmethod
     def _determine_growth_factor(water_stress: float, temperature_stress: float, nitrogen_stress: float,
                                  phosphorus_stress: float) -> float:  # pseudocode: C.7.E.1
@@ -77,7 +76,8 @@ class GrowthConstraints:
         return stress
 
     @staticmethod
-    def _determine_temperature_stress(air_temp: float, min_temp: float, optimal_temp: float) -> float:  # pseudocode C.7.B.
+    def _determine_temperature_stress(air_temp: float, min_temp: float,
+                                      optimal_temp: float) -> float:  # pseudocode C.7.B.
         """
         Description: Calculates temperature stress for a given day.
 
