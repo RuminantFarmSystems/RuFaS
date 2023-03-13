@@ -10,6 +10,7 @@ from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
+from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
 
 
 # --- Tests to validate Soil Config Factory module ---
@@ -120,11 +121,14 @@ def test_annual_reset() -> None:
     evapotranspirator = Evapotranspiration(soil_data)
     infiltrator = Infiltration(soil_data)
     eroder = SoilErosion(soil_data)
+    fertilizer_phosphorus = Fertilizer(soil_data)
 
     # Run methods that add to annual totals
     evapotranspirator.evapotranspirate(500, 24, 18, 20, 1000, 200, 0.12, 1.01)
     infiltrator.infiltrate(20, 0.58392)
     eroder.erode(1, 0.2, 800)
+    fertilizer_phosphorus.add_fertilizer_phosphorus(90)
+    fertilizer_phosphorus.do_fertilizer_phosphorus_operations(13, 5, 1.8)
 
     # Patch profile soil water content and profile nitrates total so that they are different from their initial values
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData",
@@ -140,6 +144,7 @@ def test_annual_reset() -> None:
         assert soil_data.annual_runoff_total != 0
         assert soil_data.annual_eroded_sediment_total != 0
         assert soil_data.annual_surface_runoff_total != 0
+        assert soil_data.annual_runoff_fertilizer_phosphorus != 0
 
         # Run method
         soil_data.do_annual_reset()
@@ -154,6 +159,7 @@ def test_annual_reset() -> None:
         assert soil_data.annual_runoff_total == 0
         assert soil_data.annual_eroded_sediment_total == 0
         assert soil_data.annual_surface_runoff_total == 0
+        assert soil_data.annual_runoff_fertilizer_phosphorus == 0
 
 
 def test_profile_soil_water_content() -> None:

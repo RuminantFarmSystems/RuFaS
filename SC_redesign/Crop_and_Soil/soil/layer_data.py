@@ -3,7 +3,7 @@ from typing import Optional
 
 
 """
-Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects 
+Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
 to represent its soil
 """
 
@@ -29,7 +29,7 @@ class LayerData:
     saturation_point_water_concentration: float = 0.5
     """water concentration of soil layer at saturation point (mm water / mm soil)"""
     soil_evaporation_compensation_coefficient: float = 1
-    """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless) 
+    """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless)
         (SWAT 2:2.3.17)"""
 
     # --- Percolation
@@ -40,7 +40,7 @@ class LayerData:
 
     # --- Temperature
     bulk_density: float = 1.4
-    """bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for 
+    """bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for
         calculating this field as well)"""
     previous_day_temperature: Optional[float] = None
     """temperature of soil layer on the previous day (degrees C)"""
@@ -60,7 +60,11 @@ class LayerData:
     # --- Decomposition
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
-    
+
+    # --- Phosphorus
+    labile_phosphorus_content: float = 0
+    """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -101,11 +105,6 @@ class LayerData:
         return max(0, self.water_content - self.field_capacity_content)
 
     @property
-    def saturation_content(self) -> float:
-        """volume of water in layer when saturated (mm)"""
-        return self.saturation_point_water_concentration * self.layer_thickness
-
-    @property
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
         return max(0, self.saturation_content - self.water_content)
@@ -135,6 +134,3 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
-
-
-

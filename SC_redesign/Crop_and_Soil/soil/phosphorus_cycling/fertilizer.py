@@ -167,9 +167,11 @@ class Fertilizer:
     def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil
             profile.
+
         Args:
             phosphorus_to_add: amount of phosphorus to add (kg)
             field_size: size of the field (ha)
+
         Details:
             Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount
             of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
