@@ -544,7 +544,7 @@ def userbounds():
             tribounds.append((0,0))
     return tribounds
 
-def optimize(user_defined_ration):
+def optimize():
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -564,6 +564,7 @@ def optimize(user_defined_ration):
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
+    user_defined_ration = False
     if user_defined_ration:
         bnds = userbounds()
     else:    
@@ -604,7 +605,7 @@ def optimize(user_defined_ration):
     #        writer.writerow(data)
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
-    import matplotlib.pyplot as plt
+    # iport matplotlib.pyplot as plt
     if user_defined_ration:
         # accumulator = []
         usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)

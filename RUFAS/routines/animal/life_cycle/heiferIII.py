@@ -19,7 +19,7 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
-
+import csv
 
 class HeiferIII(HeiferII):
     # TODO: Rank heifers to enter the herd or sold
@@ -90,7 +90,35 @@ class HeiferIII(HeiferII):
         self.Ca_req = req['Ca_req']
         self.P_req = req['P_req']
         self.DMIest = req['DMIest']
-
+        
+        csvline = [self.id,
+            'heiferiii',
+            self.body_weight, 
+            self.mature_body_weight,
+            self.days_in_preg,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            self.NEmaint,
+            self.NEg,
+            self.NEpreg,
+            self.NEl,
+            self.MP_req,
+            self.Ca_req,
+            self.P_req,
+            self.DMIest,
+            0,
+            0,
+            ]
+        #with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/test.csv', 'a', newline='') as file:
+        with open('C:/Users/joecw/RUFAS/NRC_10yr.csv', 'a', newline='') as file:
+            csvout = csv.writer(file)
+            csvout.writerow(csvline)
     def calc_manure_excretion(self, feed):
         """
         Calculates and sets the manure excretion components.

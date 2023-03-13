@@ -31,6 +31,7 @@ from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 from RUFAS.output_manager import OutputManager
 om = OutputManager()
+import csv
 
 class MilkProductionHistory:
     def __init__(self, sim_day, days_in_milk, milk_prod, days_born):
@@ -309,11 +310,32 @@ class Cow(HeiferIII):
         #    print(attrs_req)
         #info_map = {"class": self.__class__.__name__, "function":'dailynurient'}
         #om.add_log("nutr", attrs_req, info_map)
-        csvline = [self.id, self.body_weight, self.CI, self.DMIest, self.Ca_req, self.days_in_milk,
-                    self.days_born, self.days_in_preg]
-        import csv
+        csvline = [self.id,
+                   'cow',
+                   self.body_weight, 
+                   self.mature_body_weight,
+                   self.days_in_preg,
+                   self.calves,
+                   self.CI,
+                   self.mPrt,
+                   self.fat_percent,
+                   self.lactose_milk,
+                   self.estimated_daily_milk_produced,
+                   self.days_in_milk,
+                   self.milking,
+                   self.NEmaint,
+                   self.NEg,
+                   self.NEpreg,
+                   self.NEl,
+                   self.MP_req,
+                   self.Ca_req,
+                   self.P_req,
+                   self.DMIest,
+                   self.DNED_req,
+                   self.DMDP_req,
+                   ]
         #with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/test.csv', 'a', newline='') as file:
-        with open('C:/Users/joecw/RUFAS/NASEM.csv', 'a', newline='') as file:
+        with open('C:/Users/joecw/RUFAS/NRC_10yr.csv', 'a', newline='') as file:
             csvout = csv.writer(file)
             csvout.writerow(csvline)
         # JCW PRINTING

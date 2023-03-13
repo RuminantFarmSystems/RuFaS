@@ -58,7 +58,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize(user_defined_ration)
+            solution = NLP.optimize()
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
@@ -127,12 +127,12 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type,user_defined_ration)
-            overridecheck += 1
+            # overridecheck += 1
             # print(overridecheck)
             #### # if NEl_con < 0.75*NEl_reference:
-            if overridecheck > 2:
-                solution.success = True
-                break
+            #if overridecheck > 2:
+            #    solution.success = True
+            #    break
 
     if solution != None:
         ration = {}
