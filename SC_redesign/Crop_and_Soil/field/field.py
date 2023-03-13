@@ -134,6 +134,7 @@ class Field:
 
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
+        # TODO: test this method when it is merged with a branch containing field_test.py
         fertilizer_phosphorus_applied = 90
         if fertilizer_phosphorus_applied:
             self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(fertilizer_phosphorus_applied)
