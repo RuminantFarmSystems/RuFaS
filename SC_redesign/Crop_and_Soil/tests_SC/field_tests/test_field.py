@@ -1,9 +1,8 @@
-import warnings
 from typing import Optional, List, Dict
 from unittest.mock import MagicMock
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpeciesDataFactory, CropSpecies
+from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
 
 
@@ -118,7 +117,8 @@ def test_make_crop_from_config_dict(config: dict):
         Field.make_supported_crop.assert_not_called()
         Field.make_custom_crop.assert_called_once()
 
-@pytest.mark.parametrize("config_list,coverages",[
+
+@pytest.mark.parametrize("config_list,coverages", [
     ([{"species": "corn"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
@@ -128,5 +128,21 @@ def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     field = Field()
     field.plant_crops(config_list, coverages)
     assert len(field.crops) == len(config_list)
+
+
+def test_amend_soil() -> None:
+    """Tests that amend_soil() properly calls all the subroutines that add nutrients to the field"""
+    field = Field()
+    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus = MagicMock()
+    field.amend_soil()
+    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus.assert_called_once_with(0)
+
+
+def test_annual_reset() -> None:
+    """Tests that all annual reset subroutines are called properly"""
+    field = Field()
+    field.soil.data.do_annual_reset = MagicMock()
+    field.perform_annual_reset()
+    field.soil.data.do_annual_reset.assert_called_once()
 
 # TODO: All field methods need to be tested in future PRs.

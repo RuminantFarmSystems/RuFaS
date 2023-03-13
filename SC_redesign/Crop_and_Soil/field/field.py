@@ -135,10 +135,7 @@ class Field:
 
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
-        # TODO: test this method when it is merged with a branch containing field_test.py
-        fertilizer_phosphorus_applied = 90
-        if fertilizer_phosphorus_applied:
-            self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(fertilizer_phosphorus_applied)
+        self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(0)
         return
 
     # </editor-fold>
@@ -393,5 +390,4 @@ class Field:
         """Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
             file, and then reset all annual totals"""
         self.soil.data.do_annual_reset()
-
-        pass
+        return
