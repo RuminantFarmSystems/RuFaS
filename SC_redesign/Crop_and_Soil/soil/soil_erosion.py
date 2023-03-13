@@ -63,10 +63,10 @@ class SoilErosion:
         Args:
             percent_sand_content: percent of soil content that is sand
             percent_silt_content: percent of soil content that is silt
-            
-        Details: 
-          The coarseness of a soil effects the overall erodibility of the soil. Specifically, soils with high-levels of 
-          coarse-sand content will have relatively low erodibility compared to soils with less sand. 
+
+        Details:
+          The coarseness of a soil effects the overall erodibility of the soil. Specifically, soils with high-levels of
+          coarse-sand content will have relatively low erodibility compared to soils with less sand.
 
         Returns:
             coarseness factor of erodibility, based on sand content (unitless)

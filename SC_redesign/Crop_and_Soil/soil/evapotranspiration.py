@@ -1,7 +1,5 @@
 from math import exp
 from typing import Optional
-
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
@@ -75,15 +73,15 @@ class Evapotranspiration:
         if self.data.potential_evapotranspiration < initial_canopy_free_water:
             """
             Evaporation from free water in canopy on a given day is set equal to potential evapotranspiration on a given
-            day (2:2.3.1), and the potential evapotranspiration adjusted for evaporation of free water in 
+            day (2:2.3.1), and the potential evapotranspiration adjusted for evaporation of free water in
             canopy is equal to their difference (E'_0 = E_0 - E_CAN = 0)
             """
             return 0  # 2:2.3.1
         else:
             """
-            Evaporation from free water in canopy on given day is set equal to initial free water in the canopy 
-            (2:2.3.3), and the potential evapotranspiration adjusted for evaporation of free water in copy is equal to 
-            difference between potential evapotranspiration and evaporation from free water in canopy 
+            Evaporation from free water in canopy on given day is set equal to initial free water in the canopy
+            (2:2.3.3), and the potential evapotranspiration adjusted for evaporation of free water in copy is equal to
+            difference between potential evapotranspiration and evaporation from free water in canopy
             (E'_0 = E_0 - E_CAN)
             """
             return self.data.potential_evapotranspiration - initial_canopy_free_water
@@ -95,16 +93,13 @@ class Evapotranspiration:
         SWAT Reference: 2:2.3.3.2
         """
         for layer in self.data.soil_layers:
-            evaporative_demand = self._determine_layer_evaporative_demand(self.data.maximum_soil_evaporation,
-                                                                          layer.top_depth, layer.bottom_depth,
-                                                                          layer.soil_evaporation_compensation_coefficient)
-            evaporative_demand_reduced = self._determine_evaporative_demand_reduced(evaporative_demand,
-                                                                                    layer.water_content,
-                                                                                    layer.field_capacity_content,
-                                                                                    layer.wilting_point_content)
-            amount_water_removed = self._determine_amount_water_removed(evaporative_demand_reduced,
-                                                                        layer.water_content,
-                                                                        layer.wilting_point_content)
+            evaporative_demand = self._determine_layer_evaporative_demand(
+                self.data.maximum_soil_evaporation, layer.top_depth, layer.bottom_depth,
+                layer.soil_evaporation_compensation_coefficient)
+            evaporative_demand_reduced = self._determine_evaporative_demand_reduced(
+                evaporative_demand, layer.water_content, layer.field_capacity_content, layer.wilting_point_content)
+            amount_water_removed = self._determine_amount_water_removed(
+                evaporative_demand_reduced, layer.water_content, layer.wilting_point_content)
 
             # remove water from soil water content
             layer.water_content -= amount_water_removed

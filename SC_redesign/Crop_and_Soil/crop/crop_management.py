@@ -124,8 +124,8 @@ class CropManagement:
         if self.data.harvest_index <= 1.0:
             self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index  # SWAT 5:2.4.2
         else:
-            self.data.cut_biomass = self._determine_biomass_cut_from_whole_plant(self.data.biomass,
-                                                                                 self.data.harvest_index)
+            self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(self.data.biomass,
+                                                                                self.data.harvest_index)
         fraction_cut = self.data.cut_biomass / self.data.biomass
         self.data.biomass -= self.data.cut_biomass
 
@@ -201,7 +201,7 @@ class CropManagement:
         return max(adj_harvest_index, 0)
 
     @staticmethod
-    def _determine_biomass_cut_from_whole_plant(biomass: float, harvest_index: float) -> float:
+    def determine_biomass_cut_from_whole_plant(biomass: float, harvest_index: float) -> float:
         """Calculates maximum crop yield at harvest (in ideal conditions), when harvest index is > 1.
 
         SWAT Reference: 5:2.4.3

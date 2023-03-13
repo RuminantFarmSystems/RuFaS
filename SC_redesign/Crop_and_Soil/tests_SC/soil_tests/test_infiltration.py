@@ -1,8 +1,11 @@
 import pytest
-from math import log, floor
+from math import log
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.soil.infiltration import *
+from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from math import exp
 
 
 # --- static function tests ---
@@ -17,8 +20,8 @@ from SC_redesign.Crop_and_Soil.soil.infiltration import *
 def test_determine_curve_number_1(curve_num_2):
     """test _determine_curve_number_1() in infiltration.py"""
     observe = Infiltration._determine_first_moisture_condition_parameter(curve_num_2)
-    expect = curve_num_2 - \
-             ((20 * (100 - curve_num_2)) / (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
+    expect = curve_num_2 - ((20 * (100 - curve_num_2)) /
+                            (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
     assert expect == observe
 
 
@@ -81,8 +84,8 @@ def test_determine_first_shape_coefficient(field_capacity, max_retention_param, 
     """test _determine_first_shape_coefficient() in infiltration.py"""
     observe = Infiltration._determine_first_shape_coefficient(field_capacity, max_retention_param,
                                                               curve_3_retention_param, second_shape_coeff)
-    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity) + \
-             (second_shape_coeff * field_capacity)
+    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity
+                 ) + (second_shape_coeff * field_capacity)
     assert expect == observe
 
 

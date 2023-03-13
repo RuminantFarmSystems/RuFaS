@@ -1,9 +1,8 @@
-import warnings
 from typing import Optional, List, Dict
 from unittest.mock import MagicMock
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpeciesDataFactory, CropSpecies
+from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
 
 
@@ -118,7 +117,8 @@ def test_make_crop_from_config_dict(config: dict):
         Field.make_supported_crop.assert_not_called()
         Field.make_custom_crop.assert_called_once()
 
-@pytest.mark.parametrize("config_list,coverages",[
+
+@pytest.mark.parametrize("config_list,coverages", [
     ([{"species": "corn"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),

@@ -2,8 +2,10 @@ import warnings
 
 import pytest
 from mock.mock import MagicMock
-
-from SC_redesign.Crop_and_Soil.crop.crop_management import *
+from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from math import exp
+from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 
 # ---- Test Static Functions ----
@@ -64,7 +66,7 @@ def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float):
 def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float):
     """ensure that yield is correctly calculated by determine_yield_from_total_biomass()"""
     frac = 1 / (1 + harv_ind)
-    assert CropManagement._determine_biomass_cut_from_whole_plant(bmass, harv_ind) == bmass * (1 - frac)
+    assert CropManagement.determine_biomass_cut_from_whole_plant(bmass, harv_ind) == bmass * (1 - frac)
 
 
 # ---- Test Member functions
@@ -169,7 +171,7 @@ def cut_crop(efficiency: float, harvest: float, override: bool):
 
     # expect/assert
     if harvest > 1:
-        cut_biomass = CropManagement._determine_biomass_cut_from_whole_plant(100, harvest)
+        cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
     else:
         cut_biomass = 100 * harvest
 
@@ -192,4 +194,3 @@ def cut_crop(efficiency: float, harvest: float, override: bool):
         assert data.yield_phosphorus == collected * 0.0092
         assert data.residue_nitrogen == residue * 0.12
         assert data.residue_phosphorus == residue * 0.0092
-

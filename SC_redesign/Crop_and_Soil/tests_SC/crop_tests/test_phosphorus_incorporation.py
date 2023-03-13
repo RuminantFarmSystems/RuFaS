@@ -122,7 +122,7 @@ def test_uptake_phosphorus(phosphates, depths):
     assert data.unmet_phosphorus_demands == [12, 15, 17]
 
     NitrogenIncorporation.determine_layer_nutrient_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10],
-                                                                                                            [1, 2, 3])
+                                                                                  [1, 2, 3])
     assert data.phosphorus_requests == [8.9, 9.9, 13.12]
 
     NitrogenIncorporation.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
@@ -164,7 +164,8 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
 
     # assertions
     incorp.shift_phosphorus_time.assert_called_once()
-    NitrogenIncorporation.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.62, 0.60)
+    NitrogenIncorporation.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68,
+                                                                                      0.62, 0.60)
     assert data.phosphorus_shapes == [1.2, 0.8]
 
     NitrogenIncorporation.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
@@ -184,4 +185,3 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
     incorp.uptake_phosphorus.assert_called_once_with(phosphates, depths)
     NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should be called_once_with() w/ attr mocked
     assert data.phosphorus == 99.3
-
