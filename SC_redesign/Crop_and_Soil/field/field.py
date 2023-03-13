@@ -6,10 +6,10 @@ from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from typing import Optional, List, Dict
 
 # TODO: delete/replace the note block below once satisfied with the design
-""" 
-The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm 
+"""
+The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm
 manager classes. The field class, as laid out here, handles the management actions and scenarios that can be performed
-in an agricultural field. 
+in an agricultural field.
 
 Note that some of the field-level attributes will be tracked by the FieldData class
 """
@@ -56,11 +56,11 @@ class Field:
         # determine total amount of residue and above-ground biomass present on the given day
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
 
+        # TODO: track snow cover on soil surface somewhere - Issue #317
         self.soil.daily_soil_routine(current_weather.incoming_light, current_weather.mean_air_temperature,
                                      current_weather.min_air_temperature, current_weather.max_air_temperature,
-                                     total_plant_cover, current_weather.snow_fall,  # TODO: track snow cover on soil
-                                     current_weather.annual_mean_air_temperature)   #       surface somewhere - Issue
-                                                                                    #       #317
+                                     total_plant_cover, current_weather.snow_fall,
+                                     current_weather.annual_mean_air_temperature)
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -120,7 +120,10 @@ class Field:
 
     def setup_amendments(self, amendment_config):
         """sets up the nutrient amendment details (manure and fertilizer) for this field"""
-        pass
+        fertilizer_phosphorus_applied = 90
+        if fertilizer_phosphorus_applied:
+            self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(fertilizer_phosphorus_applied)
+        return
 
     def setup_crop_schedule(self, crop_config):
         """sets up the cropping schedule (species, planting/harvest dates, etc)"""
@@ -217,7 +220,8 @@ class Field:
         """cut all crops in the field, either removing the cut biomass as harvest or leaving it in the field as
         residue to be incorporated into the soil depending upon 'harvest_percent'
         """
-        cuttings = [this_crop.cut(fraction=self.field_data.cut_fraction) for this_crop in self.crops]
+        # Note: cuttings is commented out to make flake8 stop complaining about it
+        # cuttings = [this_crop.cut(fraction=self.field_data.cut_fraction) for this_crop in self.crops]
         if self.field_data.harvest_proportion > 0:  # NOTE: this logic could simply go in the cut() method.
             # ... remove cut biomass from field
             pass
@@ -257,8 +261,9 @@ class Field:
         self.soil.daily_soil_water_routine(current_weather.rainfall, 1, self.field_data.seasonal_high_water_table,
                                            current_weather.incoming_light, current_weather.max_air_temperature,
                                            current_weather.min_air_temperature, current_weather.mean_air_temperature,
-                                           self._determine_total_above_ground_biomass(), self.field_data.current_residue,
-                                           current_weather.snow_fall, total_initial_canopy_free_water, 0.2)
+                                           self._determine_total_above_ground_biomass(),
+                                           self.field_data.current_residue, current_weather.snow_fall,
+                                           total_initial_canopy_free_water, 0.2)
         pass
 
     def _determine_total_above_ground_biomass(self) -> float:

@@ -156,6 +156,9 @@ class SoilData:
         self.annual_eroded_sediment_total = 0
         self.annual_surface_runoff_total = 0
 
+        # Reset phosphorus fertilizer total
+        self.annual_runoff_fertilizer_phosphorus = 0
+
     # ---- decomposition
     decomposition_temperature_effect: Optional[float] = None
     """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
