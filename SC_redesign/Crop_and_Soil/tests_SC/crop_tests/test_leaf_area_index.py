@@ -1,5 +1,7 @@
 import pytest
-from SC_redesign.Crop_and_Soil.crop.leaf_area_index import *
+from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from math import exp, log, sqrt
 
 
 @pytest.mark.parametrize("heatfrac,s1,s2", [

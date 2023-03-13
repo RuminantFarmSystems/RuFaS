@@ -1,8 +1,9 @@
 import pytest
 from unittest.mock import MagicMock
-
+from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.percolation import *
+from math import exp
 
 
 # --- Static function tests ---
@@ -59,12 +60,12 @@ def test_determine_if_percolation_allowed(water_content, field_capacity_content,
     observe = Percolation._determine_if_percolation_allowed(water_content, field_capacity_content,
                                                             saturated_capacity_content, high_seasonal_water_table)
     if not high_seasonal_water_table:
-        assert True == observe
-    elif (water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content)))) and \
-            high_seasonal_water_table:
-        assert True == observe
+        assert observe is True
+    elif (water_content > (field_capacity_content + (0.5 * (saturated_capacity_content - field_capacity_content)))) \
+            and high_seasonal_water_table:
+        assert observe is True
     else:
-        assert False == observe
+        assert observe is False
 
 
 def test_percolate_between_layers():

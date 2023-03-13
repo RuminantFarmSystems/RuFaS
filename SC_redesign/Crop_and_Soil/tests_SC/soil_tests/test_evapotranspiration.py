@@ -1,7 +1,9 @@
+from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from math import exp
+from mock import MagicMock, patch
 import pytest
-
-from SC_redesign.Crop_and_Soil.soil.evapotranspiration import *
-from unittest.mock import MagicMock, patch
 
 
 # --- static function tests ---
@@ -17,12 +19,12 @@ def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_
                                                                          avg_temp)
     if avg_temp is not None:
         latent_heat = Evapotranspiration._determine_latent_heat_vaporization(avg_temp)
-        expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) * (avg_temp + 17.8)) / \
-                 latent_heat
+        expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                  (avg_temp + 17.8)) / latent_heat
     else:
         latent_heat = Evapotranspiration._determine_latent_heat_vaporization((max_temp + min_temp) / 2)
-        expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) * (((max_temp + min_temp) / 2)
-                                                                                             + 17.8)) / latent_heat
+        expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                  (((max_temp + min_temp) / 2) + 17.8)) / latent_heat
     assert observe == expect
 
     # check that _determine_potential_evapotranspiration() actually calls _determine_latent_heat_vaporization once
@@ -30,8 +32,8 @@ def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_
     with patch(
             "SC_redesign.Crop_and_Soil.soil.evapotranspiration.Evapotranspiration._determine_latent_heat_vaporization",
             new=MagicMock(return_value=1.3)):
-        throwaway = Evapotranspiration._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp,
-                                                                               min_temp, avg_temp)
+        Evapotranspiration._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp,
+                                                                   min_temp, avg_temp)
         Evapotranspiration._determine_latent_heat_vaporization.assert_called_once()
 
 
@@ -68,8 +70,8 @@ def test_determine_soil_evaporation(above_ground_biomass, residue, snow_water, p
     # Check that _determine_soil_cover_index() is being called once
     with patch("SC_redesign.Crop_and_Soil.soil.evapotranspiration.Evapotranspiration._determine_soil_cover_index",
                new=MagicMock(return_value=2.1)):
-        throwaway = Evapotranspiration._determine_soil_evaporation_adjusted(above_ground_biomass, residue, snow_water,
-                                                                            potential_evapotrans_adj, transpiration)
+        Evapotranspiration._determine_soil_evaporation_adjusted(above_ground_biomass, residue, snow_water,
+                                                                potential_evapotrans_adj, transpiration)
         Evapotranspiration._determine_soil_cover_index.assert_called_once()
 
 
