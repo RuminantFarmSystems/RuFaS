@@ -15,6 +15,8 @@ class CurrentWeather:
     """average air temperature for the day (C)"""
     max_air_temperature: Optional[float] = None
     """maximum air temperature for the day (C)"""
+    daylength: Optional[float] = None
+    """Length of time from sunup to sundown on the day (hours)"""
     annual_mean_air_temperature: Optional[float] = None
     """average annual air temperature for the year (C)"""
     snow_fall: float = 0    # TODO: make this better integrated with Soil module

@@ -98,7 +98,7 @@ class LayerData:
         """volume of water available for percolation in the soil layer (mm)
         SWAT Reference: 2:3.2.1, 2
         """
-        return max(0, self.water_content - self.field_capacity_content)
+        return max(0.0, self.water_content - self.field_capacity_content)
 
     @property
     def saturation_content(self) -> float:
@@ -108,7 +108,7 @@ class LayerData:
     @property
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
-        return max(0, self.saturation_content - self.water_content)
+        return max(0.0, self.saturation_content - self.water_content)
 
     @property
     def percent_organic_matter_content(self) -> float:
@@ -135,6 +135,3 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
-
-
-

@@ -99,6 +99,10 @@ class SoilData:
     surface_runoff_volume: Optional[float] = None
     """volume of surface runoff (mm per hectare), used in SWAT equation 4:1.1.1."""
 
+    # ---- decomposition
+    decomposition_temperature_effect: Optional[float] = None
+    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
+
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
@@ -156,10 +160,6 @@ class SoilData:
         self.annual_eroded_sediment_total = 0
         self.annual_surface_runoff_total = 0
 
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
     @property
     def profile_soil_water_content(self) -> float:
         """
@@ -175,7 +175,7 @@ class SoilData:
         else:
             water_sum = 0
             for layer in self.soil_layers:
-                water_sum += max(0, (layer.water_content - layer.wilting_point_content))
+                water_sum += max(0.0, (layer.water_content - layer.wilting_point_content))
             return water_sum
 
     @property
