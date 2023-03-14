@@ -204,3 +204,25 @@ def test_passive_carbon_decomposition_amount(decomposition_moisture_effect, deco
 def test_carbon_lost_adjusted_factor(silt_clay_content):
     expected = 0.85 - 0.68 * silt_clay_content
     assert expected == PoolGasPartition._carbon_lost_adjusted_factor(silt_clay_content)
+
+
+@pytest.mark.parametrize("active_carbon_decomposition_amount, carbon_lost_adjusted_factor", [
+    (66, 44),  # higher value
+    (0.5, 1.8),  # arbitrary values
+    (2, 9)  # lower value
+])
+def test_active_carbon_to_slow_amount(active_carbon_decomposition_amount, carbon_lost_adjusted_factor):
+    expected = active_carbon_decomposition_amount * (1 - carbon_lost_adjusted_factor - 0.004)
+    assert expected == PoolGasPartition._active_carbon_to_slow_amount(active_carbon_decomposition_amount,
+                                                                      carbon_lost_adjusted_factor)
+
+
+@pytest.mark.parametrize("active_carbon_decomposition_amount, carbon_lost_adjusted_factor", [
+    (66, 44),  # higher value
+    (0.5, 1.8),  # arbitrary values
+    (2, 9)  # lower value
+])
+def test_active_carbon_to_slow_loss(active_carbon_decomposition_amount, carbon_lost_adjusted_factor):
+    expected = active_carbon_decomposition_amount * carbon_lost_adjusted_factor
+    assert expected == PoolGasPartition._active_carbon_to_slow_loss(active_carbon_decomposition_amount,
+                                                                      carbon_lost_adjusted_factor)
