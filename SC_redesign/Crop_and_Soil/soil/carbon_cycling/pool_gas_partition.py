@@ -168,6 +168,8 @@ class PoolGasPartition:
                                         passive_carbon_co2_lost_rate=0.55) -> float:
         return passive_carbon_decomposition_amount * passive_carbon_co2_lost_rate
 
+    # TODO:---------test everything above
+
     # ---- S.6.C.9
     # TODO: Figure out where did 0.03 and 0.55 come from
     @staticmethod
@@ -184,8 +186,6 @@ class PoolGasPartition:
     def _slow_to_passive_carbon_amount(slow_carbon_decomposition_amount: float,
                                        slow_carbon_passive_decompose_rate=0.03) -> float:
         return slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
-
-    # TODO:---------test everything above
 
     # ---- S.6.C.8
     @staticmethod
