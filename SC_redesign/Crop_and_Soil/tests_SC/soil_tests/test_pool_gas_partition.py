@@ -267,6 +267,28 @@ def test_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount):
     9.24,  # arbitrary values
 ])
 def test_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount):
-    slow_carbon_passive_decompose_rate=0.03
+    slow_carbon_passive_decompose_rate = 0.03
     expected = slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
     assert expected == PoolGasPartition._slow_to_passive_carbon_amount(slow_carbon_decomposition_amount)
+
+
+@pytest.mark.parametrize("passive_carbon_decomposition_amount", [
+    16,  # lower value
+    77,  # higher value
+    7.7,  # arbitrary values
+])
+def test_passive_to_active_carbon_amount(passive_carbon_decomposition_amount):
+    passive_carbon_co2_lost_rate = 0.55
+    expected = passive_carbon_decomposition_amount * (1 - passive_carbon_co2_lost_rate)
+    assert expected == PoolGasPartition._passive_to_active_carbon_amount(passive_carbon_decomposition_amount)
+
+
+@pytest.mark.parametrize("passive_carbon_decomposition_amount", [
+    16,  # lower value
+    77,  # higher value
+    7.7,  # arbitrary values
+])
+def test_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount):
+    passive_carbon_co2_lost_rate = 0.55
+    expected = passive_carbon_decomposition_amount * passive_carbon_co2_lost_rate
+    assert expected == PoolGasPartition._passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount)
