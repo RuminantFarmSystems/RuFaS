@@ -201,12 +201,12 @@ class PoolGasPartition:
                                       ) -> float:
         return active_carbon_decomposition_amount * (1 - carbon_lost_adjusted_factor - 0.004)
 
+    # TODO:---------test everything above
+
     # ---- S.6.C.6
     @staticmethod
     def _carbon_lost_adjusted_factor(silt_clay_content: float) -> float:
         return 0.85 - 0.68 * silt_clay_content
-
-    # TODO:---------test everything above
 
     # ---- S.6.C.5
     @staticmethod
