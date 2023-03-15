@@ -12,6 +12,12 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 from typing import List, Dict, DefaultDict, Any
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
@@ -253,21 +259,23 @@ class Pen:
         self.MEdiet = 0.0
 
         # template for manure, calf_total, etc.
-        self._manure_dict_template = {"U": 0,
-                                      "Urine": 0,
-                                      "TAN_s": 0,
-                                      "MN": 0,
-                                      "Mkg": 0,
-                                      "TSd": 0,
-                                      "VSd": 0,
-                                      "VSnd": 0,
-                                      "WIP_frac": 0,
-                                      "WOP_frac": 0,
-                                      "p_excrt_manure": 0,
-                                      "p_frac": 0,
-                                      "K_manure": 0,
-                                      "CH4_manure": 0
-                                      }
+        self._manure_dict_template = AnimalManureExcretions(
+                urea=0.0,
+                urine=0.0,
+                total_ammoniacal_nitrogen_concentration=0.0,
+                urine_nitrogen=0.0,
+                manure_nitrogen=0.0,
+                manure_mass=0.0,
+                total_solids=0.0,
+                degradable_volatile_solids=0.0,
+                non_degradable_volatile_solids=0.0,
+                inorganic_phosphorus_fraction=0.0,
+                organic_phosphorus_fraction=0.0,
+                phosphorus=0.0,
+                phosphorus_fraction=0.0,
+                potassium=0.0,
+                methane=0.0
+        )
 
         # manure attributes are initialized in the reset_manure method
         self.manure = None
@@ -485,21 +493,22 @@ class Pen:
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
+        # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal).__name__ == 'Calf':
+            if type(animal) == Calf:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Heifer':
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and not animal.milking:
+            elif type(animal) == Cow and not animal.milking:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and animal.milking:
+            elif type(animal) == Cow and animal.milking:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]
@@ -600,13 +609,13 @@ class Pen:
         self.classes_in_pen.add(class_name)
 
         if class_name == 'Cow':
-            requirements = req.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                          animal.days_in_preg, 'cow', animal.calves,
-                                          animal.CI, animal.mPrt, animal.fat_percent,
-                                          animal.lactose_milk,
-                                          animal.estimated_daily_milk_produced,
-                                          animal.days_in_milk,
-                                          animal.milking)
+            requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow', 
+                                          parity=animal.calves, calving_interval=animal.CI,
+                                          milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
+                                          milk_lactose=animal.lactose_milk,
+                                          milk_production=animal.estimated_daily_milk_produced,
+                                          days_in_milk=animal.days_in_milk, lactating=animal.milking)
             animal.NEmaint = requirements['NEmaint']
             animal.NEg = requirements['NEg']
             animal.NEpreg = requirements['NEpreg']
