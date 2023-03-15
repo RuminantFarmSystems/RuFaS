@@ -300,12 +300,12 @@ def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         heifer_a['animal_type'], heifer_a['body_weight'], heifer_a['day_of_pregnancy'], heifer_a['DIM'], heifer_a['lactating'],
         heifer_a['Milk'], heifer_a['Fat_Milk'])
-    assert (result_DMIest) == pytest.approx((0), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((2), rel=1e-1)
 
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         heifer_b['animal_type'], heifer_b['body_weight'], heifer_b['day_of_pregnancy'], heifer_b['DIM'], heifer_b['lactating'],
         heifer_b['Milk'], heifer_b['Fat_Milk'])
-    assert (result_DMIest) == pytest.approx((0), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((2), rel=1e-1)
 
 
 def test_calculate_NASEM_energy_lactation_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -458,22 +458,22 @@ def test_calculate_NASEM_calcium_requirements(cow_a:dict, cow_b:dict, heifer_a:d
     """Unit test for function calculate_NASEM_calcium_requirements in file routines/animal/ration/animal_requirements.py"""
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], 1,
-        22, cow_a['milk_protein'], cow_a['Milk'])
+        22, cow_a['milk_protein'], cow_a['Milk'], cow_a['parity'])
     assert (result_Ca_req) == pytest.approx((54), rel=1e-1)
 
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['day_of_pregnancy'], 1,
-        8, cow_b['milk_protein'], cow_b['Milk'])
+        8, cow_b['milk_protein'], cow_b['Milk'], cow_b['parity'])
     assert (result_Ca_req) == pytest.approx((38), rel=1e-1)
 
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], 1,
-        7, heifer_a['milk_protein'], heifer_a['Milk'])
+        7, heifer_a['milk_protein'], heifer_a['Milk'], heifer_a['parity'])
     assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
 
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], 1,
-        7, heifer_b['milk_protein'], heifer_b['Milk'])
+        7, heifer_b['milk_protein'], heifer_b['Milk'], heifer_b['parity'])
     assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
 
 
@@ -481,22 +481,22 @@ def test_calculate_NASEM_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_
     """Unit test for function calculate_NASEM_phosphorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['animal_type'], cow_a['day_of_pregnancy'], 1, 20,
-        cow_a['milk_protein'], cow_a['Milk'])
+        cow_a['milk_protein'], cow_a['Milk'], cow_a['parity'])
     assert (result_P_req) == pytest.approx((55), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['animal_type'], cow_b['day_of_pregnancy'], 1, 8,
-        cow_b['milk_protein'], cow_b['Milk'])
-    assert (result_P_req) == pytest.approx((28), rel=1e-1)
+        cow_b['milk_protein'], cow_b['Milk'], cow_b['parity'])
+    assert (result_P_req) == pytest.approx((22), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['animal_type'], heifer_a['day_of_pregnancy'], 1, 7,
-        heifer_a['milk_protein'], heifer_a['Milk'])
+        heifer_a['milk_protein'], heifer_a['Milk'], heifer_a['parity'])
     assert (result_P_req) == pytest.approx((13), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['animal_type'], heifer_b['day_of_pregnancy'], 1, 7,
-        heifer_b['milk_protein'], heifer_b['Milk'])
+        heifer_b['milk_protein'], heifer_b['Milk'], heifer_b['parity'])
     assert (result_P_req) == pytest.approx((12.4), rel=1e-1)
 
 
@@ -646,20 +646,20 @@ def test___str__():
 
 
 @pytest.mark.parametrize(
-        "events_list, event_descriptions, expected_days",
-        [
-            (
-                    [],
-                    ['dummy'],
-                    [-1]
-            ),
-            (
-                    [(1, 2, 'event1'), (3, 4, 'event2'),
-                     (5, 6, 'event1'), (7, 8, 'event3')],
-                    ['event1', 'event2', 'event3', 'event0'],
-                    [5, 3, 7, -1]
-            )
-        ],
+    "events_list, event_descriptions, expected_days",
+    [
+        (
+            [],
+            ['dummy'],
+            [-1]
+        ),
+        (
+            [(1, 2, 'event1'), (3, 4, 'event2'),
+             (5, 6, 'event1'), (7, 8, 'event3')],
+            ['event1', 'event2', 'event3', 'event0'],
+            [5, 3, 7, -1]
+        )
+    ],
 )
 def test_get_most_recent_date(events_list, event_descriptions, expected_days):
     """Unit test for function get_most_recent_date in file routines/animal/life_cycle/animal_events.py"""
@@ -1139,6 +1139,11 @@ def test_manure_calculations():
 
 def test_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/dry_cow_manure_excretion.py"""
+    pass
+
+
+def test_phosphorus_excreted():
+    """Unit test for function phosphorus_excreted in file routines/animal/manure/general_manure.py"""
     pass
 
 
