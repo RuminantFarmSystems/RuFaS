@@ -47,6 +47,7 @@ def test_growing_heifer_manure_calculations(mocker: MockerFixture) -> None:
                       ) * GeneralConstants.GRAMS_TO_KG
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+    urine_urea_nitrogen_concentration = max(2.0, min(urine_urea_nitrogen_concentration, 12.0))
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS

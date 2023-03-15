@@ -61,6 +61,18 @@ class BaseManureTreatment(ABC):
         self._accumulated_output = ManureTreatmentDailyOutput()
 
     @property
+    def accumulated_output(self) -> ManureTreatmentDailyOutput:
+        """Returns the accumulated output of the manure treatment.
+
+        Returns
+        -------
+        ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the accumulated output of the manure treatment.
+
+        """
+        return self._accumulated_output
+
+    @property
     def manure_separator_daily_output(self) -> Optional[ManureSeparatorDailyOutput]:
         """Returns the daily output of the intervening separator in the digester - separator - lagoon scenario.
 

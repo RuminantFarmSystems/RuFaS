@@ -141,6 +141,10 @@ def manure_calculations(ration_formulation,
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
+    # TODO: Add cases to unit test for this
+    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
+    urine_urea_nitrogen_concentration = max(2.0, min(urine_urea_nitrogen_concentration, 12.0))
+
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration

@@ -318,11 +318,14 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
 
     mock_manure_treatment = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
+
     mock_manure_treatment.daily_update.return_value = mock_manure_treatment_daily_output
+    mock_manure_treatment.accumulated_output = mock_manure_treatment_accumulated_output
     manure_management.manure_treatments[pen_id] = mock_manure_treatment
 
     # Act
-    manure_separator_daily_output, manure_treatment_daily_output = \
+    manure_separator_daily_output, manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_management._handle_daily_update_for_simple_manure_treatment(
                 simulation_day=simulation_day,
                 pen=mock_manure_management_pen,
@@ -342,7 +345,6 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
                 pen=mock_manure_management_pen,
                 sim_day=simulation_day
         )
-        assert manure_treatment_daily_output == mock_manure_treatment_daily_output
     else:
         assert manure_separator_daily_output is None
         mock_manure_treatment.daily_update.assert_called_once_with(
@@ -351,7 +353,8 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
                 pen=mock_manure_management_pen,
                 sim_day=simulation_day
         )
-        assert manure_treatment_daily_output == mock_manure_treatment_daily_output
+    assert manure_treatment_daily_output == mock_manure_treatment_daily_output
+    assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
 
 
 def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixture) -> None:
@@ -381,9 +384,11 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     manure_management.manure_separators = {pen_id: mock_manure_separator}
 
     mock_manure_treatment = mocker.MagicMock()
-
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
+
     mock_manure_treatment.daily_update.return_value = mock_manure_treatment_daily_output
+    mock_manure_treatment.accumulated_output = mock_manure_treatment_accumulated_output
 
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_manure_treatment.anaerobic_digestion_daily_output = mock_anaerobic_digestion_daily_output
@@ -394,7 +399,8 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     manure_management.manure_treatments = {pen_id: mock_manure_treatment}
 
     # Act
-    anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output = \
+    anaerobic_digestion_daily_output, manure_separator_daily_output, \
+        manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_management._handle_daily_update_for_compound_anaerobic_manure_treatment(simulation_day=simulation_day,
                                                                                        pen=mock_manure_management_pen,
                                                                                        manure_handler_daily_output=mock_manure_handler_daily_output,
@@ -411,6 +417,7 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     assert manure_treatment_daily_output == mock_manure_treatment_daily_output
     assert anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
     assert manure_separator_daily_output == mock_manure_separator_daily_output
+    assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
 
 
 @pytest.mark.parametrize(
@@ -439,20 +446,24 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     mock_manure_separator_daily_output_2 = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output_2 = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output_2 = mocker.MagicMock()
 
     patch_for_handle_daily_update_for_compound_anaerobic_manure_treatment = mocker.patch(
             'RUFAS.routines.manure.manure_management.ManureManagement.'
             '_handle_daily_update_for_compound_anaerobic_manure_treatment',
             return_value=(mock_anaerobic_digestion_daily_output,
                           mock_manure_separator_daily_output,
-                          mock_manure_treatment_daily_output),
+                          mock_manure_treatment_daily_output,
+                          mock_manure_treatment_accumulated_output),
     )
 
     patch_for_handle_daily_update_for_simple_manure_treatment = mocker.patch(
             'RUFAS.routines.manure.manure_management.ManureManagement.'
             '_handle_daily_update_for_simple_manure_treatment',
             return_value=(mock_manure_separator_daily_output_2,
-                          mock_manure_treatment_daily_output_2),
+                          mock_manure_treatment_daily_output_2,
+                          mock_manure_treatment_accumulated_output_2),
     )
 
     mock_animal_management = mocker.MagicMock()
@@ -471,7 +482,8 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     )
 
     # Act
-    anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output = \
+    anaerobic_digestion_daily_output, manure_separator_daily_output, \
+        manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_management._pen_daily_update_for_separator_and_treatment(
                 simulation_day=simulation_day,
                 pen=mock_manure_management_pen,
@@ -491,6 +503,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         assert anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
         assert manure_separator_daily_output == mock_manure_separator_daily_output
         assert manure_treatment_daily_output == mock_manure_treatment_daily_output
+        assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
     else:
         patch_for_handle_daily_update_for_simple_manure_treatment.assert_called_once_with(
                 simulation_day=simulation_day,
@@ -501,6 +514,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         assert anaerobic_digestion_daily_output is None
         assert manure_separator_daily_output == mock_manure_separator_daily_output_2
         assert manure_treatment_daily_output == mock_manure_treatment_daily_output_2
+        assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output_2
 
 
 def test_pen_daily_update(mocker: MockFixture) -> None:
@@ -528,12 +542,14 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_manure_separator_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
     patch_for_pen_daily_update_for_separator_and_treatment = mocker.patch(
             'RUFAS.routines.manure.manure_management.ManureManagement.'
             '_pen_daily_update_for_separator_and_treatment',
             return_value=(mock_anaerobic_digestion_daily_output,
                           mock_manure_separator_daily_output,
-                          mock_manure_treatment_daily_output),
+                          mock_manure_treatment_daily_output,
+                          mock_manure_treatment_accumulated_output),
     )
 
     expected_daily_update_output = (
@@ -542,6 +558,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         mock_reception_pit_daily_output,
         mock_manure_separator_daily_output,
         mock_manure_treatment_daily_output,
+        mock_manure_treatment_accumulated_output,
         mock_anaerobic_digestion_daily_output,
     )
 

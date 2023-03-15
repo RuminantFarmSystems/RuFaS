@@ -228,6 +228,7 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
     mock_reception_pit_daily_output = mocker.MagicMock()
     mock_manure_separator_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_data = (
         mock_manure_management_pen,
@@ -235,6 +236,7 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
         mock_reception_pit_daily_output,
         mock_manure_separator_daily_output,
         mock_manure_treatment_daily_output,
+        mock_manure_treatment_accumulated_output,
         mock_anaerobic_digestion_daily_output
     )
 
@@ -251,6 +253,9 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
     }
     mock_manure_treatment_daily_output_dataframe_dict = {
         '<test_manure_treatment_daily_output_field>': ['<test_manure_treatment_daily_output_value>']
+    }
+    mock_manure_treatment_accumulated_output_dataframe_dict = {
+        '<test_manure_treatment_accumulated_output_field>': ['<test_manure_treatment_accumulated_output_value>']
     }
     mock_anaerobic_digestion_daily_output_dataframe_dict = {
         '<test_anaerobic_digestion_daily_output_field>': ['<test_anaerobic_digestion_daily_output_value>']
@@ -271,6 +276,7 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
                 mock_reception_pit_daily_output_dataframe_dict,
                 mock_manure_separator_daily_output_dataframe_dict,
                 mock_manure_treatment_daily_output_dataframe_dict,
+                mock_manure_treatment_accumulated_output_dataframe_dict,
                 mock_anaerobic_digestion_daily_output_dataframe_dict
             ]
     )
@@ -298,6 +304,7 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
         **mock_reception_pit_daily_output_dataframe_dict,
         **mock_manure_separator_daily_output_dataframe_dict,
         **mock_manure_treatment_daily_output_dataframe_dict,
+        **mock_manure_treatment_accumulated_output_dataframe_dict,
         **mock_anaerobic_digestion_daily_output_dataframe_dict
     }
 
@@ -315,6 +322,7 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
         mocker.call(mock_reception_pit_daily_output, ReceptionPitDailyOutput),
         mocker.call(mock_manure_separator_daily_output, ManureSeparatorDailyOutput),
         mocker.call(mock_manure_treatment_daily_output, ManureTreatmentDailyOutput),
+        mocker.call(mock_manure_treatment_accumulated_output, ManureTreatmentDailyOutput, 'acc'),
         mocker.call(mock_anaerobic_digestion_daily_output, ManureTreatmentDailyOutput, 'ad')
     ])
     patch_for_append_row.assert_called_once_with(mock_row_data)

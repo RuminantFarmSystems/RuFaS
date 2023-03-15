@@ -177,6 +177,7 @@ class ManureManagement:
         if self.time.is_last_day_of_simulation:
             self.manure_management_output_handler.sort_by_pen_id_and_simulation_day()
             self.manure_management_output_handler.export_to_csv()
+            self.manure_management_output_handler.produce_graphics()
 
     def _pen_daily_update(self, simulation_day: int, pen) -> None:
         """Calculates and stores daily output for each manure management component for a given animal pen.
@@ -203,13 +204,17 @@ class ManureManagement:
             bedding=self.beddings[mm_pen.id]
         )
 
-        anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output = \
-            self._pen_daily_update_for_separator_and_treatment(
-                simulation_day=simulation_day,
-                pen=mm_pen,
-                manure_handler_daily_output=manure_handler_daily_output,
-                reception_pit_daily_output=reception_pit_daily_output
-            )
+        results = self._pen_daily_update_for_separator_and_treatment(
+            simulation_day=simulation_day,
+            pen=mm_pen,
+            manure_handler_daily_output=manure_handler_daily_output,
+            reception_pit_daily_output=reception_pit_daily_output
+        )
+
+        anaerobic_digestion_daily_output = results[0]
+        manure_separator_daily_output = results[1]
+        manure_treatment_daily_output = results[2]
+        manure_treatment_accumulated_output = results[3]
 
         # Put all the daily outputs into a tuple
         daily_update_output = (
@@ -218,6 +223,7 @@ class ManureManagement:
             reception_pit_daily_output,
             manure_separator_daily_output,
             manure_treatment_daily_output,
+            manure_treatment_accumulated_output,
             anaerobic_digestion_daily_output
         )
 
@@ -231,9 +237,9 @@ class ManureManagement:
                                                       pen: ManureManagementPen,
                                                       manure_handler_daily_output: ManureHandlerDailyOutput,
                                                       reception_pit_daily_output: ReceptionPitDailyOutput) \
-            -> Tuple[Optional[ManureTreatmentDailyOutput],
-            Optional[ManureSeparatorDailyOutput],
-            ManureTreatmentDailyOutput]:
+            -> Tuple[
+                Optional[ManureTreatmentDailyOutput], Optional[ManureSeparatorDailyOutput],
+                ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]:
         """Calculates daily output for the manure separator and treatment components of a pen.
 
         Parameters
@@ -250,23 +256,29 @@ class ManureManagement:
         """
         anaerobic_digestion_daily_output = None
         if self._is_compound_anaerobic_manure_treatment(pen.manure_treatment):
-            anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output = \
-                self._handle_daily_update_for_compound_anaerobic_manure_treatment(
-                    simulation_day=simulation_day,
-                    pen=pen,
-                    manure_handler_daily_output=manure_handler_daily_output,
-                    reception_pit_daily_output=reception_pit_daily_output
-                )
+            results = self._handle_daily_update_for_compound_anaerobic_manure_treatment(
+                simulation_day=simulation_day,
+                pen=pen,
+                manure_handler_daily_output=manure_handler_daily_output,
+                reception_pit_daily_output=reception_pit_daily_output
+            )
+            anaerobic_digestion_daily_output = results[0]
+            manure_separator_daily_output = results[1]
+            manure_treatment_daily_output = results[2]
+            manure_treatment_accumulated_output = results[3]
         else:
-            manure_separator_daily_output, manure_treatment_daily_output = \
-                self._handle_daily_update_for_simple_manure_treatment(
-                    simulation_day=simulation_day,
-                    pen=pen,
-                    manure_handler_daily_output=manure_handler_daily_output,
-                    reception_pit_daily_output=reception_pit_daily_output
-                )
+            results = self._handle_daily_update_for_simple_manure_treatment(
+                simulation_day=simulation_day,
+                pen=pen,
+                manure_handler_daily_output=manure_handler_daily_output,
+                reception_pit_daily_output=reception_pit_daily_output
+            )
+            manure_separator_daily_output = results[0]
+            manure_treatment_daily_output = results[1]
+            manure_treatment_accumulated_output = results[2]
 
-        return anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output
+        return (anaerobic_digestion_daily_output, manure_separator_daily_output,
+                manure_treatment_daily_output, manure_treatment_accumulated_output)
 
     @classmethod
     def _is_compound_anaerobic_manure_treatment(cls, manure_treatment_name: str) -> bool:
@@ -296,7 +308,9 @@ class ManureManagement:
                                                                      ManureHandlerDailyOutput,
                                                                      reception_pit_daily_output:
                                                                      ReceptionPitDailyOutput) \
-            -> Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput]:
+            -> Tuple[
+                ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput],
+                ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]:
         """Handles the daily update for a compound anaerobic manure treatment.
         
         Parameters
@@ -312,10 +326,12 @@ class ManureManagement:
         
         Returns
         -------
-        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput]
+        Tuple[ManureTreatmentDailyOutput, Optional[ManureSeparatorDailyOutput], 
+                ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
             The daily output of the anaerobic digestion, 
             the daily output of the manure separator, and 
-            the daily output of the anaerobic lagoon.
+            the daily output of the anaerobic lagoon, and
+            the accumulated output of the anaerobic lagoon.
         
         """
         # Currently, calling the daily_update on the treatment only returns one final output
@@ -327,7 +343,7 @@ class ManureManagement:
             manure_separator=self.manure_separators[pen.id]
         )
 
-        # To retrieve the following two intermediate results,
+        # To retrieve the following three intermediate results,
         # we need to access them via instance variables of the treatment object
         anaerobic_digestion_daily_output = (
             typing.cast(AnaerobicDigestionAndLagoon, self.manure_treatments[pen.id])
@@ -335,13 +351,16 @@ class ManureManagement:
 
         manure_separator_daily_output = self.manure_treatments[pen.id].manure_separator_daily_output
 
-        return anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output
+        manure_treatment_accumulated_output = self.manure_treatments[pen.id].accumulated_output
+
+        return (anaerobic_digestion_daily_output, manure_separator_daily_output,
+                manure_treatment_daily_output, manure_treatment_accumulated_output)
 
     def _handle_daily_update_for_simple_manure_treatment(self, simulation_day: int,
                                                          pen: ManureManagementPen,
                                                          manure_handler_daily_output: ManureHandlerDailyOutput,
                                                          reception_pit_daily_output: ReceptionPitDailyOutput) \
-            -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput]:
+            -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]:
         """Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.
 
         If the given pen does not use a manure separator, the manure separator daily output will be None.
@@ -359,7 +378,7 @@ class ManureManagement:
 
         Returns
         -------
-        Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput]
+        Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput]
             The manure separator daily output and the manure treatment daily output.
 
         """
@@ -374,7 +393,9 @@ class ManureManagement:
             sim_day=simulation_day
         )
 
-        return manure_separator_daily_output, manure_treatment_daily_output
+        manure_treatment_accumulated_output = self.manure_treatments[pen.id].accumulated_output
+
+        return manure_separator_daily_output, manure_treatment_daily_output, manure_treatment_accumulated_output
 
 
 def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:
