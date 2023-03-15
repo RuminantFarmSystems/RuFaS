@@ -57,6 +57,8 @@ class FieldData:
     """are grazers currently in the field? is grazing occurring?"""
     seasonal_high_water_table: bool = False
     """if the HRU has a seasonal high water table (true/false)"""
+    field_size: float = 1
+    """size of the field (ha)"""
 
     def __post_init__(self):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""

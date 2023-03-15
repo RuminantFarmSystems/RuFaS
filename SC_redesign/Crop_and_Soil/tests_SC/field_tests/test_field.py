@@ -129,4 +129,20 @@ def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     field.plant_crops(config_list, coverages)
     assert len(field.crops) == len(config_list)
 
+
+def test_amend_soil() -> None:
+    """Tests that amend_soil() properly calls all the subroutines that add nutrients to the field"""
+    field = Field()
+    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus = MagicMock()
+    field.amend_soil()
+    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus.assert_called_once_with(0)
+
+
+def test_annual_reset() -> None:
+    """Tests that all annual reset subroutines are called properly"""
+    field = Field()
+    field.soil.data.do_annual_reset = MagicMock()
+    field.perform_annual_reset()
+    field.soil.data.do_annual_reset.assert_called_once()
+
 # TODO: All field methods need to be tested in future PRs.

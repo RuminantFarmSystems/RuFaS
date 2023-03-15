@@ -64,10 +64,12 @@ class Field:
         # determine total amount of residue and above-ground biomass present on the given day
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
 
+        # TODO: track snow cover on soil surface somewhere - Issue #317
         self.soil.daily_soil_routine(current_weather.incoming_light, current_weather.mean_air_temperature,
                                      current_weather.min_air_temperature, current_weather.max_air_temperature,
                                      total_plant_cover, current_weather.snow_fall,
                                      current_weather.annual_mean_air_temperature)
+
         # TODO: track snow cover on soil surface somewhere - Issue #317
 
         # --- Whole-Field Methods ---
@@ -133,7 +135,8 @@ class Field:
 
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
-        pass
+        self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(0)
+        return
 
     # </editor-fold>
 
@@ -308,7 +311,6 @@ class Field:
     def harvest_crops(self):
         """perform the harvest operation on all crops in the field, depending on the harvest operation"""
         for crop in self.crops:
-
             if self.field_data.harvest_type == HarvestOperation.HARVEST:
                 crop.crop_management.manage_harvest(cut=True, collect=True, kill=True)
 
@@ -361,12 +363,17 @@ class Field:
         # TODO: track snow cover on soil surface somewhere - Issue #317
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
         # TODO: figure out how to determine minimum cover management factor when there are multiple crops in the field
-        self.soil.daily_soil_water_routine(current_weather.rainfall, 1, self.field_data.seasonal_high_water_table,
-                                           current_weather.incoming_light, current_weather.max_air_temperature,
-                                           current_weather.min_air_temperature, current_weather.mean_air_temperature,
-                                           self._determine_total_above_ground_biomass(),
-                                           self.field_data.current_residue,
-                                           current_weather.snow_fall, total_initial_canopy_free_water, 0.2)
+        self.soil.daily_soil_water_routine(rainfall=current_weather.rainfall, weighting_coefficient=1,
+                                           has_seasonal_high_water_table=self.field_data.seasonal_high_water_table,
+                                           solar_radiation=current_weather.incoming_light,
+                                           max_air_temp=current_weather.max_air_temperature,
+                                           min_air_temp=current_weather.min_air_temperature,
+                                           avg_air_temp=current_weather.mean_air_temperature,
+                                           above_ground_biomass=self._determine_total_above_ground_biomass(),
+                                           residue=self.field_data.current_residue,
+                                           snow_water_content=current_weather.snow_fall,
+                                           initial_canopy_free_water=total_initial_canopy_free_water,
+                                           minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
 
     def _determine_total_above_ground_biomass(self) -> float:
@@ -383,5 +390,4 @@ class Field:
         """Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
             file, and then reset all annual totals"""
         self.soil.data.do_annual_reset()
-
-        pass
+        return
