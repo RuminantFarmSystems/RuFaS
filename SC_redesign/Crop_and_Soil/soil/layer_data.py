@@ -60,6 +60,10 @@ class LayerData:
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
 
+    # --- Phosphorus
+    labile_phosphorus_content: float = 0
+    """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
