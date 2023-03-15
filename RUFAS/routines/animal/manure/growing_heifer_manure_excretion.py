@@ -18,7 +18,8 @@ def manure_calculations(ration_formulation,
                         feed,
                         body_weight: float,
                         fecal_phosphorus: float,
-                        urine_phosphorus_required: float) \
+                        urine_phosphorus_required: float, 
+                        methane_model: str) \
         -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
 
@@ -34,6 +35,8 @@ def manure_calculations(ration_formulation,
         Amount of fecal phosphorus excreted by the current animal, g.
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Boadi, IPCC.
 
     Returns
     -------
@@ -52,7 +55,10 @@ def manure_calculations(ration_formulation,
     ASH_concentration = nutrient_concentrations["ash"]
     NDF_concentration = nutrient_concentrations['NDF']
     EE_concentration = nutrient_concentrations["EE"]
-
+    # Soluble residue
+    # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
+    soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
+   
     # Total urine, kg [A.3B.A.1]
     urine = 9.0
 
@@ -95,10 +101,16 @@ def manure_calculations(ration_formulation,
     # Amount of potassium excreted, g [A.3D.B.3]
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
-    # Methane emissions, g/day [A.3B.C.1]
-    # Methane model = Boadi
-    methane_emission = (38.62 + 26.44 * dry_matter_intake) * 0.554
-    # TODO: Implement the other methane model - IPCC Tier 2
+    # Methane emissions, g/day 
+    methane_emission = 0.0
+    if methane_model == "Boadi": 
+        # Methane model = 'Boadi' [A.3B.C.1]
+        methane_emission = (38.62 + 26.44 * dry_matter_intake) * 0.554
+    else:
+        # Default: IPCC Tier 2 
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
+                                    + 0.198 * NDF_concentration + 0.160 * soluble_residue) # [A.3B.C.2]
+        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565 # [A.3B.C.3]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=0,
