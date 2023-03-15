@@ -7,7 +7,8 @@ from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculatio
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
 
-def test_calf_manure_excretions(mocker: MockFixture) -> None:
+def test_calf_manure_excretions(methane_model: str,
+                                mocker: MockFixture) -> None:
     """Unit test for the manure_calculations function in calf_manure_excretion.py."""
     # Arrange
     mock_ration_formulation = mocker.MagicMock()
@@ -37,7 +38,9 @@ def test_calf_manure_excretions(mocker: MockFixture) -> None:
     manure_nitrogen = 112.55 * dry_matter_intake * (CP_concentration / 100)
     urine_nitrogen = 0.45 * manure_nitrogen
 
-    methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission = 0.0
+    if methane_model:
+        methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
 
     total_phosphorus_excreted = 3.0
     inorganic_phosphorus_fraction = 0.4

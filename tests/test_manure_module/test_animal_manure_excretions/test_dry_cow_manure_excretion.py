@@ -8,7 +8,8 @@ from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calcula
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
 
-def test_dry_cow_manure_calculations(mocker: MockerFixture) -> None:
+def test_dry_cow_manure_calculations(methane_model: str,
+                                     mocker: MockerFixture) -> None:
     """Unit test for the manure_calculations function in dry_cow_manure_excretion.py."""
     # Arrange
     mock_ration_formulation = mocker.MagicMock()
@@ -69,8 +70,17 @@ def test_dry_cow_manure_calculations(mocker: MockerFixture) -> None:
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
-    methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
+    
+    methane_emission = 0.0
+    if methane_model == "Mills": 
+        methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
                                                  * metabolizable_energy_intake * 4.184)) / 0.05565
+    else:
+        soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
+                                    + 0.198 * NDF_concentration + 0.160 * soluble_residue) 
+        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565 
+    
     total_phosphorus_excreted = 5.0
     inorganic_phosphorus_fraction = 0.4
     organic_phosphorus_fraction = 0.6
