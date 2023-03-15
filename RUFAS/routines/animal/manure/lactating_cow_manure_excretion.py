@@ -100,22 +100,16 @@ def manure_calculations(ration_formulation,
     # Amount of feces and urine excreted daily by the growing heifer, kg [A.3E.A.4]
     total_manure_excreted = fecal_water + fecal_solids + urine
 
-    # Fecal nitrogen, kg [A.3E.B.1]
-    fecal_nitrogen = (-0.0368
-                      + 0.0096 * dry_matter_intake
-                      + 0.0022 * CP_concentration
-                      + 0.0034 * lignin_concentration
-                      - 0.000043 * body_weight)
+    # Total manure nitrogen, kg [A.3E.B.1]
+    manure_nitrogen = (20.3 + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
+                        ) * GeneralConstants.GRAMS_TO_KG
 
     # Urine nitrogen, kg [A.3E.B.2]
-    urine_nitrogen = (-0.2837
-                      + 0.0068 * dry_matter_intake
-                      + 0.0155 * CP_concentration
-                      + 0.00013 * days_in_milk
-                      + 0.000092 * body_weight)
+    urine_nitrogen = (12.0 + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
+                      ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen in liquid and solid manure, kg [A.3E.B.3]
-    manure_nitrogen = fecal_nitrogen + urine_nitrogen
+    # Fecal nitrogen, kg [A.3B.B.3]
+    fecal_nitrogen = manure_nitrogen - urine_nitrogen
 
     # Organic matter intake, kg [A.2.A.3]
     organic_matter_intake = dry_matter_intake - ASH_diet_content
@@ -141,16 +135,20 @@ def manure_calculations(ration_formulation,
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
+    if urine_urea_nitrogen_concentration < 2:
+        urine_urea_nitrogen_concentration = 2
+    elif urine_urea_nitrogen_concentration > 12:
+        urine_urea_nitrogen_concentration = 12
+    else:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
+
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
 
-    # Amount of potassium excreted, g [A.3C.C.1]
-    potassium = (1.822 * daily_milk_production
-                 + 2688.88 * (milk_protein / 100)
-                 + 156.93 * dry_matter_intake * (potassium_concentration / 100)
-                 - 91.755)
+    # Amount of potassium excreted, g [A.3E.B.3]
+    potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5 
 
     # Methane Emissions
     methane_emission = 0.0

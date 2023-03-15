@@ -58,34 +58,42 @@ def manure_calculations(ration_formulation,
 
     # Manure excretion
     # Amount of feces and urine excreted daily by the growing heifer, kg [A.3B.A.2]
-    total_manure_excreted = 3.886 * dry_matter_intake - 0.029 * body_weight + 5.641
+    total_manure_excreted = 4.158 * dry_matter_intake - 0.0246 * body_weight 
 
     # Total solids excretion
-    # Amount of dry material excreted by the growing heifer, kg [A.3B.A.2]
-    total_solids = 0.0084 * body_weight
+    # Amount of dry material excreted by the growing heifer, kg [A.3B.A.3]
+    total_solids = 0.178 * dry_matter_intake + 2.733
 
-    # Total volatile solids, kg [A.3B.A.3]
+    # Total volatile solids, kg [A.3B.A.4]
     total_volatile_solids = 0.0073 * body_weight
 
-    # Degradable volatile solids, kg [A.3B.A.4]
+    # Degradable volatile solids, kg [A.3B.A.5]
     degradable_volatile_solids = 0.9 * total_volatile_solids
 
     # Non-degradable volatile solids, kg
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
     # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
-    manure_nitrogen = 78.390 * dry_matter_intake * (CP_concentration / 100) + 51.35
+    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in urine, kg [A.3F.B.2]
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 100)
+    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in feces, kg [A.3F.B.3]
     fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
 
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
-    urinary_nitrogen_concentration = (urine_nitrogen *GeneralConstants.KG_TO_GRAMS) / urine
+    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+
+    if urine_urea_nitrogen_concentration < 2:
+        urine_urea_nitrogen_concentration = 2
+    elif urine_urea_nitrogen_concentration > 12:
+        urine_urea_nitrogen_concentration = 12
+    else:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
 
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]

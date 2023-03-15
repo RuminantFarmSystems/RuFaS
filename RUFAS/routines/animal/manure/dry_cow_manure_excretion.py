@@ -74,7 +74,10 @@ def manure_calculations(ration_formulation,
 
     # Manure excretion
     # Amount of feces and urine excreted daily by the dry cow, kg [A.3F.A.2]
-    total_manure_excreted = 0.022 * body_weight + 21.844
+    total_manure_excreted = (0.00711 * body_weight 
+                            + 0.324 * CP_concentration
+                            + 0.259 * NDF_concentration
+                            + 8.05) 
 
     # Total solids excretion
     # Amount of dry material excreted by the dry cow, kg [A.3F.A.3]
@@ -99,12 +102,11 @@ def manure_calculations(ration_formulation,
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
     # Nitrogen in liquid and solid manure, kg [A.3F.B.1]
-    manure_nitrogen = (12.747 * dry_matter_intake
-                       + 1606.290 * (CP_concentration / 100)
-                       - 117.5)
+    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in urine, kg [A.3F.B.2]
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 100)
+    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Nitrogen excretion in feces, kg [A.3F.B.3]
@@ -113,6 +115,13 @@ def manure_calculations(ration_formulation,
     # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+
+    if urine_urea_nitrogen_concentration < 2:
+        urine_urea_nitrogen_concentration = 2
+    elif urine_urea_nitrogen_concentration > 12:
+        urine_urea_nitrogen_concentration = 12
+    else:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
 
     # Total ammoniacal nitrogen concentration in the manure slurry,
     # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
