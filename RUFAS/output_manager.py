@@ -1,9 +1,11 @@
 # !/usr/bin/env python3
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 import json
 import os
 import time
+
+from RUFAS.util import Utility
 
 
 class OutputManager (object):
@@ -224,11 +226,37 @@ class OutputManager (object):
         """
         return f"{caller_class}.{caller_function}"
 
-    def _dict_to_file_json(self, dict: Dict[str, Any], path: str) -> None:
-        """Saves a dictionary into a JSON file"""
+    def _dict_to_file_json(self, data_dict: Dict[str, Any], path: str) -> None:
+        """Saves a dictionary into a JSON file
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The dictionary to be saved
+        path : str
+            The path to the file to be saved
+
+        Raises
+        ------
+        Exception
+            If an error occurs while saving the file
+
+        Notes
+        -----
+        The dictionary is first converted to a serializable format using
+        `Utility.make_serializable()`.
+
+        The file is saved with 4 spaces indentation.
+
+        If you want to save time and space, limit the maximum depth of the
+        serialized dictionary using the max_depth parameter.
+
+        """
         try:
             with open(path, 'w') as json_file:
-                json_file.write(json.dumps(dict))
+                json.dump(Utility.make_serializable(data_dict, max_depth=6),
+                          json_file,
+                          indent=4)
         except Exception as e:
             raise e
 
@@ -240,10 +268,16 @@ class OutputManager (object):
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
-    def save_variables(self, path: str) -> None:
+    def save_variables(self, path: str, exclude_info_maps=False) -> None:
         """
         Saves variables_pool into a json file in the given path to a directory.
         """
+        vars_pool = self.variables_pool.copy()  # shallow copy
+        if exclude_info_maps:
+            for key, value in vars_pool.items():
+                if isinstance(value, dict) and 'info_maps' in value:
+                    value.pop('info_maps')
+
         file_path = os.path.join(
             path, self._generate_file_name("variables", "json"))
         self._dict_to_file_json(self.variables_pool, file_path)
@@ -276,7 +310,8 @@ class OutputManager (object):
         """
         Saves all pool into the given path to a directory.
         """
-        self.save_variables(path)
+        # If you want to save time and space, set exclude_info_maps to True
+        self.save_variables(path, exclude_info_maps=False)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)

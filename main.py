@@ -14,6 +14,7 @@ import config.global_variables
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.user_prompt import obtain_file_list
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Utility
 
 
 def run_rufas(input_path=None, make_graphs=True, verbose=True):
@@ -60,5 +61,9 @@ def parse_gnu_args():
 
 
 if __name__ == '__main__':
+    # Clear the output directory before running the model
+    output_dir = Path(config.global_variables.OUT_DIR)
+    Utility.empty_dir(output_dir, keep=['.keep'])
+
     cmd_arguments = parse_gnu_args()
     run_rufas(input_path=cmd_arguments.input_path, make_graphs=not cmd_arguments.no_graphics, verbose=cmd_arguments.verbose)
