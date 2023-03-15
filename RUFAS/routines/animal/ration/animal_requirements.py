@@ -888,6 +888,7 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
                      (day_of_pregnancy - 1)) * (body_weight/715)
     Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
     calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
+    if calcium_requirement < 0.0: calcium_requirement = 0.0
     return calcium_requirement
 
 
@@ -1013,6 +1014,7 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     else:
         P_Lact = milk_production * (0.49 + 0.13*milk_true_protein)
     phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
+    if phosphorus_requirement < 0.0: phosphorus_requirement = 0.0
     return phosphorus_requirement
 
 
@@ -1068,6 +1070,7 @@ def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: in
         # TODO: Actual calculation for dry_matter_intake_estimate
         dry_matter_intake_estimate = 0.0
         # this comment is a holdover from the previous version
+    if dry_matter_intake_estimate < 2.0: dry_matter_intake_estimate = 2.0
     return dry_matter_intake_estimate
 
 
@@ -1128,6 +1131,7 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
             -(0.082*(NDF_concentration_percentage\
             -(23.1+56*(body_weight/mature_body_weight)-30.6(body_weight/mature_body_weight)^2)))
         """
+    if dry_matter_intake_estimate < 2.0: dry_matter_intake_estimate = 2.0
     return dry_matter_intake_estimate
 
 
