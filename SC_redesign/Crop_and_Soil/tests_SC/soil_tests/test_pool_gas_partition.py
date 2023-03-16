@@ -14,20 +14,20 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
       LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
                 wilting_point_water_concentration=0.8),
       LayerData(top_depth=12, bottom_depth=20, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
-                wilting_point_water_concentration=0.3)]),  # lower values
+                wilting_point_water_concentration=0.3)]),
     ([LayerData(top_depth=0, bottom_depth=3, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
                 wilting_point_water_concentration=1.8),
       LayerData(top_depth=3, bottom_depth=15, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
                 wilting_point_water_concentration=0.8),
       LayerData(top_depth=15, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-                wilting_point_water_concentration=0.2)]),  # higher values
+                wilting_point_water_concentration=0.2)]),
     ([LayerData(top_depth=0, bottom_depth=8, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
                 wilting_point_water_concentration=1.8),
       LayerData(top_depth=8, bottom_depth=20, soil_water_concentration=1.4,
                 field_capacity_water_concentration=1.8,
                 wilting_point_water_concentration=0.8),
       LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-                wilting_point_water_concentration=0.6)])  # arbitrary
+                wilting_point_water_concentration=0.6)])
 ])
 def test_partition(layers):
     data = SoilData(soil_layers=layers)
@@ -48,7 +48,7 @@ def test_partition(layers):
     PoolGasPartition._soil_structural_slow_carbon_remaining = MagicMock(return_value=3.2)
 
     # S.6.C.2 mocking
-    PoolGasPartition._active_carbon_decomposition_rate = MagicMock(return_value=3.3)
+    PoolGasPartition._active_carbon_decomposition_rate = MagicMock(return_value=0.87)
 
     # S.6.C.3 mocking
     PoolGasPartition._active_carbon_decomposition_amount = MagicMock(return_value=3.4)
@@ -67,9 +67,31 @@ def test_partition(layers):
     PoolGasPartition._active_carbon_to_slow_loss = MagicMock(return_value=3.9)
 
     # S.6.C.8 mocking
-    PoolGasPartition._active_carbon_to_slow_loss = MagicMock(return_value=4.1)
+    PoolGasPartition._active_carbon_to_passive_amount = MagicMock(return_value=4.1)
+
+    # S.6.C.9 mocking
+    PoolGasPartition._slow_to_active_carbon_amount = MagicMock(return_value=4.2)
+    PoolGasPartition._slow_carbon_co2_lost_amount = MagicMock(return_value=4.3)
+    PoolGasPartition._slow_to_passive_carbon_amount = MagicMock(return_value=4.4)
+
+    # S.6.C.10 mocking
+    PoolGasPartition._passive_to_active_carbon_amount = MagicMock(return_value=4.5)
+    PoolGasPartition._passive_carbon_co2_lost_amount = MagicMock(return_value=4.6)
+
+    # S.6.C.11 mocking
+    PoolGasPartition._plant_active_decompose_carbon = MagicMock(return_value=4.7)
+    PoolGasPartition._soil_active_decompose_carbon = MagicMock(return_value=4.8)
+    PoolGasPartition._soil_active_carbon_amount = MagicMock(return_value=4.9)
+
+    # S.6.C.12 mocking
+    PoolGasPartition._soil_slow_carbon_amount = MagicMock(return_value=5.1)
+
+    # S.6.C.13 mocking
+    PoolGasPartition._soil_passive_carbon_amount = MagicMock(return_value=5.2)
 
     partition.partition()
+
+    # Checking if methods are called correct number of times
     assert PoolGasPartition._plant_metabolic_active_carbon_loss.call_count == 3
     assert PoolGasPartition._plant_metabolic_active_carbon_remaining.call_count == 3
     assert PoolGasPartition._plant_structural_active_carbon_loss.call_count == 3
@@ -95,6 +117,64 @@ def test_partition(layers):
 
     assert PoolGasPartition._active_carbon_to_slow_amount.call_count == 3
     assert PoolGasPartition._active_carbon_to_slow_loss.call_count == 3
+
+    assert PoolGasPartition._slow_to_active_carbon_amount.call_count == 3
+    assert PoolGasPartition._slow_carbon_co2_lost_amount.call_count == 3
+    assert PoolGasPartition._slow_to_passive_carbon_amount.call_count == 3
+
+    assert PoolGasPartition._passive_to_active_carbon_amount.call_count == 3
+    assert PoolGasPartition._passive_carbon_co2_lost_amount.call_count == 3
+
+    assert PoolGasPartition._plant_active_decompose_carbon.call_count == 3
+    assert PoolGasPartition._soil_active_decompose_carbon.call_count == 3
+    assert PoolGasPartition._soil_active_carbon_amount.call_count == 3
+
+    assert PoolGasPartition._soil_slow_carbon_amount.call_count == 3
+
+    assert PoolGasPartition._soil_passive_carbon_amount.call_count == 3
+
+    # Checking values were set correctly by the main routine
+    assert partition.data.active_carbon_decomposition_rate == 0.87
+
+    assert partition.data.carbon_lost_adjusted_factor == 3.7
+    for layer in data.soil_layers:
+        assert layer.plant_metabolic_active_carbon_loss == 1.89
+        assert layer.plant_metabolic_active_carbon_remaining == 2.1
+        assert layer.plant_structural_active_carbon_remaining == 2.3
+        assert layer.plant_structural_slow_carbon_loss == 2.4
+        assert layer.plant_structural_slow_carbon_remaining == 2.5
+        assert layer.soil_metabolic_active_carbon_loss == 2.6
+        assert layer.soil_metabolic_active_carbon_remaining == 2.7
+        assert layer.soil_structural_active_carbon_loss == 2.8
+        assert layer.soil_structural_active_carbon_remaining == 2.9
+        assert layer.soil_structural_slow_carbon_loss == 3.1
+        assert layer.soil_structural_slow_carbon_remaining == 3.2
+
+        assert layer.active_carbon_decomposition_amount == 3.4
+
+        assert layer.slow_carbon_decomposition_amount == 3.5
+
+        assert layer.passive_carbon_decomposition_amount == 3.6
+
+        assert layer.active_carbon_to_slow_amount == 3.8
+        assert layer.active_carbon_to_slow_loss == 3.9
+
+        assert layer.active_carbon_to_passive_amount == 4.1
+
+        assert layer.slow_to_active_carbon_amount == 4.2
+        assert layer.slow_carbon_co2_lost_amount == 4.3
+        assert layer.slow_to_passive_carbon_amount == 4.4
+
+        assert layer.passive_to_active_carbon_amount == 4.5
+        assert layer.passive_carbon_co2_lost_amount == 4.6
+
+        assert layer.plant_active_decompose_carbon == 4.7
+        assert layer.soil_active_decompose_carbon == 4.8
+        assert layer.active_carbon_amount == 4.9
+
+        assert layer.slow_carbon_amount == 5.1
+
+        assert layer.passive_carbon_amount == 5.2
 
 
 @pytest.mark.parametrize("soil_structural_slow_carbon_usage", [
