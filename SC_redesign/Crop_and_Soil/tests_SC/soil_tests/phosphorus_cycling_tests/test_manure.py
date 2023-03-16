@@ -1,5 +1,6 @@
 import pytest
 from math import exp, sqrt
+from unittest.mock import MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure import Manure
 
@@ -101,13 +102,42 @@ def test_determine_rain_manure_dry_matter_ratio(rain: float, manure_mass: float,
     assert observe == expect
 
 
+@pytest.mark.parametrize("manure,rain_manure_ratio,is_cow", [
+    (300, 1300, True),
+    (255, 1234, False),
+])
+def test_determine_water_extractable_inorganic_phosphorus_leached(manure: float, rain_manure_ratio: float,
+                                                                  is_cow: bool) -> None:
+    """Tests that the correct mass of water extractable inorganic phosphorus leached is calculated."""
+    observe = Manure._determine_water_extractable_inorganic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
+    if is_cow:
+        expect = min(1.0, (1.2 * rain_manure_ratio) / (rain_manure_ratio + 73.1)) * manure
+    else:
+        expect = min(1.0, (2.2 * rain_manure_ratio) / (rain_manure_ratio + 300.1)) * manure
+    expect = max(0, expect)
+    assert observe == expect
+
+
+@pytest.mark.parametrize("manure,rain_manure_ratio,is_cow", [
+    (300, 1300, True),
+    (255, 1234, False),
+])
+def test_determine_water_extractable_organic_phosphorus_leached(manure: float, rain_manure_ratio: float,
+                                                                is_cow: bool) -> None:
+    """Tests that the correct mass of water extractable organic phosphorus leached is calculated."""
+    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=50)
+    observe = Manure._determine_water_extractable_organic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
+    expect = 50 / 0.6
+    assert observe == expect
+
+
 @pytest.mark.parametrize("rain,runoff", [
     (13, 0),
     (11, 3),
     (10, 10),
 ])
-def test_determine_phosphorus_dissolved_factor(rain: float, runoff: float) -> None:
-    """Tests that the adjusted ratio of rainfall to runoff is calculated correctly"""
-    observe = Manure._determine_phosphorus_dissolved_factor(rain, runoff)
+def test_determine_phosphorus_distribution_factor(rain: float, runoff: float) -> None:
+    """Tests that the adjusted ratio of rainfall to runoff is calculated correctly."""
+    observe = Manure._determine_phosphorus_distribution_factor(rain, runoff)
     expect = (runoff / rain) ** 0.225
     assert observe == expect
