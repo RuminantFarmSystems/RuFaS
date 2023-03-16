@@ -19,6 +19,9 @@ class PoolGasPartition:
         self.data.active_carbon_decomposition_rate = self._active_carbon_decomposition_rate(
             self.data.silt_clay_content)
 
+        # S.6.C.6
+        self.data.carbon_lost_adjusted_factor = self._carbon_lost_adjusted_factor(self.data.silt_clay_content)
+
         for layer in self.data.soil_layers:
             # ---- plants
             layer.plant_metabolic_active_carbon_loss = self._plant_metabolic_active_carbon_loss(
@@ -69,9 +72,6 @@ class PoolGasPartition:
             layer.passive_carbon_decomposition_amount = self._passive_carbon_decomposition_amount(
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
                 layer.passive_carbon_amount)
-
-            # S.6.C.6
-            self.data.carbon_lost_adjusted_factor = self._carbon_lost_adjusted_factor(self.data.silt_clay_content)
 
             # S.6.C.7
             layer.active_carbon_to_slow_amount = self._active_carbon_to_slow_amount(
