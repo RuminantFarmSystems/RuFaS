@@ -101,11 +101,13 @@ def manure_calculations(ration_formulation,
     total_manure_excreted = fecal_water + fecal_solids + urine
 
     # Total manure nitrogen, kg [A.3E.B.1]
-    manure_nitrogen = (20.3 + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
+    manure_nitrogen = (20.3 
+                       + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                         ) * GeneralConstants.GRAMS_TO_KG
 
     # Urine nitrogen, kg [A.3E.B.2]
-    urine_nitrogen = (12.0 + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 6.25) / 100
+    urine_nitrogen = (12.0 
+                      + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Fecal nitrogen, kg [A.3B.B.3]
@@ -135,10 +137,12 @@ def manure_calculations(ration_formulation,
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-    if urine_urea_nitrogen_concentration < 2:
-        urine_urea_nitrogen_concentration = 2
-    elif urine_urea_nitrogen_concentration > 12:
-        urine_urea_nitrogen_concentration = 12
+    urine_urea_nitrogen_concentration_lower_bound = 2
+    urine_urea_nitrogen_concentration_upper_bound = 12
+    if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_lower_bound
+    elif urine_urea_nitrogen_concentration > urine_urea_nitrogen_concentration_upper_bound:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
     else:
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
 
