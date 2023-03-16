@@ -3,7 +3,7 @@ from math import exp, sqrt
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MILLIMETERS_TO_CENTIMETERS, KILOGRAMS_TO_GRAMS, \
-    HECTARES_TO_SQUARE_CENTIMETERS
+    KILOGRAMS_TO_MILLIGRAMS, HECTARES_TO_SQUARE_CENTIMETERS, HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS
 
 """
 This module adds and tracks manure phosphorus dynamics based on the SurPhos model.
@@ -286,3 +286,31 @@ class Manure:
 
         """
         return (runoff / rainfall) ** 0.225
+
+    @staticmethod
+    def _determine_water_extractable_phosphorus_runoff_concentration(manure_leached: float, rainfall: float,
+                                                                     field_size: float,
+                                                                     distribution_factor: float) -> float:
+        """Calculates the concentration of water extractable phosphorus in runoff on the current day.
+
+        Parameters
+        ----------
+        manure_leached : float
+            Mass of water extractable phosphorus leached from surface manure by rain on the current day (kg)
+        rainfall : float
+            Amount of rainfall on the current day (mm)
+        field_size : float
+            Size of the field (ha)
+        distribution_factor : float
+            Factor accounting for runoff to rainfall ratio on the current day (unitless)
+
+        Returns
+        -------
+        float
+            The concentration of water extractable phosphorus in runoff on the current day (milligrams per liter)
+
+        """
+        manure_leached_in_mg = manure_leached * KILOGRAMS_TO_MILLIGRAMS
+        field_size_in_square_mm = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        return manure_leached_in_mg * (1 / rainfall) * (1 / field_size_in_square_mm) * \
+            (1 / CUBIC_MILLIMETERS_TO_LITERS) * distribution_factor

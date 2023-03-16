@@ -128,6 +128,8 @@ def test_determine_water_extractable_organic_phosphorus_leached(manure: float, r
     Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=50)
     observe = Manure._determine_water_extractable_organic_phosphorus_leached(manure, rain_manure_ratio, is_cow)
     expect = 50 / 0.6
+    Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(manure, rain_manure_ratio,
+                                                                                             is_cow)
     assert observe == expect
 
 
@@ -141,3 +143,20 @@ def test_determine_phosphorus_distribution_factor(rain: float, runoff: float) ->
     observe = Manure._determine_phosphorus_distribution_factor(rain, runoff)
     expect = (runoff / rain) ** 0.225
     assert observe == expect
+
+
+@pytest.mark.parametrize("manure,rain,field_size,distribution_factor", [
+    (23, 11, 3.1, 0.8743),
+    (58.67143, 7.183, 0.981, 0.69982),
+    (147.1892, 4.867, 1.875, 0.1984),
+    (87.92734, 6.839, 2.385, 1.0),
+    (101.29482, 9.29583, 3.4918, 0.0),
+])
+def test_determine_water_extractable_phosphorus_runoff_concentration(manure: float, rain: float, field_size: float,
+                                                                     distribution_factor: float) -> None:
+    """Tests that the concentration of water extractable phosphorus in runoff is calculated correctly based on manure
+        leached, amount of rainfall, area of the field, and the ratio of runoff to rainfall."""
+    observe = Manure._determine_water_extractable_phosphorus_runoff_concentration(manure, rain, field_size,
+                                                                                  distribution_factor)
+    expect = manure / rain * (1 / field_size) * 100 * distribution_factor
+    assert pytest.approx(observe) == expect
