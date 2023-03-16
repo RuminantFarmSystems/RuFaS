@@ -87,3 +87,27 @@ def test_determine_moisture_change(rain: float, moisture: float, current_mass: f
     else:
         expect = (-0.3 * moisture) + 0.27
     assert observe == expect
+
+
+@pytest.mark.parametrize("rain,manure_mass,manure_coverage", [
+    (13, 300, 3),
+    (5, 30, 1.8),
+    (3.881993, 86.24832, 2.3948),
+])
+def test_determine_rain_manure_dry_matter_ratio(rain: float, manure_mass: float, manure_coverage: float) -> float:
+    """Tests that the ratio of rain to manure is calculated correctly."""
+    observe = Manure._determine_rain_manure_dry_matter_ratio(rain, manure_mass, manure_coverage)
+    expect = rain / manure_mass * manure_coverage * 10_000
+    assert observe == expect
+
+
+@pytest.mark.parametrize("rain,runoff", [
+    (13, 0),
+    (11, 3),
+    (10, 10),
+])
+def test_determine_phosphorus_dissolved_factor(rain: float, runoff: float) -> None:
+    """Tests that the adjusted ratio of rainfall to runoff is calculated correctly"""
+    observe = Manure._determine_phosphorus_dissolved_factor(rain, runoff)
+    expect = (runoff / rain) ** 0.225
+    assert observe == expect

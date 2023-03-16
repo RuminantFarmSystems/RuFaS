@@ -2,6 +2,8 @@ from typing import Optional
 from math import exp, sqrt
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MILLIMETERS_TO_CENTIMETERS, KILOGRAMS_TO_GRAMS, \
+    HECTARES_TO_SQUARE_CENTIMETERS
 
 """
 This module adds and tracks manure phosphorus dynamics based on the SurPhos model.
@@ -167,3 +169,52 @@ class Manure:
             return (-1) * (-0.05 * (current_mass / original_mass) + 0.075) * temperature_factor
 
         return (-0.3 * current_moisture) + 0.27
+
+    @staticmethod
+    def _determine_rain_manure_dry_matter_ratio(rainfall: float, manure_dry_matter: float,
+                                                manure_coverage: float) -> float:
+        """Calculates the ratio of rainfall to manure dry matter currently on the field.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm)
+        manure_dry_matter : float
+            Current mass of manure dry matter on the field (kg)
+        manure_coverage : float
+            Area of the field covered by manure (ha)
+
+        Returns
+        -------
+        float
+            The ratio of rainfall to manure dry matter currently on the field (cubic cm per g)
+
+        """
+        rain_in_centimeters = rainfall * MILLIMETERS_TO_CENTIMETERS
+        dry_matter_in_grams = manure_dry_matter * KILOGRAMS_TO_GRAMS
+        coverage_in_square_centimeters = manure_coverage * HECTARES_TO_SQUARE_CENTIMETERS
+        return (rain_in_centimeters / dry_matter_in_grams) * coverage_in_square_centimeters
+
+    @staticmethod
+    def _determine_phosphorus_dissolved_factor(rainfall: float, runoff: float) -> float:
+        """Calculates a factor used to determine the concentration of Phosphorus dissolved in runoff, based on the ratio
+            of rainfall to runoff
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm)
+        runoff : float
+            Amount of runoff on the current day (mm)
+
+        Returns
+        -------
+        float
+            The ratio of rainfall to runoff adjusted for use in determining dissolved Phosphorus concentrations
+
+        References
+        ----------
+        SurPhos [13], pseudocode_soil [S.5.D.II.2]
+
+        """
+        return (runoff / rainfall) ** 0.225
