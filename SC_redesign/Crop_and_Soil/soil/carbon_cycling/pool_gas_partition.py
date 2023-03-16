@@ -138,6 +138,8 @@ class PoolGasPartition:
         return slow_carbon_amount + plant_structural_slow_carbon_remaining + soil_structural_slow_carbon_remaining + \
                active_carbon_to_slow_amount - slow_carbon_decomposition_amount
 
+    # TODO:---------test everything above
+
     # ---- S.6.C.11
     @staticmethod
     def _plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining: float,
@@ -156,8 +158,6 @@ class PoolGasPartition:
                                    active_carbon_decomposition_amount: float) -> float:
         return active_carbon_amount + plant_active_decompose_carbon + soil_active_decompose_carbon \
                + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
-
-    # TODO:---------test everything above
 
     # ---- S.6.C.10
     @staticmethod
