@@ -47,9 +47,27 @@ def test_partition(layers):
     PoolGasPartition._soil_structural_slow_carbon_loss = MagicMock(return_value=3.1)
     PoolGasPartition._soil_structural_slow_carbon_remaining = MagicMock(return_value=3.2)
 
+    # S.6.C.2 mocking
     PoolGasPartition._active_carbon_decomposition_rate = MagicMock(return_value=3.3)
 
+    # S.6.C.3 mocking
     PoolGasPartition._active_carbon_decomposition_amount = MagicMock(return_value=3.4)
+
+    # S.6.C.4 mocking
+    PoolGasPartition._slow_carbon_decomposition_amount = MagicMock(return_value=3.5)
+
+    # S.6.C.5 mocking
+    PoolGasPartition._passive_carbon_decomposition_amount = MagicMock(return_value=3.6)
+
+    # S.6.C.6 mocking
+    PoolGasPartition._carbon_lost_adjusted_factor = MagicMock(return_value=3.7)
+
+    # S.6.C.7 mocking
+    PoolGasPartition._active_carbon_to_slow_amount = MagicMock(return_value=3.8)
+    PoolGasPartition._active_carbon_to_slow_loss = MagicMock(return_value=3.9)
+
+    # S.6.C.8 mocking
+    PoolGasPartition._active_carbon_to_slow_loss = MagicMock(return_value=4.1)
 
     partition.partition()
     assert PoolGasPartition._plant_metabolic_active_carbon_loss.call_count == 3
@@ -68,6 +86,15 @@ def test_partition(layers):
     assert PoolGasPartition._active_carbon_decomposition_rate.call_count == 1
 
     assert PoolGasPartition._active_carbon_decomposition_amount.call_count == 3
+
+    assert PoolGasPartition._slow_carbon_decomposition_amount.call_count == 3
+
+    assert PoolGasPartition._passive_carbon_decomposition_amount.call_count == 3
+
+    assert PoolGasPartition._carbon_lost_adjusted_factor.call_count == 1
+
+    assert PoolGasPartition._active_carbon_to_slow_amount.call_count == 3
+    assert PoolGasPartition._active_carbon_to_slow_loss.call_count == 3
 
 
 @pytest.mark.parametrize("soil_structural_slow_carbon_usage", [
