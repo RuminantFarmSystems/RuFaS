@@ -1,3 +1,4 @@
+import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
@@ -5,7 +6,13 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 
-
+@pytest.mark.parametrize(
+    'methane_model',
+    [
+        'Boadi',
+        'IPCC',
+    ]
+)
 def test_growing_heifer_manure_calculations(methane_model: str,
                                             mocker: MockerFixture) -> None:
     """Unit test for the manure_calculations function in growing_heifer_manure_excretion.py."""
@@ -85,7 +92,8 @@ def test_growing_heifer_manure_calculations(methane_model: str,
         feed=mock_feed,
         body_weight=body_weight,
         fecal_phosphorus=fecal_phosphorus,
-        urine_phosphorus_required=urine_phosphorus_required
+        urine_phosphorus_required=urine_phosphorus_required,
+        methane_model=methane_model
     )
 
     # Assert
