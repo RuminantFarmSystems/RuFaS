@@ -335,3 +335,22 @@ def test_soil_active_carbon_amount(active_carbon_amount, plant_active_decompose_
                                                                    passive_to_active_carbon_amount,
                                                                    slow_to_active_carbon_amount,
                                                                    active_carbon_decomposition_amount)
+
+
+@pytest.mark.parametrize("slow_carbon_amount, plant_structural_slow_carbon_remaining,"
+                         "soil_structural_slow_carbon_remaining, active_carbon_to_slow_amount,"
+                         "slow_carbon_decomposition_amount", [
+                             (77, 54, 88, 97, 103),  # higher value
+                             (0.5, 1.8, 21.2, 1.2, 99.45),  # arbitrary values
+                             (2, 9, 1, 3, 5)  # lower value
+                         ])
+def test_soil_slow_carbon_amount(slow_carbon_amount, plant_structural_slow_carbon_remaining,
+                                 soil_structural_slow_carbon_remaining, active_carbon_to_slow_amount,
+                                 slow_carbon_decomposition_amount):
+    expected = slow_carbon_amount + plant_structural_slow_carbon_remaining + soil_structural_slow_carbon_remaining + \
+               active_carbon_to_slow_amount - slow_carbon_decomposition_amount
+    assert expected == PoolGasPartition._soil_slow_carbon_amount(slow_carbon_amount,
+                                                                 plant_structural_slow_carbon_remaining,
+                                                                 soil_structural_slow_carbon_remaining,
+                                                                 active_carbon_to_slow_amount,
+                                                                 slow_carbon_decomposition_amount)
