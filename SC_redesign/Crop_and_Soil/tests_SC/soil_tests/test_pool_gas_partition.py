@@ -8,6 +8,68 @@ from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
+@pytest.mark.parametrize("layers", [
+    ([LayerData(top_depth=0, bottom_depth=4, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+                wilting_point_water_concentration=0.9),
+      LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
+                wilting_point_water_concentration=0.8),
+      LayerData(top_depth=12, bottom_depth=20, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
+                wilting_point_water_concentration=0.3)]),  # lower values
+    ([LayerData(top_depth=0, bottom_depth=3, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
+                wilting_point_water_concentration=1.8),
+      LayerData(top_depth=3, bottom_depth=15, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
+                wilting_point_water_concentration=0.8),
+      LayerData(top_depth=15, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+                wilting_point_water_concentration=0.2)]),  # higher values
+    ([LayerData(top_depth=0, bottom_depth=8, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
+                wilting_point_water_concentration=1.8),
+      LayerData(top_depth=8, bottom_depth=20, soil_water_concentration=1.4,
+                field_capacity_water_concentration=1.8,
+                wilting_point_water_concentration=0.8),
+      LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+                wilting_point_water_concentration=0.6)])  # arbitrary
+])
+def test_partition(layers):
+    data = SoilData(soil_layers=layers)
+    partition = PoolGasPartition(data)
+
+    # S.6.C.1 mocking
+    PoolGasPartition._plant_metabolic_active_carbon_loss = MagicMock(return_value=1.89)
+    PoolGasPartition._plant_metabolic_active_carbon_remaining = MagicMock(return_value=2.1)
+    PoolGasPartition._plant_structural_active_carbon_loss = MagicMock(return_value=2.2)
+    PoolGasPartition._plant_structural_active_carbon_remaining = MagicMock(return_value=2.3)
+    PoolGasPartition._plant_structural_slow_carbon_loss = MagicMock(return_value=2.4)
+    PoolGasPartition._plant_structural_slow_carbon_remaining = MagicMock(return_value=2.5)
+    PoolGasPartition._soil_metabolic_active_carbon_loss = MagicMock(return_value=2.6)
+    PoolGasPartition._soil_metabolic_active_carbon_remaining = MagicMock(return_value=2.7)
+    PoolGasPartition._soil_structural_active_carbon_loss = MagicMock(return_value=2.8)
+    PoolGasPartition._soil_structural_active_carbon_remaining = MagicMock(return_value=2.9)
+    PoolGasPartition._soil_structural_slow_carbon_loss = MagicMock(return_value=3.1)
+    PoolGasPartition._soil_structural_slow_carbon_remaining = MagicMock(return_value=3.2)
+
+    PoolGasPartition._active_carbon_decomposition_rate = MagicMock(return_value=3.3)
+
+    PoolGasPartition._active_carbon_decomposition_amount = MagicMock(return_value=3.4)
+
+    partition.partition()
+    assert PoolGasPartition._plant_metabolic_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._plant_metabolic_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._plant_structural_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._plant_structural_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._plant_structural_slow_carbon_loss.call_count == 3
+    assert PoolGasPartition._plant_structural_slow_carbon_remaining.call_count == 3
+    assert PoolGasPartition._soil_metabolic_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._soil_metabolic_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._soil_structural_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._soil_structural_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._soil_structural_slow_carbon_loss.call_count == 3
+    assert PoolGasPartition._soil_structural_slow_carbon_remaining.call_count == 3
+
+    assert PoolGasPartition._active_carbon_decomposition_rate.call_count == 1
+
+    assert PoolGasPartition._active_carbon_decomposition_amount.call_count == 3
+
+
 @pytest.mark.parametrize("soil_structural_slow_carbon_usage", [
     70,  # lower values
     150,  # higher values

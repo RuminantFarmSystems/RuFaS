@@ -15,6 +15,10 @@ class PoolGasPartition:
         Args:
             soil: an instance of the Soil class defined in soil.py
         """
+        # S.6.C.2
+        self.data.active_carbon_decomposition_rate = self._active_carbon_decomposition_rate(
+            self.data.silt_clay_content)
+
         for layer in self.data.soil_layers:
             # ---- plants
             layer.plant_metabolic_active_carbon_loss = self._plant_metabolic_active_carbon_loss(
@@ -49,10 +53,6 @@ class PoolGasPartition:
                 layer.soil_structural_slow_carbon_usage)
             layer.soil_structural_slow_carbon_remaining = self._soil_structural_slow_carbon_remaining(
                 layer.soil_structural_slow_carbon_usage)
-
-            # S.6.C.2
-            self.data.active_carbon_decomposition_rate = self._active_carbon_decomposition_rate(
-                self.data.silt_clay_content)
 
             # S.6.C.3
             layer.active_carbon_decomposition_amount = self._active_carbon_decomposition_amount(
