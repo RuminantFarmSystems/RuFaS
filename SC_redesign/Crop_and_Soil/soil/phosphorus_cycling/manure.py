@@ -196,7 +196,75 @@ class Manure:
         return (rain_in_centimeters / dry_matter_in_grams) * coverage_in_square_centimeters
 
     @staticmethod
-    def _determine_phosphorus_dissolved_factor(rainfall: float, runoff: float) -> float:
+    def _determine_water_extractable_inorganic_phosphorus_leached(manure_water_extractable_inorganic_phosphorus: float,
+                                                                  rainfall_to_dry_manure_ratio: float,
+                                                                  is_from_cow: bool) -> float:
+        """Determines the amount of water extractable inorganic phosphorus leached by rainfall
+
+        Parameters
+        ----------
+        manure_water_extractable_inorganic_phosphorus : float
+            The amount of water extractable inorganic phosphorus from manure on the field (kg)
+        rainfall_to_dry_manure_ratio : float
+            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram)
+        is_from_cow : float
+            Is the water extractable inorganic phosphorus from cow manure (true / false)
+
+        Returns
+        -------
+        float
+            The amount of water extractable inorganic phosphorus leached from manure on the soil surface by rain on the
+            given day (kg)
+
+        References
+        ----------
+        SurPhos [9, 10], pseudocode_soil [S.5.D.I.3, II.1]
+
+        Details
+        -------
+        Phosphorus leaching from cow manure is determined with a different set of constants than non-cow manure, which
+        is why the is_from_cow parameter is necessary.
+
+        """
+        if is_from_cow:
+            first_term = (1.2 * rainfall_to_dry_manure_ratio) / (rainfall_to_dry_manure_ratio + 73.1)
+        else:
+            first_term = (2.2 * rainfall_to_dry_manure_ratio) / (rainfall_to_dry_manure_ratio + 300.1)
+        first_term = min(1.0, first_term)
+        return max(0.0, first_term * manure_water_extractable_inorganic_phosphorus)
+
+    @staticmethod
+    def _determine_water_extractable_organic_phosphorus_leached(manure_water_extractable_organic_phosphorus: float,
+                                                                rainfall_to_dry_manure_ratio: float,
+                                                                is_from_cow: bool) -> float:
+        """Determines the amount of water extractable organic phosphorus leached by rainfall
+
+        Parameters
+        ----------
+        manure_water_extractable_organic_phosphorus : float
+            The amount of water extractable inorganic phosphorus from manure on the field (kg)
+        rainfall_to_dry_manure_ratio : float
+            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram)
+        is_from_cow : float
+            Is the water extractable inorganic phosphorus from cow manure (true / false)
+
+        Returns
+        -------
+        float
+            The amount of water extractable inorganic phosphorus leached from manure on the soil surface by rain on the
+            given day (kg)
+
+        References
+        ----------
+        SurPhos [9, 10], pseudocode_soil [S.5.D.I.3, II.1]
+
+        """
+        result = Manure._determine_water_extractable_inorganic_phosphorus_leached(
+            manure_water_extractable_organic_phosphorus, rainfall_to_dry_manure_ratio, is_from_cow)
+        return result / 0.6
+
+    @staticmethod
+    def _determine_phosphorus_distribution_factor(rainfall: float, runoff: float) -> float:
         """Calculates a factor used to determine the concentration of Phosphorus dissolved in runoff, based on the ratio
             of rainfall to runoff
 
