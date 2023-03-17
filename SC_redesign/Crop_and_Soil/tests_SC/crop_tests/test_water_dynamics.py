@@ -1,5 +1,6 @@
 import pytest
-from SC_redesign.Crop_and_Soil.crop.water_dynamics import *
+from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 
 # ---- helper functions tests ----
@@ -68,8 +69,10 @@ def test_cycle_water(evap, trans, et_max, potential_evapotrans_adj):
                     cumulative_potential_evapotranspiration=0)
     water_dyn = WaterDynamics(data)
     water_dyn.cycle_water(evap, trans, et_max, potential_evapotrans_adj)
-    expected = [water_dyn.data.cumulative_evaporation, water_dyn.data.cumulative_transpiration, water_dyn.data.cumulative_evapotranspiration,
-                water_dyn.data.cumulative_potential_evapotranspiration, water_dyn.data.water_deficiency, water_dyn.data.max_transpiration]
+    expected = [water_dyn.data.cumulative_evaporation, water_dyn.data.cumulative_transpiration,
+                water_dyn.data.cumulative_evapotranspiration, water_dyn.data.cumulative_potential_evapotranspiration,
+                water_dyn.data.water_deficiency, water_dyn.data.max_transpiration]
     observed = [evap, trans, evap + trans, et_max, WaterDynamics._determine_water_deficiency(evap + trans, et_max),
-                WaterDynamics._determine_maximum_transpiration(water_dyn.data.leaf_area_index, potential_evapotrans_adj)]
+                WaterDynamics._determine_maximum_transpiration(water_dyn.data.leaf_area_index,
+                                                               potential_evapotrans_adj)]
     assert expected == observed

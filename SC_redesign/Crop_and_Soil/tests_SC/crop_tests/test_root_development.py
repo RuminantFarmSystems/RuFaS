@@ -1,5 +1,8 @@
-from SC_redesign.Crop_and_Soil.crop.root_development import *
+from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.crop.crop_data import PlantCategory
 import pytest
+
 
 # ---- Test Static Functions ----
 @pytest.mark.parametrize("heatfrac,expect", [
@@ -51,15 +54,15 @@ def test_develop_roots(maxd, heatfrac):
     """integration test for main root development function develop_roots()"""
 
     # ---- perennial crop ----
-    data_perennial = CropData(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=True)
+    data_perennial = CropData(heat_fraction=heatfrac, max_root_depth=maxd, plant_category=PlantCategory("perennial"))
     rd = RootDevelopment(data_perennial)
     rd.develop_roots()
     assert data_perennial.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
-    assert data_perennial.root_depth == RootDevelopment._determine_root_depth(maxd, heatfrac)
+    assert data_perennial.root_depth == maxd
 
     # ---- annual crop ----
-    data_annual = CropData(heat_fraction=heatfrac, max_root_depth=maxd, is_perennial=False)
+    data_annual = CropData(heat_fraction=heatfrac, max_root_depth=maxd, plant_category=PlantCategory("warm_annual"))
     rd = RootDevelopment(data_annual)
     rd.develop_roots()
     assert data_annual.root_fraction == RootDevelopment._determine_root_fraction(heatfrac)
-    assert data_annual.root_depth == maxd
+    assert data_annual.root_depth == RootDevelopment._determine_root_depth(maxd, heatfrac)

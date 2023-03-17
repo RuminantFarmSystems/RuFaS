@@ -1,6 +1,8 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.biomass_allocation import *
+from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from math import exp
 
 
 # ---- helper function tests ----
@@ -77,6 +79,7 @@ def test_calc_above_ground_biomass(frac, bmass):
 def test_calc_below_ground_biomass(frac, bmass):
     """ensure that below ground biomass is correctly calculated"""
     assert BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
+
 
 # ---- member function tests ----
 @pytest.mark.parametrize("light,ext,conv,gfact,rfrac", [

@@ -1,9 +1,8 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
-
 """
-Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects 
+Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
 to represent its soil
 """
 
@@ -29,7 +28,7 @@ class LayerData:
     saturation_point_water_concentration: float = 0.5
     """water concentration of soil layer at saturation point (mm water / mm soil)"""
     soil_evaporation_compensation_coefficient: float = 1
-    """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless) 
+    """coefficient that allows user to modify depth distribution used to meet the soil evaporative demand (unitless)
         (SWAT 2:2.3.17)"""
 
     # --- Percolation
@@ -40,7 +39,7 @@ class LayerData:
 
     # --- Temperature
     bulk_density: float = 1.4
-    """bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for 
+    """bulk density of the soil layer (Mg per cubic meter) (provided by user, but SWAT 2:3.1.1 has an equation for
         calculating this field as well)"""
     previous_day_temperature: Optional[float] = None
     """temperature of soil layer on the previous day (degrees C)"""
@@ -56,7 +55,6 @@ class LayerData:
     """silt content expressed as percent of soil in this layer (unitless)"""
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
-
 
     # --- Decomposition
     decomposition_moisture_effect: Optional[float] = None
@@ -155,10 +153,10 @@ class LayerData:
     soil_active_decompose_carbon: Optional[float] = None
     """soil carbon decomposed into the active carbon pool (kg/ha)"""
 
+    # --- Phosphorus
+    labile_phosphorus_content: float = 0
+    """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
 
-
-
-    
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
@@ -166,6 +164,9 @@ class LayerData:
     @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
+        if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
+            raise ValueError(f"Expected positive values for top and bottom depths of soil layer where top < bottom, "
+                             f"received top: '{self.top_depth}', bottom: '{self.bottom_depth}'.")
         return self.bottom_depth - self.top_depth
 
     @property
@@ -184,22 +185,21 @@ class LayerData:
         return self.wilting_point_water_concentration * self.layer_thickness
 
     @property
-    def excess_water_available(self) -> float:
-        """volume of water available for percolation in the soil layer (mm)
-        SWAT Reference: 2:3.2.1, 2
-        """
-        return max(0, self.water_content - self.field_capacity_content)
-
-    @property
     def saturation_content(self) -> float:
         """volume of water in layer when saturated (mm)"""
         return self.saturation_point_water_concentration * self.layer_thickness
 
     @property
+    def excess_water_available(self) -> float:
+        """volume of water available for percolation in the soil layer (mm)
+        SWAT Reference: 2:3.2.1, 2
+        """
+        return max(0.0, self.water_content - self.field_capacity_content)
 
+    @property
     def acceptable_percolation_amount(self) -> float:
         """volume of water that can be accepted by layer before reaching saturation (mm)"""
-        return max(0, self.saturation_content - self.water_content)
+        return max(0.0, self.saturation_content - self.water_content)
 
     @property
     def percent_organic_matter_content(self) -> float:
@@ -226,6 +226,3 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
-
-
-

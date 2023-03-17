@@ -15,9 +15,11 @@ class GeneralConstants:
     """
     # Mass-related
     GRAMS_TO_KG = 0.001
+    KG_TO_GRAMS = 1000
 
     # Volume-related
     LITERS_TO_CUBIC_METERS = 0.001
+    CUBIC_METERS_TO_LITERS = 1000
     KG_TO_CUBIC_METERS = 0.001
 
     # Time-related
