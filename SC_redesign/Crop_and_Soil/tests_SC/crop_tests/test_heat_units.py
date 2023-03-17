@@ -1,6 +1,7 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.heat_units import *
+from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from pytest_mock import MockerFixture
 
 
@@ -142,7 +143,7 @@ def test_absorb_heat_units(mean, mint, maxt, use_heat_unit_temp):
     if use_heat_unit_temp:
         expect_max_heat_unit_temp = HeatUnits._determine_maximum_heat_unit_temperature(maxt, 38)
         assert expect_max_heat_unit_temp == data.maximum_heat_unit_temperature
-        expect_min_heat_unit_temp = HeatUnits._determine_minimum_heat_unit_temperature(mint, 20)  #x
+        expect_min_heat_unit_temp = HeatUnits._determine_minimum_heat_unit_temperature(mint, 20)  # x
         assert expect_min_heat_unit_temp == data.minimum_heat_unit_temperature
         expect_heat_unit_temp = (expect_min_heat_unit_temp / 2) + (expect_max_heat_unit_temp / 2)
         assert expect_heat_unit_temp == data.heat_unit_temperature

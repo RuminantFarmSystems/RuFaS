@@ -1,6 +1,8 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import *
+from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from math import log, exp
 from pytest_mock import MockerFixture
 from unittest.mock import MagicMock
 
@@ -348,6 +350,7 @@ def test_determine_stored_nitrogen(prev, new, fix):
     """test the stored nitrogen is properly calculated by determine_stored_nitrogen()"""
     observe = NitrogenIncorporation.determine_stored_nutrient(new, prev, fix)
     assert observe == prev + new + fix
+
 
 # ---- member function tests ----
 @pytest.mark.parametrize("old,new", [

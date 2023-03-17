@@ -7,6 +7,7 @@ This module primarily follows the Biomass Production section of the SWAT model (
 and some components from the Crop Yield section (5:2.4)
 """
 
+
 class BiomassAllocation:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
@@ -79,8 +80,8 @@ class BiomassAllocation:
             max_growth: the maximum amount of biomass the plant can accumulate in a day
 
         Returns:
-            a dictionary containing the starting biomass of the plant ("start"), the biomass of the plant at the end of the
-            day ("end"), and the total biomass accumulated ("accumulated biomass")
+            a dictionary containing the starting biomass of the plant ("start"), the biomass of the plant at the end
+            of the day ("end"), and the total biomass accumulated ("accumulated biomass")
         """
         growth = max_growth * growth_factor
         return growth
@@ -99,7 +100,6 @@ class BiomassAllocation:
         Returns: above ground biomass
         """
         return (1 - root_frac) * biomass
-
 
     @staticmethod
     def _determine_below_ground_biomass(root_frac: float, biomass: float) -> float:

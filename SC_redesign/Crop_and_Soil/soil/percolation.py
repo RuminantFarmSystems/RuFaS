@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
@@ -123,11 +123,11 @@ class Percolation:
         if upper_layer.excess_water_available <= 0:
             return 0
         else:
-            percolation_time = Percolation._determine_percolation_travel_time(upper_layer.saturation_content,
-                                                                              upper_layer.field_capacity_content,
-                                                                              upper_layer.saturated_hydraulic_conductivity)
-            amount_to_percolate = Percolation._determine_percolation_to_next_layer(upper_layer.excess_water_available,
-                                                                                   time_step, percolation_time)
+            percolation_time = Percolation._determine_percolation_travel_time(
+                upper_layer.saturation_content, upper_layer.field_capacity_content,
+                upper_layer.saturated_hydraulic_conductivity)
+            amount_to_percolate = Percolation._determine_percolation_to_next_layer(
+                upper_layer.excess_water_available, time_step, percolation_time)
 
             #  Limit the maximum amount of water allowed to percolate so that lower layer cannot become overly saturated
             if amount_to_percolate > lower_layer.acceptable_percolation_amount:

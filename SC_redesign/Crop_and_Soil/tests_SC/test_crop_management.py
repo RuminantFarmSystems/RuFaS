@@ -1,0 +1,196 @@
+import warnings
+
+import pytest
+from mock.mock import MagicMock
+from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from math import exp
+from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
+
+
+# ---- Test Static Functions ----
+@pytest.mark.parametrize("heatfrac,optimal_index", [
+    (0, 1),
+    (1, 1),
+    (0.5, 1),
+    (1.2, 1),
+    (0.5, 0),
+    (0.5, 100),
+    (0.326, 12.2)  # arbitrary
+])
+def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float):
+    """ensure that the potential harvest index is properly calculated"""
+    top = 100 * heatfrac
+    bottom = (100 * heatfrac) + exp(11.1 - (10 * heatfrac))
+    expect = optimal_index * (top / bottom)
+    assert CropManagement._determine_potential_harvest_index(heatfrac, optimal_index) == expect
+
+
+@pytest.mark.parametrize("idx,min_index,deficiency", [
+    (1, .5, .5),  # start case
+    (0, 0, 0),  # all zeros
+    (0, 0.5, 0.5),  # zero harvest index
+    (0, 0.5, 0.2),
+    (-1, 0.5, 0.5),  # index < 0
+    (1, 0, 0.5),  # zero min
+    (1, 0.5, 1),  # high deficiency
+    (1, 0.5, 0),  # no deficiency
+    (1.35, 0.83, 0.29)  # arbitrary
+])
+def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float):
+    """ensure that actual harvest index is properly calculated by calc_actual_harvest_index()"""
+    if min_index < 0:
+        adj_min = 0
+    else:
+        adj_min = min_index
+
+    if idx < adj_min:
+        adj_idx = adj_min
+    else:
+        adj_idx = idx
+
+    diff = adj_idx - adj_min
+    bottom = deficiency + exp(6.13 - 0.883 * deficiency)
+    expect = diff * deficiency / bottom + adj_min
+    if expect < 0:
+        expect = 0
+    assert CropManagement._adjust_harvest_index(idx, min_index, deficiency) == expect
+
+
+@pytest.mark.parametrize("bmass,harv_ind", [
+    (1, 1.2),
+    (0, 1.2),  # no biomass
+    (1, 2.5),  # increased biomass
+    (136.5, 1.22)  # arbitrary
+])
+def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float):
+    """ensure that yield is correctly calculated by determine_yield_from_total_biomass()"""
+    frac = 1 / (1 + harv_ind)
+    assert CropManagement.determine_biomass_cut_from_whole_plant(bmass, harv_ind) == bmass * (1 - frac)
+
+
+# ---- Test Member functions
+def test_kill():
+    """tests that a crop is properly killed by kill()"""
+    crop = CropManagement(crop_data=CropData(yield_residue=5.29, biomass=192.33))
+    crop.kill()
+    assert not crop.data.is_alive
+    assert crop.data.yield_residue == 5.29 + 192.33
+
+
+def test_dry_down():
+    crop = CropManagement(CropData(above_ground_biomass=10.2, dry_down_fraction=0.18))
+    crop.dry_down()
+    assert pytest.approx(crop.data.above_ground_biomass) == 10.2 * (1 - 0.18)
+
+
+def test_graze():
+    warnings.warn("no graze method implemented")
+
+
+def test_collect_cut_yields():
+    warnings.warn("no collect cut yields method implemented")
+
+
+@pytest.mark.parametrize("harvest,heat_frac,water_def", [
+    (None, 0, 0),  # base case
+    (None, 0.5, 0),  # accumulated half heat
+    (None, 0.9, 0),  # accumulated 90% heat
+    (None, 1.0, 0),  # accumulated all heat
+    (None, 1.2, 0),  # accumulated more than PHU
+    (None, 0, 0.5),  # increase water deficiency
+    (None, 0.5, 0.5),  # increase water deficiency and heat
+    (None, 0, 1.0),  # max deficiency, no heat
+    (None, 0.5, 1.0),  # max deficiency, some heat
+    (None, 1.0, 1.0),  # max deficiency, max heat
+    (1.0, None, None),  # user-defined harvest index, others not given
+    (0.85, 0.5, 0.33)  # user-defined, ignore others
+])
+def test_determine_harvest_index(harvest, heat_frac, water_def):
+    """ensure that the harvest index is properly evaluated"""
+    data = CropData(user_harvest_index=harvest, heat_fraction=heat_frac, optimal_harvest_index=0.95,
+                    min_harvest_index=0.5, water_deficiency=water_def)
+    crop = CropManagement(data)
+    crop.determine_harvest_index()
+
+    if harvest is not None:
+        assert data.harvest_index == harvest
+    else:
+        potential = CropManagement._determine_potential_harvest_index(heat_frac, 0.95)
+        assert data.potential_harvest_index == potential
+        assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
+
+
+@pytest.mark.parametrize("harvest_op", [
+    HarvestOperation.HARVEST,
+    HarvestOperation.HARVEST_NOKILL
+])
+def test_manage_harvest(harvest_op: HarvestOperation):
+    """ensure that crops are harvested properly, dependent on their operation specs"""
+    # Setup
+    crop = CropManagement()
+    crop.determine_harvest_index = MagicMock()
+    crop.kill = MagicMock()
+    crop.cut_crop = MagicMock()
+
+    # Act
+    crop.manage_harvest(harvest_op)
+
+    # Assertions
+    crop.determine_harvest_index.assert_called_once()
+    # Method specific (one for each op type)
+    if harvest_op == HarvestOperation.HARVEST:
+        crop.cut_crop.assert_called_once()
+        crop.kill.assert_called_once()
+
+    if harvest_op == HarvestOperation.HARVEST_NOKILL:
+        crop.cut_crop.assert_called_once()
+        crop.kill.assert_not_called()
+
+
+@pytest.mark.parametrize("efficiency,harvest,override", [
+    (0, 0, False),  # no harvest and not collection
+    (0, 0.85, False),  # harvest but don't collect
+    (0.9, 0, False),  # collect from no harvest
+    (0.9, 0.85, False),  # harvest and collect
+    (0, 0, True),  # harvest override
+    (0.9, 0.85, True),  # harvest override
+])
+def cut_crop(efficiency: float, harvest: float, override: bool):
+    """ensure that the crop cutting routines are properly executed"""
+    # setup
+    data = CropData(harvest_index=harvest, biomass=100, leaf_area_index=2.3, accumulated_heat_units=1.1,
+                    optimal_nitrogen_fraction=0.09, optimal_phosphorus_fraction=0.02,
+                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092)
+    if override:
+        data.user_harvest_index = harvest
+    crop = CropManagement(data)
+
+    # act
+    crop.cut_crop(efficiency)
+
+    # expect/assert
+    if harvest > 1:
+        cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
+    else:
+        cut_biomass = 100 * harvest
+
+    assert data.cut_biomass == cut_biomass
+    assert data.biomass == 100 - cut_biomass
+    assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
+    assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
+    collected = cut_biomass * efficiency
+    residue = cut_biomass * (1 - efficiency)
+    assert data.yield_collected == collected
+    assert data.yield_residue == residue
+
+    if override:
+        assert data.yield_nitrogen == collected * 0.09
+        assert data.yield_phosphorus == collected * 0.02
+        assert data.residue_nitrogen == residue * 0.09
+        assert data.residue_phosphorus == residue * 0.02
+    else:
+        assert data.yield_nitrogen == collected * 0.12
+        assert data.yield_phosphorus == collected * 0.0092
+        assert data.residue_nitrogen == residue * 0.12
+        assert data.residue_phosphorus == residue * 0.0092

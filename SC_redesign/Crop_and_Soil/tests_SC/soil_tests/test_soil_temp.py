@@ -1,8 +1,9 @@
 import pytest
-
 from unittest.mock import MagicMock
-from SC_redesign.Crop_and_Soil.soil.soil_temp import *
+from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from math import exp, log
+
 
 # --- Static function tests ---
 @pytest.mark.parametrize("bulk_density", [
@@ -136,6 +137,7 @@ def test_determine_average_soil_temperature(lag, prev_soil_temp, depth_factor, a
     expect = (lag * prev_soil_temp) + ((1 - lag) * ((depth_factor * (avg_annual_air_temp - soil_surface_temp))
                                                     + soil_surface_temp))
     assert observe == expect
+
 
 # ---- Integration tests ----
 @pytest.mark.parametrize("radiation,avg_temp,min_temp,max_temp,plant_cover,snow_cover,avg_annual_temp", [

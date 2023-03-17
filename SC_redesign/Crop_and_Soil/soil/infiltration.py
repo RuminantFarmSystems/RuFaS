@@ -1,7 +1,5 @@
 from math import exp, log
 from typing import Optional
-
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
@@ -13,22 +11,27 @@ class Infiltration:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()
 
-    def infiltrate(self, second_moisture_condition_parameter: float, rainfall: float,
-                   weighting_coefficient: float) -> None:
-        """main routine for determining runoff and infiltration of soil for a given day"""
+    def infiltrate(self, rainfall: float, weighting_coefficient: float) -> None:
+        """main routine for determining runoff and infiltration of soil for a given day
+
+        rainfall: rainfall depth of current day (mm)
+        weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
+            calculations dependent on plant evapotranspiration (unitless)
+
+        """
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
-                                                                                    second_moisture_condition_parameter)
+                                                                        self.data.second_moisture_condition_parameter)
 
         # --- adjust moisture condition parameters for slope of soil, if necessary -------------------------------------
         if abs(self.data.average_subbasin_slope - 0.05) != 0:
             adjusted_second_moisture_condition_parameter = self._determine_second_moisture_condition_adjusted(
-                                                                                    self.data.average_subbasin_slope,
-                                                                                    second_moisture_condition_parameter,
-                                                                                    third_moisture_condition_parameter)
+                                                                        self.data.average_subbasin_slope,
+                                                                        self.data.second_moisture_condition_parameter,
+                                                                        third_moisture_condition_parameter)
             adjusted_third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
                                                                         adjusted_second_moisture_condition_parameter)
         else:
-            adjusted_second_moisture_condition_parameter = second_moisture_condition_parameter
+            adjusted_second_moisture_condition_parameter = self.data.second_moisture_condition_parameter
             adjusted_third_moisture_condition_parameter = third_moisture_condition_parameter
         # --------------------------------------------------------------------------------------------------------------
         adjusted_first_moisture_condition_parameter = self._determine_first_moisture_condition_parameter(
@@ -42,13 +45,12 @@ class Infiltration:
         profile_saturation = self.data.profile_saturation
         profile_field_capacity = self.data.profile_field_capacity
 
-        second_shape_coefficient = self._determine_second_shape_coefficient(profile_field_capacity, profile_saturation,
-                                                                            first_moisture_condition_retention_parameter,
-                                                                            third_moisture_condition_retention_parameter)
-        first_shape_coefficient = self._determine_first_shape_coefficient(profile_field_capacity,
-                                                                          first_moisture_condition_retention_parameter,
-                                                                          third_moisture_condition_retention_parameter,
-                                                                          second_shape_coefficient)
+        second_shape_coefficient = self._determine_second_shape_coefficient(
+            profile_field_capacity, profile_saturation, first_moisture_condition_retention_parameter,
+            third_moisture_condition_retention_parameter)
+        first_shape_coefficient = self._determine_first_shape_coefficient(
+            profile_field_capacity, first_moisture_condition_retention_parameter,
+            third_moisture_condition_retention_parameter, second_shape_coefficient)
         profile_water_content = self.data.profile_soil_water_content
         retention_parameter = self._determine_retention_parameter(profile_water_content,
                                                                   first_moisture_condition_retention_parameter,
@@ -78,6 +80,9 @@ class Infiltration:
         # --------------------------------------------------------------------------------------------------------------
 
         self.data.moisture_condition_parameter = self._determine_moisture_condition_parameter(retention_parameter)
+
+        # Update annual totals
+        self.data.annual_runoff_total += self.data.accumulated_runoff
 
     # --- static methods ---
     @staticmethod
@@ -135,7 +140,8 @@ class Infiltration:
         Args:
             field_capacity: amount of water in soil profile at field capacity (mm)
             saturation: amount of water in soil profile when saturated (mm)
-            max_retention_parameter: retention parameter calculated from curve number 1 (driest conditions) (unitless)
+            max_retention_parameter: retention parameter calculated from curve number 1
+                (the driest conditions) (unitless)
             third_moisture_condition_retention_parameter: retention parameter calculated from curve number 3 (the
                 wettest conditions) (unitless)
 
@@ -159,7 +165,8 @@ class Infiltration:
 
         Args:
             field_capacity: amount of water in soil profile at field capacity (mm)
-            max_retention_parameter: retention parameter calculated from curve number 1 (driest conditions) (unitless)
+            max_retention_parameter: retention parameter calculated from curve number 1
+                (the driest conditions) (unitless)
             third_moisture_condition_retention_parameter: retention parameter calculated from curve number 3 (the
                 wettest conditions) (unitless)
             second_shape_coefficient: the second shape coefficient (unitless)
@@ -184,7 +191,8 @@ class Infiltration:
         Args:
             soil_water_content: amount of water held in the soil profile excluding amount of water held in profile at
                 the wilting point (mm)
-            max_retention_parameter: maximum retention parameter, calculated from curve number 1 (driest conditions) (mm)
+            max_retention_parameter: maximum retention parameter, calculated from curve number 1
+                (the driest conditions) (mm)
             first_shape_coefficient: first shape coefficient (unitless)
             second_shape_coefficient: second shape coefficient (unitless)
 
@@ -202,7 +210,8 @@ class Infiltration:
         """determines the adjusted retention parameter if the top layer of soil is frozen
 
         Args:
-            max_retention_parameter: maximum retention parameter, calculated from curve number 1 (driest conditions) (mm)
+            max_retention_parameter: maximum retention parameter, calculated from curve number 1
+                (the driest conditions) (mm)
             retention_parameter: retention parameter for a given day (mm)
 
         Returns:

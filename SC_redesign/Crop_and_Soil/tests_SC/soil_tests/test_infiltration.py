@@ -1,8 +1,11 @@
 import pytest
-from math import log, floor
+from math import log
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.soil.infiltration import *
+from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from math import exp
 
 
 # --- static function tests ---
@@ -17,8 +20,8 @@ from SC_redesign.Crop_and_Soil.soil.infiltration import *
 def test_determine_curve_number_1(curve_num_2):
     """test _determine_curve_number_1() in infiltration.py"""
     observe = Infiltration._determine_first_moisture_condition_parameter(curve_num_2)
-    expect = curve_num_2 - \
-             ((20 * (100 - curve_num_2)) / (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
+    expect = curve_num_2 - ((20 * (100 - curve_num_2)) /
+                            (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
     assert expect == observe
 
 
@@ -81,8 +84,8 @@ def test_determine_first_shape_coefficient(field_capacity, max_retention_param, 
     """test _determine_first_shape_coefficient() in infiltration.py"""
     observe = Infiltration._determine_first_shape_coefficient(field_capacity, max_retention_param,
                                                               curve_3_retention_param, second_shape_coeff)
-    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity) + \
-             (second_shape_coeff * field_capacity)
+    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity
+                 ) + (second_shape_coeff * field_capacity)
     assert expect == observe
 
 
@@ -179,15 +182,15 @@ def test_determine_moisture_condition_parameter(retention_param):
 
 
 # --- Integration tests ----
-@pytest.mark.parametrize("second_moisture_parameter,rainfall,is_top_frozen,coefficient", [
-    (40, 1.4, False, 0.91),
-    (59, 3.5, True, 0.4858),
-    (14, 2.5, False, 0.694),
-    (36, 0.3, False, 0.58392),
-    (96, 4.697, False, 0.5938),
-    (76, 2.45, False, 0.9694),
+@pytest.mark.parametrize("rainfall,is_top_frozen,coefficient", [
+    (1.4, False, 0.91),
+    (3.5, True, 0.4858),
+    (2.5, False, 0.694),
+    (0.3, False, 0.58392),
+    (4.697, False, 0.5938),
+    (2.45, False, 0.9694),
 ])
-def test_infiltrate(second_moisture_parameter, rainfall, is_top_frozen, coefficient):
+def test_infiltrate(rainfall, is_top_frozen, coefficient):
     """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
     # initialize objects
     if is_top_frozen:
@@ -215,7 +218,7 @@ def test_infiltrate(second_moisture_parameter, rainfall, is_top_frozen, coeffici
     incorp._determine_moisture_condition_parameter = MagicMock(return_value=50)
 
     # run main method
-    incorp.infiltrate(second_moisture_parameter, rainfall, coefficient)
+    incorp.infiltrate(rainfall, coefficient)
 
     # assertions
     assert incorp._determine_third_moisture_condition_parameter.call_count == 2
@@ -235,3 +238,4 @@ def test_infiltrate(second_moisture_parameter, rainfall, is_top_frozen, coeffici
     assert incorp.data.previous_retention_parameter == 21.34
     assert incorp.data.moisture_condition_parameter == 50
     assert incorp.data.accumulated_runoff == 0.95
+    assert incorp.data.annual_runoff_total == 0.95

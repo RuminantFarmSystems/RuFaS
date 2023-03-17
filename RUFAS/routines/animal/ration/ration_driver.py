@@ -261,26 +261,23 @@ class Requirements:
             for animal in pen.animals_in_pen:
                 a_type = type(animal).__name__
                 if a_type == 'HeiferI':
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, None, animal_type='heifer',
-                                                         BCS5=3, PrevTemp=15,
-                                                         ADG_heifer=animal.daily_growth,
-                                                         Age=animal.days_born
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = None, animal_type='heifer',
+                                                         body_condition_score_5=3, previous_temperature=15,
+                                                         average_daily_gain_heifer=animal.daily_growth
                                                          )
                 elif a_type == 'HeiferII' or a_type == 'HeiferIII':
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, animal.days_in_preg,
-                                                         animal_type='heifer', BCS5=3, PrevTemp=15,
-                                                         ADG_heifer=animal.daily_growth,
-                                                         Age=animal.days_born
-                                                         )
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type='heifer', body_condition_score_5=3, previous_temperature=15,
+                                                         average_daily_gain_heifer=animal.daily_growth)
                 else:
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, animal.days_in_preg,
-                                                         'cow', animal.calves, animal.CI,
-                                                         animal.mPrt, animal.fat_percent, animal.lactose_milk,
-                                                         animal.estimated_daily_milk_produced,
-                                                         animal.days_in_milk, animal.milking
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type = 'cow', parity = animal.calves, calving_interval = animal.CI,
+                                                         milk_true_protein= animal.mPrt, milk_fat = animal.fat_percent, milk_lactose = animal.lactose_milk,
+                                                         milk_production = animal.estimated_daily_milk_produced,
+                                                         days_in_milk = animal.days_in_milk, lactating = animal.milking
                                                          )
 
                 animal.NEmaint = req['NEmaint']
