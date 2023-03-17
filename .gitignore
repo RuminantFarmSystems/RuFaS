@@ -43,3 +43,5 @@ venv/
 
 .pytest_cache/
 *.bak
+
+model_evaluation/sensitivity_analysis/files_from_joe/
