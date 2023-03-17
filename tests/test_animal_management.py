@@ -14,6 +14,7 @@ from pytest_mock.plugin import MockerFixture
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.feed.feed import Feed
 
 
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
@@ -367,6 +368,8 @@ def pens_test_data_dict() -> List[dict[Any]]:
                       "expected_stocking_density": 0.20, "num_stalls": 35,
                       "ration": {"dummy_feed1": 100.0, "status": "dummy_val"}}
                  },
+            "calf_set": 0,
+            "addition_set": 0,
             "removal_set":
                 {115078, 169062, 112516, 189801, 198542},
             "expected_map":
@@ -411,6 +414,8 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                  "dummy_feed4": 362.0, "dummy_feed5": 3.8, "dummy_feed6": 800.0, "dummy_feed7": 0.0,
                                  "dummy_feed8": 1.0, "dummy_feed9": 104.0, "dummy_feed10": 0.0}}
                  },
+            "calf_set": 0,
+            "addition_set": 0,
             "removal_set":
                 {181144, 185339, 186287, 164961},
             "expected_map":
@@ -458,6 +463,8 @@ def pens_test_data_dict() -> List[dict[Any]]:
                       "expected_stocking_density": 0.00, "num_stalls": 10,
                       "ration": {"status": "dummy_value", "objective": "dummy_value"}}
                  },
+            "calf_set": 0,
+            "addition_set": 0,
             "removal_set":
                 {138864, 166665, 183594, 192382},
             "expected_map":
@@ -631,9 +638,30 @@ def test_calculate_pen_rations(info_dict: dict[Any], animal_management: AnimalMa
         assert pen.ration == info_dict['expected_ration_value_list'][idx]
 
 
-def test_daily_update_id_map():
+@pytest.mark.parametrize("info_dict", pens_test_data_dict())
+def test_daily_update_id_map(info_dict: dict[Any], animal_management: AnimalManagement, mocker: MockerFixture):
     """Unit test for function daily_update_id_map in file routines/animal/animal_management.py"""
-    pass
+
+    mocker.patch('RUFAS.routines.feed.Feed.__init__',
+                 return_value=None)
+
+    calf_addition_list = []
+    animal_addition_list = []
+
+    dummy_feed = Feed(data=mocker.MagicMock())
+
+    dummy_object_and_removals = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)
+    dummy_animal_management = dummy_object_and_removals['animal_management_object']
+    dummy_removal_list = dummy_object_and_removals['animals_removed_list']
+
+    for animal_id in info_dict["addition_set"]:
+        animal_addition_list.append(setup_dummy_animal(animal_id))
+
+    for animal_id in info_dict["calf_set"]:
+        calf_addition_list.append(setup_dummy_animal(animal_id))
+
+    dummy_animal_management.daily_update_id_map(animal_addition_list, dummy_removal_list, calf_addition_list,
+                                                dummy_feed, 20.0)
 
 
 def test_allocate_all_pens():
