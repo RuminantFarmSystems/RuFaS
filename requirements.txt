@@ -8,3 +8,6 @@ pytest-mock
 scipy
 pytest-lazy-fixture
 argparse
+typing_extensions
+sphinx
+sphinx-rtd-theme
