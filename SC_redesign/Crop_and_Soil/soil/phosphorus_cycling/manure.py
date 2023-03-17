@@ -24,6 +24,8 @@ class Manure:
         """
         self.data = soil_data or SoilData()
 
+
+
     # --- Static Methods ---
     @staticmethod
     def _determine_temperature_factor(avg_air_temperature: float) -> float:
