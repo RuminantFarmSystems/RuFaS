@@ -98,15 +98,15 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
         dry_matter_intake_estimate = calculate_NASEM_DMI(
             body_weight, mature_body_weight, days_in_milk, lactating, net_energy_lactation, parity,
             body_condition_score_5)
-        net_energy_maintenance, gravid_utertine_weight, utertine_weight = \
+        net_energy_maintenance, gravid_uterine_weight, uterine_weight = \
             calculate_NASEM_energy_maintenance_requirements(body_weight, mature_body_weight, day_of_pregnancy,
                                                             days_in_milk)
         net_energy_growth, average_daily_gain, frame_weight_gain = calculate_NASEM_energy_growth_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval)
-        net_energy_pregnancy, gravid_utertine_weight_gain = calculate_NASEM_energy_pregnancy_requirements(
-            lactating, day_of_pregnancy, days_in_milk, gravid_utertine_weight, utertine_weight)
+        net_energy_pregnancy, gravid_uterine_weight_gain = calculate_NASEM_energy_pregnancy_requirements(
+            lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight)
         metabolizable_protein_requirement = calculate_NASEM_protein_requirements(
-            lactating, body_weight, frame_weight_gain, gravid_utertine_weight_gain, dry_matter_intake_estimate,
+            lactating, body_weight, frame_weight_gain, gravid_uterine_weight_gain, dry_matter_intake_estimate,
             milk_true_protein, milk_production)
         calcium_requirement = calculate_NASEM_calcium_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, average_daily_gain, dry_matter_intake_estimate,
@@ -210,9 +210,9 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
     -------
     net_energy_maintenance : float
         Net energy requirement for maintenance (mcal/day)
-    gravid_utertine_weight : float
+    gravid_uterine_weight : float
         Gravid uterine weight (kg))
-    utertine_weight : float
+    uterine_weight : float
         Uterine weight (kg))
 
     Notes
@@ -223,7 +223,7 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
     # Instead of calculating calf_birth_weight, NASEM (2021) also contains standards calf_birth_weight and
     # mature_body_weight (tabulated values) for selected breeds (eg., Holstein)
     # Instead of estimating conceptus_weight, gain in pregnancy tissues is estimated:
-    # (gravid_utertine_weight and utertine_weight).
+    # (gravid_uterine_weight and uterine_weight).
     # day_of_pregnancy (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in NASEM (2021) book.
 
     References
@@ -233,19 +233,19 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
     """
     if day_of_pregnancy is None:
         net_energy_maintenance = 0.10*body_weight**0.75
-        gravid_utertine_weight = 0.0
-        utertine_weight = 0.0
+        gravid_uterine_weight = 0.0
+        uterine_weight = 0.0
     else:
         calf_birth_weight = mature_body_weight * 0.06275
-        gravid_utertine_weight = (calf_birth_weight * 1.825) * \
+        gravid_uterine_weight = (calf_birth_weight * 1.825) * \
                                  math.exp(-0.0243 -(0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy))
         if days_in_milk == None:
             days_in_milk = 0
-        utertine_weight = ((calf_birth_weight * 0.2288) *
+        uterine_weight = ((calf_birth_weight * 0.2288) *
                            math.exp(-0.2*days_in_milk)) + 0.204
         net_energy_maintenance = 0.10 * \
-            (body_weight-gravid_utertine_weight - utertine_weight)**0.75
-    return net_energy_maintenance, gravid_utertine_weight, utertine_weight
+            (body_weight-gravid_uterine_weight - uterine_weight)**0.75
+    return net_energy_maintenance, gravid_uterine_weight, uterine_weight
 
 
 def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_weight: float, conceptus_weight: float,
@@ -444,8 +444,8 @@ def calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy: Optional[int],
 
 
 def calculate_NASEM_energy_pregnancy_requirements(lactating: bool, day_of_pregnancy: Optional[int],
-                                                  days_in_milk: Optional[int], gravid_utertine_weight: float,
-                                                  utertine_weight: float) -> tuple[float, float]:
+                                                  days_in_milk: Optional[int], gravid_uterine_weight: float,
+                                                  uterine_weight: float) -> tuple[float, float]:
     """ Calculates energy requirement for pregnancy and gravid uterine weight gain
 
     Calculates the estimated energy requirements requirements for pregnancy in megacalories per day,
@@ -459,16 +459,16 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating: bool, day_of_pregna
         Day of pregnancy
     days_in_milk : int
         Days in milk (lactation, days)
-    gravid_utertine_weight : float
+    gravid_uterine_weight : float
         Gravid uterine weight (kilograms)
-    utertine_weight : float
+    uterine_weight : float
         Uterine weight (kilograms)
 
     Returns
     -------
     net_energy_pregnancy : float
         Net energy requirement for pregnancy (Mcal/d)
-    gravid_utertine_weight_gain : float
+    gravid_uterine_weight_gain : float
         Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
 
     Notes
@@ -485,15 +485,15 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating: bool, day_of_pregna
     """
 
     if lactating:
-        gravid_utertine_weight_gain = -0.2 * \
-            days_in_milk * (utertine_weight - 0.204)
+        gravid_uterine_weight_gain = -0.2 * \
+            days_in_milk * (uterine_weight - 0.204)
     elif day_of_pregnancy == None:
-        gravid_utertine_weight_gain = 0.0
+        gravid_uterine_weight_gain = 0.0
     else:
-        gravid_utertine_weight_gain = (
-            0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_utertine_weight
-    net_energy_pregnancy = gravid_utertine_weight_gain * (0.882 / 0.14) * 0.66
-    return net_energy_pregnancy, gravid_utertine_weight_gain
+        gravid_uterine_weight_gain = (
+            0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
+    net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
+    return net_energy_pregnancy, gravid_uterine_weight_gain
 
 
 def calculate_NRC_energy_lactation_requirements(animal_type: str, milk_fat: float, milk_true_protein: float,
@@ -686,7 +686,7 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
 
 
 def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, frame_weight_gain: float, 
-                                        gravid_utertine_weight_gain: float, dry_matter_intake_estimate: float,
+                                        gravid_uterine_weight_gain: float, dry_matter_intake_estimate: float,
                                         milk_true_protein: float, milk_production: float) -> float:
     """ Calculates Protein requirement for maintenance according to NASEM (2021).
 
@@ -700,7 +700,7 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
         Body weight (kilograms)
     frame_weight_gain : float
         Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day)
-    gravid_utertine_weight_gain : float
+    gravid_uterine_weight_gain : float
         Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal/d)
     dry_matter_intake_estimate : float
         Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
@@ -741,7 +741,7 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     CPMFP = (11.62+0.134*NDF_conc)*dry_matter_intake_estimate
     NPMFP = CPMFP*0.73
     NPGrowth = frame_weight_gain*0.11*0.86
-    NPGest = gravid_utertine_weight_gain * 125
+    NPGest = gravid_uterine_weight_gain * 125
     NPMilk = milk_true_protein*milk_production*1000
     TargetEffMP = 0.69
     if lactating:
