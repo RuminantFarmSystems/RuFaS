@@ -153,7 +153,7 @@ class LayerData:
     plant_active_decompose_carbon: Optional[float] = None
     """plant carbon decomposed into the active carbon pool (kg/ha)"""
     soil_active_decompose_carbon: Optional[float] = None
-    """below ground carbon decomposed into the active carbon pool (kg/ha)"""
+    """soil carbon decomposed into the active carbon pool (kg/ha)"""
 
 
 
