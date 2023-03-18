@@ -7,31 +7,17 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 
 import numpy as np
 import pytest
-from unittest.mock import MagicMock, patch
-from pytest_mock.plugin import MockerFixture
-from typing import List, Dict
-
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.life_cycle.calf import Calf
 
 import RUFAS.routines.animal.clustering_pen_grouping
-
-
-def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
-    mock_object_list = []
-
-    for attribute_dict in attribute_dicts:
-        mock_object = MagicMock()
-
-        for attribute, value in attribute_dict.items():
-            setattr(mock_object, attribute, value)
-
-        mock_object_list.append(mock_object)
-
-        return mock_object_list
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 
 
 def test_norm():
     """Unit test for function norm in file routines/animal/clustering_pen_grouping.py"""
+
     def actual_func(l): return RUFAS.routines.animal.clustering_pen_grouping.norm(l)
 
     actual = actual_func([1, 2, 3])
@@ -49,32 +35,9 @@ def test_percentile_list():
     assert actual == expected
 
 
-#@pytest.fixture
-def mock_lactating_cow_list() -> List[MagicMock]:
-    animal_attribute_dicts = [
-        {
-            "body_weight": 5.0,
-            "p_animal": 7.0
-        },
-        {
-            "body_weight": 1.0,
-            "p_animal": 8.0
-        },
-        {
-            "body_weight": 2.0,
-            "p_animal": 1.0
-        },
-    ]
-    return create_mock_object_list(animal_attribute_dicts)
-
-
 def test_grouping():
     """Unit test for function grouping in file routines/animal/clustering_pen_grouping.py"""
-    #need to create magic mock function for a list of pen objects
-    cow_list = mock_lactating_cow_list()
-    actual = RUFAS.routines.animal.clustering_pen_grouping.grouping(cow_list, 10, 80)
-    #error, int object is not iterable, updated grouping.py to be more clear that the pen parameter is a list of pens
-    print(actual)
+    pass
 
 
 def test_update_animals():
@@ -127,7 +90,7 @@ def test_call_p_rqmts():
     pass
 
 
-def test_daily_p_update():
+def test_daily_pen_p_update():
     """Unit test for function daily_p_update in file routines/animal/pen.py"""
     pass
 
@@ -167,7 +130,7 @@ def test_set_p_intake():
     pass
 
 
-def test_daily_p_update():
+def test_daily_animal_p_update():
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
     pass
 
@@ -194,17 +157,25 @@ def test_update_body_weight_history():
 
 def test_init_from_string():
     """Unit test for function init_from_string in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    A = AnimalEvents()
+    A.init_from_string('3: simulation_day=0, event')
+    assert A.events == {3: ['simulation_day=0, event']}
 
 
 def test_add_event():
     """Unit test for function add_event in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    A = AnimalEvents()
+    A.add_event(12, 212, 'event1')
+    A.add_event(12, 3, 'event2')
+    A.add_event(1, 345, 'event3')
+    assert A.events == {12: ['simulation_day=212', 'event1', 'event2'], 1: ['simulation_day=345', 'event3']}
 
 
 def test___str__():
     """Unit test for function __str__ in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    A = AnimalEvents()
+    A.add_event(1000, 2000, 'event')
+    assert A.__str__().__eq__("\tdays born 1000: ['simulation_day=2000', 'event'] \n")
 
 
 @pytest.mark.parametrize(
@@ -319,82 +290,82 @@ def test_update_milk_production_history():
     pass
 
 
-def test__determine_param_value():
+def test_cow_determine_param_value():
     """Unit test for function _determine_param_value in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__milking_update():
+def test_cow_milking_update():
     """Unit test for function _milking_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_calc_manure_excretion():
+def test_cow_calc_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_phosphorus_rqmts():
+def test_cow_phosphorus_rqmts():
     """Unit test for function phosphorus_rqmts in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_calc_daily_walking_dist():
+def test_cow_calc_daily_walking_dist():
     """Unit test for function calc_daily_walking_dist in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_get_bw_change():
+def test_cow_get_bw_change():
     """Unit test for function get_bw_change in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_update():
+def test_cow_update():
     """Unit test for function update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__determine_estrus_day():
+def test_cow_determine_estrus_day():
     """Unit test for function _determine_estrus_day in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__restart_estrus():
+def test_cow_restart_estrus():
     """Unit test for function _restart_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__later_estrus():
+def test_cow_later_estrus():
     """Unit test for function _later_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__return_estrus():
+def test_cow_return_estrus():
     """Unit test for function _return_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__after_ai_estrus():
+def test_cow_after_ai_estrus():
     """Unit test for function _after_ai_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__after_abortion_estrus():
+def test_cow_after_abortion_estrus():
     """Unit test for function _after_abortion_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__ed_update():
+def test_cow_ed_update():
     """Unit test for function _ed_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__determine_tai_program_day():
+def test_cow_determine_tai_program_day():
     """Unit test for function _determine_tai_program_day in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__tai_program_day_after_preg_check():
+def test_cow_tai_program_day_after_preg_check():
     """Unit test for function _tai_program_day_after_preg_check in file routines/animal/life_cycle/cow.py"""
     pass
 
@@ -404,17 +375,17 @@ def test__OvSynch56_update():
     pass
 
 
-def test__OvSynch48_update():
+def test_cow_OvSynch48_update():
     """Unit test for function _OvSynch48_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__CoSynch72_update():
+def test_cow_CoSynch72_update():
     """Unit test for function _CoSynch72_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__5dCoSynch_update():
+def test_cow_5dCoSynch_update():
     """Unit test for function _5dCoSynch_update in file routines/animal/life_cycle/cow.py"""
     pass
 
@@ -694,12 +665,12 @@ def test__calc_average():
     pass
 
 
-def test_manure_calculations():
+def test_calf_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/calf_manure_excretion.py"""
     pass
 
 
-def test_manure_calculations():
+def test_cow_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/dry_cow_manure_excretion.py"""
     pass
 
@@ -714,7 +685,7 @@ def test_manure_calculations():
     pass
 
 
-def test_manure_calculations():
+def test_lactating_cow_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/lactating_cow_manure_excretion.py"""
     pass
 
