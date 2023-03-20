@@ -246,7 +246,8 @@ class Manure:
         rainfall_to_dry_manure_ratio : float
             The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram)
         is_from_cow : float
-            Is the water extractable inorganic phosphorus from cow manure (true / false)
+            Is the water extractable inorganic phosphorus from cow manure, and not poultry or swine manure
+                                                                                                        (true / false)
 
         Returns
         -------
