@@ -14,7 +14,7 @@ problem = ProblemSpec(
 
 # ---- Sample from parameter space ----
 # samples = sobol.sample(problem=problem, N=1024)
-problem.sample(func=sobol_sampler.sample, N=1024)  # creates annoying message on each call.
+problem.sample(func=sobol_sampler.sample, N=2**14)  # creates annoying message on each call.
 # alternatively, call the samplers directly (thanks to ProblemSpec._add_samplers()):
 # problem.sample_sobol(1024); # problem.sample_morris(100); # problem.sample_fast(100)
 
@@ -30,7 +30,7 @@ getattr(problem, "samples")  # problem.samples
 
 # ---- Evaluate the objective function ----
 # The function must take a numpy array as input (columns corresponding to parameters) and return a numpy array as
-problem.evaluate(func=Ishigami.evaluate)
+problem.evaluate(func=Ishigami.evaluate, nprocs=16)
 
 # view the results (numpy.array)
 getattr(problem, "results")
@@ -41,8 +41,8 @@ getattr(problem, "results")
 problem.analyze(sobol.analyze)
 
 # View the analysis results
-# problem.plot()
-problem.heatmap()
+problem.plot()
+# problem.heatmap()
 
 # ---- Again, with different hyper parameters ----
 problem.evaluate(func=Ishigami.evaluate, A=0.532, B=0.2)

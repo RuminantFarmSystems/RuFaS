@@ -90,8 +90,15 @@ Here are some relevant links to help get started with this package:
 * [Package example using a variable and parameters](https://salib.readthedocs.io/en/latest/basics.html#another-example)
 * [Categorical data GitHub Issue](https://github.com/SALib/SALib/issues/195)
 * [Negative sobol index GitHub Issues](https://github.com/SALib/SALib/issues/102)
+* [How to wrap existing models](https://salib.readthedocs.io/en/latest/user_guide/wrappers.html)
 
 The documentation for the package pretty good, and the two blogs are helpful at seeing how others have used it. 
+
+NOTE: SALIb has parallel and distributed processing available out of box. It DOES NOT work in pycharm, but DOES work
+with all other methods of running python code. It is a known issue that the python interactive console cannot execute
+code from the `multiprocessing` package (it has been 4 years, so I doubt it will ever get patched): [Link](
+https://youtrack.jetbrains.com/issue/PY-36151?_ga=2.6010288.221937295.1679330535-2071016451.1670387953&_gl=1*1qr3jl1*_ga*MjA3MTAxNjQ1MS4xNjcwMzg3OTUz*_ga_9J976DJZ68*MTY3OTMzMDUzNC4xMS4wLjE2NzkzMzA1NDMuMC4wLjA.
+)
 
 ----
 
