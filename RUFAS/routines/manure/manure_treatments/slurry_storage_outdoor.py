@@ -211,8 +211,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         ammonia_loss = GasEmissions.calc_ammonia_emission(
                 num_animals=num_animals,
                 barn_area=barn_area,
-                manure_urine=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
-                manure_urine_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+                mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+                total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
                 temperature_celsius=self._get_current_day_average_temperature_celsius()
         )
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
@@ -233,6 +233,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         methane_loss, new_accumulated_liquid_manure_total_solids = \
             self.calc_methane_emission(self._accumulated_output.liquid_manure_total_solids)
         daily_output.storage_methane = methane_loss
+        self._accumulated_output.storage_methane += methane_loss
         self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
 
         ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
@@ -244,6 +245,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
                         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen),
             )
         daily_output.storage_ammonia = ammonia_loss
+        self._accumulated_output.storage_ammonia += ammonia_loss
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = \
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
 

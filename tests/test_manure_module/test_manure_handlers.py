@@ -298,9 +298,9 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     # Arrange
     mock_manure = mocker.MagicMock(autospec=PenManure)
-    mock_manure.total_ammoniacal_nitrogen = TAN = 19.0
+    mock_manure.manure_total_ammoniacal_nitrogen = TAN = 19.0
     mock_manure.urea = urea = 20.0
-    mock_manure.urine_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
+    mock_manure.urine_total_ammoniacal_nitrogen = urine_ammoniacal_nitrogen = 21.0
     mock_manure.urine = urine = 22.0
     mock_manure.nitrogen = N = 23.0
     mock_manure.total_solids = TS = 24.0
@@ -366,8 +366,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     patch_for_calc_E_NH3_emission.assert_called_once_with(
             num_animals=num_animals,
             barn_area=barn_area_from_pen_type,
-            manure_urine_total_ammoniacal_nitrogen=urine_ammoniacal_nitrogen,
-            manure_urine=urine / num_animals,
+            total_ammoniacal_nitrogen=urine_ammoniacal_nitrogen,
+            mass=urine / num_animals,
             temperature_celsius=current_day_avg_tempC
     )
     assert manure_handler_daily_output.simulation_day == sim_day
