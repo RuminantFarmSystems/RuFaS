@@ -31,7 +31,7 @@ class Manure:
 
         Parameters
         ----------
-        avg_air_temperature : float
+        mean_air_temperature : float
             The average air temperature of the current day (degrees celsius).
 
         Returns
@@ -83,7 +83,7 @@ class Manure:
         manure_cover_area : float
             Area of the field covered by manure (ha)
         is_dung : bool
-            Was the manure being assimilated applied via animal (true / false)
+            Was the manure being assimilated applied by animals grazing in the field (true / false)
 
         Returns
         -------
