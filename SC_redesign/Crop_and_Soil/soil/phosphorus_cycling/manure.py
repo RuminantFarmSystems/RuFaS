@@ -26,7 +26,7 @@ class Manure:
 
     # --- Static Methods ---
     @staticmethod
-    def _determine_temperature_factor(avg_air_temperature: float) -> float:
+    def _determine_temperature_factor(mean_air_temperature: float) -> float:
         """Calculates the temperature factor for the current day
 
         Parameters
@@ -44,8 +44,8 @@ class Manure:
         SurPhos [2], pseudocode_soil [S.5.D.I.1]
 
         """
-        calculated_temperature_factor = ((2 * (32 ** 2) * (avg_air_temperature ** 2)) - (avg_air_temperature ** 4)) / \
-                                        (32 ** 4)
+        calculated_temperature_factor = ((2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)) \
+            / (32 ** 4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
