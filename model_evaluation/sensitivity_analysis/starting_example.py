@@ -52,3 +52,17 @@ problem.analyze(sobol.analyze)
 
 # ---- Evaluate in parallel
 # problem.evaluate(Ishigami.evaluate, nprocs=8)
+
+
+###
+import numpy
+def linear(intercept, slope, x):
+    return intercept + slope * x
+
+
+def wrapped_linear(X):
+    intercept, slope, x = X.T
+    return linear(intercept, slope, x)
+
+thisX = numpy.array([[0.5, 0.5, 0.0], [0.5, 0.2, 0.2], [1.0, 1.0, 1.0]]).T
+wrapped_linear(X=thisX)
