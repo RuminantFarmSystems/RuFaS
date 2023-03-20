@@ -102,7 +102,7 @@ class ManureApplication:
         self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
         self.data.grazing_water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
         self.data.grazing_stable_inorganic_phosphorus += total_phosphorus_mass * 0.1125
-        self.data.grazing_stable_organic_phosphorus += total_phosphorus_mass * 33.75
+        self.data.grazing_stable_organic_phosphorus += total_phosphorus_mass * 0.3375
 
         application_field_coverage = self._determine_grazing_manure_field_coverage(field_size, dry_matter_mass)
         new_vals = self._determine_weighted_manure_attributes(self.data.grazing_manure_dry_mass,
@@ -127,8 +127,8 @@ class ManureApplication:
         Returns
         -------
         float
-             Fraction of water extractable inorganic phosphorus in a manure application, when that manure is produced by
-             a certain type of animal.
+             Fraction of total phosphorus in a manure application that is water extractable inorganic phosphorus, when
+             that manure is produced by a certain type of animal.
 
         Raises
         ------
@@ -213,7 +213,7 @@ class ManureApplication:
         """
         if not 0.0 < dry_matter_content <= 1.0:
             raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_content}'.")
-        return (1 - dry_matter_content) * dry_matter_mass
+        return min(0.9, (1 - dry_matter_content) * dry_matter_mass)
 
     @staticmethod
     def _determine_weighted_manure_attributes(old_total_dry_mass: float, old_moisture_factor: float,
@@ -227,7 +227,7 @@ class ManureApplication:
         old_total_dry_mass : float
             Dry weight equivalent of the manure that was already on the field (kg)
         old_moisture_factor : float
-            Moisture factor of the manure that was already on the field, between [0, 1] (unitless)
+            Moisture factor of the manure that was already on the field, between [0, 0.9] (unitless)
         old_field_coverage : float
             The fraction of the area of the field that was already covered by old manure, between [0, 1] (unitless)
         application_dry_mass : float
@@ -242,7 +242,7 @@ class ManureApplication:
         new_dry_matter_mass : float
             The new dry weight equivalent of manure on the field (kg)
         new_moisture_factor : float
-            The new moisture factor of the manure on the field, in the range [0, 1] (unitless)
+            The new moisture factor of the manure on the field, in the range [0, 0.9] (unitless)
         new_field_coverage : float
             The new fraction of field area that is covered by manure, in the range [0, 1] (unitless)
 

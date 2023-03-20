@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application import ManureApplication
 
 
@@ -56,7 +57,7 @@ def test_determine_moisture_factor(mass: float, dry_content: float) -> None:
     """Tests that the correct moisture factor is calculated based the mass applied and amount of water in the
         application."""
     observe = ManureApplication._determine_moisture_factor(mass, dry_content)
-    expect = (1 - dry_content) * mass
+    expect = min(0.9, (1 - dry_content) * mass)
     assert observe == expect
 
 
@@ -93,3 +94,31 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
         assert observe.get("new_dry_matter_mass") == new_mass
         assert observe.get("new_moisture_factor") == new_moisture
         assert observe.get("new_field_coverage") == new_coverage
+
+
+# ---- Main routine tests
+@pytest.mark.parametrize("dry_mass,dry_content,phosphorus_mass,field_size", [
+    (1000, 0.78, 150, 1.8),
+    (2344, 0.90, 201, 2.34),
+    (900, 0.688, 78, 1.12),
+    (1500, 0.89, 400, 4.1),
+])
+def test_apply_grazing_manure(dry_mass: float, dry_content: float, phosphorus_mass: float, field_size: float) -> None:
+    """Tests that the grazing manure related attributes are correctly updated when grazing manure is applied."""
+    data = SoilData(grazing_manure_dry_mass=4000, grazing_manure_moisture_factor=0.75,
+                    grazing_manure_field_coverage=0.6)
+    incorp = ManureApplication(data)
+    incorp._determine_grazing_manure_field_coverage = MagicMock(return_value=0.8)
+    incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 5000,
+                                                                           "new_moisture_factor": 0.6,
+                                                                           "new_field_coverage": 0.8})
+
+    incorp.apply_grazing_manure(dry_mass, dry_content, phosphorus_mass, field_size)
+
+    incorp._determine_grazing_manure_field_coverage.assert_called_once_with(field_size, dry_mass)
+    incorp._determine_weighted_manure_attributes.assert_called_once_with(4000, 0.75, 0.6, dry_mass, dry_content,
+                                                                         0.8)
+    assert incorp.data.grazing_water_extractable_inorganic_phosphorus == phosphorus_mass * 0.50
+    assert incorp.data.grazing_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
+    assert incorp.data.grazing_stable_inorganic_phosphorus == phosphorus_mass * 0.1125
+    assert incorp.data.grazing_stable_organic_phosphorus == phosphorus_mass * 0.3375

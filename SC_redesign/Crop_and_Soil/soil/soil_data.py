@@ -133,7 +133,7 @@ class SoilData:
     machine_manure_field_coverage: float = 0
     """Fraction of the field that is covered by machine-applied manure, between [0, 1] (unitless)"""
     machine_manure_moisture_factor: float = 0
-    """Fraction representing the current moisture level of the machine-applied manure on the field, between [0, 1]
+    """Fraction representing the current moisture level of the machine-applied manure on the field, between [0, 0.9]
         (unitless)
     """
     machine_water_extractable_inorganic_phosphorus: float = 0
@@ -154,7 +154,7 @@ class SoilData:
     grazing_manure_field_coverage: float = 0
     """Fraction of the field that is covered by grazing-applied manure, between [0, 1] (unitless)"""
     grazing_manure_moisture_factor: float = 0
-    """Fraction representing the current moisture level of the grazing-applied manure on the field, between [0, 1]
+    """Fraction representing the current moisture level of the grazing-applied manure on the field, between [0, 0.9]
         (unitless)
     """
     grazing_water_extractable_inorganic_phosphorus: float = 0
