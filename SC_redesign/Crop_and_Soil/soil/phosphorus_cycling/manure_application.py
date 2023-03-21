@@ -23,65 +23,6 @@ class ManureApplication:
         """
         self.data = soil_data or SoilData()
 
-    def apply_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
-                             total_phosphorus_mass: float, field_coverage: float,
-                             water_extractable_inorganic_phosphorus_fraction: float = None,
-                             source_animal: str = None) -> None:
-        """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
-            be tracked.
-
-        Parameters
-        ----------
-        dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
-        dry_matter_content : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
-        total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
-        field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
-        water_extractable_inorganic_phosphorus_fraction : float, default=None
-            Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
-        source_animal : str, default=None
-            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless)
-
-        Raises
-        ------
-        ValueError
-            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 1.0]
-
-        """
-        # TODO: implement an option for applying manure phosphorus at subsurface levels, after talking with Pete about
-        #  how this should be done with more than two soil layers.
-
-        if water_extractable_inorganic_phosphorus_fraction is not None:
-            if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 1.0:
-                raise ValueError(f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 1.0], "
-                                 f"received '{water_extractable_inorganic_phosphorus_fraction}'.")
-        else:
-            water_extractable_inorganic_phosphorus_fraction = \
-                self._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(source_animal)
-        water_extractable_organic_phosphorus_fraction = 0.05
-        stable_phosphorus_fraction = 1.0 - (water_extractable_organic_phosphorus_fraction +
-                                            water_extractable_inorganic_phosphorus_fraction)
-        stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
-        stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
-        self.data.machine_water_extractable_inorganic_phosphorus += (total_phosphorus_mass *
-                                                                     water_extractable_inorganic_phosphorus_fraction)
-        self.data.machine_water_extractable_organic_phosphorus += (total_phosphorus_mass *
-                                                                   water_extractable_organic_phosphorus_fraction)
-        self.data.machine_stable_inorganic_phosphorus += (total_phosphorus_mass * stable_inorganic_phosphorus_fraction)
-        self.data.machine_stable_organic_phosphorus += (total_phosphorus_mass * stable_organic_phosphorus_fraction)
-
-        new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
-                                                              self.data.machine_manure_moisture_factor,
-                                                              self.data.grazing_manure_field_coverage, dry_matter_mass,
-                                                              dry_matter_content, field_coverage)
-        self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
-
     def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
                              total_phosphorus_mass: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
@@ -114,40 +55,6 @@ class ManureApplication:
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
 
     # --- Static Methods ---
-    @staticmethod
-    def _determine_water_extractable_inorganic_phosphorus_fraction_by_animal(source_animal: str = None) -> float:
-        """This method returns what the water extractable inorganic phosphorus fraction of total manure phosphorus mass
-            should be based on the type of animal that produced the manure.
-
-        Parameters
-        ----------
-        source_animal : str, default=None
-            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless)
-
-        Returns
-        -------
-        float
-             Fraction of total phosphorus in a manure application that is water extractable inorganic phosphorus, when
-             that manure is produced by a certain type of animal.
-
-        Raises
-        ------
-        ValueError
-            If source animal of the manure application is not None, 'CATTLE', 'SWINE', or 'POULTRY'
-
-        """
-        if source_animal is None:
-            return 0.45
-        elif source_animal == "CATTLE":
-            return 0.50
-        elif source_animal == "SWINE":
-            return 0.35
-        elif source_animal == "POULTRY":
-            return 0.20
-        else:
-            raise ValueError(f"Expected manure source animal to be 'CATTLE', 'SWINE', 'POULTRY', or None, "
-                             f"received: '{source_animal}'.")
-
     @staticmethod
     def _determine_grazing_manure_field_coverage(field_size: float, total_manure_applied: float) -> float:
         """Calculates the fraction of the field covered by manure that was applied by grazers.
