@@ -122,3 +122,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_content: float, phosphorus_ma
     assert incorp.data.grazing_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.grazing_stable_inorganic_phosphorus == phosphorus_mass * 0.1125
     assert incorp.data.grazing_stable_organic_phosphorus == phosphorus_mass * 0.3375
+    assert incorp.data.grazing_manure_dry_mass == 5000
+    assert incorp.data.grazing_manure_moisture_factor == 0.6
+    assert incorp.data.grazing_manure_field_coverage == 0.8
+    
