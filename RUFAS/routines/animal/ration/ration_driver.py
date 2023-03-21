@@ -16,7 +16,7 @@ import math
 import statistics as stat
 
 
-def optimization(requirements, available_feeds, animal_type, cow_type, user_defined_ration=False):
+def optimization(requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -58,7 +58,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize()
+            solution = NLP.optimize(user_defined_ration_select)
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
@@ -79,6 +79,102 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
         ration_vals = NLP.get_ration_vals(solution.x)
     return solution, ration_vals
 
+def user_defined_ration(pen, available_feeds, animal_type, cow_type):
+    """
+    Function that links the ration_driver file with the calc_ration function in
+    pen.py. Returns a dictionary of the rations by feed and status of the NLP
+    optimization.
+
+    Args:
+        pen: an object of class Pen
+        feed: an object of class Feed
+        available_feeds: an object of class AvailableFeeds
+        animal_type: string representation of the type of animal (cow, heifer)
+        cow_type: Boolean which is True if cow is lactating, False otherwise
+    """
+    user_defined_ration_select = True
+    # creating instance of class requirements
+    req = Requirements()
+    req.set_requirements(pen, animal_type, False)
+    import json
+    with open('input/userdefinedration/userdefinedration_test.json', 'r') as f:
+        rationall = json.load(f)
+    if animal_type == 'cow':
+        if cow_type == True:
+            rationtouse = rationall['cow_lactating']
+        else:
+            rationtouse = rationall['cow_dry']
+    elif animal_type == 'heifer':
+        rationtouse = rationall['all_heifers']
+    else: 
+        rationtouse = rationall['calf']   
+    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
+    # Reduction of milk production estimate process to achieve feasible solution
+    if animal_type == 'cow':
+        total_milk_in_pen = 0.0
+        num_animals = 0
+        for animal in pen.animals_in_pen:
+            total_milk_in_pen += animal.estimated_daily_milk_produced
+            num_animals += 1
+        average_total_milk = total_milk_in_pen/num_animals
+        print(average_total_milk)
+    fixed_ration = False
+    if animal_type == 'cow':
+        while not solution.success:
+            # This values for reduction are not from pseudocode, but the vales below
+            # are based on fastest case runtime testing
+            # TODO: continue testing for more efficient reductions
+            NEl_con = NLP.NEl_constraint(solution.x)
+            if NEl_con < -0.5:
+                reduction = 3 * (-NEl_con)
+            else:
+                reduction = 1.5
+            running_total_milk = 0.0
+            for animal in pen.animals_in_pen:
+                animal.estimated_daily_milk_produced -= reduction
+                running_total_milk += animal.estimated_daily_milk_produced
+            average_running_total_milk = running_total_milk / num_animals
+            print(average_running_total_milk)
+            # recalculating requirements after reduction
+            req.set_requirements(pen, animal_type, True)
+            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
+            if average_running_total_milk < 0.75*average_total_milk or average_running_total_milk == 0.0:
+                fixed_ration= True
+                solution.success = True
+                print('broken')
+                break
+
+    if solution != None or fixed_ration:
+        if not fixed_ration:
+            ration = {}
+            for feed_id in range(len(available_feeds['feed_id'])):
+                i = feed_id * 3
+                num = solution.x[i]
+                num += solution.x[i + 1]
+                num += solution.x[i + 2]
+                ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
+            ration['status'] = 'Optimal'
+            ration['objective'] = NLP.objective(solution.x)
+        else:
+            ration = {}
+            for feed_id in range(len(available_feeds['feed_id'])):
+                print(feed_id)
+                print(available_feeds['feed_key'][feed_id])
+                if available_feeds['feed_key'][feed_id] in rationtouse:
+                    print('ration yes')
+                    ingredient_percentage = rationtouse[available_feeds['feed_key'][feed_id]]
+                    ingredient_as_proportion = ingredient_percentage/100*req.DMIest
+                    ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
+                else:
+                    ration[available_feeds['feed_key'][feed_id]] = 0.0
+            ration['status'] = 'Optimal'
+            ration['objective'] = NLP.objective(solution.x)
+        return ration, ration_vals
+    # safeguard if scipy SLSQP bounds error still occurs after many iterations
+    # using previous cycles ration for this pen
+    else:
+        return pen.ration, ration_vals
+    
 
 def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
@@ -93,16 +189,18 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
         animal_type: string representation of the type of animal (cow, heifer)
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-
+    user_defined_ration_select = True
+    if user_defined_ration_select == True:
+        print('userdefined')
+        ration, ration_vals = user_defined_ration(pen, available_feeds, animal_type, cow_type)
+        return ration, ration_vals
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
 
-    user_defined_ration = True
-    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration)
+    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type,)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
-        overridecheck = 0
         while not solution.success:
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
@@ -126,7 +224,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
                 animal.estimated_daily_milk_produced -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type,user_defined_ration)
+            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
             # overridecheck += 1
             # print(overridecheck)
             #### # if NEl_con < 0.75*NEl_reference:

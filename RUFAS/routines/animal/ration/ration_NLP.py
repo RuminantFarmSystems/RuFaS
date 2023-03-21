@@ -505,10 +505,10 @@ def userbounds():
     # TODO use the util.py read_json_file method instead
     with open('input/userdefinedration/userdefinedration_test.json', 'r') as f:
         rationall = json.load(f)
-    ration_calf = rationall['calf']['ration']
-    ration_all_heifers = rationall['all_heifers']['ration']
-    ration_cow_lactating = rationall['cow_lactating']['ration']
-    ration_cow_dry = rationall['cow_dry']['ration']
+    ration_calf = rationall['calf']
+    ration_all_heifers = rationall['all_heifers']
+    ration_cow_lactating = rationall['cow_lactating']
+    ration_cow_dry = rationall['cow_dry']
     if animal_type == 'cow':
         if cow_type == True:
             rationtouse = ration_cow_lactating
@@ -523,14 +523,17 @@ def userbounds():
     else: 
         rationtouse = ration_calf
     values2= []
-    for key, value in rationall.items():
-        [values2.append(int(i)) for i in value['ration'].keys()]
+    # IT"S FAILING HERE
+    for key, value in rationtouse.items():
+        [values2.append(int(i)) for i in value.keys()]
     uniqueset=set(values2) # TODO fix tortured logic 
     uniqueset2 = [i for i in uniqueset]
     uniqueset2.sort()
     uniqueset2 = [str(i) for i in uniqueset2]
     tribounds = []
     wiggleroom = 0.15
+    print('foundrations3')
+
     for key in uniqueset2:
         if key in rationtouse.keys():
             target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
@@ -544,7 +547,7 @@ def userbounds():
             tribounds.append((0,0))
     return tribounds
 
-def optimize():
+def optimize(user_defined_ration_select):
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -564,8 +567,7 @@ def optimize():
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    user_defined_ration = False
-    if user_defined_ration:
+    if user_defined_ration_select:
         bnds = userbounds()
     else:    
         for i in range(len(limit)):
@@ -606,7 +608,7 @@ def optimize():
     #t1 = t_end_2 - t_end_1
     #write_csv([t1, obj1])
     # iport matplotlib.pyplot as plt
-    if user_defined_ration:
+    if user_defined_ration_select:
         # accumulator = []
         usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)
         # plt.plot(accumulator[:, 0], accumulator[:, 1])
