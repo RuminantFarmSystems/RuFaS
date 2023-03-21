@@ -488,6 +488,21 @@ def energy_req_limit_constraint(x):
         list.append(x[a + 1] * x[a + 2])
     return -sum(list)
 
+
+def get_ration_vals2(x):
+    """
+    Function that calculates and retrieves ration values used throughout the
+    ration.
+
+    Args:
+        x: the decision vector of the NLP (should be a completed ration)
+    """
+    #ration vals (subject to adding other ration vals)
+    ME_tot = sum(np.multiply(x, 0))
+    ration_vals = {'ME_tot': ME_tot}
+    return ration_vals
+
+
 def get_ration_vals(x):
     """
     Function that calculates and retrieves ration values used throughout the
@@ -522,18 +537,21 @@ def userbounds():
             print(ration_all_heifers)
     else: 
         rationtouse = ration_calf
+    
     values2= []
     # IT"S FAILING HERE
-    for key, value in rationtouse.items():
-        [values2.append(int(i)) for i in value.keys()]
+    for key, value in rationall.items():
+        for i in value.keys():
+            values2.append(int(i))
     uniqueset=set(values2) # TODO fix tortured logic 
     uniqueset2 = [i for i in uniqueset]
     uniqueset2.sort()
     uniqueset2 = [str(i) for i in uniqueset2]
+    
     tribounds = []
     wiggleroom = 0.15
     print('foundrations3')
-
+    if DMIest == 0.0: DMIest = 1
     for key in uniqueset2:
         if key in rationtouse.keys():
             target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
@@ -542,9 +560,9 @@ def userbounds():
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
         else:
-            tribounds.append((0,0))
-            tribounds.append((0,0))
-            tribounds.append((0,0))
+            tribounds.append((0,0.0001))
+            tribounds.append((0,0.0001))
+            tribounds.append((0,0.0001))
     return tribounds
 
 def optimize(user_defined_ration_select):
@@ -589,7 +607,7 @@ def optimize(user_defined_ration_select):
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
     cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
     heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
-    user_bnds = [con1, con2, con3, con4, con5, con6, con7, con9, con10] 
+    user_cons = [con1, con2, con3, con4, con5, con6, con7, con9, con10] 
     # removing DMI and upper NDF constraint allows for better chance of convergence, but this needs reevaluation
     #t_start_1 = timer.time()
     #sol1 = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons,
@@ -610,7 +628,7 @@ def optimize(user_defined_ration_select):
     # iport matplotlib.pyplot as plt
     if user_defined_ration_select:
         # accumulator = []
-        usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_bnds)
+        usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons)
         # plt.plot(accumulator[:, 0], accumulator[:, 1])
         # plt.show()
         chanchodebug = False

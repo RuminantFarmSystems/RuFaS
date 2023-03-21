@@ -251,10 +251,10 @@ class HeiferII(HeiferI):
             0,
             0,
             ]
-        with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/NASEM_10yr.csv', 'a', newline='') as file:
-        #with open('C:/Users/joecw/RUFAS/NRC_10yr.csv', 'a', newline='') as file:
-            csvout = csv.writer(file)
-            csvout.writerow(csvline)
+        # with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/NASEM_10yr.csv', 'a', newline='') as file:
+        # #with open('C:/Users/joecw/RUFAS/NRC_10yr.csv', 'a', newline='') as file:
+        #     csvout = csv.writer(file)
+        #     csvout.writerow(csvline)
         
     def calc_manure_excretion(self, feed):
         """
