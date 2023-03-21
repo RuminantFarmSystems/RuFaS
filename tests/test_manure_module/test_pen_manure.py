@@ -2,6 +2,8 @@ from dataclasses import fields
 
 from pytest import approx
 
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
@@ -31,8 +33,8 @@ def test_pen_manure_init() -> None:
     manure_data = {
         'urea': 1.0,
         'urine': 2.0,
-        'urine_ammoniacal_nitrogen': 3.0,
-        'total_ammoniacal_nitrogen': 4.0,
+        'urine_total_ammoniacal_nitrogen': 3.0,
+        'manure_total_ammoniacal_nitrogen': 4.0,
         'nitrogen': 5.0,
         'manure_mass': 6.0,
         'total_solids': 7.0,
@@ -52,8 +54,8 @@ def test_pen_manure_init() -> None:
     # Assert
     assert manure.urea == approx(1.0)
     assert manure.urine == approx(2.0)
-    assert manure.urine_ammoniacal_nitrogen == approx(3.0)
-    assert manure.total_ammoniacal_nitrogen == approx(4.0)
+    assert manure.urine_total_ammoniacal_nitrogen == approx(3.0)
+    assert manure.manure_total_ammoniacal_nitrogen == approx(4.0)
     assert manure.nitrogen == approx(5.0)
     assert manure.manure_mass == approx(6.0)
     assert manure.manure_volume == approx(manure.manure_mass / ManureConstants.MANURE_DENSITY)
@@ -73,40 +75,63 @@ def test_pen_manure_init() -> None:
     # should be returned with internal attributes correctly calculated.
 
     # Arrange
-    animal_manure = {
-        'U': 1.0,
-        'Urine': 2.0,
-        'TAN_s': 3.0,
-        'MN': 4.0,
-        'Mkg': 5.0,
-        'TSd': 6.0,
-        'VSd': 7.0,
-        'VSnd': 8.0,
-        'WIP_frac': 9.0,
-        'WOP_frac': 10.0,
-        'p_excrt_manure': 11.0,
-        'p_frac': 12.0,
-        'K_manure': 13.0,
-        'CH4_manure': 14.0
-    }
+    urea = 1.0
+    urine = 2.0
+    total_ammoniacal_nitrogen_concentration = 3.0
+    urine_nitrogen = 4.0
+    manure_nitrogen = 5.0
+    manure_mass = 6.0
+    total_solids = 7.0
+    degradable_volatile_solids = 8.0
+    non_degradable_volatile_solids = 9.0
+    inorganic_phosphorus_fraction = 10.0
+    organic_phosphorus_fraction = 11.0
+    phosphorus = 12.0
+    phosphorus_fraction = 13.0
+    potassium = 14.0
+    methane = 15.0
+    animal_manure = AnimalManureExcretions(
+        urea=urea,
+        urine=urine,
+        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=manure_mass,
+        total_solids=total_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=phosphorus,
+        phosphorus_fraction=phosphorus_fraction,
+        potassium=potassium,
+        methane=methane
+    )
     num_animals = 2
+    expected_total_ammoniacal_nitrogen = (
+            total_ammoniacal_nitrogen_concentration *
+            manure_mass * GeneralConstants.KG_TO_GRAMS /
+            ManureConstants.MANURE_DENSITY
+    ) * GeneralConstants.GRAMS_TO_KG
+    expected_urine_ammoniacal_nitrogen = urine_nitrogen * ManureConstants.URINE_TAN_FACTOR
 
     # Act
     manure = PenManure.get_instance(animal_manure, num_animals)
 
     # Assert
-    assert manure.urea == approx(animal_manure['U'] / num_animals)
-    assert manure.urine == approx(animal_manure['Urine'] / num_animals)
-    assert manure.urine_ammoniacal_nitrogen == approx(animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals)
-    assert manure.total_ammoniacal_nitrogen == approx(animal_manure['TAN_s'])
-    assert manure.nitrogen == approx(animal_manure['MN'])
-    assert manure.manure_mass == approx(animal_manure['Mkg'])
-    assert manure.total_solids == approx(animal_manure['TSd'])
-    assert manure.degradable_volatile_solids == approx(animal_manure['VSd'])
-    assert manure.non_degradable_volatile_solids == approx(animal_manure['VSnd'])
-    assert manure.inorganic_phosphorus_fraction == approx(animal_manure['WIP_frac'] / num_animals)
-    assert manure.organic_phosphorus_fraction == approx(animal_manure['WOP_frac'] / num_animals)
-    assert manure.phosphorus == approx(animal_manure['p_excrt_manure'])
-    assert manure.phosphorus_fraction == approx(animal_manure['p_frac'] / num_animals)
-    assert manure.potassium == approx(animal_manure['K_manure'])
-    assert manure.methane == approx(animal_manure['CH4_manure'])
+    assert manure.urea == approx(animal_manure['urea'] / num_animals)
+    assert manure.urine == approx(animal_manure['urine'])
+    assert manure.urine_nitrogen == approx(animal_manure['urine_nitrogen'])
+    assert manure.urine_total_ammoniacal_nitrogen == approx(expected_urine_ammoniacal_nitrogen)
+    assert manure.manure_total_ammoniacal_nitrogen == approx(expected_total_ammoniacal_nitrogen)
+    assert manure.nitrogen == approx(animal_manure['manure_nitrogen'])
+    assert manure.manure_mass == approx(animal_manure['manure_mass'])
+    assert manure.total_solids == approx(animal_manure['total_solids'])
+    assert manure.degradable_volatile_solids == approx(animal_manure['degradable_volatile_solids'])
+    assert manure.non_degradable_volatile_solids == approx(animal_manure['non_degradable_volatile_solids'])
+    assert manure.inorganic_phosphorus_fraction == approx(animal_manure['inorganic_phosphorus_fraction'] / num_animals)
+    assert manure.organic_phosphorus_fraction == approx(animal_manure['organic_phosphorus_fraction'] / num_animals)
+    assert manure.phosphorus == approx(animal_manure['phosphorus'] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.phosphorus_fraction == approx(animal_manure['phosphorus_fraction'] / num_animals)
+    assert manure.potassium == approx(animal_manure['potassium'] * GeneralConstants.GRAMS_TO_KG)
+    assert manure.methane == approx(animal_manure['methane'] * GeneralConstants.GRAMS_TO_KG)
