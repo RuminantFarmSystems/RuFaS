@@ -47,17 +47,17 @@ def test_determine_field_coverage(field_size: float, mass_applied: float) -> Non
     assert observe == expect
 
 
-@pytest.mark.parametrize("mass,dry_content", [
-    (300, 0.35),
-    (800, 0.445),
-    (1200, 0.85),
-    (900, 1.0),
+@pytest.mark.parametrize("dry_content", [
+    0.35,
+    0.445,
+    0.85,
+    1.0,
 ])
-def test_determine_moisture_factor(mass: float, dry_content: float) -> None:
+def test_determine_moisture_factor(dry_content: float) -> None:
     """Tests that the correct moisture factor is calculated based the mass applied and amount of water in the
         application."""
-    observe = ManureApplication._determine_moisture_factor(mass, dry_content)
-    expect = min(0.9, (1 - dry_content) * mass)
+    observe = ManureApplication._determine_moisture_factor(dry_content)
+    expect = min(0.9, (1 - dry_content))
     assert observe == expect
 
 
@@ -69,7 +69,7 @@ def test_determine_moisture_factor(mass: float, dry_content: float) -> None:
 def test_error_determine_moisture_factor(mass: float, dry_content: float) -> None:
     """Tests that correct error is raised when invalid argument is passed."""
     with pytest.raises(ValueError) as e:
-        ManureApplication._determine_moisture_factor(mass, dry_content)
+        ManureApplication._determine_moisture_factor(dry_content)
     assert str(e.value) == f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_content}'."
 
 
@@ -90,7 +90,7 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
         new_moisture = (old_moisture * old_mass) / new_mass + (0.65 * app_mass) / new_mass
         new_coverage = (old_coverage * old_mass) / new_mass + (app_coverage * app_mass) / new_mass
 
-        ManureApplication._determine_moisture_factor.assert_called_once_with(app_mass, app_dry_content)
+        ManureApplication._determine_moisture_factor.assert_called_once_with(app_dry_content)
         assert observe.get("new_dry_matter_mass") == new_mass
         assert observe.get("new_moisture_factor") == new_moisture
         assert observe.get("new_field_coverage") == new_coverage
@@ -125,4 +125,3 @@ def test_apply_grazing_manure(dry_mass: float, dry_content: float, phosphorus_ma
     assert incorp.data.grazing_manure_dry_mass == 5000
     assert incorp.data.grazing_manure_moisture_factor == 0.6
     assert incorp.data.grazing_manure_field_coverage == 0.8
-    

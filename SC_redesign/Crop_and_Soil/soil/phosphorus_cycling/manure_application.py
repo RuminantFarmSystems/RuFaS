@@ -184,14 +184,12 @@ class ManureApplication:
         return field_coverage_fraction
 
     @staticmethod
-    def _determine_moisture_factor(dry_matter_mass: float, dry_matter_content: float) -> float:
+    def _determine_moisture_factor(dry_matter_content: float) -> float:
         """This method determines the moisture factor of a new manure application based on how much manure was applied
             and how much water was in the application.
 
         Parameters
         ----------
-        dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
         dry_matter_content : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
 
@@ -213,7 +211,7 @@ class ManureApplication:
         """
         if not 0.0 < dry_matter_content <= 1.0:
             raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_content}'.")
-        return min(0.9, (1 - dry_matter_content) * dry_matter_mass)
+        return min(0.9, (1 - dry_matter_content))
 
     @staticmethod
     def _determine_weighted_manure_attributes(old_total_dry_mass: float, old_moisture_factor: float,
@@ -254,10 +252,9 @@ class ManureApplication:
 
         """
         new_dry_matter_mass = old_total_dry_mass + application_dry_mass
-        application_moisture_factor = ManureApplication._determine_moisture_factor(application_dry_mass,
-                                                                                   application_dry_content)
-        new_moisture_factor = (old_moisture_factor * old_total_dry_mass +
-                               application_moisture_factor * application_dry_mass) / new_dry_matter_mass
+        application_moisture_factor = ManureApplication._determine_moisture_factor(application_dry_content)
+        new_moisture_factor = (old_moisture_factor * old_total_dry_mass + application_moisture_factor *
+                               application_dry_mass) / new_dry_matter_mass
         new_field_coverage = (old_field_coverage * old_total_dry_mass +
                               application_field_coverage * application_dry_mass) / new_dry_matter_mass
         return {"new_dry_matter_mass": new_dry_matter_mass, "new_moisture_factor": new_moisture_factor,
