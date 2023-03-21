@@ -49,15 +49,15 @@ class ManureApplication:
         Raises
         ------
         ValueError
-            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 1.0]
+            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95]
 
         """
         # TODO: implement an option for applying manure phosphorus at subsurface levels, after talking with Pete about
         #  how this should be done with more than two soil layers.
 
         if water_extractable_inorganic_phosphorus_fraction is not None:
-            if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 1.0:
-                raise ValueError(f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 1.0], "
+            if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
+                raise ValueError(f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
                                  f"received '{water_extractable_inorganic_phosphorus_fraction}'.")
         else:
             water_extractable_inorganic_phosphorus_fraction = \
@@ -76,7 +76,7 @@ class ManureApplication:
 
         new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
                                                               self.data.machine_manure_moisture_factor,
-                                                              self.data.grazing_manure_field_coverage, dry_matter_mass,
+                                                              self.data.machine_manure_field_coverage, dry_matter_mass,
                                                               dry_matter_content, field_coverage)
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
