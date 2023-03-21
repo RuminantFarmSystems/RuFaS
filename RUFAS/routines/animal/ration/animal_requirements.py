@@ -1066,7 +1066,7 @@ def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: in
         # TODO: Actual calculation for dry_matter_intake_estimate
         dry_matter_intake_estimate = 0.0
         # this comment is a holdover from the previous version
-    if dry_matter_intake_estimate < 0.0: dry_matter_intake_estimate = 0.0
+    if dry_matter_intake_estimate < 0.0: dry_matter_intake_estimate = 1.0
     return dry_matter_intake_estimate
 
 
@@ -1127,7 +1127,7 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
             -(0.082*(NDF_concentration_percentage\
             -(23.1+56*(body_weight/mature_body_weight)-30.6(body_weight/mature_body_weight)^2)))
         """
-    if dry_matter_intake_estimate < 0.0: dry_matter_intake_estimate = 0.0
+    if dry_matter_intake_estimate < 0.0: dry_matter_intake_estimate = 1.0
     return dry_matter_intake_estimate
 
 
