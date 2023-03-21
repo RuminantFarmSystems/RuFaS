@@ -26,12 +26,12 @@ class Manure:
 
     # --- Static Methods ---
     @staticmethod
-    def _determine_temperature_factor(avg_air_temperature: float) -> float:
+    def _determine_temperature_factor(mean_air_temperature: float) -> float:
         """Calculates the temperature factor for the current day
 
         Parameters
         ----------
-        avg_air_temperature : float
+        mean_air_temperature : float
             The average air temperature of the current day (degrees celsius).
 
         Returns
@@ -44,8 +44,8 @@ class Manure:
         SurPhos [2], pseudocode_soil [S.5.D.I.1]
 
         """
-        calculated_temperature_factor = ((2 * (32 ** 2) * (avg_air_temperature ** 2)) - (avg_air_temperature ** 4)) / \
-                                        (32 ** 4)
+        calculated_temperature_factor = ((2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)) \
+            / (32 ** 4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -83,7 +83,7 @@ class Manure:
         manure_cover_area : float
             Area of the field covered by manure (ha)
         is_dung : bool
-            Was the manure being assimilated applied via animal (true / false)
+            Was the manure being assimilated applied by animals grazing in the field (true / false)
 
         Returns
         -------
@@ -246,7 +246,8 @@ class Manure:
         rainfall_to_dry_manure_ratio : float
             The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram)
         is_from_cow : float
-            Is the water extractable inorganic phosphorus from cow manure (true / false)
+            Is the water extractable inorganic phosphorus from cow manure, and not poultry or swine manure
+                                                                                                        (true / false)
 
         Returns
         -------
