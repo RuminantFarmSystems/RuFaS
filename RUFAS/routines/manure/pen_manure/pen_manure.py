@@ -12,6 +12,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
 
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 
@@ -19,74 +21,102 @@ from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 class PenManure:
     """A class that represents the manure data extracted from the animal module.
 
-    Attributes:
-        urea: manure urea concentration in the manure, g/L.
-        urine: amount of urine, kg.
-        urine_ammoniacal_nitrogen: ammoniacal nitrogen concentration in the urine, g/L.
-        total_ammoniacal_nitrogen: total ammoniacal nitrogen concentration in the manure slurry, g/L.
-        nitrogen: nitrogen in liquid and solid manure, kg.
-        manure_mass: amount of manure, kg.
-        manure_volume: volume of manure, m^3.
-        total_solids: total solids, kg.
-        degradable_volatile_solids: degradable volatile solids, kg.
-        non_degradable_volatile_solids: non-degradable volatile solids, kg.
-        inorganic_phosphorus_fraction: water extractable inorganic phosphorus fraction,
-        unitless.
-        organic_phosphorus_fraction: water extractable organic phosphorus fraction, unitless.
-        phosphorus: manure phosphorus excretion for manure module input, kg.
-        phosphorus_fraction: phosphorus fraction of manure, unitless.
-        potassium: potassium in manure, kg.
-        methane: methane emission, g/day.
-
     """
     urea: float = 0.0
+    """float: Concentration of urea in manure, g/L."""
+
     urine: float = 0.0
-    urine_ammoniacal_nitrogen: float = 0.0
-    total_ammoniacal_nitrogen: float = 0.0
+    """Amount of urine in manure, kg."""
+
+    urine_total_ammoniacal_nitrogen: float = 0.0
+    """Amount of ammoniacal nitrogen concentration in urine, kg."""
+
+    manure_total_ammoniacal_nitrogen: float = 0.0
+    """Amount of total ammoniacal nitrogen in manure slurry, kg."""
+
+    urine_nitrogen: float = 0.0
+    """Amount of nitrogen in urine, kg."""
+
     nitrogen: float = 0.0
+    """Amount of nitrogen in manure, kg."""
+
     manure_mass: float = 0.0
+    """Amount of manure, kg."""
+
     manure_volume: float = field(init=False)
+    """Volume of manure, m^3."""
+
     total_solids: float = 0.0
+    """Amount of total solids, kg."""
+
     degradable_volatile_solids: float = 0.0
+    """Amount of degradable volatile solids, kg."""
+
     non_degradable_volatile_solids: float = 0.0
+    """Amount of non-degradable volatile solids, kg."""
+
     inorganic_phosphorus_fraction: float = 0.0
+    """Fraction of water extractable inorganic phosphorus, unitless."""
+
     organic_phosphorus_fraction: float = 0.0
+    """Fraction of water extractable organic phosphorus, unitless."""
+
     phosphorus: float = 0.0
+    """Amount of phosphorus excreted in manure, kg."""
+
     phosphorus_fraction: float = 0.0
+    """Fraction of phosphorus in manure, unitless."""
+
     potassium: float = 0.0
+    """Amount of potassium in manure, kg."""
+
     methane: float = 0.0
+    """Amount of methane emission, kg/day."""
 
     def __post_init__(self):
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
 
     @classmethod
-    def get_instance(cls, animal_manure, num_animals: int) -> PenManure:
+    def get_instance(cls, animal_manure: AnimalManureExcretions, num_animals: int) -> PenManure:
         """Returns a PenManure object based on the information given in the manure data.
 
-        Args:
-            animal_manure: The manure data extracted from the animal module.
-            num_animals: The number of animals in the pen.
+        Parameters
+        ----------
+        animal_manure : AnimalManureExcretions
+            The manure data extracted from the animal module.
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
+
+        Returns
+        -------
+        PenManure
             A PenManure object.
 
         """
+        manure_mass = animal_manure['manure_mass']  # kg
+        manure_volume = (manure_mass / ManureConstants.MANURE_DENSITY) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
+        total_ammoniacal_nitrogen = (
+                                            animal_manure['total_ammoniacal_nitrogen_concentration']  # g/L
+                                            * manure_volume  # L
+                                    ) * GeneralConstants.GRAMS_TO_KG  # kg
+
         return cls(
-                urea=animal_manure['U'] / num_animals,
-                urine=animal_manure['Urine'] / num_animals,
-                urine_ammoniacal_nitrogen=(
-                        animal_manure['TAN_s'] * ManureConstants.URINE_TAN_FACTOR / num_animals),
-                total_ammoniacal_nitrogen=animal_manure['TAN_s'],
-                nitrogen=animal_manure['MN'],
-                manure_mass=animal_manure['Mkg'],
-                total_solids=animal_manure['TSd'],
-                degradable_volatile_solids=animal_manure['VSd'],
-                non_degradable_volatile_solids=animal_manure['VSnd'],
-                inorganic_phosphorus_fraction=animal_manure['WIP_frac'] / num_animals,
-                organic_phosphorus_fraction=animal_manure['WOP_frac'] / num_animals,
-                phosphorus=animal_manure['p_excrt_manure'],
-                phosphorus_fraction=animal_manure['p_frac'] / num_animals,
-                potassium=animal_manure['K_manure'],
-                methane=animal_manure['CH4_manure']
+            urea=animal_manure['urea'] / num_animals,
+            urine=animal_manure['urine'],
+            urine_nitrogen=animal_manure['urine_nitrogen'],
+            urine_total_ammoniacal_nitrogen=animal_manure['urine_nitrogen'] * ManureConstants.URINE_TAN_FACTOR,
+            manure_total_ammoniacal_nitrogen=total_ammoniacal_nitrogen,
+            nitrogen=animal_manure['manure_nitrogen'],
+            manure_mass=manure_mass,
+            total_solids=animal_manure['total_solids'],
+            degradable_volatile_solids=animal_manure['degradable_volatile_solids'],
+            non_degradable_volatile_solids=animal_manure['non_degradable_volatile_solids'],
+            inorganic_phosphorus_fraction=animal_manure['inorganic_phosphorus_fraction'] / num_animals,
+            organic_phosphorus_fraction=animal_manure['organic_phosphorus_fraction'] / num_animals,
+            phosphorus=animal_manure['phosphorus'] * GeneralConstants.GRAMS_TO_KG,
+            phosphorus_fraction=animal_manure['phosphorus_fraction'] / num_animals,
+            potassium=animal_manure['potassium'] * GeneralConstants.GRAMS_TO_KG,
+            methane=animal_manure['methane'] * GeneralConstants.GRAMS_TO_KG,
         )

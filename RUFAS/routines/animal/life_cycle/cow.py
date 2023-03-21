@@ -272,10 +272,18 @@ class Cow(HeiferIII):
         """
         Calculates this Cow's nutrient requirements.
         """
-        req = calc_rqmts(self.body_weight, self.mature_body_weight, self.days_in_preg,
-                        'cow', self.calves, self.CI, self.mPrt, self.fat_percent,
-                        self.lactose_milk, self.estimated_daily_milk_produced,
-                        self.days_in_milk, self.milking)
+        req = calc_rqmts(body_weight=self.body_weight,
+                         mature_body_weight=self.mature_body_weight,
+                         day_of_pregnancy=self.days_in_preg,
+                         animal_type='cow',
+                         parity=self.calves,
+                         calving_interval=self.CI,
+                         milk_true_protein=self.mPrt,
+                         milk_fat=self.fat_percent,
+                         milk_lactose=self.lactose_milk,
+                         milk_production=self.estimated_daily_milk_produced,
+                         days_in_milk=self.days_in_milk,
+                         lactating=self.milking)
                         
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
@@ -898,8 +906,8 @@ class Cow(HeiferIII):
                 AnimalBase.config['conception_rate_decrease']
             self.estrus_day = self.determine_estrus_day(
                 self.abortion_day, const.ESTRUS_AFTER_PGF_NOTE,
-                AnimalBase.config['avg_estrus_cycle_p'],
-                AnimalBase.config['std_estrus_cycle_p'], sim_day)
+                AnimalBase.config['avg_estrus_cycle_after_pgf'],
+                AnimalBase.config['std_estrus_cycle_after_pgf'], sim_day)
 
     # Preg methods
     def open(self, sim_day):
@@ -1113,7 +1121,7 @@ class Cow(HeiferIII):
                 cull_reason_cull_prob = AnimalBase.config['udder_cull_prob']
                 self.cull_reason = const.UDDER_CULL
             else:
-                cull_reason_cull_prob = AnimalBase.config['unkown_cull_prob']
+                cull_reason_cull_prob = AnimalBase.config['unknown_cull_prob']
                 self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()

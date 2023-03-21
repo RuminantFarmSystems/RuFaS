@@ -115,40 +115,6 @@ class ManureApplication:
 
     # --- Static Methods ---
     @staticmethod
-    def _determine_water_extractable_inorganic_phosphorus_fraction_by_animal(source_animal: str = None) -> float:
-        """This method returns what the water extractable inorganic phosphorus fraction of total manure phosphorus mass
-            should be based on the type of animal that produced the manure.
-
-        Parameters
-        ----------
-        source_animal : str, default=None
-            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless)
-
-        Returns
-        -------
-        float
-             Fraction of total phosphorus in a manure application that is water extractable inorganic phosphorus, when
-             that manure is produced by a certain type of animal.
-
-        Raises
-        ------
-        ValueError
-            If source animal of the manure application is not None, 'CATTLE', 'SWINE', or 'POULTRY'
-
-        """
-        if source_animal is None:
-            return 0.45
-        elif source_animal == "CATTLE":
-            return 0.50
-        elif source_animal == "SWINE":
-            return 0.35
-        elif source_animal == "POULTRY":
-            return 0.20
-        else:
-            raise ValueError(f"Expected manure source animal to be 'CATTLE', 'SWINE', 'POULTRY', or None, "
-                             f"received: '{source_animal}'.")
-
-    @staticmethod
     def _determine_grazing_manure_field_coverage(field_size: float, total_manure_applied: float) -> float:
         """Calculates the fraction of the field covered by manure that was applied by grazers.
 
