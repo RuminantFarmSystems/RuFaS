@@ -195,7 +195,7 @@ class SensitivityAnalysis:
         """Evaluates the objective function over the entire parameter sample space
 
         Notes
-        ----
+        -----
         This is a wrapper for `problem.evaluate()`. If `parallel_processors > 1`, then the parallel version of
         `problem.evaluate()` is used. This method should really benefit from parallelization, especially if the
         objective function has a substantial run time (as RuFaS does).
