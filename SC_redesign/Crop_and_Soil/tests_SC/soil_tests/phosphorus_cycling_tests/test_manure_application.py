@@ -175,7 +175,54 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
     assert incorp.data.machine_manure_field_coverage == 0.93
 
 
-# @pytest.mark.parametrize("dry_mass,dry_con=")
+@pytest.mark.parametrize("dry_mass,dry_frac,phosphorus_mass,coverage,area,weiP_frac", [
+    (1000, 0.15, 122, 0.88, 1.94, 0.4),
+    (1230, 0.115, 180, 0.97, 2.45, 0.356),
+    (2015, 0.0911, 233.2, 0.66, 4.8, 0.22),
+    (1780, 0.056, 345, 0.93, 3.81, 0.623),
+])
+def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphorus_mass: float, coverage: float,
+                                     area: float, weiP_frac: float) -> float:
+    """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
+        sets surface pool characteristics.
+    """
+    data = SoilData(machine_manure_dry_mass=1000, machine_manure_moisture_factor=0.8, machine_manure_field_coverage=0.9)
+    incorp = ManureApplication(data)
+    incorp._determine_wet_rate_factor = MagicMock(return_value=2000)
+    incorp._determine_infiltration_factor = MagicMock(return_value=0.5)
+    incorp._add_to_labile_phosphorus = MagicMock()
+    incorp._add_to_active_phosphorus = MagicMock()
+    incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 2050,
+                                                                           "new_moisture_factor": 0.93,
+                                                                           "new_field_coverage": 0.98})
+
+    incorp._apply_liquid_machine_manure(dry_mass, dry_frac, phosphorus_mass, coverage, area, weiP_frac)
+
+    expect_adjusted_dry_mass = dry_mass * 0.8
+    expect_adjusted_coverage = coverage * 0.5
+    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.5
+    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.5
+    expect_stable_inorganic = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5
+    expect_stable_organic = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5
+    expect_labile = phosphorus_mass * weiP_frac * 0.5
+    expect_labile += phosphorus_mass * 0.05 * 0.5 * 0.95
+    expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5 * 0.95
+    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5
+
+    incorp._determine_wet_rate_factor.assert_called_once_with(dry_mass, dry_frac, coverage, area)
+    incorp._determine_infiltration_factor.assert_called_once_with(2000)
+    incorp._determine_weighted_manure_attributes.assert_called_once_with(1000, 0.8, 0.9, expect_adjusted_dry_mass,
+                                                                         dry_frac, expect_adjusted_coverage)
+    incorp._add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
+    incorp._add_to_active_phosphorus.assert_called_once_with(expect_active, area)
+    assert incorp.data.machine_manure_dry_mass == 2050
+    assert incorp.data.machine_manure_moisture_factor == 0.93
+    assert incorp.data.machine_manure_field_coverage == 0.98
+    assert incorp.data.machine_water_extractable_inorganic_phosphorus == expect_water_extractable_inorganic
+    assert incorp.data.machine_water_extractable_organic_phosphorus == expect_water_extractable_organic
+    assert incorp.data.machine_stable_inorganic_phosphorus == expect_stable_inorganic
+    assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
+
 
 # ---- Main routine tests
 @pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_size", [

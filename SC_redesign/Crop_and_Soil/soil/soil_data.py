@@ -126,10 +126,6 @@ class SoilData:
     # ---- Manure (Phosphorus Cycling)
     machine_manure_dry_mass: float = 0
     """The dry weight equivalent of manure mass applied by machine (kg)"""
-    machine_manure_dry_matter_content: float = 0
-    """Fraction of total mass of machine-applied manure that comes from dry matter content, between (0, 1]
-        (unitless)
-    """
     machine_manure_field_coverage: float = 0
     """Fraction of the field that is covered by machine-applied manure, between [0, 1] (unitless)"""
     machine_manure_moisture_factor: float = 0

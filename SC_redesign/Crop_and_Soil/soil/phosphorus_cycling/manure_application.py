@@ -207,7 +207,7 @@ class ManureApplication:
         self._add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
         mass_to_add_to_active_P = total_phosphorus_mass * stable_inorganic_phosphorus_fraction * soil_infiltration
-        self._add_to_active_phosphorus(mass_to_add_to_active_P)
+        self._add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
 
         adjusted_field_coverage = field_coverage * 0.5
         adjusted_dry_matter_mass = dry_matter_mass * 0.8
@@ -408,6 +408,7 @@ class ManureApplication:
         manure.f file of the SurPhos Fortran code.
 
         """
+        # TODO: add note about and/or reference to origin of this equation after talking with Pete about it
         return dry_matter_mass / dry_matter_fraction / (field_size * field_coverage)
 
     @staticmethod
@@ -430,5 +431,6 @@ class ManureApplication:
         but can be found on line 33 of the manure.f file of the SurPhos Fortran code.
 
         """
+        # TODO: add note about and/or reference to origin of this equation after talking with Pete about it
         retention_rate = min(0.9, 0.000002 * wet_rate + 0.267)
         return 1.0 - retention_rate
