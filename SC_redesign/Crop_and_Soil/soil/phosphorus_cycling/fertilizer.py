@@ -105,6 +105,8 @@ class Fertilizer:
             pools. It also updates the starting available phosphorus value to the new available phosphorus pool value.
             If the amount of fertilizer to be added is zero, no pool or counters will be modified.
         """
+        # TODO: add capability to apply fertilizer beneath soil surface, first talk with Pete about how phosphorus gets
+        #  distributed between layers based on depth when this happens.
         if fertilizer_phosphorus_applied == 0:
             return
         self.data.available_phosphorus_pool += 0.75 * fertilizer_phosphorus_applied
