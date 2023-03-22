@@ -179,6 +179,7 @@ class Fertilizer:
             of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
             converts the new mass to kg per ha.
         """
+        # TODO: move to LayerData - Issue #403
         labile_phosphorus_mass = self.data.soil_layers[0].labile_phosphorus_content * field_size
         labile_phosphorus_mass += phosphorus_to_add
         self.data.soil_layers[0].labile_phosphorus_content = labile_phosphorus_mass / field_size

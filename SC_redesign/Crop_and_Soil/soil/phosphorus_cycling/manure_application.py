@@ -166,6 +166,52 @@ class ManureApplication:
         # adjusted_field_coverage = field_coverage * 0.5
         # adjusted_dry_matter_mass = dry_matter_mass * 0.8
 
+    def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+        """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil
+            profile.
+
+        Parameters
+        ----------
+            phosphorus_to_add: float
+                Amount of phosphorus to add (kg)
+            field_size: float
+                Size of the field (ha)
+
+        Notes
+        -----
+            Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount
+            of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
+            converts the new mass to kg per ha.
+
+        """
+        # TODO: move to LayerData - Issue #403
+        labile_phosphorus_mass = self.data.soil_layers[0].labile_phosphorus_content * field_size
+        labile_phosphorus_mass += phosphorus_to_add
+        self.data.soil_layers[0].labile_phosphorus_content = labile_phosphorus_mass / field_size
+
+    def _add_to_stable_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+        """This method adds a specified mass of phosphorus to the stable phosphorus content of the top layer of the soil
+            profile.
+
+        Parameters
+        ----------
+            phosphorus_to_add: float
+                Amount of phosphorus to add (kg)
+            field_size: float
+                Size of the field (ha)
+
+        Notes
+        -----
+            Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount
+            of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
+            converts the new mass to kg per ha.
+
+        """
+        # TODO: move to LayerData - Issue #403
+        stable_phosphorus_mass = self.data.soil_layers[0].stable_phosphorus_content * field_size
+        stable_phosphorus_mass += phosphorus_to_add
+        self.data.soil_layers[0].stable_phosphorus_content = stable_phosphorus_mass / field_size
+
     def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
                              total_phosphorus_mass: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
