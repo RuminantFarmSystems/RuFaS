@@ -60,7 +60,7 @@ class ManureApplication:
         self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
 
-    def apply_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
+    def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
                              source_animal: str = None) -> None:
@@ -71,7 +71,7 @@ class ManureApplication:
         ----------
         dry_matter_mass : float
             Dry weight equivalent of this application (kg)
-        dry_matter_content : float
+        dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
@@ -93,7 +93,6 @@ class ManureApplication:
         """
         # TODO: implement an option for applying manure phosphorus at subsurface levels, after talking with Pete about
         #  how this should be done with more than two soil layers.
-
         if water_extractable_inorganic_phosphorus_fraction is not None:
             if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
                 raise ValueError(f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
@@ -102,15 +101,15 @@ class ManureApplication:
             water_extractable_inorganic_phosphorus_fraction = \
                 self._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(source_animal)
 
-        if dry_matter_content <= 0.15:
-            self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_content, total_phosphorus_mass,
+        if dry_matter_fraction <= 0.15:
+            self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
                                               field_coverage, field_size,
                                               water_extractable_inorganic_phosphorus_fraction)
         else:
-            self._apply_solid_machine_manure(dry_matter_mass, dry_matter_content, total_phosphorus_mass,
+            self._apply_solid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
                                              field_coverage, water_extractable_inorganic_phosphorus_fraction)
 
-    def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
+    def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                     total_phosphorus_mass: float, field_coverage: float,
                                     water_extractable_inorganic_phosphorus_fraction: float) -> None:
         """This method applies manure to the field surface when the dry matter content of the application is greater
@@ -120,7 +119,7 @@ class ManureApplication:
         ----------
         dry_matter_mass : float
             Dry weight equivalent of this application (kg)
-        dry_matter_content : float
+        dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
@@ -146,12 +145,12 @@ class ManureApplication:
         new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
                                                               self.data.machine_manure_moisture_factor,
                                                               self.data.machine_manure_field_coverage, dry_matter_mass,
-                                                              dry_matter_content, field_coverage)
+                                                              dry_matter_fraction, field_coverage)
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-    def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
+    def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                      total_phosphorus_mass: float, field_coverage: float, field_size: float,
                                      water_extractable_inorganic_phosphorus_fraction: float) -> None:
         """This method applies manure with 15% solid content or less to a field.
@@ -160,7 +159,7 @@ class ManureApplication:
         ----------
         dry_matter_mass : float
             Dry weight equivalent of this application (kg)
-        dry_matter_content : float
+        dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
@@ -180,7 +179,7 @@ class ManureApplication:
         implementation. Currently, RuFaS uses the same equations as the SurPhos code.
 
         """
-        wet_rate = self._determine_wet_rate_factor(dry_matter_mass, dry_matter_content, field_coverage, field_size)
+        wet_rate = self._determine_wet_rate_factor(dry_matter_mass, dry_matter_fraction, field_coverage, field_size)
         soil_infiltration = self._determine_infiltration_factor(wet_rate)
         surface_retention = (1.0 - soil_infiltration)
         water_extractable_organic_phosphorus_fraction = 0.05
@@ -215,7 +214,7 @@ class ManureApplication:
         new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
                                                               self.data.machine_manure_moisture_factor,
                                                               self.data.machine_manure_field_coverage,
-                                                              adjusted_dry_matter_mass, dry_matter_content,
+                                                              adjusted_dry_matter_mass, dry_matter_fraction,
                                                               adjusted_field_coverage)
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
@@ -234,9 +233,9 @@ class ManureApplication:
 
         Notes
         -----
-            Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount
-            of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
-            converts the new mass to kg per ha.
+        Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount of
+        labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then converts the
+        new mass to kg per ha.
 
         """
         # TODO: move to LayerData - Issue #403
@@ -257,9 +256,9 @@ class ManureApplication:
 
         Notes
         -----
-            Before adding the mass of phosphorus to the active phosphorus content, it first converts the current amount
-            of active phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
-            converts the new mass to kg per ha.
+        Before adding the mass of phosphorus to the active phosphorus content, it first converts the current amount of
+        active phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then converts the
+        new mass to kg per ha.
 
         """
         # TODO: move to LayerData - Issue #403
@@ -382,7 +381,7 @@ class ManureApplication:
                 "new_field_coverage": new_field_coverage}
 
     @staticmethod
-    def _determine_wet_rate_factor(dry_matter_mass: float, dry_matter_content: float, field_coverage: float,
+    def _determine_wet_rate_factor(dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
                                    field_size: float) -> float:
         """This method calculates the wet rate factor, which is used to calculate how much liquid manure infiltrates the
             soil.
@@ -391,7 +390,7 @@ class ManureApplication:
         ----------
         dry_matter_mass : float
             Dry weight equivalent of this application (kg)
-        dry_matter_content : float
+        dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
@@ -409,7 +408,7 @@ class ManureApplication:
         manure.f file of the SurPhos Fortran code.
 
         """
-        return dry_matter_mass / dry_matter_content / (field_size * field_coverage)
+        return dry_matter_mass / dry_matter_fraction / (field_size * field_coverage)
 
     @staticmethod
     def _determine_infiltration_factor(wet_rate: float) -> float:
