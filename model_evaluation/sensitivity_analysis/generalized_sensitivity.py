@@ -257,6 +257,7 @@ class SensitivityAnalysis:
     def __repr__(self):  # TODO: need to implement this too.
         pass
 
+
 if __name__ == '__main__':
     # Run Examples
     from SALib.test_functions import Ishigami, oakley2004
