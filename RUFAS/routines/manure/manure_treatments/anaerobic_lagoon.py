@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Tuple
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
@@ -100,6 +101,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
         adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
         daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
+        daily_output.daily_precipitation_volume = self.precipitation_volume
+        daily_output.daily_rainfall = self._get_current_day_rainfall()
 
         daily_output = self._calc_daily_sludge_output(daily_output, self._current_manure_treatment_daily_input)
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
@@ -137,10 +140,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             The adjusted final manure volume.
 
         """
-        adjusted_final_manure_volume = current_day_final_manure_volume + self.precipitation_volume
-        if self._sim_day % self.storage_time_period > 1:
-            adjusted_final_manure_volume -= self.flushing_volume
-        return adjusted_final_manure_volume
+        return current_day_final_manure_volume + self.precipitation_volume
 
     @property
     def sludge_accumulation_volume(self) -> float:
@@ -177,7 +177,9 @@ class AnaerobicLagoon(BaseManureTreatment):
         if self._sim_day % self.storage_time_period == 1:
             return manure_treatment_daily_output
         else:
-            return self._accumulated_output + manure_treatment_daily_output
+            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
+            new_accumulated_output.daily_final_manure_volume -= self.flushing_volume
+            return new_accumulated_output
 
     @property
     def volume_needed(self):
@@ -231,7 +233,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         """
         abc = self._calc_abc()
         a, b, c = abc[0], abc[1], abc[2]
-        return (-1 * b + (b ** 2 - 4 * a * c) ** 0.5) / (2 * a)
+        discriminant = b ** 2 - 4 * a * c
+        return (-b + discriminant ** 0.5) / (2 * a)
 
     @property
     def lagoon_length(self):
@@ -276,7 +279,8 @@ class AnaerobicLagoon(BaseManureTreatment):
             Additional lagoon volume needed for precipitation, m^3.
 
         """
-        return self._get_current_day_rainfall() * self.lagoon_surface_area
+        rainfall = self._get_current_day_rainfall() * GeneralConstants.MM_TO_M
+        return rainfall * self.lagoon_surface_area
 
     @property
     def freeboard_volume(self) -> float:

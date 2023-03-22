@@ -63,3 +63,6 @@ class Units:
     sludge_manure_daily_volume = 'm^3'
     accumulated_sludge_volume = 'm^3'
     accumulated_final_manure_volume = 'm^3'
+
+    daily_rainfall = 'mm'
+    daily_precipitation_volume = 'm^3'

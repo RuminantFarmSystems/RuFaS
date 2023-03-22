@@ -53,6 +53,9 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     minimum_digester_volume: float = 0.0
     top_cover_volume: float = 0.0
 
+    daily_rainfall: float = 0.0
+    daily_precipitation_volume: float = 0.0
+
     def __post_init__(self):
         """Ensures that the daily volume is set to the final manure volume."""
         self.liquid_manure_daily_volume = self.daily_final_manure_volume

@@ -32,7 +32,7 @@
       "scenario_id": 4,
       "bedding_type": "sand",
       "manure_handler": "flush system",
-      "manure_separator": "sand lane",
+      "manure_separator": "sand lane manure separation",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -147,9 +147,9 @@
     },
     {
       "manure_treatment_type": "anaerobic lagoon",
-      "total_solids_removal_efficiency_for_treatment": 0.75,
+      "total_solids_removal_efficiency_for_treatment": 0.65,
       "volatile_solids_removal_efficiency_for_treatment": 0.85,
-      "nitrogen_removal_efficiency_for_treatment": 0.65,
+      "nitrogen_removal_efficiency_for_treatment": 0.55,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.7,
       "phosphorus_removal_efficiency_for_treatment": 0.6,
       "potassium_removal_efficiency_for_treatment": 0.2,

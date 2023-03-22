@@ -4,6 +4,7 @@ from typing import Tuple
 
 import math
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
@@ -157,7 +158,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The additional pit volume needed for precipitation, m^3.
 
         """
-        return self._get_current_day_rainfall() * self.pit_surface_area
+        rainfall = self._get_current_day_rainfall() * GeneralConstants.MM_TO_M
+        return rainfall * self.pit_surface_area
 
     @property
     def freeboard_volume(self):

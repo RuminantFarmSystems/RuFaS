@@ -13,6 +13,10 @@ class GeneralConstants:
         WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.
 
     """
+    # Length-related
+    MM_TO_M = 0.001
+    M_TO_MM = 1000
+
     # Mass-related
     GRAMS_TO_KG = 0.001
     KG_TO_GRAMS = 1000

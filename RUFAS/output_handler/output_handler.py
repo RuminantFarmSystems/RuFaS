@@ -76,8 +76,8 @@ class OutputHandler:
         if base_graphic_dir.exists():
             shutil.rmtree(base_graphic_dir)
 
-        base_csv_dir.mkdir(exist_ok=True, parents=False)
-        base_graphic_dir.mkdir(exist_ok=True, parents=False)
+        base_csv_dir.mkdir(exist_ok=True, parents=True)
+        base_graphic_dir.mkdir(exist_ok=True, parents=True)
 
         for report in self.reports.values():
             report.initialize_dir(base_csv_dir, base_graphic_dir)
