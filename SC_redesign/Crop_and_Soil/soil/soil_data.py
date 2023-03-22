@@ -123,6 +123,24 @@ class SoilData:
     rain_events_after_fertilizer_application: int = 0
     """Number of rain events that have occurred since phosphorus was applied to field via fertilizer"""
 
+    # ---- Manure (Phosphorus Cycling)
+    grazing_manure_dry_mass: float = 0
+    """The dry weight equivalent of manure mass applied by grazers (kg)"""
+    grazing_manure_field_coverage: float = 0
+    """Fraction of the field that is covered by grazing-applied manure, between [0, 1] (unitless)"""
+    grazing_manure_moisture_factor: float = 0
+    """Fraction representing the current moisture level of the grazing-applied manure on the field, between [0, 0.9]
+        (unitless)
+    """
+    grazing_water_extractable_inorganic_phosphorus: float = 0
+    """Amount of water extractable inorganic phosphorus on the field that was applied by grazing (kg)"""
+    grazing_water_extractable_organic_phosphorus: float = 0
+    """Amount of water extractable organic phosphorus on the field that was applied by grazing (kg)"""
+    grazing_stable_inorganic_phosphorus: float = 0
+    """Amount of stable inorganic phosphorus on the field that was applied by grazing (kg)"""
+    grazing_stable_organic_phosphorus: float = 0
+    """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
+
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set"""
