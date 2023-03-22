@@ -7,7 +7,7 @@ class PoolGasPartition:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
-    def partition(self):
+    def partition_pool_gas(self):
         """
         main routine to update variable in all layers
 

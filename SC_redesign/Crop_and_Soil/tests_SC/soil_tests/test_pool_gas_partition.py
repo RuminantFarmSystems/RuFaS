@@ -427,7 +427,7 @@ def test_soil_passive_carbon_amount(passive_carbon_amount: float, slow_to_passiv
       LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
                 wilting_point_water_concentration=0.6)])
 ])
-def test_partition(layers: list) -> None:
+def test_partition_pool_gas(layers: list) -> None:
     """Tests that attributes were updated correctly"""
     data = SoilData(soil_layers=layers)
     partition = PoolGasPartition(data)
@@ -475,7 +475,7 @@ def test_partition(layers: list) -> None:
 
     PoolGasPartition._soil_passive_carbon_amount = MagicMock(return_value=5.2)
 
-    partition.partition()
+    partition.partition_pool_gas()
 
     # Checking if methods are called correct number of times
     assert PoolGasPartition._plant_metabolic_active_carbon_loss.call_count == 3
