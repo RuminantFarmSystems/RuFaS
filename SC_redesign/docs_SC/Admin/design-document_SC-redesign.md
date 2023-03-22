@@ -205,6 +205,55 @@ Manure Application:
 ## Milestones
 
 **Note:** check [road-map_soil-and-crop.md](road-map_soil-and-crop.md)
+**Other Note:** Re-review this section and update it according to Pooya's example
+
+Below are measurable components that the module should have, which will be tracked as development
+continues. 
+
+* All the main process files (`.py`) need to be reformatted and reorganized to the new design, 
+cross-checked with source documentation, tested, and documented (updated pseudocode). 
+The original versions should remain in-tact and new versions placed in `SC_redesign/Crop_and_Soil/` until the redesign
+is complete. In total, there are:
+  - [x] 10 crop files, 2671 lines (`RUFAS/routines/field/crop/`)
+  - [ ] 23 soil files, 2213 lines (`RUFAS/routines/field/soil/`)
+  - [ ] 4 field management files, 295 lines (`RUFAS/routines/field/field_management`)
+
+* The main classes need to be rewritten with new formatting guidelines, and linked to the process classes.
+  - [ ] `Soil`
+  - [x] `Crop`
+  - [ ] `Field`
+
+* The current `Crop.py` file (`RUFAS/routines/field/crop/`) needs to be re-written and organized 
+into the new `FieldManager` class. 
+
+* the new data manager and `SCInput` classes need to be created and utilized
+
+Here are a general list of things that the module code needs to do:
+
+* [x] `Crop` should be able to initialize with different species-specific attributes and from input data
+* [x] `Crop` component methods should reflect daily crop processes (e.g., SWAT)
+* [x] `Soil` should be able to initialize with soil profile attributes from input data
+* [ ] `Soil` component methods should reflect daily soil processes (e.g., SWAT)
+* [x] `Field` should be able to initialize with different dimensions and geography, from input data
+  - should be able to initialize `Crop`(s) and `Soil`, passing them the data they need
+  - needs to have one `Soil` and 0-n `Crop`
+* [ ] `Field` methods should reflect field management processes (apply manure/fertilizer, plant/harvest crops,
+  - methods should manage crops one by one 
+  - and will often be wrappers that call `Soil` and `Crop` methods
+* [ ] `FieldManager` should be able initialized based on input data
+  - should be able to initialize a number of `Fields`, passing them data they need
+* [ ] `FieldManager` methods should reflect management of the system
+  - should track which `Field`/`Soil` processes need to run and execute them accordingly, such as: 
+    + `Crop` planting/multi-cropping
+    + following cropping patterns
+    + `Crop` growing season/dormancy
+    + `Crop` cutting/harvesting/killing/cover-cropping
+    + fertilizer/manure addition to `Soil`
+    + `Soil` tillage
+  - should manage fields one by one
+  - should pass relevant weather and time data to `Field`
+  - should accept input from `SCInput` and pass output to output manager
+
 
 ---
 
