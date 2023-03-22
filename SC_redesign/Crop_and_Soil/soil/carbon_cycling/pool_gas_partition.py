@@ -222,65 +222,65 @@ class PoolGasPartition:
 
     @staticmethod
     def _determine_passive_to_active_carbon_amount(passive_carbon_decomposition_amount: float,
-                                                   passive_carbon_co2_lost_rate=0.55) -> float:
+                                                   passive_carbon_loss_rate=0.55) -> float:
         """
         Calculates passive carbon decomposed into active carbon (kg/ha)
 
         Args:
             passive_carbon_decomposition_amount: passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            passive_carbon_co2_lost_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
+            passive_carbon_loss_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
 
         Returns: passive carbon decomposed into active carbon (kg/ha)
 
         pseudocode_soil Reference: S.6.C.10
         """
-        return passive_carbon_decomposition_amount * (1 - passive_carbon_co2_lost_rate)
+        return passive_carbon_decomposition_amount * (1 - passive_carbon_loss_rate)
 
     @staticmethod
     def _determine_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount: float,
-                                                  passive_carbon_co2_lost_rate=0.55) -> float:
+                                                  passive_carbon_loss_rate=0.55) -> float:
         """
         Calculates passive carbon lost as CO2 during decomposition (kg/ha)
         Args:
             passive_carbon_decomposition_amount: passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            passive_carbon_co2_lost_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
+            passive_carbon_loss_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
 
         Returns: passive carbon lost as CO2 during decomposition (kg/ha)
         pseudocode_soil Reference: S.6.C.10
         """
-        return passive_carbon_decomposition_amount * passive_carbon_co2_lost_rate
+        return passive_carbon_decomposition_amount * passive_carbon_loss_rate
 
     # TODO: Figure out where did 0.03 and 0.55 come from -- issue #398
     @staticmethod
     def _determine_slow_to_active_carbon_amount(slow_carbon_decomposition_amount: float,
                                                 slow_carbon_passive_decompose_rate=0.03,
-                                                slow_carbon_co2_lost_rate=0.55) -> float:
+                                                slow_carbon_loss_rate=0.55) -> float:
         """
         Calculates slow carbon decomposed into active carbon (kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
             slow_carbon_passive_decompose_rate: fraction of slow carbon decomposed into passive carbon (unitless)
-            slow_carbon_co2_lost_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
+            slow_carbon_loss_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
 
         Returns: slow carbon decomposed into active carbon (kg/ha)
 
         pseudocode_soil Reference: S.6.C.9
         """
-        return slow_carbon_decomposition_amount * (1 - slow_carbon_co2_lost_rate - slow_carbon_passive_decompose_rate)
+        return slow_carbon_decomposition_amount * (1 - slow_carbon_loss_rate - slow_carbon_passive_decompose_rate)
 
     @staticmethod
-    def _determine_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float, slow_carbon_co2_lost_rate=0.55) -> float:
+    def _determine_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float, slow_carbon_loss_rate=0.55) -> float:
         """
         Calculates slow carbon lost as CO2 during decomposition (kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            slow_carbon_co2_lost_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
+            slow_carbon_loss_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
 
         Returns: slow carbon lost as CO2 during decomposition (kg/ha)
 
         pseudocode_soil Reference: S.6.C.9
         """
-        return slow_carbon_decomposition_amount * slow_carbon_co2_lost_rate
+        return slow_carbon_decomposition_amount * slow_carbon_loss_rate
 
     @staticmethod
     def _determine_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount: float,
