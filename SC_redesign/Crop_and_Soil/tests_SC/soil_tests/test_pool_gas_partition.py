@@ -12,7 +12,8 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
     150,  # higher values
     88.8,  # arbitrary
 ])
-def test_soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage):
+def test_soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage: float) -> None:
+    """Tests that the amount of structural soil carbon decomposed is calculated correctly."""
     structural_slow_carbon_loss_rate = 0.3
     expect = soil_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
     assert expect == PoolGasPartition._soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage)

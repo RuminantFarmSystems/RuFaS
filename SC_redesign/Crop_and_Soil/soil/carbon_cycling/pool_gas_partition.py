@@ -14,11 +14,9 @@ class PoolGasPartition:
         Returns: None
 
         """
-        # S.6.C.2
         self.data.active_carbon_decomposition_rate = self._active_carbon_decomposition_rate(
             self.data.silt_clay_content)
 
-        # S.6.C.6
         self.data.carbon_lost_adjusted_factor = self._carbon_lost_adjusted_factor(self.data.silt_clay_content)
 
         for layer in self.data.soil_layers:
@@ -56,34 +54,29 @@ class PoolGasPartition:
             layer.soil_structural_slow_carbon_remaining = self._soil_structural_slow_carbon_remaining(
                 layer.soil_structural_slow_carbon_usage)
 
-            # S.6.C.3
             layer.active_carbon_decomposition_amount = self._active_carbon_decomposition_amount(
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
                 layer.active_carbon_amount, self.data.active_carbon_decomposition_rate
             )
 
-            # S.6.C.4
             layer.slow_carbon_decomposition_amount = self._slow_carbon_decomposition_amount(
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
                 layer.slow_carbon_amount)
 
-            # S.6.C.5
             layer.passive_carbon_decomposition_amount = self._passive_carbon_decomposition_amount(
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
                 layer.passive_carbon_amount)
 
-            # S.6.C.7
             layer.active_carbon_to_slow_amount = self._active_carbon_to_slow_amount(
                 layer.active_carbon_decomposition_amount, self.data.carbon_lost_adjusted_factor)
 
             layer.active_carbon_to_slow_loss = self._active_carbon_to_slow_loss(
                 layer.active_carbon_decomposition_amount, self.data.carbon_lost_adjusted_factor)
 
-            # S.6.C.8
             layer.active_carbon_to_passive_amount = self._active_carbon_to_passive_amount(
                 layer.active_carbon_decomposition_amount
             )
-            # S.6.C.9
+
             layer.slow_to_active_carbon_amount = self._slow_to_active_carbon_amount(
                 layer.slow_carbon_decomposition_amount)
             layer.slow_carbon_co2_lost_amount = self._slow_carbon_co2_lost_amount(
@@ -91,7 +84,6 @@ class PoolGasPartition:
             layer.slow_to_passive_carbon_amount = self._slow_to_passive_carbon_amount(
                 layer.slow_carbon_decomposition_amount)
 
-            # S.6.C.10
             layer.passive_to_active_carbon_amount = self._passive_to_active_carbon_amount(
                 layer.passive_carbon_decomposition_amount)
             layer.passive_carbon_co2_lost_amount = self._passive_carbon_co2_lost_amount(
@@ -99,7 +91,6 @@ class PoolGasPartition:
             # active, slow and lost CO2 pools
 
             # aggregate active carbon pool flux
-            # S.6.C.11
             layer.plant_active_decompose_carbon = self._plant_active_decompose_carbon(
                 layer.plant_metabolic_active_carbon_remaining, layer.plant_structural_active_carbon_remaining)
             layer.soil_active_decompose_carbon = self._soil_active_decompose_carbon(
@@ -110,13 +101,11 @@ class PoolGasPartition:
                 layer.active_carbon_decomposition_amount)
             # aggregate slow carbon pool flux
 
-            # S.6.C.12
             layer.slow_carbon_amount = self._soil_slow_carbon_amount(
                 layer.slow_carbon_amount, layer.plant_structural_slow_carbon_remaining,
                 layer.soil_structural_slow_carbon_remaining, layer.active_carbon_to_slow_amount,
                 layer.slow_carbon_decomposition_amount)
             # aggregate passive carbon pool flux
-            # S.6.C.13
             layer.passive_carbon_amount = self._soil_passive_carbon_amount(
                 layer.passive_carbon_amount, layer.slow_to_passive_carbon_amount,
                 layer.active_carbon_to_passive_amount, layer.passive_carbon_decomposition_amount)
@@ -234,7 +223,7 @@ class PoolGasPartition:
 
         Args:
             passive_carbon_decomposition_amount: passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            passive_carbon_co2_lost_rate: passive carbon lost as CO2 during decomposition (%)
+            passive_carbon_co2_lost_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
 
         Returns: passive carbon decomposed into active carbon (kg/ha)
 
@@ -249,7 +238,7 @@ class PoolGasPartition:
         Calculates passive carbon lost as CO2 during decomposition (kg/ha)
         Args:
             passive_carbon_decomposition_amount: passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            passive_carbon_co2_lost_rate: passive carbon lost as CO2 during decomposition (%)
+            passive_carbon_co2_lost_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
 
         Returns: passive carbon lost as CO2 during decomposition (kg/ha)
         pseudocode_soil Reference: S.6.C.10
@@ -265,8 +254,8 @@ class PoolGasPartition:
         Calculates slow carbon decomposed into active carbon (kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            slow_carbon_passive_decompose_rate: slow carbon decomposed into passive carbon (%)
-            slow_carbon_co2_lost_rate: slow carbon lost as CO2 during decomposition (%)
+            slow_carbon_passive_decompose_rate: fraction of slow carbon decomposed into passive carbon (unitless)
+            slow_carbon_co2_lost_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
 
         Returns: slow carbon decomposed into active carbon (kg/ha)
 
@@ -280,7 +269,7 @@ class PoolGasPartition:
         Calculates slow carbon lost as CO2 during decomposition (kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            slow_carbon_co2_lost_rate: slow carbon lost as CO2 during decomposition (%)
+            slow_carbon_co2_lost_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
 
         Returns: slow carbon lost as CO2 during decomposition (kg/ha)
 
@@ -295,7 +284,7 @@ class PoolGasPartition:
         Calculates slow carbon decomposed into passive carbon (kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
-            slow_carbon_passive_decompose_rate: slow carbon decomposed into passive carbon (%)
+            slow_carbon_passive_decompose_rate: fraction of slow carbon decomposed into passive carbon (unitless)
 
         Returns: slow carbon decomposed into passive carbon (kg/ha)
 
@@ -352,7 +341,7 @@ class PoolGasPartition:
         """
         Calculates adjusted factor of CO2 loss from the decomposition of active carbon
         Args:
-            silt_clay_content: silt and clay content in the soil (%)
+            silt_clay_content: fraction of silt and clay content in the soil (unitless)
 
         Returns: adjusted factor of CO2 loss from the decomposition of active carbon
 
@@ -412,7 +401,7 @@ class PoolGasPartition:
             moisture_effect: moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)
             temperature_effect: temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)
             active_carbon: active carbon stored in the soil (kg/ha)
-            active_carbon_decomposition_rate: active carbon decomposition factor
+            active_carbon_decomposition_rate: active carbon decomposition factor (unitless)
 
         Returns: active carbon decomposed into slow or passive carbon and CO2 (kg/ha)
 
@@ -425,12 +414,12 @@ class PoolGasPartition:
     def _active_carbon_decomposition_rate(silt_clay_content: float,
                                           max_carbon_decomposition_rate: float = 0.14) -> float:
         """
-        Calculates rate at which active carbon is decomposed into slow or passive carbon and CO2 (%)
+        Calculates rate at which active carbon is decomposed into slow or passive carbon and CO2
         Args:
             silt_clay_content: silt and clay content in the soil (%)
-            max_carbon_decomposition_rate: maximum rate of carbon decomposition
+            max_carbon_decomposition_rate: maximum rate of carbon decomposition (unitless)
 
-        Returns: rate at which active carbon is decomposed into slow or passive carbon and CO2 (%)
+        Returns: rate at which active carbon is decomposed into slow or passive carbon and CO2 (unitless)
 
         pseudocode_soil Reference: S.6.C.2
         """
@@ -620,7 +609,7 @@ class PoolGasPartition:
         Args:
             soil_structural_slow_carbon_usage: soil structural carbon decomposed into slow carbon (kg/ha)
             structural_slow_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
-                                                                                                            slow carbon
+                                                                                                slow carbon (unitless)
 
         Returns: soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)
 
