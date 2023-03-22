@@ -23,7 +23,7 @@ class ManureApplication:
         """
         self.data = soil_data or SoilData()
 
-    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
+    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
             be tracked.
@@ -32,7 +32,7 @@ class ManureApplication:
         ----------
         dry_matter_mass : float
             Dry weight equivalent of this application (kg)
-        dry_matter_content : float
+        dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
@@ -49,7 +49,7 @@ class ManureApplication:
         new_vals = self._determine_weighted_manure_attributes(self.data.grazing_manure_dry_mass,
                                                               self.data.grazing_manure_moisture_factor,
                                                               self.data.grazing_manure_field_coverage, dry_matter_mass,
-                                                              dry_matter_content, application_field_coverage)
+                                                              dry_matter_fraction, application_field_coverage)
         self.data.grazing_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
@@ -91,13 +91,13 @@ class ManureApplication:
         return field_coverage_fraction
 
     @staticmethod
-    def _determine_moisture_factor(dry_matter_content: float) -> float:
+    def _determine_moisture_factor(dry_matter_fraction: float) -> float:
         """This method determines the moisture factor of a new manure application based on how much manure was applied
             and how much water was in the application.
 
         Parameters
         ----------
-        dry_matter_content : float
+        dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
 
         Returns
@@ -113,17 +113,18 @@ class ManureApplication:
         Notes
         -----
         This equation is not listed in the SurPhos theoretical documentation, but is present in both the SurPhos Python
-        and Fortran code.
+        and Fortran code (see manure.f and manure.py, lines 30, 31 and 41, 42 respectively).
 
         """
-        if not 0.0 < dry_matter_content <= 1.0:
-            raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_content}'.")
-        return min(0.9, (1 - dry_matter_content))
+        # TODO: clarify where this equation comes from / how it works after finding out from Pete
+        if not 0.0 < dry_matter_fraction <= 1.0:
+            raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.")
+        return min(0.9, (1 - dry_matter_fraction))
 
     @staticmethod
     def _determine_weighted_manure_attributes(old_total_dry_mass: float, old_moisture_factor: float,
                                               old_field_coverage: float, application_dry_mass: float,
-                                              application_dry_content: float, application_field_coverage: float) \
+                                              application_dry_fraction: float, application_field_coverage: float) \
             -> Dict:
         """Recalculates the manure pool attributes that use a weighted average to find their new values.
 
@@ -137,7 +138,7 @@ class ManureApplication:
             The fraction of the area of the field that was already covered by old manure, between [0, 1] (unitless)
         application_dry_mass : float
             Dry weight equivalent of manure application (kg)
-        application_dry_content : float
+        application_dry_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         application_field_coverage : float
             Fraction of the field covered by the manure application (unitless)
@@ -159,7 +160,7 @@ class ManureApplication:
 
         """
         new_dry_matter_mass = old_total_dry_mass + application_dry_mass
-        application_moisture_factor = ManureApplication._determine_moisture_factor(application_dry_content)
+        application_moisture_factor = ManureApplication._determine_moisture_factor(application_dry_fraction)
         new_moisture_factor = (old_moisture_factor * old_total_dry_mass + application_moisture_factor *
                                application_dry_mass) / new_dry_matter_mass
         new_field_coverage = (old_field_coverage * old_total_dry_mass +
