@@ -24,7 +24,7 @@ class ManureApplication:
         self.data = soil_data or SoilData()
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
-                             total_phosphorus_mass: float, field_coverage: float,
+                             total_phosphorus_mass: float, field_coverage: float, field_size: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
                              source_animal: str = None) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
@@ -40,6 +40,8 @@ class ManureApplication:
             Total mass of phosphorus in this application of manure (kg)
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
+        field_size : float
+            Size of the field (ha)
         water_extractable_inorganic_phosphorus_fraction : float, default=None
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
@@ -65,7 +67,8 @@ class ManureApplication:
 
         if dry_matter_content <= 0.15:
             self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_content, total_phosphorus_mass,
-                                              field_coverage, water_extractable_inorganic_phosphorus_fraction)
+                                              field_coverage, field_size,
+                                              water_extractable_inorganic_phosphorus_fraction)
         else:
             self._apply_solid_machine_manure(dry_matter_mass, dry_matter_content, total_phosphorus_mass,
                                              field_coverage, water_extractable_inorganic_phosphorus_fraction)
@@ -112,7 +115,7 @@ class ManureApplication:
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
     def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
-                                     total_phosphorus_mass: float, field_coverage: float,
+                                     total_phosphorus_mass: float, field_coverage: float, field_size: float,
                                      water_extractable_inorganic_phosphorus_fraction: float) -> None:
         """This method applies manure with 15% solid content or less to a field.
 
@@ -126,15 +129,42 @@ class ManureApplication:
             Total mass of phosphorus in this application of manure (kg)
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
+        field_size : float
+            Size of the field (ha)
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
 
-        Returns
-        -------
+        Notes
+        -----
+        When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
+        SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
+        and adds 60% of all manure P to corresponding soil P pools", but is handled differently in the actual SurPhos
+        implementation. Currently, RuFaS uses the same equations as the SurPhos code.
 
         """
-        pass
+        wet_rate = self._determine_wet_rate_factor(dry_matter_mass, dry_matter_content, field_coverage, field_size)
+        soil_infiltration = self._determine_infiltration_factor(wet_rate)
+        surface_retention = (1.0 - soil_infiltration)
+        water_extractable_organic_phosphorus_fraction = 0.05
+        stable_phosphorus_fraction = 1.0 - (water_extractable_organic_phosphorus_fraction +
+                                            water_extractable_inorganic_phosphorus_fraction)
+        stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
+        stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
+
+        self.data.machine_water_extractable_inorganic_phosphorus += total_phosphorus_mass * \
+            water_extractable_inorganic_phosphorus_fraction * surface_retention
+        self.data.machine_water_extractable_organic_phosphorus += total_phosphorus_mass * \
+            water_extractable_organic_phosphorus_fraction * surface_retention
+        self.data.machine_stable_inorganic_phosphorus += total_phosphorus_mass * \
+            stable_inorganic_phosphorus_fraction * surface_retention
+        self.data.machine_stable_organic_phosphorus += total_phosphorus_mass * \
+            stable_organic_phosphorus_fraction * surface_retention
+
+        # self.data.soil_layers[0]
+
+        # adjusted_field_coverage = field_coverage * 0.5
+        # adjusted_dry_matter_mass = dry_matter_mass * 0.8
 
     def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
                              total_phosphorus_mass: float, field_size: float) -> None:
@@ -285,3 +315,56 @@ class ManureApplication:
                               application_field_coverage * application_dry_mass) / new_dry_matter_mass
         return {"new_dry_matter_mass": new_dry_matter_mass, "new_moisture_factor": new_moisture_factor,
                 "new_field_coverage": new_field_coverage}
+
+    @staticmethod
+    def _determine_wet_rate_factor(dry_matter_mass: float, dry_matter_content: float, field_coverage: float,
+                                   field_size: float) -> float:
+        """This method calculates the wet rate factor, which is used to calculate how much liquid manure infiltrates the
+            soil.
+
+        Parameters
+        ----------
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        dry_matter_content : float
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless)
+        field_size : float
+            Size of the field (ha)
+
+        Returns
+        -------
+        float
+            The wet rate of this manure application.
+
+        Notes
+        -----
+        This equation is not present in the SurPhos theoretical documentation, but can be found on line 32 of the
+        manure.f file of the SurPhos Fortran code.
+
+        """
+        return dry_matter_mass / dry_matter_content / (field_size * field_coverage)
+
+    @staticmethod
+    def _determine_infiltration_factor(wet_rate: float) -> float:
+        """Calculates the rate at which manure slurry infiltrates the soil.
+
+        Parameters
+        ----------
+        wet_rate : float
+            Factor accounting for how liquid an application of manure is and the area it was applied to (kg / ha)
+
+        Returns
+        -------
+        The fraction of machine-applied manure slurry that immediately infiltrates soil after application (unitless).
+
+        Notes
+        -----
+        This function will only be used to determine the amount of phosphorus that infiltrates the soil after an
+        application of manure that has 15% or less solid matter content. It is not present in the SurPhos documentation,
+        but can be found on line 33 of the manure.f file of the SurPhos Fortran code.
+
+        """
+        retention_rate = min(0.9, 0.000002 * wet_rate + 0.267)
+        return 1.0 - retention_rate

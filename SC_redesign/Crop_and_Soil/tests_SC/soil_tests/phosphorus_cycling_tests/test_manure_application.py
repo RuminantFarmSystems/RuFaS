@@ -70,6 +70,34 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
         assert observe.get("new_field_coverage") == new_coverage
 
 
+@pytest.mark.parametrize("dry_mass,dry_content,coverage,area", [
+    (1000, 0.15, 0.85, 3.86),
+    (2500, 0.115, 0.88, 2.56),
+    (1394.2943, 0.085643, 0.788184, 1.97482),
+])
+def test_determine_wet_rate_factor(dry_mass: float, dry_content: float, coverage: float, area: float) -> None:
+    """Tests that the wet rate factor is calculated correctly based on the mass applied, fraction of solids in
+        application, and area of coverage of the field.
+    """
+    observe = ManureApplication._determine_wet_rate_factor(dry_mass, dry_content, coverage, area)
+    expect = dry_mass * (1 / (dry_content * (coverage * area)))
+    assert pytest.approx(observe) == expect
+
+
+@pytest.mark.parametrize("wet_rate", [
+    0,
+    1500,
+    14000,
+    2043,
+    8945.29032,
+])
+def test_determine_infiltration_factor(wet_rate: float) -> None:
+    """Tests that the infiltration rate is correctly calculated based on the wet rate."""
+    observe = ManureApplication._determine_infiltration_factor(wet_rate)
+    expect = 1.0 - min(0.9, 0.000002 * wet_rate + 0.267)
+    assert observe == expect
+
+
 # ---- Helper function tests
 @pytest.mark.parametrize("dry_mass,dry_content,phosphorus_mass,field_coverage,weiP_frac", [
     (1000, 0.18, 200, 0.89, 0.5),
@@ -132,14 +160,14 @@ def test_apply_grazing_manure(dry_mass: float, dry_content: float, phosphorus_ma
     assert incorp.data.grazing_manure_field_coverage == 0.8
 
 
-@pytest.mark.parametrize("dry_mass,dry_content,total_phosphorus_mass,coverage,weiP_frac,source_animal", [
-    (1000, 0.75, 200, 0.85, 0.5, None),
-    (3000, 0.10, 150, 0.975, None, "CATTLE"),
-    (2000, 0.44, 103.5, 0.88, 0.25, "SWINE"),
-    (2500, 0.08, 175, 0.79, None, None),
+@pytest.mark.parametrize("dry_mass,dry_content,total_phosphorus_mass,coverage,area,weiP_frac,source_animal", [
+    (1000, 0.75, 200, 0.85, 1.835, 0.5, None),
+    (3000, 0.10, 150, 0.975, 2.2254, None, "CATTLE"),
+    (2000, 0.44, 103.5, 0.88, 0.8898, 0.25, "SWINE"),
+    (2500, 0.08, 175, 0.79, 3.4453, None, None),
 ])
 def test_apply_machine_manure(dry_mass: float, dry_content: float, total_phosphorus_mass: float, coverage: float,
-                              weiP_frac: float, source_animal: float) -> None:
+                              area: float, weiP_frac: float, source_animal: float) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
     data = SoilData()
     incorp = ManureApplication(data)
@@ -148,7 +176,7 @@ def test_apply_machine_manure(dry_mass: float, dry_content: float, total_phospho
     incorp._apply_liquid_machine_manure = MagicMock()
     incorp._apply_solid_machine_manure = MagicMock()
 
-    incorp.apply_machine_manure(dry_mass, dry_content, total_phosphorus_mass, coverage, weiP_frac, source_animal)
+    incorp.apply_machine_manure(dry_mass, dry_content, total_phosphorus_mass, coverage, area, weiP_frac, source_animal)
 
     expected_weiP_frac = weiP_frac
     if weiP_frac is None:
@@ -160,7 +188,7 @@ def test_apply_machine_manure(dry_mass: float, dry_content: float, total_phospho
 
     if dry_content <= 0.15:
         incorp._apply_liquid_machine_manure.assert_called_once_with(dry_mass, dry_content, total_phosphorus_mass,
-                                                                    coverage, expected_weiP_frac)
+                                                                    coverage, area, expected_weiP_frac)
     else:
         incorp._apply_solid_machine_manure.assert_called_once_with(dry_mass, dry_content, total_phosphorus_mass,
                                                                    coverage, expected_weiP_frac)
