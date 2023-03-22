@@ -539,7 +539,6 @@ def userbounds():
         rationtouse = ration_calf
     
     values2= []
-    # IT"S FAILING HERE
     for key, value in rationall.items():
         for i in value.keys():
             values2.append(int(i))
@@ -549,20 +548,27 @@ def userbounds():
     uniqueset2 = [str(i) for i in uniqueset2]
     
     tribounds = []
-    wiggleroom = 0.15
-    print('foundrations3')
-    if DMIest == 0.0: DMIest = 1
-    for key in uniqueset2:
-        if key in rationtouse.keys():
-            target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
+    wiggleroom = 0.05
+    previousbounds = False # this is whether the bounds need to be all possible, or just the animal_type specific feeds available
+    if previousbounds:
+        for key in uniqueset2:
+            if key in rationtouse.keys():
+                target = rationtouse[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
+                # target = rationtouse[key]
+                tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
+                tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
+                tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
+            else:
+                tribounds.append((0,0.0001))
+                tribounds.append((0,0.0001))
+                tribounds.append((0,0.0001))
+    else:
+        for key in rationtouse.keys():
+            target = rationtouse[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
             # target = rationtouse[key]
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
             tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-        else:
-            tribounds.append((0,0.0001))
-            tribounds.append((0,0.0001))
-            tribounds.append((0,0.0001))
     return tribounds
 
 def optimize(user_defined_ration_select):
