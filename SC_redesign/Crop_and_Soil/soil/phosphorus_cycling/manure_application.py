@@ -23,6 +23,43 @@ class ManureApplication:
         """
         self.data = soil_data or SoilData()
 
+    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
+                             total_phosphorus_mass: float, field_size: float) -> None:
+        """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
+            be tracked.
+
+        Parameters
+        ----------
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        dry_matter_content : float
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+        total_phosphorus_mass : float
+            Total mass of phosphorus in this application of manure (kg)
+        field_size : float
+            Size of the field (ha)
+
+        Notes
+        -----
+        The hardcoded values that determine the distribution of phosphorus between the water extractable
+        inorganic/organic and stable inorganic/organic pools are listed in the SurPhos theoretical documentation page 7,
+        in the paragraph immediately following the head "Simulation of Grazing Manure Transforms".
+
+        """
+        self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
+        self.data.grazing_water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
+        self.data.grazing_stable_inorganic_phosphorus += total_phosphorus_mass * 0.1125
+        self.data.grazing_stable_organic_phosphorus += total_phosphorus_mass * 0.3375
+
+        application_field_coverage = self._determine_grazing_manure_field_coverage(field_size, dry_matter_mass)
+        new_vals = self._determine_weighted_manure_attributes(self.data.grazing_manure_dry_mass,
+                                                              self.data.grazing_manure_moisture_factor,
+                                                              self.data.grazing_manure_field_coverage, dry_matter_mass,
+                                                              dry_matter_content, application_field_coverage)
+        self.data.grazing_manure_dry_mass = new_vals.get("new_dry_matter_mass")
+        self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
+        self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
+
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
@@ -161,10 +198,28 @@ class ManureApplication:
         self.data.machine_stable_organic_phosphorus += total_phosphorus_mass * \
             stable_organic_phosphorus_fraction * surface_retention
 
-        # self.data.soil_layers[0]
+        # TODO: remove or explain why 0.95 is preset of stable organic phosphorus and water extractable inorganic
+        #  phosphorus after getting explanation from Pete
+        mass_to_add_to_labile_P = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * \
+            soil_infiltration
+        mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
+            soil_infiltration * 0.95
+        mass_to_add_to_labile_P += total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
+        self._add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
-        # adjusted_field_coverage = field_coverage * 0.5
-        # adjusted_dry_matter_mass = dry_matter_mass * 0.8
+        mass_to_add_to_active_P = total_phosphorus_mass * stable_inorganic_phosphorus_fraction * soil_infiltration
+        self._add_to_active_phosphorus(mass_to_add_to_active_P)
+
+        adjusted_field_coverage = field_coverage * 0.5
+        adjusted_dry_matter_mass = dry_matter_mass * 0.8
+        new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
+                                                              self.data.machine_manure_moisture_factor,
+                                                              self.data.machine_manure_field_coverage,
+                                                              adjusted_dry_matter_mass, dry_matter_content,
+                                                              adjusted_field_coverage)
+        self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
+        self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
+        self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
     def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil
@@ -189,8 +244,8 @@ class ManureApplication:
         labile_phosphorus_mass += phosphorus_to_add
         self.data.soil_layers[0].labile_phosphorus_content = labile_phosphorus_mass / field_size
 
-    def _add_to_stable_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method adds a specified mass of phosphorus to the stable phosphorus content of the top layer of the soil
+    def _add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+        """This method adds a specified mass of phosphorus to the active phosphorus content of the top layer of the soil
             profile.
 
         Parameters
@@ -202,52 +257,15 @@ class ManureApplication:
 
         Notes
         -----
-            Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount
-            of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
+            Before adding the mass of phosphorus to the active phosphorus content, it first converts the current amount
+            of active phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
             converts the new mass to kg per ha.
 
         """
         # TODO: move to LayerData - Issue #403
-        stable_phosphorus_mass = self.data.soil_layers[0].stable_phosphorus_content * field_size
-        stable_phosphorus_mass += phosphorus_to_add
-        self.data.soil_layers[0].stable_phosphorus_content = stable_phosphorus_mass / field_size
-
-    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
-                             total_phosphorus_mass: float, field_size: float) -> None:
-        """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
-            be tracked.
-
-        Parameters
-        ----------
-        dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
-        dry_matter_content : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
-        total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
-        field_size : float
-            Size of the field (ha)
-
-        Notes
-        -----
-        The hardcoded values that determine the distribution of phosphorus between the water extractable
-        inorganic/organic and stable inorganic/organic pools are listed in the SurPhos theoretical documentation page 7,
-        in the paragraph immediately following the head "Simulation of Grazing Manure Transforms".
-
-        """
-        self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
-        self.data.grazing_water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
-        self.data.grazing_stable_inorganic_phosphorus += total_phosphorus_mass * 0.1125
-        self.data.grazing_stable_organic_phosphorus += total_phosphorus_mass * 0.3375
-
-        application_field_coverage = self._determine_grazing_manure_field_coverage(field_size, dry_matter_mass)
-        new_vals = self._determine_weighted_manure_attributes(self.data.grazing_manure_dry_mass,
-                                                              self.data.grazing_manure_moisture_factor,
-                                                              self.data.grazing_manure_field_coverage, dry_matter_mass,
-                                                              dry_matter_content, application_field_coverage)
-        self.data.grazing_manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
+        active_phosphorus_mass = self.data.soil_layers[0].active_phosphorus_content * field_size
+        active_phosphorus_mass += phosphorus_to_add
+        self.data.soil_layers[0].active_phosphorus_content = active_phosphorus_mass / field_size
 
     # --- Static Methods ---
     @staticmethod
