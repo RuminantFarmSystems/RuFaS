@@ -70,6 +70,37 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
         assert observe.get("new_field_coverage") == new_coverage
 
 
+# ---- Helper function tests
+@pytest.mark.parametrize("dry_mass,dry_content,phosphorus_mass,field_coverage,weiP_frac", [
+    (1000, 0.18, 200, 0.89, 0.5),
+    (955, 0.44, 100, 0.76, 0.47),
+    (2500, 0.411, 350, 0.96, 0.33),
+])
+def test_apply_solid_machine_manure(dry_mass: float, dry_content: float, phosphorus_mass: float, field_coverage: float,
+                                    weiP_frac: float) -> None:
+    """Tests that manure with greater than 15% solid matter content is added to the field correctly."""
+    data = SoilData(machine_manure_dry_mass=3000, machine_manure_moisture_factor=0.65,
+                    machine_manure_field_coverage=0.77)
+    incorp = ManureApplication(data)
+    incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 4000,
+                                                                           "new_moisture_factor": 0.83,
+                                                                           "new_field_coverage": 0.93})
+
+    incorp._apply_solid_machine_manure(dry_mass, dry_content, phosphorus_mass, field_coverage, weiP_frac)
+
+    incorp._determine_weighted_manure_attributes.assert_called_once_with(3000, 0.65, 0.77, dry_mass, dry_content,
+                                                                         field_coverage)
+    assert incorp.data.machine_water_extractable_inorganic_phosphorus == phosphorus_mass * weiP_frac
+    assert incorp.data.machine_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
+    assert incorp.data.machine_stable_inorganic_phosphorus == \
+        (phosphorus_mass * (1 - (weiP_frac + 0.05))) * 0.25
+    assert pytest.approx(incorp.data.machine_stable_organic_phosphorus) == \
+        (phosphorus_mass * (1 - (weiP_frac + 0.05))) * 0.75
+    assert incorp.data.machine_manure_dry_mass == 4000
+    assert incorp.data.machine_manure_moisture_factor == 0.83
+    assert incorp.data.machine_manure_field_coverage == 0.93
+
+
 # ---- Main routine tests
 @pytest.mark.parametrize("dry_mass,dry_content,phosphorus_mass,field_size", [
     (1000, 0.78, 150, 1.8),
@@ -103,21 +134,19 @@ def test_apply_grazing_manure(dry_mass: float, dry_content: float, phosphorus_ma
 
 @pytest.mark.parametrize("dry_mass,dry_content,total_phosphorus_mass,coverage,weiP_frac,source_animal", [
     (1000, 0.75, 200, 0.85, 0.5, None),
-    (3000, 0.33, 150, 0.975, None, "CATTLE"),
+    (3000, 0.10, 150, 0.975, None, "CATTLE"),
     (2000, 0.44, 103.5, 0.88, 0.25, "SWINE"),
-    (2500, 0.65, 175, 0.79, None, None),
+    (2500, 0.08, 175, 0.79, None, None),
 ])
 def test_apply_machine_manure(dry_mass: float, dry_content: float, total_phosphorus_mass: float, coverage: float,
                               weiP_frac: float, source_animal: float) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
-    data = SoilData(machine_manure_dry_mass=3500, machine_manure_moisture_factor=0.66,
-                    machine_manure_field_coverage=0.89)
+    data = SoilData()
     incorp = ManureApplication(data)
 
     incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
-    incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 4000,
-                                                                           "new_moisture_factor": 0.83,
-                                                                           "new_field_coverage": 0.93})
+    incorp._apply_liquid_machine_manure = MagicMock()
+    incorp._apply_solid_machine_manure = MagicMock()
 
     incorp.apply_machine_manure(dry_mass, dry_content, total_phosphorus_mass, coverage, weiP_frac, source_animal)
 
@@ -128,14 +157,10 @@ def test_apply_machine_manure(dry_mass: float, dry_content: float, total_phospho
         expected_weiP_frac = 0.25
     else:
         incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.assert_not_called()
-    incorp._determine_weighted_manure_attributes.assert_called_once_with(3500, 0.66, 0.89, dry_mass, dry_content,
-                                                                         coverage)
-    assert incorp.data.machine_water_extractable_inorganic_phosphorus == total_phosphorus_mass * expected_weiP_frac
-    assert incorp.data.machine_water_extractable_organic_phosphorus == total_phosphorus_mass * 0.05
-    assert incorp.data.machine_stable_inorganic_phosphorus == \
-        (total_phosphorus_mass * (1 - (expected_weiP_frac + 0.05))) * 0.25
-    assert pytest.approx(incorp.data.machine_stable_organic_phosphorus) == \
-           (total_phosphorus_mass * (1 - (expected_weiP_frac + 0.05))) * 0.75
-    assert incorp.data.machine_manure_dry_mass == 4000
-    assert incorp.data.machine_manure_moisture_factor == 0.83
-    assert incorp.data.machine_manure_field_coverage == 0.93
+
+    if dry_content <= 0.15:
+        incorp._apply_liquid_machine_manure.assert_called_once_with(dry_mass, dry_content, total_phosphorus_mass,
+                                                                    coverage, expected_weiP_frac)
+    else:
+        incorp._apply_solid_machine_manure.assert_called_once_with(dry_mass, dry_content, total_phosphorus_mass,
+                                                                   coverage, expected_weiP_frac)

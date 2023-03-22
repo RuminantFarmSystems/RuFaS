@@ -62,6 +62,35 @@ class ManureApplication:
         else:
             water_extractable_inorganic_phosphorus_fraction = \
                 self._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(source_animal)
+
+        if dry_matter_content <= 0.15:
+            self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_content, total_phosphorus_mass,
+                                              field_coverage, water_extractable_inorganic_phosphorus_fraction)
+        else:
+            self._apply_solid_machine_manure(dry_matter_mass, dry_matter_content, total_phosphorus_mass,
+                                             field_coverage, water_extractable_inorganic_phosphorus_fraction)
+
+    def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
+                                    total_phosphorus_mass: float, field_coverage: float,
+                                    water_extractable_inorganic_phosphorus_fraction: float) -> None:
+        """This method applies manure to the field surface when the dry matter content of the application is greater
+            than 15%.
+
+        Parameters
+        ----------
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        dry_matter_content : float
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+        total_phosphorus_mass : float
+            Total mass of phosphorus in this application of manure (kg)
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless)
+        water_extractable_inorganic_phosphorus_fraction : float
+            Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
+            in the range [0.0, 1.0] (unitless)
+
+        """
         water_extractable_organic_phosphorus_fraction = 0.05
         stable_phosphorus_fraction = 1.0 - (water_extractable_organic_phosphorus_fraction +
                                             water_extractable_inorganic_phosphorus_fraction)
@@ -82,6 +111,31 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
+    def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_content: float,
+                                     total_phosphorus_mass: float, field_coverage: float,
+                                     water_extractable_inorganic_phosphorus_fraction: float) -> None:
+        """This method applies manure with 15% solid content or less to a field.
+
+        Parameters
+        ----------
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        dry_matter_content : float
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+        total_phosphorus_mass : float
+            Total mass of phosphorus in this application of manure (kg)
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless)
+        water_extractable_inorganic_phosphorus_fraction : float
+            Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
+            in the range [0.0, 1.0] (unitless)
+
+        Returns
+        -------
+
+        """
+        pass
+
     def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_content: float,
                              total_phosphorus_mass: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
@@ -97,6 +151,12 @@ class ManureApplication:
             Total mass of phosphorus in this application of manure (kg)
         field_size : float
             Size of the field (ha)
+
+        Notes
+        -----
+        The hardcoded values that determine the distribution of phosphorus between the water extractable
+        inorganic/organic and stable inorganic/organic pools are listed in the SurPhos theoretical documentation page 7,
+        in the paragraph immediately following the head "Simulation of Grazing Manure Transforms".
 
         """
         self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
