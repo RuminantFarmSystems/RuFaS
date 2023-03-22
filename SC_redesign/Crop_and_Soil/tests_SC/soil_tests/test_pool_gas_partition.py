@@ -332,8 +332,9 @@ def test_plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining: 
                                        plant_structural_active_carbon_remaining: float) -> None:
     """Tests that the plant carbon decomposed into the active carbon pool is calculated correctly"""
     expected = plant_metabolic_active_carbon_remaining + plant_structural_active_carbon_remaining
-    assert expected == PoolGasPartition._determine_plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining,
-                                                                                 plant_structural_active_carbon_remaining)
+    assert expected == PoolGasPartition._determine_plant_active_decompose_carbon(
+        plant_metabolic_active_carbon_remaining,
+        plant_structural_active_carbon_remaining)
 
 
 @pytest.mark.parametrize("soil_metabolic_active_carbon_remaining,soil_structural_active_carbon_remaining", [
@@ -363,7 +364,8 @@ def test_soil_active_carbon_amount(active_carbon_amount: float, plant_active_dec
     """Tests that total amount of active carbon in the layer is aggregated correctly"""
     expected = active_carbon_amount + plant_active_decompose_carbon + soil_active_decompose_carbon \
                + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
-    assert expected == PoolGasPartition._determine_soil_active_carbon_amount(active_carbon_amount, plant_active_decompose_carbon,
+    assert expected == PoolGasPartition._determine_soil_active_carbon_amount(active_carbon_amount,
+                                                                             plant_active_decompose_carbon,
                                                                              soil_active_decompose_carbon,
                                                                              passive_to_active_carbon_amount,
                                                                              slow_to_active_carbon_amount,
