@@ -7,6 +7,8 @@ from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
+
+
 @pytest.mark.parametrize("soil_structural_slow_carbon_usage", [
     70,  # lower values
     150,  # higher values
@@ -16,7 +18,7 @@ def test_soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage
     """Tests that the amount of structural soil carbon decomposed is calculated correctly."""
     structural_slow_carbon_loss_rate = 0.3
     expect = soil_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
-    assert expect == PoolGasPartition._soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage)
+    assert expect == PoolGasPartition._determine_soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage)
 
 
 @pytest.mark.parametrize("soil_structural_slow_carbon_usage", [
@@ -28,7 +30,7 @@ def test_soil_structural_slow_carbon_loss(soil_structural_slow_carbon_usage: flo
     """Tests that the loss of structural soil carbon decomposed is calculated correctly."""
     structural_slow_carbon_loss_rate = 0.3
     expect = soil_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
-    assert expect == PoolGasPartition._soil_structural_slow_carbon_loss(soil_structural_slow_carbon_usage)
+    assert expect == PoolGasPartition._determine_soil_structural_slow_carbon_loss(soil_structural_slow_carbon_usage)
 
 
 @pytest.mark.parametrize("soil_structural_active_carbon_usage", [
@@ -40,7 +42,7 @@ def test_soil_structural_active_carbon_remaining(soil_structural_active_carbon_u
     """Tests that the amount of soil structural active carbon decomposed is calculated correctly."""
     structural_active_carbon_loss_rate = 0.45
     expect = soil_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
-    assert expect == PoolGasPartition._soil_structural_active_carbon_remaining(soil_structural_active_carbon_usage)
+    assert expect == PoolGasPartition._determine_soil_structural_active_carbon_remaining(soil_structural_active_carbon_usage)
 
 
 @pytest.mark.parametrize("soil_structural_active_carbon_usage", [
@@ -52,7 +54,7 @@ def test_soil_structural_active_carbon_loss(soil_structural_active_carbon_usage:
     """Tests that the loss of soil structural active carbon decomposed is calculated correctly."""
     structural_active_carbon_loss_rate = 0.45
     expect = soil_structural_active_carbon_usage * structural_active_carbon_loss_rate
-    assert expect == PoolGasPartition._soil_structural_active_carbon_loss(soil_structural_active_carbon_usage)
+    assert expect == PoolGasPartition._determine_soil_structural_active_carbon_loss(soil_structural_active_carbon_usage)
 
 
 @pytest.mark.parametrize("soil_metabolic_active_carbon_usage", [
@@ -64,7 +66,7 @@ def test_soil_metabolic_active_carbon_remaining(soil_metabolic_active_carbon_usa
     """Tests that the amount of soil metabolic active carbon decomposed is calculated correctly."""
     metabolic_active_carbon_loss_rate = 0.55
     expect = soil_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
-    assert expect == PoolGasPartition._soil_metabolic_active_carbon_remaining(soil_metabolic_active_carbon_usage)
+    assert expect == PoolGasPartition._determine_soil_metabolic_active_carbon_remaining(soil_metabolic_active_carbon_usage)
 
 
 @pytest.mark.parametrize("soil_metabolic_active_carbon_usage", [
@@ -76,7 +78,7 @@ def test_soil_metabolic_active_carbon_loss(soil_metabolic_active_carbon_usage: f
     """Tests that the loss of soil metabolic active carbon decomposed is calculated correctly."""
     metabolic_active_carbon_loss_rate = 0.55
     expect = soil_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
-    assert expect == PoolGasPartition._soil_metabolic_active_carbon_loss(soil_metabolic_active_carbon_usage)
+    assert expect == PoolGasPartition._determine_soil_metabolic_active_carbon_loss(soil_metabolic_active_carbon_usage)
 
 
 @pytest.mark.parametrize("plant_structural_slow_carbon_usage", [
@@ -88,7 +90,7 @@ def test_plant_structural_slow_carbon_remaining(plant_structural_slow_carbon_usa
     """Tests that the amount of plant structural slow carbon decomposed is calculated correctly."""
     structural_slow_carbon_loss_rate = 0.3
     expect = plant_structural_slow_carbon_usage * (1 - structural_slow_carbon_loss_rate)
-    assert expect == PoolGasPartition._plant_structural_slow_carbon_remaining(plant_structural_slow_carbon_usage)
+    assert expect == PoolGasPartition._determine_plant_structural_slow_carbon_remaining(plant_structural_slow_carbon_usage)
 
 
 @pytest.mark.parametrize("plant_structural_slow_carbon_usage", [
@@ -100,7 +102,7 @@ def test_plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage: f
     """Tests that the loss of plant structural slow carbon decomposed is calculated correctly."""
     structural_slow_carbon_loss_rate = 0.3
     expect = plant_structural_slow_carbon_usage * structural_slow_carbon_loss_rate
-    assert expect == PoolGasPartition._plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage)
+    assert expect == PoolGasPartition._determine_plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage)
 
 
 @pytest.mark.parametrize("plant_structural_active_carbon_usage", [
@@ -112,7 +114,7 @@ def test_plant_structural_active_carbon_remaining(plant_structural_active_carbon
     """Tests that the amount of plant structural active carbon decomposed is calculated correctly."""
     structural_active_carbon_loss_rate = 0.45
     expected = plant_structural_active_carbon_usage * (1 - structural_active_carbon_loss_rate)
-    assert expected == PoolGasPartition._plant_structural_active_carbon_remaining(plant_structural_active_carbon_usage)
+    assert expected == PoolGasPartition._determine_plant_structural_active_carbon_remaining(plant_structural_active_carbon_usage)
 
 
 @pytest.mark.parametrize("plant_structural_active_carbon_usage", [
@@ -124,7 +126,7 @@ def test_plant_structural_active_carbon_loss(plant_structural_active_carbon_usag
     """Tests that the loss of plant structural active carbon decomposed is calculated correctly."""
     structural_active_carbon_loss_rate = 0.45
     expected = plant_structural_active_carbon_usage * structural_active_carbon_loss_rate
-    assert expected == PoolGasPartition._plant_structural_active_carbon_loss(plant_structural_active_carbon_usage)
+    assert expected == PoolGasPartition._determine_plant_structural_active_carbon_loss(plant_structural_active_carbon_usage)
 
 
 @pytest.mark.parametrize("plant_metabolic_active_carbon_usage", [
@@ -136,7 +138,7 @@ def test_plant_metabolic_active_carbon_remaining(plant_metabolic_active_carbon_u
     """Tests that the amount of plant metabolic active carbon decomposed is calculated correctly."""
     metabolic_active_carbon_loss_rate = 0.55
     expected = plant_metabolic_active_carbon_usage * (1 - metabolic_active_carbon_loss_rate)
-    assert expected == PoolGasPartition._plant_metabolic_active_carbon_remaining(plant_metabolic_active_carbon_usage)
+    assert expected == PoolGasPartition._determine_plant_metabolic_active_carbon_remaining(plant_metabolic_active_carbon_usage)
 
 
 @pytest.mark.parametrize("plant_metabolic_active_carbon_usage", [
@@ -148,7 +150,7 @@ def test_plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage:
     """Tests that the loss of plant metabolic active carbon decomposed is calculated correctly."""
     metabolic_active_carbon_loss_rate = 0.55
     expected = plant_metabolic_active_carbon_usage * metabolic_active_carbon_loss_rate
-    assert expected == PoolGasPartition._plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage)
+    assert expected == PoolGasPartition._determine_plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage)
 
 
 @pytest.mark.parametrize("silt_clay_content", [
@@ -160,7 +162,7 @@ def test_active_carbon_decomposition_rate(silt_clay_content: float) -> None:
     """Tests that the rate of active carbon decomposition is calculated correctly"""
     max_carbon_decomposition_rate = 0.14
     expected = max_carbon_decomposition_rate * (1 - 0.75 * silt_clay_content)
-    assert expected == PoolGasPartition._active_carbon_decomposition_rate(silt_clay_content)
+    assert expected == PoolGasPartition._determine_active_carbon_decomposition_rate(silt_clay_content)
 
 
 @pytest.mark.parametrize("moisture_effect, temperature_effect, active_carbon, active_carbon_decomposition_rate", [
@@ -172,9 +174,9 @@ def test_active_carbon_decomposition_amount(moisture_effect: float, temperature_
                                             active_carbon: float, active_carbon_decomposition_rate: float) -> None:
     """Tests that the active carbon decomposition amount is calculated correctly"""
     expected = active_carbon_decomposition_rate * moisture_effect * temperature_effect * active_carbon
-    assert expected == PoolGasPartition._active_carbon_decomposition_amount(moisture_effect, temperature_effect,
-                                                                            active_carbon,
-                                                                            active_carbon_decomposition_rate)
+    assert expected == PoolGasPartition._determine_active_carbon_decomposition_amount(moisture_effect, temperature_effect,
+                                                                                      active_carbon,
+                                                                                      active_carbon_decomposition_rate)
 
 
 @pytest.mark.parametrize("decomposition_moisture_effect, decomposition_temperature_effect,slow_carbon_amount", [
@@ -189,9 +191,9 @@ def test_slow_carbon_decomposition_amount(decomposition_moisture_effect: float, 
     slow_carbon_decomposition_factor = 0.0038
     expected = decomposition_moisture_effect * decomposition_temperature_effect * slow_carbon_amount * \
                slow_carbon_decomposition_factor
-    assert expected == PoolGasPartition._slow_carbon_decomposition_amount(decomposition_moisture_effect,
-                                                                          decomposition_temperature_effect,
-                                                                          slow_carbon_amount)
+    assert expected == PoolGasPartition._determine_slow_carbon_decomposition_amount(decomposition_moisture_effect,
+                                                                                    decomposition_temperature_effect,
+                                                                                    slow_carbon_amount)
 
 
 @pytest.mark.parametrize("decomposition_moisture_effect, decomposition_temperature_effect,passive_carbon_amount", [
@@ -207,9 +209,9 @@ def test_passive_carbon_decomposition_amount(decomposition_moisture_effect: floa
     passive_carbon_decomposition_factor = 0.00013
     expected = decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
                passive_carbon_decomposition_factor
-    assert expected == PoolGasPartition._passive_carbon_decomposition_amount(decomposition_moisture_effect,
-                                                                             decomposition_temperature_effect,
-                                                                             passive_carbon_amount)
+    assert expected == PoolGasPartition._determine_passive_carbon_decomposition_amount(decomposition_moisture_effect,
+                                                                                       decomposition_temperature_effect,
+                                                                                       passive_carbon_amount)
 
 
 @pytest.mark.parametrize("silt_clay_content", [
@@ -220,7 +222,7 @@ def test_passive_carbon_decomposition_amount(decomposition_moisture_effect: floa
 def test_carbon_lost_adjusted_factor(silt_clay_content: float) -> None:
     """Tests that the carbon lost adjusted factor is calculated correctly"""
     expected = 0.85 - 0.68 * silt_clay_content
-    assert expected == PoolGasPartition._carbon_lost_adjusted_factor(silt_clay_content)
+    assert expected == PoolGasPartition._determine_carbon_lost_adjusted_factor(silt_clay_content)
 
 
 @pytest.mark.parametrize("active_carbon_decomposition_amount, carbon_lost_adjusted_factor", [
@@ -232,8 +234,8 @@ def test_active_carbon_to_slow_amount(active_carbon_decomposition_amount: float,
                                       carbon_lost_adjusted_factor: float) -> None:
     """Tests that the amount of active carbon decomposed into slow carbon is calculated correctly"""
     expected = active_carbon_decomposition_amount * (1 - carbon_lost_adjusted_factor - 0.004)
-    assert expected == PoolGasPartition._active_carbon_to_slow_amount(active_carbon_decomposition_amount,
-                                                                      carbon_lost_adjusted_factor)
+    assert expected == PoolGasPartition._determine_active_carbon_to_slow_amount(active_carbon_decomposition_amount,
+                                                                                carbon_lost_adjusted_factor)
 
 
 @pytest.mark.parametrize("active_carbon_decomposition_amount, carbon_lost_adjusted_factor", [
@@ -245,8 +247,8 @@ def test_active_carbon_to_slow_loss(active_carbon_decomposition_amount: float,
                                     carbon_lost_adjusted_factor: float) -> None:
     """Tests that the loss of active carbon decomposed into slow carbon is calculated correctly"""
     expected = active_carbon_decomposition_amount * carbon_lost_adjusted_factor
-    assert expected == PoolGasPartition._active_carbon_to_slow_loss(active_carbon_decomposition_amount,
-                                                                    carbon_lost_adjusted_factor)
+    assert expected == PoolGasPartition._determine_active_carbon_to_slow_loss(active_carbon_decomposition_amount,
+                                                                              carbon_lost_adjusted_factor)
 
 
 @pytest.mark.parametrize("active_carbon_decomposition_amount", [
@@ -257,7 +259,7 @@ def test_active_carbon_to_slow_loss(active_carbon_decomposition_amount: float,
 def test_active_carbon_to_passive_amount(active_carbon_decomposition_amount: float) -> None:
     """Tests that the the amount of active carbon decomposed into passive carbon was calculated correctly"""
     expected = active_carbon_decomposition_amount * 0.004
-    assert expected == PoolGasPartition._active_carbon_to_passive_amount(active_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_active_carbon_to_passive_amount(active_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("slow_carbon_decomposition_amount", [
@@ -270,7 +272,7 @@ def test_slow_to_active_carbon_amount(slow_carbon_decomposition_amount: float) -
     slow_carbon_passive_decompose_rate = 0.03
     slow_carbon_co2_lost_rate = 0.55
     expected = slow_carbon_decomposition_amount * (1 - slow_carbon_co2_lost_rate - slow_carbon_passive_decompose_rate)
-    assert expected == PoolGasPartition._slow_to_active_carbon_amount(slow_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_slow_to_active_carbon_amount(slow_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("slow_carbon_decomposition_amount", [
@@ -282,7 +284,7 @@ def test_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float) ->
     """Tests that the the amount of lost slow carbon decomposed into CO2 was calculated correctly"""
     slow_carbon_co2_lost_rate = 0.55
     expected = slow_carbon_decomposition_amount * slow_carbon_co2_lost_rate
-    assert expected == PoolGasPartition._slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("slow_carbon_decomposition_amount", [
@@ -294,7 +296,7 @@ def test_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount: float) 
     """Tests that the the amount of slow carbon decomposed into passive carbon was calculated correctly"""
     slow_carbon_passive_decompose_rate = 0.03
     expected = slow_carbon_decomposition_amount * slow_carbon_passive_decompose_rate
-    assert expected == PoolGasPartition._slow_to_passive_carbon_amount(slow_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("passive_carbon_decomposition_amount", [
@@ -306,7 +308,7 @@ def test_passive_to_active_carbon_amount(passive_carbon_decomposition_amount: fl
     """Tests that the the amount of passive carbon decomposed into active carbon was calculated correctly"""
     passive_carbon_co2_lost_rate = 0.55
     expected = passive_carbon_decomposition_amount * (1 - passive_carbon_co2_lost_rate)
-    assert expected == PoolGasPartition._passive_to_active_carbon_amount(passive_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_passive_to_active_carbon_amount(passive_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("passive_carbon_decomposition_amount", [
@@ -318,7 +320,7 @@ def test_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount: flo
     """Tests that the the amount of lost passive carbon decomposed into CO2 was calculated correctly"""
     passive_carbon_co2_lost_rate = 0.55
     expected = passive_carbon_decomposition_amount * passive_carbon_co2_lost_rate
-    assert expected == PoolGasPartition._passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("plant_metabolic_active_carbon_remaining, plant_structural_active_carbon_remaining", [
@@ -330,8 +332,8 @@ def test_plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining: 
                                        plant_structural_active_carbon_remaining: float) -> None:
     """Tests that the plant carbon decomposed into the active carbon pool is calculated correctly"""
     expected = plant_metabolic_active_carbon_remaining + plant_structural_active_carbon_remaining
-    assert expected == PoolGasPartition._plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining,
-                                                                       plant_structural_active_carbon_remaining)
+    assert expected == PoolGasPartition._determine_plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining,
+                                                                                 plant_structural_active_carbon_remaining)
 
 
 @pytest.mark.parametrize("soil_metabolic_active_carbon_remaining,soil_structural_active_carbon_remaining", [
@@ -343,8 +345,8 @@ def test_soil_active_decompose_carbon(soil_metabolic_active_carbon_remaining: fl
                                       soil_structural_active_carbon_remaining: float) -> None:
     """Tests that the soil carbon decomposed into the active carbon pool is calculated correctly"""
     expected = soil_metabolic_active_carbon_remaining + soil_structural_active_carbon_remaining
-    assert expected == PoolGasPartition._soil_active_decompose_carbon(soil_metabolic_active_carbon_remaining,
-                                                                      soil_structural_active_carbon_remaining)
+    assert expected == PoolGasPartition._determine_soil_active_decompose_carbon(soil_metabolic_active_carbon_remaining,
+                                                                                soil_structural_active_carbon_remaining)
 
 
 @pytest.mark.parametrize("active_carbon_amount, plant_active_decompose_carbon, soil_active_decompose_carbon, "
@@ -361,11 +363,11 @@ def test_soil_active_carbon_amount(active_carbon_amount: float, plant_active_dec
     """Tests that total amount of active carbon in the layer is aggregated correctly"""
     expected = active_carbon_amount + plant_active_decompose_carbon + soil_active_decompose_carbon \
                + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
-    assert expected == PoolGasPartition._soil_active_carbon_amount(active_carbon_amount, plant_active_decompose_carbon,
-                                                                   soil_active_decompose_carbon,
-                                                                   passive_to_active_carbon_amount,
-                                                                   slow_to_active_carbon_amount,
-                                                                   active_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_soil_active_carbon_amount(active_carbon_amount, plant_active_decompose_carbon,
+                                                                             soil_active_decompose_carbon,
+                                                                             passive_to_active_carbon_amount,
+                                                                             slow_to_active_carbon_amount,
+                                                                             active_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("slow_carbon_amount, plant_structural_slow_carbon_remaining,"
@@ -381,11 +383,11 @@ def test_soil_slow_carbon_amount(slow_carbon_amount: float, plant_structural_slo
     """Tests that total amount of slow carbon in the layer is aggregated correctly"""
     expected = slow_carbon_amount + plant_structural_slow_carbon_remaining + soil_structural_slow_carbon_remaining + \
                active_carbon_to_slow_amount - slow_carbon_decomposition_amount
-    assert expected == PoolGasPartition._soil_slow_carbon_amount(slow_carbon_amount,
-                                                                 plant_structural_slow_carbon_remaining,
-                                                                 soil_structural_slow_carbon_remaining,
-                                                                 active_carbon_to_slow_amount,
-                                                                 slow_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_soil_slow_carbon_amount(slow_carbon_amount,
+                                                                           plant_structural_slow_carbon_remaining,
+                                                                           soil_structural_slow_carbon_remaining,
+                                                                           active_carbon_to_slow_amount,
+                                                                           slow_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("passive_carbon_amount, slow_to_passive_carbon_amount,active_carbon_to_passive_amount,"
@@ -400,10 +402,10 @@ def test_soil_passive_carbon_amount(passive_carbon_amount: float, slow_to_passiv
     """Tests that total amount of passive carbon in the layer is aggregated correctly"""
     expected = passive_carbon_amount + slow_to_passive_carbon_amount + active_carbon_to_passive_amount - \
                passive_carbon_decomposition_amount
-    assert expected == PoolGasPartition._soil_passive_carbon_amount(passive_carbon_amount,
-                                                                    slow_to_passive_carbon_amount,
-                                                                    active_carbon_to_passive_amount,
-                                                                    passive_carbon_decomposition_amount)
+    assert expected == PoolGasPartition._determine_soil_passive_carbon_amount(passive_carbon_amount,
+                                                                              slow_to_passive_carbon_amount,
+                                                                              active_carbon_to_passive_amount,
+                                                                              passive_carbon_decomposition_amount)
 
 
 @pytest.mark.parametrize("layers", [
@@ -432,92 +434,92 @@ def test_partition_pool_gas(layers: list) -> None:
     data = SoilData(soil_layers=layers)
     partition = PoolGasPartition(data)
 
-    PoolGasPartition._plant_metabolic_active_carbon_loss = MagicMock(return_value=1.89)
-    PoolGasPartition._plant_metabolic_active_carbon_remaining = MagicMock(return_value=2.1)
-    PoolGasPartition._plant_structural_active_carbon_loss = MagicMock(return_value=2.2)
-    PoolGasPartition._plant_structural_active_carbon_remaining = MagicMock(return_value=2.3)
-    PoolGasPartition._plant_structural_slow_carbon_loss = MagicMock(return_value=2.4)
-    PoolGasPartition._plant_structural_slow_carbon_remaining = MagicMock(return_value=2.5)
-    PoolGasPartition._soil_metabolic_active_carbon_loss = MagicMock(return_value=2.6)
-    PoolGasPartition._soil_metabolic_active_carbon_remaining = MagicMock(return_value=2.7)
-    PoolGasPartition._soil_structural_active_carbon_loss = MagicMock(return_value=2.8)
-    PoolGasPartition._soil_structural_active_carbon_remaining = MagicMock(return_value=2.9)
-    PoolGasPartition._soil_structural_slow_carbon_loss = MagicMock(return_value=3.1)
-    PoolGasPartition._soil_structural_slow_carbon_remaining = MagicMock(return_value=3.2)
+    PoolGasPartition._determine_plant_metabolic_active_carbon_loss = MagicMock(return_value=1.89)
+    PoolGasPartition._determine_plant_metabolic_active_carbon_remaining = MagicMock(return_value=2.1)
+    PoolGasPartition._determine_plant_structural_active_carbon_loss = MagicMock(return_value=2.2)
+    PoolGasPartition._determine_plant_structural_active_carbon_remaining = MagicMock(return_value=2.3)
+    PoolGasPartition._determine_plant_structural_slow_carbon_loss = MagicMock(return_value=2.4)
+    PoolGasPartition._determine_plant_structural_slow_carbon_remaining = MagicMock(return_value=2.5)
+    PoolGasPartition._determine_soil_metabolic_active_carbon_loss = MagicMock(return_value=2.6)
+    PoolGasPartition._determine_soil_metabolic_active_carbon_remaining = MagicMock(return_value=2.7)
+    PoolGasPartition._determine_soil_structural_active_carbon_loss = MagicMock(return_value=2.8)
+    PoolGasPartition._determine_soil_structural_active_carbon_remaining = MagicMock(return_value=2.9)
+    PoolGasPartition._determine_soil_structural_slow_carbon_loss = MagicMock(return_value=3.1)
+    PoolGasPartition._determine_soil_structural_slow_carbon_remaining = MagicMock(return_value=3.2)
 
-    PoolGasPartition._active_carbon_decomposition_rate = MagicMock(return_value=0.87)
+    PoolGasPartition._determine_active_carbon_decomposition_rate = MagicMock(return_value=0.87)
 
-    PoolGasPartition._active_carbon_decomposition_amount = MagicMock(return_value=3.4)
+    PoolGasPartition._determine_active_carbon_decomposition_amount = MagicMock(return_value=3.4)
 
-    PoolGasPartition._slow_carbon_decomposition_amount = MagicMock(return_value=3.5)
+    PoolGasPartition._determine_slow_carbon_decomposition_amount = MagicMock(return_value=3.5)
 
-    PoolGasPartition._passive_carbon_decomposition_amount = MagicMock(return_value=3.6)
+    PoolGasPartition._determine_passive_carbon_decomposition_amount = MagicMock(return_value=3.6)
 
-    PoolGasPartition._carbon_lost_adjusted_factor = MagicMock(return_value=3.7)
+    PoolGasPartition._determine_carbon_lost_adjusted_factor = MagicMock(return_value=3.7)
 
-    PoolGasPartition._active_carbon_to_slow_amount = MagicMock(return_value=3.8)
-    PoolGasPartition._active_carbon_to_slow_loss = MagicMock(return_value=3.9)
+    PoolGasPartition._determine_active_carbon_to_slow_amount = MagicMock(return_value=3.8)
+    PoolGasPartition._determine_active_carbon_to_slow_loss = MagicMock(return_value=3.9)
 
-    PoolGasPartition._active_carbon_to_passive_amount = MagicMock(return_value=4.1)
+    PoolGasPartition._determine_active_carbon_to_passive_amount = MagicMock(return_value=4.1)
 
-    PoolGasPartition._slow_to_active_carbon_amount = MagicMock(return_value=4.2)
-    PoolGasPartition._slow_carbon_co2_lost_amount = MagicMock(return_value=4.3)
-    PoolGasPartition._slow_to_passive_carbon_amount = MagicMock(return_value=4.4)
+    PoolGasPartition._determine_slow_to_active_carbon_amount = MagicMock(return_value=4.2)
+    PoolGasPartition._determine_slow_carbon_co2_lost_amount = MagicMock(return_value=4.3)
+    PoolGasPartition._determine_slow_to_passive_carbon_amount = MagicMock(return_value=4.4)
 
-    PoolGasPartition._passive_to_active_carbon_amount = MagicMock(return_value=4.5)
-    PoolGasPartition._passive_carbon_co2_lost_amount = MagicMock(return_value=4.6)
+    PoolGasPartition._determine_passive_to_active_carbon_amount = MagicMock(return_value=4.5)
+    PoolGasPartition._determine_passive_carbon_co2_lost_amount = MagicMock(return_value=4.6)
 
-    PoolGasPartition._plant_active_decompose_carbon = MagicMock(return_value=4.7)
-    PoolGasPartition._soil_active_decompose_carbon = MagicMock(return_value=4.8)
-    PoolGasPartition._soil_active_carbon_amount = MagicMock(return_value=4.9)
+    PoolGasPartition._determine_plant_active_decompose_carbon = MagicMock(return_value=4.7)
+    PoolGasPartition._determine_soil_active_decompose_carbon = MagicMock(return_value=4.8)
+    PoolGasPartition._determine_soil_active_carbon_amount = MagicMock(return_value=4.9)
 
-    PoolGasPartition._soil_slow_carbon_amount = MagicMock(return_value=5.1)
+    PoolGasPartition._determine_soil_slow_carbon_amount = MagicMock(return_value=5.1)
 
-    PoolGasPartition._soil_passive_carbon_amount = MagicMock(return_value=5.2)
+    PoolGasPartition._determine_soil_passive_carbon_amount = MagicMock(return_value=5.2)
 
     partition.partition_pool_gas()
 
     # Checking if methods are called correct number of times
-    assert PoolGasPartition._plant_metabolic_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._plant_metabolic_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._plant_structural_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._plant_structural_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._plant_structural_slow_carbon_loss.call_count == 3
-    assert PoolGasPartition._plant_structural_slow_carbon_remaining.call_count == 3
-    assert PoolGasPartition._soil_metabolic_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._soil_metabolic_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._soil_structural_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._soil_structural_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._soil_structural_slow_carbon_loss.call_count == 3
-    assert PoolGasPartition._soil_structural_slow_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_plant_metabolic_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._determine_plant_metabolic_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_plant_structural_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._determine_plant_structural_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_plant_structural_slow_carbon_loss.call_count == 3
+    assert PoolGasPartition._determine_plant_structural_slow_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_soil_metabolic_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._determine_soil_metabolic_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_soil_structural_active_carbon_loss.call_count == 3
+    assert PoolGasPartition._determine_soil_structural_active_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_soil_structural_slow_carbon_loss.call_count == 3
+    assert PoolGasPartition._determine_soil_structural_slow_carbon_remaining.call_count == 3
 
-    assert PoolGasPartition._active_carbon_decomposition_rate.call_count == 1
+    assert PoolGasPartition._determine_active_carbon_decomposition_rate.call_count == 1
 
-    assert PoolGasPartition._active_carbon_decomposition_amount.call_count == 3
+    assert PoolGasPartition._determine_active_carbon_decomposition_amount.call_count == 3
 
-    assert PoolGasPartition._slow_carbon_decomposition_amount.call_count == 3
+    assert PoolGasPartition._determine_slow_carbon_decomposition_amount.call_count == 3
 
-    assert PoolGasPartition._passive_carbon_decomposition_amount.call_count == 3
+    assert PoolGasPartition._determine_passive_carbon_decomposition_amount.call_count == 3
 
-    assert PoolGasPartition._carbon_lost_adjusted_factor.call_count == 1
+    assert PoolGasPartition._determine_carbon_lost_adjusted_factor.call_count == 1
 
-    assert PoolGasPartition._active_carbon_to_slow_amount.call_count == 3
-    assert PoolGasPartition._active_carbon_to_slow_loss.call_count == 3
+    assert PoolGasPartition._determine_active_carbon_to_slow_amount.call_count == 3
+    assert PoolGasPartition._determine_active_carbon_to_slow_loss.call_count == 3
 
-    assert PoolGasPartition._slow_to_active_carbon_amount.call_count == 3
-    assert PoolGasPartition._slow_carbon_co2_lost_amount.call_count == 3
-    assert PoolGasPartition._slow_to_passive_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_slow_to_active_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_slow_carbon_co2_lost_amount.call_count == 3
+    assert PoolGasPartition._determine_slow_to_passive_carbon_amount.call_count == 3
 
-    assert PoolGasPartition._passive_to_active_carbon_amount.call_count == 3
-    assert PoolGasPartition._passive_carbon_co2_lost_amount.call_count == 3
+    assert PoolGasPartition._determine_passive_to_active_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_passive_carbon_co2_lost_amount.call_count == 3
 
-    assert PoolGasPartition._plant_active_decompose_carbon.call_count == 3
-    assert PoolGasPartition._soil_active_decompose_carbon.call_count == 3
-    assert PoolGasPartition._soil_active_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_plant_active_decompose_carbon.call_count == 3
+    assert PoolGasPartition._determine_soil_active_decompose_carbon.call_count == 3
+    assert PoolGasPartition._determine_soil_active_carbon_amount.call_count == 3
 
-    assert PoolGasPartition._soil_slow_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_soil_slow_carbon_amount.call_count == 3
 
-    assert PoolGasPartition._soil_passive_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == 3
 
     # Checking values were set correctly by the main routine
     assert partition.data.active_carbon_decomposition_rate == 0.87
