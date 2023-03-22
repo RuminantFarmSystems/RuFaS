@@ -1,33 +1,61 @@
 # Sensitivity Analyses for RuFaS
 
-Authors: Clay J. Morrow  
+Authors: Clay J. Morrow <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions --> 
 Date Created: 17 Mar 2023  
-Last Updated: 17 Mar 2023  
+Last Updated: 22 Mar 2023 <!-- NOTE: please remember to change this date when editing this file -->> 
 
 __Contents:__
 1. [Introduction](#1-introduction)
-2. [Summary of Sensitivity Analyses](#2-summary-of-sensitivity-analyses)  
-   a. [Types of SA](#types-of-sa)
-3. [References and Links](#3-references-and-links)  
+2. [Summary of RuFaS Sensitivity Analyses](#2-summary-of-rufas-sensitivity-analyses)  
+   a. [Parallelization](#parallelization) 
+   b. [Types of SA](#types-of-sa)
+4. [References and Links](#3-references-and-links)  
    a. [Primary Sources](#primary-sources)  
    b. [SALib](#salib)
-4. [Original Code](#4-original-code)
 
 ---
 
 ## 1. Introduction
 
 The purpose of this document is to guide the developers of RuFaS in conducting sensitivity analyses (SA). These methods
-can be applied to either 1) The whole module or 2) any submodule. Joe Waddell began this process, by finding the 
-relevant packages and writing some scripts to implement SA for the full RuFaS module. My goal is to build on his work
-to write a module that generalises the SA methods and allows them to be applied to any python function/module. 
+can be applied to either 1) The entire RuFaS model or 2) any submodule, with minimal work on the user's part. 
+Joe Waddell began this process, by finding the relevant packages and writing some scripts to implement SA for the full 
+RuFaS module. My goal is to build on his work to write a module that generalises the SA methods and allows them to be 
+applied to any python function/module. 
 
 The [References and Links](#references-and-links) section provides both the primary and secondary sources that we used
 to create these methods. 
-
 ----
 
-## 2. Summary of Sensitivity Analyses
+## 2. Summary of RUFAS Sensitivity Analyses
+
+Broadly speaking, a global sensitivity analysis (SA) simply aims to answer the questions, "which parameters have the 
+largest impact on the results of a model".
+
+Within the [generalized_sensitivity.py](generalized_sensitivity.py) file, is the class `SensitivityAnalysis`. This 
+class executes a standardized procedure for conducting SA. The user needs to provide an objective function, names of
+parameters of that function to be analyzed, upper and lower bounds for each parameter, and some additional 
+specifications about how the SA should be conducted. 
+
+Currently, this class supports 5 methods for conducting SA. The first three (Sobol, FAST, and Morris' method) are
+further discussed below in [Types of SA](#types-of-sa). 
+
+The final two compound methods are of our own design and were created to provide robust results with special attention to speed. 
+Of the three base methods, Sobol is by far the most rigorous but is much slower than other methods. In an attempt to 
+remedy this, "fast_sobol" and "morris_sobol" first conduct FAST or Morris' SA and then, based on those results, conduct
+a Sobol analysis on a reduced number of parameters (determined with user-defined criteria). **NOTE:** this method
+is still experimental and users should seriously consider using one of the 3 base methods instead. The largest
+bottleneck to the SA will likely be the time it takes to execute the RUFAS model and NOT the SA itself. The main reason
+that a user should consider using one of the compound methods is if a) there are many parameters under consideration
+(I'd guess a good rule of thumb is more than 50) and b) there are many response variables under consideration (I'd
+guess more than 4 or 5). 
+
+### Parallelization
+
+Because RuFaS takes a long time to run and will need to be executed many times (thousands), it will be important to
+parallelize its execution. Luckily the package that we are using to perform SA 
+[SALib](https://salib.readthedocs.io/en/latest/) (additional links and description provided in the 
+[SALib Section](#salib) below) already utilizes parallel processing. We leverage that functionality in our SA class.
 
 ### Types of SA
 
@@ -50,8 +78,10 @@ There is no explicit test of interactions in this method but a large variance "i
 highly dependent on the values of the inputs - that is, one involved in interactions or whose effect is nonlinear."
 
 ###### FAST (Extended)
+<!-- TODO: add summary of FAST method -->
 
 ###### Sobol method
+<!-- TODO: add summary of Sobol Method -->
 
 ----
 
@@ -100,21 +130,3 @@ code from the `multiprocessing` package (it has been 4 years, so I doubt it will
 https://youtrack.jetbrains.com/issue/PY-36151?_ga=2.6010288.221937295.1679330535-2071016451.1670387953&_gl=1*1qr3jl1*_ga*MjA3MTAxNjQ1MS4xNjcwMzg3OTUz*_ga_9J976DJZ68*MTY3OTMzMDUzNC4xMS4wLjE2NzkzMzA1NDMuMC4wLjA.
 )
 
-----
-
-## 4. Original Code
-
-Joe wrote a handful of scripts implementing SA for the full RUFAS model [**Need to add links**] these are working
-scripts and should not be considered "production code". They are living documents and may evolve as Joe adapts them
-further. 
-
-* Saloop_v3.py
-* Saloop_generate_thefiles_basiclog.py
-* [**I need to add the others when back to my other PC, with Joe's permission**]
-
-<!-- Comments from Joe's original message to me: Also a book (Saltelli_Full.pdf), and two script (Saloop_v3.py, 
-Saloop_generate_thefiles_basiclog.py): they're the in-progress things I was working on leading up to the RUFAS 
-meeting, so they're far from finished - but you can see in the "generate the files" script how I prepped the 
-analysis, to then run it in the SALoop file, where the JSONs were all pre-generated, and one could easily 
-run the whole analysis (or sections, e.g. analyses X-X, if you run it on multiple PCs/VMs). The loop shows 
-a few different ways to run it in parallel, with varying success -->

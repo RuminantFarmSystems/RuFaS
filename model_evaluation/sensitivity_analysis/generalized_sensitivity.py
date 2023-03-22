@@ -220,7 +220,7 @@ if __name__ == '__main__':
     from SALib.test_functions import Ishigami, oakley2004
     # -- Ishigami function --
     sens = SensitivityAnalysis(Ishigami.evaluate, pars=["x1", "x2", "x3"], bounds=[(-numpy.pi, numpy.pi)]*3,
-                               groups=None, outputs=["response"], method="sobol")
+                               groups=None, outputs=["response"], method="sobol", n_cores=4)
     sens.define_problem()
     sens.sample_parameter_space()
     sens.evaluate_model()
