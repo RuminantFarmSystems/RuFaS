@@ -147,10 +147,6 @@ class SoilData:
 
     grazing_manure_dry_mass: float = 0
     """The dry weight equivalent of manure mass applied by grazers (kg)"""
-    grazing_manure_dry_matter_content: float = 0
-    """Fraction of total mass of grazing-applied manure that comes from dry matter content, between (0, 1]
-        (unitless)
-    """
     grazing_manure_field_coverage: float = 0
     """Fraction of the field that is covered by grazing-applied manure, between [0, 1] (unitless)"""
     grazing_manure_moisture_factor: float = 0
