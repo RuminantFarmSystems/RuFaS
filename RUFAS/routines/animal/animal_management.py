@@ -14,18 +14,19 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Chris VanKerkhove, cjv47@cornell.edu
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.clustering_pen_grouping import grouping
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
-
+import math
 import random
 from statistics import mean
 from typing import Any, Dict, Tuple, List
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.clustering_pen_grouping import grouping
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
 
 om = OutputManager()
 
@@ -319,7 +320,7 @@ class AnimalManagement:
         """
 
         return mean(pen.vertical_dist_to_parlor for pen in self.all_pens), \
-               mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
+            mean(pen.horizontal_dist_to_parlor for pen in self.all_pens)
 
     def calc_nutrient_rqmts(self, feed, temp):
         """
@@ -493,23 +494,6 @@ class AnimalManagement:
             # self.all_pens[pen].animals_in_pen.append(calf)
 
     @classmethod
-    def _calc_total_stalls(cls, pens: List[Pen]) -> int:
-        """
-        Calculate the total number of stalls across a list of pens.
-
-        Parameters
-        ----------
-        pens : List[Pen]
-            A list of Pen objects representing the available pens.
-
-        Returns
-        -------
-        int
-            The total number of stalls across all pens in the list.
-        """
-        return sum([pen.num_stalls for pen in pens])
-
-    @classmethod
     def _calc_density(cls, num_animals: int, num_stalls: int) -> float:
         """
         Calculate the animal density in a pen given the number of animals and stalls.
@@ -517,33 +501,91 @@ class AnimalManagement:
         Parameters
         ----------
         num_animals : int
-            The number of animals in the pen.
+            The number of animals in the pen. Must be a non-negative integer and not greater than num_stalls.
         num_stalls : int
-            The number of stalls in the pen.
+            The number of stalls in the pen. Must be a positive integer.
 
         Returns
         -------
         float
             The animal density, calculated as the ratio of the number of animals to the number of stalls.
+
+        Raises
+        ------
+        ValueError
+            If num_animals is negative, num_stalls is non-positive, or num_animals is greater than num_stalls.
         """
+        if num_animals < 0:
+            raise ValueError("num_animals must be a non-negative integer")
+
+        if num_stalls <= 0:
+            raise ValueError("num_stalls must be a positive integer")
+
+        if num_animals > num_stalls:
+            raise ValueError("num_animals must not be greater than num_stalls")
+
         return num_animals / num_stalls
 
     @classmethod
-    def _allocate_calves_to_calf_pens(cls, calves: List[Calf], calf_pens: List[Pen]) -> None:
+    def allocate_animals_to_pens(cls, animals, pens: List[Pen], animal_combination: Pen.AnimalCombination) -> None:
         """
-        Allocate calves to calf pens based on overall density while preventing overcrowding.
+        Allocate animals to pens based on overall density while preventing overcrowding.
 
-        This method distributes the calves among the available calf pens, ensuring that the density
-        in each pen does not exceed the overall density. In case there are not enough stalls to
-        accommodate all calves, a ValueError will be raised. The last pen will contain any remaining
-        calves, even if it slightly exceeds the overall density.
+        This method distributes the animals among the available pens, ensuring that the density
+        in each pen matches the overall density as closely as possible.
 
         Parameters
         ----------
-        calves : List[Calf]
-            A list of Calf objects to be allocated to calf pens.
-        calf_pens : List[Pen]
-            A list of Pen objects representing the available calf pens.
+        animals :
+            A list of animal to be allocated to pens.
+            # TODO: Add type hint for animals later
+        pens : List[Pen]
+            A list of Pen objects representing the available pens.
+        animal_combination : Pen.AnimalCombination
+            The animal combination of the animals to be allocated to pens.
+
+        Returns
+        -------
+        None
+
+        """
+        allocation_plan = cls.plan_animal_allocation(
+            num_animals=len(animals),
+            pen_stalls=[pen.num_stalls for pen in pens]
+        )
+        cls.execute_allocation_plan(
+            animals=animals,
+            animal_pens=pens,
+            allocation_plan=allocation_plan,
+            animal_combination=animal_combination
+        )
+
+    @classmethod
+    def execute_allocation_plan(cls, allocation_plan: List[int],
+                                animals,
+                                animal_pens: List[Pen],
+                                animal_combination: Pen.AnimalCombination) -> None:
+        """
+        Execute an allocation plan to distribute animals into pens according to the given plan.
+
+        This method iterates over the provided allocation plan and updates each pen with the specified number
+        of animals and assign the pen with the given animal combination.
+
+        Parameters
+        ----------
+        allocation_plan : List[int]
+            A list of integers representing the number of animals to be allocated to each pen.
+            The length of the allocation_plan list should match the number of pens in animal_pens.
+
+        animals
+            A list of animals to be allocated among the pens.
+            # TODO: Add type hint for animals later
+
+        animal_pens : List[Pen]
+            A list of Pen objects representing the pens to which animals will be allocated.
+
+        animal_combination : Pen.AnimalCombination
+            The animal combination enum that all the given pens should be associated with.
 
         Returns
         -------
@@ -552,29 +594,89 @@ class AnimalManagement:
         Raises
         ------
         ValueError
-            If there are not enough stalls in the calf pens to accommodate all calves.
+            If the length of the allocation plan does not match the number of pens.
 
         """
-        total_stalls = cls._calc_total_stalls(calf_pens)
-        if len(calves) > total_stalls:
-            raise ValueError("Not enough stalls to accommodate all calves.")
 
-        overall_density = cls._calc_density(num_animals=len(calves), num_stalls=total_stalls)
+        if len(allocation_plan) != len(animal_pens):
+            raise ValueError("The length of the allocation plan must match the number of pens")
 
-        current_group_of_calves = []
-        current_pen_idx = 0
-        for calf in calves:
-            current_group_of_calves.append(calf)
-            current_group_density = cls._calc_density(num_animals=len(current_group_of_calves),
-                                                      num_stalls=calf_pens[current_pen_idx].num_stalls)
-            if current_group_density > overall_density:
-                current_group_of_calves.pop()  # Remove the last calf that caused the density to exceed overall_density
-                calf_pens[current_pen_idx].update_animals(current_group_of_calves, Pen.AnimalCombination.CALF)
-                current_pen_idx = min(current_pen_idx + 1, len(calf_pens) - 1)
-                current_group_of_calves = [calf]
+        for i, count in enumerate(allocation_plan):
+            animal_pens[i].update_animals(animals[:count], animal_combination)
+            animals = animals[count:]
 
-        # Allocate the remaining calves to the last pen, even if it slightly exceeds the overall density
-        calf_pens[current_pen_idx].update_animals(current_group_of_calves, Pen.AnimalCombination.CALF)
+    @classmethod
+    def plan_animal_allocation(cls, num_animals: int, pen_stalls: List[int]) -> List[int]:
+        """
+        Allocate animals to pens and match pen density as closely as possible to the overall density.
+
+        Rules:
+        2. The number of animals allocated to each pen must be less than or equal to the number of stalls in the pen.
+        3. The total number of animals allocated to all pens must be equal to num_animals.
+        4. The density in each pen must be as close as possible to the overall density.
+        5. Generally, it is expected that the density in each pen will be greater than or equal the overall density,
+            except the last pen.
+        6. The last pen considered by the algorithm is the pen with the highest allocation limit.
+        7. That last pen will hold the remaining animals, likely resulting in a density that is lower than the overall density.
+
+        Notes
+        -----
+        The overall density is calculated as the ratio of the total number of animals to the total number of stalls.
+        The allocation limit of a pen `math.ceil(overall_density * pen_stalls[i])`. It is the smallest integer
+        greater than or equal to the overall density multiplied by the number of stalls in that pen.
+        This ensures that the individual pen density will be the same as the overall density or only slightly higher
+        due to the addition of exactly one extra animal.
+
+        Here, allocating animals to the pens with the higher allocation limits last gives a more even density
+        distribution across all pens, because those with lower allocation limits will get filled first
+        and won't be ignored.
+
+        The alternative approach would be to allocate animals to the pens with the higher allocation limits first.
+        This would use up the animal count more quickly, so the later the allocation, the fewer animals are left
+        to allocate. Depending on the dynamics between the given numbers, some pens may end up with a very low density.
+
+        Parameters
+        ----------
+        num_animals : int
+            The total number of animals to allocate. Must be a non-negative integer and not greater than the
+            total number of stalls.
+        pen_stalls : List[int]
+            A list of integers representing the number of stalls in each pen. Each integer must be positive.
+
+        Returns
+        -------
+        List[int]
+            A list of integers representing the allocation of animals in each pen. Each integer will be less than or
+            equal to `math.ceil(overall_density * pen_stalls[i])]`.
+
+        Examples
+        --------
+        >>> AnimalManagement.plan_animal_allocation(num_animals=90, pen_stalls=[50, 30, 20])
+        [45, 27, 18]
+
+        >>> AnimalManagement.plan_animal_allocation(num_animals=70, pen_stalls=[50, 30, 20])
+        [35, 21, 14]
+
+        >>> AnimalManagement.plan_animal_allocation(num_animals=47, pen_stalls=[50, 30, 20])
+        [22, 15, 10]
+
+        """
+        num_pens = len(pen_stalls)
+        overall_density = cls._calc_density(num_animals=num_animals, num_stalls=sum(pen_stalls))
+        num_animals_in_pen = [0] * num_pens
+
+        allocation_limits = [math.ceil(overall_density * stall) for stall in pen_stalls]
+
+        # Sort pens by allocation limit, then by index
+        sorted_pen_indices = sorted(range(num_pens), key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx))
+
+        for i in sorted_pen_indices[:num_pens - 1]:
+            num_animals_to_allocate = min(num_animals, allocation_limits[i])
+            num_animals_in_pen[i] += num_animals_to_allocate
+            num_animals -= num_animals_to_allocate
+        num_animals_in_pen[sorted_pen_indices[-1]] += num_animals
+
+        return num_animals_in_pen
 
     def allocate_all_pens(self):
         # TODO: Refactor this function, currently nearly 200 lines long
@@ -921,7 +1023,7 @@ class AnimalManagement:
                 pen.populated = len(pen.animals_in_pen) > 0
 
             animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
-            self.heiferIIs, self.heiferIIIs, self.cows = \
+                self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
                                                      self.heiferIs,
