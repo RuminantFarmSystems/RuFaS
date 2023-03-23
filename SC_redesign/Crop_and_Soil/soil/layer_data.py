@@ -76,9 +76,9 @@ class LayerData:
 
         Parameters
         ----------
-            phosphorus_to_add: float
+            phosphorus_to_add : float
                 Amount of phosphorus to add (kg)
-            field_size: float
+            field_size : float
                 Size of the field (ha)
 
         """
@@ -91,9 +91,9 @@ class LayerData:
 
         Parameters
         ----------
-            phosphorus_to_add: float
+            phosphorus_to_add : float
                 Amount of phosphorus to add (kg)
-            field_size: float
+            field_size : float
                 Size of the field (ha)
 
         """
@@ -101,7 +101,7 @@ class LayerData:
                                                                       field_size)
 
     @staticmethod
-    def _add_phosphorus_to_pool(self, pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
+    def _add_phosphorus_to_pool(pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
         """This is a generic method to be used by wrapper functions to add phosphorus to any of the phosphorus pools.
 
         Parameters

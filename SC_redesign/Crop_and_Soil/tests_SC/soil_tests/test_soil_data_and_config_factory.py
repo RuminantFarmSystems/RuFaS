@@ -2,7 +2,7 @@ import pytest
 from typing import Dict, List
 from math import inf
 from dataclasses import asdict
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -406,4 +406,50 @@ def test_percent_organic_matter_content(percent_organic_carbon_content: float) -
     layer = LayerData(top_depth=0, bottom_depth=30, percent_organic_carbon_content=percent_organic_carbon_content)
     observe = layer.percent_organic_matter_content
     expect = 1.72 * percent_organic_carbon_content
+    assert observe == expect
+
+
+@pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
+    (100, 450, 1.5),
+    (78, 335, 1),
+    (150, 800, 2.393481),
+    (200, 467, 4.10184),
+    (138, 0, 3.29184),
+])
+def test_add_to_labile_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
+    """Tests that the labile phosphorus content of the top soil layer has phosphorus correctly added to it."""
+    layer = LayerData(top_depth=0, bottom_depth=30, labile_phosphorus_content=initial_labile_phosphorus)
+    layer._add_phosphorus_to_pool = MagicMock(return_value=100)
+
+    layer.add_to_labile_phosphorus(added_phosphorus, field_size)
+
+    layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
+    assert layer.labile_phosphorus_content == 100
+
+
+@pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
+    (210, 460, 1.8),
+    (135, 540, 2.37),
+    (95, 300, 1.88),
+    (215, 0, 4.15),
+])
+def test_add_to_active_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
+    """Tests that the stable phosphorus content of the top soil layer has phosphorus correctly added to it."""
+    layer = LayerData(top_depth=0, bottom_depth=27, labile_phosphorus_content=initial_labile_phosphorus)
+    layer._add_phosphorus_to_pool = MagicMock(return_value=200)
+
+    layer.add_to_labile_phosphorus(added_phosphorus, field_size)
+
+    layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
+    assert layer.labile_phosphorus_content == 200
+
+
+@pytest.mark.parametrize("pool,added_phosphorus,area", [
+    (400, 35, 1.8),
+    (166, 84, 3.8),
+    (0, 221, 2.334),
+])
+def test_add_phosphorus_to_pool(pool: float, added_phosphorus: float, area: float) -> None:
+    observe = LayerData._add_phosphorus_to_pool(pool, added_phosphorus, area)
+    expect = pool + (added_phosphorus / area)
     assert observe == expect
