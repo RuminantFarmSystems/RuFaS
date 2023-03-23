@@ -4,6 +4,8 @@ This module will contain the classes and methods needed to apply global sensitiv
 The workhorse of this module is the SALib python package (Herman et al. 2023): https://salib.readthedocs.io/en/latest/
 """
 from __future__ import annotations
+
+import os
 from SALib import ProblemSpec
 from SALib.sample import sobol as sobol_sampler, morris as morris_sampler, fast_sampler
 from SALib.analyze import sobol, morris, fast
@@ -70,6 +72,7 @@ class SensitivityAnalysis:
     def __init__(self, fun: Callable, pars: List[str], bounds: List[Tuple[float, float]], method: str = "fs",
                  groups: Optional[List[str]] = None, outputs: Optional[List[str]] = None, sample_n: int = 2**10,
                  n_cores: int = 1, *args, **kwargs):
+        # TODO: specify the structure that is needed for `fun`
         """Sets up the sensitivity analysis object
 
         This method first calls assigns attributes from the given arguments, after verifying them with `_check_inputs()`
@@ -97,6 +100,12 @@ class SensitivityAnalysis:
             Additional positional arguments passed to `fun` during model evaluation.
         **kwargs
             Additional keyword arguments passed to `fun` during model evaluation.
+
+        Notes
+        -----
+        If `n_cores=None`, then all the processors on your machine will be used. Because of poor interaction with
+        Pycharm's interactive console, this is not currently the default but might be in the future, since it is the
+        most sensible option.
         """
 
         self._check_inputs(pars, bounds, groups)
@@ -108,7 +117,7 @@ class SensitivityAnalysis:
         self.parameter_groups: Optional[List[str]] = groups
         self.output_names: Optional[List[str]] = outputs
         self.sample_n: int = sample_n
-        self.parallel_processors: int = n_cores
+        self.parallel_processors: int = n_cores or os.cpu_count()
         self.additional_args: Tuple = args
         self.additional_kwargs: Dict = kwargs
 
