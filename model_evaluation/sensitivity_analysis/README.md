@@ -1,8 +1,8 @@
 # Sensitivity Analyses for RuFaS
 
-Authors: Clay J. Morrow <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions -->   
+Authors: Clay J. Morrow, Joseph Waddell <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions -->   
 Date Created: 17 Mar 2023   
-Last Updated: 22 Mar 2023 <!-- NOTE: please remember to change this date when editing this file --> 
+Last Updated: 23 Mar 2023 <!-- NOTE: please remember to change this date when editing this file --> 
 
 __Contents:__
 1. [Introduction](#1-introduction)
