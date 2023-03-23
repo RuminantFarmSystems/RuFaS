@@ -1,15 +1,15 @@
 # Sensitivity Analyses for RuFaS
 
-Authors: Clay J. Morrow <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions --> 
-Date Created: 17 Mar 2023  
-Last Updated: 22 Mar 2023 <!-- NOTE: please remember to change this date when editing this file -->> 
+Authors: Clay J. Morrow, Joseph Waddell <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions -->   
+Date Created: 17 Mar 2023   
+Last Updated: 23 Mar 2023 <!-- NOTE: please remember to change this date when editing this file --> 
 
 __Contents:__
 1. [Introduction](#1-introduction)
 2. [Summary of RuFaS Sensitivity Analyses](#2-summary-of-rufas-sensitivity-analyses)  
-   a. [Parallelization](#parallelization) 
+   a. [Parallelization](#parallelization)   
    b. [Types of SA](#types-of-sa)
-4. [References and Links](#3-references-and-links)  
+3. [References and Links](#3-references-and-links)  
    a. [Primary Sources](#primary-sources)  
    b. [SALib](#salib)
 
@@ -29,7 +29,7 @@ to create these methods.
 
 ## 2. Summary of RUFAS Sensitivity Analyses
 
-Broadly speaking, a global sensitivity analysis (SA) simply aims to answer the questions, "which parameters have the 
+Broadly speaking, a global sensitivity analysis (SA) simply aims to answer the question, "which parameters have the 
 largest impact on the results of a model".
 
 Within the [generalized_sensitivity.py](generalized_sensitivity.py) file, is the class `SensitivityAnalysis`. This 
@@ -60,9 +60,20 @@ parallelize its execution. Luckily the package that we are using to perform SA
 ### Types of SA
 
 In this document, we'll consider 3 methods of global sensitivity analysis: 1) Morris' method, 2) the extended FAST
-method, and 2) the Sobol method. They each have their advantages and disadvantages. Generally speaking, Sobol is
+method, and 3) the Sobol method. They each have their advantages and disadvantages. Generally speaking, Sobol is
 the most accurate but is the slowest by far. The other methods are fast and accurate but can't quantify
 interactive effects (Sobol can quantify 2nd order).
+
+A solid review/summary/critique that covers different approaches in more detail:
+[Paleari et al, 2021](
+https://www.sciencedirect.com/science/article/pii/S0304380021002088?casa_token=xTPqc6Gp5w4AAAAA:HUJUaa__fELazAdkJrfCtK5DyILPrRqUdvHBKN_8t6ikjLYsb7UpdpmR_KYgiqpRf9tcgdmGcZI
+) 
+
+They outline some of the drawbacks of different methods, and may serve as a good citation when publishing results. 
+Particularly, when we are able to demonstrate concordance between the different metrics. Part of the overall workflow 
+can/should include various techniques, with the fastest methods being used as a first pass, allowing us to have 
+both preliminary results and detailed second-order effects calculated - when appropriate - using the computationally
+intensive Sobol method. 
 
 ###### Morris' method
 
