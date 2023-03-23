@@ -199,7 +199,7 @@ def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rai
                     rain_events_after_fertilizer_application=rain_events)
     fert = Fertilizer(data)
 
-    fert._add_to_labile_phosphorus = MagicMock()
+    fert.data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
     fert._determine_leached_phosphorus = MagicMock(
         return_value={"runoff_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor)),
                       "absorbed_phosphorus": (0.5 * (recalcitrant_pool * fert.data.solubilizing_factor))})
@@ -207,19 +207,21 @@ def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rai
     fert._update_after_first_rain(rainfall, runoff, field_size)
 
     if not rainfall:
-        assert fert._add_to_labile_phosphorus.call_count == 0
+        assert fert.data.soil_layers[0].add_to_labile_phosphorus.call_count == 0
         assert fert._determine_leached_phosphorus.call_count == 0
         assert fert.data.recalcitrant_phosphorus_pool == recalcitrant_pool
     elif rainfall and not runoff:
-        fert._add_to_labile_phosphorus.assert_called_once_with(recalcitrant_pool * fert.data.solubilizing_factor,
-                                                               field_size)
+        fert.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(recalcitrant_pool *
+                                                                                  fert.data.solubilizing_factor,
+                                                                                  field_size)
         assert fert.data.recalcitrant_phosphorus_pool == \
                (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
     else:
         fert._determine_leached_phosphorus.assert_called_once_with(rainfall, runoff, field_size, recalcitrant_pool)
-        fert._add_to_labile_phosphorus.assert_called_once_with(0.5 *
-                                                               (recalcitrant_pool * fert.data.solubilizing_factor),
-                                                               field_size)
+        fert.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(0.5 *
+                                                                                  (recalcitrant_pool *
+                                                                                   fert.data.solubilizing_factor),
+                                                                                  field_size)
         assert fert.data.recalcitrant_phosphorus_pool == \
                (recalcitrant_pool - (recalcitrant_pool * fert.data.solubilizing_factor))
 

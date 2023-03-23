@@ -190,8 +190,8 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     incorp = ManureApplication(data)
     incorp._determine_wet_rate_factor = MagicMock(return_value=2000)
     incorp._determine_infiltration_factor = MagicMock(return_value=0.5)
-    incorp._add_to_labile_phosphorus = MagicMock()
-    incorp._add_to_active_phosphorus = MagicMock()
+    incorp.data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
+    incorp.data.soil_layers[0].add_to_active_phosphorus = MagicMock()
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 2050,
                                                                            "new_moisture_factor": 0.93,
                                                                            "new_field_coverage": 0.98})
@@ -213,8 +213,8 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     incorp._determine_infiltration_factor.assert_called_once_with(2000)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(1000, 0.8, 0.9, expect_adjusted_dry_mass,
                                                                          dry_frac, expect_adjusted_coverage)
-    incorp._add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
-    incorp._add_to_active_phosphorus.assert_called_once_with(expect_active, area)
+    incorp.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
+    incorp.data.soil_layers[0].add_to_active_phosphorus.assert_called_once_with(expect_active, area)
     assert incorp.data.machine_manure_dry_mass == 2050
     assert incorp.data.machine_manure_moisture_factor == 0.93
     assert incorp.data.machine_manure_field_coverage == 0.98
