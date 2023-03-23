@@ -220,52 +220,6 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-    def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil
-            profile.
-
-        Parameters
-        ----------
-            phosphorus_to_add: float
-                Amount of phosphorus to add (kg)
-            field_size: float
-                Size of the field (ha)
-
-        Notes
-        -----
-        Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount of
-        labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then converts the
-        new mass to kg per ha.
-
-        """
-        # TODO: move to LayerData - Issue #403
-        labile_phosphorus_mass = self.data.soil_layers[0].labile_phosphorus_content * field_size
-        labile_phosphorus_mass += phosphorus_to_add
-        self.data.soil_layers[0].labile_phosphorus_content = labile_phosphorus_mass / field_size
-
-    def _add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method adds a specified mass of phosphorus to the active phosphorus content of the top layer of the soil
-            profile.
-
-        Parameters
-        ----------
-            phosphorus_to_add: float
-                Amount of phosphorus to add (kg)
-            field_size: float
-                Size of the field (ha)
-
-        Notes
-        -----
-        Before adding the mass of phosphorus to the active phosphorus content, it first converts the current amount of
-        active phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then converts the
-        new mass to kg per ha.
-
-        """
-        # TODO: move to LayerData - Issue #403
-        active_phosphorus_mass = self.data.soil_layers[0].active_phosphorus_content * field_size
-        active_phosphorus_mass += phosphorus_to_add
-        self.data.soil_layers[0].active_phosphorus_content = active_phosphorus_mass / field_size
-
     # --- Static Methods ---
     @staticmethod
     def _determine_grazing_manure_field_coverage(field_size: float, total_manure_applied: float) -> float:
