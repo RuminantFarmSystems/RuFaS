@@ -450,6 +450,7 @@ def test_add_to_active_phosphorus(added_phosphorus: float, initial_labile_phosph
     (0, 221, 2.334),
 ])
 def test_add_phosphorus_to_pool(pool: float, added_phosphorus: float, area: float) -> None:
+    """Tests that this method correctly calculates the new value of the soil phosphorus pool being added to."""
     observe = LayerData._add_phosphorus_to_pool(pool, added_phosphorus, area)
     expect = pool + (added_phosphorus / area)
     assert observe == expect
