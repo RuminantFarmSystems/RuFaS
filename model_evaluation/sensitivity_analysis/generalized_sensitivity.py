@@ -28,6 +28,7 @@ class SupportedSensitivityMethods(Enum):
     SOBOL = "sobol"
     FAST = "fast"
     MORRIS = "morris"
+    # TODO: add fractional factorial method
 
 
 class SensitivityAnalysis:
