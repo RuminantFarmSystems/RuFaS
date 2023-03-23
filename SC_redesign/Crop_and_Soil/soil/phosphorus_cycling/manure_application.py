@@ -204,10 +204,10 @@ class ManureApplication:
         mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
             soil_infiltration * 0.95
         mass_to_add_to_labile_P += total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
-        self._add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
+        self.data.soil_layers[0].add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
         mass_to_add_to_active_P = total_phosphorus_mass * stable_inorganic_phosphorus_fraction * soil_infiltration
-        self._add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
+        self.data.soil_layers[0].add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
 
         adjusted_field_coverage = field_coverage * 0.5
         adjusted_dry_matter_mass = dry_matter_mass * 0.8
