@@ -19,12 +19,14 @@ class PoolGasPartition:
         Returns: None
 
         """
-        self.data.active_carbon_decomposition_rate = self._determine_active_carbon_decomposition_rate(
-            self.data.silt_clay_content)
-
-        self.data.carbon_lost_adjusted_factor = self._determine_carbon_lost_adjusted_factor(self.data.silt_clay_content)
 
         for layer in self.data.soil_layers:
+            layer.active_carbon_decomposition_rate = self._determine_active_carbon_decomposition_rate(
+                layer.silt_clay_content)
+
+            layer.carbon_lost_adjusted_factor = self._determine_carbon_lost_adjusted_factor(
+                layer.silt_clay_content)
+
             # ---- plants
             layer.plant_metabolic_active_carbon_loss = self._determine_plant_metabolic_active_carbon_loss(
                 layer.plant_metabolic_active_carbon_usage)
@@ -61,7 +63,7 @@ class PoolGasPartition:
 
             layer.active_carbon_decomposition_amount = self._determine_active_carbon_decomposition_amount(
                 layer.decomposition_moisture_effect, self.data.decomposition_temperature_effect,
-                layer.active_carbon_amount, self.data.active_carbon_decomposition_rate
+                layer.active_carbon_amount, layer.active_carbon_decomposition_rate
             )
 
             layer.slow_carbon_decomposition_amount = self._determine_slow_carbon_decomposition_amount(
@@ -73,10 +75,10 @@ class PoolGasPartition:
                 layer.passive_carbon_amount)
 
             layer.active_carbon_to_slow_amount = self._determine_active_carbon_to_slow_amount(
-                layer.active_carbon_decomposition_amount, self.data.carbon_lost_adjusted_factor)
+                layer.active_carbon_decomposition_amount, layer.carbon_lost_adjusted_factor)
 
             layer.active_carbon_to_slow_loss = self._determine_active_carbon_to_slow_loss(
-                layer.active_carbon_decomposition_amount, self.data.carbon_lost_adjusted_factor)
+                layer.active_carbon_decomposition_amount, layer.carbon_lost_adjusted_factor)
 
             layer.active_carbon_to_passive_amount = self._determine_active_carbon_to_passive_amount(
                 layer.active_carbon_decomposition_amount
@@ -114,6 +116,7 @@ class PoolGasPartition:
             layer.passive_carbon_amount = self._determine_soil_passive_carbon_amount(
                 layer.passive_carbon_amount, layer.slow_to_passive_carbon_amount,
                 layer.active_carbon_to_passive_amount, layer.passive_carbon_decomposition_amount)
+
 
     @staticmethod
     def _determine_soil_passive_carbon_amount(passive_carbon_amount: float, slow_to_passive_carbon_amount: float,

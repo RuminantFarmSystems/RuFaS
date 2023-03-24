@@ -105,6 +105,11 @@ class LayerData:
     soil_structural_slow_carbon_remaining: Optional[float] = None
     """soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)"""
 
+    active_carbon_decomposition_rate: Optional[float] = None
+    """rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2)"""
+    carbon_lost_adjusted_factor: Optional[float] = None
+    """adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6)"""
+
     # pseudocode_soil S.6.C.3
     active_carbon_decomposition_amount: Optional[float] = None
     """active carbon decomposed into slow or passive carbon and CO2 (kg/ha)"""
@@ -214,7 +219,7 @@ class LayerData:
 
     @property
     def soil_water_content(self):
-        """volume of soil water in the layer in mm"""
+        """volume of soil water in the layer (mm)"""
         return self.soil_water_concentration / self.layer_thickness
 
     @property
@@ -228,3 +233,8 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
+
+    @property
+    def silt_clay_content(self):
+        """silt and clay fraction in the soil (unitless)"""
+        return self.percent_silt_content / self.percent_clay_content

@@ -502,7 +502,7 @@ def test_partition_pool_gas(layers: list) -> None:
     assert PoolGasPartition._determine_soil_structural_slow_carbon_loss.call_count == 3
     assert PoolGasPartition._determine_soil_structural_slow_carbon_remaining.call_count == 3
 
-    assert PoolGasPartition._determine_active_carbon_decomposition_rate.call_count == 1
+    assert PoolGasPartition._determine_active_carbon_decomposition_rate.call_count == 3
 
     assert PoolGasPartition._determine_active_carbon_decomposition_amount.call_count == 3
 
@@ -510,7 +510,7 @@ def test_partition_pool_gas(layers: list) -> None:
 
     assert PoolGasPartition._determine_passive_carbon_decomposition_amount.call_count == 3
 
-    assert PoolGasPartition._determine_carbon_lost_adjusted_factor.call_count == 1
+    assert PoolGasPartition._determine_carbon_lost_adjusted_factor.call_count == 3
 
     assert PoolGasPartition._determine_active_carbon_to_slow_amount.call_count == 3
     assert PoolGasPartition._determine_active_carbon_to_slow_loss.call_count == 3
@@ -531,10 +531,10 @@ def test_partition_pool_gas(layers: list) -> None:
     assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == 3
 
     # Checking values were set correctly by the main routine
-    assert partition.data.active_carbon_decomposition_rate == 0.87
-
-    assert partition.data.carbon_lost_adjusted_factor == 3.7
+    # Checking values were set correctly by the main routine
     for layer in data.soil_layers:
+        assert layer.active_carbon_decomposition_rate == 0.87
+        assert layer.carbon_lost_adjusted_factor == 3.7
         assert layer.plant_metabolic_active_carbon_loss == 1.89
         assert layer.plant_metabolic_active_carbon_remaining == 2.1
         assert layer.plant_structural_active_carbon_remaining == 2.3

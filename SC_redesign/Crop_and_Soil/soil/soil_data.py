@@ -103,14 +103,6 @@ class SoilData:
     decomposition_temperature_effect: Optional[float] = None
     """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
 
-    # --- pool gas partition
-    silt_clay_content: Optional[float] = None
-    """silt and clay content in the soil (%)"""
-    active_carbon_decomposition_rate: Optional[float] = None
-    """rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2)"""
-    carbon_lost_adjusted_factor: Optional[float] = None
-    """adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6)"""
-
     # ---- Fertilizer (Phosphorus Cycling)
     cover_type: str = "BARE"
     """The cover type of the soil surface, can be bare, residue covered, or grassed"""
