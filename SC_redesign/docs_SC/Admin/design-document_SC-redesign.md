@@ -296,7 +296,12 @@ time and Matthew is working part-time between classes.
 Here are my estimates:
 * Best case scenario: If everything goes right, the project might be finished in **early May**
 * Most likely scenario: A more realistic estimate is **mid-late May**
+<<<<<<< HEAD
 * Worst case scenario: If things take longer than expected, I believe the project could be done **sometime in June**.
+=======
+* Worst case scenario: If things take longer than expected, I believe the project could be done sometime in June. 
+
+>>>>>>> f3c0a3c03146b7e2fc856b20e18e5b06196ad0bb
 
 ---
 
