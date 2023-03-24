@@ -63,6 +63,8 @@ class LayerData:
     # --- Phosphorus
     labile_phosphorus_content: float = 0
     """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
+    active_phosphorus_content: float = 0
+    """Active phosphorus content of this soil layer (kg phosphorus / ha)"""
 
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
