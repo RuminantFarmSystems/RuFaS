@@ -22,7 +22,7 @@ Reviewers: [TBD]
    b. [GitHub Project](#sc-redesign-github-project)  
    c. [Timeline](#timeline)  
 5. [Existing Solution](#existing-solution)
-6. [Proposed Solution](#proposed-solution)
+6. [Proposed Solution](#proposed-solution-design-details)
 7. [Alternative Solutions](#alternative-solutions)
 8. [Testability, etc.](#testability-monitoring-and-alerting)
 9. [Cross-Team Impact](#cross-team-impact)
@@ -302,9 +302,13 @@ Here are my estimates:
 
 ## Existing Solution
 
+The existing Crop and Soil module exists in 
+[RUFAS/routines/field/](https://github.com/RuminantFarmSystems/MASM/tree/SC_redesign/RUFAS/routines/field) but, as
+discussed in the [Context](#context) section, this version of the model is poorly implemented.
+
 ---
 
-## Proposed Solution
+## Proposed Solution (design details)
 
 ---
 
