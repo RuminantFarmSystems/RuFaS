@@ -531,7 +531,6 @@ def test_partition_pool_gas(layers: list) -> None:
     assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == 3
 
     # Checking values were set correctly by the main routine
-    # Checking values were set correctly by the main routine
     for layer in data.soil_layers:
         assert layer.active_carbon_decomposition_rate == 0.87
         assert layer.carbon_lost_adjusted_factor == 3.7

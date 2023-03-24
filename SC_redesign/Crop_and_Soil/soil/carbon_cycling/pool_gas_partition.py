@@ -5,19 +5,30 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 """
 This module contains all necessary methods for updating all kinds of carbon in the field, based on the
 pseudocode soil documentation.
+
+References
+-------
+pseudocode_soil S.6.C.1 to S.6.C.13
 """
 
 
 class PoolGasPartition:
+    """This method initializes the SoilData object that this module will work with, or create one if none provided.
+    Parameters
+    ----------
+    soil_data : SoilData, optional
+        The SoilData object used by this module to track carbon pool gas partition activity,
+        creates new one if one is not provided.
+    """
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
     def partition_pool_gas(self):
-        """
-        main routine to update variable in all layers
-
-        Returns: None
-
+        """main routine to update variables associated with gas partitioning in all layers
+        Notes
+        ------
+        This method applies all the gas-partitioning sub routines to each layer of soil that is present in the soil
+        `data` object.
         """
 
         for layer in self.data.soil_layers:
@@ -169,7 +180,7 @@ class PoolGasPartition:
     def _determine_plant_active_decompose_carbon(plant_metabolic_active_carbon_remaining: float,
                                                  plant_structural_active_carbon_remaining: float) -> float:
         """
-        Calculates plant carbon decomposed into the active carbon pool (kg/ha)
+        Calculates plant carbon decomposed into the active carbon pool in the layer (kg/ha)
 
         Args:
             plant_metabolic_active_carbon_remaining:
@@ -187,7 +198,7 @@ class PoolGasPartition:
     def _determine_soil_active_decompose_carbon(soil_metabolic_active_carbon_remaining: float,
                                                 soil_structural_active_carbon_remaining: float) -> float:
         """
-        Calculates soil carbon decomposed into the active carbon pool (kg/ha)
+        Calculates soil carbon decomposed into the active carbon pool in the layer (kg/ha)
         Args:
             soil_metabolic_active_carbon_remaining:
                     soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)
@@ -227,7 +238,7 @@ class PoolGasPartition:
     def _determine_passive_to_active_carbon_amount(passive_carbon_decomposition_amount: float,
                                                    passive_carbon_loss_rate=0.55) -> float:
         """
-        Calculates passive carbon decomposed into active carbon (kg/ha)
+        Calculates passive carbon decomposed into active carbon int the layer(kg/ha)
 
         Args:
             passive_carbon_decomposition_amount: passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
@@ -243,7 +254,7 @@ class PoolGasPartition:
     def _determine_passive_carbon_co2_lost_amount(passive_carbon_decomposition_amount: float,
                                                   passive_carbon_loss_rate=0.55) -> float:
         """
-        Calculates passive carbon lost as CO2 during decomposition (kg/ha)
+        Calculates passive carbon lost as CO2 during decomposition in the layer(kg/ha)
         Args:
             passive_carbon_decomposition_amount: passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
             passive_carbon_loss_rate: fraction of passive carbon lost as CO2 during decomposition (unitless)
@@ -259,7 +270,7 @@ class PoolGasPartition:
                                                 slow_carbon_passive_decompose_rate=0.03,
                                                 slow_carbon_loss_rate=0.55) -> float:
         """
-        Calculates slow carbon decomposed into active carbon (kg/ha)
+        Calculates slow carbon decomposed into active carbon in the layer(kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
             slow_carbon_passive_decompose_rate: fraction of slow carbon decomposed into passive carbon (unitless)
@@ -274,7 +285,7 @@ class PoolGasPartition:
     @staticmethod
     def _determine_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float, slow_carbon_loss_rate=0.55) -> float:
         """
-        Calculates slow carbon lost as CO2 during decomposition (kg/ha)
+        Calculates slow carbon lost as CO2 during decomposition in the layer(kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
             slow_carbon_loss_rate: fraction of slow carbon lost as CO2 during decomposition (unitless)
@@ -289,7 +300,7 @@ class PoolGasPartition:
     def _determine_slow_to_passive_carbon_amount(slow_carbon_decomposition_amount: float,
                                                  slow_carbon_passive_decompose_rate=0.03) -> float:
         """
-        Calculates slow carbon decomposed into passive carbon (kg/ha)
+        Calculates slow carbon decomposed into passive carbon in the layer(kg/ha)
         Args:
             slow_carbon_decomposition_amount: slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
             slow_carbon_passive_decompose_rate: fraction of slow carbon decomposed into passive carbon (unitless)
@@ -303,7 +314,7 @@ class PoolGasPartition:
     @staticmethod
     def _determine_active_carbon_to_passive_amount(active_carbon_decomposition_amount: float) -> float:
         """
-        Calculates active carbon decomposed into passive carbon (kg/ha)
+        Calculates active carbon decomposed into passive carbon in the layer (kg/ha)
         Args:
             active_carbon_decomposition_amount: active carbon decomposed into slow or passive carbon and CO2 (kg/ha)
 
@@ -318,7 +329,7 @@ class PoolGasPartition:
     def _determine_active_carbon_to_slow_loss(active_carbon_decomposition_amount: float, carbon_lost_adjusted_factor: float,
                                               ) -> float:
         """
-        Calculate active carbon lost as CO2 during decomposition into slow carbon (kg/ha)
+        Calculate active carbon lost as CO2 during decomposition into slow carbon in the layer (kg/ha)
         Args:
             active_carbon_decomposition_amount: active carbon decomposed into slow or passive carbon and CO2 (kg/ha)
             carbon_lost_adjusted_factor: adjusted factor of CO2 loss from the decomposition of active carbon
@@ -333,7 +344,7 @@ class PoolGasPartition:
     def _determine_active_carbon_to_slow_amount(active_carbon_decomposition_amount: float, carbon_lost_adjusted_factor: float,
                                                 ) -> float:
         """
-        Calculate active carbon decomposed into slow carbon (kg/ha)
+        Calculate active carbon decomposed into slow carbon in the layer (kg/ha)
         Args:
             active_carbon_decomposition_amount: active carbon decomposed into slow or passive carbon and CO2 (kg/ha)
             carbon_lost_adjusted_factor: adjusted factor of CO2 loss from the decomposition of active carbon
@@ -347,7 +358,7 @@ class PoolGasPartition:
     @staticmethod
     def _determine_carbon_lost_adjusted_factor(silt_clay_content: float) -> float:
         """
-        Calculates adjusted factor of CO2 loss from the decomposition of active carbon
+        Calculates adjusted factor of CO2 loss from the decomposition of active carbon in the layer
         Args:
             silt_clay_content: fraction of silt and clay content in the soil (unitless)
 
@@ -363,7 +374,7 @@ class PoolGasPartition:
             decomposition_moisture_effect: float, decomposition_temperature_effect: float,
             passive_carbon_amount: float, passive_carbon_decomposition_factor=0.00013) -> float:
         """
-        Caluculates passive carbon decomposed into active or passive carbon and CO2 (kg/ha)
+        Caluculates passive carbon decomposed into active or passive carbon and CO2 in the layer (kg/ha)
         Args:
             decomposition_moisture_effect: moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)
             decomposition_temperature_effect:
@@ -384,7 +395,7 @@ class PoolGasPartition:
             decomposition_moisture_effect: float, decomposition_temperature_effect: float,
             slow_carbon_amount: float, slow_carbon_decomposition_factor=0.0038) -> float:
         """
-        Calculates slow carbon decomposed into active or passive carbon and CO2 (kg/ha)
+        Calculates slow carbon decomposed into active or passive carbon and CO2 in the layer (kg/ha)
         Args:
             decomposition_moisture_effect: moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)
             decomposition_temperature_effect:
@@ -404,7 +415,7 @@ class PoolGasPartition:
     def _determine_active_carbon_decomposition_amount(moisture_effect: float, temperature_effect: float,
                                                       active_carbon: float, active_carbon_decomposition_rate: float) -> float:
         """
-        Calculates active carbon decomposed into slow or passive carbon and CO2 (kg/ha)
+        Calculates active carbon decomposed into slow or passive carbon and CO2 in the layer (kg/ha)
         Args:
             moisture_effect: moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)
             temperature_effect: temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)
@@ -422,7 +433,7 @@ class PoolGasPartition:
     def _determine_active_carbon_decomposition_rate(silt_clay_content: float,
                                                     max_carbon_decomposition_rate: float = 0.14) -> float:
         """
-        Calculates rate at which active carbon is decomposed into slow or passive carbon and CO2
+        Calculates rate at which active carbon is decomposed into slow or passive carbon and CO2 in the layer
         Args:
             silt_clay_content: silt and clay content in the soil (%)
             max_carbon_decomposition_rate: maximum rate of carbon decomposition (unitless)
@@ -438,7 +449,8 @@ class PoolGasPartition:
     def _determine_plant_metabolic_active_carbon_loss(plant_metabolic_active_carbon_usage: float,
                                                       metabolic_active_carbon_loss_rate: float = 0.55) -> float:
         """
-        Calculates plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        Calculates plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
+        layer (kg/ha)
         Args:
             plant_metabolic_active_carbon_usage: plant metabolic carbon decomposed into active carbon (kg/ha)
             metabolic_active_carbon_loss_rate: rate of carbon dioxide loss during transformation of metabolic to
@@ -454,7 +466,8 @@ class PoolGasPartition:
     def _determine_plant_metabolic_active_carbon_remaining(plant_metabolic_active_carbon_usage: float,
                                                            metabolic_active_carbon_loss_rate: float = 0.55) -> float:
         """
-        Calculates plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)
+        Calculates plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+        layer (kg/ha)
         Args:
             plant_metabolic_active_carbon_usage: plant metabolic carbon decomposed into active carbon (kg/ha)
             metabolic_active_carbon_loss_rate: rate of carbon dioxide loss during transformation of metabolic to
@@ -470,7 +483,8 @@ class PoolGasPartition:
     def _determine_plant_structural_active_carbon_loss(plant_structural_active_carbon_usage: float,
                                                        structural_active_carbon_loss_rate: float = 0.45) -> float:
         """
-        Calculates plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        Calculates plant structural carbon being lost as carbon dioxide during decomposition into active carbon
+        in the layer (kg/ha)
         Args:
             plant_structural_active_carbon_usage: plant structural carbon decomposed into active carbon (kg/ha)
             structural_active_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
@@ -486,7 +500,8 @@ class PoolGasPartition:
     def _determine_plant_structural_active_carbon_remaining(plant_structural_active_carbon_usage: float,
                                                             structural_active_carbon_loss_rate: float = 0.45) -> float:
         """
-        Calculates plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)
+        Calculates plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+        layer (kg/ha)
         Args:
             plant_structural_active_carbon_usage: plant structural carbon decomposed into active carbon (kg/ha)
             structural_active_carbon_loss_rate:  rate of carbon dioxide loss during transformation of structural to
@@ -502,7 +517,8 @@ class PoolGasPartition:
     def _determine_plant_structural_slow_carbon_loss(plant_structural_slow_carbon_usage: float,
                                                      structural_slow_carbon_loss_rate: float = 0.3) -> float:
         """
-        Calculates plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)
+        Calculates plant structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
+        layer (kg/ha)
         Args:
             plant_structural_slow_carbon_usage: plant structural carbon decomposed into slow carbon (kg/ha)
             structural_slow_carbon_loss_rate:  rate of carbon dioxide loss during transformation of structural to
@@ -518,7 +534,8 @@ class PoolGasPartition:
     def _determine_plant_structural_slow_carbon_remaining(plant_structural_slow_carbon_usage: float,
                                                           structural_slow_carbon_loss_rate: float = 0.3) -> float:
         """
-        Calculates plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)
+        Calculates plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
+        layer (kg/ha)
         Args:
             plant_structural_slow_carbon_usage: plant structural carbon decomposed into slow carbon (kg/ha)
             structural_slow_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
@@ -534,7 +551,8 @@ class PoolGasPartition:
     def _determine_soil_metabolic_active_carbon_loss(soil_metabolic_active_carbon_usage: float,
                                                      metabolic_active_carbon_loss_rate: float = 0.55) -> float:
         """
-        Calculates soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        Calculates soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon in the
+        layer (kg/ha)
         Args:
             soil_metabolic_active_carbon_usage: soil metabolic carbon decomposed into active carbon (kg/ha)
             metabolic_active_carbon_loss_rate:  rate of carbon dioxide loss during transformation of metabolic to
@@ -550,7 +568,8 @@ class PoolGasPartition:
     def _determine_soil_metabolic_active_carbon_remaining(soil_metabolic_active_carbon_usage: float,
                                                           metabolic_active_carbon_loss_rate: float = 0.55) -> float:
         """
-        Calculates soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)
+        Calculates soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+        layer (kg/ha)
         Args:
            soil_metabolic_active_carbon_usage: soil metabolic carbon decomposed into active carbon (kg/ha)
             metabolic_active_carbon_loss_rate:  rate of carbon dioxide loss during transformation of metabolic to
@@ -566,7 +585,8 @@ class PoolGasPartition:
     def _determine_soil_structural_active_carbon_loss(soil_structural_active_carbon_usage: float,
                                                       structural_active_carbon_loss_rate: float = 0.45) -> float:
         """
-        Calculates soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        Calculates soil structural carbon being lost as carbon dioxide during decomposition into active carbon in the
+        layer (kg/ha)
         Args:
             soil_structural_active_carbon_usage: soil structural carbon decomposed into active carbon (kg/ha)
             structural_active_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
@@ -582,7 +602,8 @@ class PoolGasPartition:
     def _determine_soil_structural_active_carbon_remaining(soil_structural_active_carbon_usage: float,
                                                            structural_active_carbon_loss_rate: float = 0.45) -> float:
         """
-        Calculates soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)
+        Calculates soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss in the
+        layer (kg/ha)
         Args:
             soil_structural_active_carbon_usage: soil structural carbon decomposed into active carbon (kg/ha)
             structural_active_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
@@ -597,7 +618,8 @@ class PoolGasPartition:
     def _determine_soil_structural_slow_carbon_loss(soil_structural_slow_carbon_usage: float,
                                                     structural_slow_carbon_loss_rate: float = 0.3) -> float:
         """
-        Calculates soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)
+        Calculates soil structural carbon being lost as carbon dioxide during decomposition into slow carbon in the
+        layer (kg/ha)
         Args:
             soil_structural_slow_carbon_usage: soil structural carbon decomposed into slow carbon (kg/ha)
             structural_slow_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
@@ -613,7 +635,8 @@ class PoolGasPartition:
     def _determine_soil_structural_slow_carbon_remaining(soil_structural_slow_carbon_usage: float,
                                                          structural_slow_carbon_loss_rate: float = 0.3) -> float:
         """
-        Calculates soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)
+        Calculates soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss in the
+        layer (kg/ha)
         Args:
             soil_structural_slow_carbon_usage: soil structural carbon decomposed into slow carbon (kg/ha)
             structural_slow_carbon_loss_rate: rate of carbon dioxide loss during transformation of structural to
