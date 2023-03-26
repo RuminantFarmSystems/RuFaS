@@ -53,9 +53,7 @@ def test_growing_heifer_manure_calculations(methane_model: str,
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
     
     methane_emission = 0.0
-    if methane_model == "Boadi": 
-        methane_emission = (38.62 + 26.44 * dry_matter_intake) * 0.554
-    else:
+    if methane_model:
         soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
         gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
                                     + 0.198 * NDF_concentration + 0.160 * soluble_residue) 
