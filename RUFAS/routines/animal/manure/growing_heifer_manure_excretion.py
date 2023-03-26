@@ -103,10 +103,7 @@ def manure_calculations(ration_formulation,
 
     # Methane emissions, g/day 
     methane_emission = 0.0
-    if methane_model == "Boadi": 
-        # Methane model = 'Boadi' [A.3B.C.1]
-        methane_emission = (38.62 + 26.44 * dry_matter_intake) * 0.554
-    else:
+    if methane_model:
         # Default: IPCC Tier 2 
         gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
                                     + 0.198 * NDF_concentration + 0.160 * soluble_residue) # [A.3B.C.2]
