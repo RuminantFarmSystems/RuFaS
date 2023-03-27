@@ -353,7 +353,10 @@ runs as expected.
 
 ### Module Design and Structure
 
-This section will outline, in detail, how the module is/will be organized. 
+This section will outline, in detail, how the module is/will be organized. An early schematic for the design can be 
+seen in the image below: 
+
+![SC-Class-Diagrams.jpg](SC-Class-Diagrams.jpg)
 
 #### Basic structure: Field, Soil, and Crop
 
@@ -658,6 +661,17 @@ output manager. At the end of each year (and the simulation), the output manager
 aggregate/summarize these data.
 
 ---
+
+###### Visualization
+
+An old schematic for the `FieldManager` class (aliased "FieldDirector") and its structure is shown by the following
+figure:
+
+![SC-Field-System-Engine.jpg](SC-Field-System-Engine.jpg)
+
+and the conceptual model for the simulation is shown in this image:
+
+![SC-temporal-model-diagram.jpg](SC-temporal-model-diagram.jpg)
 
 
 ### Timeline
