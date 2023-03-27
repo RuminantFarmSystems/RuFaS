@@ -8,7 +8,7 @@ Reviewers: [TBD]
 ## Contents:
 1. [Overview](#overview)
 2. [Context](#context)
-3. [Requirements](#requirements)
+3. [Requirements](#requirements)  
    a. [Fields](#fields)  
    b. [Crop Species](#crop-species)  
    c. [Crop Rotation](#crop-rotation)  
@@ -17,17 +17,19 @@ Reviewers: [TBD]
    f. [Tillage Practices](#tillage-practices)  
    g. [Outputs](#outputs)  
    h. [Beyond v1](#beyond-v1)  
-4. [Progress](#progress)
+4. [Progress](#progress)  
    a. [Milestones](#milestones)  
    b. [GitHub Project](#sc-redesign-github-project)  
    c. [Timeline](#timeline)  
 5. [Existing Solution](#existing-solution)
-6. [Proposed Solution](#proposed-solution-design-details)
+6. [Proposed Solution](#proposed-solution--design-details-)
 7. [Alternative Solutions](#alternative-solutions)
 8. [Testability, etc.](#testability-monitoring-and-alerting)
 9. [Cross-Team Impact](#cross-team-impact)
 10. [Open Questions](#open-questions)
-11. [Details](#detailed-scoping-and-timeline)
+11. [Details](#detailed-scoping-and-timeline)  
+    a. [Module Design and Structure](#design-details)  
+    b. [Timeline details](#timeline-details)  
 
 ---
 
@@ -310,9 +312,30 @@ discussed in the [Context](#context) section, this version of the model is poorl
 
 ## Proposed Solution (design details)
 
----
+As stated previously, we have decided to fully redesign the SC module. 
+
+We have chosen to use the [composite class design](https://en.wikipedia.org/wiki/Composite_pattern) as the main 
+pattern for this module. This pattern was chosen due to the complex nature of the main entities, each of which 
+are governed by many complex processes. Therefore, creating these entities as composite classes and making the 
+processes component classes, we are able to organize the complex project across files that each serve a specific 
+purpose. The composite contains all the functionality of the component classes, while the code for that class being 
+overly complex.
+
+Each method and feature that is re-written or refactored will be fully tested concurrently. This will ensure that
+the tests do not fall behind the implementation.
 
 ## Alternative Solutions
+
+We considered using an [inheritance pattern](https://en.wikipedia.org/wiki/Inheritance_(object-oriented_programming)), 
+but decided against it because the structure of our system does not really lend it self to this design. We also 
+considered writing each process method into the class files directly, but this would have led to extremely large
+files with many many methods in each class, with a variety of functionality. 
+
+All alternative solutions seemed much less parsimonious than the composite pattern.
+
+We also considered using full test driven development, but decided against it since none of the programmers were
+experienced enough to make it an efficient use of time. Rather than writing tests before the implementation,
+we settled for writing them concurrently with the implementation (or immediately afterwards). 
 
 ---
 
@@ -329,3 +352,314 @@ discussed in the [Context](#context) section, this version of the model is poorl
 ---
 
 ## Detailed Scoping and Timeline
+
+### Module Design and Structure
+
+This section will outline, in detail, how the module is/will be organized. 
+
+#### Basic structure: Field, Soil, and Crop
+
+The three main classes in this module are `Field`, `Soil`, and `Crop`. 
+
+* A `Field` instance represents a single agricultural field on a farm (**or** a management unit: i.e., all fields on a
+farm that are exposed to **identical** management practices). 
+  - data attributes contain high-level information about the field such as 
+  its dimensions and geographic location. 
+  - contains a single `Soil` instance, and a variable number of
+  `Crop` instances (in a list). 
+  - methods pertain to management of the field (e.g., applying fertilizer, 
+  planting/harvesting crops, etc.) and often correspond to following a schedule (do x on date Y).
+  - initialized at the start of a simulation and persists for the full duration,
+  changing as time passes
+
+* A `Soil` instance represents the soil profile of a single agricultural field.
+  - built from `SoilData`, whose attributes contain information about the soil such as water and 
+  nutrient content. 
+  - because a soil profile typically consists of multiple layers, `Soil` has also has a series of `LayerData` components
+    (in a list) that track variables for each layer. 
+  - component "process classes" contain methods that pertain to soil processes (e.g., nutrient cycling, erosion, etc.)
+  - initialized by/with its containing `Field`, changing as time passes
+
+* A `Crop` instance represents a single crop species within an agricultural field.
+  - has the component `CropData` whose attributes contain information about the crop such as species-specific
+  data values, planting/harvest dates, biomass composition, etc.
+  - component "process classes" contain methods pertaining to crop processes such as nutrient uptake, 
+  increasing/decreasing biomass, etc.
+  - depends upon and interacts with the `Soil` in its `Field` (e.g., exchanging resources)
+  - initialized when planted, destroyed when killed (after collecting final 
+  data), changes as time passes
+  - may coexist with other `Crop` instances within the `Field` at a given time.
+  
+In pursuit of modularity and isolation, and as stated previously, these classes will follow the "composite" design 
+pattern, wherein they are made up of (contain) other classes. The primary component classes are process classes, 
+which each house methods for a particular process (biological, management, etc). For example the `Crop` class is a 
+composite of `NitrogenIncorporation`, `PhosphorusIncorporation`, `GrowthConstraints`, etc. The main classes 
+`Field`, `Crop`, and `Soil` all utilize from such process classes. The benefit of these process superclasses is 
+that they can be run/tested in isolation while coming together in the main class to work together for high-level 
+processes. It also allows each of the units or classes to be completely agnostic of the other units. 
+
+##### Main (composite) classes
+
+In general, the main composite classes should receive most of their methods and attributes
+from their respective components (e.g., `Crop` has an attribute `nitrogen_incorporation` which is an instance
+of `NitrogenIncorporation` and `nitrogen_incorporation.incorporate_nitrogen()` is called by the main method). However, 
+some features may be implemented directly in the  composite class: 
+
+* class and initialization methods can be kept in base classes, when possible. As an 
+example, the class method `Crop.plant_species(species)` initializes a crop with preset data values according to the 
+`species` given. 
+
+* Other situations may arise where methods and attributes should be housed in
+the base class. Use good judgement, refer to the design principles, and ask
+for a second opinion.
+
+##### Data classes
+
+Data class components control the configuration/setup of each composite class and track the relevant state 
+variables/attributes. 
+For example, the `Crop` class is initialized with a component attribute `data` which is an instance of `CropData`. This
+instance contains all the crop's data values and is used and updated by the other components. The starting value of one 
+such attribute `data.nitrogen` is used and updated by `nitrogen_incorporation.incorporate_nitrogen()` and the
+updated value is used by `growth_constraints.constrain_growth()` to calculate the crop's growth for the day. This 
+process is repeated every day that the crop grows and many of the crop variables are utilized in this way.
+
+##### Process classes
+
+The process classes will be utilized by the composite classes. 
+They should follow consistent format, structure, and organization:
+
+* they should be kept in separate files, with names referencing the overarching process or system. For
+example, `nitrogen_incorporation.py` contains the `NitrogenIncorporation` class and related functionality. 
+
+* they should be responsible for methods related to a single kind of process. For 
+example, `NitrogenIncorporation` contains methods and attributes related to a 
+crop's demand for, uptake, fixation, and incorporation of nitrogen.
+
+* they have/utilize data class components (e.g., `NitrogenIncorporation` is initialized with `data`, which is an 
+instance of `CropData`. It is important that any variables used by multiple process classes are attributes of the data 
+* class.
+
+* see the section on [Design Principles](#design-principles) for more details
+
+#### Managing the system: FieldManager
+
+An SC simulation contains many instances of fields and their crops and soil which need to change
+independently through time. The `FieldManager` class will be the high-level container that 
+initializes and stores all the fields according to user input (from `SCInput`), tracks them 
+through time (i.e., checks if the current date/weather should trigger an event), directs 
+them to perform their tasks, and pushes their output to the output handler. See [details](#fieldmanager-details) and
+[the example below](#fieldmanager-simulation-example)) for more information.
+
+The main method of `FieldManager` (`manage_all_fields()`) will execute every day of the simulation. On each day, 
+it will determine which `Fields` need to perform any actions on that day and will instruct those fields to perform
+their routines. In most cases, the daily routines of each field will be called each day 
+(via a `Field.manage_field()` method) and the individual `Field` will decide what needs to be done locally and perform
+any relevant routines (e.g., `grow_crops()`, `till_field()`, `apply_manure()` etc..  
+
+##### Input handling: SCInput
+
+The model's configuration will be handled by the `SCInput` class (or similar), which provides data and 
+specifications/configurations to the model (via `FieldManager`):
+
+* the attributes of `SCInput` contain **all** necessary input for the SC module to run and any
+optional input values.
+  
+* needs to be agnostic to the structure of the data and should contain 
+`@classmethod` (or `@staticmethod`) functions that take data of different formats and returns the
+class. As an example `SCInput.from_json()` would build the class from input
+given in a .json file and `SCinput.from_dict()` would build from a dictionary,
+etc.
+  
+* This way, we can change input format without changing the model - this class
+will always give data to the module in the same format, regardless of
+input format.
+
+##### Data collection: OutputCurator
+
+The `FieldManager` would pass relevant output to another auxiliary class `OutputCurator` (or similar), which collect 
+any data generated by the model that needs tracking (e.g., from `Crop`, `Soil`, and `Field`) for output to the user. 
+This occurs at the end of each iteration/day of the simulation. Like `SCInput` this class needs to be agnostic to the 
+output structure and can have methods that reformat the data to the output desired depending upon interface/View. 
+
+**Note:** this may be redundant with the new `OutputManager` class being developed by Pooya and Niko, so I'll simply 
+refer to this as the "output manager" rather than by a class name. No matter what system RuFaS ends up using for output
+handling, `FieldMangaer` will be agnostic and will push its output to whoever needs it.
+
+##### FieldManager details
+
+Here are some specifics about how `FieldManager` (and a SC simulation generally) should work:
+
+* the main method `.manage_all_fields()` (or similar), which executes all field events for a day, is called by the
+simulation engine every day. It:
+  - checks the current date and time, evaluates if any events should be triggered (evaluated for each field) 
+  - executes daily routines for each field one at a time (fully manage field `X` before moving on to field `Y`)
+  - within a field, it tells the soil to complete all its daily and triggered routines
+  - within a field, it tells each crop - one at a time - to complete their daily and triggered routines (remember,
+  multiple crops in a field need to share soil resources)
+* `FieldManager` handles dependence on temporal variables such as the current day, year, and 
+weather and passes the **values** down the stack to entities that need them (e.g., `Crop.is_harvest_day(date)`).
+
+##### FieldManager simulation example
+
+Below is a detailed example of a how a SC simulation, via `FieldManager`, should behave for a system with 3 fields 
+over a two-year simulation. **Note:** This example is meant to display the flexibility of the model, not a realistic 
+scenario. Some functionality described may be beyond the expectations of v1 (e.g., grazing).
+
+###### Example details (user specification/configuration):
+
+* in the first field: 
+  - the soil is fertilized on day 8 of both years.
+  - the soil is tilled on day 5 of the second year.
+  - corn is planted on day 10 of the first and second year of the simulation
+  - corn is cut on day 100 of both years but is only harvested (collected) during the first year. 
+  In the second year, the biomass is left in the field.
+* in the second field: 
+  - no fertilization occurs
+  - no tillage occurs
+  - no crops are ever planted
+  - no grazing occurs
+* in the third field:
+  - no fertilization occurs
+  - alfalfa is planted on day 8 of the first year (perennials only planted once)
+  - alfalfa is harvested on day 90 of both years
+  - corn is planted on day 10 of the first year
+  - corn is never cut
+  - grass is planted on day 15 of the second year
+  - grazing occurs both years, starting on day 50 and ending day 100. The grazers prefer grass
+
+A user could create the necessary configuration class with something like
+
+```python
+config = SCInput.from_dictionary(
+    {"fields": {
+        "field one": {
+            "fertilizer_spec": {"application_day": 8, "application_years": (1, 2)},
+            "tillage_spec": {"tillage_day": 5, "tillage_years": 2},
+            "crop_spec": {
+                "corn one": {"planting_day": 10, "planting_years": (1, 2), "harvest_day": 100, "harvest_years": (1, 2),
+                             "collection_years": 1, "species": "corn"}
+            },
+            "grazing_spec": {}
+        },
+        "field two": {
+            "fertilizer_spec": {},
+            "tillage_spec": {},
+            "crop_spec": {},
+            "grazing_spec": {}
+        },
+        "field three": {
+            "fertilizer_spec": {},
+            "tillage_spec": {},
+            "crop_spec": {
+                "alfalfa three": {"planting_day": 8, "planting_years": 1, "harvest_day": 90, "harvest_years": (1, 2),
+                                  "collection_years": (1, 2), "species": "alfalfa"},
+                "corn three": {"planting_day": 10, "planting_years": 1, "harvest_day": None, "harvest_years": None,
+                               "collection_years": None, "species": "corn"},
+                "grass three": {"planting_day": 15, "planting_years": 2, 'harvest_day': None, "harvest_years": None,
+                                "colleciton_years": None, "species": "forage grass A"}
+            },
+            "grazing_spec": {"start_day": 50, "end_day": 100, "grazing_years": 2, 
+                             "crop_preferences": {"corn": 0.1, "forage grass A": 0.8}}
+        },
+    }}
+)
+
+FieldManager.setup(config)
+```
+
+###### Example steps:
+
+`FieldManager.manage_fields()` is then called every day and does the following over the course of the simulation:
+
+* Year 0, days 0:
+  - startup: initializes the first `field` and its `soil`, followed by the second `field` and
+  `soil`, and then the third (from specifications contained in `SCInput`)
+  - enters first `field`: does (**A**) = applies daily `soil` routines (nutrient cycling, erosion,
+  etc.)
+  - enters second `field`: does (**A**)
+  - enters third `field`:  does (**A**)
+  
+* Year 0, days 1-7:
+  - does (**A**) for all `field`s
+
+* Year 0, day 8:
+  - enters first `field`:
+    + fertilization triggered: nutrients are added to the `soil`
+  - does (**A**) for second `field`
+  - enters third `field`:
+    + planting triggered = "plants" alfalfa by initializing a new `crop` (i.e.,
+    `Crop.plant_species("alfalfa")`)
+    + does (**A**)
+    + does (**B**) = applies daily `crop` routines for the alfalfa
+
+* Year 0, day 10
+  - enters first `field`:
+    + planting triggered: initialize a new corn `crop`
+    + does (**A**)
+  - does (**A**) for second `field`
+  - enters third `field`:
+    + planting triggered: initialize a new corn `crop`
+    + does (**A**)
+    + does (**B**) for alfalfa, then corn
+
+* Year 0, days 11-49:
+  - does (**A**) for all `field`s and (**B**) for all `crop`s
+  
+* Year 0, day 50:
+  - does (**A**) and (**B**) for all first and second `field`s 
+  - enters third `field`:
+    + grazing triggered: grazers are released
+    + does (**A**)
+    + does(**B**)
+    + does (**C**) = execute grazing routines (some % of `crop` biomass is removed each day)
+    
+* Year 0, days 51-89:
+  - does (**A**) for all `field`s, (**B**) for all `crop`s, and (**C**) for the third `field`
+  
+* Year 0, day 90:
+  - does (**A**) and (**B**) for first and second fields
+  - enters third `field`:
+    + harvest triggered: alfalfa `crop` is cut and biomass is collected, (alfalfa is not killed and 
+    continues growing)
+    + does (**A**)
+    + does (**B**) for alfalfa and corn
+    + does (**C**)
+    
+**From here on out, only days when events occur will be shown:**
+    
+* Year 0, day 100:
+  - enters first field:
+    + harvest triggered: corn is cut, collected, and killed (the `crop` is destroyed)
+    + does (**A**)
+  - does (**A**), (**B**), for second and `field`
+  - enters third `field`:
+    + end grazing triggered: stop grazing routines
+    + does (**A**)
+    + does (**B**)
+  
+* Year 1, day 5: tillage routines triggered in first `field`, ...
+
+* Year 1, day 8: fertilization routines triggered in first `field`, ...
+
+* Year 1, day 10: planting triggered - new corn `crop` initialized in first `field`, ...
+
+* Year 1, day 15: planting triggered - new grass `crop` initialized in third `field`, ...
+
+* Year 1, day 50: grazing triggered - grazing routines start again in third `field`, ...
+
+* Year 1, day 90: harvest triggered - alfalfa collected, ...
+
+* Year 1, day 100: 
+  - harvest triggered - corn is cut, killed, and left in the first `field`, (**B**) 
+  no longer occurs in first `field` since all crops are gone, 
+  - end grazing triggered: strop grazing routines in third `field`, 
+  - ...
+
+Note that, at the end of each day, `manage_fields()` would also be sending data to the 
+output manager. At the end of each year (and the simulation), the output manager would
+aggregate/summarize these data.
+
+---
+
+
+### Timeline details
