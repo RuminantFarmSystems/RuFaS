@@ -17,10 +17,7 @@ Reviewers: [TBD]
    f. [Tillage Practices](#tillage-practices)  
    g. [Outputs](#outputs)  
    h. [Beyond v1](#beyond-v1)  
-4. [Progress](#progress)  
-   a. [Milestones](#milestones)  
-   b. [GitHub Project](#sc-redesign-github-project)  
-   c. [Timeline](#timeline)  
+4. [Milestones](#milestones) 
 5. [Existing Solution](#existing-solution)
 6. [Proposed Solution](#proposed-solution--design-details-)
 7. [Alternative Solutions](#alternative-solutions)
@@ -28,8 +25,8 @@ Reviewers: [TBD]
 9. [Cross-Team Impact](#cross-team-impact)
 10. [Open Questions](#open-questions)
 11. [Details](#detailed-scoping-and-timeline)  
-    a. [Module Design and Structure](#design-details)  
-    b. [Timeline details](#timeline-details)  
+    a. [Module Design and Structure](#module-design-and-structure)  
+    b. [Timeline](#timeline)  
 
 ---
 
@@ -216,9 +213,7 @@ Manure Application:
 
 ---
 
-## Progress
-
-### Milestones
+## Milestones
 
 **Other Note:** Re-review this section and update it according to Pooya's example
 
@@ -270,8 +265,6 @@ expected May 2023
   - should pass relevant weather and time data to `Field`
   - should accept input from `SCInput` and pass output to output manager
 
-### SC Redesign GitHub Project
-
 In support of the milestones present in this document, the 
 [Soil and Crop Redesign](https://github.com/orgs/RuminantFarmSystems/projects/1/views/2) GitHub Project contains all 
 the itemized tasks for this particular project. These tasks are tracked and updated every time our developers work on
@@ -281,24 +274,6 @@ of this module. In particular,
 subdivision of tasks between "Todo", "In Progres", and "Done". As seen from this figure, the number of tasks associated
 with the project has been increasing (as we find new problems/issues) but the rate at which we complete tasks has grown
 at a much greater rate.
-
-### Timeline
-
-This redesign project is somewhat unpredictable in terms of time. Because we are not the original authors of the code,
-we do not fully understand its intricacies and nuances. This means that as we take on new files to refactor and learn
-more about the design of the old code, we gain greater insight into what needs to be done and how. New tasks are
-created as we learn more and even the code that we've already re-worked my need to be further tweaked once new
-information from elsewhere in the model comes to light. With all that said, acknowledging that this is an iterative
-process, I will attempt to give an estimate of when the project will be completed. These estimates are based on a few
-important factors. 1) experience: based on how long it has taken us to get to where we currently are, we might expect that a similar level
-of efficiency will continue for the remaining tasks (per person, per task); 2) resources: as of this writing, I (Clay)
-am preparing to leave my position for a new job. That leaves 2 developers on the Crop and Soil team. Ed is working full
-time and Matthew is working part-time between classes. 
-
-Here are my estimates:
-* Best case scenario: If everything goes right, the project might be finished in **early May**
-* Most likely scenario: A more realistic estimate is **mid-late May**
-* Worst case scenario: If things take longer than expected, I believe the project could be done **sometime in June**.
 
 ---
 
@@ -341,13 +316,36 @@ we settled for writing them concurrently with the implementation (or immediately
 
 ## Testability, Monitoring, and Alerting
 
+In addition to the tests written with each method implemented in the redesign, we will also write tests that check the
+overall functionality of the SC module. We will have formal tests that evaluate and demonstrate the 
+[requirements](#requirements). We will also create validation tests (after v1) that check the full model against 
+pre-computed results to alert us when updates to the model lead to changes in the output values. This will likely need
+to be a project of its own since its scope is so large (likely done in tandem with validation testing, sensitivity
+analyses, and mathematical optimization).
+
 ---
 
 ## Cross-Team Impact
 
+The primary impacts that this redesign will have on the entire RuFaS team is delay of accurate crop and soil
+simulations. Because the redesign is such a large undertaking, human resources for the SC team are limited, and
+new problems are difficult to anticipate, it is difficult to estimate when this project will be completed. 
+
+However, there are few functional effects on the rest of the team. We have left the original code entirely in-tact
+while we work on the redesign, which resides in an entirely separate directory. Once the redesign is complete, it will
+replace the old code, but for not the old version is still running.  
+
+We expect the inputs and outputs of the SC module to be roughly the same as they were prior to the redesign: we still
+need the same variables and calculate the same quantities. 
+
 ---
 
 ## Open Questions
+
+* The main open question is when this redesign will be fully completed. At present, we are hopeful to finish by the end
+of May. 
+* Another question is how to effectively create integration tests and tests to validate that the overall SC model
+runs as expected. 
 
 ---
 
@@ -662,4 +660,20 @@ aggregate/summarize these data.
 ---
 
 
-### Timeline details
+### Timeline
+
+This redesign project is somewhat unpredictable in terms of time. Because we are not the original authors of the code,
+we do not fully understand its intricacies and nuances. This means that as we take on new files to refactor and learn
+more about the design of the old code, we gain greater insight into what needs to be done and how. New tasks are
+created as we learn more and even the code that we've already re-worked my need to be further tweaked once new
+information from elsewhere in the model comes to light. With all that said, acknowledging that this is an iterative
+process, I will attempt to give an estimate of when the project will be completed. These estimates are based on a few
+important factors. 1) experience: based on how long it has taken us to get to where we currently are, we might expect that a similar level
+of efficiency will continue for the remaining tasks (per person, per task); 2) resources: as of this writing, I (Clay)
+am preparing to leave my position for a new job. That leaves 2 developers on the Crop and Soil team. Ed is working full
+time and Matthew is working part-time between classes. 
+
+Here are my estimates:
+* Best case scenario: If everything goes right, the project might be finished in **early May**
+* Most likely scenario: A more realistic estimate is **mid-late May**
+* Worst case scenario: If things take longer than expected, I believe the project could be done **sometime in June**.
