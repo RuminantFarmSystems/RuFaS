@@ -34,9 +34,9 @@ class ResiduePartition:
         # TODO: check source, 0.1 or 0.01, ask Hector about the value
 
     @staticmethod
-    def _determine_metabolic_plant_residue_ration(plant_residue_lignin_composition: float,
-                                                  nitrogen_fraction_plant_residue=0.4) -> float:
-        """This method calculates the above ground lignin to nitrogen ratio when nitrogen in plant residue at harvest
+    def _determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float,
+                                                 nitrogen_fraction_plant_residue=0.4) -> float:
+        """This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
         is greater than zero
 
         Parameters
@@ -49,7 +49,7 @@ class ResiduePartition:
         Returns
         -------
         float
-            above ground lignin to nitrogen ration (Dmnl)
+            plant lignin to nitrogen ratio (Dmnl)
 
         References
         -------
@@ -59,3 +59,24 @@ class ResiduePartition:
             return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
         else:
             return 0
+
+    @staticmethod
+    def _determine_plant_resdiue_metabolic_fraction(metabolic_plant_residue_ratio: float) -> float:
+        """This method calculates the fraction of plant residue that is metabolic
+
+        Parameters
+        ----------
+        metabolic_plant_residue_ratio : float
+            plant lignin to nitrogen ratio (Dmnl)
+
+        Returns
+        -------
+        float
+            plant residue fraction that is metabolic (unitless)
+
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.3
+        """
+        return 0.85 - 0.18 * metabolic_plant_residue_ratio
