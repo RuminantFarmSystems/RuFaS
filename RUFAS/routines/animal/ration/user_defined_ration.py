@@ -152,18 +152,11 @@ class user_defined_ration_values(object):
             heifer_ration = ration_all['all_heifers']
             calf_ration = ration_all['calf']
 
-            self.calf_ration = calf_ration
-            self.heifer_ration = heifer_ration
-            self.lactating_cow_ration = lactating_cow_ration
-            self.dry_cow_ration = dry_cow_ration
-            self.ration_all = ration_all
-
-
-
-            self.variables_pool: Dict[str, Any] = {}
-            self.warnings_pool: Dict[str, Any] = {}
-            self.errors_pool: Dict[str, Any] = {}
-            self.logs_pool: Dict[str, Any] = {}
+            self.calf_ration: Dict[str, Any] = calf_ration
+            self.heifer_ration: Dict[str, Any]  = heifer_ration
+            self.lactating_cow_ration: Dict[str, Any]  = lactating_cow_ration
+            self.dry_cow_ration: Dict[str, Any]  = dry_cow_ration
+            self.ration_all: Dict[str, Any]  = ration_all
 
 udrv = user_defined_ration_values()
 

@@ -73,7 +73,8 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
         # simulation if bounds error is not resolved
         if count > 30:
             solution = None
-            ration_vals = NLP.get_ration_vals2(fakesolution(available_feeds))
+            ration_vals = NLP.get_ration_vals_null(fakesolution(available_feeds, animal_type, cow_type))
+            print('nullvals')
             return solution, ration_vals
 
     # retrieving MEact from diet
@@ -84,12 +85,19 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     return solution, ration_vals
 
 
-def fakesolution(available_feeds):
+def fakesolution(available_feeds, animal_type, cow_type):
+    rationtouse = ration_to_use(animal_type, cow_type)
     listy = []
-    for feed in available_feeds.items():
-        listy.append(1)
-        listy.append(1)
-        listy.append(1)
+    # for feed_key in available_feeds['feed_key']:
+    #     if feed_key in rationtouse.keys():
+    #         value = rationtouse[feed_key]
+    #     else:
+    #         value = 0.0
+    for rationkey in rationtouse.keys():
+        value = rationtouse[rationkey]
+        listy.append(value)
+        listy.append(0.0)
+        listy.append(0.0)
     return listy
 
 
