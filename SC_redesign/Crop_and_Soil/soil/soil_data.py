@@ -198,10 +198,6 @@ class SoilData:
         # Reset phosphorus fertilizer total
         self.annual_runoff_fertilizer_phosphorus = 0
 
-    # ---- decomposition
-    decomposition_temperature_effect: Optional[float] = None
-    """temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1)"""
-
     @property
     def profile_soil_water_content(self) -> float:
         """
