@@ -58,6 +58,13 @@ class AnimalManagement:
     animals' life cycles.
     """
 
+    DEFAULT_NUM_STALLS_BY_COMBINATION = {
+        Pen.AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
+        Pen.AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
+        Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
+        Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN
+    }
+
     @staticmethod
     def get_animal_config(data):
         config = {}
@@ -496,46 +503,6 @@ class AnimalManagement:
                                                     feed, temp, pen_population_before_additions[pen.id])
             # self.all_pens[pen].animals_in_pen.append(calf)
 
-    # TODO: Not used yet
-    @classmethod
-    def _get_far_off_dry_cows(cls, cows: List[Cow]) -> List[Cow]:
-        """
-        Return a list of far-off dry cows from a list of cows.
-
-        Parameters
-        ----------
-        cows : List[Cow]
-            List of cows to filter far-off dry cows from.
-
-        Returns
-        -------
-        List[Cow]
-            List of far-off dry cows.
-
-        """
-
-        return list(filter(lambda cow: cow.is_far_off_dry, cows))
-
-    # TODO: Not used yet
-    @classmethod
-    def _get_close_up_dry_cows(cls, cows: List[Cow]) -> List[Cow]:
-        """
-        Return a list of close-up dry cows from a list of cows.
-
-        Parameters
-        ----------
-        cows : List[Cow]
-            List of cows to filter close-up dry cows from.
-
-        Returns
-        -------
-        List[Cow]
-            List of close-up dry cows.
-
-        """
-
-        return list(filter(lambda cow: cow.is_close_up_dry, cows))
-
     @classmethod
     def _get_dry_cows(cls, cows: List[Cow]) -> List[Cow]:
         """
@@ -690,15 +657,15 @@ class AnimalManagement:
 
         return Pen(
             pen_id=pen_id,
-            vertical_dist_to_milking_parlor=0.1,
-            horizontal_dist_to_milking_parlor=1.6,
+            vertical_dist_to_milking_parlor=AnimalModuleConstants.VERTICAL_DIST_TO_MILKING_PARLOR,
+            horizontal_dist_to_milking_parlor=AnimalModuleConstants.HORIZONTAL_DIST_TO_MILKING_PARLOR,
             number_of_stalls=num_stalls,
-            housing_type='open air barn',
-            bedding_type='sawdust',
-            pen_type='tiestall',
-            manure_handling='manual scraping',
-            manure_separator='screw press',
-            manure_storage='slurry storage outdoor',
+            housing_type=AnimalModuleConstants.DEFAULT_HOUSING_TYPE,
+            bedding_type=AnimalModuleConstants.DEFAULT_BEDDING_TYPE,
+            pen_type=AnimalModuleConstants.DEFAULT_PEN_TYPE,
+            manure_handling=AnimalModuleConstants.DEFAULT_MANURE_HANDLER,
+            manure_separator=AnimalModuleConstants.DEFAULT_MANURE_SEPARATOR,
+            manure_storage=AnimalModuleConstants.DEFAULT_MANURE_STORAGE,
             animal_combination=animal_combination,
             max_stocking_density=max_stocking_density,
         )
@@ -734,9 +701,12 @@ class AnimalManagement:
         )
 
         if animal_space_shortage > 0:
+            num_stalls_per_pen = self.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
+            max_stocking_density = AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
+
             max_animal_spaces_per_default_pen = self._calc_max_animal_spaces_per_pen(
-                num_stalls=AnimalModuleConstants.DEFAULT_NUM_STALLS,
-                max_stocking_density=AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
+                num_stalls=num_stalls_per_pen,
+                max_stocking_density=max_stocking_density
             )
             num_new_default_pens = math.ceil(animal_space_shortage / max_animal_spaces_per_default_pen)
             new_default_pens: List[Pen] = []
@@ -744,8 +714,8 @@ class AnimalManagement:
                 new_default_pens.append(self._create_default_pen(
                     pen_id=start_pen_id + i,
                     animal_combination=animal_combination,
-                    num_stalls=AnimalModuleConstants.DEFAULT_NUM_STALLS,
-                    max_stocking_density=AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
+                    num_stalls=num_stalls_per_pen,
+                    max_stocking_density=max_stocking_density
                 ))
 
         return new_default_pens
@@ -754,7 +724,7 @@ class AnimalManagement:
     def allocate_animals_to_pens(self):
         """TODO: Add docstring when finished."""
         lactating_cows = self._get_lactating_cows(self.cows)
-        dry_cows = self._get_dry_cows(self.cows)  # includes both far-off and close-up dry cows
+        dry_cows = self._get_dry_cows(self.cows)
 
         self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
 
