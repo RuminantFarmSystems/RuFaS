@@ -20,6 +20,14 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
     Returns nothing, BUT the feed JSON needs to have the PRICES manually adjusted. placeholdervalues of 0.9999 
         used for any not found in the reference JSON
 
+    Parameters
+    ----------
+    ration_percentage_filename: str
+
+    reference_filename: str
+
+    new_feed_filename: str
+
     """
     import json
     with open(ration_percentage_filename, 'r') as f:
@@ -96,31 +104,6 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
     #     fff = json.load(f)
 
 
-def triple_ration_formatting(ration):
-    triple_ration_formatted = []
-    for key, value in ration.keys():
-        triple_ration_formatted.append=value
-        triple_ration_formatted.append=0.0
-        triple_ration_formatted.append=0.0
-    return triple_ration_formatted
-
-
-# def ration_formatting(ration_all, ration_percentages, DMIest):
-#     ration = {}
-#     for feed_id in range(len(available_feeds['feed_id'])):
-#         print(feed_id)
-#         print(available_feeds['feed_key'][feed_id])
-#         if available_feeds['feed_key'][feed_id] in ration:
-#             ingredient_percentage = ration[available_feeds['feed_key'][feed_id]]
-#             ingredient_as_proportion = ingredient_percentage/100*DMIest
-#             ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
-#         else:
-#             ration[available_feeds['feed_key'][feed_id]] = 0.0
-#     ration['status'] = 'Optimal'
-#     ration['objective'] = 0.0 # JCW THIS IS FAST FIX # NLP.objective(solution.x)
-#     return ration
-
-
 class user_defined_ration_values(object):
     """
     Reads in the user_defined_ration JSON and collects variables and dicts to use later
@@ -161,6 +144,21 @@ class user_defined_ration_values(object):
 udrv = user_defined_ration_values()
 
 def ration_to_use(animal_type, lactating):
+    """
+    Function outputs the correct dictionary from the user_defined_ration_values class
+    
+    Parameters
+    ----------
+    animal_type: str
+        animal type e.g. 'calf', 'heifer', 'cow'
+    lactating: bool
+        state of whether a cow is actively lactating or not 
+
+    Returns
+    -------
+    rationtouse: Dict
+        dictionary of feed ids and their associated percentage of DMI 
+    """
     ration_calf = udrv.calf_ration
     ration_all_heifers = udrv.heifer_ration
     ration_cow_lactating = udrv.lactating_cow_ration
