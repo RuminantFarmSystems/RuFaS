@@ -24,6 +24,9 @@
             "118":5.90,
             "136":3.00,
             "139":0.30
-        }
-    }
-    
+        },
+"Tolerances": {
+    "Tolerancia": 0.25,
+    "Toleracnaia_DIM": 0.15,
+    "Milk_reduction_percent": 0.75}
+}

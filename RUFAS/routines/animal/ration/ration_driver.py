@@ -59,6 +59,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     # try block for catching scipy SLSQP error
     i = 0
     count = 0
+    print('optimization_attempt')
     while i < 1:
         try:
             solution = NLP.optimize(user_defined_ration_select)
@@ -71,9 +72,10 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
             count += 1
         # this case should not be called, but is in place to not crash the
         # simulation if bounds error is not resolved
+        print(count)
         if count > 30:
             solution = None
-            ration_vals = NLP.get_ration_vals_null(fakesolution(available_feeds, animal_type, cow_type))
+            ration_vals = NLP.get_ration_vals_null(fakesolution(animal_type, cow_type,requirements.DMIest))
             print('nullvals')
             return solution, ration_vals
 
@@ -85,16 +87,29 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     return solution, ration_vals
 
 
-def fakesolution(available_feeds, animal_type, cow_type):
+def fakesolution(animal_type, cow_type, DMIest):
+    """
+    Returns a "solution" in format of the output from the optimization function
+    Simply takes the percentage values and multiplies them by estimated DMI to retrieve the calculated  ration
+    Each ration is represented in the NLP process as the sum of three values, here we simplify it by reporting two values as 0.0
+
+    Parameters
+    ----------
+    animal_type: str
+        'calf', 'heiferI', etc. 
+    cow_type: boolean
+        self.milking in an animal object, e.g. Lactating or not lactating
+    DMIest: float
+
+    Returns
+    -------
+    listy: list[float,]
+        list of values in order of feeds available for a given animal_type
+    """
     rationtouse = ration_to_use(animal_type, cow_type)
     listy = []
-    # for feed_key in available_feeds['feed_key']:
-    #     if feed_key in rationtouse.keys():
-    #         value = rationtouse[feed_key]
-    #     else:
-    #         value = 0.0
     for rationkey in rationtouse.keys():
-        value = rationtouse[rationkey]
+        value = rationtouse[rationkey]*DMIest
         listy.append(value)
         listy.append(0.0)
         listy.append(0.0)
@@ -181,9 +196,11 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
                 animal.estimated_daily_milk_produced -= reduction
                 running_total_milk += animal.estimated_daily_milk_produced
             average_running_total_milk = running_total_milk / num_animals
-            print('dropping milk!')
-            print('reduction = '+ str(reduction))
-            print('average_running_total_milk = '+ str(average_running_total_milk))
+            chanchodebug = False
+            if chanchodebug:
+                print('dropping milk!')
+                print('reduction = '+ str(reduction))
+                print('average_running_total_milk = '+ str(average_running_total_milk))
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
@@ -191,10 +208,12 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
                 fixed_ration = True
                 solution.success = True
                 print('dropped too much!')
+                print(solution)
                 break
 
     if solution is not None and not fixed_ration:
         print(solution)
+        print('solution is not None and not fixed_ration')
         # if not fixed_ration:
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
@@ -206,9 +225,12 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
     else:
+        print('fixed ration')
         ration = {}
-        print(available_feeds['feed_id'])
-        print(rationtouse)
+        chanchodebug = False
+        if chanchodebug:
+            print(available_feeds['feed_id'])
+            print(rationtouse)
         for feed_id in range(len(available_feeds['feed_id'])):
             # print(feed_id)
             # print(available_feeds['feed_key'][feed_id])
@@ -216,8 +238,9 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
                 ingredient_percentage = rationtouse[available_feeds['feed_key'][feed_id]]
                 ingredient_as_proportion = ingredient_percentage/100*req.DMIest
                 ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
-                print('ingredient_as_proportion = ' + str(ingredient_as_proportion))
-                print('ingredient_as_proportion = ' + str(round(ingredient_as_proportion,6)))
+                if chanchodebug:
+                    print('ingredient_as_proportion = ' + str(ingredient_as_proportion))
+                    print('ingredient_as_proportion = ' + str(round(ingredient_as_proportion,6)))
             else:
                 ration[available_feeds['feed_key'][feed_id]] = 0.0
         ration['status'] = 'Optimal'
@@ -291,6 +314,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
         # print('userdefined')
         ##### THIS WILL BE REPLACED BY calling user_defined_ration CLASS values
         ration, ration_vals = user_defined_ration(pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
+        print('returning UDR \n \n \n ')
         return ration, ration_vals
     # creating instance of class requirements
     req = Requirements()
