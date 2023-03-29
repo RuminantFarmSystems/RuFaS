@@ -112,6 +112,12 @@ class BaseManureHandler:
                     "bedding": vars(bedding),
                     "sim_day": sim_day, }
 
+        methane_housing_emission = GasEmissions.calc_methane_housing_emission(
+            num_animals=pen.num_animals,
+            barn_area=pen.barn_area_from_pen_type,
+            current_barn_temp=self._get_current_day_average_temperature_in_celsius(),
+        )
+
         NH3_housing_emission = GasEmissions.calc_ammonia_emission(
             num_animals=pen.num_animals,
             barn_area=pen.barn_area_from_pen_type,  # m^2/animal
@@ -131,8 +137,7 @@ class BaseManureHandler:
             manure_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
             liquid_manure_phosphorus=pen.manure.phosphorus,
             liquid_manure_potassium=pen.manure.potassium,
-            housing_methane=GasEmissions.calc_methane_housing_emission(
-                pen.num_animals, pen.barn_area_from_pen_type),
+            housing_methane=methane_housing_emission,
             housing_carbon_dioxide=GasEmissions.calc_carbon_dioxide_housing_emission(
                 pen.num_animals, pen.barn_area_from_pen_type),
             housing_ammonia=NH3_housing_emission,

@@ -9,28 +9,22 @@ class GasEmissions:
     # TODO: review docstring
     @classmethod
     def calc_methane_emission_for_slurry_storage(cls,
-                                                 manure_total_solids: float,
+                                                 total_volatile_solids: float,
                                                  is_enclosed=False,
                                                  temperature_celsius=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
-                                                 manure_volatile_solids_fraction=(
-                                                         GasEmissionConstants.DEFAULT_VOLATILE_SOLIDS_FRACTION),
                                                  efficiency_fraction=0.99) -> float:
         """Calculates methane emissions from manure storage using total solids.
 
         Args:
-            manure_total_solids: Total solids, kg.
+            total_volatile_solids: total volatile solids in manure, kg.
             is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
             temperature_celsius: temperature in Celsius, C.
-            manure_volatile_solids_fraction: Fraction (0-1) volatile solids. # TODO: review this
             efficiency_fraction: efficiency of process, unitless. # TODO: review this
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
 
         """
-        c = 0.024
-        VS_tot = manure_total_solids * manure_volatile_solids_fraction
-
         constants = GasEmissionConstants
         b1 = constants.b1
         b2 = constants.b2
@@ -43,9 +37,12 @@ class GasEmissions:
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)
         ex = math.exp(lnA - (E / (R * tempK)))
 
-        VSd = (Bo / E_CH4_pot)
-        VSnd = 1 - VSd
-        E_CH4_open_air = c * VS_tot * (VSd * b1 + VSnd * b2) * ex
+        Vsd = total_volatile_solids * (Bo / E_CH4_pot)  # kg
+        VSnd = total_volatile_solids - Vsd  # kg
+
+        VSd_term = 24 * Vsd * b1 * ex
+        VSnd_term = 24 * VSnd * b2 * ex
+        E_CH4_open_air = VSd_term + VSnd_term  # kg CH4/day
 
         if not is_enclosed:
             return E_CH4_open_air
@@ -94,24 +91,23 @@ class GasEmissions:
 
     # TODO: Be more descriptive
     @classmethod
-    def calc_methane_housing_emission(cls, num_animals: int, barn_area: float, hours=24, temperature_min=20.0,
-                                      temperature_max=25.0) -> float:
+    def calc_methane_housing_emission(cls,
+                                      num_animals: int,
+                                      barn_area: float,
+                                      current_barn_temp: float,
+                                      ) -> float:
         """Calculates methane housing emission.
 
         Args:
             num_animals: Number of animals in the pen.
             barn_area: Area of the barn based on housing type, m^2.
-            hours: hours of the day from 1 to 24.
-            temperature_min: Minimum barn temperature, C.
-            temperature_max: Maximum barn temperature, C.
+            current_barn_temp: Current barn temperature, degree Celsius.
 
         Returns:
-            Methane floor emissions, kg CH4/day.
+            Methane floor emission, kg CH4/day.
 
         """
-        t_ambient = cls._calc_ambient_temp(hours, temperature_min, temperature_max)
-        t = max(-5.0, 0.63 * t_ambient + 6.0)
-        return num_animals * max(0.0, 0.13 * t) * barn_area / 1000
+        return num_animals * max(0.0, 0.13 * current_barn_temp) * barn_area / 1000
 
     @classmethod
     def calc_carbon_dioxide_housing_emission(cls,

@@ -143,6 +143,7 @@ class ManureManagementOutputHandler:
             'num_lactating_cows': [pen.num_lactating_cows],
             'animal_types': [str(pen.classes_in_pen).strip("{}").replace("'", "")],
             'housing_type': [pen.housing_type],
+            'pen_type': [pen.pen_type],
             'bedding_type': [pen.bedding_type],
             'handler_type': [pen.manure_handler],
             'separator_type': [pen.manure_separator],
@@ -617,7 +618,7 @@ class ManureManagementOutputHandler:
         plt.legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
         # ax[0].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
         # ax[1].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        plt.savefig(output_path, dpi=400, bbox_inches='tight', pad_inches=0.2)
+        plt.savefig(output_path, dpi=200, bbox_inches='tight', pad_inches=0.2)
         plt.close()
 
     def _get_graphics_dir(self) -> Path:
