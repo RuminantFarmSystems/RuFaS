@@ -175,13 +175,11 @@ class Pen:
         """
         CALF = 0  # calves
         GROWING = 1  # heiferIs, heiferIIs
-        CLOSE_UP = 2  # heiferIIIs, all dry cows (both far-off and close-up)
+        CLOSE_UP = 2  # heiferIIIs, dry cows
         LAC_COW = 3  # lactating cows
 
-        FAR_OFF_DRY = 4  # far-off dry cows only
-        CLOSE_UP_DRY = 5  # close-up dry cows only
-        GROWING_AND_CLOSE_UP = 6  # all heifers and all dry cows
-        NONE = 7  # TODO: Remove this option after fixing _init_default_pens() in AnimalManagement
+        GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
+        NONE = 5  # TODO: Remove this option after fixing _init_default_pens() in AnimalManagement
 
     def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
                  number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
