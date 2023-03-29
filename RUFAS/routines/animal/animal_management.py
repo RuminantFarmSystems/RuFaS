@@ -353,16 +353,8 @@ class AnimalManagement:
         for animal in animals_removed:
             if animal.id in self.animal_to_pen_id_map:
                 pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
-                # only a concern if runtime would be significant from using the list
-                # order of entries in animals_in_pen probably doesn't matter but double-check
-                # grouping algorithm might rely on order
-                # if sets won't work, then we can create a new list from the old one with the intended value removed
-                # look into stocking density changes
-
-                # might be worth making a pen function for line 363
-
-                # pen.animals_in_pen.remove(animal)
-                pen.stocking_density = (len(pen.animals_in_pen) - 1) / pen.num_stalls
+                pen.animals_in_pen.remove(animal)
+                pen.stocking_density = len(pen.animals_in_pen) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 
     def track_former_pen_population(self) -> List[int]:
@@ -375,7 +367,7 @@ class AnimalManagement:
                  any additions due to daily pen updates
         """
 
-        pen_population_before_additions = [None] * len(self.all_pens)
+        pen_population_before_additions = [0] * len(self.all_pens)
 
         for index, pen in enumerate(self.all_pens):
             pen_population_before_additions[index] = len(pen.animals_in_pen)
@@ -410,7 +402,8 @@ class AnimalManagement:
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
-        animals_added.extend(calves_born)
+
+        all_animals_added = animals_added + calves_born
 
         self.remove_animals_from_herd(animals_removed)
 
@@ -430,7 +423,7 @@ class AnimalManagement:
             'Dry_Cow': {'p_conc': self.p_conc['cow'], 'animal_list': self.cows,
                         'animal_group': Pen.AnimalCombination.CLOSE_UP}}
 
-        for animal in animals_added:
+        for animal in all_animals_added:
             animal_class = type(animal).__name__
 
             if animal_class == 'Cow':
@@ -444,7 +437,13 @@ class AnimalManagement:
             group = animal_type_mapping_dict.get(animal_class)['animal_group']
 
             candidate_pens = self.pens_by_animal_combination[group]
+            # for pen in candidate_pens:
+            #     print(group)
+            #     print(pen.id)
+            #     print("x" * 88)
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
+            # print(pen_for_insert.id, animal.id)
+            # print("l" * 88)
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
