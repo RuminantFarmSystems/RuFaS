@@ -15,6 +15,11 @@ from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.cow import Cow
 
 
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
@@ -369,7 +374,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                                            161608,
                                                            162583, 163942,
                                                            176371],
-                                             'Dry_ Cow': [187817, 189760, 189801, 198331, 199999], 'Lac_Cow': []},
+                                             'Dry_Cow': [187817, 189760, 189801, 198331, 199999], 'Lac_Cow': []},
                       "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
                       "post_removal_stocking_density": 0.10, "num_stalls": 150,
                       "ration": {"dummy_feed1": 10.0, "dummy_feed2": 35.0, "dummy_feed3": 0.0,
@@ -377,7 +382,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                  "pen3":
                      {"pen_id": 3,
                       "cow_type_to_id_map": {'Calf': [],
-                                             'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_ Cow': [],
+                                             'HeiferI': [], 'HeiferII': [], 'HeiferIII': [], 'Dry_Cow': [],
                                              'Lac_Cow': [126963, 133132, 156958, 158639, 160697, 162375, 164238,
                                                          198542]},
                       "pen_animal_combination": Pen.AnimalCombination.LAC_COW,
@@ -552,7 +557,20 @@ def setup_dummy_animal(animal_id: int, animal_type: str) -> AnimalBase:
     AnimalBase.set_config(config_dict)
     dummy_animal = AnimalBase(args_dict)
 
-    type(dummy_animal).__name__ = animal_type
+    type_to_class_dict = {
+        'Calf': Calf,
+        'HeiferI': HeiferI,
+        'HeiferII': HeiferII,
+        'HeiferIII': HeiferIII,
+        'Dry_Cow': Cow,
+        'Lac_Cow': Cow
+    }
+    if animal_type == 'Dry_Cow':
+        dummy_animal.milking = False
+    elif animal_type == 'Lac_Cow':
+        dummy_animal.milking = True
+
+    dummy_animal.__class__ = type_to_class_dict[animal_type]
 
     return dummy_animal
 
@@ -708,17 +726,11 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_management: AnimalMana
 
     for animal_id, animal_type in info_dict["new_cow_dict"].items():
         new_cow = setup_dummy_animal(animal_id, animal_type)
-        print(animal_id, animal_type)
         animal_addition_list.append(new_cow)
-        print(type(new_cow).__name__)
-
-    for animall in animal_addition_list:
-        print(type(animall).__name__)
 
     for calf_id, calf_type in info_dict["new_calf_dict"].items():
-        # new_calf = setup_dummy_animal(calf_id, calf_type)
-        calf_addition_list.append(setup_dummy_animal(calf_id, calf_type))
-        # print(type(new_calf).__name__)
+        new_calf = setup_dummy_animal(calf_id, calf_type)
+        calf_addition_list.append(new_calf)
 
     with patch("RUFAS.routines.animal.pen.Pen.set_up_new_animal") as set_up_new_animal:
         dummy_animal_management.daily_update_id_map(animal_addition_list, dummy_removal_list, calf_addition_list,
