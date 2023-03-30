@@ -14,7 +14,7 @@ Reviewers: [Add your names here!]
    c. [Manure Application](#manure-application)  
    d. [Manure](#manure)  
    f. [Mineralization](#mineralization)  
-   g. [Soluble Phosphorus](#soluble-phosphorus)
+   g. [Soluble Phosphorus](#soluble-phosphorus)  
    i. [Other Requirements](#other-requirement-details)
 4. [Open Questions](#open-questions)
 5. [Beyond Version 1](#beyond-version-1)
