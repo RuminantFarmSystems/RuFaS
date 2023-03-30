@@ -44,10 +44,12 @@ class GasEmissions:
         VSnd_term = 24 * VSnd * b2 * ex
         E_CH4_open_air = VSd_term + VSnd_term  # kg CH4/day
 
-        if not is_enclosed:
-            return E_CH4_open_air
-        else:
-            return E_CH4_open_air * (1 - efficiency_fraction)
+        # if not is_enclosed:
+        #     return E_CH4_open_air
+        # else:
+        #     return E_CH4_open_air * (1 - efficiency_fraction)
+
+        return E_CH4_open_air
 
     # TODO: Be more descriptive
     @classmethod

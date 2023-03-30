@@ -33,7 +33,7 @@ class GasEmissionConstants:
     # Methane related constants
     Bo = 0.24  # achievable emission of CH4 during anaerobic digestion, g CH4/kg VS
     MCF = 0.79
-    MS = 0.9
+    MS = 1.0
     METHANE_FACTOR = 0.67  # TODO: use a better name
 
     METHANE_ENERGY_DENSITY = 55  # MJ/kg
