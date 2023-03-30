@@ -2,7 +2,7 @@
 
 Authors: Clay J. Morrow, Joseph Waddell <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions -->   
 Date Created: 17 Mar 2023   
-Last Updated: 23 Mar 2023 <!-- NOTE: please remember to change this date when editing this file --> 
+Last Updated: 30 Mar 2023 <!-- NOTE: please remember to change this date when editing this file --> 
 
 __Contents:__
 1. [Introduction](#1-introduction)
@@ -15,19 +15,62 @@ __Contents:__
 
 ---
 
-## 1. Introduction
+## 1. Overview
 
-The purpose of this document is to guide the developers of RuFaS in conducting sensitivity analyses (SA). These methods
-can be applied to either 1) The entire RuFaS model or 2) any submodule, with minimal work on the user's part. 
+The purpose of this document is to guide the RuFaS team in conducting sensitivity analyses (SA) for the model. 
+
+---
+
+## Context
+
+---
+
+## Requirements
+
+---
+
+## Milestones
+
+---
+
+## Existing Solution
+
+---
+
+## Proposed Solution
+
+---
+
+## Alternative Solutions
+
+---
+
+## Testability, Monitoring, and Alerting
+
+---
+
+## Cross-Team Impact
+
+---
+
+## Open Questions
+
+---
+
+## Scoping and Timeline
+
+---
+
+## 2. Summary of generalized Sensitivity Analyses
+
+The methods discussed and outlined in this section can be applied to either 1) The entire RuFaS model or 2) any 
+submodule, with minimal work on the user's part. 
 Joe Waddell began this process, by finding the relevant packages and writing some scripts to implement SA for the full 
 RuFaS module. My goal is to build on his work to write a module that generalises the SA methods and allows them to be 
 applied to any python function/module. 
 
 The [References and Links](#references-and-links) section provides both the primary and secondary sources that we used
 to create these methods. 
-----
-
-## 2. Summary of RUFAS Sensitivity Analyses
 
 Broadly speaking, a global sensitivity analysis (SA) simply aims to answer the question, "which parameters have the 
 largest impact on the results of a model".
@@ -77,7 +120,7 @@ highly dependent on the values of the inputs - that is, one involved in interact
 ###### Sobol method
 <!-- TODO: add summary of Sobol Method -->
 
-----
+---
 
 ## 3. References and Links
 
@@ -123,4 +166,3 @@ with all other methods of running python code. It is a known issue that the pyth
 code from the `multiprocessing` package (it has been 4 years, so I doubt it will ever get patched): [Link](
 https://youtrack.jetbrains.com/issue/PY-36151?_ga=2.6010288.221937295.1679330535-2071016451.1670387953&_gl=1*1qr3jl1*_ga*MjA3MTAxNjQ1MS4xNjcwMzg3OTUz*_ga_9J976DJZ68*MTY3OTMzMDUzNC4xMS4wLjE2NzkzMzA1NDMuMC4wLjA.
 )
-
