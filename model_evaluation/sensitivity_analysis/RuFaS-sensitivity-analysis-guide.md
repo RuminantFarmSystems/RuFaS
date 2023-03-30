@@ -15,17 +15,36 @@ __Contents:__
 
 ---
 
-## 1. Overview
+##  Overview
 
-The purpose of this document is to guide the RuFaS team in conducting sensitivity analyses (SA) for the model. 
+The purpose of this document is to guide the RuFaS team in conducting sensitivity analyses (SA) for the model and to
+describe the `SensitivityAnalysis` module. This document is a combination of a design document for the SA module 
+and a plan for conducting SA across the RuFaS model. 
 
 ---
 
 ## Context
 
+The RuFaS simulation model is highly complex, it simulates an entire farm from many equations, functions,
+and sub-models. There are thousands of variables that the model tracks and calculates throughout the simulation. Users
+provide dozens of these variables, many variables of interest are calculated and returned to users, and many more
+are internal intermediate variables. Because of this complexity, RuFaS is somewhat of a black box and model 
+validation like SA will be a challenging endeavor. Our team will need to conduct multiple SAs, on different parts of the
+model (e.g., sub-modules), across different time periods (single day to multiple years), under various environmental
+conditions (weather), and with different suites of variables (input, output, and intermediary). The framework laid
+out here and the `SensitivityAnalysis` module aim to help with this process. 
+
 ---
 
 ## Requirements
+
+In the context of validating the RuFaS model, global sensitivity analyses will help us to better understand our system.
+Successful analyses will:
+* Identify variables that the model is most affected by, with respect to a particular output, for all response 
+variables of interest. This includes variables that the users have direct agency over and intermediary variables
+(or hyper-parameters) that can be used to fine-tune behavior of the model.
+* Improve our understanding of the relationships between variables, especially across modules.
+* 
 
 ---
 
