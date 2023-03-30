@@ -21,6 +21,7 @@ def manure_calculations(ration_formulation,
                         daily_milk_production: float,
                         fecal_phosphorus: float,
                         urine_phosphorus_required: float,
+                        methane_model: str,
                         metabolizable_energy_intake: float) \
         -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
@@ -39,6 +40,8 @@ def manure_calculations(ration_formulation,
         Amount of fecal phosphorus excreted by the current animal, g.
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Mills, IPCC.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
 
@@ -54,7 +57,8 @@ def manure_calculations(ration_formulation,
     # TODO: Add TypedDicts for ration_formulation and available feeds
     # TODO: Pass in available feeds directly instead of a Feed object
     # TODO: Rename abbreviated key names to full names
-    nutrient_amounts, nutrient_concentrations = ration_report(ration_formulation, feed.available_feeds)
+    nutrient_amounts, nutrient_concentrations = ration_report(
+        ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     ash_diet_content = nutrient_amounts['ash']
     CP_concentration = nutrient_concentrations['CP']
@@ -64,6 +68,10 @@ def manure_calculations(ration_formulation,
     EE_concentration = nutrient_concentrations["EE"]  # TODO: Unused
     ADF_concentration = nutrient_concentrations['ADF']
     starch_concentration = nutrient_concentrations['starch']
+    # Soluble residue
+    # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
+    soluble_residue = (100 - ASH_concentration) - \
+        NDF_concentration - CP_concentration - EE_concentration
     # TODO: Further calculations to account for entire diet:
     # DMI: dry matter intake, kg
     # DM: dietary dry matter, % of diet
@@ -74,63 +82,84 @@ def manure_calculations(ration_formulation,
 
     # Manure excretion
     # Amount of feces and urine excreted daily by the dry cow, kg [A.3F.A.2]
-    total_manure_excreted = 0.022 * body_weight + 21.844
+    total_manure_excreted = (0.00711 * body_weight
+                             + 0.324 * CP_concentration
+                             + 0.259 * NDF_concentration
+                             + 8.05)
 
     # Total solids excretion
     # Amount of dry material excreted by the dry cow, kg [A.3F.A.3]
     total_solids = 0.178 * dry_matter_intake + 2.733
 
-    # Organic matter intake, kg.
+    # Organic matter intake, kg [A.2.A.3]
     organic_matter_intake = dry_matter_intake - ash_diet_content
 
-    # Total volatile solids, kg [A.3F.A.4]
+    # Total volatile solids, kg [A.3E.A.6]
     total_volatile_solids = (-1.201
                              + 0.402 * organic_matter_intake
                              + 0.036 * NDF_concentration
                              - 0.024 * CP_concentration)
 
-    # Degradable volatile solids, kg [A.3F.A.5]
+    # Degradable volatile solids, kg [A.3E.A.5]
     degradable_volatile_solids = (-1.017
                                   + 0.364 * organic_matter_intake
                                   + 0.029 * NDF_concentration
                                   - 0.023 * CP_concentration)
 
-    # Non-degradable volatile solids, kg
+    # Non-degradable volatile solids, kg [A.3A.A.6]
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-    # Nitrogen in liquid and solid manure, kg [A.3F.B.1]
-    manure_nitrogen = (12.747 * dry_matter_intake
-                       + 1606.290 * (CP_concentration / 100)
-                       - 117.5)
+    # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
+    manure_nitrogen = (15.1
+                       + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in urine, kg [A.3F.B.2]
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 100)
+    # Nitrogen excretion in urine, kg [A.3B.B.2]
+    urine_nitrogen = (14.3
+                      + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in feces, kg [A.3F.B.3]
+    # Nitrogen excretion in feces, kg [A.3B.B.3]
     fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
 
-    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
-    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
-    urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+    # Urinary N concentration, g N/kg [A.3G.B.1]
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+    urine_urea_nitrogen_concentration = -1.16 + \
+        0.86 * urinary_nitrogen_concentration
 
-    # TODO: Add cases to unit test for this
     # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration = max(2.0, min(urine_urea_nitrogen_concentration, 12.0))
+    urine_urea_nitrogen_concentration_lower_bound = 2
+    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
+        urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
 
-    # Total ammoniacal nitrogen concentration in the manure slurry,
-    # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
+    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    # Total ammoniacal nitrogen concentration in the manure slurry,
+    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
 
-    # Amount of potassium excreted, g [A.3D.B.3]
-    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+    # Amount of potassium excreted, g [A.3B.B.4]
+    potassium = dry_matter_intake * \
+        (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
-    # Methane emissions, g/day [A.3F.C.1]
-    # Methane model = 'Mills'
-    methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
-                                                 * metabolizable_energy_intake * 4.184)) / 0.05565
-    # TODO: Implement the other methane model - IPCC Tier 2. But need to pass in a methane_model parameter first.
+    # Methane emissions, g/day
+    methane_emission = 0.0
+    if methane_model == "Mills":
+        # Methane model = 'Mills' [A.3E.C.2]
+        methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
+                                                     * metabolizable_energy_intake * 4.184)) / 0.05565
+    else:
+        # Default: IPCC Tier 2
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)  # [A.3B.C.2]
+        methane_emission = (0.065 * gross_energy_concentration *
+                            dry_matter_intake) / 0.05565  # [A.3B.C.3]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,
