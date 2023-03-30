@@ -1,9 +1,9 @@
 # Design Document: Soil and Crop Module Redesign
 
-Authors: Clay J. Morrow
-Date created: 22 Mar 2023
-Last updated: 22 Mar 2023
-Reviewers: [TBD]
+Authors: Clay J. Morrow  
+Date created: 22 Mar 2023  
+Last updated: 22 Mar 2023  
+Reviewers: [TBD]  
 
 ## Contents:
 1. [Overview](#overview)
@@ -12,7 +12,7 @@ Reviewers: [TBD]
    a. [Fields](#fields)  
    b. [Crop Species](#crop-species)  
    c. [Crop Rotation](#crop-rotation)  
-   d. [Coover Cropping](#cover-cropping)  
+   d. [Cover Cropping](#cover-cropping)  
    e. [Soil Amendments](#soil-amendments)  
    f. [Tillage Practices](#tillage-practices)  
    g. [Outputs](#outputs)  
@@ -52,7 +52,7 @@ Below is a list of the general problems that this redesign aims to address:
 * The model returns entirely inaccurate results. For example, Crop yields are much lower than expected and are
 inconsistent across years. 
 
-* The components and sub-modules are not independent or isolated. For example Performing tests requires running the
+* The components and sub-modules are not independent or isolated. For example, performing tests requires running the
 **entire** model and looking through all the output.
 
 * Formal unit tests are not implemented for any of the code, so every component's integrity is suspect.
@@ -64,7 +64,7 @@ with what the code does in actuality.
 
 * Names of module entities are poorly selected and not intuitive.
 
-For these reasons, RuFaS leadership (Kristan, Pooya, Joe, and I) decided that the est course of action was to rebuild
+For these reasons, RuFaS leadership (Kristan, Pooya, Joe, and I) decided that the best course of action was to rebuild
 SC, essentially from the ground up, following improved standards and guidelines for a stable and reliable module.
 
 ---
@@ -77,7 +77,7 @@ on, so we also describe known requirements for the future as well.
 
 I've broken the requirements into sections based on the hierarchical organization structure present in the model's 
 simulated farm systems (and in real systems). These requirements are formatted as checklists so that they can be 
-ticked when as requirements are met.
+ticked as requirements are met.
 
 ### Fields
 
@@ -143,6 +143,8 @@ Nutrient additions to the soil should be handled:
 
 * [x] no nutrient addition
 * [x] manure application
+  - [x] manure applied by grazing animals in the field
+  - [x] manure applied by machine
 * [x] commercial fertilizer application
 * [x] both manure and fertilizer application
 
@@ -172,7 +174,6 @@ The model should return at least the following outputs **for each year**:
 * [ ] water use
 * [ ] energy usage (i.e., fossil fuels)
 * [ ] soil nutrients ($C$, $N$, $P$)
-* [ ] crop yields (mass)
 * [ ] crop yields (mass)
 * [ ] crop composition ($C$, $N$, $P$, $H_{2}O$, etc.)
 
@@ -226,6 +227,10 @@ The original versions should remain in-tact and new versions placed in `SC_redes
 is complete. In total, there are:
   - [x] 10 crop files, 2671 lines (`RUFAS/routines/field/crop/`): Done (Feb 2023)
   - [ ] 23 soil files, 2213 lines (`RUFAS/routines/field/soil/`): Approx. 52% finished (Mar 2023), expected April 2023 
+    - [x] soil files
+    - [ ] 4 carbon cycling files: approx. 50% finished
+    - [ ] nitrogen cycling files: not started
+    - [ ] phosphorus cycling files: approx. 33% finished
   - [ ] 4 field management files, 295 lines (`RUFAS/routines/field/field_management`): 
 
 * The main classes need to be rewritten with new formatting guidelines, and linked to the process classes.
@@ -302,7 +307,7 @@ the tests do not fall behind the implementation.
 ## Alternative Solutions
 
 We considered using an [inheritance pattern](https://en.wikipedia.org/wiki/Inheritance_(object-oriented_programming)), 
-but decided against it because the structure of our system does not really lend it self to this design. We also 
+but decided against it because the structure of our system does not really lend itself to this design. We also 
 considered writing each process method into the class files directly, but this would have led to extremely large
 files with many many methods in each class, with a variety of functionality. 
 
@@ -333,7 +338,7 @@ new problems are difficult to anticipate, it is difficult to estimate when this 
 
 However, there are few functional effects on the rest of the team. We have left the original code entirely in-tact
 while we work on the redesign, which resides in an entirely separate directory. Once the redesign is complete, it will
-replace the old code, but for not the old version is still running.  
+replace the old code, but for now the old version is still running.  
 
 We expect the inputs and outputs of the SC module to be roughly the same as they were prior to the redesign: we still
 need the same variables and calculate the same quantities. 
@@ -679,7 +684,7 @@ and the conceptual model for the simulation is shown in this image:
 This redesign project is somewhat unpredictable in terms of time. Because we are not the original authors of the code,
 we do not fully understand its intricacies and nuances. This means that as we take on new files to refactor and learn
 more about the design of the old code, we gain greater insight into what needs to be done and how. New tasks are
-created as we learn more and even the code that we've already re-worked my need to be further tweaked once new
+created as we learn more and even the code that we've already re-worked may need to be further tweaked once new
 information from elsewhere in the model comes to light. With all that said, acknowledging that this is an iterative
 process, I will attempt to give an estimate of when the project will be completed. These estimates are based on a few
 important factors. 1) experience: based on how long it has taken us to get to where we currently are, we might expect that a similar level
