@@ -3,7 +3,7 @@
 Authors: Clay J. Morrow  
 Date created: 22 Mar 2023  
 Last updated: 22 Mar 2023  
-Reviewers: [TBD]  
+Reviewers: Ed Hansen, Matthew Liu  
 
 ## Contents:
 1. [Overview](#overview)
@@ -207,7 +207,7 @@ With respect to crop species, users should be able to:
 
 #### Soil Amendment Options
 
-Manure Application:
+Manure and Fertilizer Application:
 
 * [ ] differentiate between broadcasting (spread onto surface) and injection (knife, sweep, or disk variants)
 * [x] nutrient composition of the manure should have sensible defaults **and also** be customizable
@@ -444,8 +444,6 @@ crop's demand for, uptake, fixation, and incorporation of nitrogen.
 * they have/utilize data class components (e.g., `NitrogenIncorporation` is initialized with `data`, which is an 
 instance of `CropData`. It is important that any variables used by multiple process classes are attributes of the data 
 * class.
-
-* see the section on [Design Principles](#design-principles) for more details
 
 #### Managing the system: FieldManager
 
