@@ -197,7 +197,7 @@ def test_slow_carbon_decomposition_amount(decomposition_moisture_effect: float, 
     """Tests that the slow carbon decomposition amount is calculated correctly"""
     slow_carbon_decomposition_factor = 0.0038
     expected = decomposition_moisture_effect * decomposition_temperature_effect * slow_carbon_amount * \
-               slow_carbon_decomposition_factor
+        slow_carbon_decomposition_factor
     assert expected == PoolGasPartition._determine_slow_carbon_decomposition_amount(decomposition_moisture_effect,
                                                                                     decomposition_temperature_effect,
                                                                                     slow_carbon_amount)
@@ -215,7 +215,7 @@ def test_passive_carbon_decomposition_amount(decomposition_moisture_effect: floa
     """Tests that the passive carbon decomposition amount is calculated correctly"""
     passive_carbon_decomposition_factor = 0.00013
     expected = decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
-               passive_carbon_decomposition_factor
+        passive_carbon_decomposition_factor
     assert expected == PoolGasPartition._determine_passive_carbon_decomposition_amount(decomposition_moisture_effect,
                                                                                        decomposition_temperature_effect,
                                                                                        passive_carbon_amount)
@@ -370,7 +370,7 @@ def test_soil_active_carbon_amount(active_carbon_amount: float, plant_active_dec
                                    active_carbon_decomposition_amount: float) -> None:
     """Tests that total amount of active carbon in the layer is aggregated correctly"""
     expected = active_carbon_amount + plant_active_decompose_carbon + soil_active_decompose_carbon \
-               + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
+        + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
     assert expected == PoolGasPartition._determine_soil_active_carbon_amount(active_carbon_amount,
                                                                              plant_active_decompose_carbon,
                                                                              soil_active_decompose_carbon,
@@ -391,7 +391,7 @@ def test_soil_slow_carbon_amount(slow_carbon_amount: float, plant_structural_slo
                                  slow_carbon_decomposition_amount: float) -> None:
     """Tests that total amount of slow carbon in the layer is aggregated correctly"""
     expected = slow_carbon_amount + plant_structural_slow_carbon_remaining + soil_structural_slow_carbon_remaining + \
-               active_carbon_to_slow_amount - slow_carbon_decomposition_amount
+        active_carbon_to_slow_amount - slow_carbon_decomposition_amount
     assert expected == PoolGasPartition._determine_soil_slow_carbon_amount(slow_carbon_amount,
                                                                            plant_structural_slow_carbon_remaining,
                                                                            soil_structural_slow_carbon_remaining,
@@ -410,7 +410,7 @@ def test_soil_passive_carbon_amount(passive_carbon_amount: float, slow_to_passiv
                                     passive_carbon_decomposition_amount: float) -> None:
     """Tests that total amount of passive carbon in the layer is aggregated correctly"""
     expected = passive_carbon_amount + slow_to_passive_carbon_amount + active_carbon_to_passive_amount - \
-               passive_carbon_decomposition_amount
+        passive_carbon_decomposition_amount
     assert expected == PoolGasPartition._determine_soil_passive_carbon_amount(passive_carbon_amount,
                                                                               slow_to_passive_carbon_amount,
                                                                               active_carbon_to_passive_amount,
