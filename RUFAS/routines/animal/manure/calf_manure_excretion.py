@@ -66,7 +66,8 @@ def manure_calculations(ration_formulation,
     # Nitrogen excretion
     # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
     # TODO: Review this part. It was added to get the dry matter intake and CP concentration.
-    nutrient_amounts, nutrient_concentrations = ration_report(ration_formulation, feed.available_feeds)
+    nutrient_amounts, nutrient_concentrations = ration_report(
+        ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     CP_concentration = nutrient_concentrations['CP']
     manure_nitrogen = 112.55 * dry_matter_intake * (CP_concentration / 100)
@@ -78,31 +79,32 @@ def manure_calculations(ration_formulation,
         methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
-            daily_milk_production=0,
-            total_manure_excreted=total_manure_excreted,
-            fecal_phosphorus=fecal_phosphorus,
-            urine_phosphorus_required=urine_phosphorus_required
+        daily_milk_production=0,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
     )
 
     (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
      manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-            urea=0.340,  # TODO: Implement with correct equation
-            urine=2,
-            total_ammoniacal_nitrogen_concentration=0.14,  # TODO: Implement with correct equation
-            urine_nitrogen=urine_nitrogen,
-            manure_nitrogen=manure_nitrogen,
-            manure_mass=total_manure_excreted,
-            total_solids=total_solids,
-            degradable_volatile_solids=degradable_volatile_solids,
-            non_degradable_volatile_solids=non_degradable_volatile_solids,
-            inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
-            organic_phosphorus_fraction=organic_phosphorus_fraction,
-            phosphorus=manure_phosphorus_excreted,
-            phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=0,
-            methane=methane_emission
+        urea=0.340,  # TODO: Implement with correct equation
+        urine=2,
+        # TODO: Implement with correct equation
+        total_ammoniacal_nitrogen_concentration=0.14,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=total_manure_excreted,
+        total_solids=total_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=manure_phosphorus_excreted,
+        phosphorus_fraction=manure_phosphorus_fraction,
+        potassium=0,
+        methane=methane_emission
     )
 
     return total_phosphorus_excreted, manure_excretion_values
