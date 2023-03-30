@@ -63,7 +63,8 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    nutrient_amounts, nutrient_concentrations = ration_report(ration_formulation, feed.available_feeds)
+    nutrient_amounts, nutrient_concentrations = ration_report(
+        ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     ASH_diet_content = nutrient_amounts['ash']
     ASH_concentration = nutrient_concentrations["ash"]
@@ -101,13 +102,15 @@ def manure_calculations(ration_formulation,
     total_manure_excreted = fecal_water + fecal_solids + urine
 
     # Total manure nitrogen, kg [A.3E.B.1]
-    manure_nitrogen = (20.3 
-                       + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
-                        ) * GeneralConstants.GRAMS_TO_KG
+    manure_nitrogen = (20.3
+                       + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Urine nitrogen, kg [A.3E.B.2]
-    urine_nitrogen = (12.0 
-                      + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+    urine_nitrogen = (12.0
+                      + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
 
     # Fecal nitrogen, kg [A.3B.B.3]
@@ -130,29 +133,32 @@ def manure_calculations(ration_formulation,
                              - 0.024 * CP_concentration
                              )
 
-    # Non-degradable volatile solids, kg
+    # Non-degradable volatile solids, kg [A.3A.A.6]
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
-    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
-    urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+    # Urinary N concentration, g N/kg [A.3G.B.1]
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+    urine_urea_nitrogen_concentration = -1.16 + \
+        0.86 * urinary_nitrogen_concentration
 
+    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
     urine_urea_nitrogen_concentration_lower_bound = 2
     urine_urea_nitrogen_concentration_upper_bound = 12
-    if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_lower_bound
-    elif urine_urea_nitrogen_concentration > urine_urea_nitrogen_concentration_upper_bound:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
-    else:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
+    urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
+        urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
 
-    # Total ammoniacal nitrogen concentration in the manure slurry,
-    # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
+    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    # Total ammoniacal nitrogen concentration in the manure slurry,
+    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
 
     # Amount of potassium excreted, g [A.3E.B.3]
-    potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5 
+    potassium = 7.21 * dry_matter_intake + 15944 * \
+        potassium_concentration / 100 - 164.5
 
     # Methane Emissions
     methane_emission = 0.0
@@ -164,18 +170,22 @@ def manure_calculations(ration_formulation,
                             + 0.148 * body_weight)
 
     elif methane_model == "Mills":  # [A.3E.C.2]
-        starch_to_ADF_concentration_ratio = -0.0011 * starch_concentration / ADF_concentration
-        temp = -(starch_to_ADF_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
+        starch_to_ADF_concentration_ratio = -0.0011 * \
+            starch_concentration / ADF_concentration
+        temp = -(starch_to_ADF_concentration_ratio + 0.0045) * \
+            metabolizable_energy_intake * 4.184
         methane_emission = 45.98 * (1 - math.exp(temp)) / 0.05565
 
     elif methane_model == "IPCC":  # IPCC
         # Calculating gross energy concentration (Moraes et al. 2014)
-        soluble_residue = 100 - ASH_concentration - NDF_concentration - CP_concentration - EE_concentration
+        soluble_residue = 100 - ASH_concentration - \
+            NDF_concentration - CP_concentration - EE_concentration
         gross_energy_concentration = (0.263 * CP_concentration
                                       + 0.522 * EE_concentration
                                       + 0.198 * NDF_concentration
                                       + 0.160 * soluble_residue)  # [A.3E.C.3]
-        methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565  # [A.3E.C.4]
+        methane_emission = 0.065 * gross_energy_concentration * \
+            dry_matter_intake / 0.05565  # [A.3E.C.4]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,
