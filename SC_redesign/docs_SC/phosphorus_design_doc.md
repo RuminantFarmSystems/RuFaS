@@ -22,9 +22,9 @@ Reviewers: [Add your names here!]
 --- 
 
 ## Overview
-This document will detail how the redesigned Phosphorus Cycling (PC) submodule within the Soil module of RuFaS. The redesign
-that is described in this document is a part of the larger Soil and Crop redesign project, on which details can be found
-here: [design-document_SC-redesign.md](design-document_SC-redesign.md).
+This document will detail how the redesigned Phosphorus Cycling (PC) submodule operates/will operate within the Soil 
+module of RuFaS. The redesign that is described in this document is a part of the larger Soil and Crop redesign project,
+on which details can be found here: [design-document_SC-redesign.md](design-document_SC-redesign.md).
 
 ---
 
