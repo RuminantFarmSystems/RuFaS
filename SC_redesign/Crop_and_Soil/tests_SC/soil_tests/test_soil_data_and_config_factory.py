@@ -166,7 +166,8 @@ def test_profile_soil_water_content() -> None:
     """Test that SoilData correctly calculates amount of water in the entire soil profile"""
     # Set water content and wilting point content of every soil layer to certain amount
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
-                        water_content=PropertyMock(return_value=0.87),
+                        soil_water_concentration=PropertyMock(return_value=0.87),
+                        layer_thickness=PropertyMock(return_value=1),
                         wilting_point_content=PropertyMock(return_value=0.32)):
         soil_data = SoilData()
         observe = soil_data.profile_soil_water_content
@@ -363,7 +364,8 @@ def test_excess_water_available(water_content: float, field_capacity_content: fl
     """Test that excess_water_available() in LayerData correctly calculates the amount of excess water available in a
         layer"""
     with patch.multiple('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData',
-                        water_content=PropertyMock(return_value=water_content),
+                        soil_water_concentration=PropertyMock(return_value=water_content),
+                        layer_thickness=PropertyMock(return_value=1),
                         field_capacity_content=PropertyMock(return_value=field_capacity_content)):
         layer = LayerData(top_depth=0, bottom_depth=30)
         observe = layer.excess_water_available
@@ -384,7 +386,8 @@ def test_acceptable_percolation_amount(water_content: float, saturation_content:
     """Test that acceptable_percolation_amount() in LayerData correctly calculates the maximum amount of water that can
         be percolated into it"""
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
-                        water_content=PropertyMock(return_value=water_content),
+                        soil_water_concentration=PropertyMock(return_value=water_content),
+                        layer_thickness=PropertyMock(return_value=1),
                         saturation_content=PropertyMock(return_value=saturation_content)):
         layer = LayerData(top_depth=0, bottom_depth=30)
         observe = layer.acceptable_percolation_amount
