@@ -493,6 +493,8 @@ def energy_req_limit_constraint(x):
 
 def get_ration_vals_null(x):
     """
+    Deprecated use, possible
+    
     Function that calculates and retrieves ration values used throughout the
     ration.
 
@@ -518,75 +520,31 @@ def get_ration_vals(x):
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
+
 def userbounds():
-    # TODO use the util.py read_json_file method instead
-    # with open('input/userdefinedration/userdefinedration_test.json', 'r') as f:
-    #     rationall = json.load(f)
-    # ration_calf = rationall['calf']
-    # ration_all_heifers = rationall['all_heifers']
-    # ration_cow_lactating = rationall['cow_lactating']
-    # ration_cow_dry = rationall['cow_dry']
-    # if animal_type == 'cow':
-    #     if cow_type == True:
-    #         rationtouse = ration_cow_lactating
-    #     else:
-    #         rationtouse = ration_cow_dry
-    # elif animal_type == 'heifer':
-    #     rationtouse = ration_all_heifers
-    #     chancho_debug = False
-    #     if chancho_debug:
-    #         print('heiferfound')
-    #         print(ration_all_heifers)
-    # else: 
-    #     rationtouse = ration_calf
-    
-    # values2= []
-    # for key, value in rationall.items():
-    #     for i in value.keys():
-    #         values2.append(int(i))
-    # uniqueset=set(values2) # TODO fix tortured logic 
-    # uniqueset2 = [i for i in uniqueset]
-    # uniqueset2.sort()
-    # uniqueset2 = [str(i) for i in uniqueset2]
-    
     ration_calf = udrv.calf_ration
     ration_all_heifers = udrv.heifer_ration
     ration_cow_lactating = udrv.lactating_cow_ration
     ration_cow_dry = udrv.lactating_cow_ration
     if animal_type == 'cow':
         if cow_type == True:
-            rationtouse = ration_cow_lactating
+            ration_percents = ration_cow_lactating
             # print('çów')
         else:
-            rationtouse = ration_cow_dry
+            ration_percents = ration_cow_dry
     elif animal_type == 'heifer':
-        rationtouse = ration_all_heifers
+        ration_percents = ration_all_heifers
     else: 
-        rationtouse = ration_calf
+        ration_percents = ration_calf
 
     tribounds = []
-    wiggleroom = 0.05
-    previousbounds = False # this is whether the bounds need to be all possible, or just the animal_type specific feeds available
-    if previousbounds:
-        uniqueset2 = [] # debug line to avoid error
-        for key in uniqueset2:
-            if key in rationtouse.keys():
-                target = rationtouse[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
-                # target = rationtouse[key]
-                tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-                tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-                tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-            else:
-                tribounds.append((0,0.0001))
-                tribounds.append((0,0.0001))
-                tribounds.append((0,0.0001))
-    else:
-        for key in rationtouse.keys():
-            target = rationtouse[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
-            # target = rationtouse[key]
-            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
+    udr_tolerance = udrv.tolerance
+    for key in ration_percents.keys():
+        target = ration_percents[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
+        # target = ration_percents[key]
+        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
+        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
+        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
     return tribounds
 
 def optimize(user_defined_ration_select):
