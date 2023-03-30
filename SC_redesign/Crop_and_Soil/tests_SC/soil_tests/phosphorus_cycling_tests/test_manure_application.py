@@ -99,52 +99,6 @@ def test_determine_infiltration_factor(wet_rate: float) -> None:
 
 
 # ---- Helper function tests
-@pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
-    (3, 6.8, 1.5),
-    (0.87, 1.235, 1),
-    (8.9284921, 5.18393, 2.393481),
-    (0.34, 2.495821, 4.10184),
-    (2.39854, 0, 3.29184)
-])
-def test_add_to_labile_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
-    """Tests that the labile phosphorus content of the top soil layer has phosphorus correctly added to it."""
-    data = SoilData()
-    data.soil_layers[0].labile_phosphorus_content = initial_labile_phosphorus
-    incorp = ManureApplication(data)
-
-    incorp._add_to_labile_phosphorus(added_phosphorus, field_size)
-    observe = incorp.data.soil_layers[0].labile_phosphorus_content
-
-    expect = initial_labile_phosphorus * field_size
-    expect += added_phosphorus
-    expect /= field_size
-
-    assert observe == expect
-
-
-@pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
-    (3, 6.8, 1.5),
-    (0.87, 1.235, 1),
-    (8.9284921, 5.18393, 2.393481),
-    (0.34, 2.495821, 4.10184),
-    (2.39854, 0, 3.29184)
-])
-def test_add_to_stable_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
-    """Tests that the stable phosphorus content of the top soil layer has phosphorus correctly added to it."""
-    data = SoilData()
-    data.soil_layers[0].labile_phosphorus_content = initial_labile_phosphorus
-    incorp = ManureApplication(data)
-
-    incorp._add_to_labile_phosphorus(added_phosphorus, field_size)
-    observe = incorp.data.soil_layers[0].labile_phosphorus_content
-
-    expect = initial_labile_phosphorus * field_size
-    expect += added_phosphorus
-    expect /= field_size
-
-    assert observe == expect
-
-
 @pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_coverage,weiP_frac", [
     (1000, 0.18, 200, 0.89, 0.5),
     (955, 0.44, 100, 0.76, 0.47),
@@ -190,8 +144,8 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     incorp = ManureApplication(data)
     incorp._determine_wet_rate_factor = MagicMock(return_value=2000)
     incorp._determine_infiltration_factor = MagicMock(return_value=0.5)
-    incorp._add_to_labile_phosphorus = MagicMock()
-    incorp._add_to_active_phosphorus = MagicMock()
+    incorp.data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
+    incorp.data.soil_layers[0].add_to_active_phosphorus = MagicMock()
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 2050,
                                                                            "new_moisture_factor": 0.93,
                                                                            "new_field_coverage": 0.98})
@@ -213,8 +167,8 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     incorp._determine_infiltration_factor.assert_called_once_with(2000)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(1000, 0.8, 0.9, expect_adjusted_dry_mass,
                                                                          dry_frac, expect_adjusted_coverage)
-    incorp._add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
-    incorp._add_to_active_phosphorus.assert_called_once_with(expect_active, area)
+    incorp.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
+    incorp.data.soil_layers[0].add_to_active_phosphorus.assert_called_once_with(expect_active, area)
     assert incorp.data.machine_manure_dry_mass == 2050
     assert incorp.data.machine_manure_moisture_factor == 0.93
     assert incorp.data.machine_manure_field_coverage == 0.98

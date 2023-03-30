@@ -2,7 +2,7 @@ import pytest
 from typing import Dict, List
 from math import inf
 from dataclasses import asdict
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -166,7 +166,8 @@ def test_profile_soil_water_content() -> None:
     """Test that SoilData correctly calculates amount of water in the entire soil profile"""
     # Set water content and wilting point content of every soil layer to certain amount
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
-                        water_content=PropertyMock(return_value=0.87),
+                        soil_water_concentration=PropertyMock(return_value=0.87),
+                        layer_thickness=PropertyMock(return_value=1),
                         wilting_point_content=PropertyMock(return_value=0.32)):
         soil_data = SoilData()
         observe = soil_data.profile_soil_water_content
@@ -363,7 +364,8 @@ def test_excess_water_available(water_content: float, field_capacity_content: fl
     """Test that excess_water_available() in LayerData correctly calculates the amount of excess water available in a
         layer"""
     with patch.multiple('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData',
-                        water_content=PropertyMock(return_value=water_content),
+                        soil_water_concentration=PropertyMock(return_value=water_content),
+                        layer_thickness=PropertyMock(return_value=1),
                         field_capacity_content=PropertyMock(return_value=field_capacity_content)):
         layer = LayerData(top_depth=0, bottom_depth=30)
         observe = layer.excess_water_available
@@ -384,7 +386,8 @@ def test_acceptable_percolation_amount(water_content: float, saturation_content:
     """Test that acceptable_percolation_amount() in LayerData correctly calculates the maximum amount of water that can
         be percolated into it"""
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
-                        water_content=PropertyMock(return_value=water_content),
+                        soil_water_concentration=PropertyMock(return_value=water_content),
+                        layer_thickness=PropertyMock(return_value=1),
                         saturation_content=PropertyMock(return_value=saturation_content)):
         layer = LayerData(top_depth=0, bottom_depth=30)
         observe = layer.acceptable_percolation_amount
@@ -406,4 +409,51 @@ def test_percent_organic_matter_content(percent_organic_carbon_content: float) -
     layer = LayerData(top_depth=0, bottom_depth=30, percent_organic_carbon_content=percent_organic_carbon_content)
     observe = layer.percent_organic_matter_content
     expect = 1.72 * percent_organic_carbon_content
+    assert observe == expect
+
+
+@pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
+    (100, 450, 1.5),
+    (78, 335, 1),
+    (150, 800, 2.393481),
+    (200, 467, 4.10184),
+    (138, 0, 3.29184),
+])
+def test_add_to_labile_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
+    """Tests that the labile phosphorus content of the top soil layer has phosphorus correctly added to it."""
+    layer = LayerData(top_depth=0, bottom_depth=30, labile_phosphorus_content=initial_labile_phosphorus)
+    layer._add_phosphorus_to_pool = MagicMock(return_value=100)
+
+    layer.add_to_labile_phosphorus(added_phosphorus, field_size)
+
+    layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
+    assert layer.labile_phosphorus_content == 100
+
+
+@pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
+    (210, 460, 1.8),
+    (135, 540, 2.37),
+    (95, 300, 1.88),
+    (215, 0, 4.15),
+])
+def test_add_to_active_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
+    """Tests that the stable phosphorus content of the top soil layer has phosphorus correctly added to it."""
+    layer = LayerData(top_depth=0, bottom_depth=27, labile_phosphorus_content=initial_labile_phosphorus)
+    layer._add_phosphorus_to_pool = MagicMock(return_value=200)
+
+    layer.add_to_labile_phosphorus(added_phosphorus, field_size)
+
+    layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
+    assert layer.labile_phosphorus_content == 200
+
+
+@pytest.mark.parametrize("pool,added_phosphorus,area", [
+    (400, 35, 1.8),
+    (166, 84, 3.8),
+    (0, 221, 2.334),
+])
+def test_add_phosphorus_to_pool(pool: float, added_phosphorus: float, area: float) -> None:
+    """Tests that this method correctly calculates the new value of the soil phosphorus pool being added to."""
+    observe = LayerData._add_phosphorus_to_pool(pool, added_phosphorus, area)
+    expect = pool + (added_phosphorus / area)
     assert observe == expect

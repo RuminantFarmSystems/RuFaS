@@ -204,10 +204,10 @@ class ManureApplication:
         mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
             soil_infiltration * 0.95
         mass_to_add_to_labile_P += total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
-        self._add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
+        self.data.soil_layers[0].add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
         mass_to_add_to_active_P = total_phosphorus_mass * stable_inorganic_phosphorus_fraction * soil_infiltration
-        self._add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
+        self.data.soil_layers[0].add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
 
         adjusted_field_coverage = field_coverage * 0.5
         adjusted_dry_matter_mass = dry_matter_mass * 0.8
@@ -219,52 +219,6 @@ class ManureApplication:
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
-
-    def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil
-            profile.
-
-        Parameters
-        ----------
-            phosphorus_to_add: float
-                Amount of phosphorus to add (kg)
-            field_size: float
-                Size of the field (ha)
-
-        Notes
-        -----
-        Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount of
-        labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then converts the
-        new mass to kg per ha.
-
-        """
-        # TODO: move to LayerData - Issue #403
-        labile_phosphorus_mass = self.data.soil_layers[0].labile_phosphorus_content * field_size
-        labile_phosphorus_mass += phosphorus_to_add
-        self.data.soil_layers[0].labile_phosphorus_content = labile_phosphorus_mass / field_size
-
-    def _add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method adds a specified mass of phosphorus to the active phosphorus content of the top layer of the soil
-            profile.
-
-        Parameters
-        ----------
-            phosphorus_to_add: float
-                Amount of phosphorus to add (kg)
-            field_size: float
-                Size of the field (ha)
-
-        Notes
-        -----
-        Before adding the mass of phosphorus to the active phosphorus content, it first converts the current amount of
-        active phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then converts the
-        new mass to kg per ha.
-
-        """
-        # TODO: move to LayerData - Issue #403
-        active_phosphorus_mass = self.data.soil_layers[0].active_phosphorus_content * field_size
-        active_phosphorus_mass += phosphorus_to_add
-        self.data.soil_layers[0].active_phosphorus_content = active_phosphorus_mass / field_size
 
     # --- Static Methods ---
     @staticmethod
