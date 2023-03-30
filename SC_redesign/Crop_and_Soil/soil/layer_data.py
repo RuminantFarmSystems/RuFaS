@@ -69,7 +69,6 @@ class LayerData:
     plant_metabolic_active_carbon_remaining: Optional[float] = None
     """plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-
     plant_structural_active_carbon_usage: Optional[float] = None
     """plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11)"""
     plant_structural_active_carbon_loss: Optional[float] = None
