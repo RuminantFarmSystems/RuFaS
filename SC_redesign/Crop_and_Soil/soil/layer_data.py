@@ -19,7 +19,7 @@ class LayerData:
     """phosphate content of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    water_content:  Optional[float] = None
+    water_content: Optional[float] = None
     """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
@@ -68,7 +68,6 @@ class LayerData:
     """plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
     plant_metabolic_active_carbon_remaining: Optional[float] = None
     """plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
-
 
     plant_structural_active_carbon_usage: Optional[float] = None
     """plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11)"""

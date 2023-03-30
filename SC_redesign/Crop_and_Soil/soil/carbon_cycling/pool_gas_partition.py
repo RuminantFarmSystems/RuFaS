@@ -1,5 +1,4 @@
-import math
-from typing import Optional, List
+from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
@@ -20,6 +19,7 @@ class PoolGasPartition:
         The SoilData object used by this module to track carbon pool gas partition activity,
         creates new one if one is not provided.
     """
+
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
@@ -128,7 +128,6 @@ class PoolGasPartition:
                 layer.passive_carbon_amount, layer.slow_to_passive_carbon_amount,
                 layer.active_carbon_to_passive_amount, layer.passive_carbon_decomposition_amount)
 
-
     @staticmethod
     def _determine_soil_passive_carbon_amount(passive_carbon_amount: float, slow_to_passive_carbon_amount: float,
                                               active_carbon_to_passive_amount: float,
@@ -148,12 +147,13 @@ class PoolGasPartition:
 
         """
         return passive_carbon_amount + slow_to_passive_carbon_amount + active_carbon_to_passive_amount - \
-               passive_carbon_decomposition_amount
+            passive_carbon_decomposition_amount
 
     # ---- S.6.C.12
     @staticmethod
     def _determine_soil_slow_carbon_amount(slow_carbon_amount: float, plant_structural_slow_carbon_remaining: float,
-                                           soil_structural_slow_carbon_remaining: float, active_carbon_to_slow_amount: float,
+                                           soil_structural_slow_carbon_remaining: float,
+                                           active_carbon_to_slow_amount: float,
                                            slow_carbon_decomposition_amount: float):
         """
         Aggregate the total amount of slow carbon in the layer
@@ -173,7 +173,7 @@ class PoolGasPartition:
 
         """
         return slow_carbon_amount + plant_structural_slow_carbon_remaining + soil_structural_slow_carbon_remaining + \
-               active_carbon_to_slow_amount - slow_carbon_decomposition_amount
+            active_carbon_to_slow_amount - slow_carbon_decomposition_amount
 
     # ---- S.6.C.11
     @staticmethod
@@ -213,7 +213,8 @@ class PoolGasPartition:
 
     @staticmethod
     def _determine_soil_active_carbon_amount(active_carbon_amount: float, plant_active_decompose_carbon: float,
-                                             soil_active_decompose_carbon: float, passive_to_active_carbon_amount: float,
+                                             soil_active_decompose_carbon: float,
+                                             passive_to_active_carbon_amount: float,
                                              slow_to_active_carbon_amount: float,
                                              active_carbon_decomposition_amount: float) -> float:
         """
@@ -232,7 +233,7 @@ class PoolGasPartition:
         pseudocode_soil Reference: S.6.C.11
         """
         return active_carbon_amount + plant_active_decompose_carbon + soil_active_decompose_carbon \
-               + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
+            + slow_to_active_carbon_amount + passive_to_active_carbon_amount - active_carbon_decomposition_amount
 
     @staticmethod
     def _determine_passive_to_active_carbon_amount(passive_carbon_decomposition_amount: float,
@@ -283,7 +284,8 @@ class PoolGasPartition:
         return slow_carbon_decomposition_amount * (1 - slow_carbon_loss_rate - slow_carbon_passive_decompose_rate)
 
     @staticmethod
-    def _determine_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float, slow_carbon_loss_rate=0.55) -> float:
+    def _determine_slow_carbon_co2_lost_amount(slow_carbon_decomposition_amount: float,
+                                               slow_carbon_loss_rate=0.55) -> float:
         """
         Calculates slow carbon lost as CO2 during decomposition in the layer(kg/ha)
         Args:
@@ -326,7 +328,8 @@ class PoolGasPartition:
 
     # ---- S.6.C.7
     @staticmethod
-    def _determine_active_carbon_to_slow_loss(active_carbon_decomposition_amount: float, carbon_lost_adjusted_factor: float,
+    def _determine_active_carbon_to_slow_loss(active_carbon_decomposition_amount: float,
+                                              carbon_lost_adjusted_factor: float,
                                               ) -> float:
         """
         Calculate active carbon lost as CO2 during decomposition into slow carbon in the layer (kg/ha)
@@ -341,7 +344,8 @@ class PoolGasPartition:
         return active_carbon_decomposition_amount * carbon_lost_adjusted_factor
 
     @staticmethod
-    def _determine_active_carbon_to_slow_amount(active_carbon_decomposition_amount: float, carbon_lost_adjusted_factor: float,
+    def _determine_active_carbon_to_slow_amount(active_carbon_decomposition_amount: float,
+                                                carbon_lost_adjusted_factor: float,
                                                 ) -> float:
         """
         Calculate active carbon decomposed into slow carbon in the layer (kg/ha)
@@ -387,7 +391,7 @@ class PoolGasPartition:
         pseudocode_soil Reference: S.6.C.5
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * passive_carbon_amount * \
-               passive_carbon_decomposition_factor
+            passive_carbon_decomposition_factor
 
     # ---- S.6.C.4
     @staticmethod
@@ -408,12 +412,13 @@ class PoolGasPartition:
         pseudocode_soil Reference: S.6.C.4
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * slow_carbon_amount * \
-               slow_carbon_decomposition_factor
+            slow_carbon_decomposition_factor
 
     # ---- S.6.C.3
     @staticmethod
     def _determine_active_carbon_decomposition_amount(moisture_effect: float, temperature_effect: float,
-                                                      active_carbon: float, active_carbon_decomposition_rate: float) -> float:
+                                                      active_carbon: float,
+                                                      active_carbon_decomposition_rate: float) -> float:
         """
         Calculates active carbon decomposed into slow or passive carbon and CO2 in the layer (kg/ha)
         Args:
