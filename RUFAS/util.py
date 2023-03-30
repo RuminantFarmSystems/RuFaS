@@ -219,15 +219,16 @@ class Utility:
         # Note: dictionary keys must be strings
         if isinstance(obj, dict):
             return {
-                str(cls._make_serializable(key, depth + 1, max_depth)):
-                    cls._make_serializable(value, depth + 1, max_depth)
+                str(cls._make_serializable(key, depth, max_depth)):
+                    cls._make_serializable(value, depth, max_depth)
                 for key, value in obj.items()
             }
 
         # If the object is a custom class, serialize its __dict__ attribute
         if hasattr(obj, '__dict__'):
-            return cls._make_serializable(obj.__dict__, depth + 1, max_depth)
+            return cls._make_serializable(obj.__dict__, depth, max_depth)
 
+        # When none of the above conditions are met, return a string representation of the object.
         return cls._get_str(obj)
 
     @classmethod
@@ -251,10 +252,10 @@ class Utility:
 
         Normally, the default __str__ method returns a string of the format:
         `<module>.<class> object at <memory address>`.
-        Here, we want to simplify the string to the format:
+        Here, we want to simplify that string to the format:
         `<class> object at <memory address>`.
 
-        This turns out to save quite a bit of space when serializing objects.
+        This turns out to be saving quite a bit of space when serializing objects.
 
         """
         if obj.__class__.__str__ != object.__str__:
