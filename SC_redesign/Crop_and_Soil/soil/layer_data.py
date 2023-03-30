@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 """
@@ -19,7 +19,7 @@ class LayerData:
     """phosphate content of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    water_content:  Optional[float] = None
+    water_content:  float = field(init=False)
     """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
