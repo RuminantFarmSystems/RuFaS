@@ -55,7 +55,10 @@ def test_dry_cow_manure_calculations(methane_model: str,
     )
 
     urine = 15.4
-    total_manure_excreted = 0.022 * body_weight + 21.844
+    total_manure_excreted = total_manure_excreted = (0.00711 * body_weight 
+                            + 0.324 * CP_concentration
+                            + 0.259 * NDF_concentration
+                            + 8.05) 
     total_solids = 0.178 * dry_matter_intake + 2.733
     organic_matter_intake = dry_matter_intake - ash_diet_content
     total_volatile_solids = (-1.201
@@ -67,13 +70,20 @@ def test_dry_cow_manure_calculations(methane_model: str,
                                   + 0.029 * NDF_concentration
                                   - 0.023 * CP_concentration)
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
-    manure_nitrogen = (12.747 * dry_matter_intake
-                       + 1606.290 * (CP_concentration / 100)
-                       - 117.5)
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 100)
+    manure_nitrogen = (15.1 + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
+    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+    urine_urea_nitrogen_concentration_lower_bound = 2
+    urine_urea_nitrogen_concentration_upper_bound = 12
+    if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_lower_bound
+    elif urine_urea_nitrogen_concentration > urine_urea_nitrogen_concentration_upper_bound:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
+    else:
+        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
     potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS

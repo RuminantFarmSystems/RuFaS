@@ -8,6 +8,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 from typing import Tuple
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
@@ -46,31 +47,37 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    # Manure excretion
-    # Amount of feces and urine excreted daily by the calf, kg [A.3A.A.1]
-    total_manure_excreted = 0.0567 * body_weight
-
-    # Total solids excretion
-    # Amount of dry material excreted by the calf, kg [A.3A.A.2]
-    total_solids = 0.0093 * body_weight
-
-    # Total volatile solids, kg/day [A.3A.A.3]
-    total_volatile_solids = 0.0023 * body_weight
-
-    # Degradable volatile solids, kg/day [A.3C.A.5]
-    degradable_volatile_solids = 0.9 * total_volatile_solids
-
-    # Non-degradable volatile solids, kg/day
-    non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
-
-    # Nitrogen excretion
-    # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
-    # TODO: Review this part. It was added to get the dry matter intake and CP concentration.
     nutrient_amounts, nutrient_concentrations = ration_report(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     CP_concentration = nutrient_concentrations['CP']
-    manure_nitrogen = 112.55 * dry_matter_intake * (CP_concentration / 100)
+
+    # Manure excretion
+    # Amount of feces and urine excreted daily by the calf, kg [A.3A.A.1]
+    total_manure_excreted = 3.45 * dry_matter_intake
+
+    # Total urine, kg [A.3A.A.2]
+    urine = 2.0
+
+    # Total solids excretion
+    # Amount of dry material excreted by the calf, kg [A.3A.A.3]
+    total_solids = 0.393 * dry_matter_intake
+
+    # Total volatile solids, kg/day [A.3A.A.4]
+    total_volatile_solids = 0.0023 * body_weight
+
+    # Degradable volatile solids, kg/day [A.3A.A.5]
+    degradable_volatile_solids = 0.9 * total_volatile_solids
+
+    # Non-degradable volatile solids, kg/day [A.3A.A.6]
+    non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
+
+    # Nitrogen excretion
+    # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
+    manure_nitrogen = (112.55 * dry_matter_intake *
+                       (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
+
+    # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
     urine_nitrogen = 0.45 * manure_nitrogen
 
     # Methane emissions, g/day [A.3A.C.1]
@@ -89,7 +96,7 @@ def manure_calculations(ration_formulation,
      manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
 
     manure_excretion_values = AnimalManureExcretions(
-        urea=0.340,  # TODO: Implement with correct equation
+        urea=9.52,  # 0.340 mol/L TODO: Implement with correct equation
         urine=2,
         # TODO: Implement with correct equation
         total_ammoniacal_nitrogen_concentration=0.14,
