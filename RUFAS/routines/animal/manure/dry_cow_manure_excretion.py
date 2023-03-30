@@ -21,6 +21,7 @@ def manure_calculations(ration_formulation,
                         daily_milk_production: float,
                         fecal_phosphorus: float,
                         urine_phosphorus_required: float,
+                        methane_model: str,
                         metabolizable_energy_intake: float) \
         -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
@@ -39,6 +40,8 @@ def manure_calculations(ration_formulation,
         Amount of fecal phosphorus excreted by the current animal, g.
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Mills, IPCC.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
 
@@ -65,6 +68,10 @@ def manure_calculations(ration_formulation,
     EE_concentration = nutrient_concentrations["EE"]  # TODO: Unused
     ADF_concentration = nutrient_concentrations['ADF']
     starch_concentration = nutrient_concentrations['starch']
+    # Soluble residue
+    # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
+    soluble_residue = (100 - ASH_concentration) - \
+        NDF_concentration - CP_concentration - EE_concentration
     # TODO: Further calculations to account for entire diet:
     # DMI: dry matter intake, kg
     # DM: dietary dry matter, % of diet
@@ -141,11 +148,18 @@ def manure_calculations(ration_formulation,
     potassium = dry_matter_intake * \
         (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
-    # Methane emissions, g/day [A.3F.C.1]
-    # Methane model = 'Mills'
-    methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
-                                                 * metabolizable_energy_intake * 4.184)) / 0.05565
-    # TODO: Implement the other methane model - IPCC Tier 2. But need to pass in a methane_model parameter first.
+    # Methane emissions, g/day
+    methane_emission = 0.0
+    if methane_model == "Mills":
+        # Methane model = 'Mills' [A.3E.C.2]
+        methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
+                                                     * metabolizable_energy_intake * 4.184)) / 0.05565
+    else:
+        # Default: IPCC Tier 2
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)  # [A.3B.C.2]
+        methane_emission = (0.065 * gross_energy_concentration *
+                            dry_matter_intake) / 0.05565  # [A.3B.C.3]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,

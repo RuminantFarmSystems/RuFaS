@@ -183,9 +183,10 @@ def manure_calculations(ration_formulation,
         gross_energy_concentration = (0.263 * CP_concentration
                                       + 0.522 * EE_concentration
                                       + 0.198 * NDF_concentration
-                                      + 0.160 * soluble_residue)  # [A.3E.C.3]
+                                      + 0.160 * soluble_residue)  # [A.3B.C.2]
         methane_emission = 0.065 * gross_energy_concentration * \
-            dry_matter_intake / 0.05565  # [A.3E.C.4]
+            dry_matter_intake / 0.05565  # [A.3B.C.3]
+
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,

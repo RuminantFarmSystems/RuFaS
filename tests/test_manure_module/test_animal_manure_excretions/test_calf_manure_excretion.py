@@ -1,5 +1,6 @@
 from typing import Optional
 
+import pytest
 from pytest import approx
 from pytest_mock import MockFixture
 
@@ -7,8 +8,15 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
+@pytest.mark.parametrize(
+    'methane_model',
+    [
+        
+    ]
+)
 
-def test_calf_manure_excretions(mocker: MockFixture) -> None:
+def test_calf_manure_excretions(methane_model: str,
+                                mocker: MockFixture) -> None:
     """Unit test for the manure_calculations function in calf_manure_excretion.py."""
     # Arrange
     mock_ration_formulation = mocker.MagicMock()
@@ -40,7 +48,9 @@ def test_calf_manure_excretions(mocker: MockFixture) -> None:
                        (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
     urine_nitrogen = 0.45 * manure_nitrogen
 
-    methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission = 0.0
+    if methane_model:
+        methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
 
     total_phosphorus_excreted = 3.0
     inorganic_phosphorus_fraction = 0.4
@@ -71,7 +81,8 @@ def test_calf_manure_excretions(mocker: MockFixture) -> None:
         feed=mock_feed,
         body_weight=body_weight,
         fecal_phosphorus=fecal_phosphorus,
-        urine_phosphorus_required=urine_phosphorus_required
+        urine_phosphorus_required=urine_phosphorus_required, 
+        methane_model=methane_model
     )
 
     # Assert

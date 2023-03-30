@@ -18,7 +18,8 @@ def manure_calculations(ration_formulation,
                         feed,
                         body_weight: float,
                         fecal_phosphorus: float,
-                        urine_phosphorus_required: float) \
+                        urine_phosphorus_required: float,
+                        methane_model: str) \
         -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a calf with information from the ration formulation.
 
@@ -34,6 +35,8 @@ def manure_calculations(ration_formulation,
         Amount of fecal phosphorus excreted by the current animal, g.
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
 
     Returns
     -------
@@ -78,7 +81,9 @@ def manure_calculations(ration_formulation,
     urine_nitrogen = 0.45 * manure_nitrogen
 
     # Methane emissions, g/day [A.3A.C.1]
-    methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission = 0.0
+    if methane_model:
+        methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=0,
