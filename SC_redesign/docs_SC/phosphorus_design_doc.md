@@ -29,11 +29,11 @@ on which details can be found here: [design-document_SC-redesign.md](design-docu
 ---
 
 ## Context
-The Phosphorus Cycling submodule is based largely on the SurPhos model for predicting the portions of phosphorus that are lost from the soil 
-surface in runoff. It was designed specifically to improve on the shortcomings of the SWAT model in this aspect. 
-Currently (March 2023), the state of the Phosphorus Cycling submodule (`RUFAS/routines/field/soil/phosphorus_cycling/`) 
-is in the same state of disarray as the rest of the Soil and Crop module, described in the above document describing the
-Soil and Crop redesign.
+The Phosphorus Cycling submodule is based largely on the SurPhos model for predicting the portions of phosphorus that 
+are lost from the soil surface in runoff. It was designed specifically to improve on the shortcomings of the SWAT model 
+in this aspect. Currently (March 2023), the state of the Phosphorus Cycling submodule 
+(`RUFAS/routines/field/soil/phosphorus_cycling/`)is in the same state of disarray as the rest of the Soil and Crop 
+module, described in the above document describing the Soil and Crop redesign.
 
 ---
 
@@ -47,9 +47,10 @@ This submodule will serve as the composite class for PC. It will include
 the field.
 - methods used by multiple PC sub-modules
 
-It will be structured similar to other [Soil and Crop classes](design-document_SC-redesign.md#module-design-and-structure), with one notable difference:
-all states related to phosphorus will be maintained in `SoilData` and `LayerData` instances, not in a 
-`@dataclass` specific to PC.
+It will be structured similar to other 
+[Soil and Crop classes](design-document_SC-redesign.md#module-design-and-structure), with one notable difference: all 
+states related to phosphorus will be maintained in `SoilData` and `LayerData` instances, not in a `@dataclass` specific
+to PC.
 
 ### Fertilizer
 `Fertilizer` serves as the handler of all additions and daily management of phosphorus that comes from fertilizer on the
@@ -68,8 +69,9 @@ via fertilizer (~1 time per year). This reflects the most common real-world agri
 This submodule handles **applying** phosphorus from manure to a field (which is, arguably, a crappier way to apply 
 phosphorus than applying via fertilizer). When implementing this submodule, the original intent was to have everything 
 in the `Manure` module but the application operations became too complex, and necessitated separate modules. 
-There are two methods to be used by higher level modules. One is for manure applied by animals grazing in a field [grazing not yet implemented in RuFaS], and 
-the other is for manure applied by machine. Each type of manure has its own set of pools and factors that includes
+There are two methods to be used by higher level modules. One is for manure applied by animals grazing in a field 
+[grazing not yet implemented in RuFaS], and the other is for manure applied by machine. Each type of manure has its own 
+set of pools and factors that includes
 * Pools of Phosphorus
   * Water-extractable inorganic pool
   * Water-extractable organic pool
@@ -112,8 +114,8 @@ discussed more in the [Open Questions](#open-questions) section.
 ---
 
 ## Open Questions
-* Currently (Mar 29, 2023), the module does not maintain a top layer soil with a depth of 20 mm (as required by SurPhos), and there are many 
-potential ways that this requirement could be realized:
+* Currently (Mar 29, 2023), the module does not maintain a top layer soil with a depth of 20 mm (as required by 
+SurPhos), and there are many potential ways that this requirement could be realized:
   * Override user input and always add a 20 mm top layer to the soil profile.
     * Pros: 
       * Does not require change in the implementation details of modules that have already been implemented.
