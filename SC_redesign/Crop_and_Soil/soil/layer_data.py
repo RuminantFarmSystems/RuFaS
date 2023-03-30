@@ -10,7 +10,7 @@ to represent its soil
 @dataclass
 class LayerData:
 
-    
+
     top_depth: Optional[float] = None
     """top depth of the layer (mm)"""
     bottom_depth: Optional[float] = None
