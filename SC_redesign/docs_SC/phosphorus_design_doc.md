@@ -3,7 +3,7 @@
 Authors: Ed Hansen  
 Date Created: 27 Mar 2023  
 Last Updated: 27 Mar 2023  
-Reviewers: [Add your names here!]
+Reviewers: Clay Morrow
 
 ## Contents:
 1. [Overview](#overview)
@@ -29,7 +29,7 @@ here: [design-document_SC-redesign.md](design-document_SC-redesign.md).
 ---
 
 ## Context
-The Phosphorus Cycling submodule is based largely on the SurPhos model for predicting Phosphorus lost from the soil 
+The Phosphorus Cycling submodule is based largely on the SurPhos model for predicting the portions of phosphorus that are lost from the soil 
 surface in runoff. It was designed specifically to improve on the shortcomings of the SWAT model in this aspect. 
 Currently (March 2023), the state of the Phosphorus Cycling submodule (`RUFAS/routines/field/soil/phosphorus_cycling/`) 
 is in the same state of disarray as the rest of the Soil and Crop module, described in the above document describing the
@@ -47,7 +47,7 @@ This submodule will serve as the composite class for PC. It will include
 the field.
 - methods used by multiple PC sub-modules
 
-It will be structured the same as its counterpart composite classes in higher level modules with one notable difference:
+It will be structured similar to other [Soil and Crop classes](design-document_SC-redesign.md#module-design-and-structure), with one notable difference:
 all states related to phosphorus will be maintained in `SoilData` and `LayerData` instances, not in a 
 `@dataclass` specific to PC.
 
@@ -62,13 +62,13 @@ parameters:
    * the size of the field on which these operations are occurring
 
 The `Fertilizer` submodule is designed with the assumption that there will not be frequent applications of phosphorus 
-via fertilizer (~1 time per year). This reflects real-world agricultural practices.
+via fertilizer (~1 time per year). This reflects the most common real-world agricultural practices.
 
 ### Manure Application
-This submodule handles **applying** phosphorus from manure to a field (which is, arguably, a shittier way to apply 
+This submodule handles **applying** phosphorus from manure to a field (which is, arguably, a crappier way to apply 
 phosphorus than applying via fertilizer). When implementing this submodule, the original intent was to have everything 
-in the `Manure` module but the application operations became too complex, and necessitated having their own module. 
-There are two methods to be used by higher level modules. One is for manure applied by animals grazing in a field, and 
+in the `Manure` module but the application operations became too complex, and necessitated separate modules. 
+There are two methods to be used by higher level modules. One is for manure applied by animals grazing in a field [grazing not yet implemented in RuFaS], and 
 the other is for manure applied by machine. Each type of manure has its own set of pools and factors that includes
 * Pools of Phosphorus
   * Water-extractable inorganic pool
@@ -112,7 +112,7 @@ discussed more in the [Open Questions](#open-questions) section.
 ---
 
 ## Open Questions
-* Currently (Mar 29, 2023), the module does not maintain a top layer soil with a depth of 20 mm, and there are many 
+* Currently (Mar 29, 2023), the module does not maintain a top layer soil with a depth of 20 mm (as required by SurPhos), and there are many 
 potential ways that this requirement could be realized:
   * Override user input and always add a 20 mm top layer to the soil profile.
     * Pros: 
