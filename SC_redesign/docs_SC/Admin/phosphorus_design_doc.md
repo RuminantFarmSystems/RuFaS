@@ -38,7 +38,7 @@ module, described in the above document describing the Soil and Crop redesign.
 ---
 
 ## Requirements
-This section will list the requirements of PC in order to be integrated with and used by other modules. 
+This section will list the features of PC required in order to be integrated with and used by other modules. 
 * Provide a composite class that can be used by higher level modules to efficiently and effectively manage phosphorus on
 and in the soil, including
   * Phosphorus content on the soil surface.
@@ -72,7 +72,7 @@ cases the model will treat the soil profile as if it had the original top layer 
 ---
 
 ## Alternative Solution
-Some solutions considered when this design was being flushed out:
+Some solutions considered when this design was being fleshed out:
 * Maintain a special set of pools in the soil profile that are used to track what is in the top 20 mm of the soil 
     profile.
   * Pros:
