@@ -44,7 +44,7 @@ def test_determine_plant_residue_metabolic_fraction(plant_lignin_nitrogen_ratio:
 
 
 @pytest.mark.parametrize("plant_metabolic_carbon_amount, plant_residue_metabolic_fraction,"
-                         "plant_dry_matter_harvest_residue_amount, plant_metabolic_active_carbon_usage, "
+                         "plant_dry_matter_residue_amount, plant_metabolic_active_carbon_usage, "
                          "plant_metabolic_to_soil_carbon_amount", [
                              (3, 8, 7, 1, 2),
                              (60, 64, 85, 40, 30),
@@ -52,17 +52,16 @@ def test_determine_plant_residue_metabolic_fraction(plant_lignin_nitrogen_ratio:
                          ])
 def test_determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount: float,
                                                  plant_residue_metabolic_fraction: float,
-                                                 plant_dry_matter_harvest_residue_amount: float,
+                                                 plant_dry_matter_residue_amount: float,
                                                  plant_metabolic_active_carbon_usage: float,
                                                  plant_metabolic_to_soil_carbon_amount: float) -> None:
     """Tests that the updated plant metabolic carbon amount is calculated correctly"""
-    expected = plant_metabolic_carbon_amount + plant_dry_matter_harvest_residue_amount \
+    expected = plant_metabolic_carbon_amount + plant_dry_matter_residue_amount \
         * plant_residue_metabolic_fraction - \
         (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
     assert expected == ResiduePartition._determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount,
                                                                                  plant_residue_metabolic_fraction,
-                                                                                 plant_dry_matter_harvest_residue_amount
-                                                                                 ,
+                                                                                 plant_dry_matter_residue_amount,
                                                                                  plant_metabolic_active_carbon_usage,
                                                                                  plant_metabolic_to_soil_carbon_amount)
 

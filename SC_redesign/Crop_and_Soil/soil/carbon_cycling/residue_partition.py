@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
@@ -94,7 +94,7 @@ class ResiduePartition:
     @staticmethod
     def _determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount: float,
                                                  plant_residue_metabolic_fraction: float,
-                                                 plant_dry_matter_harvest_residue_amount: float,
+                                                 plant_dry_matter_residue_amount: float,
                                                  plant_metabolic_active_carbon_usage: float,
                                                  plant_metabolic_to_soil_carbon_amount: float) -> float:
         """This method calculates a return the updated plant metabolic carbon amount after adding the metabolic carbon
@@ -106,7 +106,7 @@ class ResiduePartition:
             plant metabolic carbon amount (kg/ha)
         plant_residue_metabolic_fraction: float
             fraction of plant residue that is metabolic (unitless)
-        plant_dry_matter_harvest_residue_amount: float
+        plant_dry_matter_residue_amount: float
             amount of dry matter residue at harvest (kg/ha)
         plant_metabolic_active_carbon_usage: float
             plant metabolic carbon decomposed into active carbon (kg/ha)
@@ -123,7 +123,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.4, S.6.B.I.7
 
         """
-        plant_metabolic_carbon_amount += plant_dry_matter_harvest_residue_amount \
+        plant_metabolic_carbon_amount += plant_dry_matter_residue_amount \
             * plant_residue_metabolic_fraction - \
             (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
         return plant_metabolic_carbon_amount
