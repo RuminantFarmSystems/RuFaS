@@ -12,6 +12,8 @@ import numpy as np
 import random
 from scipy.optimize import minimize
 import json
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration_values as user_defined_ration_values
 udrv = user_defined_ration_values()
 
@@ -589,7 +591,19 @@ def optimize(user_defined_ration_select):
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
     cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
     heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
-    user_cons = [con1, con2, con3, con4, con5, con6, con7, con9, con10] 
+    user_cons = [con1, con2, con3, con4, con5, con6, con7, con9, con10]
+
+    def is_constraint_violated(solution, constraint) -> bool:
+        result = constraint['fun'](solution)
+        if constraint['type'] == 'ineq' and result < 0:
+            return True
+        elif constraint['type'] == 'eq' and not np.isclose(result, 0):
+            return True
+        else:
+            return False
+
+    def find_failed_constraints(solution, constraints):
+        return list(filter(lambda c: is_constraint_violated(solution, c), constraints))
 
     if user_defined_ration_select:
         # accumulator = []
@@ -625,6 +639,20 @@ def optimize(user_defined_ration_select):
             if chanchodebug: print('constraint 11 ' + str(constraint_check_.success))
         else:
             print('success!\n\n\n\n\n\n')
+
+        # Uncomment to use
+        # if not usermod.success:
+        #     failed_constraints = find_failed_constraints(usermod.x, user_cons)
+        #     if not failed_constraints:
+        #         print('No constraints violated')
+        #
+        #     for constr in failed_constraints:
+        #         # add warnings to output manager
+        #         # or print out to console or both
+        #         print(f'Constraint {constr} violated')
+        #         print(f'Constraint value: {constr["fun"](usermod.x)}')
+        #         print(f'Constraint type: {constr["type"]}')
+
         return usermod
     elif animal_type == 'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
