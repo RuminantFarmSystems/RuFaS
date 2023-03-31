@@ -19,7 +19,7 @@ udrv = user_defined_ration_values()
 from RUFAS.routines.animal.ration.user_defined_ration import ration_to_use as ration_to_use
 
 
-def optimization(requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False):
+def optimization(pen, requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -75,8 +75,8 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
         print(count)
         if count > 30:
             solution = None
-            mock_solution = user_defined_solution(animal_type, cow_type,requirements.DMIest)
-            ration_vals = NLP.get_ration_vals(mock_solution)
+            mock_solution = user_defined_solution(pen, requirements.DMIest)
+            ration_vals = NLP.get_ration_vals_null(mock_solution)
             print('nullvals')
             return solution, ration_vals
 
@@ -88,7 +88,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     return solution, ration_vals
 
 
-def user_defined_solution(animal_type, cow_type, DMIest):
+def user_defined_solution(pen, DMIest):
     """
     Returns a "solution" in format of the output from the optimization function
     Simply takes the percentage values and multiplies them by estimated DMI to retrieve the calculated  ration
@@ -96,10 +96,8 @@ def user_defined_solution(animal_type, cow_type, DMIest):
 
     Parameters
     ----------
-    animal_type: str
-        'calf', 'heiferI', etc. 
-    cow_type: boolean
-        self.milking in an animal object, e.g. Lactating or not lactating
+    Pen: object of pen class
+    
     DMIest: float
 
     Returns
@@ -107,7 +105,7 @@ def user_defined_solution(animal_type, cow_type, DMIest):
     solution: list[float,]
         list of values in order of feeds available for a given animal_type
     """
-    ration_percents = ration_to_use(animal_type, cow_type)
+    ration_percents = ration_to_use(pen.animal_combination)
     solution = []
     for rationkey in ration_percents.keys():
         value = ration_percents[rationkey]*DMIest
@@ -117,7 +115,7 @@ def user_defined_solution(animal_type, cow_type, DMIest):
     return solution
 
 
-def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_defined_ration_select):
+def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_defined_ration_select):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -130,12 +128,8 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
         animal_type: string representation of the type of animal (cow, heifer)
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-    # creating instance of class requirements
-    req = Requirements()
-    req.set_requirements(pen, animal_type, False)
-    # rationall, ration_percents = userrationfromjson(animal_type, cow_type)
-    ration_percents = ration_to_use(animal_type, cow_type)
-    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
+    ration_percents = ration_to_use(pen.animal_combination)
+    solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
         total_milk_in_pen = 0.0
@@ -171,7 +165,7 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
                 print('average_running_total_milk = '+ str(average_running_total_milk))
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
+            solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select)
             if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
@@ -272,18 +266,17 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
         animal_type: string representation of the type of animal (cow, heifer)
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-    user_defined_ration_select = udrv.udr_or_not
-    if user_defined_ration_select:
-        # print('userdefined')
-        ##### THIS WILL BE REPLACED BY calling user_defined_ration CLASS values
-        ration, ration_vals = user_defined_ration(pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
-        print('returning UDR \n \n \n ')
-        return ration, ration_vals
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
 
-    solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type,)
+    user_defined_ration_select = udrv.udr_or_not
+    if user_defined_ration_select:
+        ration, ration_vals = user_defined_ration(req, pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
+        print('\n \n \n returning UDR \n \n \n ')
+        return ration, ration_vals
+
+    solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type,)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
         while not solution.success:
@@ -300,7 +293,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
                 animal.estimated_daily_milk_produced -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
+            solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type)
 
     if solution != None:
         ration = {}
