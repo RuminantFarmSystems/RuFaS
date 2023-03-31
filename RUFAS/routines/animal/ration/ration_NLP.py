@@ -502,7 +502,7 @@ def get_ration_vals_null(x):
         x: the decision vector of the NLP (should be a completed ration)
     """
     #ration vals (subject to adding other ration vals)
-    ME_tot = sum(np.multiply(x, MEact))
+    ME_tot = sum(np.multiply(x, 0.0)) # TODO Import the actual MEact values
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
@@ -538,6 +538,7 @@ def userbounds():
         ration_percents = ration_calf
 
     tribounds = []
+    # udr = user defined ration
     udr_tolerance = udrv.tolerance
     for key in ration_percents.keys():
         target = ration_percents[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
@@ -546,6 +547,7 @@ def userbounds():
         tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
         tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
     return tribounds
+
 
 def optimize(user_defined_ration_select):
     """
@@ -600,6 +602,7 @@ def optimize(user_defined_ration_select):
         if chanchodebug:
             print(usermod)
         if usermod.success == False:
+            # TODO figure out a better way to check which constraints are failing
             if chanchodebug: print(animal_type)
             constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con1)
             if chanchodebug: print('constraint 1 ' + str(constraint_check_.success))

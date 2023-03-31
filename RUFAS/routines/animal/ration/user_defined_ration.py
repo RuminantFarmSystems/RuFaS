@@ -108,7 +108,6 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
         json.dump(fff, file, indent=3)
 
 
-
 class user_defined_ration_values(object):
     """
     Reads in the user_defined_ration JSON and collects variables and dicts to use later
@@ -137,23 +136,24 @@ class user_defined_ration_values(object):
                 ration_all = json.load(f)
             lactating_cow_ration = ration_all['cow_lactating']
             dry_cow_ration = ration_all['cow_dry']
-            heifer_ration = ration_all['all_heifers']
+            heifer_ration = ration_all['growing_heifers']
             calf_ration = ration_all['calf']
-
+            close_up_ration = ration_all['close_up']
             self.calf_ration: Dict[str, Any] = calf_ration
             self.heifer_ration: Dict[str, Any]  = heifer_ration
             self.lactating_cow_ration: Dict[str, Any]  = lactating_cow_ration
             self.dry_cow_ration: Dict[str, Any]  = dry_cow_ration
             self.ration_all: Dict[str, Any]  = ration_all
-            
+            self.close_up_ration: Dict[str, Any] = close_up_ration
+
             self.tolerance = ration_all['tolerance']
             self.milk_reduction_percent = ration_all['milk_reduction_percent']
             
-            self.udr_or_not = True
+            self.udr_or_not = True # TODO: retrieve this value from the animal_management config
             
 udrv = user_defined_ration_values()
 
-def ration_to_use(animal_type, lactating):
+def ration_to_use(pen_animal_combo):
     """
     Function outputs the correct dictionary from the user_defined_ration_values class
     
@@ -169,17 +169,14 @@ def ration_to_use(animal_type, lactating):
     ration_percents: Dict
         dictionary of feed ids and their associated percentage of DMI 
     """
-    ration_calf = udrv.calf_ration
-    ration_all_heifers = udrv.heifer_ration
-    ration_cow_lactating = udrv.lactating_cow_ration
-    ration_cow_dry = udrv.lactating_cow_ration
-    if animal_type == 'cow':
-        if lactating:
-            ration_percents = ration_cow_lactating
-        else:
-            ration_percents = ration_cow_dry
-    elif animal_type == 'heifer':
-        ration_percents = ration_all_heifers
+    group = pen_animal_combo.name 
+    if group == 'LAC_COW':
+        ration_percents = udrv.lactating_cow_ration
+    # elif pen.classes
+    elif group == 'GROWING':
+        ration_percents = udrv.heifer_ration
+    elif group == 'CLOSE_UP':
+        ration_percents = udrv.close_up_ration
     else: 
-        ration_percents = ration_calf
+        ration_percents = udrv.calf_ration
     return ration_percents
