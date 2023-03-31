@@ -161,13 +161,23 @@ class SoilData:
 
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
-            attributes in the object to be set before they can be set"""
+            attributes in the object to be set before they can be set
+
+        Raises
+        ------
+        ValueError
+            If the bottom depth of the top layer of soil is < 20
+
+        """
         if self.soil_layers is None:
             self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.3),
                                 LayerData(top_depth=20, bottom_depth=50, nitrate=0.5),
                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1),
                                 LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
-        else:
+        elif self.soil_layers[0].bottom_depth < 20:
+            raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                             f"'{self.soil_layers[0].bottom_depth}'.")
+        elif self.soil_layers[0].bottom_depth > 20:
             self._subdivide_top_layer()
 
         if self.vadose_zone_layer is None:

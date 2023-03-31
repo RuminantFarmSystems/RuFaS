@@ -101,13 +101,10 @@ def test_soil_factory_alteration_error(config: str, args_dict: Dict) -> None:
 # --- Tests to verify correct behavior of SoilData module
 def test_manual_soil_data_configuration() -> None:
     """Test that creating a custom SoilData object actually has all the correct values in its fields"""
-    # with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData._subdivide_top_layer", new_callable=MagicMock) as \
-    #         mocked_subdivide_top_layer:
     mollisols = SoilData(name="mollisols", soil_layers=[LayerData(top_depth=0, bottom_depth=80, nitrate=1.8),
                                                         LayerData(top_depth=80, bottom_depth=150, nitrate=2.6),
                                                         LayerData(top_depth=150, bottom_depth=300, nitrate=5)])
 
-    # assert mocked_subdivide_top_layer.call_count == 1
     assert mollisols.name == "mollisols"
     assert mollisols.soil_layers[0] == LayerData(top_depth=0, bottom_depth=20, nitrate=1.8)
     assert mollisols.soil_layers[1] == LayerData(top_depth=20, bottom_depth=80, nitrate=1.8)
@@ -116,6 +113,15 @@ def test_manual_soil_data_configuration() -> None:
     assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000,
                                                     soil_water_concentration=0,
                                                     saturation_point_water_concentration=inf)
+
+
+def test_error_manual_soil_data_configuration() -> None:
+    """Test that an error is correctly raised when an invalid input is used to create SoilData object."""
+    with pytest.raises(ValueError) as e:
+        SoilData(soil_layers=[LayerData(top_depth=0, bottom_depth=19, nitrate=1.8),
+                              LayerData(top_depth=19, bottom_depth=150, nitrate=2.6),
+                              LayerData(top_depth=150, bottom_depth=300, nitrate=5)])
+    assert str(e.value) == "Expected bottom depth of top soil layer must be 20 mm or greater, received '19'."
 
 
 def test_annual_reset() -> None:
