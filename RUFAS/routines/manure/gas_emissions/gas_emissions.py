@@ -10,16 +10,13 @@ class GasEmissions:
     @classmethod
     def calc_methane_emission_for_slurry_storage(cls,
                                                  total_volatile_solids: float,
-                                                 is_enclosed=False,
                                                  temperature_celsius=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
-                                                 efficiency_fraction=0.99) -> float:
+                                                 ) -> float:
         """Calculates methane emissions from manure storage using total solids.
 
         Args:
             total_volatile_solids: total volatile solids in manure, kg.
-            is_enclosed: True if manure storage is enclosed, and False if manure storage is open to air.
             temperature_celsius: temperature in Celsius, C.
-            efficiency_fraction: efficiency of process, unitless. # TODO: review this
 
         Returns:
             CH4 emissions from storage, kg CH4/day.
@@ -43,11 +40,6 @@ class GasEmissions:
         VSd_term = 24 * Vsd * b1 * ex
         VSnd_term = 24 * VSnd * b2 * ex
         E_CH4_open_air = VSd_term + VSnd_term  # kg CH4/day
-
-        # if not is_enclosed:
-        #     return E_CH4_open_air
-        # else:
-        #     return E_CH4_open_air * (1 - efficiency_fraction)
 
         return E_CH4_open_air
 

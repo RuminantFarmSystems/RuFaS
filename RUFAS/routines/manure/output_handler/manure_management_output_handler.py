@@ -293,8 +293,35 @@ class ManureManagementOutputHandler:
         if self._df is None:
             return None
         csv_output_file_path = self.get_csv_output_file_path()
+
+        # When exporting to csv, temporarily drop all columns that are all zeros, NaN, or None
+        # self.drop_all_zeros_nan_none_columns(self._df).to_csv(csv_output_file_path, index=False)
+
+        # Or permanently drop all columns that are all zeros, NaN, or None
+        # This saves time from not having to make graphics for columns that are all zeros, NaN, or None
+        self._df = self.drop_all_zeros_nan_none_columns(self._df)
         self._df.to_csv(csv_output_file_path, index=False)
+
         return csv_output_file_path
+
+    @classmethod
+    def drop_all_zeros_nan_none_columns(cls, df: DataFrame) -> DataFrame:
+        """Drops all columns in a dataframe that are all zeros, NaN, or None.
+
+        Parameters
+        ----------
+        df : DataFrame
+            The dataframe to drop columns from.
+
+        Returns
+        -------
+        DataFrame
+            The dataframe with the columns dropped.
+
+        """
+        temp_df = df.fillna(value=np.nan)
+        cols_to_drop = (temp_df == 0).all(axis=0) | temp_df.isna().all(axis=0)
+        return temp_df.loc[:, ~cols_to_drop]
 
     @classmethod
     def _capitalize_first_letters(cls, s: str, delimiter=' ') -> str:
@@ -593,22 +620,7 @@ class ManureManagementOutputHandler:
         small, medium, large = 10, 12, 16
         # plt.style.use('fivethirtyeight')
         plt.style.use('ggplot')
-        # plt.figure()
         plt.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        # plt.plot(x, y, c='#1746A2', linewidth=2)
-        # fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
-        # ax[0].scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        # ax[1].plot(x, y, c='#1746A2', linewidth=2)
-        # ax.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
-        # ax.plot(x, y, c='#1746A2', linewidth=2)        ax[0].set_xlabel(x_label, fontsize=medium)
-        # ax[1].set_xlabel(x_label, fontsize=medium)
-        # ax[0].set_ylabel(y_label, fontsize=medium)
-        # ax[1].set_ylabel(y_label, fontsize=medium)
-        # ax[0].set_title(title, fontsize=large)
-        # ax.tick_params(axis='both', which='major', labelsize=small)
-        # set integer x-axis ticks        ax[0].xaxis.set_major_locator(MaxNLocator(integer=True))
-        # ax[1].xaxis.set_major_locator(MaxNLocator(integer=True))
-
         plt.xlabel(x_label, fontsize=small)
         plt.ylabel(y_label, fontsize=small)
         plt.title(title, fontsize=medium)
@@ -616,9 +628,7 @@ class ManureManagementOutputHandler:
         plt.xticks([int(loc) for loc in locs if loc >= 0], fontsize=small)
         plt.yticks(fontsize=small)
         plt.legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        # ax[0].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        # ax[1].legend([f'{y_label}'], loc='best', frameon=False, fontsize=small)
-        plt.savefig(output_path, dpi=200, bbox_inches='tight', pad_inches=0.2)
+        plt.savefig(output_path, dpi=100, bbox_inches='tight', pad_inches=0.2)
         plt.close()
 
     def _get_graphics_dir(self) -> Path:

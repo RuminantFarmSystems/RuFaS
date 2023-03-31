@@ -41,25 +41,12 @@ class AnaerobicLagoon(BaseManureTreatment):
                 0.03 / ManureConstants.MANURE_DENSITY)  # TODO: Use constants instead
         return new_daily_output
 
-    def calc_methane_emission(self,
-                              accumulated_liquid_manure_total_volatile_solids: float,
-                              accumulated_liquid_manure_total_solids: float) \
-            -> Tuple[float, float]:
-        """Calculates methane emission from the anaerobic lagoon.
-
-        Args:
-            accumulated_liquid_manure_total_volatile_solids: The accumulated total volatile solids in the lagoon, kg.
-            accumulated_liquid_manure_total_solids: The accumulated total solids in the lagoon, kg.
-
-        Returns:
-            methane loss: The methane loss from the lagoon, kg.
-            new_accumulated_liquid_manure_total_solids: The new accumulated total solids in the lagoon, kg.
-
-        """
-        methane_loss = GasEmissions.calc_methane_emission_for_anaerobic_lagoon(
-                manure_volatile_solids=accumulated_liquid_manure_total_volatile_solids)
-        new_accumulated_liquid_manure_total_solids = max(accumulated_liquid_manure_total_solids - methane_loss, 0.0)
-        return methane_loss, new_accumulated_liquid_manure_total_solids
+    def calc_methane_emission(self, liquid_manure_total_volatile_solids: float) -> float:
+        methane_emission = GasEmissions.calc_methane_emission_for_slurry_storage(
+            total_volatile_solids=liquid_manure_total_volatile_solids,
+            temperature_celsius=self._get_current_day_average_temperature_celsius(),
+        )
+        return max(methane_emission, 0.0)
 
     def calc_ammonia_emission(self, num_animals: int, barn_area: float,
                               accumulated_manure_volume: float,
@@ -78,14 +65,14 @@ class AnaerobicLagoon(BaseManureTreatment):
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen: Accumulated total ammoniacal nitrogen
             in the treatment system after the ammonia emission is calculated, kg.
 
-
         """
+
         ammonia_loss = GasEmissions.calc_ammonia_emission(
-                num_animals=num_animals,
-                barn_area=barn_area,
-                mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
-                total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-                temperature_celsius=self._get_current_day_average_temperature_celsius()
+            num_animals=num_animals,
+            barn_area=barn_area,
+            mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+            total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+            temperature_celsius=self._get_current_day_average_temperature_celsius()
         )
         new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
             max(accumulated_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0)
@@ -108,20 +95,19 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
         self._accumulated_precipitation_volume += self.precipitation_volume
 
-        methane_loss, new_accumulated_liquid_manure_total_solids = self.calc_methane_emission(
-                self._accumulated_output.liquid_manure_total_volatile_solids,
-                self._accumulated_output.liquid_manure_total_solids)
-        daily_output.storage_methane = methane_loss
-        self._accumulated_output.storage_methane += methane_loss
-        self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
+        daily_methane_emission = self.calc_methane_emission(daily_output.liquid_manure_total_volatile_solids)
+        daily_output.storage_methane = daily_methane_emission
+        self._accumulated_output.storage_methane += daily_methane_emission
+        self._accumulated_output.liquid_manure_total_solids += \
+            daily_output.liquid_manure_total_volatile_solids - daily_methane_emission * 3
 
         ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
             self.calc_ammonia_emission(
-                    num_animals=self._current_pen.num_animals,
-                    barn_area=self._current_pen.barn_area_from_pen_type,
-                    accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
-                    accumulated_manure_total_ammoniacal_nitrogen=(
-                        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen)
+                num_animals=self._current_pen.num_animals,
+                barn_area=self._current_pen.barn_area_from_pen_type,
+                accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
+                accumulated_manure_total_ammoniacal_nitrogen=(
+                    self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen)
             )
         daily_output.storage_ammonia = ammonia_loss
         self._accumulated_output.storage_ammonia += ammonia_loss

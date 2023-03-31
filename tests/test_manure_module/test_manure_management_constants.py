@@ -24,7 +24,7 @@ def test_gas_emission_constants() -> None:
 
     assert constants.Bo == approx(0.24)
     assert constants.MCF == approx(0.79)
-    assert constants.MS == approx(0.9)
+    assert constants.MS == approx(1.0)
     assert constants.METHANE_FACTOR == approx(0.67)
 
     assert constants.METHANE_ENERGY_DENSITY == approx(55)
