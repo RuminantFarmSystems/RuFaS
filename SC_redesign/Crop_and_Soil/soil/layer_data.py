@@ -164,6 +164,10 @@ class LayerData:
     active_phosphorus_content: float = 0
     """Active phosphorus content of this soil layer (kg phosphorus / ha)"""
 
+    # --- Residue partition
+    plant_metabolic_to_soil_carbon_amount: Optional[float] = None
+    """metabolic carbon incorporated into soil during tillage (kg/ha)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
