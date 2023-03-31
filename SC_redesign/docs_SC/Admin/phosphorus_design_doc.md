@@ -49,7 +49,6 @@ and in the soil, including
   * Manure applied with a machine.
   * Manure applied with by animals grazing in said field.
 
-### Other Requirement Details
 * This section does not flush out the requirements that may be addressed in future versions of this module. See 
 [Beyond Version 1](#beyond-version-1)
 
@@ -63,7 +62,7 @@ based on the user-defined input.
 
 ## Proposed Solution
 Automatically divide the user-defined top layer of soil into two layers: a top layer that is 20 mm thick, so that the 
-simulation can follow critical parts of the SurPhos model, and then a second layer. This second layer is the same as the
+simulation can follow critical parts of the SurPhos model and then a second layer. This second layer is the same as the
 user-defined top layer of soil except for the fact that it's top depth is 20 mm below where the user specified it was.  
 
 Most of the Soil and Crop modules outside of PC will not have their operations disrupted by this new top layer, however
