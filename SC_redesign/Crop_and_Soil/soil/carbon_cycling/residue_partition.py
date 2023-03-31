@@ -36,6 +36,8 @@ class ResiduePartition:
     @staticmethod
     def _determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float,
                                                  nitrogen_fraction_plant_residue=0.4) -> float:
+        # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
+        #  GitHub Issue #163
         """This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
         is greater than zero
 
@@ -61,12 +63,12 @@ class ResiduePartition:
             return 0
 
     @staticmethod
-    def _determine_plant_resdiue_metabolic_fraction(metabolic_plant_residue_ratio: float) -> float:
+    def _determine_plant_residue_metabolic_fraction(plant_lignin_nitrogen_ratio: float) -> float:
         """This method calculates the fraction of plant residue that is metabolic
 
         Parameters
         ----------
-        metabolic_plant_residue_ratio : float
+        plant_lignin_nitrogen_ratio : float
             plant lignin to nitrogen ratio (Dmnl)
 
         Returns
@@ -79,4 +81,41 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.I.3
         """
-        return 0.85 - 0.18 * metabolic_plant_residue_ratio
+        return 0.85 - 0.18 * plant_lignin_nitrogen_ratio
+
+    @staticmethod
+    def _determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount: float,
+                                                 plant_residue_metabolic_fraction: float,
+                                                 plant_dry_matter_harvest_residue_amount: float,
+                                                 plant_metabolic_active_carbon_usage: float,
+                                                 plant_metabolic_to_soil_carbon_amount: float) -> float:
+        """This method calculates a return the updated plant metabolic carbon amount after adding the metabolic carbon
+        in dry matter at harvest and and reduced my the amount that's decomposed and incorporated
+
+        Parameters
+        ----------
+        plant_metabolic_carbon_amount: float
+            plant metabolic carbon amount (kg/ha)
+        plant_residue_metabolic_fraction: float
+            fraction of plant residue that is metabolic (unitless)
+        plant_dry_matter_harvest_residue_amount: float
+            amount of dry matter residue at harvest (kg/ha)
+        plant_metabolic_active_carbon_usage: float
+            plant metabolic carbon decomposed into active carbon (kg/ha)
+        plant_metabolic_to_soil_carbon_amount: float
+            metabolic carbon incorporated into soil during tillage (kg/ha)
+
+        Returns
+        -------
+        float
+            updated plant metabolic carbon amount (hg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.4, S.6.B.I.7
+
+        """
+        plant_metabolic_carbon_amount += plant_dry_matter_harvest_residue_amount \
+            * plant_residue_metabolic_fraction - \
+            (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+        return plant_metabolic_carbon_amount
