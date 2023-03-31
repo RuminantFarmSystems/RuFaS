@@ -63,7 +63,7 @@ class LayerData:
     # --- pool_gas_partition
     # (pseudocode_soil S.6.A.1)
     plant_metabolic_active_carbon_usage: Optional[float] = None
-    """plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.6)"""
+    """plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.)"""
     plant_metabolic_active_carbon_loss: Optional[float] = None
     """plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
     plant_metabolic_active_carbon_remaining: Optional[float] = None

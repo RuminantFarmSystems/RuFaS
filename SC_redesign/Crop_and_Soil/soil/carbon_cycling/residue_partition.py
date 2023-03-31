@@ -1,6 +1,14 @@
-import math
 from typing import Optional, List
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+
+"""
+This class contains all necessary methods that involves residue partition, including both plant and soil and also 
+considers the case of tillage for plants
+
+References
+-------
+pseudocode_soil S.6.B
+"""
 
 
 class ResiduePartition:
@@ -116,6 +124,36 @@ class ResiduePartition:
 
         """
         plant_metabolic_carbon_amount += plant_dry_matter_harvest_residue_amount \
-            * plant_residue_metabolic_fraction - \
-            (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+                                         * plant_residue_metabolic_fraction - \
+                                         (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
         return plant_metabolic_carbon_amount
+
+    @staticmethod
+    def _determine_plant_metabolic_active_carbon_usage(decomposition_moisture_effect: float,
+                                                       decomposition_temperature_effect: float,
+                                                       plant_metabolic_carbon_amount: float,
+                                                       metabolic_active_carbon_rate=0.28) -> float:
+        # TODO: Double check the metabolic_active_carbon_rate, again, pseudocode_soil differs from the original code
+        """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
+        Parameters
+        ----------
+        decomposition_moisture_effect: float
+            moisture effect on decomposition factor (unitless)
+        decomposition_temperature_effect: float
+            temperature effect on decomposition factor (unitless)
+        plant_metabolic_carbon_amount: float
+            plant metabolic carbon amount (kg/ha)
+        metabolic_active_carbon_rate: float
+            rate of decomposition from metabolic to active carbon (unitless)
+
+        Returns
+        -------
+        float
+            above ground metabolic carbon decomposed to active carbon (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.5
+        """
+        return decomposition_moisture_effect * decomposition_temperature_effect * \
+            plant_metabolic_carbon_amount * metabolic_active_carbon_rate
