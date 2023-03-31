@@ -418,24 +418,24 @@ def test_soil_passive_carbon_amount(passive_carbon_amount: float, slow_to_passiv
 
 
 @pytest.mark.parametrize("layers", [
-    ([LayerData(top_depth=0, bottom_depth=4, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+    ([LayerData(top_depth=0, bottom_depth=40, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
                 wilting_point_water_concentration=0.9),
-      LayerData(top_depth=4, bottom_depth=12, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
+      LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
                 wilting_point_water_concentration=0.8),
-      LayerData(top_depth=12, bottom_depth=20, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
+      LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
                 wilting_point_water_concentration=0.3)]),
-    ([LayerData(top_depth=0, bottom_depth=3, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
+    ([LayerData(top_depth=0, bottom_depth=30, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
                 wilting_point_water_concentration=1.8),
-      LayerData(top_depth=3, bottom_depth=15, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
+      LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
                 wilting_point_water_concentration=0.8),
-      LayerData(top_depth=15, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+      LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
                 wilting_point_water_concentration=0.2)]),
-    ([LayerData(top_depth=0, bottom_depth=8, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
+    ([LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
                 wilting_point_water_concentration=1.8),
-      LayerData(top_depth=8, bottom_depth=20, soil_water_concentration=1.4,
+      LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4,
                 field_capacity_water_concentration=1.8,
                 wilting_point_water_concentration=0.8),
-      LayerData(top_depth=20, bottom_depth=22, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+      LayerData(top_depth=200, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
                 wilting_point_water_concentration=0.6)])
 ])
 def test_partition_pool_gas(layers: list) -> None:
@@ -489,46 +489,46 @@ def test_partition_pool_gas(layers: list) -> None:
     partition.partition_pool_gas()
 
     # Checking if methods are called correct number of times
-    assert PoolGasPartition._determine_plant_metabolic_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._determine_plant_metabolic_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._determine_plant_structural_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._determine_plant_structural_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._determine_plant_structural_slow_carbon_loss.call_count == 3
-    assert PoolGasPartition._determine_plant_structural_slow_carbon_remaining.call_count == 3
-    assert PoolGasPartition._determine_soil_metabolic_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._determine_soil_metabolic_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._determine_soil_structural_active_carbon_loss.call_count == 3
-    assert PoolGasPartition._determine_soil_structural_active_carbon_remaining.call_count == 3
-    assert PoolGasPartition._determine_soil_structural_slow_carbon_loss.call_count == 3
-    assert PoolGasPartition._determine_soil_structural_slow_carbon_remaining.call_count == 3
+    assert PoolGasPartition._determine_plant_metabolic_active_carbon_loss.call_count == len(layers)
+    assert PoolGasPartition._determine_plant_metabolic_active_carbon_remaining.call_count == len(layers)
+    assert PoolGasPartition._determine_plant_structural_active_carbon_loss.call_count == len(layers)
+    assert PoolGasPartition._determine_plant_structural_active_carbon_remaining.call_count == len(layers)
+    assert PoolGasPartition._determine_plant_structural_slow_carbon_loss.call_count == len(layers)
+    assert PoolGasPartition._determine_plant_structural_slow_carbon_remaining.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_metabolic_active_carbon_loss.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_metabolic_active_carbon_remaining.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_structural_active_carbon_loss.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_structural_active_carbon_remaining.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_structural_slow_carbon_loss.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_structural_slow_carbon_remaining.call_count == len(layers)
 
-    assert PoolGasPartition._determine_active_carbon_decomposition_rate.call_count == 3
+    assert PoolGasPartition._determine_active_carbon_decomposition_rate.call_count == len(layers)
 
-    assert PoolGasPartition._determine_active_carbon_decomposition_amount.call_count == 3
+    assert PoolGasPartition._determine_active_carbon_decomposition_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_slow_carbon_decomposition_amount.call_count == 3
+    assert PoolGasPartition._determine_slow_carbon_decomposition_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_passive_carbon_decomposition_amount.call_count == 3
+    assert PoolGasPartition._determine_passive_carbon_decomposition_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_carbon_lost_adjusted_factor.call_count == 3
+    assert PoolGasPartition._determine_carbon_lost_adjusted_factor.call_count == len(layers)
 
-    assert PoolGasPartition._determine_active_carbon_to_slow_amount.call_count == 3
-    assert PoolGasPartition._determine_active_carbon_to_slow_loss.call_count == 3
+    assert PoolGasPartition._determine_active_carbon_to_slow_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_active_carbon_to_slow_loss.call_count == len(layers)
 
-    assert PoolGasPartition._determine_slow_to_active_carbon_amount.call_count == 3
-    assert PoolGasPartition._determine_slow_carbon_co2_lost_amount.call_count == 3
-    assert PoolGasPartition._determine_slow_to_passive_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_slow_to_active_carbon_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_slow_carbon_co2_lost_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_slow_to_passive_carbon_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_passive_to_active_carbon_amount.call_count == 3
-    assert PoolGasPartition._determine_passive_carbon_co2_lost_amount.call_count == 3
+    assert PoolGasPartition._determine_passive_to_active_carbon_amount.call_count == len(layers)
+    assert PoolGasPartition._determine_passive_carbon_co2_lost_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_plant_active_decompose_carbon.call_count == 3
-    assert PoolGasPartition._determine_soil_active_decompose_carbon.call_count == 3
-    assert PoolGasPartition._determine_soil_active_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_plant_active_decompose_carbon.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_active_decompose_carbon.call_count == len(layers)
+    assert PoolGasPartition._determine_soil_active_carbon_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_soil_slow_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_soil_slow_carbon_amount.call_count == len(layers)
 
-    assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == 3
+    assert PoolGasPartition._determine_soil_passive_carbon_amount.call_count == len(layers)
 
     # Checking values were set correctly by the main routine
     for layer in data.soil_layers:
