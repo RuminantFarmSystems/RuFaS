@@ -10,7 +10,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Any, Union
 import collections
 import math
 import statistics as stat
@@ -75,7 +75,8 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
         print(count)
         if count > 30:
             solution = None
-            ration_vals = NLP.get_ration_vals_null(fakesolution(animal_type, cow_type,requirements.DMIest))
+            mock_solution = user_defined_solution(animal_type, cow_type,requirements.DMIest)
+            ration_vals = NLP.get_ration_vals(mock_solution)
             print('nullvals')
             return solution, ration_vals
 
@@ -87,7 +88,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type, user_defi
     return solution, ration_vals
 
 
-def fakesolution(animal_type, cow_type, DMIest):
+def user_defined_solution(animal_type, cow_type, DMIest):
     """
     Returns a "solution" in format of the output from the optimization function
     Simply takes the percentage values and multiplies them by estimated DMI to retrieve the calculated  ration
@@ -103,53 +104,18 @@ def fakesolution(animal_type, cow_type, DMIest):
 
     Returns
     -------
-    listy: list[float,]
+    solution: list[float,]
         list of values in order of feeds available for a given animal_type
     """
-    rationtouse = ration_to_use(animal_type, cow_type)
-    listy = []
-    for rationkey in rationtouse.keys():
-        value = rationtouse[rationkey]*DMIest
-        listy.append(value)
-        listy.append(0.0)
-        listy.append(0.0)
-    return listy
+    ration_percents = ration_to_use(animal_type, cow_type)
+    solution = []
+    for rationkey in ration_percents.keys():
+        value = ration_percents[rationkey]*DMIest
+        solution.append(value)
+        solution.append(0.0)
+        solution.append(0.0)
+    return solution
 
-
-# def rationbuilt(pen, available_feeds, animal_type, cow_type):
-#     req = Requirements()
-#     req.set_requirements(pen, animal_type, False)
-#     ration = {}
-#     rationall, rationtouse = userrationfromjson(animal_type, cow_type)
-#     for feed_id in range(len(available_feeds['feed_id'])):
-#         print(feed_id)
-#         print(available_feeds['feed_key'][feed_id])
-#         if available_feeds['feed_key'][feed_id] in rationtouse:
-#             print('ration yes rebuilt')
-#             ingredient_percentage = rationtouse[available_feeds['feed_key'][feed_id]]
-#             ingredient_as_proportion = ingredient_percentage/100*req.DMIest
-#             ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
-#         else:
-#             ration[available_feeds['feed_key'][feed_id]] = 0.0
-#     ration['status'] = 'Optimal'
-#     ration['objective'] = NLP.objective(fakesolution(available_feeds))
-#     return ration
-
-
-# def userrationfromjson(animal_type, cow_type):
-#     import json
-#     with open('input/userdefinedration/userdefinedration_test.json', 'r') as f:
-#         rationall = json.load(f)
-#     if animal_type == 'cow':
-#         if cow_type == True:
-#             rationtouse = rationall['cow_lactating']
-#         else:
-#             rationtouse = rationall['cow_dry']
-#     elif animal_type == 'heifer':
-#         rationtouse = rationall['all_heifers']
-#     else: 
-#         rationtouse = rationall['calf']   
-#     return rationall, rationtouse
 
 def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_defined_ration_select):
     """
@@ -167,8 +133,8 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
-    # rationall, rationtouse = userrationfromjson(animal_type, cow_type)
-    rationtouse = ration_to_use(animal_type, cow_type)
+    # rationall, ration_percents = userrationfromjson(animal_type, cow_type)
+    ration_percents = ration_to_use(animal_type, cow_type)
     solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
@@ -182,18 +148,20 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
     fixed_ration = False
     if animal_type == 'cow' and solution is not None:
         while not solution.success:
+            # TODO: JCW 24 Mar 2023 commented out below is the existing method, here we're simply reducing 1 at a time.
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
-            NEl_con = NLP.NEl_constraint(solution.x)
-            if NEl_con < -0.5:
-                reduction = 3 * (-NEl_con)
-            else:
-                reduction = 1.5
+            # NEl_con = NLP.NEl_constraint(solution.x)
+            # if NEl_con < -0.5:
+            #     reduction = 3 * (-NEl_con)
+            # else:
+            #     reduction = 1.5
             reduction = 1.0
             running_total_milk = 0.0
             for animal in pen.animals_in_pen:
-                animal.estimated_daily_milk_produced -= reduction
+                if animal.estimated_daily_milk_produced > 1.0:
+                    animal.estimated_daily_milk_produced -= reduction
                 running_total_milk += animal.estimated_daily_milk_produced
             average_running_total_milk = running_total_milk / num_animals
             chanchodebug = False
@@ -204,11 +172,12 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type, user_defined_ration_select)
-            if average_running_total_milk < 0.75*average_total_milk or average_running_total_milk == 0.0:
+            if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
-                print('dropped too much!')
-                print(solution)
+                if chanchodebug:
+                    print('dropped too much!')
+                    print(solution)
                 break
 
     if solution is not None and not fixed_ration:
@@ -230,12 +199,10 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
         chanchodebug = False
         if chanchodebug:
             print(available_feeds['feed_id'])
-            print(rationtouse)
+            print(ration_percents)
         for feed_id in range(len(available_feeds['feed_id'])):
-            # print(feed_id)
-            # print(available_feeds['feed_key'][feed_id])
-            if available_feeds['feed_key'][feed_id] in rationtouse:
-                ingredient_percentage = rationtouse[available_feeds['feed_key'][feed_id]]
+            if available_feeds['feed_key'][feed_id] in ration_percents:
+                ingredient_percentage = ration_percents[available_feeds['feed_key'][feed_id]]
                 ingredient_as_proportion = ingredient_percentage/100*req.DMIest
                 ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
                 if chanchodebug:
@@ -244,14 +211,10 @@ def user_defined_ration(pen, available_feeds, animal_type, cow_type, user_define
             else:
                 ration[available_feeds['feed_key'][feed_id]] = 0.0
         ration['status'] = 'Optimal'
-        ration['objective'] = 0.0 # JCW THIS IS FAST FIX # NLP.objective(solution.x)
+        ration['objective'] = 0.0 # setting as optimal
     return ration, ration_vals
-    # safeguard if scipy SLSQP bounds error still occurs after many iterations
-    # using previous cycles ration for this pen
-    # else:
-    #     return pen.ration, ration_vals
+
     
-from typing import Any, Dict, List, Union
 
 class user_defined_ration_values(object):
     """
@@ -309,7 +272,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
         animal_type: string representation of the type of animal (cow, heifer)
         cow_type: Boolean which is True if cow is lactating, False otherwise
     """
-    user_defined_ration_select = True
+    user_defined_ration_select = udrv.udr_or_not
     if user_defined_ration_select:
         # print('userdefined')
         ##### THIS WILL BE REPLACED BY calling user_defined_ration CLASS values

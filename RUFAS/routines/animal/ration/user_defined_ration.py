@@ -1,6 +1,25 @@
 """
 User-defined ration logic
 
+General workflow is as follows:
+User should first modify the following file:
+input/userdefinedration/userdefinedration_test.json
+This file contains a dictionary where the key value pairs are the feed ID and their associated desired percent of the suplied ration
+User will note that there are a few other values they can change.
+One is the amount of tolerance of those percentages allowed in the optmization step. 
+The idea here is that a user may want 30% of the ration to be feed X, but is OK within some tolerance of those percentages.
+    Because these are percentages of the percent tolerance, not raw +/- values, a tolerance of 0.033 would allow any value from 29-30.9
+NOTE: We need to think about how to handle cases in which the solution drop below the total DMI: e.g. not meeting the minimum DMI because the target percentages were too high, and optmization lowered the totals - and they don't sum to 100.
+
+Once this is defined, the user must ensure that the main input JSON is "pointing" to the 'input/feed/user_defined_ration_feed.json'
+This file is supplied, but will be rewritten to update the ration items found in the user_defined_ration_input_percentages file supplied.
+NOTE: price values will need to be manually adjusted, as values not found in the reference_filename aren't supplied, and instead filled with 0.99999
+
+Now the user must note that inside the "animal": "animal_user_input_ration.json"
+    Inside this JSON make sure that the ['ration']['user_input'] == True"ration": {"user_input": true,...
+    
+Once this prep has been done, run RuFaS as normal. 
+
 """
 
 from typing import Any, Dict, List, Union
@@ -10,7 +29,7 @@ import json
 #from RUFAS.routines.animal.ration import ration_driver as ration_driver
 #available_feeds = ration_driver.AvailableFeeds()
 
-def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedration/userdefinedration_test.json',
+def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedration/user_defined_ration_input_percentages.json',
                             reference_filename = 'input/feed/purchased_feed.json',
                             new_feed_filename = 'input/feed/user_defined_ration_feed.json')->None:
     """
@@ -42,10 +61,10 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
         ff = json.load(f)
         key_list = list(ff.keys())
 
-    ff['calf_feeds']
-    ff['growing_feeds']
-    ff['close_up_feeds']
-    ff['lac_cow_feeds']
+    # ff['calf_feeds']
+    # ff['growing_feeds']
+    # ff['close_up_feeds']
+    # ff['lac_cow_feeds']
 
     new_calf_feeds = [int(i) for i in ration_calf]
     new_growing_feeds = [int(i) for i in ration_all_heifers]
@@ -57,8 +76,6 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
     ff['close_up_feeds']=new_close_up_feeds
     ff['lac_cow_feeds']=new_lac_cow_feeds
 
-    # fftoprint = json.dumps(ff, sort_keys=True, indent=4)
-
     with open(new_feed_filename, 'w') as file:
         json.dump(ff, file)
     with open(new_feed_filename, 'r') as f:
@@ -66,7 +83,6 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
     fff['purchased_feeds_costs']
 
     feedslisted = list(fff['purchased_feeds_costs'].keys())
-    feedsprices = list(fff['purchased_feeds_costs'].values())
 
     newlist = new_lac_cow_feeds + new_calf_feeds + new_close_up_feeds \
         + new_growing_feeds
@@ -74,16 +90,8 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
     newsetted = list(setlist)
     newsetted.sort()
     newsetted = [str(i) for i in newsetted]
-    # [newsetted not in feedslisted for newsetted in newsetted]
     difflist = list(set(newsetted).difference(feedslisted))
     difflist.sort()
-
-    dummyprices = [1 for i in difflist]
-    len(feedslisted)
-    len(difflist)
-    len(newsetted)
-    len(dummyprices)
-
     newpricesdict = {}
     for i in newsetted:
         print(i)
@@ -92,16 +100,13 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
             print(fff['purchased_feeds_costs'][str(i)])
         else: 
             price = 0.9999
-            # print(0.9999)
         newpricesdict[i] = price
-    # len(newpricesdict)
     fff['purchased_feeds_costs'] = newpricesdict
     purchased_feeds_keynames = list(newpricesdict.keys())
     fff['purchased_feeds'] = [int(i) for i in purchased_feeds_keynames]
     with open(new_feed_filename, 'w') as file:
         json.dump(fff, file, indent=3)
-    # with open(new_feed_filename, 'r') as f:
-    #     fff = json.load(f)
+
 
 
 class user_defined_ration_values(object):
@@ -140,7 +145,12 @@ class user_defined_ration_values(object):
             self.lactating_cow_ration: Dict[str, Any]  = lactating_cow_ration
             self.dry_cow_ration: Dict[str, Any]  = dry_cow_ration
             self.ration_all: Dict[str, Any]  = ration_all
-
+            
+            self.tolerance = ration_all['tolerance']
+            self.milk_reduction_percent = ration_all['milk_reduction_percent']
+            
+            self.udr_or_not = True
+            
 udrv = user_defined_ration_values()
 
 def ration_to_use(animal_type, lactating):
@@ -156,7 +166,7 @@ def ration_to_use(animal_type, lactating):
 
     Returns
     -------
-    rationtouse: Dict
+    ration_percents: Dict
         dictionary of feed ids and their associated percentage of DMI 
     """
     ration_calf = udrv.calf_ration
@@ -165,61 +175,11 @@ def ration_to_use(animal_type, lactating):
     ration_cow_dry = udrv.lactating_cow_ration
     if animal_type == 'cow':
         if lactating:
-            rationtouse = ration_cow_lactating
+            ration_percents = ration_cow_lactating
         else:
-            rationtouse = ration_cow_dry
+            ration_percents = ration_cow_dry
     elif animal_type == 'heifer':
-        rationtouse = ration_all_heifers
+        ration_percents = ration_all_heifers
     else: 
-        rationtouse = ration_calf
-    return rationtouse
-
-
-def userbounds(animal_type = 'cow', lactating = True, DMIest = 0.0):
-    # TODO use the util.py read_json_file method instead
-    with open('input/userdefinedration/user_defined_ration_input_percentages.json', 'r') as f:
-        rationall = json.load(f)
-    ration_calf = rationall['calf']
-    ration_all_heifers = rationall['all_heifers']
-    ration_cow_lactating = rationall['cow_lactating']
-    ration_cow_dry = rationall['cow_dry']
-    if animal_type == 'cow':
-        if lactating:
-            rationtouse = ration_cow_lactating
-        else:
-            rationtouse = ration_cow_dry
-    elif animal_type == 'heifer':
-        rationtouse = ration_all_heifers
-        chancho_debug = False
-        if chancho_debug:
-            print('heiferfound')
-            print(ration_all_heifers)
-    else: 
-        rationtouse = ration_calf
-    
-    values2= []
-    # IT"S FAILING HERE
-    for key, value in rationall.items():
-        for i in value.keys():
-            values2.append(int(i))
-    uniqueset=set(values2) # TODO fix tortured logic 
-    uniqueset2 = [i for i in uniqueset]
-    uniqueset2.sort()
-    uniqueset2 = [str(i) for i in uniqueset2]
-    
-    tribounds = []
-    wiggleroom = 0.15
-    print('foundrations3')
-    if DMIest == 0.0: DMIest = 1.0
-    for key in uniqueset2:
-        if key in rationtouse.keys():
-            target = rationtouse[key]/100*(DMIest) # change from percent to decimal percent
-            # target = rationtouse[key]
-            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-            tribounds.append((target-target*wiggleroom,target+target*wiggleroom))
-        else:
-            tribounds.append((0,0.0001))
-            tribounds.append((0,0.0001))
-            tribounds.append((0,0.0001))
-    return tribounds
+        ration_percents = ration_calf
+    return ration_percents
