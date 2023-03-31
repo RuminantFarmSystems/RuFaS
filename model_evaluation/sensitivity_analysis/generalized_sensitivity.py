@@ -81,7 +81,7 @@ class SensitivityAnalysis:
         Parameters
         ----------
         fun : function
-            The objective function
+            The objective function - TODO: add details about how the function needs to be structured.
         pars : list[str]
             Names of the parameters to analyze
         bounds : list[tuple(float, float)]
@@ -201,6 +201,12 @@ class SensitivityAnalysis:
         if self.sensitivity_method == SupportedSensitivityMethods.MORRIS:
             self.problem.sample(func=morris_sampler.sample, N=self.sample_n, *args, **kwargs)
 
+        # add column names to the sample array (does not work, for some reason)
+        # self.problem.samples.dtype = {
+        #     "names": self.parameter_names,
+        #     "formats": [numpy.float64] * len(self.parameter_names)
+        # }
+
     def evaluate_model(self) -> None:
         """Evaluates the objective function over the entire parameter sample space
 
@@ -275,12 +281,18 @@ if __name__ == '__main__':
 
     # -- Simple: Ishigami function --
     sens = SensitivityAnalysis(Ishigami.evaluate, pars=["x1", "x2", "x3"], bounds=[(-numpy.pi, numpy.pi)]*3,
-                               groups=None, outputs=["response"], method="fast", n_cores=4)
+                               groups=None, outputs=["response"], method="fast", n_cores=1)
     sens.define_problem()
     sens.sample_parameter_space()
     sens.evaluate_model()
     sens.analyze_model()
     print(sens.problem.analysis)
+
+    expect_results = numpy.empty(shape=sens.problem.samples.shape[0])
+    for i in range(sens.problem.samples.shape[0]):  # for each row
+        M = sens.problem.samples[i, :]
+        x1, x2, x3 = M
+        # expect_results[i] = Ishigami.evaluate(M)
 
     # -- More complex: Oakley 2004 --
     weights = numpy.array([[1.0]*5 + [0.1]*5 + [0.01]*5,  # first 5 params have strong main effects, others are weaker
@@ -303,3 +315,4 @@ if __name__ == '__main__':
     sens2.problem.heatmap()
     sens2.problem.plot()
     pyplot.show()
+
