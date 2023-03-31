@@ -91,8 +91,6 @@ class ManureApplication:
             If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95]
 
         """
-        # TODO: implement an option for applying manure phosphorus at subsurface levels, after talking with Pete about
-        #  how this should be done with more than two soil layers.
         if water_extractable_inorganic_phosphorus_fraction is not None:
             if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
                 raise ValueError(f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95], "
