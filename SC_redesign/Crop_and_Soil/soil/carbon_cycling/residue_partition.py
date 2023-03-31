@@ -124,8 +124,8 @@ class ResiduePartition:
 
         """
         plant_metabolic_carbon_amount += plant_dry_matter_harvest_residue_amount \
-                                         * plant_residue_metabolic_fraction - \
-                                         (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+            * plant_residue_metabolic_fraction - \
+            (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
         return plant_metabolic_carbon_amount
 
     @staticmethod
