@@ -8,13 +8,14 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
+
 @pytest.mark.parametrize(
     'methane_model',
     [
-        
+        None,
+        'dummy'
     ]
 )
-
 def test_calf_manure_excretions(methane_model: str,
                                 mocker: MockFixture) -> None:
     """Unit test for the manure_calculations function in calf_manure_excretion.py."""
@@ -81,7 +82,7 @@ def test_calf_manure_excretions(methane_model: str,
         feed=mock_feed,
         body_weight=body_weight,
         fecal_phosphorus=fecal_phosphorus,
-        urine_phosphorus_required=urine_phosphorus_required, 
+        urine_phosphorus_required=urine_phosphorus_required,
         methane_model=methane_model
     )
 
@@ -99,7 +100,7 @@ def test_calf_manure_excretions(methane_model: str,
     assert manure_excretion_values['urea'] == approx(urea)
     assert manure_excretion_values['urine'] == approx(urine)
     assert manure_excretion_values['total_ammoniacal_nitrogen_concentration'] == \
-        approx(total_ammoniacal_nitrogen_concentration)
+           approx(total_ammoniacal_nitrogen_concentration)
     assert manure_excretion_values['urine_nitrogen'] == approx(urine_nitrogen)
     assert manure_excretion_values['manure_nitrogen'] == approx(
         manure_nitrogen)
