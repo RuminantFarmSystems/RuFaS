@@ -39,7 +39,7 @@ def test_config_factory_defaults():
         defaults"""
     generic = SoilConfigFactory.create_soil_data()
     assert generic.name == "generic soil configuration"
-    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, nitrate=0.3),
+    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5),
                                    LayerData(top_depth=20, bottom_depth=50, nitrate=0.5),
                                    LayerData(top_depth=50, bottom_depth=80, nitrate=1),
                                    LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
