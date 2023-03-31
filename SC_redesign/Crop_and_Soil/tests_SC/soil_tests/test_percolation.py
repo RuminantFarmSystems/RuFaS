@@ -141,7 +141,7 @@ def test_percolate_between_layers():
         incorp2.data.soil_layers[0].excess_water_available,
         incorp2.data.time_step, 0.245)
 
-    # Case 3: amount to percolate is greater excess water available in upper layer
+    # Case 3: amount to percolate is greater than excess water available in upper layer
     # Initialize objects
     with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.excess_water_available", new_callable=PropertyMock,
                return_value=0):
