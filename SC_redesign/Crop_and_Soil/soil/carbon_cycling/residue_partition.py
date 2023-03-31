@@ -2,7 +2,7 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
-This class contains all necessary methods that involves residue partition, including both plant and soil and also 
+This class contains all necessary methods that involves residue partition, including both plant and soil and also
 considers the case of tillage for plants
 
 References
