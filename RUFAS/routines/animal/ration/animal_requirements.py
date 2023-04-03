@@ -14,6 +14,7 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 from typing import Optional
 from typing import Dict
+from RUFAS.routines.animal.ration import ration_constants
 
 def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: int, animal_type: str, parity: Optional[int] = 0,
                calving_interval: Optional[int] = None, milk_true_protein: Optional[float] = 0.0,
@@ -886,7 +887,8 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
                      (day_of_pregnancy - 1)) * (body_weight/715)
     Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
     calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
-    if calcium_requirement < 0.0: calcium_requirement = 0.0
+    if calcium_requirement < ration_constants.minimum_calcium:
+        calcium_requirement = ration_constants.minimum_calcium
     return calcium_requirement
 
 
@@ -1010,7 +1012,8 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     else:
         P_Lact = milk_production * (0.49 + 0.13*milk_true_protein)
     phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
-    if phosphorus_requirement < 0.0: phosphorus_requirement = 0.0
+    if phosphorus_requirement < ration_constants.minimum_phosophorus: 
+        phosphorus_requirement = ration_constants.minimum_phosophorus
     return phosphorus_requirement
 
 
@@ -1066,7 +1069,10 @@ def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: in
         # TODO: Actual calculation for dry_matter_intake_estimate
         dry_matter_intake_estimate = 0.0
         # this comment is a holdover from the previous version
-    if dry_matter_intake_estimate < 0.0: dry_matter_intake_estimate = 1.0
+    # TODO: below (and in the NASEM calculation) we use a flat minimum DMI value, but...
+    #   should we also consider a % value as a proportion of their current body weight?
+    if dry_matter_intake_estimate < ration_constants.minimum_DMI:
+        dry_matter_intake_estimate = ration_constants.minimum_DMI
     return dry_matter_intake_estimate
 
 
@@ -1127,7 +1133,8 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
             -(0.082*(NDF_concentration_percentage\
             -(23.1+56*(body_weight/mature_body_weight)-30.6(body_weight/mature_body_weight)^2)))
         """
-    if dry_matter_intake_estimate < 0.0: dry_matter_intake_estimate = 1.0
+    if dry_matter_intake_estimate < ration_constants.minimum_DMI:
+        dry_matter_intake_estimate = ration_constants.minimum_DMI
     return dry_matter_intake_estimate
 
 
