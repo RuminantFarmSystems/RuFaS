@@ -6,6 +6,19 @@ from math import exp, log
 
 
 # --- Static function tests ---
+@pytest.mark.parametrize("top_temp,top_thickness,bottom_temp,bottom_thickness", [
+    (14.52, 20, 13.29, 30),
+    (16.99, 20, 16.78, 60),
+    (11, 20, 24, 66),
+])
+def test_determine_weighted_average_temperature(top_temp: float, top_thickness: float, bottom_temp: float,
+                                                bottom_thickness: float) -> None:
+    """Tests that the correct weighted average temperature is calculated for the two soil layers given."""
+    observe = SoilTemp._determine_weighted_average_temperature(top_temp, top_thickness, bottom_temp, bottom_thickness)
+    expect = (top_temp * top_thickness + bottom_temp * bottom_thickness) / (top_thickness + bottom_thickness)
+    assert observe == expect
+
+
 @pytest.mark.parametrize("bulk_density", [
     0,
     1.89,
@@ -43,7 +56,7 @@ def test_determine_scaling_factor(water_content, density, bottom_depth):
 def test_determine_damping_depth(max_damping_depth, scaling_factor):
     """tests _determine_damping_depth() in soil_temp.py"""
     observe = SoilTemp._determine_damping_depth(max_damping_depth, scaling_factor)
-    expect = max_damping_depth * exp(log(500 / max_damping_depth) * ((1 - scaling_factor) / (1 + scaling_factor))**2)
+    expect = max_damping_depth * exp(log(500 / max_damping_depth) * ((1 - scaling_factor) / (1 + scaling_factor)) ** 2)
     assert observe == expect
 
 
