@@ -18,6 +18,15 @@ class Infiltration:
         weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
             calculations dependent on plant evapotranspiration (unitless)
 
+        Notes
+        -----
+        This module, in part, relies on the temperature of the top soil layer to determine infiltration. Because RuFaS
+        overrides the user-defined soil profile to maintain a top soil layer that is 20 mm thick for the purpose of
+        tracking phosphorus more accurately, this module distributes the water infiltrated between the two top layers of
+        proportionately by thickness. It also assumes that the top two layers of soil will have the same temperature
+        every day, which will be true for every day of the simulation as long as daily routine in `soil_temp.py` is run
+        prior to this routine.
+
         """
         third_moisture_condition_parameter = self._determine_third_moisture_condition_parameter(
                                                                         self.data.second_moisture_condition_parameter)
@@ -65,6 +74,11 @@ class Infiltration:
         # --------------------------------------------------------------------------------------------------------------
 
         self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
+        infiltrated_water = max(0, rainfall - self.data.accumulated_runoff)
+        top_layer_water_portion = self.data.soil_layers[0].layer_thickness / self.data.soil_layers[1].bottom_depth
+        bottom_layer_water_portion = (1.0 - top_layer_water_portion)
+        self.data.soil_layers[0].water_content += infiltrated_water * top_layer_water_portion
+        self.data.soil_layers[1].water_content += infiltrated_water * bottom_layer_water_portion
 
         # --- Update previous retention parameter ----------------------------------------------------------------------
         if self.data.previous_retention_parameter is None:

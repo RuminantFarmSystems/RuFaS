@@ -33,6 +33,12 @@ class SoilTemp:
             is fairly reasonable due to temporal auto-correlation, but does not account for the random fluctuations
             that can occur throughout the year.
 
+            Because this model now simulates the top 20 mm of the soil profile as its own layer for the purpose of
+            tracking phosphorus runoff, this module first performs operations specifically on the top 2 layers of soil.
+            The result is that this module treats the top two layers of soil as if they were 1, i.e. both layers are set
+            to be the same temperature every day. For every day of the of simulation besides potentially the first, the
+            top two layers of soil will have the same temperature.
+
         SWAT Reference: section 1:1.3.3
         """
         max_damping_depth = self._determine_maximum_damping_depth(self.data.profile_bulk_density)

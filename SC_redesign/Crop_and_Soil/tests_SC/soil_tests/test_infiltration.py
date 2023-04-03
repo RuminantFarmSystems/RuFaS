@@ -1,11 +1,11 @@
 import pytest
-from math import log
+from math import log, exp
 from unittest.mock import MagicMock
+from typing import Tuple
 
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from math import exp
 
 
 # --- static function tests ---
@@ -195,10 +195,14 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     # initialize objects
     if is_top_frozen:
         data = SoilData(potential_evapotranspiration=1.5, average_subbasin_slope=0.07, previous_retention_parameter=27,
-                        soil_layers=[LayerData(top_depth=0, bottom_depth=100, temperature=-1)])
+                        soil_layers=[LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, temperature=-1,
+                                               soil_water_concentration=0),
+                                     LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, temperature=-1,
+                                               soil_water_concentration=0)])
     else:
         data = SoilData(potential_evapotranspiration=1.5, average_subbasin_slope=0.07, previous_retention_parameter=27,
-                        soil_layers=[LayerData(top_depth=0, bottom_depth=100, temperature=14)])
+                        soil_layers=[LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, soil_water_concentration=0),
+                                     LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, soil_water_concentration=0)])
     incorp = Infiltration(data)
     assert incorp.data.potential_evapotranspiration == 1.5
     assert incorp.data.average_subbasin_slope == 0.07
@@ -219,6 +223,7 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
 
     # run main method
     incorp.infiltrate(rainfall, coefficient)
+    expected_top_water, expected_bottom_water = _calculate_infiltrated_water(rainfall, 0.95, 20, 50)
 
     # assertions
     assert incorp._determine_third_moisture_condition_parameter.call_count == 2
@@ -238,4 +243,15 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     assert incorp.data.previous_retention_parameter == 21.34
     assert incorp.data.moisture_condition_parameter == 50
     assert incorp.data.accumulated_runoff == 0.95
+    assert incorp.data.soil_layers[0].water_content == expected_top_water
+    assert incorp.data.soil_layers[1].water_content == expected_bottom_water
     assert incorp.data.annual_runoff_total == 0.95
+
+
+def _calculate_infiltrated_water(rainfall: float, runoff: float, first_layer_thickness: float,
+                                 bottom_depth: float) -> Tuple[float, float]:
+    """Method that calculates the amount of water that infiltrates into the top two layers of soil."""
+    top_proportion = first_layer_thickness / bottom_depth
+    bottom_proportion = 1.0 - top_proportion
+    infiltrated_water = max(0.0, rainfall - runoff)
+    return infiltrated_water * top_proportion, infiltrated_water * bottom_proportion
