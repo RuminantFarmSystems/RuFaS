@@ -1,33 +1,13 @@
 """
-User-defined ration logic
-
-General workflow is as follows:
-User should first modify the following file:
-input/userdefinedration/userdefinedration_test.json
-This file contains a dictionary where the key value pairs are the feed ID and their associated desired percent of the suplied ration
-User will note that there are a few other values they can change.
-One is the amount of tolerance of those percentages allowed in the optmization step. 
-The idea here is that a user may want 30% of the ration to be feed X, but is OK within some tolerance of those percentages.
-    Because these are percentages of the percent tolerance, not raw +/- values, a tolerance of 0.033 would allow any value from 29-30.9
-NOTE: We need to think about how to handle cases in which the solution drop below the total DMI: e.g. not meeting the minimum DMI because the target percentages were too high, and optmization lowered the totals - and they don't sum to 100.
-
-Once this is defined, the user must ensure that the main input JSON is "pointing" to the 'input/feed/user_defined_ration_feed.json'
-This file is supplied, but will be rewritten to update the ration items found in the user_defined_ration_input_percentages file supplied.
-NOTE: price values will need to be manually adjusted, as values not found in the reference_filename aren't supplied, and instead filled with 0.99999
-
-Now the user must note that inside the "animal": "animal_user_input_ration.json"
-    Inside this JSON make sure that the ['ration']['user_input'] == True"ration": {"user_input": true,...
-    
-Once this prep has been done, run RuFaS as normal. 
-
+RUFAS: Ruminant Farm Systems Model
+File name: user_defined_ration.py
+Description: Tools for accessing and providing user-defined ration  variables
+    Main class used to read JSON as singleton, return ration percentages where needed
+Author: Joseph C. Waddell, jw2574@cornell.edu
 """
 
 from typing import Any, Dict, List, Union
-from RUFAS.util import Utility
 import json
-
-#from RUFAS.routines.animal.ration import ration_driver as ration_driver
-#available_feeds = ration_driver.AvailableFeeds()
 
 def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedration/user_defined_ration_input_percentages.json',
                             reference_filename = 'input/feed/purchased_feed.json',
@@ -111,12 +91,6 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
 class user_defined_ration_values(object):
     """
     Reads in the user_defined_ration JSON and collects variables and dicts to use later
-
-    Attributes
-    ----------
-    something_somethingelse : Dict[str, Any]
-        Contains variables 
-    
     """
 
     # check the setup JSON
@@ -140,18 +114,17 @@ class user_defined_ration_values(object):
             calf_ration = ration_all['calf']
             close_up_ration = ration_all['close_up']
             self.calf_ration: Dict[str, Any] = calf_ration
-            self.heifer_ration: Dict[str, Any]  = heifer_ration
-            self.lactating_cow_ration: Dict[str, Any]  = lactating_cow_ration
-            self.dry_cow_ration: Dict[str, Any]  = dry_cow_ration
-            self.ration_all: Dict[str, Any]  = ration_all
+            self.heifer_ration: Dict[str, Any] = heifer_ration
+            self.lactating_cow_ration: Dict[str, Any] = lactating_cow_ration
+            self.dry_cow_ration: Dict[str, Any] = dry_cow_ration
+            self.ration_all: Dict[str, Any] = ration_all
             self.close_up_ration: Dict[str, Any] = close_up_ration
 
             self.tolerance = ration_all['tolerance']
             self.milk_reduction_percent = ration_all['milk_reduction_percent']
+ 
+            self.udr_or_not = False
             
-            self.udr_or_not = True # TODO: retrieve this value from the animal_management config
-            
-udrv = user_defined_ration_values()
 
 def ration_to_use(pen_animal_combo):
     """
@@ -169,6 +142,8 @@ def ration_to_use(pen_animal_combo):
     ration_percents: Dict
         dictionary of feed ids and their associated percentage of DMI 
     """
+    udrv = user_defined_ration_values()
+    # print('udrv.udr_or_not' + str(udrv.udr_or_not))
     group = pen_animal_combo.name 
     if group == 'LAC_COW':
         ration_percents = udrv.lactating_cow_ration

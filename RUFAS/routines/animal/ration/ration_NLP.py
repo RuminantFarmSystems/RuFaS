@@ -640,21 +640,20 @@ def optimize(user_defined_ration_select):
             if chanchodebug: print('constraint 10 ' + str(constraint_check_.success))
             constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con11)
             if chanchodebug: print('constraint 11 ' + str(constraint_check_.success))
-        else:
-            print('success!\n\n\n\n\n\n')
 
         # Uncomment to use
-        # if not usermod.success:
-        #     failed_constraints = find_failed_constraints(usermod.x, user_cons)
-        #     if not failed_constraints:
-        #         print('No constraints violated')
-        #
-        #     for constr in failed_constraints:
-        #         # add warnings to output manager
-        #         # or print out to console or both
-        #         print(f'Constraint {constr} violated')
-        #         print(f'Constraint value: {constr["fun"](usermod.x)}')
-        #         print(f'Constraint type: {constr["type"]}')
+        if not usermod.success:
+            failed_constraints = find_failed_constraints(usermod.x, user_cons)
+            if not failed_constraints:
+                print('No constraints violated')
+        
+            for constr in failed_constraints:
+                # add warnings to output manager
+                # or print out to console or both
+                #print(f'Constraint {constr} violated')
+                #print(f'Constraint value: {constr["fun"](usermod.x)}')
+                #print(f'Constraint type: {constr["type"]}')
+                print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
 
         return usermod
     elif animal_type == 'cow':

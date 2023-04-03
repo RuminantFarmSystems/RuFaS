@@ -28,6 +28,7 @@ from typing import Any, Dict, Tuple
 
 om = OutputManager()
 
+from RUFAS.routines.animal.ration import user_defined_ration as udr
 
 def daily_animal_routine(animal_management, feed, weather, time):
     """
@@ -139,7 +140,9 @@ class AnimalManagement:
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
 
+        udrv = udr.user_defined_ration_values()
         self.ration_user_input = data['ration']['user_input']
+        udrv.udr_or_not = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']

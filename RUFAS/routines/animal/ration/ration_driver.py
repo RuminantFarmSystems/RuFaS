@@ -18,7 +18,6 @@ from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration
 udrv = user_defined_ration_values()
 from RUFAS.routines.animal.ration.user_defined_ration import ration_to_use as ration_to_use
 
-
 def optimization(pen, requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False):
     """
     Function that sets up the nutrients and requirements lists into structured
@@ -59,7 +58,7 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
     # try block for catching scipy SLSQP error
     i = 0
     count = 0
-    print('optimization_attempt')
+    #print('optimization_attempt')
     while i < 1:
         try:
             solution = NLP.optimize(user_defined_ration_select)
@@ -72,7 +71,7 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
             count += 1
         # this case should not be called, but is in place to not crash the
         # simulation if bounds error is not resolved
-        print(count)
+        #print(count)
         if count > 30:
             solution = None
             mock_solution = user_defined_solution(pen, requirements.DMIest)
@@ -125,8 +124,11 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
         pen: an object of class Pen
         feed: an object of class Feed
         available_feeds: an object of class AvailableFeeds
-        animal_type: string representation of the type of animal (cow, heifer)
-        cow_type: Boolean which is True if cow is lactating, False otherwise
+        animal_type: string
+            representation of the type of animal (cow, heifer)
+        cow_type: Boolean 
+            True if cow is lactating, False otherwise
+        user_defined_ration_select: Boolean of whether user input selected
     """
     ration_percents = ration_to_use(pen.animal_combination)
     solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select)
@@ -138,7 +140,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
             total_milk_in_pen += animal.estimated_daily_milk_produced
             num_animals += 1
         average_total_milk = total_milk_in_pen/num_animals
-        print('average_total_milk = '+ str(average_total_milk))
+        # print('average_total_milk = '+ str(average_total_milk))
     fixed_ration = False
     if animal_type == 'cow' and solution is not None:
         while not solution.success:
@@ -175,8 +177,8 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
                 break
 
     if solution is not None and not fixed_ration:
-        print(solution)
-        print('solution is not None and not fixed_ration')
+        #print(solution)
+        #print('solution is not None and not fixed_ration')
         # if not fixed_ration:
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
@@ -208,50 +210,6 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
         ration['objective'] = 0.0 # setting as optimal
     return ration, ration_vals
 
-    
-
-class user_defined_ration_values(object):
-    """
-    Reads in the user_defined_ration JSON and collects variables and dicts to use later
-
-    Attributes
-    ----------
-    something_somethingelse : Dict[str, Any]
-        Contains variables 
-    
-    """
-
-    # check the setup JSON
-    # if user-defined-ration is NOT selected, initialize as NULL
-    
-    __instance = None
-
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(user_defined_ration_values, cls).__new__(cls)
-        return cls.instance
-
-    def __init__(self) -> None:
-        if user_defined_ration_values.__instance is None:
-            user_defined_ration_values.__instance = self
-            import json
-            with open('input/userdefinedration/userdefinedration_test.json', 'r') as f:
-                ration_all = json.load(f)
-            lactating_cow_ration = ration_all['cow_lactating']
-            dry_cow_ration = ration_all['cow_dry']
-            heifer_ration = ration_all['all_heifers']
-            calf_ration = ration_all['calf']   
-            self.calf_ration = calf_ration
-            self.heifer_ration = heifer_ration
-            self.lactating_cow_ration = lactating_cow_ration
-            self.dry_cow_ration = dry_cow_ration
-            self.ration_all = ration_all
-
-            self.variables_pool: Dict[str, Any] = {}
-            self.warnings_pool: Dict[str, Any] = {}
-            self.errors_pool: Dict[str, Any] = {}
-            self.logs_pool: Dict[str, Any] = {}
- 
 
 def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
@@ -269,11 +227,11 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
-
+    # print('udrv.udr_or_not' + str(udrv.udr_or_not))
     user_defined_ration_select = udrv.udr_or_not
     if user_defined_ration_select:
         ration, ration_vals = user_defined_ration(req, pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
-        print('\n \n \n returning UDR \n \n \n ')
+        #print('\n \n \n returning UDR \n \n \n ')
         return ration, ration_vals
 
     solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type,)
