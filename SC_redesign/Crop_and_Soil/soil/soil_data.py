@@ -43,7 +43,7 @@ class SoilData:
     """Cumulative total of volume of surface runoff that occurred in a year (mm per hectare)"""
 
     # Track annual nutrient activity
-    annual_runoff_fertilizer_phosphorus: float = 0  # TODO: add this to annual reset method
+    annual_runoff_fertilizer_phosphorus: float = 0
     """Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff"""
 
     # ---- evapotranspiration
