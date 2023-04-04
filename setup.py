@@ -9,4 +9,5 @@ setup(name='RUFAS',
       author_email='kfr3@cornell.edu',
       url='xxx',
       packages=['RUFAS'],
+      python_requires='>=3.10',
       )

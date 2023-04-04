@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from typing import Optional
+from typing import Tuple
+from typing import Union
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
@@ -23,7 +25,10 @@ class BaseManureTreatment(ABC):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather, time,
+                 manure_treatment_config: Union[ManureTreatmentConfig,
+                                                Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
+                 ) -> None:
         """Initializes the BaseManureTreatment class.
 
         Args:
@@ -158,7 +163,10 @@ class BaseManureTreatment(ABC):
         """
         self._initialize_private_attributes_during_update(sim_day, pen, manure_handler_daily_output,
                                                           manure_treatment_daily_input, manure_separator)
-        return self._daily_update_helper()
+        daily_output = self._daily_update_helper()
+        self._accumulated_output.simulation_day = sim_day
+        self._accumulated_output.pen_id = pen.id
+        return daily_output
 
     @abstractmethod
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:

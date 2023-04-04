@@ -10,9 +10,12 @@ Description: This file's main function is grouping(list, pens) (line 44) which
     Jorge Barrientos (jab924@cornell.edu).
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
+import math
+
 ################################################################################
 import pandas as pd
 import numpy as np
+import math
 from scipy.stats import percentileofscore
 
 
@@ -140,7 +143,8 @@ def grouping(cow_list, pens, stocking_density):
     # Adding pen_assignment number to list based on percentile
     for i in range(len(percentile)):
         key = 0
-        while percentile[i] <= index[key-1] or percentile[i] > index[key]:
+        while percentile[i] <= index[key - 1] or (
+                percentile[i] > index[key] and not math.isclose(percentile[i], index[key], rel_tol=1e-09)):
             key += 1
         pen_assignment.append(key)
 
