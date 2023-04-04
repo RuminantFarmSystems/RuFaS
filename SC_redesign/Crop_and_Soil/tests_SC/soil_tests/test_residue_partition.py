@@ -15,21 +15,32 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
                                                                                     rainfall)
 
 
-@pytest.mark.parametrize("plant_residue_lignin_composition", [
-    5,  # lower values
-    100,  # higher values
-    35.8,  # arbitrary
+@pytest.mark.parametrize("plant_residue_lignin_composition, nitrogen_fraction_plant_residue", [
+    (3, 0.4),  # default value
+    (50, 0.5),  # higher value
+    (1.8, 1.1),  # arbitrary values
+    (2.2, 0)  # zeros
 ])
-def test_determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float) -> None:
+def test_determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float,
+                                                 nitrogen_fraction_plant_residue) -> None:
     """Test that metabolic plant residue ration is correctly determined under current nitrogen_fraction_plant_residue
     """
-    nitrogen_fraction_plant_residue = 0.4
-    if nitrogen_fraction_plant_residue != 0:
+    if 0 < nitrogen_fraction_plant_residue < 1.0:
         expected = (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
-    else:
+        assert expected == ResiduePartition._determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition,
+                                                                                     nitrogen_fraction_plant_residue)
+    elif nitrogen_fraction_plant_residue == 0:
         expected = 0
-
-    assert expected == ResiduePartition._determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition)
+        assert expected == ResiduePartition._determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition,
+                                                                                     nitrogen_fraction_plant_residue)
+    else:
+        # case of invalid input
+        with pytest.raises(ValueError) as e:
+            ResiduePartition._determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition,
+                                                                      nitrogen_fraction_plant_residue)
+        expected = "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received " + \
+                   str(nitrogen_fraction_plant_residue)
+        assert expected == str(e.value)
 
 
 @pytest.mark.parametrize("plant_lignin_nitrogen_ratio", [

@@ -2,7 +2,7 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
-This class contains all necessary methods that involves residue partition, including both plant and soil and also
+This class contains all necessary methods that involve residue partition, including both plant and soil and also
 considers the case of tillage for plants
 
 References
@@ -53,7 +53,7 @@ class ResiduePartition:
         ----------
         plant_residue_lignin_composition : float
             lignin fraction of plant residue (unitless)
-        nitrogen_fraction_plant_residue : float
+        nitrogen_fraction_plant_residue : float, default = 0.4
             Nitrogen fraction in plant residue at harvest (unitless)
 
         Returns
@@ -65,10 +65,13 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.I.2
         """
-        if nitrogen_fraction_plant_residue != 0:
+        if 0 < nitrogen_fraction_plant_residue < 1.0:
             return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
-        else:
+        elif nitrogen_fraction_plant_residue == 0:
             return 0
+        else:
+            raise ValueError("Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
+                             + str(nitrogen_fraction_plant_residue))
 
     @staticmethod
     def _determine_plant_residue_metabolic_fraction(plant_lignin_nitrogen_ratio: float) -> float:
@@ -97,8 +100,8 @@ class ResiduePartition:
                                                  plant_dry_matter_residue_amount: float,
                                                  plant_metabolic_active_carbon_usage: float,
                                                  plant_metabolic_to_soil_carbon_amount: float) -> float:
-        """This method calculates a return the updated plant metabolic carbon amount after adding the metabolic carbon
-        in dry matter at harvest and and reduced my the amount that's decomposed and incorporated
+        """This method calculates the updated plant metabolic carbon amount after adding the metabolic carbon
+        in dry matter at harvest and and reduced by the amount that's decomposed and incorporated
 
         Parameters
         ----------
