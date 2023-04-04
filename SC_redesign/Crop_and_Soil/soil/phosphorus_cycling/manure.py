@@ -3,7 +3,8 @@ from math import exp, sqrt
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MILLIMETERS_TO_CENTIMETERS, KILOGRAMS_TO_GRAMS, \
-    KILOGRAMS_TO_MILLIGRAMS, HECTARES_TO_SQUARE_CENTIMETERS, HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS
+    KILOGRAMS_TO_MILLIGRAMS, HECTARES_TO_SQUARE_CENTIMETERS, HECTARES_TO_SQUARE_MILLIMETERS, \
+    CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
 
 """
 This module adds and tracks manure phosphorus dynamics based on the SurPhos model.
@@ -23,6 +24,126 @@ class Manure:
 
         """
         self.data = soil_data or SoilData()
+
+    def daily_manure_update(self, rainfall: float, runoff: float, field_size: float) -> None:
+        """This method conducts daily operations on manure including decomposition, assimilation into soil, etc.
+
+        Parameters
+        ----------
+        rainfall: float
+            The amount of rainfall on the current day (mm)
+        runoff : float
+            The amount of runoff on the current day (mm)
+        field_size : float
+            The size of the field (ha)
+
+        """
+        # Leach phosphorus from manure to surface runoff
+        if runoff > 0:
+            if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
+                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, True, True)
+                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, True, False)
+            if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
+                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, False, True)
+                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, False, False)
+
+    def _leach_phosphorus_to_runoff(self, rainfall: float, runoff: float, field_size: float, from_machine: bool,
+                                    is_organic: bool) -> None:
+        """This method leaches and transfers phosphorus from the manure phosphorus pools.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm)
+        runoff : float
+            The amount of runoff on the current day (mm)
+        field_size : float
+            Area of the field (ha)
+        from_machine : bool
+            Is the phosphorus being leached from the machine-applied manure pools (True / False)
+        is_organic : bool
+            Is the phosphorus being leached organic (True / False)
+
+        """
+        organic_machine, inorganic_machine, organic_grazer = False
+        if from_machine:
+            manure_dry_mass = self.data.machine_manure_dry_mass
+            field_coverage = self.data.machine_manure_field_coverage
+            if is_organic:
+                organic_machine = True
+                water_extractable_phosphorus = self.data.machine_water_extractable_organic_phosphorus
+            else:
+                inorganic_machine = True
+                water_extractable_phosphorus = self.data.machine_water_extractable_inorganic_phosphorus
+        else:
+            manure_dry_mass = self.data.grazing_manure_dry_mass
+            field_coverage = self.data.grazing_manure_field_coverage
+            if is_organic:
+                organic_grazer = True
+                water_extractable_phosphorus = self.data.grazing_water_extractable_organic_phosphorus
+            else:
+                water_extractable_phosphorus = self.data.grazing_water_extractable_inorganic_phosphorus
+
+        rain_manure_dry_matter_ratio = self._determine_rain_manure_dry_matter_ratio(rainfall, manure_dry_mass,
+                                                                                    field_coverage)
+
+        distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
+
+        # P leached in kg
+        if is_organic:
+            water_extractable_phosphorus_leached = self._determine_water_extractable_organic_phosphorus_leached(
+                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
+        else:
+            water_extractable_phosphorus_leached = self._determine_water_extractable_inorganic_phosphorus_leached(
+                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
+
+        # mg phosphorus / Liter of runoff
+        runoff_dissolved_phosphorus_concentration = self._determine_water_extractable_phosphorus_runoff_concentration(
+            water_extractable_phosphorus_leached, rainfall, field_size, distribution_factor)
+
+        runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
+
+        phosphorus_lost_to_runoff_in_kg = (runoff_dissolved_phosphorus_concentration * runoff_in_liters) * \
+            MILLIGRAMS_TO_KILOGRAMS
+
+        infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
+
+        if organic_machine:
+            self.data.machine_water_extractable_organic_phosphorus -= water_extractable_phosphorus_leached
+            self.data.annual_runoff_machine_manure_organic_phosphorus += phosphorus_lost_to_runoff_in_kg
+        elif inorganic_machine:
+            self.data.machine_water_extractable_inorganic_phosphorus -= water_extractable_phosphorus_leached
+            self.data.annual_runoff_machine_manure_inorganic_phosphorus += phosphorus_lost_to_runoff_in_kg
+        elif organic_grazer:
+            self.data.grazing_water_extractable_organic_phosphorus -= water_extractable_phosphorus_leached
+            self.data.annual_runoff_grazing_manure_organic_phosphorus += phosphorus_lost_to_runoff_in_kg
+        else:
+            self.data.grazing_water_extractable_inorganic_phosphorus -= water_extractable_phosphorus_leached
+            self.data.annual_runoff_grazing_manure_inorganic_phosphorus += phosphorus_lost_to_runoff_in_kg
+
+        self._add_infiltrated_phosphorus_to_soil(infiltrated_phosphorus, field_size)
+
+    def _add_infiltrated_phosphorus_to_soil(self, infiltrated_phosphorus_amount: float, field_size: float) -> None:
+        """This method adds phosphorus that was dissolved in rainfall to the soil profile as outlined in SurPhos.
+
+        Parameters
+        ----------
+        infiltrated_phosphorus_amount : float
+            The amount of phosphorus to be added to the soil profile (kg)
+        field_size : float
+            The size of the field (ha)
+
+        Notes
+        -----
+        This method follows what is outlined in SurPhos (theoretical documentation, page 8, paragraph just below eqn.
+        [13]), which is that 80% of infiltrated phosphorus stays in the top 20 mm of soil, and the rest infiltrates
+        deeper.
+        TODO: implement distribution mechanism for the 20% of phosphorus that infiltrates deeper after talking with Pete
+            about how that mechanism works.
+
+        """
+        self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
+        self.data.soil_layers[0].add_to_active_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
 
     # --- Static Methods ---
     @staticmethod
