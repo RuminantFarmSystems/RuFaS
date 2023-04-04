@@ -34,8 +34,8 @@ class GasEmissions:
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)
         ex = math.exp(lnA - (E / (R * tempK)))
 
-        Vsd = total_volatile_solids * (Bo / E_CH4_pot)  # kg
-        VSnd = total_volatile_solids - Vsd  # kg
+        Vsd = total_volatile_solids * (Bo / E_CH4_pot)  # g
+        VSnd = total_volatile_solids - Vsd  # g
 
         VSd_term = 24 * Vsd * b1 * ex
         VSnd_term = 24 * VSnd * b2 * ex

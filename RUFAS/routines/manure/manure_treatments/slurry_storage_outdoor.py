@@ -171,14 +171,12 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         """
         return self.freeboard_input * self.pit_surface_area
 
-    def calc_methane_emission(self, liquid_manure_total_volatile_solids: float) -> Tuple[float, float]:
-        temperature_celsius = self._get_current_day_average_temperature_celsius()
+    def calc_methane_emission(self, liquid_manure_total_volatile_solids: float) -> float:
         methane_emission = GasEmissions.calc_methane_emission_for_slurry_storage(
                 total_volatile_solids=liquid_manure_total_volatile_solids,
-                temperature_celsius=temperature_celsius
+                temperature_celsius=self._get_current_day_average_temperature_celsius(),
         )
-        methane_emission = max(methane_emission, 0.0)
-        return methane_emission
+        return max(methane_emission, 0.0)
 
     def calc_ammonia_emission(self, num_animals: int, barn_area: float,
                               accumulated_manure_volume: float,
@@ -219,7 +217,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
         self._accumulate_daily_output(daily_output)
 
-        daily_methane_emission = self.calc_methane_emission(self._accumulated_output.liquid_manure_total_volatile_solids)
+        daily_methane_emission = self.calc_methane_emission(daily_output.liquid_manure_total_volatile_solids)
         daily_output.storage_methane = daily_methane_emission
         self._accumulated_output.storage_methane += daily_methane_emission
         self._accumulated_output.liquid_manure_total_volatile_solids += \

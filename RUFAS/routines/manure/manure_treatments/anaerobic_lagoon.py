@@ -98,7 +98,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         daily_methane_emission = self.calc_methane_emission(daily_output.liquid_manure_total_volatile_solids)
         daily_output.storage_methane = daily_methane_emission
         self._accumulated_output.storage_methane += daily_methane_emission
-        self._accumulated_output.liquid_manure_total_solids += \
+        self._accumulated_output.liquid_manure_total_volatile_solids += \
             daily_output.liquid_manure_total_volatile_solids - daily_methane_emission * 3
 
         ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
@@ -161,7 +161,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         if self._sim_day % self.storage_time_period == 1:
-            return manure_treatment_daily_output
+            return manure_treatment_daily_output.clone()
         else:
             new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
             new_accumulated_output.daily_final_manure_volume -= self.flushing_volume
