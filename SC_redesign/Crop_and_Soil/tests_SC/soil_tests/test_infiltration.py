@@ -223,7 +223,7 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
 
     # run main method
     incorp.infiltrate(rainfall, coefficient)
-    expected_top_water, expected_bottom_water = _calculate_infiltrated_water(rainfall, 0.95, 20, 50)
+    expected_infiltrated_water = max(0.0, rainfall - 0.95)
 
     # assertions
     assert incorp._determine_third_moisture_condition_parameter.call_count == 2
@@ -243,8 +243,7 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     assert incorp.data.previous_retention_parameter == 21.34
     assert incorp.data.moisture_condition_parameter == 50
     assert incorp.data.accumulated_runoff == 0.95
-    assert incorp.data.soil_layers[0].water_content == expected_top_water
-    assert incorp.data.soil_layers[1].water_content == expected_bottom_water
+    assert incorp.data.soil_layers[0].water_content == expected_infiltrated_water
     assert incorp.data.annual_runoff_total == 0.95
 
 

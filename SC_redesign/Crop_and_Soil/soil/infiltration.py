@@ -75,10 +75,7 @@ class Infiltration:
 
         self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
-        top_layer_water_portion = self.data.soil_layers[0].layer_thickness / self.data.soil_layers[1].bottom_depth
-        bottom_layer_water_portion = (1.0 - top_layer_water_portion)
-        self.data.soil_layers[0].water_content += infiltrated_water * top_layer_water_portion
-        self.data.soil_layers[1].water_content += infiltrated_water * bottom_layer_water_portion
+        self.data.soil_layers[0].water_content += infiltrated_water
 
         # --- Update previous retention parameter ----------------------------------------------------------------------
         if self.data.previous_retention_parameter is None:
