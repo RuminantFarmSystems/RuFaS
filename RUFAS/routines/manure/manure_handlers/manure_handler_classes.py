@@ -110,14 +110,13 @@ class BaseManureHandler:
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
                     "bedding": vars(bedding),
-                    "sim_day": sim_day
-                    }
+                    "sim_day": sim_day, }
 
         NH3_housing_emission = GasEmissions.calc_ammonia_emission(
             num_animals=pen.num_animals,
             barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-            manure_urine_total_ammoniacal_nitrogen=pen.manure.urine_ammoniacal_nitrogen,  # kg/animal
-            manure_urine=pen.manure.urine / pen.num_animals,  # kg/animal
+            total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg/animal
+            mass=pen.manure.urine / pen.num_animals,  # kg/animal
             temperature_celsius=self._get_current_day_average_temperature_in_celsius()
         )
         daily_output = ManureHandlerDailyOutput(
@@ -125,7 +124,7 @@ class BaseManureHandler:
             pen_id=pen.id,
             manure_urea=pen.manure.urea,
             liquid_manure_total_ammoniacal_nitrogen=(
-                max(0.0, pen.manure.total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
+                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
@@ -283,10 +282,6 @@ class ManureHandlerFactory:
             A new instance of a BaseManureHandler subtype.
 
         """
-        info_map = {"class": cls.__name__,
-                    "function": cls.get_instance.__name__,
-                    }
-
         manure_handler_class_by_type: Dict[ManureHandlerType, Type[BaseManureHandler]] = {
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
@@ -297,19 +292,9 @@ class ManureHandlerFactory:
             manure_handler_type_name)
         manure_handler_class = manure_handler_class_by_type[manure_handler_type]
 
-        om.add_variable("manure_handler_type",
-                        manure_handler_type.value, info_map)
-        om.add_variable("manure_handler_class",
-                        manure_handler_class.__name__, info_map)
-
         if custom_manure_handler_config:
             manure_handler_subtype = manure_handler_class(
                 weather, time, custom_manure_handler_config)
-
-            om.add_variable("custom_manure_handler_config",
-                            vars(custom_manure_handler_config), info_map)
-            om.add_variable("manure_handler_subtype",
-                            vars(manure_handler_subtype), info_map)
 
             return manure_handler_subtype
         else:
@@ -317,10 +302,5 @@ class ManureHandlerFactory:
                 manure_handler_type)
             manure_handler_subtype = manure_handler_class(
                 weather, time, default_manure_handler_config)
-
-            om.add_variable("default_manure_handler_config",
-                            vars(default_manure_handler_config), info_map)
-            om.add_variable("manure_handler_subtype",
-                            vars(manure_handler_subtype), info_map)
 
             return manure_handler_subtype

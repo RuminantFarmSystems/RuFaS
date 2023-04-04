@@ -49,11 +49,13 @@ class HeiferI(Calf):
         """
         Calculates this heiferI's nutrient requirements.
         """
-        req = calc_rqmts(self.body_weight, self.mature_body_weight, None,
-                         animal_type='heifer', BCS5=3, PrevTemp=temp,
-                         ADG_heifer=self.daily_growth,
-                         Age=self.days_born
-                         )
+        req = calc_rqmts(body_weight=self.body_weight,
+                         mature_body_weight=self.mature_body_weight,
+                         day_of_pregnancy=None,
+                         animal_type='heifer',
+                         body_condition_score_5=3,
+                         previous_temperature=temp,
+                         average_daily_gain_heifer=self.daily_growth)
 
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
@@ -64,17 +66,18 @@ class HeiferI(Calf):
         self.P_req = req['P_req']
         self.DMIest = req['DMIest']
 
-    def calc_manure_excretion(self, feed):
+    def calc_manure_excretion(self, feed, methane_model):
         """
         Calculates and sets the manure excretion components.
 
         Args:
                 feed: instance of the Feed class
+                methane_model: methane model used for methane emission calculations
         """
         p_urine, p_feces_excrt = self.calc_base_manure()
         self.p_excrt, self.manure_excretion = \
             manure_calculations(self.ration_formulation, feed,
-                                self.body_weight, p_feces_excrt, p_urine)
+                                self.body_weight, p_feces_excrt, p_urine, methane_model)
 
     def phosphorus_rqmts(self, DMI):
         """

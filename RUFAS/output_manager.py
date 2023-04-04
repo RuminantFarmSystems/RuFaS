@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 from typing import Any, Dict, List, Union
+import json
 import os
 import time
 
@@ -242,7 +243,7 @@ class OutputManager (object):
         """Saves a dictionary into a JSON file"""
         try:
             with open(path, 'w') as json_file:
-                json_file.write(str(dict))
+                json_file.write(json.dumps(dict))
         except Exception as e:
             raise e
 

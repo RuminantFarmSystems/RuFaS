@@ -6,133 +6,214 @@ Description: Determines manure excretion with information from the ration
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from .general_manure import phosphorus_excreted
-from RUFAS.routines.animal.ration.ration_driver import ration_report
 import math
+from typing import Tuple
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
+from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
-def manure_calculations(ration_formulation, feed, bw, days_milk, milk_protein,
-                        milk_prod, p_feces_excrt, p_urine, methane_model, milk_fat, ME_intake):
+def manure_calculations(ration_formulation,
+                        feed,
+                        body_weight: float,
+                        days_in_milk: int,
+                        milk_protein: float,
+                        daily_milk_production: float,
+                        fecal_phosphorus: float,
+                        urine_phosphorus_required: float,
+                        methane_model: str,
+                        milk_fat: float,
+                        metabolizable_energy_intake: float) \
+        -> Tuple[float, AnimalManureExcretions]:
+    """Calculates the manure excretion values for a cow with information from the ration formulation.
+
+    Parameters
+    ----------
+    ration_formulation : Dict[str, float]
+        Dictionary that stores the calculated ration.
+    feed : Dict[str, float]
+        A Feed object that contains information about the available feeds.
+    body_weight : float
+        Body weight of the current cow, kg.
+    days_in_milk : int
+        Days in milk, days.
+    milk_protein : float
+        Milk protein (from animal input), % of milk.
+    daily_milk_production : float
+        Daily milk production of the current cow, kg.
+    fecal_phosphorus : float
+        Amount of fecal phosphorus excreted by the current cow, g.
+    urine_phosphorus_required : float
+        Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
+    milk_fat : float
+        Milk fat (from animal input), % of milk.
+    metabolizable_energy_intake : float
+        Metabolizable energy intake, Mcal/kg dry matter.
+
+    Returns
+    -------
+    float
+        Total amount of phosphorus excreted by the given animal, g.
+    AnimalManureExcretions
+        A dictionary that contains the manure excretion values as specified
+            in the AnimalManureExcretions class definition.
+
     """
-    Calculates inputs for manure module with information from the
-    ration formulation. Equations referenced are from pseudocode.
+    nutrient_amounts, nutrient_concentrations = ration_report(
+        ration_formulation, feed.available_feeds)
+    dry_matter_intake = nutrient_amounts['dm']
+    ASH_diet_content = nutrient_amounts['ash']
+    ASH_concentration = nutrient_concentrations["ash"]
+    dry_matter_concentration = nutrient_concentrations['dm']
+    ADF_concentration = nutrient_concentrations['ADF']
+    CP_concentration = nutrient_concentrations['CP']
+    lignin_concentration = nutrient_concentrations['lignin']
+    NDF_concentration = nutrient_concentrations['NDF']
+    potassium_concentration = nutrient_concentrations['potassium']
+    EE_concentration = nutrient_concentrations["EE"]
+    starch_concentration = nutrient_concentrations['starch']
 
-    Args:
-        milk_prod: milk production, kg
-        ration_formulation: dictionary which stores the calculated ration
-        feed: instance of the Feed class
-        bw: body weight, kg
-        days_milk: days in milk, d
-        milk_protein: milk protein, % of milk (from animal input)
-        p_feces_excrt: amount of P excreted by an animal (g)
-        p_urine: amount of P required for urine production (g)
-        methane_model: methane model used for methane emission calculations
-        milk_fat: milk fat, % of milk
-        ME_intake: metabolizable energy intake, Mcal/kg DM
+    # Fecal water, kg [A.3E.A.1]
+    fecal_water = (1.987 * dry_matter_intake
+                   + 0.348 * ADF_concentration
+                   - 0.412 * CP_concentration
+                   - 0.074 * dry_matter_concentration
+                   - 0.0057 * days_in_milk)
 
-    Returns:
-        p_excrt: amount of P excreted by animal, g
-        and a dictionary containing the following values
-            U: urea concentration, mol/L
-            TAN_s: total ammoniacal nitrogen concentration in the manure slurry,
-                mol/L
-            MN: nitrogen in liquid and solid manure, g
-            Mkg: amount of manure, kg
-            VSd: degradable volatile solids, g
-            VSnd: non-degradable volatile solids, g
-            WIP_frac: water extractable inorganic P fraction
-            WOP_frac: water extractable organic P fraction
-            p_excrt_manure: manure P excretion for manure module input (g)
-            p_frac: P fraction of manure
-            K: potassium in manure, g/day
-    """
-    amount, conc = ration_report(ration_formulation, feed.available_feeds)
-    dm_intake = amount['dm']
-    Ash_diet_content = amount['ash']
-    ASH_conc = conc["ash"]
-    DM_conc = conc['dm']
-    ADF_conc = conc['ADF']
-    CP_conc = conc['CP']
-    lignin_conc = conc['lignin']
-    NDF_conc = conc['NDF']
-    K_conc = conc['potassium']
-    EE_conc = conc["EE"]
-    starch_conc = conc['starch']
+    # Total Solids, kg [A.3E.A.2]
+    # The amount of fecal solids is assumed to be equivalent to the amount of total solids
+    fecal_solids = (-0.576
+                    + 0.370 * dry_matter_intake
+                    - 0.075 * CP_concentration
+                    + 0.059 * ADF_concentration)
 
-    # Faecal water, kg [A.3C.A.1]
-    fecal_water = 1.987 * dm_intake + 0.348 * ADF_conc - 0.412 * CP_conc - 0.074 * DM_conc - 0.0057 * days_milk
+    # Total urine, kg [A.3E.A.3]
+    urine = (-7.742
+             + 0.388 * dry_matter_intake
+             + 0.726 * CP_concentration
+             + 2.066 * milk_protein)
 
-    # Total Solids, kg [A.3C.A.2]
-    total_solids = -0.576 + 0.370 * dm_intake - 0.075 * CP_conc + 0.059 * ADF_conc
+    # Manure excretion
+    # Amount of feces and urine excreted daily by the growing heifer, kg [A.3E.A.4]
+    total_manure_excreted = fecal_water + fecal_solids + urine
 
-    # Total urine, kg [A.3C.A.3]
-    urine = -7.742 + 0.388 * dm_intake + 0.726 * CP_conc + 2.066 * milk_protein
+    # Total manure nitrogen, kg [A.3E.B.1]
+    manure_nitrogen = (20.3
+                       + 0.654 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
-    # Amount of manure, kg [A.3C.A.4]
-    manure = fecal_water + total_solids + urine
+    # Urine nitrogen, kg [A.3E.B.2]
+    urine_nitrogen = (12.0
+                      + 0.333 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                      ) * GeneralConstants.GRAMS_TO_KG
 
-    # Faecal nitrogen, g [A.3C.B.1]
-    N_feces = (-0.0368 +
-               0.0096 * dm_intake + 0.0022 * CP_conc +
-               0.0034 * lignin_conc -
-               0.000043 * bw)
+    # Fecal nitrogen, kg [A.3B.B.3]
+    fecal_nitrogen = manure_nitrogen - urine_nitrogen
 
-    # Urine nitrogen, g [A.3C.B.2]
-    N_urine = (-0.2837 +
-               0.0068 * dm_intake + 0.0155 * CP_conc +
-               0.00013 * days_milk +
-               0.000092 * bw)
+    # Organic matter intake, kg [A.2.A.3]
+    organic_matter_intake = dry_matter_intake - ASH_diet_content
 
-    # Nitrogen in liquid and solid manure, g [A.3C.B.3]
-    N_manure = N_feces + N_urine
+    # Degradable volatile solids, kg [A.3E.A.5]
+    degradable_volatile_solids = (-1.017
+                                  + 0.364 * organic_matter_intake
+                                  + 0.029 * NDF_concentration
+                                  - 0.023 * CP_concentration
+                                  )
 
-    # Organic matter intake, kg
-    OM_intake = dm_intake - Ash_diet_content
+    # Total volatile solids, kg [A.3E.A.6]
+    total_volatile_solids = (-1.201
+                             + 0.402 * organic_matter_intake
+                             + 0.036 * NDF_concentration
+                             - 0.024 * CP_concentration
+                             )
 
-    # Degradable volatile solids, g [A.3C.A.5]
-    degradable_volatile_solids = (-1.017 + 0.364 * OM_intake + 0.029 * NDF_conc - 0.023 * CP_conc) * 1000
+    # Non-degradable volatile solids, kg [A.3A.A.6]
+    non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-    # Non-degradable volatile solids, g [A.3C.A.6]
-    nondegradable_volatile_solids = (-0.184 + 0.038 * OM_intake + 0.007 * NDF_conc - 0.001 * CP_conc) * 1000
+    # Urinary N concentration, g N/kg [A.3G.B.1]
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+    urine_urea_nitrogen_concentration = -1.16 + \
+        0.86 * urinary_nitrogen_concentration
 
-    # Urea concentration, mol/L (Eq 5.1)
-    U = (-1.16 + 0.86 * (N_urine / urine)) / 28
+    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
+    urine_urea_nitrogen_concentration_lower_bound = 2
+    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
+        urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
 
+    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
+    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
     # Total ammoniacal nitrogen concentration in the manure slurry,
-    # mol/L (Eq 6.1)
-    TAN_s = (-162.4 * U * U + 96.4 * U) / 100
+    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
 
-    # Amount of potassium excreted, g/day [A.3C.C.1]
-    K_manure = 1.822 * milk_prod + 2688.88 * (milk_protein / 100) + 156.93 * dm_intake * (K_conc / 100) - 91.755
+    # Amount of potassium excreted, g [A.3E.B.3]
+    potassium = 7.21 * dry_matter_intake + 15944 * \
+        potassium_concentration / 100 - 164.5
 
     # Methane Emissions
+    methane_emission = 0.0
     if methane_model == "Mutian":  # [A.3E.C.1]
-        methane_emis = - 126 + 11.3 * dm_intake + 2.30 * NDF_conc + 28.8 * milk_fat + 0.148 * bw
+        methane_emission = (- 126
+                            + 11.3 * dry_matter_intake
+                            + 2.30 * NDF_concentration
+                            + 28.8 * milk_fat
+                            + 0.148 * body_weight)
+
     elif methane_model == "Mills":  # [A.3E.C.2]
-        methane_emis = (45.98 - 45.98 * math.exp(- ((- 0.0011 * starch_conc / ADF_conc) + 0.0045)
-                                                 * ME_intake * 4.184)) / 0.05565
+        starch_to_ADF_concentration_ratio = -0.0011 * \
+            starch_concentration / ADF_concentration
+        temp = -(starch_to_ADF_concentration_ratio + 0.0045) * \
+            metabolizable_energy_intake * 4.184
+        methane_emission = 45.98 * (1 - math.exp(temp)) / 0.05565
+
     elif methane_model == "IPCC":  # IPCC
         # Calculating gross energy concentration (Moraes et al. 2014)
-        soluble_residue = (100 - ASH_conc) - NDF_conc - CP_conc - EE_conc
-        gross_energy_conc = 0.263 * CP_conc + 0.522 * EE_conc + 0.198 * NDF_conc + 0.160 * soluble_residue  # [A.3E.C.3]
+        soluble_residue = 100 - ASH_concentration - \
+            NDF_concentration - CP_concentration - EE_concentration
+        gross_energy_concentration = (0.263 * CP_concentration
+                                      + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration
+                                      + 0.160 * soluble_residue)  # [A.3B.C.2]
+        methane_emission = 0.065 * gross_energy_concentration * \
+            dry_matter_intake / 0.05565  # [A.3B.C.3]
 
-        methane_emis = (0.065 * gross_energy_conc * dm_intake) / 0.05565  # [A.3E.C.4]
 
-    p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
-        phosphorus_excreted(milk_prod, manure, p_feces_excrt, p_urine)
+    phosphorus_excretion_values = calculate_phosphorus_excretion_values(
+        daily_milk_production=daily_milk_production,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
+    )
 
-    return p_excrt, \
-           {"U": U,
-            "TAN_s": TAN_s,
-            "MN": N_manure,
-            "Mkg": manure,
-            "TSd": total_solids,
-            "VSd": degradable_volatile_solids,
-            "VSnd": nondegradable_volatile_solids,
-            "WIP_frac": WIP_frac,
-            "WOP_frac": WOP_frac,
-            "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac,
-            "K_manure": K_manure,
-            "CH4_manure": methane_emis
-            }
+    (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
+     manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
+
+    manure_excretion_values = AnimalManureExcretions(
+        urea=urine_urea_nitrogen_concentration,
+        urine=urine,
+        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=total_manure_excreted,
+        total_solids=fecal_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=manure_phosphorus_excreted,
+        phosphorus_fraction=manure_phosphorus_fraction,
+        potassium=potassium,
+        methane=methane_emission
+    )
+
+    return total_phosphorus_excreted, manure_excretion_values

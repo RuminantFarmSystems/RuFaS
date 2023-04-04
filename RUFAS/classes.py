@@ -19,6 +19,7 @@ from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
+from typing import Any, Dict
 
 
 om = OutputManager()
@@ -52,11 +53,12 @@ class State:
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(
             input_dir / 'feed' / data['feed']))
-        self.animal_management = AnimalManagement(
-            Utility.read_json_file(input_dir / 'animal' / data['animal']), config, self.feed, weather, time)
-
+        manure_management_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
+        animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
+        animal_config['manure_management_scenarios'] = manure_management_config['manure_management_scenarios']
+        self.animal_management = AnimalManagement(animal_config, config, self.feed, weather, time)
         self.manure_storage = ManureStorage(self.animal_management)
-        self.manure_management = ManureManagement(self.animal_management)
+        self.manure_management = ManureManagement(self.animal_management, weather, time, manure_management_config)
 
     def annual_reset(self):
         """
@@ -89,8 +91,7 @@ class Config:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
-                    "data": data,
-                    "weather_file_path": weather_file, }
+                    "config_data": data, }
 
         # gets a start/end date in the format year:julian-day. That way the program
         # can start in the middle of the year
@@ -333,8 +334,7 @@ class Weather:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
-                    "weather_file": weather_file,
-                    "config": config, }
+                    "weather_config": vars(config), }
 
         years = config.years
         w_start_year = config.w_start_year
@@ -561,6 +561,19 @@ class Time:
             return True
         elif self.year == len(self.years):
             return self.day > len(self.years[self.year - 1])
+
+        return False
+
+    @property
+    def is_last_day_of_simulation(self):
+        """Checks whether the current day is the last day of the simulation.
+
+        Returns:
+            bool: True if the current day is the last day of the simulation, false otherwise
+
+        """
+        if self.year == len(self.years):
+            return self.day == len(self.years[self.year - 1])
 
         return False
 
