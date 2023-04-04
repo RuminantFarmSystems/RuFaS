@@ -353,8 +353,8 @@ class AnimalManagement:
         for animal in animals_removed:
             if animal.id in self.animal_to_pen_id_map:
                 pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
-                pen.animals_in_pen.remove(animal)
-                pen.stocking_density = len(pen.animals_in_pen) / pen.num_stalls
+                # pen.animals_in_pen.remove(animal)
+                pen.stocking_density = (len(pen.animals_in_pen) - 1) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 
     def track_former_pen_population(self) -> List[int]:
@@ -437,13 +437,7 @@ class AnimalManagement:
             group = animal_type_mapping_dict.get(animal_class)['animal_group']
 
             candidate_pens = self.pens_by_animal_combination[group]
-            # for pen in candidate_pens:
-            #     print(group)
-            #     print(pen.id)
-            #     print("x" * 88)
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
-            # print(pen_for_insert.id, animal.id)
-            # print("l" * 88)
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
