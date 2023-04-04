@@ -21,6 +21,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output impor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
+from RUFAS.routines.manure.units.units import Units
 
 PenDailyUpdateDataType = Tuple[ManureManagementPen,
                                ManureHandlerDailyOutput,
@@ -90,11 +91,11 @@ class ManureManagementOutputHandler:
         """
         dataframe_dict = collections.defaultdict(list)
         for field in data_fields:
-            # unit = vars(Units).get(field.name, '')  # TODO: Add a Units class later
+            unit = vars(Units).get(field.name, '')  # TODO: Add a Units class later
             # unit = ''
             key_name = f'{prefix}{delimiter}' \
                        f'{self._capitalize_first_letters(field.name, "_")}' \
-                # f'{f"{delimiter}({unit})" if unit else ""}'
+                f'{f"{delimiter}({unit})" if unit else ""}'
             value = getattr(dataclass_obj, field.name, np.nan)
             dataframe_dict[key_name].append(round(value, 6))
         return dataframe_dict

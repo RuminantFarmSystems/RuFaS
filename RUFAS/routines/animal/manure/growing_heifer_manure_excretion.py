@@ -6,80 +6,155 @@ Description: Determines manure excretion with information from the
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from .general_manure import phosphorus_excreted
+from typing import Tuple
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
-def manure_calculations(ration_formulation, feed, bw, p_feces_excrt, p_urine):
+def manure_calculations(ration_formulation,
+                        feed,
+                        body_weight: float,
+                        fecal_phosphorus: float,
+                        urine_phosphorus_required: float,
+                        methane_model: str) \
+        -> Tuple[float, AnimalManureExcretions]:
+    """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
+
+    Parameters
+    ----------
+    ration_formulation : Dict[str, float]
+        Dictionary that stores the calculated ration.
+    feed : Dict[str, float]
+        A Feed object that contains information about the available feeds.
+    body_weight : float
+        Body weight of the current animal, kg.
+    fecal_phosphorus : float
+        Amount of fecal phosphorus excreted by the current animal, g.
+    urine_phosphorus_required : float
+        Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Boadi, IPCC.
+
+    Returns
+    -------
+    float
+        Total amount of phosphorus excreted by the given animal, g.
+    AnimalManureExcretions
+        A dictionary that contains the manure excretion values as specified
+            in the AnimalManureExcretions class definition.
+
     """
-    TEMPORARY PLACEHOLDER
-    Calculates inputs for manure module with information from the
-    ration formulation. Equations referenced are from pseudocode.
+    # TODO: Same TODOs as in dry_cow_manure_excretion.py
+    nutrient_amounts, nutrient_concentrations = ration_report(
+        ration_formulation, feed.available_feeds)
+    dry_matter_intake = nutrient_amounts['dm']
+    CP_concentration = nutrient_concentrations['CP']
+    potassium_concentration = nutrient_concentrations['potassium']
+    ASH_concentration = nutrient_concentrations["ash"]
+    NDF_concentration = nutrient_concentrations['NDF']
+    EE_concentration = nutrient_concentrations["EE"]
+    # Soluble residue
+    # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
+    soluble_residue = (100 - ASH_concentration) - \
+        NDF_concentration - CP_concentration - EE_concentration
 
-    Args:
-        ration_formulation: dictionary which stores the calculated ration
-        feed: instance of the Feed class
-        bw: body weight, kg
-        p_feces_excrt: amount of P excreted by an animal (g)
-        p_urine: amount of P required for urine production (g)
+    # Total urine, kg [A.3B.A.1]
+    urine = 9.0
 
-    Returns:
-        p_excrt: amount of P excreted by animal, g
-        and a dictionary containing the following values
-            U: urea concentration, mol/L
-            Urine: # TODO: Add description
-            TAN_s: total ammoniacal nitrogen concentration in the manure slurry,
-                mol/L
-            MN: nitrogen in liquid and solid manure, g
-            Mkg: amount of manure, kg
-            VSd: degradable volatile solids, g
-            VSnd: non-degradable volatile solids, g
-            WIP_frac: water extractable inorganic P fraction
-            WOP_frac: water extractable organic P fraction
-            p_excrt_manure: manure P excretion for manure module input (g)
-            p_frac: P fraction of manure
-            K: potassium in manure, g/day
+    # Manure excretion
+    # Amount of feces and urine excreted daily by the growing heifer, kg [A.3B.A.2]
+    total_manure_excreted = 4.158 * dry_matter_intake - 0.0246 * body_weight
 
-    """
-    amount, conc = ration_report(ration_formulation, feed.available_feeds)
-    dm_intake = amount['dm']
-    cp_conc = conc['CP']
-    K_conc = conc['potassium']
-    ASH_conc = conc["ash"]
-    NDF_conc = conc['NDF']
-    EE_conc = conc["EE"]
+    # Total solids excretion
+    # Amount of dry material excreted by the growing heifer, kg [A.3F.A.3]
+    total_solids = 0.178 * dry_matter_intake + 2.733
 
-    # Amount of manure, kg [A.3B.A.1]
-    manure = 3.886 * dm_intake - 0.029 * bw + 5.641
+    # Total volatile solids, kg [A.3B.A.3]
+    total_volatile_solids = 0.0073 * body_weight
 
-    # Total solids, kg/day [A.3B.A.2]
-    total_solids = 0.0084 * bw
+    # Degradable volatile solids, kg [A.3A.A.5]
+    degradable_volatile_solids = 0.9 * total_volatile_solids
 
-    # Nitrogen in liquid and solid manure, g/day [A.3D.B.1]
-    N_manure = 78.390 * dm_intake * cp_conc / 100 + 51.35
+    # Non-degradable volatile solids, kg [A.3A.A.6]
+    non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-    # Amount of potassium excreted, g/day [A.3D.B.3]
-    K_manure = 1000 * dm_intake * K_conc / 100
+    # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
+    manure_nitrogen = (15.1
+                       + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
-    # Methane Emissions [A.3B.C.1]
-    methane_emis = (38.62 + 26.44 * dm_intake) * 0.554
+    # Nitrogen excretion in urine, kg [A.3B.B.2]
+    urine_nitrogen = (14.3
+                      + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                      ) * GeneralConstants.GRAMS_TO_KG
 
-    p_excrt, WIP_frac, WOP_frac, p_excrt_manure, p_frac = \
-        phosphorus_excreted(0, manure, p_feces_excrt, p_urine)
+    # Nitrogen excretion in feces, kg [A.3B.B.3]
+    fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
 
-    return p_excrt, \
-           {"U": 0.340,  # TODO: Implement with correct equation
-            "Urine": 7,
-            "TAN_s": 0.14,  # TODO: Implement with correct equation
-            "MN": N_manure,
-            "Mkg": manure,
-            "TSd": total_solids,
-            "VSd": 7087.413,  # TODO: Implement with correct equation
-            "VSnd": 859.390,  # TODO: Implement with correct equation
-            "WIP_frac": WIP_frac,
-            "WOP_frac": WOP_frac,
-            "p_excrt_manure": p_excrt_manure,
-            "p_frac": p_frac,
-            "K_manure": K_manure,
-            "CH4_manure": methane_emis
-            }
+    # Urinary N concentration, g N/kg [A.3G.B.1]
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+    urine_urea_nitrogen_concentration = -1.16 + \
+        0.86 * urinary_nitrogen_concentration
+
+    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
+    urine_urea_nitrogen_concentration_lower_bound = 2
+    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
+        urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
+
+    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
+    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
+    # Total ammoniacal nitrogen concentration in the manure slurry,
+    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+
+    # Amount of potassium excreted, g [A.3B.B.4]
+    potassium = dry_matter_intake * \
+        (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+
+    # Methane emissions, g/day
+    methane_emission = 0.0
+    if methane_model:
+        # Default: IPCC Tier 2
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)  # [A.3B.C.2]
+        methane_emission = (0.065 * gross_energy_concentration *
+                            dry_matter_intake) / 0.05565  # [A.3B.C.3]
+
+    phosphorus_excretion_values = calculate_phosphorus_excretion_values(
+        daily_milk_production=0,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
+    )
+
+    (total_phosphorus_excreted, inorganic_phosphorus_fraction, organic_phosphorus_fraction,
+     manure_phosphorus_excreted, manure_phosphorus_fraction) = phosphorus_excretion_values
+
+    manure_excretion_values = AnimalManureExcretions(
+        urea=urine_urea_nitrogen_concentration,
+        urine=urine,
+        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        urine_nitrogen=urine_nitrogen,
+        manure_nitrogen=manure_nitrogen,
+        manure_mass=total_manure_excreted,
+        total_solids=total_solids,
+        degradable_volatile_solids=degradable_volatile_solids,
+        non_degradable_volatile_solids=non_degradable_volatile_solids,
+        inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
+        organic_phosphorus_fraction=organic_phosphorus_fraction,
+        phosphorus=manure_phosphorus_excreted,
+        phosphorus_fraction=manure_phosphorus_fraction,
+        potassium=potassium,
+        methane=methane_emission
+    )
+
+    return total_phosphorus_excreted, manure_excretion_values
