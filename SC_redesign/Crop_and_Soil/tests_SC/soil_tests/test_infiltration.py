@@ -1,7 +1,6 @@
 import pytest
 from math import log, exp
 from unittest.mock import MagicMock
-from typing import Tuple
 
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -245,12 +244,3 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     assert incorp.data.accumulated_runoff == 0.95
     assert incorp.data.soil_layers[0].water_content == expected_infiltrated_water
     assert incorp.data.annual_runoff_total == 0.95
-
-
-def _calculate_infiltrated_water(rainfall: float, runoff: float, first_layer_thickness: float,
-                                 bottom_depth: float) -> Tuple[float, float]:
-    """Method that calculates the amount of water that infiltrates into the top two layers of soil."""
-    top_proportion = first_layer_thickness / bottom_depth
-    bottom_proportion = 1.0 - top_proportion
-    infiltrated_water = max(0.0, rainfall - runoff)
-    return infiltrated_water * top_proportion, infiltrated_water * bottom_proportion
