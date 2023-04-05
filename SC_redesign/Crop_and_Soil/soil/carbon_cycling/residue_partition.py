@@ -1,5 +1,6 @@
 from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+import math
 
 """
 This class contains all necessary methods that involve residue partition, including both plant and soil and also
@@ -183,3 +184,27 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.6
         """
         return plant_metabolic_carbon_amount * tillage_fraction
+
+    @staticmethod
+    def _determine_plant_structural_to_slow_or_active_rate(plant_residue_metabolic_fraction: float,
+                                                           structural_decomposition_factor=0.076) -> float:
+        # TODO: check with subject expert for structural_decomposition_factor's default value. issue #428
+        """This method calculates the rate at which above ground structural carbon decomposes into slow or active carbon
+
+        Parameters
+        ----------
+        structural_decomposition_factor: float, default = 0.076
+            structural decomposition factor (unitless)
+        plant_residue_metabolic_fraction: float
+            fraction of plant residue that is metabolic (unitless)
+        Returns
+        -------
+        float
+            the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.9
+        """
+        # TODO: contradiction with the equation in pseudocode_soil. issue #427
+        return structural_decomposition_factor * math.exp(-3) * 1 - plant_residue_metabolic_fraction
