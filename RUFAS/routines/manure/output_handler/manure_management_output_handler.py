@@ -24,6 +24,7 @@ from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 from RUFAS.routines.manure.units.units import Units
+from RUFAS.util import Utility
 
 PenDailyUpdateDataType = Tuple[
     ManureManagementPen,
@@ -413,7 +414,7 @@ class ManureManagementOutputHandler:
             The path of the main output directory for the manure module.
 
         """
-        main_output_dir_path = Path('RUFAS/routines/manure/output')
+        main_output_dir_path = Utility.get_base_dir() / 'RUFAS' / 'routines' / 'manure' / 'output'
         main_output_dir_path.mkdir(parents=True, exist_ok=True)
         return main_output_dir_path
 
