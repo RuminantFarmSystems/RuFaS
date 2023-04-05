@@ -80,7 +80,7 @@ class ResiduePartition:
         Parameters
         ----------
         plant_lignin_nitrogen_ratio : float
-            plant lignin to nitrogen ratio (Dmnl)
+            plant lignin to nitrogen ratio (Dimensionless unit)
 
         Returns
         -------
