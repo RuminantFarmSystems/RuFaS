@@ -219,8 +219,8 @@ class SensitivityAnalysis:
         Running this method in parallel will always result in a warning, indicating that it is experimental.
         """
         if self.parallel_processors > 1:
-            self.problem.evaluate(func=self.objective_function, nprocs=self.parallel_processors,
-                                  *self.additional_args, **self.additional_kwargs)
+            self.problem.evaluate(func=self.objective_function, *self.additional_args, nprocs=self.parallel_processors,
+                                  **self.additional_kwargs)
         else:
             self.problem.evaluate(func=self.objective_function, *self.additional_args, **self.additional_kwargs)
 
