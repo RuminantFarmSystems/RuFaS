@@ -1,7 +1,8 @@
 import pytest
 from math import exp, sqrt
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock, PropertyMock
 
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure import Manure
 
 
@@ -160,3 +161,19 @@ def test_determine_water_extractable_phosphorus_runoff_concentration(manure: flo
                                                                                   distribution_factor)
     expect = manure / rain * (1 / field_size) * 100 * distribution_factor
     assert pytest.approx(observe) == expect
+
+
+# --- Helper method tests ---
+@pytest.mark.parametrize("amount_phosphorus,field_size", [
+    (100, 3.1),
+    (25.6, 2),
+    (66.23, 1.88),
+])
+def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size: float) -> None:
+    """Test that methods are called correctly on correct layers of soil profile."""
+    data = SoilData()
+    incorp = Manure(data)
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_labile_phosphorus",
+               new_callable=PropertyMock) as mocked_add_to_labile_phosphorus:
+        incorp._add_infiltrated_phosphorus_to_soil(amount_phosphorus, field_size)
+        assert mocked_add_to_labile_phosphorus.call_count == 2
