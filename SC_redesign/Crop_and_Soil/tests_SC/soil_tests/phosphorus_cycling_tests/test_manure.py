@@ -181,72 +181,45 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
         assert mocked_add_to_labile_phosphorus.call_count == 2
 
 
-@pytest.mark.parametrize("rain,runoff,area,machine,organic", [
-    (11, 3, 1.8, True, True),           # Machine-applied organic manure
-    (14, 1.8, 3.1, True, False),        # Machine-applied inorganic manure
-    (9.1, 2.7, 2.2, False, True),       # Grazer-applied organic manure
-    (10.11, 4.1, 2.8, False, False),    # Grazer-applied inorganic manure
-    (14, 13, 2.0, True, False),
-    (9.8, 9.1, 2.3, False, True),
+@pytest.mark.parametrize("rain,runoff,area,manure_mass,field_coverage,phosphorus_mass,organic", [
+    (11, 3, 1.8, 800, 0.7, 120, True),
+    (14, 1.8, 3.1, 950, 0.91, 133, False),
+    (9.1, 2.7, 2.2, 993, 0.88, 86, True),
+    (10.11, 4.1, 2.8, 1234, 0.9655, 200, False),
+    (14, 13, 2.0, 20, 0.12, 1.4, False),
+    (9.8, 9.1, 2, 36, 0.28, 2.1, True),
+    (6.2, 0.0, 2.3, 500, 0.65, 80, False),
 ])
-def test_leach_phosphorus_to_runoff(rain: float, runoff: float, area: float, machine: bool, organic: bool) -> None:
-    """Test that leaching phosphorus calls all the correct functions and sets right attributes to right values."""
-    machine_organic = machine and organic
-    machine_inorganic = machine and not organic
-    grazer_organic = not machine and organic
+def test_leach_phosphorus_to_runoff(rain: float, runoff: float, area: float, manure_mass: float, field_coverage: float,
+                                    phosphorus_mass: float, organic: bool) -> None:
+    """Test that leaching phosphorus calls all the correct functions and calculates the masses of phosphorus lost
+        correctly."""
+    Manure._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
+    Manure._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
+    Manure._determine_water_extractable_organic_phosphorus_leached = MagicMock(return_value=25)
+    Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=25)
+    Manure._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(return_value=5)
 
-    data = SoilData(machine_manure_dry_mass=800,
-                    machine_manure_field_coverage=0.8,
-                    machine_water_extractable_organic_phosphorus=100,
-                    machine_water_extractable_inorganic_phosphorus=200,
-                    grazing_manure_dry_mass=900,
-                    grazing_manure_field_coverage=0.9,
-                    grazing_water_extractable_organic_phosphorus=120,
-                    grazing_water_extractable_inorganic_phosphorus=220)
-    incorp = Manure(data)
-
-    incorp._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
-    incorp._determine_distribution_factor = MagicMock(return_value=1.1)
-    incorp._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
-    incorp._determine_water_extractable_organic_phosphorus_leached = MagicMock(return_value=25)
-    incorp._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=25)
-    incorp._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(return_value=5)
-    incorp._add_infiltrated_phosphorus_to_soil = MagicMock()
-
-    incorp._leach_phosphorus_to_runoff(rain, runoff, area, machine, organic)
+    observed = Manure._leach_phosphorus_to_runoff(rain, runoff, area, manure_mass, field_coverage, phosphorus_mass,
+                                                  organic)
     runoff_in_liters = runoff * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+    expected_water_extractable_phosphorus_leached = min(25, phosphorus_mass)
     expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * MILLIGRAMS_TO_KILOGRAMS
-    expected_infiltrated_phosphorus = max(0, 25 - expected_runoff_phosphorus_in_kg)
+    expected_infiltrated_phosphorus = max(0, expected_water_extractable_phosphorus_leached
+                                          - expected_runoff_phosphorus_in_kg)
 
-    if machine:
-        incorp._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, 800, 0.8)
+    Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, manure_mass, field_coverage)
+    Manure._determine_phosphorus_distribution_factor.assert_called_once_with(rain, runoff)
+    if organic:
+        Manure._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(phosphorus_mass, 0.4,
+                                                                                               True)
+        Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_not_called()
     else:
-        incorp._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, 900, 0.9)
-    incorp._determine_phosphorus_distribution_factor.assert_called_once_with(rain, runoff)
-    if machine_organic:
-        incorp._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(100, 0.4, True)
-        assert incorp._determine_water_extractable_inorganic_phosphorus_leached.call_count == 0
-        assert incorp.data.machine_water_extractable_organic_phosphorus == 75
-        assert pytest.approx(incorp.data.annual_runoff_machine_manure_organic_phosphorus) == \
-               expected_runoff_phosphorus_in_kg
-    elif machine_inorganic:
-        incorp._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(200, 0.4, True)
-        assert incorp._determine_water_extractable_organic_phosphorus_leached.call_count == 0
-        assert incorp.data.machine_water_extractable_inorganic_phosphorus == 175
-        assert pytest.approx(incorp.data.annual_runoff_machine_manure_inorganic_phosphorus) == \
-               expected_runoff_phosphorus_in_kg
-    elif grazer_organic:
-        incorp._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(120, 0.4, True)
-        assert incorp._determine_water_extractable_inorganic_phosphorus_leached.call_count == 0
-        assert incorp.data.grazing_water_extractable_organic_phosphorus == 95
-        assert pytest.approx(incorp.data.annual_runoff_grazing_manure_organic_phosphorus) == \
-               expected_runoff_phosphorus_in_kg
-    else:
-        incorp._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(220, 0.4, True)
-        assert incorp._determine_water_extractable_organic_phosphorus_leached.call_count == 0
-        assert incorp.data.grazing_water_extractable_inorganic_phosphorus == 195
-        assert pytest.approx(incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus) == \
-               expected_runoff_phosphorus_in_kg
-    incorp._determine_water_extractable_phosphorus_runoff_concentration.assert_called_once_with(25, rain, area, 1.2)
-    incorp._add_infiltrated_phosphorus_to_soil.assert_called_once_with(pytest.approx(expected_infiltrated_phosphorus),
-                                                                       area)
+        Manure._determine_water_extractable_organic_phosphorus_leached.assert_not_called()
+        Manure._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(phosphorus_mass, 0.4,
+                                                                                                 True)
+    Manure._determine_water_extractable_phosphorus_runoff_concentration.assert_called_once_with(
+        expected_water_extractable_phosphorus_leached, rain, area, 1.2)
+    assert observed["new_phosphorus_pool_amount"] == (phosphorus_mass - expected_water_extractable_phosphorus_leached)
+    assert observed["infiltrated_phosphorus"] == expected_infiltrated_phosphorus
+    assert observed["runoff_phosphorus"] == expected_runoff_phosphorus_in_kg
