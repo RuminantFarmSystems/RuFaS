@@ -161,3 +161,25 @@ class ResiduePartition:
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * \
             plant_metabolic_carbon_amount * metabolic_active_carbon_rate
+
+    @staticmethod
+    def _determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
+                                                         tillage_fraction: float) -> float:
+        """This method calculates the the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
+
+        Parameters
+        ----------
+        plant_metabolic_carbon_amount: float
+            amount of metabolic carbon in plant (kg/ha)
+        tillage_fraction: float
+            Fraction of metabolic carbon incorporated into soil during tillage (unitless)
+        Returns
+        -------
+        float
+            the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.6
+        """
+        return plant_metabolic_carbon_amount * tillage_fraction
