@@ -345,6 +345,7 @@ class Manure:
         is why the is_from_cow parameter is necessary.
 
         """
+        # TODO: combine this method with _determine_water_extractable_organic_phosphorus_leached() - GitHub issue #423
         if is_from_cow:
             first_term = (1.2 * rainfall_to_dry_manure_ratio) / (rainfall_to_dry_manure_ratio + 73.1)
         else:
@@ -379,6 +380,7 @@ class Manure:
         SurPhos [9, 10], pseudocode_soil [S.5.D.I.3, II.1]
 
         """
+        # TODO: combine this method with _determine_water_extractable_organic_phosphorus_leached() - GitHub issue #423
         result = Manure._determine_water_extractable_inorganic_phosphorus_leached(
             manure_water_extractable_organic_phosphorus, rainfall_to_dry_manure_ratio, is_from_cow)
         return result / 0.6
