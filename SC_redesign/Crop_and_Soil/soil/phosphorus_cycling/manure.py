@@ -89,7 +89,6 @@ class Manure:
 
         distribution_factor = self._determine_phosphorus_distribution_factor(rainfall, runoff)
 
-        # P leached in kg
         if is_organic:
             water_extractable_phosphorus_leached = self._determine_water_extractable_organic_phosphorus_leached(
                 water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
@@ -97,7 +96,6 @@ class Manure:
             water_extractable_phosphorus_leached = self._determine_water_extractable_inorganic_phosphorus_leached(
                 water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
 
-        # mg phosphorus / Liter of runoff
         runoff_dissolved_phosphorus_concentration = self._determine_water_extractable_phosphorus_runoff_concentration(
             water_extractable_phosphorus_leached, rainfall, field_size, distribution_factor)
 
@@ -143,7 +141,7 @@ class Manure:
 
         """
         self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
-        self.data.soil_layers[0].add_to_active_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
+        self.data.soil_layers[0].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
 
     # --- Static Methods ---
     @staticmethod
