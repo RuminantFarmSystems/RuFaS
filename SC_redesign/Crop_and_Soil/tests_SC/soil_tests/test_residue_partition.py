@@ -1,4 +1,5 @@
 import pytest
+import math
 
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
 
@@ -107,3 +108,17 @@ def test_determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_
     expected = plant_metabolic_carbon_amount * tillage_fraction
     assert expected == ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount,
                                                                                          tillage_fraction)
+
+
+@pytest.mark.parametrize("plant_residue_metabolic_fraction", [
+    0.1,  # lower values
+    0.9,  # higher values
+    0.66,
+])
+def test_determine_plant_structural_to_slow_or_active_rate(plant_residue_metabolic_fraction: float) -> None:
+    """Tests that the rate at which above ground structural carbon decomposes into slow or active carbon was calculated
+    correctly"""
+    structural_decomposition_factor = 0.076
+    expected = structural_decomposition_factor * math.exp(-3) * 1 - plant_residue_metabolic_fraction
+    assert expected == ResiduePartition._determine_plant_structural_to_slow_or_active_rate(
+        plant_residue_metabolic_fraction)
