@@ -63,7 +63,7 @@ class LayerData:
     # --- pool_gas_partition
     # (pseudocode_soil S.6.A.1)
     plant_metabolic_active_carbon_usage: Optional[float] = None
-    """plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.6)"""
+    """plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.)"""
     plant_metabolic_active_carbon_loss: Optional[float] = None
     """plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
     plant_metabolic_active_carbon_remaining: Optional[float] = None
@@ -162,6 +162,10 @@ class LayerData:
     """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
     active_phosphorus_content: float = 0
     """Active phosphorus content of this soil layer (kg phosphorus / ha)"""
+
+    # --- Residue partition
+    plant_metabolic_to_soil_carbon_amount: Optional[float] = None
+    """metabolic carbon incorporated into soil during tillage (kg/ha)"""
 
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
