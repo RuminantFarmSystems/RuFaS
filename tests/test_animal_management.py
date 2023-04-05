@@ -473,7 +473,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
             "new_calf_dict": {140735: 'Calf', 100055: 'Calf', 122469: 'Calf'},
             "new_cow_dict": {180081: 'HeiferI', 147361: 'HeiferII', 199813: 'HeiferIII', 148776: 'Dry_Cow',
                              164239: 'Lac_Cow'},
-            "prior_pen_population_list": [22, 10, 16, 8],
+            "tracked_pen_population_list": [22, 10, 16, 8],
             "former_pen_populations": [20, 10, 20, 40],
             "updated_pen_rations": [{"dummy_feed1": 225.5, "dummy_feed2": 0.0, "dummy_feed3": 20.075,
                                      "dummy_feed4": 79.2, "dummy_feed5": 49.5, "dummy_feed6": 160.6,
@@ -505,7 +505,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                                              'Lac_Cow': []},
                       "pen_animal_combination": Pen.AnimalCombination.CALF,
                       "post_removal_stocking_density": 0.50, "num_stalls": 48,
-                      "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 8.25,
+                      "ration": {"status": "dummy_val", "dummy_feed2": 34.0, "dummy_feed3": 3.4,
                                  "dummy_feed4": 77.0, "dummy_feed5": 3.2, "dummy_feed6": 9.50, "dummy_feed7": 0.0,
                                  "dummy_feed8": 12.2, "dummy_feed9": 9.9, "dummy_feed10": 400.0}},
                  "pen1":
@@ -533,7 +533,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                       "pen_animal_combination": Pen.AnimalCombination.CLOSE_UP,
                       "post_removal_stocking_density": 0.35, "num_stalls": 60,
                       "ration": {"dummy_feed1": 44.4, "dummy_feed2": 21.2, "dummy_feed3": 9.0,
-                                 "dummy_feed4": 55.55, "dummy_feed5": 2.0, "dummy_feed6": 650.0,
+                                 "dummy_feed4": 56.8, "dummy_feed5": 2.0, "dummy_feed6": 650.0,
                                  "dummy_feed7": 1.0,
                                  "dummy_feed8": 0.0, "dummy_feed9": 0.0, "dummy_feed10": 300.0}},
                  "pen3":
@@ -552,7 +552,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
                       "ration": {"objective": "dummy_val", "dummy_feed2": 3.0, "dummy_feed3": 12.5,
                                  "dummy_feed4": 0.0, "dummy_feed5": 75.0, "dummy_feed6": 0.0,
                                  "dummy_feed7": 1.0,
-                                 "dummy_feed8": 3.6, "dummy_feed9": 106.0, "dummy_feed10": 8.8}}
+                                 "dummy_feed8": 36.0, "dummy_feed9": 106.0, "dummy_feed10": 8.8}}
                  },
             "animals_to_be_removed":
                 {112752, 113310, 137493, 142972, 193035, 150294, 168737, 175771, 191700, 145796, 181517, 189495,
@@ -572,16 +572,24 @@ def pens_test_data_dict() -> List[dict[Any]]:
             "new_calf_dict": {123928: 'Calf', 138291: 'Calf', 149201: 'Calf', 187283: 'Calf', 188827: 'Calf',
                               199182: 'Calf', 199287: 'Calf'},
             "new_cow_dict": {},
-            "prior_pen_population_list": [25, 25, 25, 25],
-            "former_pen_populations": [20, 100],
-            "updated_pen_rations": [{"status": "dummy_val", "dummy_feed2": 42.5, "dummy_feed3": 10.3125,
+            "tracked_pen_population_list": [25, 25, 25, 25],
+            "former_pen_populations": [20, 25, 100, 50],
+            "updated_pen_rations": [{"status": "dummy_val", "dummy_feed2": 42.5, "dummy_feed3": 4.25,
                                      "dummy_feed4": 96.25, "dummy_feed5": 4.0, "dummy_feed6": 11.875,
-                                     "dummy_feed7": 0.0, "dummy_feed8": 15.25, "dummy_feed9": 12.375,
-                                     "dummy_feed10": 500.0},
-                                    {"objective": "dummy_val", "dummy_feed2": 1.0, "dummy_feed3": 5.0,
-                                     "dummy_feed4": 90.5, "dummy_feed5": 0.95, "dummy_feed6": 200.0,
-                                     "dummy_feed7": 0.0, "dummy_feed8": 0.25, "dummy_feed9": 26.0,
-                                     "dummy_feed10": 0.0}],
+                                     "dummy_feed7": 0.0,
+                                     "dummy_feed8": 15.25, "dummy_feed9": 12.375, "dummy_feed10": 500.0},
+                                    {"objective": "dummy_val", "dummy_feed2": 4.0, "dummy_feed3": 20.0,
+                                     "dummy_feed4": 362.0, "dummy_feed5": 3.8, "dummy_feed6": 800.0, "dummy_feed7": 0.0,
+                                     "dummy_feed8": 1.0, "dummy_feed9": 104.0, "dummy_feed10": 0.0},
+                                    {"dummy_feed1": 11.1, "dummy_feed2": 5.3, "dummy_feed3": 2.25,
+                                     "dummy_feed4": 14.2, "dummy_feed5": 0.5, "dummy_feed6": 162.5,
+                                     "dummy_feed7": 0.25,
+                                     "dummy_feed8": 0.0, "dummy_feed9": 0.0, "dummy_feed10": 75.0},
+                                    {"objective": "dummy_val", "dummy_feed2": 1.5, "dummy_feed3": 6.25,
+                                     "dummy_feed4": 0.0, "dummy_feed5": 37.5, "dummy_feed6": 0.0,
+                                     "dummy_feed7": 0.5,
+                                     "dummy_feed8": 18.0, "dummy_feed9": 53.0, "dummy_feed10": 4.4}
+                                    ],
             "animal_to_pen_id_map_after_daily_update":
                 {123928: 0, 138291: 0, 149201: 0, 187283: 0, 188827: 0, 199182: 0, 199287: 0, 120297: 0, 122798: 0,
                  123120: 0, 124011: 0, 125663: 0, 139048: 0, 141097: 0, 151564: 0,
@@ -639,7 +647,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
         #         {115259: 0, 138228: 0, 142905: 0, 144752: 0, 156434: 0, 157064: 0, 164638: 0, 167179: 0, 168371: 0,
         #          112121: 1, 117953: 1, 144952: 1, 145016: 1, 146409: 1, 175830: 1, 182621: 1, 190070: 1,
         #          114067: 2, 119819: 2, 133865: 2, 142331: 2, 155315: 2, 166593: 2, 168618: 2, 193905: 2, 197376: 2},
-        #     "prior_pen_population_list": [10, 10, 10, 0],
+        #     "tracked_pen_population_list": [10, 10, 10, 0],
         #     "former_pen_populations": [20, 5, 10, 10],
         #     "updated_pen_rations": [{"dummy_feed1": 100.0, "dummy_feed2": 0.0, "dummy_feed3": 4.25,
         #                                     "dummy_feed4": 49.0, "dummy_feed5": 1.75},
@@ -802,7 +810,7 @@ def test_remove_animals_from_herd(info_dict: dict[Any], animal_management: Anima
     assert dummy_animal_management.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_removals']
     for idx, pen_dict in enumerate(info_dict['pen_data'].values()):
         assert dummy_animal_management.all_pens[idx].stocking_density == pen_dict['post_removal_stocking_density']
-        # assert set(dummy_animal_management.all_pens[idx].animals_in_pen) & set(animals_removed) == set()
+        assert set(dummy_animal_management.all_pens[idx].animals_in_pen) & set(animals_removed) == set()
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
@@ -814,7 +822,7 @@ def test_track_former_pen_population(info_dict: dict[Any], animal_management: An
 
     former_population_dictionary = dummy_animal_management.track_former_pen_population()
 
-    assert former_population_dictionary == info_dict['prior_pen_population_list']
+    assert former_population_dictionary == info_dict['tracked_pen_population_list']
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
