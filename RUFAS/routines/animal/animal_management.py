@@ -368,8 +368,8 @@ class AnimalManagement:
         for animal in animals_removed:
             if animal.id in self.animal_to_pen_id_map:
                 pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
-                # pen.animals_in_pen.remove(animal)
-                pen.stocking_density = (len(pen.animals_in_pen) - 1) / pen.num_stalls
+                pen.animals_in_pen.remove(animal)
+                pen.stocking_density = len(pen.animals_in_pen) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 
     def track_former_pen_population(self) -> List[int]:

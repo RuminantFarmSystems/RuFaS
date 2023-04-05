@@ -260,21 +260,21 @@ class Pen:
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = AnimalManureExcretions(
-                urea=0.0,
-                urine=0.0,
-                total_ammoniacal_nitrogen_concentration=0.0,
-                urine_nitrogen=0.0,
-                manure_nitrogen=0.0,
-                manure_mass=0.0,
-                total_solids=0.0,
-                degradable_volatile_solids=0.0,
-                non_degradable_volatile_solids=0.0,
-                inorganic_phosphorus_fraction=0.0,
-                organic_phosphorus_fraction=0.0,
-                phosphorus=0.0,
-                phosphorus_fraction=0.0,
-                potassium=0.0,
-                methane=0.0
+            urea=0.0,
+            urine=0.0,
+            total_ammoniacal_nitrogen_concentration=0.0,
+            urine_nitrogen=0.0,
+            manure_nitrogen=0.0,
+            manure_mass=0.0,
+            total_solids=0.0,
+            degradable_volatile_solids=0.0,
+            non_degradable_volatile_solids=0.0,
+            inorganic_phosphorus_fraction=0.0,
+            organic_phosphorus_fraction=0.0,
+            phosphorus=0.0,
+            phosphorus_fraction=0.0,
+            potassium=0.0,
+            methane=0.0
         )
 
         # manure attributes are initialized in the reset_manure method
@@ -317,7 +317,7 @@ class Pen:
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
 
-    def add_new_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]) -> None:
+    def add_new_animals(self, new_animals: List[Any]) -> None:
         """
         Adds all animals in new_animals to the pen.
 
@@ -361,7 +361,7 @@ class Pen:
             life_cycle_stage = type(animal).__name__
             self.classes_in_pen.add(life_cycle_stage)
 
-    def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+    def update_animals(self, new_animals: List[Any],
                        animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -610,7 +610,7 @@ class Pen:
 
         if class_name == 'Cow':
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
-                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow', 
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow',
                                           parity=animal.calves, calving_interval=animal.CI,
                                           milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
                                           milk_lactose=animal.lactose_milk,
