@@ -281,6 +281,34 @@ class ManureManagementOutputHandler:
         self.sort_by(['pen_id', 'sim_day'])
         self.move_columns_to_front(['pen_id', 'sim_day'])
 
+    def _export_columns_to_csv(self, anchors: List[str], cols: List[str], file_path: Path) -> None:
+        """
+        Export selected columns from the DataFrame to a CSV file, along with the specified anchor columns.
+
+        Parameters
+        ----------
+        anchors : List[str]
+            A list of anchor column names to always include in the exported CSV file.
+        cols : List[str]
+            A list of column names to consider for exporting, excluding those containing anchor column names.
+        file_path : Path
+            The output file path for the CSV file.
+
+        """
+        # Select columns that don't contain anchors
+        filtered_cols = [col for col in cols
+                         if not any(anchor.lower() in col.lower() for anchor in anchors)]
+
+        # Create a DataFrame with the anchors and cols_to_export,
+        # and save it to a CSV file if cols_to_export is not empty
+        if filtered_cols:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            all_cols = [*anchors, *filtered_cols]
+            formatted_cols = [self._format_col_name(col) for col in all_cols]
+            temp_df = self._df[[*all_cols]]
+            temp_df.columns = formatted_cols
+            temp_df.to_csv(file_path, index=False)
+
     def export_to_csv(self) -> Optional[Path]:
         """Exports all data to a csv file.
 
@@ -292,7 +320,6 @@ class ManureManagementOutputHandler:
         """
         if self._df is None:
             return None
-        csv_output_file_path = self.get_csv_output_file_path()
 
         # When exporting to csv, temporarily drop all columns that are all zeros, NaN, or None
         # self.drop_all_zeros_nan_none_columns(self._df).to_csv(csv_output_file_path, index=False)
@@ -300,9 +327,40 @@ class ManureManagementOutputHandler:
         # Or permanently drop all columns that are all zeros, NaN, or None
         # This saves time from not having to make graphics for columns that are all zeros, NaN, or None
         self._df = self.drop_all_zeros_nan_none_columns(self._df)
-        self._df.to_csv(csv_output_file_path, index=False)
+        all_data_file_path = self.get_csv_output_directory_path() / f'ALL_DATA_{self._get_formatted_current_time()}.csv'
+        self._df.to_csv(all_data_file_path, index=False)
 
-        return csv_output_file_path
+        for col in self._df.columns:
+            sub_dir_path = self.get_csv_output_directory_path() / f'{self._extract_dir_name_from_col_name(col)}'
+            self._export_columns_to_csv(
+                anchors=['pen_id', 'sim_day'],
+                cols=[col],
+                file_path=sub_dir_path / f'{self._format_csv_filename(col)}.csv'
+            )
+
+        return all_data_file_path
+
+    @classmethod
+    def _extract_dir_name_from_col_name(cls, col_name: str) -> str:
+        ans = cls._translate_prefix(col_name).lower()
+        ans = cls._remove_units(ans)
+        if cls.HEADER_PRIMARY_DELIMITER in ans:
+            ans = ans.split(cls.HEADER_PRIMARY_DELIMITER)[0]
+        return ans
+
+    @classmethod
+    def _format_csv_filename(cls, col_name: str) -> str:
+        ans = cls._remove_prefix(col_name)
+        ans = cls._remove_units(ans)
+        ans = cls._replace_delimiters_with_spaces(ans)
+        ans = cls._squeeze_spaces(ans)
+        return ans.lower()
+
+    @classmethod
+    def _format_col_name(cls, col_name: str) -> str:
+        ans = cls._remove_prefix(col_name)
+        ans = cls._remove_units(ans)
+        return ans.lower()
 
     @classmethod
     def drop_all_zeros_nan_none_columns(cls, df: DataFrame) -> DataFrame:
@@ -437,7 +495,8 @@ class ManureManagementOutputHandler:
             'tx_ad': 'Digester',
         }.get(prefix, prefix)
 
-    def _remove_prefix(self, header: str) -> str:
+    @classmethod
+    def _remove_prefix(cls, header: str) -> str:
         """Removes the prefix from a string.
 
         Parameters
@@ -452,9 +511,12 @@ class ManureManagementOutputHandler:
 
         """
         # We stop at the first occurrence of the delimiter and return the second part of the split.
-        return header.split(self.HEADER_PRIMARY_DELIMITER, 1)[1]
+        if cls.HEADER_PRIMARY_DELIMITER not in header:
+            return header
+        return header.split(cls.HEADER_PRIMARY_DELIMITER, 1)[1]
 
-    def _translate_prefix(self, header: str) -> str:
+    @classmethod
+    def _translate_prefix(cls, header: str) -> str:
         """Formats the prefix of a string.
 
         Parameters
@@ -468,10 +530,13 @@ class ManureManagementOutputHandler:
             The string with the formatted prefix.
 
         """
-        first, second = header.split(self.HEADER_PRIMARY_DELIMITER, 1)
-        return self._get_full_prefix(first) + self.HEADER_PRIMARY_DELIMITER + second
+        if cls.HEADER_PRIMARY_DELIMITER not in header:
+            return header
+        first, second = header.split(cls.HEADER_PRIMARY_DELIMITER, 1)
+        return cls._get_full_prefix(first) + cls.HEADER_PRIMARY_DELIMITER + second
 
-    def _remove_units(self, header: str) -> str:
+    @classmethod
+    def _remove_units(cls, header: str) -> str:
         """Removes units from a string.
 
         Parameters
@@ -485,9 +550,10 @@ class ManureManagementOutputHandler:
             The string with units removed.
 
         """
-        return re.sub(rf"{self.HEADER_PRIMARY_DELIMITER}\(.*\)", '', header)
+        return re.sub(rf"{cls.HEADER_PRIMARY_DELIMITER}\(.*\)", '', header)
 
-    def _replace_delimiters_with_spaces(self, header: str) -> str:
+    @classmethod
+    def _replace_delimiters_with_spaces(cls, header: str) -> str:
         """Replaces the occurrence of consecutive secondary header delimiters with a space.
 
         Parameters
@@ -501,7 +567,7 @@ class ManureManagementOutputHandler:
             The string with the secondary header delimiters replaced with a space.
 
         """
-        return re.sub(rf'{self.HEADER_SECONDARY_DELIMITER}+', ' ', header)
+        return re.sub(rf'{cls.HEADER_SECONDARY_DELIMITER}+', ' ', header)
 
     @classmethod
     def _squeeze_spaces(cls, s: str) -> str:
@@ -563,11 +629,13 @@ class ManureManagementOutputHandler:
                                               x: str, y: str, anchor_label: str, x_label: str, y_label: str,
                                               title: str):
         for val in self._df[anchor_col].unique():
+            output_sub_dir = output_dir / (anchor_label.lower() + str(val))
+            output_sub_dir.mkdir(parents=True, exist_ok=True)
             x_series = self._df.loc[self._df[anchor_col] == val, x]
             y_series = self._df.loc[self._df[anchor_col] == val, y]
             plot_name = f'{anchor_label} {val} - {title}'
             self._make_simple_scatter_plot_with_matplotlib(
-                output_path=output_dir / f'{plot_name}.png',
+                output_path=output_sub_dir / f'{plot_name}.png',
                 x=x_series,
                 y=y_series,
                 x_label=x_label,
@@ -596,7 +664,7 @@ class ManureManagementOutputHandler:
         """Produces graphics from the data."""
         for header in self._get_headers():
             self._make_scatter_plot_with_anchor_column(
-                output_dir=self._get_graphics_dir(),
+                output_dir=self._get_graphics_dir() / self._extract_dir_name_from_col_name(header),
                 anchor_col='pen_id',
                 x='sim_day',
                 y=header,
