@@ -93,3 +93,17 @@ def test_determine_plant_metabolic_active_carbon_usage(decomposition_moisture_ef
     assert expected == ResiduePartition._determine_plant_metabolic_active_carbon_usage(decomposition_moisture_effect,
                                                                                        decomposition_temperature_effect,
                                                                                        plant_metabolic_carbon_amount)
+
+
+@pytest.mark.parametrize("plant_metabolic_carbon_amount, tillage_fraction", [
+    (3, 0.4),  # default value
+    (50, 0.5),  # higher value
+    (1.8, 0.33),  # arbitrary values
+    (2.2, 0)  # zeros
+])
+def test_determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
+                                                         tillage_fraction: float) -> None:
+    """Tests that the the amount of metabolic carbon incorporated into soil during tillage was calculated correctly"""
+    expected = plant_metabolic_carbon_amount * tillage_fraction
+    assert expected == ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount,
+                                                                                         tillage_fraction)
