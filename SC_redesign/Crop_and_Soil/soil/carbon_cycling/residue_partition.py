@@ -137,6 +137,7 @@ class ResiduePartition:
                                                        plant_metabolic_carbon_amount: float,
                                                        metabolic_active_carbon_rate=0.28) -> float:
         # TODO: Double check the metabolic_active_carbon_rate, again, pseudocode_soil differs from the original code
+        #  #issue 425
         """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
         Parameters
         ----------
