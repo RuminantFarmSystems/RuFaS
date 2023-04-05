@@ -186,6 +186,8 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
     (14, 1.8, 3.1, True, False),        # Machine-applied inorganic manure
     (9.1, 2.7, 2.2, False, True),       # Grazer-applied organic manure
     (10.11, 4.1, 2.8, False, False),    # Grazer-applied inorganic manure
+    (14, 13, 2.0, True, False),
+    (9.8, 9.1, 2.3, False, True),
 ])
 def test_leach_phosphorus_to_runoff(rain: float, runoff: float, area: float, machine: bool, organic: bool) -> None:
     """Test that leaching phosphorus calls all the correct functions and sets right attributes to right values."""
@@ -225,21 +227,26 @@ def test_leach_phosphorus_to_runoff(rain: float, runoff: float, area: float, mac
         incorp._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(100, 0.4, True)
         assert incorp._determine_water_extractable_inorganic_phosphorus_leached.call_count == 0
         assert incorp.data.machine_water_extractable_organic_phosphorus == 75
-        assert incorp.data.annual_runoff_machine_manure_organic_phosphorus == expected_runoff_phosphorus_in_kg
+        assert pytest.approx(incorp.data.annual_runoff_machine_manure_organic_phosphorus) == \
+               expected_runoff_phosphorus_in_kg
     elif machine_inorganic:
         incorp._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(200, 0.4, True)
         assert incorp._determine_water_extractable_organic_phosphorus_leached.call_count == 0
         assert incorp.data.machine_water_extractable_inorganic_phosphorus == 175
-        assert incorp.data.annual_runoff_machine_manure_inorganic_phosphorus == expected_runoff_phosphorus_in_kg
+        assert pytest.approx(incorp.data.annual_runoff_machine_manure_inorganic_phosphorus) == \
+               expected_runoff_phosphorus_in_kg
     elif grazer_organic:
         incorp._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(120, 0.4, True)
         assert incorp._determine_water_extractable_inorganic_phosphorus_leached.call_count == 0
         assert incorp.data.grazing_water_extractable_organic_phosphorus == 95
-        assert incorp.data.annual_runoff_grazing_manure_organic_phosphorus == expected_runoff_phosphorus_in_kg
+        assert pytest.approx(incorp.data.annual_runoff_grazing_manure_organic_phosphorus) == \
+               expected_runoff_phosphorus_in_kg
     else:
         incorp._determine_water_extractable_inorganic_phosphorus_leached.assert_called_once_with(220, 0.4, True)
         assert incorp._determine_water_extractable_organic_phosphorus_leached.call_count == 0
         assert incorp.data.grazing_water_extractable_inorganic_phosphorus == 195
-        assert incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus == expected_runoff_phosphorus_in_kg
+        assert pytest.approx(incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus) == \
+               expected_runoff_phosphorus_in_kg
     incorp._determine_water_extractable_phosphorus_runoff_concentration.assert_called_once_with(25, rain, area, 1.2)
-    incorp._add_infiltrated_phosphorus_to_soil.assert_called_once_with(expected_infiltrated_phosphorus, area)
+    incorp._add_infiltrated_phosphorus_to_soil.assert_called_once_with(pytest.approx(expected_infiltrated_phosphorus),
+                                                                       area)

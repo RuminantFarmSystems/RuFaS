@@ -96,6 +96,8 @@ class Manure:
             water_extractable_phosphorus_leached = self._determine_water_extractable_inorganic_phosphorus_leached(
                 water_extractable_phosphorus, rain_manure_dry_matter_ratio, True)
 
+        water_extractable_phosphorus_leached = min(water_extractable_phosphorus, water_extractable_phosphorus_leached)
+
         runoff_dissolved_phosphorus_concentration = self._determine_water_extractable_phosphorus_runoff_concentration(
             water_extractable_phosphorus_leached, rainfall, field_size, distribution_factor)
 
