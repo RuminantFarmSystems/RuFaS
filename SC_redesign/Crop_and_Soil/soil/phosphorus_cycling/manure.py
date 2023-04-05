@@ -65,7 +65,7 @@ class Manure:
             Is the phosphorus being leached organic (True / False)
 
         """
-        organic_machine, inorganic_machine, organic_grazer = False
+        organic_machine = inorganic_machine = organic_grazer = False
         if from_machine:
             manure_dry_mass = self.data.machine_manure_dry_mass
             field_coverage = self.data.machine_manure_field_coverage
