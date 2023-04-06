@@ -555,7 +555,7 @@ def test_save_all_pools(
     mock_output_manager.save_errors.assert_called_once_with(path)
     mock_output_manager.save_warnings.assert_called_once_with(path)
     mock_output_manager.save_logs.assert_called_once_with(path)
-    mock_output_manager.save_variables.assert_called_once_with(path, exclude_info_maps=False)
+    mock_output_manager.save_variables.assert_called_once_with(path, exclude_info_maps=True)
 
     # Restore original methods
     mock_output_manager.save_variables = output_manager_original_method_states[
