@@ -137,8 +137,8 @@ def test_determine_plant_structural_to_slow_active_carbon_amount(plant_structura
     """Tests that the amount of plant structural carbon decomposed into slow or active carbon was calculated
     correctly"""
     expected = plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
-            * decomposition_temperature_effect\
-            * plant_structural_carbon_amount
+        * decomposition_temperature_effect\
+        * plant_structural_carbon_amount
     assert expected == ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount(
                                                                  plant_structural_to_slow_or_active_rate,
                                                                  decomposition_moisture_effect,
