@@ -144,3 +144,44 @@ def test_determine_plant_structural_to_slow_active_carbon_amount(plant_structura
                                                                  decomposition_moisture_effect,
                                                                  decomposition_temperature_effect,
                                                                  plant_structural_carbon_amount)
+
+
+@pytest.mark.parametrize("plant_structural_carbon_amount, tillage_fraction", [
+    (3, 0.1),  # default value
+    (55, 0.6),  # higher value
+    (1.1, 0.53),  # arbitrary values
+    (2.9, 0)  # zeros
+])
+def test_determine_structural_carbon_transfer_amount(plant_structural_carbon_amount: float,
+                                                     tillage_fraction: float) -> None:
+    """Tests that the amount of transfer of structural carbon during tillage was calculated correctly"""
+    expected = plant_structural_carbon_amount * tillage_fraction
+    assert expected == ResiduePartition._determine_structural_carbon_transfer_amount(
+        plant_structural_carbon_amount, tillage_fraction)
+
+
+@pytest.mark.parametrize("plant_dry_matter_residue_amount, plant_residue_metabolic_fraction,"
+                         "structural_carbon_transfer_amount, plant_structural_to_slow_carbon_amount, "
+                         "plant_structural_carbon_amount, plant_structural_to_active_carbon_amount", [
+                             (3, 8, 7, 1, 2, 5),
+                             (60, 64, 85, 40, 30, 99),
+                             (1.8, 1.1, 3.2, 0.8, 0.7, 0.3),
+                         ])
+def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amount: float,
+                                                  plant_residue_metabolic_fraction: float,
+                                                  structural_carbon_transfer_amount: float,
+                                                  plant_structural_to_active_carbon_amount: float,
+                                                  plant_structural_to_slow_carbon_amount: float,
+                                                  plant_structural_carbon_amount: float) -> None:
+    """Tests that plant_structural_carbon_amount was updated correctly"""
+    expected = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
+        * (1-plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+        - plant_structural_to_active_carbon_amount \
+        - plant_structural_to_slow_carbon_amount
+    assert expected == ResiduePartition._determine_plant_structural_carbon_amount(
+        plant_dry_matter_residue_amount,
+        plant_residue_metabolic_fraction,
+        structural_carbon_transfer_amount,
+        plant_structural_to_active_carbon_amount,
+        plant_structural_to_slow_carbon_amount,
+        plant_structural_carbon_amount)

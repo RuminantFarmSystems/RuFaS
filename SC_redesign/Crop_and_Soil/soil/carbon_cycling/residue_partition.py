@@ -230,7 +230,7 @@ class ResiduePartition:
         Returns
         -------
         float
-            amount of plant structural carbon decomposed into slow or active carbon
+            amount of plant structural carbon decomposed into slow or active carbon (kg/ha)
 
         References
         -------
@@ -239,3 +239,67 @@ class ResiduePartition:
         return plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
             * decomposition_temperature_effect\
             * plant_structural_carbon_amount
+
+    @staticmethod
+    def _determine_structural_carbon_transfer_amount(plant_structural_carbon_amount: float,
+                                                     tillage_fraction: float) -> float:
+        """Determines the amount of transfer of structural carbon during tillage
+
+        Parameters
+        ----------
+        plant_structural_carbon_amount: float
+            amount of plant structural carbon (kg/ha)
+        tillage_fraction: float
+            fraction of metabolic carbon incorporated into soil during tillage (unitless)
+
+        Returns
+        -------
+        float
+        the amount of transfer of structural carbon during tillage (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.11
+        """
+        return plant_structural_carbon_amount * tillage_fraction
+
+    @staticmethod
+    def _determine_plant_structural_carbon_amount(plant_dry_matter_residue_amount: float,
+                                                  plant_residue_metabolic_fraction: float,
+                                                  structural_carbon_transfer_amount: float,
+                                                  plant_structural_to_active_carbon_amount: float,
+                                                  plant_structural_to_slow_carbon_amount: float,
+                                                  plant_structural_carbon_amount: float) -> float:
+        """Calculates the updated plant structural carbon amount
+
+        Parameters
+        ----------
+        plant_dry_matter_residue_amount: float
+            amount of dry matter residue at harvest (kg/ha)V
+        plant_residue_metabolic_fraction: float
+            fraction of plant residue that is metabolic (unitless)
+        structural_carbon_transfer_amount: float
+            the amount of transfer of structural carbon during tillage (kg/ha)
+        plant_structural_to_active_carbon_amount: float
+            amount of plant structural carbon decomposed into slow carbon (kg/ha)
+        plant_structural_to_slow_carbon_amount: float
+            amount of plant structural carbon decomposed into active carbon (kg/ha)
+        plant_structural_carbon_amount: float
+            plant structural carbon amount (kg/ha)
+        Returns
+        -------
+        float
+            updated plant structural carbon amount (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.8, S.6.B.I.12
+        """
+        updated_amount = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
+            * (1-plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+            - plant_structural_to_active_carbon_amount \
+            - plant_structural_to_slow_carbon_amount
+
+        return updated_amount
+
+
