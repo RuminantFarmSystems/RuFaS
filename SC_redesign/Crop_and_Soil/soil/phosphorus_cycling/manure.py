@@ -41,12 +41,72 @@ class Manure:
         # Leach phosphorus from manure to surface runoff and to soil profile
         if rainfall > 0:
             if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, True, True)
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, True, False)
-            if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, False, True)
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, False, False)
+                machine_organic_results = \
+                    self._leach_phosphorus_to_runoff(rainfall, runoff, field_size,
+                                                     self.data.machine_manure_dry_mass,
+                                                     self.data.machine_manure_field_coverage,
+                                                     self.data.machine_water_extractable_organic_phosphorus,
+                                                     True)
+                self.data.machine_water_extractable_organic_phosphorus = \
+                    machine_organic_results["new_phosphorus_pool_amount"]
+                self.data.annual_runoff_machine_manure_organic_phosphorus += \
+                    machine_organic_results["runoff_phosphorus"]
+                self._add_infiltrated_phosphorus_to_soil(machine_organic_results["infiltrated_phosphorus"], field_size)
 
+                machine_inorganic_results = \
+                    self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.machine_manure_dry_mass,
+                                                     self.data.machine_manure_field_coverage,
+                                                     self.data.machine_water_extractable_inorganic_phosphorus, False)
+                self.data.machine_water_extractable_inorganic_phosphorus = \
+                    machine_inorganic_results["new_phosphorus_pool_amount"]
+                self.data.annual_runoff_machine_manure_inorganic_phosphorus += \
+                    machine_inorganic_results["runoff_phosphorus"]
+                self._add_infiltrated_phosphorus_to_soil(machine_inorganic_results["infiltrated_phosphorus"],
+                                                         field_size)
+
+            if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
+                grazer_organic_results = \
+                    self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.grazing_manure_dry_mass,
+                                                     self.data.grazing_manure_field_coverage,
+                                                     self.data.grazing_water_extractable_organic_phosphorus, True)
+                self.data.grazing_water_extractable_organic_phosphorus = \
+                    grazer_organic_results["new_phosphorus_pool_amount"]
+                self.data.annual_runoff_grazing_manure_organic_phosphorus += grazer_organic_results["runoff_phosphorus"]
+                self._add_infiltrated_phosphorus_to_soil(grazer_organic_results["infiltrated_phosphorus"], field_size)
+
+                grazer_inorganic_results = \
+                    self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.grazing_manure_dry_mass,
+                                                     self.data.grazing_manure_field_coverage,
+                                                     self.data.grazing_water_extractable_organic_phosphorus, False)
+                self.data.grazing_water_extractable_inorganic_phosphorus = \
+                    grazer_inorganic_results["new_phosphorus_pool_amount"]
+                self.data.annual_runoff_grazing_manure_inorganic_phosphorus += \
+                    grazer_inorganic_results["runoff_phosphorus"]
+                self._add_infiltrated_phosphorus_to_soil(grazer_inorganic_results["infiltrated_phosphorus"], field_size)
+
+    def _add_infiltrated_phosphorus_to_soil(self, infiltrated_phosphorus_amount: float, field_size: float) -> None:
+        """This method adds phosphorus that was dissolved in rainfall to the soil profile as outlined in SurPhos.
+
+        Parameters
+        ----------
+        infiltrated_phosphorus_amount : float
+            The amount of phosphorus to be added to the soil profile (kg)
+        field_size : float
+            The size of the field (ha)
+
+        Notes
+        -----
+        This method follows what is outlined in SurPhos (theoretical documentation, page 8, paragraph just below eqn.
+        [13]), which is that 80% of infiltrated phosphorus stays in the top 20 mm of soil, and the rest infiltrates
+        deeper.
+        TODO: implement distribution mechanism for the 20% of phosphorus that infiltrates deeper after talking with Pete
+            about how that mechanism works.
+
+        """
+        self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
+        self.data.soil_layers[0].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
+
+    # --- Static Methods ---
     @staticmethod
     def _leach_phosphorus_to_runoff(rainfall: float, runoff: float, field_size: float, manure_dry_mass: float,
                                     field_coverage: float, water_extractable_phosphorus: float,
@@ -102,29 +162,6 @@ class Manure:
                        "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg}
         return return_dict
 
-    def _add_infiltrated_phosphorus_to_soil(self, infiltrated_phosphorus_amount: float, field_size: float) -> None:
-        """This method adds phosphorus that was dissolved in rainfall to the soil profile as outlined in SurPhos.
-
-        Parameters
-        ----------
-        infiltrated_phosphorus_amount : float
-            The amount of phosphorus to be added to the soil profile (kg)
-        field_size : float
-            The size of the field (ha)
-
-        Notes
-        -----
-        This method follows what is outlined in SurPhos (theoretical documentation, page 8, paragraph just below eqn.
-        [13]), which is that 80% of infiltrated phosphorus stays in the top 20 mm of soil, and the rest infiltrates
-        deeper.
-        TODO: implement distribution mechanism for the 20% of phosphorus that infiltrates deeper after talking with Pete
-            about how that mechanism works.
-
-        """
-        self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
-        self.data.soil_layers[0].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
-
-    # --- Static Methods ---
     @staticmethod
     def _determine_temperature_factor(mean_air_temperature: float) -> float:
         """Calculates the temperature factor for the current day
