@@ -239,8 +239,12 @@ class SoilData:
         self.annual_eroded_sediment_total = 0
         self.annual_surface_runoff_total = 0
 
-        # Reset phosphorus fertilizer total
+        # Reset phosphorus totals
         self.annual_runoff_fertilizer_phosphorus = 0
+        self.annual_runoff_machine_manure_organic_phosphorus = 0
+        self.annual_runoff_machine_manure_inorganic_phosphorus = 0
+        self.annual_runoff_grazing_manure_organic_phosphorus = 0
+        self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
 
     @property
     def profile_soil_water_content(self) -> float:
