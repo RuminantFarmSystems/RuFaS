@@ -57,18 +57,21 @@ class Manure:
         """
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
             machine_organic_results = \
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.machine_manure_dry_mass,
-                                                 self.data.machine_manure_field_coverage,
-                                                 self.data.machine_water_extractable_organic_phosphorus, True)
+                self._determine_phosphorus_leached_from_surface(rainfall, runoff, field_size,
+                                                                self.data.machine_manure_dry_mass,
+                                                                self.data.machine_manure_field_coverage,
+                                                                self.data.machine_water_extractable_organic_phosphorus,
+                                                                True)
             self.data.machine_water_extractable_organic_phosphorus = \
                 machine_organic_results["new_phosphorus_pool_amount"]
             self.data.annual_runoff_machine_manure_organic_phosphorus += machine_organic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(machine_organic_results["infiltrated_phosphorus"], field_size)
 
             machine_inorganic_results = \
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.machine_manure_dry_mass,
-                                                 self.data.machine_manure_field_coverage,
-                                                 self.data.machine_water_extractable_inorganic_phosphorus, False)
+                self._determine_phosphorus_leached_from_surface(
+                    rainfall, runoff, field_size, self.data.machine_manure_dry_mass,
+                    self.data.machine_manure_field_coverage, self.data.machine_water_extractable_inorganic_phosphorus,
+                    False)
             self.data.machine_water_extractable_inorganic_phosphorus = \
                 machine_inorganic_results["new_phosphorus_pool_amount"]
             self.data.annual_runoff_machine_manure_inorganic_phosphorus += \
@@ -77,18 +80,21 @@ class Manure:
 
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
             grazer_organic_results = \
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.grazing_manure_dry_mass,
-                                                 self.data.grazing_manure_field_coverage,
-                                                 self.data.grazing_water_extractable_organic_phosphorus, True)
+                self._determine_phosphorus_leached_from_surface(rainfall, runoff, field_size,
+                                                                self.data.grazing_manure_dry_mass,
+                                                                self.data.grazing_manure_field_coverage,
+                                                                self.data.grazing_water_extractable_organic_phosphorus,
+                                                                True)
             self.data.grazing_water_extractable_organic_phosphorus = \
                 grazer_organic_results["new_phosphorus_pool_amount"]
             self.data.annual_runoff_grazing_manure_organic_phosphorus += grazer_organic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(grazer_organic_results["infiltrated_phosphorus"], field_size)
 
             grazer_inorganic_results = \
-                self._leach_phosphorus_to_runoff(rainfall, runoff, field_size, self.data.grazing_manure_dry_mass,
-                                                 self.data.grazing_manure_field_coverage,
-                                                 self.data.grazing_water_extractable_inorganic_phosphorus, False)
+                self._determine_phosphorus_leached_from_surface(
+                    rainfall, runoff, field_size, self.data.grazing_manure_dry_mass,
+                    self.data.grazing_manure_field_coverage, self.data.grazing_water_extractable_inorganic_phosphorus,
+                    False)
             self.data.grazing_water_extractable_inorganic_phosphorus = \
                 grazer_inorganic_results["new_phosphorus_pool_amount"]
             self.data.annual_runoff_grazing_manure_inorganic_phosphorus += grazer_inorganic_results["runoff_phosphorus"]
@@ -118,9 +124,9 @@ class Manure:
 
     # --- Static Methods ---
     @staticmethod
-    def _leach_phosphorus_to_runoff(rainfall: float, runoff: float, field_size: float, manure_dry_mass: float,
-                                    field_coverage: float, water_extractable_phosphorus: float,
-                                    is_organic: bool) -> Dict:
+    def _determine_phosphorus_leached_from_surface(rainfall: float, runoff: float, field_size: float,
+                                                   manure_dry_mass: float, field_coverage: float,
+                                                   water_extractable_phosphorus: float, is_organic: bool) -> Dict:
         """This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
             between runoff and soil infiltration, and how much phosphorus remains in the given pool.
 

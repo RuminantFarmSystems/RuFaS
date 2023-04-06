@@ -174,18 +174,18 @@ def test_determine_water_extractable_phosphorus_runoff_concentration(manure: flo
     (9.8, 9.1, 2, 36, 0.28, 2.1, True),
     (6.2, 0.0, 2.3, 500, 0.65, 80, False),
 ])
-def test_leach_phosphorus_to_runoff(rain: float, runoff: float, area: float, manure_mass: float, field_coverage: float,
-                                    phosphorus_mass: float, organic: bool) -> None:
-    """Test that leaching phosphorus calls all the correct functions and calculates the masses of phosphorus lost
-        correctly."""
+def test_determine_phosphorus_leached_from_surface(rain: float, runoff: float, area: float, manure_mass: float,
+                                                   field_coverage: float, phosphorus_mass: float,
+                                                   organic: bool) -> None:
+    """Test that subroutines are called correctly and that leached phosphorus amounts are calculated correctly."""
     Manure._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
     Manure._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
     Manure._determine_water_extractable_organic_phosphorus_leached = MagicMock(return_value=25.0)
     Manure._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=25.0)
     Manure._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(return_value=5)
 
-    observed = Manure._leach_phosphorus_to_runoff(rain, runoff, area, manure_mass, field_coverage, phosphorus_mass,
-                                                  organic)
+    observed = Manure._determine_phosphorus_leached_from_surface(rain, runoff, area, manure_mass, field_coverage,
+                                                                 phosphorus_mass, organic)
     runoff_in_liters = runoff * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
     expected_water_extractable_phosphorus_leached = min(25.0, phosphorus_mass)
     expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * MILLIGRAMS_TO_KILOGRAMS
@@ -239,7 +239,7 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
                     grazing_water_extractable_inorganic_phosphorus=125, grazing_water_extractable_organic_phosphorus=70)
     incorp = Manure(data)
 
-    incorp._leach_phosphorus_to_runoff = MagicMock(return_value={
+    incorp._determine_phosphorus_leached_from_surface = MagicMock(return_value={
         "new_phosphorus_pool_amount": 30,
         "infiltrated_phosphorus": 25,
         "runoff_phosphorus": 20,
@@ -250,7 +250,7 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
 
     leached_calls = [call(rain, runoff, area, 1000, 0.86, 90, True), call(rain, runoff, area, 1000, 0.86, 200, False),
                      call(rain, runoff, area, 800, 0.78, 70, True), call(rain, runoff, area, 800, 0.78, 125, False)]
-    incorp._leach_phosphorus_to_runoff.assert_has_calls(leached_calls)
+    incorp._determine_phosphorus_leached_from_surface.assert_has_calls(leached_calls)
     infiltrated_calls = [call(25, area), call(25, area), call(25, area), call(25, area)]
     incorp._add_infiltrated_phosphorus_to_soil.assert_has_calls(infiltrated_calls)
     assert incorp.data.machine_water_extractable_organic_phosphorus == 30
