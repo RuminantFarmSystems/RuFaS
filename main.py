@@ -18,7 +18,7 @@ from RUFAS.util import Utility
 
 
 def run_rufas(input_path=None, make_graphs=True, verbose=True):
-    """ main function to run RuFaS, with options. If input_path is not provided, the interactive user prompt is
+    """main function to run RuFaS, with options. If input_path is not provided, the interactive user prompt is
     triggered.
     """
     set_global_variables(make_graphs, verbose)
@@ -31,7 +31,9 @@ def run_rufas(input_path=None, make_graphs=True, verbose=True):
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
     """sets values of global variables in config/global_variables.py"""
     config.global_variables.PRODUCE_GRAPHICS = make_graphs
-    config.global_variables.PRINT_STATUS_MESSAGES = verbose  # TODO: this is currently unimplemented - GitHub Issue #211
+    config.global_variables.PRINT_STATUS_MESSAGES = (
+        verbose  # TODO: this is currently unimplemented - GitHub Issue #211
+    )
 
 
 def execute_simulations_from_files(files: List[Path]) -> None:
@@ -42,28 +44,45 @@ def execute_simulations_from_files(files: List[Path]) -> None:
         output_manager.flush_pools()
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
-        output_manager.save_all_pools(r'output')
+        output_manager.save_all_pools(r"output")
+
 
 def parse_gnu_args():
     """parse command line options, if applicable"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("input_path", type=str, metavar="path", nargs="?",
-                        help="path to input .json file or directory of .json files")
+    parser.add_argument(
+        "input_path",
+        type=str,
+        metavar="path",
+        nargs="?",
+        help="path to input .json file or directory of .json files",
+    )
     # TODO: rather than a string, this should probably be a file handle as in the link below, but that would affect
     #   the current input handler, file reader, etc.
     #   https://stackoverflow.com/questions/11540854/file-as-command-line-argument-for-argparse-error-message-if-argument-is-not-va
 
-    parser.add_argument("-ng", "--no-graphics", help="prevent graphics from generating", action="store_true")
-    parser.add_argument("-v", "--verbose", help="print progress messages", action="store_true")
+    parser.add_argument(
+        "-ng",
+        "--no-graphics",
+        help="prevent graphics from generating",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-v", "--verbose", help="print progress messages", action="store_true"
+    )
     # parser.add_argument("-i", "--interactive", help="run in interactive mode", action="store_true")
 
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Clear the output directory before running the model
     output_dir = Path(config.global_variables.OUT_DIR)
-    Utility.empty_dir(output_dir, keep=['.keep'])
+    Utility.empty_dir(output_dir, keep=[".keep"])
 
     cmd_arguments = parse_gnu_args()
-    run_rufas(input_path=cmd_arguments.input_path, make_graphs=not cmd_arguments.no_graphics, verbose=cmd_arguments.verbose)
+    run_rufas(
+        input_path=cmd_arguments.input_path,
+        make_graphs=not cmd_arguments.no_graphics,
+        verbose=cmd_arguments.verbose,
+    )
