@@ -208,3 +208,34 @@ class ResiduePartition:
         """
         # TODO: contradiction with the equation in pseudocode_soil. issue #427
         return structural_decomposition_factor * math.exp(-3) * 1 - plant_residue_metabolic_fraction
+
+    @staticmethod
+    def _determine_plant_structural_to_slow_active_carbon_amount(plant_structural_to_slow_or_active_rate: float,
+                                                                 decomposition_moisture_effect: float,
+                                                                 decomposition_temperature_effect: float,
+                                                                 plant_structural_carbon_amount: float) -> float:
+        """This methods determines the amount of plant structural carbon decomposed into slow or active carbon
+
+        Parameters
+        ----------
+        plant_structural_to_slow_or_active_rate: float
+            rate at which above ground structural carbon decomposes into slow or active carbon (unitless)
+        decomposition_moisture_effect: float
+            moisture effect on decomposition factor (unitless)
+        decomposition_temperature_effect: float
+            temperature effect on decomposition factor (unitless)
+        plant_structural_carbon_amount: float
+            pant structural carbon amount(kg/ha)
+
+        Returns
+        -------
+        float
+            amount of plant structural carbon decomposed into slow or active carbon
+
+        References
+        -------
+        pseudocode_soil S.6.B.I.10
+        """
+        return plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
+            * decomposition_temperature_effect\
+            * plant_structural_carbon_amount
