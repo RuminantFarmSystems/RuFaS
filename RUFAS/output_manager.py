@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Union
 import json
 import os
 import time
@@ -246,7 +246,7 @@ class OutputManager (object):
         The dictionary is first converted to a serializable format using
         `Utility.make_serializable()`.
 
-        The file is saved with 4 spaces indentation.
+        The file is saved with no indentation.
 
         If you want to save time and space, limit the maximum depth of the
         serialized dictionary using the max_depth parameter.
@@ -254,9 +254,9 @@ class OutputManager (object):
         """
         try:
             with open(path, 'w') as json_file:
-                json.dump(Utility.make_serializable(data_dict, max_depth=6),
+                json.dump(Utility.make_serializable(data_dict, max_depth=3),
                           json_file,
-                          indent=4)
+                          indent=0)
         except Exception as e:
             raise e
 
@@ -272,7 +272,7 @@ class OutputManager (object):
         """
         Saves variables_pool into a json file in the given path to a directory.
         """
-        vars_pool = self.variables_pool.copy()  # shallow copy
+        vars_pool = self.variables_pool.copy()
         if exclude_info_maps:
             for key, value in vars_pool.items():
                 if isinstance(value, dict) and 'info_maps' in value:
@@ -310,8 +310,7 @@ class OutputManager (object):
         """
         Saves all pool into the given path to a directory.
         """
-        # If you want to save time and space, set exclude_info_maps to True
-        self.save_variables(path, exclude_info_maps=False)
+        self.save_variables(path, exclude_info_maps=True)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)
