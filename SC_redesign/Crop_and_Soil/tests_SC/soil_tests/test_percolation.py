@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, PropertyMock
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
@@ -80,8 +80,8 @@ def test_percolate_between_layers():
     """
     # Case 1: amount to percolate is greater than amount that can be accepted by lower layer
     # Initialize objects
-    layers1 = [LayerData(top_depth=0, bottom_depth=39),
-               LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers1 = [LayerData(top_depth=0, bottom_depth=20),
+               LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1)]
     layers1[0].water_content = 15
     layers1[1].water_content = 3.8
     data1 = SoilData(soil_layers=layers1)
@@ -112,8 +112,8 @@ def test_percolate_between_layers():
 
     # Case 2: amount to percolate is less than amount that can be accepted by lower layer
     # Initialize objects
-    layers2 = [LayerData(top_depth=0, bottom_depth=39),
-               LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers2 = [LayerData(top_depth=0, bottom_depth=20),
+               LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1)]
     layers2[0].water_content = 15
     layers2[1].water_content = 3.8
     data2 = SoilData(soil_layers=layers2)
@@ -141,31 +141,34 @@ def test_percolate_between_layers():
         incorp2.data.soil_layers[0].excess_water_available,
         incorp2.data.time_step, 0.245)
 
-    # Case 3: amount to percolate is greater excess water available in upper layer
+    # Case 3: amount to percolate is greater than excess water available in upper layer
     # Initialize objects
-    layers3 = [LayerData(top_depth=0, bottom_depth=39),
-               LayerData(top_depth=39, bottom_depth=87, saturation_point_water_concentration=0.1)]
-    layers3[0].water_content = 8.9
-    layers3[1].water_content = 3.8
-    data3 = SoilData(soil_layers=layers3)
-    incorp3 = Percolation(data3)
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.excess_water_available", new_callable=PropertyMock,
+               return_value=0):
+        layers3 = [LayerData(top_depth=0, bottom_depth=20),
+                   LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1)]
+        layers3[0].water_content = 8.9
+        layers3[1].water_content = 3.8
+        data3 = SoilData(soil_layers=layers3)
+        incorp3 = Percolation(data3)
 
-    # Neither intermediate functions need to be re-mocked
+        # Neither intermediate functions need to be re-mocked
 
-    # Determine expected return value
-    expect = helper_percolate_between_layers(incorp3.data.soil_layers[0].excess_water_available, 0.85,
-                                             incorp3.data.soil_layers[1].acceptable_percolation_amount)
+        # Determine expected return value
+        expect = helper_percolate_between_layers(incorp3.data.soil_layers[0].excess_water_available, 0.85,
+                                                 incorp3.data.soil_layers[1].acceptable_percolation_amount)
 
-    # Run method
-    observe = incorp3._percolate_between_layers(incorp3.data.time_step, incorp3.data.soil_layers[0],
-                                                incorp3.data.soil_layers[1])
+        # Run method
+        observe = incorp3._percolate_between_layers(incorp3.data.time_step, incorp3.data.soil_layers[0],
+                                                    incorp3.data.soil_layers[1])
 
-    # Assertions
-    assert observe == expect
-    assert Percolation._determine_percolation_travel_time.call_count == 2
-    # Should only be called in the first two cases, not this one
-    assert Percolation._determine_percolation_to_next_layer.call_count == 1
-    # This method is not called in this test case, and is only called once after being re-mocked in the last test case
+        # Assertions
+        assert observe == expect
+        assert Percolation._determine_percolation_travel_time.call_count == 2
+        # Should only be called in the first two cases, not this one
+        assert Percolation._determine_percolation_to_next_layer.call_count == 1
+        # This method is not called in this test case, and is only called once after being re-mocked in the last test
+        # case
 
 
 def helper_percolate_between_layers(excess_water, amount_to_percolate, acceptable_percolation_amount):
@@ -218,5 +221,5 @@ def test_percolate(high_seasonal_water_table):
 
     # Assertions
     assert observe == expect
-    assert Percolation._determine_if_percolation_allowed.call_count == 3
-    assert Percolation._percolate_between_layers.call_count == 3
+    assert Percolation._determine_if_percolation_allowed.call_count == len(data.soil_layers)
+    assert Percolation._percolate_between_layers.call_count == len(data.soil_layers)

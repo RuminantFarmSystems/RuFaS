@@ -39,7 +39,8 @@ def test_config_factory_defaults():
         defaults"""
     generic = SoilConfigFactory.create_soil_data()
     assert generic.name == "generic soil configuration"
-    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=50, nitrate=0.5),
+    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5),
+                                   LayerData(top_depth=20, bottom_depth=50, nitrate=0.5),
                                    LayerData(top_depth=50, bottom_depth=80, nitrate=1),
                                    LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
     assert generic.potential_evapotranspiration is None
@@ -100,18 +101,27 @@ def test_soil_factory_alteration_error(config: str, args_dict: Dict) -> None:
 # --- Tests to verify correct behavior of SoilData module
 def test_manual_soil_data_configuration() -> None:
     """Test that creating a custom SoilData object actually has all the correct values in its fields"""
-    # Create custom soil configuration
     mollisols = SoilData(name="mollisols", soil_layers=[LayerData(top_depth=0, bottom_depth=80, nitrate=1.8),
                                                         LayerData(top_depth=80, bottom_depth=150, nitrate=2.6),
                                                         LayerData(top_depth=150, bottom_depth=300, nitrate=5)])
-    # Check that attributes were properly set
+
     assert mollisols.name == "mollisols"
-    assert mollisols.soil_layers[0] == LayerData(top_depth=0, bottom_depth=80, nitrate=1.8)
-    assert mollisols.soil_layers[1] == LayerData(top_depth=80, bottom_depth=150, nitrate=2.6)
-    assert mollisols.soil_layers[2] == LayerData(top_depth=150, bottom_depth=300, nitrate=5)
-    # Vadose zone layer gets initialized based on the bottom soil layer, so check that too
-    assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000, soil_water_concentration=0,
+    assert mollisols.soil_layers[0] == LayerData(top_depth=0, bottom_depth=20, nitrate=1.8)
+    assert mollisols.soil_layers[1] == LayerData(top_depth=20, bottom_depth=80, nitrate=1.8)
+    assert mollisols.soil_layers[2] == LayerData(top_depth=80, bottom_depth=150, nitrate=2.6)
+    assert mollisols.soil_layers[3] == LayerData(top_depth=150, bottom_depth=300, nitrate=5)
+    assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000,
+                                                    soil_water_concentration=0,
                                                     saturation_point_water_concentration=inf)
+
+
+def test_error_manual_soil_data_configuration() -> None:
+    """Test that an error is correctly raised when an invalid input is used to create SoilData object."""
+    with pytest.raises(ValueError) as e:
+        SoilData(soil_layers=[LayerData(top_depth=0, bottom_depth=19, nitrate=1.8),
+                              LayerData(top_depth=19, bottom_depth=150, nitrate=2.6),
+                              LayerData(top_depth=150, bottom_depth=300, nitrate=5)])
+    assert str(e.value) == "Expected bottom depth of top soil layer must be 20 mm or greater, received '19'."
 
 
 def test_annual_reset() -> None:
@@ -171,7 +181,7 @@ def test_profile_soil_water_content() -> None:
                         wilting_point_content=PropertyMock(return_value=0.32)):
         soil_data = SoilData()
         observe = soil_data.profile_soil_water_content
-        expect = 3 * (0.87 - 0.32)
+        expect = len(soil_data.soil_layers) * (0.87 - 0.32)
         assert observe == expect
 
 
@@ -181,7 +191,7 @@ def test_profile_saturation() -> None:
                return_value=0.98):
         soil_data = SoilData()
         observe = soil_data.profile_saturation
-        expect = 3 * 0.98
+        expect = len(soil_data.soil_layers) * 0.98
         assert observe == expect
 
 
@@ -191,7 +201,7 @@ def test_profile_field_capacity() -> None:
                return_value=0.67):
         soil_data = SoilData()
         observe = soil_data.profile_field_capacity
-        expect = 3 * 0.67
+        expect = len(soil_data.soil_layers) * 0.67
         assert observe == expect
 
 
