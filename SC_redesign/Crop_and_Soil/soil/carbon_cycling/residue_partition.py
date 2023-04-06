@@ -301,5 +301,3 @@ class ResiduePartition:
             - plant_structural_to_slow_carbon_amount
 
         return updated_amount
-
-
