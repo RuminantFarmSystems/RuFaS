@@ -122,3 +122,25 @@ def test_determine_plant_structural_to_slow_or_active_rate(plant_residue_metabol
     expected = structural_decomposition_factor * math.exp(-3) * 1 - plant_residue_metabolic_fraction
     assert expected == ResiduePartition._determine_plant_structural_to_slow_or_active_rate(
         plant_residue_metabolic_fraction)
+
+
+@pytest.mark.parametrize("plant_structural_to_slow_or_active_rate, decomposition_moisture_effect,"
+                         "decomposition_temperature_effect, plant_structural_carbon_amount", [
+                             (3, 8, 7, 1),
+                             (60, 64, 85, 41),
+                             (1.8, 1.1, 3.2, 0.8),
+                         ])
+def test_determine_plant_structural_to_slow_active_carbon_amount(plant_structural_to_slow_or_active_rate: float,
+                                                                 decomposition_moisture_effect: float,
+                                                                 decomposition_temperature_effect: float,
+                                                                 plant_structural_carbon_amount: float) -> None:
+    """Tests that the amount of plant structural carbon decomposed into slow or active carbon was calculated
+    correctly"""
+    expected = plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
+            * decomposition_temperature_effect\
+            * plant_structural_carbon_amount
+    assert expected == ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount(
+                                                                 plant_structural_to_slow_or_active_rate,
+                                                                 decomposition_moisture_effect,
+                                                                 decomposition_temperature_effect,
+                                                                 plant_structural_carbon_amount)
