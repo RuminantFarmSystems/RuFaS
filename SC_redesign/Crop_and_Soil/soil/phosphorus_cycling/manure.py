@@ -114,7 +114,7 @@ class Manure:
 
         """
         self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
-        self.data.soil_layers[0].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
+        self.data.soil_layers[1].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
 
     # --- Static Methods ---
     @staticmethod

@@ -162,7 +162,6 @@ def test_determine_water_extractable_phosphorus_runoff_concentration(manure: flo
     observe = Manure._determine_water_extractable_phosphorus_runoff_concentration(manure, rain, field_size,
                                                                                   distribution_factor)
     expect = manure / rain * (1 / field_size) * 100 * distribution_factor
-    print(observe, expect)
     assert pytest.approx(observe) == expect
 
 
