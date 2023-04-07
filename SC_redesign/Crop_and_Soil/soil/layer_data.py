@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 """
@@ -19,7 +19,7 @@ class LayerData:
     """phosphate content of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    water_content:  Optional[float] = None
+    water_content:  float = field(init=False)
     """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
@@ -60,15 +60,175 @@ class LayerData:
     decomposition_moisture_effect: Optional[float] = None
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
 
+    # --- pool_gas_partition
+    # (pseudocode_soil S.6.A.1)
+    plant_metabolic_active_carbon_usage: Optional[float] = None
+    """plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.)"""
+    plant_metabolic_active_carbon_loss: Optional[float] = None
+    """plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
+    plant_metabolic_active_carbon_remaining: Optional[float] = None
+    """plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
+
+    plant_structural_active_carbon_usage: Optional[float] = None
+    """plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11)"""
+    plant_structural_active_carbon_loss: Optional[float] = None
+    """plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
+    plant_structural_active_carbon_remaining: Optional[float] = None
+    """plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
+
+    plant_structural_slow_carbon_usage: Optional[float] = None
+    """plant structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.I.11)"""
+    plant_structural_slow_carbon_loss: Optional[float] = None
+    """plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)"""
+    plant_structural_slow_carbon_remaining: Optional[float] = None
+    """plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)"""
+
+    soil_metabolic_active_carbon_usage: Optional[float] = None
+    """soil metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.8)"""
+    soil_metabolic_active_carbon_loss: Optional[float] = None
+    """soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
+    soil_metabolic_active_carbon_remaining: Optional[float] = None
+    """soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
+
+    soil_structural_active_carbon_usage: Optional[float] = None
+    """soil structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.11)"""
+    soil_structural_active_carbon_loss: Optional[float] = None
+    """soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
+    soil_structural_active_carbon_remaining: Optional[float] = None
+    """soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
+
+    soil_structural_slow_carbon_usage: Optional[float] = None
+    """soil structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.II.11)"""
+    soil_structural_slow_carbon_loss: Optional[float] = None
+    """soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)"""
+    soil_structural_slow_carbon_remaining: Optional[float] = None
+    """soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)"""
+
+    active_carbon_decomposition_rate: Optional[float] = None
+    """rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2)"""
+    carbon_lost_adjusted_factor: Optional[float] = None
+    """adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6)"""
+
+    # pseudocode_soil S.6.C.3
+    active_carbon_decomposition_amount: Optional[float] = None
+    """active carbon decomposed into slow or passive carbon and CO2 (kg/ha)"""
+    active_carbon_amount: Optional[float] = None
+    """active carbon stored in the soil (kg/ha)"""
+
+    # pseudocode_soil S.6.C.4
+    slow_carbon_amount: Optional[float] = None
+    """slow carbon stored in the soil (kg/ha)"""
+    slow_carbon_decomposition_amount: Optional[float] = None
+    """slow carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
+
+    # pseudocode_soil S.6.C.5
+    passive_carbon_decomposition_amount: Optional[float] = None
+    """passive carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
+    passive_carbon_amount: Optional[float] = None
+    """passive carbon stored in the soil (kg/ha)"""
+
+    # pseudocode_soil S.6.C.7
+    active_carbon_to_slow_amount: Optional[float] = None
+    """active carbon decomposed into slow carbon (kg/ha)"""
+    active_carbon_to_slow_loss: Optional[float] = None
+    """active carbon lost as CO2 during decomposition into slow carbon (kg/ha)"""
+
+    # pseudocode_soil S.6.C.8
+    active_carbon_to_passive_amount: Optional[float] = None
+    """active carbon decomposed into passive carbon (kg/ha)"""
+
+    # pseudocode_soil S.6.C.9
+    slow_to_active_carbon_amount: Optional[float] = None
+    """slow carbon decomposed into active carbon (kg/ha)"""
+    slow_carbon_co2_lost_amount: Optional[float] = None
+    """slow carbon lost as CO2 during decomposition (kg/ha)"""
+    slow_to_passive_carbon_amount: Optional[float] = None
+    """slow carbon decomposed into passive carbon (kg/ha)"""
+
+    # pseudocode_soil S.6.C.10
+    passive_to_active_carbon_amount: Optional[float] = None
+    """passive carbon decomposed into active carbon (kg/ha)"""
+    passive_carbon_co2_lost_amount: Optional[float] = None
+    """passive carbon lost as CO2 during decomposition (kg/ha)"""
+
+    # pseudocode_soil S.6.C.11
+    plant_active_decompose_carbon: Optional[float] = None
+    """plant carbon decomposed into the active carbon pool (kg/ha)"""
+    soil_active_decompose_carbon: Optional[float] = None
+    """soil carbon decomposed into the active carbon pool (kg/ha)"""
+
     # --- Phosphorus
     labile_phosphorus_content: float = 0
     """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
     active_phosphorus_content: float = 0
     """Active phosphorus content of this soil layer (kg phosphorus / ha)"""
 
+    # --- Residue partition
+    plant_metabolic_to_soil_carbon_amount: Optional[float] = None
+    """metabolic carbon incorporated into soil during tillage (kg/ha)"""
+
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
+
+    def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+        """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
+            soil layer.
+
+        Parameters
+        ----------
+            phosphorus_to_add : float
+                Amount of phosphorus to add (kg)
+            field_size : float
+                Size of the field (ha)
+
+        """
+        self.labile_phosphorus_content = self._add_phosphorus_to_pool(self.labile_phosphorus_content, phosphorus_to_add,
+                                                                      field_size)
+
+    def add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
+        """This method is a wrapper for adding a specified mass of phosphorus to the active phosphorus content of this
+            soil layer.
+
+        Parameters
+        ----------
+            phosphorus_to_add : float
+                Amount of phosphorus to add (kg)
+            field_size : float
+                Size of the field (ha)
+
+        """
+        self.active_phosphorus_content = self._add_phosphorus_to_pool(self.active_phosphorus_content, phosphorus_to_add,
+                                                                      field_size)
+
+    @staticmethod
+    def _add_phosphorus_to_pool(pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
+        """This is a generic method to be used by wrapper functions to add phosphorus to any of the phosphorus pools.
+
+        Parameters
+        ----------
+        pool_to_add_to : float
+            The phosphorus pool in this soil layer that is having phosphorus added (kg phosphorus / ha)
+        phosphorus_to_add : float
+            Amount of phosphorus to add (kg)
+        field_size : float
+            Size of the field (ha)
+
+        Returns
+        -------
+        float
+            The new value of the phosphorus pool that was added to (kg phosphorus / ha)
+
+        Notes
+        -----
+        Before adding the new phosphorus to the specified pool, it first extracts the current amount of phosphorus
+        in the pool in kg, then adds the new phosphorus, and then converts the new amount of phosphorus from kg to kg
+        per ha.
+
+        """
+        phosphorus_pool_amount = pool_to_add_to * field_size
+        phosphorus_pool_amount += phosphorus_to_add
+        return phosphorus_pool_amount / field_size
 
     @property
     def layer_thickness(self) -> float:
@@ -113,15 +273,14 @@ class LayerData:
     @property
     def percent_organic_matter_content(self) -> float:
         """percent organic matter content of this soil layer
-        TODO: remove this field from all the soil inputs, because the given values for OM_percent are not equal to value
-            that SWAT would calculate based on the percent organic carbon content
+
         SWAT Reference: 4:1.1.4
         """
         return 1.72 * self.percent_organic_carbon_content
 
     @property
     def soil_water_content(self):
-        """volume of soil water in the layer in mm"""
+        """volume of soil water in the layer (mm)"""
         return self.soil_water_concentration / self.layer_thickness
 
     @property
@@ -135,3 +294,8 @@ class LayerData:
         else:
             return (self.saturation_content - self.soil_water_content) / (
                     self.saturation_content - self.field_capacity_content)
+
+    @property
+    def silt_clay_content(self):
+        """silt and clay fraction in the soil (unitless)"""
+        return self.percent_silt_content / self.percent_clay_content

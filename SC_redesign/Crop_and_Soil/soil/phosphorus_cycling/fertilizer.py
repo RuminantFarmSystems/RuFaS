@@ -58,7 +58,7 @@ class Fertilizer:
         first_rainfall_occurred = self.data.rain_events_after_fertilizer_application == 1 \
             and self.data.available_phosphorus_pool > 0
         if first_rainfall_occurred and runoff == 0:
-            self._add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
+            self.data.soil_layers[0].add_to_labile_phosphorus(self.data.available_phosphorus_pool, field_size)
             self.data.available_phosphorus_pool = 0
             return
         elif first_rainfall_occurred and runoff > 0:
@@ -68,7 +68,7 @@ class Fertilizer:
             absorbed_phosphorus_to_remove = amounts_to_remove["absorbed_phosphorus"]
             self.data.available_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
             self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
-            self._add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
+            self.data.soil_layers[0].add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
             return
 
     def _update_after_first_rain(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -83,7 +83,7 @@ class Fertilizer:
         elif runoff == 0:
             solubilized_phosphorus = self.data.recalcitrant_phosphorus_pool * self.data.solubilizing_factor
             self.data.recalcitrant_phosphorus_pool -= solubilized_phosphorus
-            self._add_to_labile_phosphorus(solubilized_phosphorus, field_size)
+            self.data.soil_layers[0].add_to_labile_phosphorus(solubilized_phosphorus, field_size)
             return
         else:
             amounts_to_remove = self._determine_leached_phosphorus(rainfall, runoff, field_size,
@@ -92,7 +92,7 @@ class Fertilizer:
             absorbed_phosphorus_to_remove = amounts_to_remove["absorbed_phosphorus"]
             self.data.recalcitrant_phosphorus_pool -= (runoff_phosphorus_to_remove + absorbed_phosphorus_to_remove)
             self.data.annual_runoff_fertilizer_phosphorus += runoff_phosphorus_to_remove
-            self._add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
+            self.data.soil_layers[0].add_to_labile_phosphorus(absorbed_phosphorus_to_remove, field_size)
             return
 
     def add_fertilizer_phosphorus(self, fertilizer_phosphorus_applied: float) -> None:
@@ -105,8 +105,6 @@ class Fertilizer:
             pools. It also updates the starting available phosphorus value to the new available phosphorus pool value.
             If the amount of fertilizer to be added is zero, no pool or counters will be modified.
         """
-        # TODO: add capability to apply fertilizer beneath soil surface, first talk with Pete about how phosphorus gets
-        #  distributed between layers based on depth when this happens.
         if fertilizer_phosphorus_applied == 0:
             return
         self.data.available_phosphorus_pool += 0.75 * fertilizer_phosphorus_applied
@@ -165,24 +163,6 @@ class Fertilizer:
         return_dict["absorbed_phosphorus"] = absorbed_phosphorus
 
         return return_dict
-
-    def _add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
-        """This method adds a specified mass of phosphorus to the labile phosphorus content of the top layer of the soil
-            profile.
-
-        Args:
-            phosphorus_to_add: amount of phosphorus to add (kg)
-            field_size: size of the field (ha)
-
-        Details:
-            Before adding the mass of phosphorus to the labile phosphorus content, it first converts the current amount
-            of labile phosphorus in the top layer of soil from kg per ha to kg, then adds the new phosphorus, then
-            converts the new mass to kg per ha.
-        """
-        # TODO: move to LayerData - Issue #403
-        labile_phosphorus_mass = self.data.soil_layers[0].labile_phosphorus_content * field_size
-        labile_phosphorus_mass += phosphorus_to_add
-        self.data.soil_layers[0].labile_phosphorus_content = labile_phosphorus_mass / field_size
 
     # --- Static methods ---
     @staticmethod
