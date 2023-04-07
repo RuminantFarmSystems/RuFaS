@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 from math import inf
+from copy import deepcopy
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 """
@@ -160,12 +161,24 @@ class SoilData:
 
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
-            attributes in the object to be set before they can be set"""
+            attributes in the object to be set before they can be set
+
+        Raises
+        ------
+        ValueError
+            If the bottom depth of the top layer of soil is < 20
+
+        """
         if self.soil_layers is None:
-            # sets the soil layers to a default set if user does not provide any
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=50, nitrate=0.5),
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5),
+                                LayerData(top_depth=20, bottom_depth=50, nitrate=0.5),
                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1),
                                 LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
+        elif self.soil_layers[0].bottom_depth < 20:
+            raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
+                             f"'{self.soil_layers[0].bottom_depth}'.")
+        elif self.soil_layers[0].bottom_depth > 20:
+            self._subdivide_top_layer()
 
         if self.vadose_zone_layer is None:
             # configures the vadose zone LayerData object based on where the soil profile ends
@@ -177,6 +190,25 @@ class SoilData:
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
+
+    def _subdivide_top_layer(self) -> None:
+        """This method ensures that the soil profile has a top layer that is 20 mm deep.
+
+        Notes
+        -----
+        The presence of a top layer of soil that is 20 mm deep is a necessity to properly simulate SurPhos. This top 20
+        mm of soil is where most of the phosphorus that is applied stays in the soil profile, and keeping it in the top
+        20 mm of soil makes it more available to be eroded off the field by runoff.
+
+        This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
+
+        """
+        new_top_layer = deepcopy(self.soil_layers[0])
+        new_top_layer.bottom_depth = 20
+        new_top_layer.__post_init__()
+        self.soil_layers[0].top_depth = 20
+        self.soil_layers[0].__post_init__()
+        self.soil_layers.insert(0, new_top_layer)
 
     def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
