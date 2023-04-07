@@ -34,11 +34,11 @@ python Example-animal_management_SA.wrapper.py
 ```
 
 Note that the specific structure of this module (and any for conducting SA) was largely determined by how the source
-module is written. If modules had a more consistent structure (in the future), it would be much easier to apply SA 
-universally. For now, though, users will need to design their own objective functions based on how their module 
-functions is designed. It should also be noted that objective functions of the form in this module are perfectly 
-suited for both model validation and mathematical optimization, in addition to SA. This means that writing such
-objective functions will be broadly useful beyond SA.
+`AnimalManagement` module is written. If modules had a more consistent structure (in the future), it would be much 
+easier to apply SA universally. For now, though, users will need to design their own objective functions based on how 
+their module functions is designed. It should also be noted that objective functions of the form in this module are 
+perfectly suited for both model validation and mathematical optimization, in addition to SA. This means that writing 
+such objective functions will be broadly useful beyond SA.
 """
 
 class ExampleAnimalSA:
