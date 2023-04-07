@@ -387,6 +387,3 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.3
         """
         return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
-
-
-
