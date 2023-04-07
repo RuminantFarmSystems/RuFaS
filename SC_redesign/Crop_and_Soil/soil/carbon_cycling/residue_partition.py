@@ -332,3 +332,37 @@ class ResiduePartition:
         This calculation does not exits in the original code, it's added in order for its usage in S.6.B.II.2
         """
         return plant_dry_matter_residue_amount * tillage_fraction
+
+    @staticmethod
+    def _determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
+                                                               soil_biomass: float) -> float:
+        """Calculates the weighted fractional of lignin amount in residue dry matter
+
+        Parameters
+        ----------
+        soil_dry_matter_residue_amount: float
+            the amount of soil dry matter residue at harvest (kg/ha)
+        soil_biomass: float
+            below ground biomass (unknown)
+
+        Returns
+        -------
+        float
+            the weighted fractional of lignin amount in residue dry matter
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.2
+
+        Notes
+        -------
+        the referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+        mention of biomass unit
+        """
+        # TODO: check with subject experts to determine biomass's unit isse #432
+        if soil_dry_matter_residue_amount + soil_biomass != 0:
+            return soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + soil_biomass)
+        else:
+            return 0
+
+

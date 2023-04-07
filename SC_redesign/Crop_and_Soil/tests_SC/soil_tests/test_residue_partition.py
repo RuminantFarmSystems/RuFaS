@@ -204,7 +204,7 @@ def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amoun
     (3, 1.0),  # increased tillage fraction
     (1.8, 0.01),  # decreased dry matter residue amount & tillage
     (0, 0.4),  # no dry matter residue amount
-    (3, 0),  # no tillage fraction
+    (2, 0),  # no tillage fraction
     (0, 0),  # neither
 ])
 def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
@@ -213,3 +213,25 @@ def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amoun
     expected = plant_dry_matter_residue_amount * tillage_fraction
     assert expected == ResiduePartition._determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount,
                                                                                   tillage_fraction)
+
+
+@pytest.mark.parametrize("soil_dry_matter_residue_amount, soil_biomass", [
+    (15, 14),  # default
+    (50, 2.2),  # increased soil_dry_matter_residue_amount
+    (3, 24),  # increased soil_biomass
+    (1.8, 0.01),  # decreased soil_dry_matter_residue_amount & soil_biomass
+    (0, 0.4),  # no soil_dry_matter_residue_amount
+    (2, 0),  # no soil_biomass
+    (0, 0),  # neither
+])
+def test_determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
+                                                               soil_biomass: float) -> None:
+    """Tests that the the weighted fractional of lignin amount in residue dry matter was calculated correctly under each
+     condition"""
+    if soil_dry_matter_residue_amount + soil_biomass != 0:
+        expected = soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + soil_biomass)
+    else:
+        expected = 0
+
+    assert expected == ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction(
+        soil_dry_matter_residue_amount, soil_biomass)
