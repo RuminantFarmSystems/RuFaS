@@ -226,7 +226,7 @@ def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amoun
 ])
 def test_determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
                                                                soil_biomass: float) -> None:
-    """Tests that the the weighted fractional of lignin amount in residue dry matter was calculated correctly under each
+    """Tests that the weighted fractional of lignin amount in residue dry matter was calculated correctly under each
      condition"""
     if soil_dry_matter_residue_amount + soil_biomass != 0:
         expected = soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + soil_biomass)
@@ -235,3 +235,20 @@ def test_determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_r
 
     assert expected == ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction(
         soil_dry_matter_residue_amount, soil_biomass)
+
+
+@pytest.mark.parametrize("weighted_residue_dry_matter_lignin_fraction, rainfall", [
+    (0.5, 20),  # default
+    (1, 2.2),  # increased weighted_residue_dry_matter_lignin_fraction
+    (0.5, 60),  # increased rainfall
+    (0.01, 0.3),  # decreased weighted_residue_dry_matter_lignin_fraction & rainfall
+    (0, 20),  # no weighted_residue_dry_matter_lignin_fraction
+    (0.6, 0),  # no rainfall
+    (0, 0),  # neither
+])
+def test_determine_soil_residue_lignin_fraction(weighted_residue_dry_matter_lignin_fraction: float,
+                                                rainfall: float) -> None:
+    """Tests that the the fraction of soil residue that's comprised of lignin was calculated correctly"""
+    expected = max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
+    assert expected == ResiduePartition._determine_soil_residue_lignin_fraction(
+        weighted_residue_dry_matter_lignin_fraction, rainfall)

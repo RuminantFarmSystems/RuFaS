@@ -348,7 +348,7 @@ class ResiduePartition:
         Returns
         -------
         float
-            the weighted fractional of lignin amount in residue dry matter
+            the weighted fractional of lignin amount in residue dry matter (unitless)
 
         References
         -------
@@ -364,5 +364,29 @@ class ResiduePartition:
             return soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + soil_biomass)
         else:
             return 0
+
+    @staticmethod
+    def _determine_soil_residue_lignin_fraction(weighted_residue_dry_matter_lignin_fraction: float,
+                                                rainfall: float) -> float:
+        """Calculates the fraction of soil residue that's comprised of lignin
+
+        Parameters
+        ----------
+        weighted_residue_dry_matter_lignin_fraction: float
+            the weighted fractional of lignin amount in residue dry matter (unitless)
+        rainfall: float
+            amount of rain (mm H2O)
+
+        Returns
+        -------
+        float
+            the fraction of soil residue that's comprised of lignin
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.3
+        """
+        return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
+
 
 
