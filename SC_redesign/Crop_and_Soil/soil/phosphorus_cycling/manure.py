@@ -49,7 +49,9 @@ class Manure:
         if rainfall < 1 or rainfall > 4:
             self._adjust_manure_moisture_factor(rainfall, temperature_factor)
 
-        # manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
+        manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
+
+        # Calculate
 
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
         """This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
@@ -159,17 +161,16 @@ class Manure:
             self.data.grazing_manure_moisture_factor += change_in_grazing_manure_moisture
             self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
 
-    # def _decompose_surface_manure(self, mean_air_temperature: float, rainfall: float, temperature_factor: ) -> None:
+    # def _decompose_surface_manure(self, temperature_factor: float) -> None:
     #     """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
     #     adjusts the manure pools' attributes accordingly.
     #
     #     Parameters
     #     ----------
-    #     mean_air_temperature : float
-    #         The average air temperature of the current day (degrees celsius).
+    #     temperature_factor : float
+    #         The temperature factor on the current day (unitless)
     #
     #     """
-    #     temperature_factor = self._determine_temperature_factor(mean_air_temperature)
     #     manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
     #
     #     # Call subroutine that calculates new values for
@@ -201,8 +202,9 @@ class Manure:
             Is the phosphorus being leached organic (True / False)
 
         """
+        area_covered_by_manure = Manure._determine_covered_field_area(field_coverage, field_size)
         rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(rainfall, manure_dry_mass,
-                                                                                      field_coverage)
+                                                                                      area_covered_by_manure)
 
         distribution_factor = Manure._determine_phosphorus_distribution_factor(rainfall, runoff)
 
@@ -230,6 +232,29 @@ class Manure:
                        "infiltrated_phosphorus": infiltrated_phosphorus,
                        "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg}
         return return_dict
+
+    # @staticmethod
+    # def _determine_decomposed_manure_amounts(decomposition_rate: float, dry_matter_mass: float, field_coverage: float,
+    #                                          ) -> Dict:
+
+    @staticmethod
+    def _determine_covered_field_area(field_coverage: float, field_size: float) -> float:
+        """Determines the area of the field that is covered by manure.
+
+        Parameters
+        ----------
+        field_coverage : float
+            Percent of the field covered by manure, in range [0.0, 1.0]
+        field_size : float
+            Area of the field (ha)
+
+        Returns
+        -------
+        float
+            The area of the field that is covered by manure (ha)
+
+        """
+        return field_coverage * field_size
 
     @staticmethod
     def _determine_temperature_factor(mean_air_temperature: float) -> float:
@@ -394,6 +419,10 @@ class Manure:
         -------
         float
             The ratio of rainfall to manure dry matter currently on the field (cubic cm per g)
+
+        References
+        ----------
+        SurPhos Theoretical Documentation [11]
 
         """
         rain_in_centimeters = rainfall * MILLIMETERS_TO_CENTIMETERS
