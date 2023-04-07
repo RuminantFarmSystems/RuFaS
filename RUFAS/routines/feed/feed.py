@@ -150,12 +150,7 @@ class Feed:
             nutrients_dict["crude_protein_loss"] = self.CP_loss
             om.add_variable("nutrients_summary", nutrients_dict, info_map)
             store_food = 0
-            store_food = store_food * storage.C_loss  # note to try and trigger line length issues plus see what else
-            # comes up
-            # maybe another note here to see if this gets a trigger as wellas
-            # asdasdasdfkjagsnggnsdkalflkadjflkjsadlkfjasldkjfsalkdjflaskdjflkasjdflkasjdlfkjasldkfjaslkdjflksadjflkasjdfasldkfaslkdfjaslkdjfaslkjdf
-            # ads
-            # ASDF
+            store_food = store_food * storage.C_loss
 
     class Storage:
         def __init__(self, data):
