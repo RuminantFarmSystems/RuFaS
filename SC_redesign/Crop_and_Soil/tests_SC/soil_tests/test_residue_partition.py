@@ -186,9 +186,9 @@ def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amoun
                                                   plant_structural_carbon_amount: float) -> None:
     """Tests that plant_structural_carbon_amount was updated correctly"""
     expected = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
-               * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
-               - plant_structural_to_active_carbon_amount \
-               - plant_structural_to_slow_carbon_amount
+        * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+        - plant_structural_to_active_carbon_amount \
+        - plant_structural_to_slow_carbon_amount
     assert expected == ResiduePartition._determine_plant_structural_carbon_amount(
         plant_dry_matter_residue_amount,
         plant_residue_metabolic_fraction,
