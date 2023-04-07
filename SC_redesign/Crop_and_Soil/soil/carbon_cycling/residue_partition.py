@@ -305,3 +305,30 @@ class ResiduePartition:
             - plant_structural_to_slow_carbon_amount
 
         return updated_amount
+
+    @staticmethod
+    def _determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
+                                                  tillage_fraction: float) -> float:
+        """Calculates the amount of soil dry matter residue at harvest
+
+        Parameters
+        ----------
+        plant_dry_matter_residue_amount: float
+            plant dry matter residue at harvest (kg/ha)
+        tillage_fraction: float
+            fraction of metabolic carbon incorporated into soil during tillage (unitless)
+
+        Returns
+        -------
+        float
+            the amount of soil dry matter residue at harvest (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.1
+
+        Notes
+        -------
+        This calculation does not exits in the original code, it's added in order for its usage in S.6.B.II.2
+        """
+        return plant_dry_matter_residue_amount * tillage_fraction
