@@ -17,11 +17,11 @@ over the coarse of a single day. Within RuFaS, `AnimalManagement.daily_updates()
 of a day, so this will be the basis for our objective function.
 2) Then, ensure that the method of interest can be called from an objective function that meets the requirements of the
 SAlib. 
-    * These requirements are that the function must take a n*p numpy.array `X` as its first argument and must return a 
-    n*k numpy.array as output. Here, p is the number of input parameters, k is the number of responses, and n is the
-    number of samples. The model will be run n times, once for each row of `X`.
+    * These requirements are that the function must take a :math:`N \\times P` numpy array `X` as its first argument and 
+    must return a :math`N \\times K` numpy array as output. Here, p is the number of input parameters, k is the number 
+    of responses, and n is the number of samples. The model will be run n times, once for each row of `X`.
     * In this example, an objective function was created by wrapping `AnimalManagement.daily_updates()` (and its setup 
-    methods) into a function (@staticmethod) that accepts the parameters of interest as arguments (as floats) and 
+    methods) into a function (`@staticmethod`) that accepts the parameters of interest as arguments (as floats) and 
     returns the outputs of interest (as a tuple). The objective function is then 'vectorized' into the desired format.
 3) Then we pass our objective function to the `SensitivityAnalysis` module to perform SA. 
 

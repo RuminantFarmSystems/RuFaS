@@ -106,6 +106,17 @@ class SensitivityAnalysis:
         If `n_cores=None`, then all the processors on your machine will be used. Because of poor interaction with
         Pycharm's interactive console, this is not currently the default but might be in the future, since it is the
         most sensible option.
+
+        The callable `objective_function` needs to conform to the standards required by SALib. Namely, this function
+        must take a numpy array `X` as its first input and must return a numpy.array as its output. The `X` that is
+        passed to `objective_function()` by this module is an :math:`N \\times P` matrix where :math:`P` columns
+        correspond to the parameters of the function and :math:`N` rows correspond to the sampled values of those
+        parameters. The resulting array should be a matrix with :math:`N \\times K` dimensions where :math:`K` columns
+        correspond to outputs of the model for a given parameter set. Each row of the results should represent the
+        output for parameter values in the corresponding row of `X`. See
+        `ProblemSpec.evaluate() <https://salib.readthedocs.io/en/latest/_modules/SALib/util/problem.html#ProblemSpec.evaluate>`_
+        and `Wrapping and existing model <https://salib.readthedocs.io/en/latest/user_guide/wrappers.html>`_ for more
+        examples on how to wrap existing functions.
         """
 
         self._check_inputs(pars, bounds, groups)
@@ -267,13 +278,14 @@ class SensitivityAnalysis:
     #   of parameters, based on the results of FAST or MORRIS. I've chosen to exclude that from this PR due to
     #   complications that I have not yet worked out. Those compound methods may prove not to be all that useful.
 
-    def __str__(self):  # TODO: need to implement this - formatted output from printing the object
+    def __str__(self):  # TODO: need to implement this - formatted output for printing the object
         pass
 
     def __repr__(self):  # TODO: need to implement this too.
         pass
 
 
+# ---- Examples ----
 if __name__ == '__main__':
     # Run Examples
     from SALib.test_functions import Ishigami, oakley2004
