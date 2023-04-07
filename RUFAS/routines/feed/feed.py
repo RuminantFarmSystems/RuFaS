@@ -138,7 +138,7 @@ class Feed:
             self.CP_loss += storage.CP_loss
 
             self.NPN += storage.NPN
-            info_map = {"class": self.__class__.__name__, "function": self.summarize_feed_storage.__name__, 
+            info_map = {"class": self.__class__.__name__, "function": self.summarize_feed_storage.__name__,
                         "storage_type": storage}
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C
@@ -149,6 +149,13 @@ class Feed:
             nutrients_dict["carbon_loss"] = self.C_loss
             nutrients_dict["crude_protein_loss"] = self.CP_loss
             om.add_variable("nutrients_summary", nutrients_dict, info_map)
+            store_food = 0
+            store_food = store_food * storage.C_loss  # note to try and trigger line length issues plus see what else
+            # comes up
+            # maybe another note here to see if this gets a trigger as wellas
+            # asdasdasdfkjagsnggnsdkalflkadjflkjsadlkfjasldkjfsalkdjflaskdjflkasjdflkasjdlfkjasldkfjaslkdjflksadjflkasjdfasldkfaslkdfjaslkdjfaslkjdf
+            # ads
+            # ASDF
 
     class Storage:
         def __init__(self, data):
@@ -593,7 +600,7 @@ class Feed:
                         storage.inclusion_rate_est[animal] = \
                             (storage.inclusion_pct[animal] / 100) * storage.animal_avg_BW[animal]
                         storage.req_inv[animal] = storage.inclusion_rate_est[animal] \
-                                                  * storage.cow_days[animal]
+                            * storage.cow_days[animal]
                     tot_req_inv_non_lactating_cows = 0
 
                     for animal in storage.req_inv:
@@ -747,8 +754,6 @@ class Feed:
                 self.available_storage.pop(storage_name)
 
             self.summarize_feed_storage()
-            
-
 
     def daily_feed_management(self, animal_management):
         """
@@ -784,8 +789,7 @@ class Feed:
         # inventory plan for new forages
         # if it is the day before the ration interval will be calculated
         ration_interval = ((animal_management.simulation_day + 1) %
-                           animal_management.formulation_interval) == 1 or \
-                          animal_management.formulation_interval == 1
+                           animal_management.formulation_interval) == 1 or animal_management.formulation_interval == 1
         for silo in self.new_forages:
             if silo.days_since_feedout >= -1 and ration_interval and \
                     silo.feed_id != 'null':
@@ -891,7 +895,7 @@ class Feed:
 
         for entry in all_feeds_mapping:
             if not entry == all_feeds_mapping[entry]:
-                all_feed_info.update({all_feeds_mapping[entry]:all_feed_info[entry]})
+                all_feed_info.update({all_feeds_mapping[entry]: all_feed_info[entry]})
                 all_feed_info[all_feeds_mapping[entry]] = \
                     all_feed_info.pop(entry)
 

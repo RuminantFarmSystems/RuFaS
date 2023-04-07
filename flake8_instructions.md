@@ -1,0 +1,1 @@
+The RuFaS project uses flake8 as the coding styleguide enforcement tool.
