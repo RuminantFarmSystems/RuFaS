@@ -41,6 +41,19 @@ class Manure:
         if rainfall > 0:
             self._leach_and_update_phosphorus_pools(rainfall, runoff, field_size)
 
+    def _decompose_surface_manure(self, mean_air_temperature: float) -> None:
+        """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
+        adjusts the manure pools' attributes accordingly.
+
+        Parameters
+        ----------
+        mean_air_temperature : float
+            The average air temperature of the current day (degrees celsius).
+
+        """
+        temperature_factor = self._determine_temperature_factor(mean_air_temperature)
+        manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
+
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
         """This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
             that leached phosphorus is distributed, and updates the phosphorus pools based on those values.
