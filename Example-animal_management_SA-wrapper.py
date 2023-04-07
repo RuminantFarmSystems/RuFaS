@@ -18,8 +18,9 @@ of a day, so this will be the basis for our objective function.
 2) Then, ensure that the method of interest can be called from an objective function that meets the requirements of the
 SAlib. 
     * These requirements are that the function must take a :math:`N \\times P` numpy array `X` as its first argument and 
-    must return a :math`N \\times K` numpy array as output. Here, p is the number of input parameters, k is the number 
-    of responses, and n is the number of samples. The model will be run n times, once for each row of `X`.
+    must return a :math`N \\times K` numpy array as output. Here, :math:`P` is the number of input parameters, :math:`K`
+    is the number of responses, and :math:`N` is the number of samples. The model will be run :math:`N` times, once for 
+    each row of `X`. 
     * In this example, an objective function was created by wrapping `AnimalManagement.daily_updates()` (and its setup 
     methods) into a function (`@staticmethod`) that accepts the parameters of interest as arguments (as floats) and 
     returns the outputs of interest (as a tuple). The objective function is then 'vectorized' into the desired format.
@@ -177,16 +178,22 @@ class ExampleAnimalSA:
         Parameters
         ----------
         X : numpy.array
-            An n*p matrix of input values over which the `objective_function()` should be applied. Columns correspond
-            to `feed_dry_matter`, `feed_carbon`, `feed_phosphorus`, `feed_nitrogen`, and `feed_detergent_fiber`,
-            respectively.
-        ...
-            See `objective_function()` for remaining arguments, which are passed directly by keyword.
+            An :math:`N \\times P` matrix of input values over which the `objective_function()` should be applied.
+            Columns correspond to `feed_dry_matter`, `feed_carbon`, `feed_phosphorus`, `feed_nitrogen`, and
+            `feed_detergent_fiber`, respectively.
+        animal_management_json : str
+            path to a default animal management input json file
+        animal_dir : str
+            directory in which to search for the animal json file
+        feed_dir : str
+            directory in which to search for the feed json file
+        manure_dir : str
+            directory in which to search for the manure json file
 
         Returns
         -------
         Y : numpy.array
-            an n*2 matrix of response values. Columns correspond to `phosphorus_requirements` and `manure_production`,
+            an :math:`N \\times 2` matrix of response values. Columns correspond to `phosphorus_requirements` and `manure_production`,
             respectively. Rows correspond to rows of `X`: the evaluation of X[i, ] corresponds to Y[i, ]
         """
 

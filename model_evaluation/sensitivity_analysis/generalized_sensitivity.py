@@ -32,6 +32,9 @@ class SupportedSensitivityMethods(Enum):
     MORRIS = "morris"
     # TODO: add fractional factorial method
 
+# TODO: for some reason, the docstring formatting in this and Example-animal_management_SA-wrapper.py isn't rendering
+#   properly (e.g., equations) in the Pycharm preview. They may need to be tweaked.
+
 
 class SensitivityAnalysis:
     """Object for performing generalized global sensitivity analysis on an objective function over a set of parameters.
@@ -72,7 +75,6 @@ class SensitivityAnalysis:
     def __init__(self, fun: Callable, pars: List[str], bounds: List[Tuple[float, float]], method: str = "fs",
                  groups: Optional[List[str]] = None, outputs: Optional[List[str]] = None, sample_n: int = 2**10,
                  n_cores: int = 1, *args, **kwargs):
-        # TODO: specify the structure that is needed for `fun`
         """Sets up the sensitivity analysis object
 
         This method first calls assigns attributes from the given arguments, after verifying them with `_check_inputs()`
@@ -81,7 +83,7 @@ class SensitivityAnalysis:
         Parameters
         ----------
         fun : function
-            The objective function - TODO: add details about how the function needs to be structured.
+            The objective function
         pars : list[str]
             Names of the parameters to analyze
         bounds : list[tuple(float, float)]
@@ -93,7 +95,7 @@ class SensitivityAnalysis:
         outputs : list[str], optional
             Names of the output variables
         sample_n : int, optional
-            Target number of samples (passed to `SALib.ProblemSpec.sample()` as `N`). Defaults to :math:`2^10`
+            Target number of samples (passed to `SALib.ProblemSpec.sample()` as :math:`N`). Defaults to :math:`2^10`
         n_cores : int, optional
             Number of cores/threads across which SA will be conducted. Defaults to 1.
         *args
