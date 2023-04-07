@@ -25,7 +25,8 @@ class Manure:
         """
         self.data = soil_data or SoilData()
 
-    def daily_manure_update(self, rainfall: float, runoff: float, field_size: float) -> None:
+    def daily_manure_update(self, rainfall: float, runoff: float, field_size: float,
+                            mean_air_temperature: float) -> None:
         """This method conducts daily operations on manure including decomposition, assimilation into soil, etc.
 
         Parameters
@@ -36,23 +37,19 @@ class Manure:
             The amount of runoff on the current day (mm)
         field_size : float
             The size of the field (ha)
+        mean_air_temperature : float
+            Mean air temperature on the current day (degrees C)
 
         """
         if rainfall > 0:
             self._leach_and_update_phosphorus_pools(rainfall, runoff, field_size)
 
-    def _decompose_surface_manure(self, mean_air_temperature: float) -> None:
-        """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
-        adjusts the manure pools' attributes accordingly.
-
-        Parameters
-        ----------
-        mean_air_temperature : float
-            The average air temperature of the current day (degrees celsius).
-
-        """
         temperature_factor = self._determine_temperature_factor(mean_air_temperature)
-        manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
+
+        if rainfall < 1 or rainfall > 4:
+            self._adjust_manure_moisture_factor(rainfall, temperature_factor)
+
+        # manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
 
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
         """This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
@@ -135,7 +132,50 @@ class Manure:
         self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
         self.data.soil_layers[1].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
 
+    def _adjust_manure_moisture_factor(self, rainfall: float, temperature_factor: float) -> None:
+        """Adjusts the moisture factor of manure on the soil surface based on the current day's precipitation level.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm)
+        temperature_factor : float
+            The temperature factor on the current day (unitless)
+
+        """
+        if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
+            change_in_machine_manure_moisture = \
+                self._determine_moisture_change(rainfall, self.data.machine_manure_moisture_factor,
+                                                self.data.machine_manure_dry_mass,
+                                                self.data.machine_manure_applied_mass, temperature_factor)
+            self.data.machine_manure_moisture_factor += change_in_machine_manure_moisture
+            self.data.machine_manure_moisture_factor = min(0.9, max(self.data.machine_manure_moisture_factor, 0.0))
+
+        if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
+            change_in_grazing_manure_moisture = \
+                self._determine_moisture_change(rainfall, self.data.grazing_manure_moisture_factor,
+                                                self.data.grazing_manure_dry_mass,
+                                                self.data.grazing_manure_applied_mass, temperature_factor)
+            self.data.grazing_manure_moisture_factor += change_in_grazing_manure_moisture
+            self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
+
+    # def _decompose_surface_manure(self, mean_air_temperature: float, rainfall: float, temperature_factor: ) -> None:
+    #     """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
+    #     adjusts the manure pools' attributes accordingly.
+    #
+    #     Parameters
+    #     ----------
+    #     mean_air_temperature : float
+    #         The average air temperature of the current day (degrees celsius).
+    #
+    #     """
+    #     temperature_factor = self._determine_temperature_factor(mean_air_temperature)
+    #     manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
+    #
+    #     # Call subroutine that calculates new values for
+
     # --- Static Methods ---
+
     @staticmethod
     def _determine_phosphorus_leached_from_surface(rainfall: float, runoff: float, field_size: float,
                                                    manure_dry_mass: float, field_coverage: float,

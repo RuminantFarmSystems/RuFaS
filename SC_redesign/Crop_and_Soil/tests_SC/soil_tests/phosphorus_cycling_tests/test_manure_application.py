@@ -177,6 +177,7 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     assert incorp.data.machine_stable_inorganic_phosphorus == expect_stable_inorganic
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
 
+
 # ---- Main routine tests
 @pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_size", [
     (1000, 0.78, 150, 1.8),

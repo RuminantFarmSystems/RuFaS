@@ -263,21 +263,86 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     assert incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus == 20
 
 
-@pytest.mark.parametrize("rain,runoff,area", [
-    (12, 1.8, 2.1),
-    (14, 12.2, 3.4),
-    (0, 0, 2.4),
+@pytest.mark.parametrize("rain,temp_factor", [
+    (10, 0.35),
+    (4, 0.4413),
+    (16, 0.121),
 ])
-def test_daily_manure_update(rain: float, runoff: float, area: float) -> None:
+def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
+    """Tests that the manure moisture factors of the different pools are correctly updated."""
+    # Case 1: calculated moisture factor is negative
+    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+               new_callable=MagicMock, return_value=-1.0) as mocked_determine_moisture_change:
+        data1 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
+                         machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
+                         grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.76,
+                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900)
+        incorp1 = Manure(data1)
+
+        incorp1._adjust_manure_moisture_factor(rain, temp_factor)
+
+        moisture_change_calls = [call(rain, 0.5, 1000, 1100, temp_factor), call(rain, 0.6, 800, 900, temp_factor)]
+        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
+        assert incorp1.data.machine_manure_moisture_factor == 0.0
+        assert incorp1.data.grazing_manure_moisture_factor == 0.0
+
+    # Case 2: calculated moisture factor is greater than upper bound
+    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+               new_callable=MagicMock, return_value=1.0) as mocked_determine_moisture_change:
+        data2 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
+                         machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
+                         grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.76,
+                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900)
+        incorp2 = Manure(data2)
+
+        incorp2._adjust_manure_moisture_factor(rain, temp_factor)
+
+        moisture_change_calls = [call(rain, 0.5, 1000, 1100, temp_factor), call(rain, 0.6, 800, 900, temp_factor)]
+        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
+        assert incorp2.data.machine_manure_moisture_factor == 0.9
+        assert incorp2.data.grazing_manure_moisture_factor == 0.9
+
+    # Case 3: calculated moisture factor is not reset due to being out of bounds
+    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+               new_callable=MagicMock, return_value=0.1) as mocked_determine_moisture_change:
+        data3 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
+                         machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
+                         grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.76,
+                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900)
+        incorp3 = Manure(data3)
+
+        incorp3._adjust_manure_moisture_factor(rain, temp_factor)
+
+        moisture_change_calls = [call(rain, 0.5, 1000, 1100, temp_factor), call(rain, 0.6, 800, 900, temp_factor)]
+        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
+        assert incorp3.data.machine_manure_moisture_factor == 0.6
+        assert incorp3.data.grazing_manure_moisture_factor == 0.7
+
+
+@pytest.mark.parametrize("rain,runoff,area,mean_temp", [
+    (12, 1.8, 2.1, 14),
+    (14, 12.2, 3.4, 9),
+    (0, 0, 2.4, 28),
+])
+def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp: float) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
     data = SoilData()
     incorp = Manure(data)
 
     incorp._leach_and_update_phosphorus_pools = MagicMock()
+    incorp._determine_temperature_factor = MagicMock(return_value=0.35)
+    incorp._adjust_manure_moisture_factor = MagicMock()
 
-    incorp.daily_manure_update(rain, runoff, area)
+    incorp.daily_manure_update(rain, runoff, area, mean_temp)
 
     if rain > 0.0:
         incorp._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     else:
         incorp._leach_and_update_phosphorus_pools.assert_not_called()
+
+    if rain < 1.0 or rain > 4.0:
+        incorp._determine_temperature_factor.assert_called_once_with(mean_temp)
+        incorp._adjust_manure_moisture_factor.assert_called_once_with(rain, 0.35)
+    else:
+        incorp._determine_temperature_factor.assert_not_called()
+        incorp._adjust_manure_moisture_factor.assert_not_called()
