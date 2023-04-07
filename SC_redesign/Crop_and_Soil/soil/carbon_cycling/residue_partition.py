@@ -205,9 +205,13 @@ class ResiduePartition:
         References
         -------
         pseudocode_soil S.6.B.I.9
+
+        Notes
+        -------
+        the equation used here currently follows the old code to make mathematical sense
         """
         # TODO: contradiction with the equation in pseudocode_soil. issue #427
-        return structural_decomposition_factor * math.exp(-3) * 1 - plant_residue_metabolic_fraction
+        return structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
 
     @staticmethod
     def _determine_plant_structural_to_slow_active_carbon_amount(plant_structural_to_slow_or_active_rate: float,
@@ -243,7 +247,7 @@ class ResiduePartition:
     @staticmethod
     def _determine_structural_carbon_transfer_amount(plant_structural_carbon_amount: float,
                                                      tillage_fraction: float) -> float:
-        """Determines the amount of transfer of structural carbon during tillage
+        """Determines the amount of transfer of plant structural to soil structural carbon during tillage
 
         Parameters
         ----------
@@ -275,7 +279,7 @@ class ResiduePartition:
         Parameters
         ----------
         plant_dry_matter_residue_amount: float
-            amount of dry matter residue at harvest (kg/ha)V
+            amount of dry matter residue at harvest (kg/ha)
         plant_residue_metabolic_fraction: float
             fraction of plant residue that is metabolic (unitless)
         structural_carbon_transfer_amount: float

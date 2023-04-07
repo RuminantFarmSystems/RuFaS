@@ -5,9 +5,12 @@ from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import Resi
 
 
 @pytest.mark.parametrize("plant_residue_lignin_composition, rainfall", [
-    (3, 2),  # lower values
-    (50, 6),  # higher value
-    (1.8, 1.1),  # arbitrary values
+    (3, 0.4),  # default
+    (50, 0.5),  # higher plant_residue_lignin_composition
+    (1.8, 55),  # higher rainfall
+    (0, 0),  # neither
+    (3, 0),  # no rainfall
+    (0, 3),  # no plant_residue_lignin_composition
 ])
 def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float, rainfall: float) -> None:
     """Tests that the plant residue lignin composition will be updated correctly as the equation with given rainfall"""
@@ -17,10 +20,12 @@ def test_determine_plant_residue_lignin_composition(plant_residue_lignin_composi
 
 
 @pytest.mark.parametrize("plant_residue_lignin_composition, nitrogen_fraction_plant_residue", [
-    (3, 0.4),  # default value
-    (50, 0.5),  # higher value
-    (1.8, 1.1),  # arbitrary values
-    (2.2, 0)  # zeros
+    (3, 0.4),  # default
+    (50, 0.5),  # higher plant_residue_lignin_composition
+    (1.8, 55),  # higher nitrogen_fraction_plant_residue
+    (0, 0),  # neither
+    (3, 0),  # no plant_residue_lignin_composition
+    (0, 3),  # no nitrogen_fraction_plant_residue
 ])
 def test_determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float,
                                                  nitrogen_fraction_plant_residue) -> None:
@@ -69,8 +74,8 @@ def test_determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount: 
                                                  plant_metabolic_to_soil_carbon_amount: float) -> None:
     """Tests that the updated plant metabolic carbon amount is calculated correctly"""
     expected = plant_metabolic_carbon_amount + plant_dry_matter_residue_amount \
-        * plant_residue_metabolic_fraction - \
-        (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
+               * plant_residue_metabolic_fraction - \
+               (plant_metabolic_active_carbon_usage + plant_metabolic_to_soil_carbon_amount)
     assert expected == ResiduePartition._determine_plant_metabolic_carbon_amount(plant_metabolic_carbon_amount,
                                                                                  plant_residue_metabolic_fraction,
                                                                                  plant_dry_matter_residue_amount,
@@ -90,17 +95,20 @@ def test_determine_plant_metabolic_active_carbon_usage(decomposition_moisture_ef
     """Tests that plant metabolic active carbon usage amount was calculated correctly"""
     metabolic_active_carbon_rate = 0.28
     expected = decomposition_moisture_effect * decomposition_temperature_effect * \
-        plant_metabolic_carbon_amount * metabolic_active_carbon_rate
+               plant_metabolic_carbon_amount * metabolic_active_carbon_rate
     assert expected == ResiduePartition._determine_plant_metabolic_active_carbon_usage(decomposition_moisture_effect,
                                                                                        decomposition_temperature_effect,
                                                                                        plant_metabolic_carbon_amount)
 
 
 @pytest.mark.parametrize("plant_metabolic_carbon_amount, tillage_fraction", [
-    (3, 0.4),  # default value
-    (50, 0.5),  # higher value
-    (1.8, 0.33),  # arbitrary values
-    (2.2, 0)  # zeros
+    (3, 0.4),  # default
+    (50, 0.4),  # increased carbon
+    (3, 1.0),  # increased tillage
+    (1.8, 0.33),  # decreased carbon & tillage
+    (0, 0.4),  # no carbon
+    (3, 0),  # no tillage
+    (0, 0),  # neither
 ])
 def test_determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
                                                          tillage_fraction: float) -> None:
@@ -111,15 +119,15 @@ def test_determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_
 
 
 @pytest.mark.parametrize("plant_residue_metabolic_fraction", [
-    0.1,  # lower values
-    0.9,  # higher values
-    0.66,
+    0.1,  # low fraction
+    0.9,  # high fraction
+    0,  # no fraction
 ])
 def test_determine_plant_structural_to_slow_or_active_rate(plant_residue_metabolic_fraction: float) -> None:
     """Tests that the rate at which above ground structural carbon decomposes into slow or active carbon was calculated
     correctly"""
     structural_decomposition_factor = 0.076
-    expected = structural_decomposition_factor * math.exp(-3) * 1 - plant_residue_metabolic_fraction
+    expected = structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
     assert expected == ResiduePartition._determine_plant_structural_to_slow_or_active_rate(
         plant_residue_metabolic_fraction)
 
@@ -137,20 +145,23 @@ def test_determine_plant_structural_to_slow_active_carbon_amount(plant_structura
     """Tests that the amount of plant structural carbon decomposed into slow or active carbon was calculated
     correctly"""
     expected = plant_structural_to_slow_or_active_rate * decomposition_moisture_effect \
-        * decomposition_temperature_effect\
-        * plant_structural_carbon_amount
+               * decomposition_temperature_effect \
+               * plant_structural_carbon_amount
     assert expected == ResiduePartition._determine_plant_structural_to_slow_active_carbon_amount(
-                                                                 plant_structural_to_slow_or_active_rate,
-                                                                 decomposition_moisture_effect,
-                                                                 decomposition_temperature_effect,
-                                                                 plant_structural_carbon_amount)
+        plant_structural_to_slow_or_active_rate,
+        decomposition_moisture_effect,
+        decomposition_temperature_effect,
+        plant_structural_carbon_amount)
 
 
 @pytest.mark.parametrize("plant_structural_carbon_amount, tillage_fraction", [
-    (3, 0.1),  # default value
-    (55, 0.6),  # higher value
-    (1.1, 0.53),  # arbitrary values
-    (2.9, 0)  # zeros
+    (3, 0.4),  # default
+    (50, 0.4),  # increased carbon
+    (3, 1.0),  # increased tillage
+    (1.8, 0.33),  # decreased carbon & tillage
+    (0, 0.4),  # no carbon
+    (3, 0),  # no tillage
+    (0, 0),  # neither
 ])
 def test_determine_structural_carbon_transfer_amount(plant_structural_carbon_amount: float,
                                                      tillage_fraction: float) -> None:
@@ -175,9 +186,9 @@ def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amoun
                                                   plant_structural_carbon_amount: float) -> None:
     """Tests that plant_structural_carbon_amount was updated correctly"""
     expected = plant_structural_carbon_amount + plant_dry_matter_residue_amount \
-        * (1-plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
-        - plant_structural_to_active_carbon_amount \
-        - plant_structural_to_slow_carbon_amount
+               * (1 - plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
+               - plant_structural_to_active_carbon_amount \
+               - plant_structural_to_slow_carbon_amount
     assert expected == ResiduePartition._determine_plant_structural_carbon_amount(
         plant_dry_matter_residue_amount,
         plant_residue_metabolic_fraction,
