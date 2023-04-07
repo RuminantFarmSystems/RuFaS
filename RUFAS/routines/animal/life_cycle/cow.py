@@ -191,8 +191,7 @@ class Cow(HeiferIII):
         """
 
         return (self.is_pregnant and self.is_dry and
-                (AnimalModuleConstants.DRY_FAR_OFF_START_DATE <= self.days_in_preg <
-                 AnimalModuleConstants.DRY_CLOSE_UP_START_DATE))
+                (self.days_in_preg < AnimalModuleConstants.DRY_CLOSE_UP_START_DATE))
 
     # TODO: Not used yet & check for correctness
     @property
