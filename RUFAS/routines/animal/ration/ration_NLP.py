@@ -11,7 +11,6 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
-import json
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration_values as user_defined_ration_values

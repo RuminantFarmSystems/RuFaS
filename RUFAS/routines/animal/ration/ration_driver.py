@@ -76,7 +76,7 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
             solution = None
             mock_solution = user_defined_solution(pen, requirements.DMIest)
             ration_vals = NLP.get_ration_vals_null(mock_solution)
-            print('nullvals')
+            #print('nullvals')
             return solution, ration_vals
 
     # retrieving MEact from diet
@@ -190,7 +190,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
     else:
-        print('fixed ration')
+        #print('fixed ration')
         ration = {}
         chanchodebug = False
         if chanchodebug:
