@@ -165,19 +165,39 @@ class Manure:
             self.data.grazing_manure_moisture_factor += change_in_grazing_manure_moisture
             self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
 
-    # def _decompose_surface_manure(self, temperature_factor: float) -> None:
-    #     """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
-    #     adjusts the manure pools' attributes accordingly.
-    #
-    #     Parameters
-    #     ----------
-    #     temperature_factor : float
-    #         The temperature factor on the current day (unitless)
-    #
-    #     """
-    #     manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
-    #
-    #     # Call subroutine that calculates new values for
+    def _decompose_surface_manure(self, temperature_factor: float) -> Dict:
+        """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
+        adjusts the manure pools' attributes accordingly.
+
+        Parameters
+        ----------
+        temperature_factor : float
+            The temperature factor on the current day (unitless)
+
+        """
+        manure_dry_matter_decomposition_rate = max(0.0,
+                                                   self._determine_dry_matter_decomposition_rate(temperature_factor))
+        if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
+            decomposed_machine_manure_mass = min(
+                (self.data.machine_manure_dry_mass * manure_dry_matter_decomposition_rate),
+                self.data.machine_manure_dry_mass)
+            decomposed_machine_manure_coverage = min(
+                (decomposed_machine_manure_mass / self.data.machine_manure_dry_mass) *
+                self.data.machine_manure_field_coverage, self.data.machine_manure_field_coverage)
+
+        if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
+            decomposed_grazing_manure_mass = min(
+                (self.data.grazing_manure_dry_mass * manure_dry_matter_decomposition_rate),
+                self.data.machine_manure_dry_mass)
+            decomposed_grazing_manure_coverage = min(
+                (decomposed_grazing_manure_mass / self.data.grazing_manure_dry_mass) *
+                self.data.grazing_manure_field_coverage, self.data.grazing_manure_field_coverage)
+
+        return_dict = {"decomposed_machine_manure_mass": decomposed_machine_manure_mass,
+                       "decomposed_machine_manure_coverage": decomposed_machine_manure_coverage,
+                       "decomposed_grazing_manure_mass": decomposed_grazing_manure_mass,
+                       "decomposed_grazing_manure_coverage": decomposed_grazing_manure_coverage}
+        return return_dict
 
     # --- Static Methods ---
 
@@ -199,7 +219,7 @@ class Manure:
         manure_dry_mass : float
             Dry-weight equivalent of manure on the field (kg)
         field_coverage : float
-            Percent of the field covered by manure, in range [0.0, 1.0]
+            Percent of the field covered by manure, in range [0.0, 1.0] (unitless)
         water_extractable_phosphorus : float
             The mass of the water extractable phosphorus pool that is being leached from (kg)
         is_organic : bool
@@ -256,8 +276,27 @@ class Manure:
         return return_dict
 
     # @staticmethod
-    # def _determine_decomposed_manure_amounts(decomposition_rate: float, dry_matter_mass: float, field_coverage: float,
-    #                                          ) -> Dict:
+    # def _determine_decomposed_manure_amount(decomposition_rate: float, dry_matter_mass: float,
+    #                                          field_coverage: float) -> Dict:
+    #     """This method calculates how much manure is decomposed from the surface phosphorus pools, and how much
+    #         phosphorus gets decomposed from the various pools.
+    #
+    #     Parameters
+    #     ----------
+    #     decomposition_rate : float
+    #         The rate of manure dry matter decomposition on the current day (unitless)
+    #     dry_matter_mass : float
+    #         Dry-weight equivalent of manure on the field (kg)
+    #     field_coverage : float
+    #         Percent of the field covered by manure, in range [0.0, 1.0] (unitless)
+    #
+    #     Returns
+    #     -------
+    #
+    #     """
+    #     manure_decomposition_amount = min(max(0.0, dry_matter_mass * decomposition_rate), dry_matter_mass)
+
+
 
     @staticmethod
     def _determine_covered_field_area(field_coverage: float, field_size: float) -> float:
@@ -266,7 +305,7 @@ class Manure:
         Parameters
         ----------
         field_coverage : float
-            Percent of the field covered by manure, in range [0.0, 1.0]
+            Percent of the field covered by manure, in range [0.0, 1.0] (unitless)
         field_size : float
             Area of the field (ha)
 
