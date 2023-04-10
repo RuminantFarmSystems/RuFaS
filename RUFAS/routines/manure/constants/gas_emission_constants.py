@@ -21,7 +21,7 @@ class GasEmissionConstants:
         CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH: Chen-Hashimoto kinetic constant, dimensionless.
         SPECIFIC_GROWTH_RATE: specific growth rate, micrometers.
 
-        DEFAULT_HOUSING_SPECIFIC_CONSTANT: default housing specific constant, s/m.
+        DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING: default housing specific constant, s/m.
 
     """
     b1 = 1.0  # rate correcting factor, dimensionless.
@@ -46,4 +46,8 @@ class GasEmissionConstants:
     CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH = 3.1  # dimensionless
     SPECIFIC_GROWTH_RATE = 0.637  # micrometers
 
-    DEFAULT_HOUSING_SPECIFIC_CONSTANT = 260.0  # s/m
+    DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING = 260.0  # s/m
+
+    DEFAULT_PH_FOR_HOUSING_AMMONIA = 7.7  # unitless
+    DEFAULT_PH_FOR_STORAGE_AMMONIA = 7.5  # unitless
+    DEFAULT_STORAGE_AREA = 1.0  # m^2

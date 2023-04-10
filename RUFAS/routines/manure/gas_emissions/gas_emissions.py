@@ -1,7 +1,7 @@
 import math
 
-from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 
@@ -85,7 +85,7 @@ class GasEmissions:
 
     # TODO: Be more descriptive
     @classmethod
-    def calc_methane_housing_emission(cls,
+    def calc_housing_methane_emission(cls,
                                       num_animals: int,
                                       barn_area: float,
                                       current_barn_temp: float,
@@ -104,74 +104,22 @@ class GasEmissions:
         return num_animals * max(0.0, 0.13 * current_barn_temp) * barn_area / 1000
 
     @classmethod
-    def calc_carbon_dioxide_housing_emission(cls,
+    def calc_housing_carbon_dioxide_emission(cls,
                                              num_animals: int,
                                              barn_area: float,
-                                             hours=24,
-                                             temperature_min=20.0,
-                                             temperature_max=25.0) -> float:
-        """Calculates carbon dioxide housing emissions.
-
-        Args:
-            num_animals: Number of animals in the pen.
-            barn_area: Area of the barn based on housing type, m^2.
-            hours: hours of the day from 1 to 24.
-            temperature_min: Minimum barn temperature, C.
-            temperature_max: Maximum barn temperature, C.
-
-        Returns:
-            Carbon dioxide floor emissions, kg CO2/day.
-
-        """
-        t_ambient = cls._calc_ambient_temp(hours, temperature_min, temperature_max)
-        t = max(-5.0, 0.63 * t_ambient + 6.0)
-        return num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
+                                             current_barn_temp: float
+                                             ) -> float:
+        return num_animals * max(0.0, 0.0065 + 0.0192 * current_barn_temp) * barn_area / 1000
 
     @classmethod
-    def calc_ammonia_emission(cls,
-                              num_animals: int,
-                              barn_area: float,
-                              total_ammoniacal_nitrogen: float,
-                              mass: float,
-                              temperature_celsius: float,
-                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
-                              ) -> float:
-        """Calculates NH3 storage emissions.
-
-        Args:
-            num_animals: Number of animals in the pen.
-            barn_area: Surface area for treatment, m^2.
-            total_ammoniacal_nitrogen: total ammoniacal nitrogen in urine or manure, kg N.
-            mass: total amount of urine or manure in exposed surface area, kg.
-            temperature_celsius: temperature, C.
-            housing_specific_constant: housing specific constant, s/m.
-
-        Returns:
-            NH3 storage emissions, kg N/day.
-
-        """
-        p = ManureConstants.MANURE_DENSITY  # kg/m^3
-        pH = 7.5
-        c = GeneralConstants.SECONDS_PER_DAY  # s/day
-        tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
-        r = cls._calc_barn_resistance(temperature_celsius, housing_specific_constant)
-        M = mass / barn_area  # manure per area of exposed surface, kg/m^2
-        Q = cls._calc_Q(tempK, pH)
-        if r * M * Q > 0:
-            return num_animals * barn_area * ((total_ammoniacal_nitrogen / barn_area) * c * p) / (
-                    r * M * Q)
-        else:
-            return 0.0
-
-    # TODO: Write unit tests for the following two functions and use them in handler and treatment classes
-    @classmethod
-    def calc_ammonia_housing_emission(cls,
+    def calc_housing_ammonia_emission(cls,
                                       num_animals: int,
                                       barn_area: float,
                                       urine_total_ammoniacal_nitrogen: float,
                                       urine: float,
                                       temperature_celsius: float,
-                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+                                      pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING,
                                       ) -> float:
         """Calculates ammonia housing emissions for manure handlers.
 
@@ -187,61 +135,71 @@ class GasEmissions:
             Total urine per animal, kg.
         temperature_celsius : float
             Current temperature, C.
+        pH : float
+            pH of the urine.
         housing_specific_constant : float, optional
             Housing specific constant, s/m.
-            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
+            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING.
 
         """
-        return cls.calc_ammonia_emission(
-            num_animals=num_animals,
-            barn_area=barn_area,
-            total_ammoniacal_nitrogen=urine_total_ammoniacal_nitrogen,
-            mass=urine,
-            temperature_celsius=temperature_celsius,
-            housing_specific_constant=housing_specific_constant
-        )
+        total_barn_area = num_animals * barn_area
+        TAN = urine_total_ammoniacal_nitrogen / total_barn_area
+        p = ManureConstants.MANURE_DENSITY  # kg/m^3
+        c = GeneralConstants.SECONDS_PER_DAY  # s/day
+        tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
+        r = cls._calc_barn_resistance(temperature_celsius, housing_specific_constant)
+        M = urine / total_barn_area  # manure per area of exposed surface, kg/m^2
+        Q = cls._calc_Q(tempK, pH)
+        loss = (TAN * c * p) / (r * M * Q)
+        total_loss = loss * total_barn_area
+
+        # Add this number to manure TAN, and then pass this new sum to storage ammonia as TAN
+        remaining = (TAN - loss) * total_barn_area
+
+        return max(0.0, total_loss)
 
     @classmethod
-    def calc_ammonia_storage_emission(cls,
-                                      num_animals: int,
-                                      barn_area: float,
+    def calc_storage_ammonia_emission(cls,
                                       manure_total_ammoniacal_nitrogen: float,
-                                      manure_mass: float,  # TODO: Decide to use volume or mass
+                                      manure_volume: float,
+                                      total_solids: float,
+                                      storage_area: float,  # use 1 m^2 for now
                                       temperature_celsius: float,
-                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
+                                      pH: float,
                                       ) -> float:
-        """Calculates ammonia storage emissions for manure treatments.
+        TAN = manure_total_ammoniacal_nitrogen
+        p = ManureConstants.MANURE_DENSITY  # kg/m^3
+        c = GeneralConstants.SECONDS_PER_DAY  # s/day
+        tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
 
-        Parameters
-        ----------
-        num_animals : int
-            Number of animals in the pen.
-        barn_area : float
-            Surface area per animal, m^2.
-        manure_total_ammoniacal_nitrogen : float
-            Total ammoniacal nitrogen in manure per animal, kg N.
-        manure_mass : float
-            Manure mass per animal, kg.
-        temperature_celsius : float
-            Current temperature, C.
-        housing_specific_constant : float, optional
-            Housing specific constant, s/m.
-            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
+        manure_mass = manure_volume * ManureConstants.MANURE_DENSITY
+        housing_specific_constant = cls._calc_housing_specific_constant(manure_mass, total_solids)
+        r = cls._calc_barn_resistance(temperature_celsius, housing_specific_constant)
 
-        """
-        return cls.calc_ammonia_emission(
-            num_animals=num_animals,
-            barn_area=barn_area,
-            total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
-            mass=manure_mass,
-            temperature_celsius=temperature_celsius,
-            housing_specific_constant=housing_specific_constant
-        )
+        M = manure_mass - total_solids
+        Q = cls._calc_Q(tempK, pH)
+        loss = (TAN * c * p) / (r * M * Q)
+        total_loss = loss * storage_area
+
+        return max(0.0, total_loss)
+
+    @classmethod
+    def _calc_housing_specific_constant(cls, manure_mass: float, total_solids: float) -> float:
+        dry_matter = manure_mass / total_solids
+        if dry_matter >= 13.0:  # solid manure
+            housing_specific_constant = 10.0
+        elif dry_matter >= 8.0:  # semi-solid manure
+            housing_specific_constant = 10.0
+        elif dry_matter >= 5.0:  # slurry manure
+            housing_specific_constant = 19.0
+        else:  # liquid manure
+            housing_specific_constant = 4.1
+        return housing_specific_constant
 
     # TODO: Be more descriptive
     @classmethod
     def _calc_barn_resistance(cls, temperature_celsius: float,
-                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> \
+                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING) -> \
             float:
         """Calculates barn resistance.
 

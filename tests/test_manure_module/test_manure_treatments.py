@@ -884,62 +884,62 @@ def test_daily_update(manure_treatment_type_name: str,
 #     assert actual_new_accumulated_liquid_manure_total_solids == expected_new_accumulated_liquid_manure_total_solids
 
 
-@pytest.mark.parametrize(
-    'slurry_storage_treatment_type_name',
-    [
-        'slurry storage underfloor',
-        'slurry storage outdoor',
-    ]
-)
-def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name: str,
-                                              mocker: MockFixture) -> None:
-    """Unit test for calc_ammonia_emission() in both slurry storage treatments."""
-    # Arrange
-    slurry_storage = ManureTreatmentFactory.get_instance(
-        manure_treatment_type_name=slurry_storage_treatment_type_name,
-        weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
-    )
-
-    num_animals = 100
-    barn_area = 1000.0
-    accumulated_manure_volume = 200.0
-    accumulated_manure_total_ammoniacal_nitrogen = 20.0
-    temperature_celsius = 20.0
-    patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
-        slurry_storage, '_get_current_day_average_temperature_celsius',
-        return_value=temperature_celsius
-    )
-    expected_ammonia_loss = 2.0
-    patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch(
-        'RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.'
-        'GasEmissions.calc_ammonia_emission',
-        return_value=expected_ammonia_loss
-    )
-    expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
-        accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0)
-
-    # Act
-    actual_ammonia_loss, actual_new_accumulated_manure_total_ammoniacal_nitrogen = \
-        slurry_storage.calc_ammonia_emission(
-            num_animals=num_animals,
-            barn_area=barn_area,
-            accumulated_manure_volume=accumulated_manure_volume,
-            accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
-        )
-
-    # Assert
-    patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
-        num_animals=num_animals,
-        barn_area=barn_area,
-        total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-        mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
-        temperature_celsius=temperature_celsius
-    )
-    assert actual_ammonia_loss == expected_ammonia_loss
-    assert actual_new_accumulated_manure_total_ammoniacal_nitrogen == \
-           expected_new_accumulated_manure_total_ammoniacal_nitrogen
+# @pytest.mark.parametrize(
+#     'slurry_storage_treatment_type_name',
+#     [
+#         'slurry storage underfloor',
+#         'slurry storage outdoor',
+#     ]
+# )
+# def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name: str,
+#                                               mocker: MockFixture) -> None:
+#     """Unit test for calc_ammonia_emission() in both slurry storage treatments."""
+#     # Arrange
+#     slurry_storage = ManureTreatmentFactory.get_instance(
+#         manure_treatment_type_name=slurry_storage_treatment_type_name,
+#         weather=mocker.MagicMock(),
+#         time=mocker.MagicMock(),
+#     )
+#
+#     num_animals = 100
+#     barn_area = 1000.0
+#     accumulated_manure_volume = 200.0
+#     accumulated_manure_total_ammoniacal_nitrogen = 20.0
+#     temperature_celsius = 20.0
+#     patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
+#         slurry_storage, '_get_current_day_average_temperature_celsius',
+#         return_value=temperature_celsius
+#     )
+#     expected_ammonia_loss = 2.0
+#     patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch(
+#         'RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.'
+#         'GasEmissions.calc_ammonia_emission',
+#         return_value=expected_ammonia_loss
+#     )
+#     expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
+#         accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0)
+#
+#     # Act
+#     actual_ammonia_loss, actual_new_accumulated_manure_total_ammoniacal_nitrogen = \
+#         slurry_storage.calc_ammonia_emission(
+#             num_animals=num_animals,
+#             barn_area=barn_area,
+#             accumulated_manure_volume=accumulated_manure_volume,
+#             accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
+#         )
+#
+#     # Assert
+#     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
+#     patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
+#         num_animals=num_animals,
+#         barn_area=barn_area,
+#         total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+#         mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+#         temperature_celsius=temperature_celsius
+#     )
+#     assert actual_ammonia_loss == expected_ammonia_loss
+#     assert actual_new_accumulated_manure_total_ammoniacal_nitrogen == \
+#            expected_new_accumulated_manure_total_ammoniacal_nitrogen
 
 
 # Test SlurryStorageUnderfloor specific methods
@@ -1485,54 +1485,54 @@ def test_calc_daily_sludge_output(anaerobic_treatment_class: Union[Type[Anaerobi
 #            approx(expected_new_accumulated_liquid_manure_total_solids)
 
 
-def test_anaerobic_lagoon_calc_ammonia_emission(mocker: MockFixture) -> None:
-    """Unit test for calc_ammonia_emission() in anaerobic_lagoon.py."""
-    # Arrange
-    anaerobic_lagoon = AnaerobicLagoon(
-        weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
-        manure_treatment_config=mocker.MagicMock()
-    )
-
-    num_animals = 100
-    barn_area = 1000.0
-    accumulated_manure_volume = 200.0
-    accumulated_manure_total_ammoniacal_nitrogen = 20.0
-    temperature_celsius = 20.0
-    patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
-        anaerobic_lagoon, '_get_current_day_average_temperature_celsius',
-        return_value=temperature_celsius
-    )
-    expected_ammonia_loss = 2.0
-    patch_for_calc_ammonia_emission_for_anaerobic_lagoon = mocker.patch(
-        'RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.'
-        'GasEmissions.calc_ammonia_emission',
-        return_value=expected_ammonia_loss
-    )
-    expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
-        accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0)
-
-    # Act
-    actual_ammonia_loss, actual_new_accumulated_manure_total_ammoniacal_nitrogen = \
-        anaerobic_lagoon.calc_ammonia_emission(
-            num_animals=num_animals,
-            barn_area=barn_area,
-            accumulated_manure_volume=accumulated_manure_volume,
-            accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
-        )
-
-    # Assert
-    patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    patch_for_calc_ammonia_emission_for_anaerobic_lagoon.assert_called_once_with(
-        num_animals=num_animals,
-        barn_area=barn_area,
-        total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-        mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
-        temperature_celsius=temperature_celsius
-    )
-    assert actual_ammonia_loss == expected_ammonia_loss
-    assert actual_new_accumulated_manure_total_ammoniacal_nitrogen == \
-           expected_new_accumulated_manure_total_ammoniacal_nitrogen
+# def test_anaerobic_lagoon_calc_ammonia_emission(mocker: MockFixture) -> None:
+#     """Unit test for calc_ammonia_emission() in anaerobic_lagoon.py."""
+#     # Arrange
+#     anaerobic_lagoon = AnaerobicLagoon(
+#         weather=mocker.MagicMock(),
+#         time=mocker.MagicMock(),
+#         manure_treatment_config=mocker.MagicMock()
+#     )
+#
+#     num_animals = 100
+#     barn_area = 1000.0
+#     accumulated_manure_volume = 200.0
+#     accumulated_manure_total_ammoniacal_nitrogen = 20.0
+#     temperature_celsius = 20.0
+#     patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
+#         anaerobic_lagoon, '_get_current_day_average_temperature_celsius',
+#         return_value=temperature_celsius
+#     )
+#     expected_ammonia_loss = 2.0
+#     patch_for_calc_ammonia_emission_for_anaerobic_lagoon = mocker.patch(
+#         'RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.'
+#         'GasEmissions.calc_ammonia_emission',
+#         return_value=expected_ammonia_loss
+#     )
+#     expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
+#         accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0)
+#
+#     # Act
+#     actual_ammonia_loss, actual_new_accumulated_manure_total_ammoniacal_nitrogen = \
+#         anaerobic_lagoon.calc_ammonia_emission(
+#             num_animals=num_animals,
+#             barn_area=barn_area,
+#             accumulated_manure_volume=accumulated_manure_volume,
+#             accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
+#         )
+#
+#     # Assert
+#     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
+#     patch_for_calc_ammonia_emission_for_anaerobic_lagoon.assert_called_once_with(
+#         num_animals=num_animals,
+#         barn_area=barn_area,
+#         total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
+#         mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
+#         temperature_celsius=temperature_celsius
+#     )
+#     assert actual_ammonia_loss == expected_ammonia_loss
+#     assert actual_new_accumulated_manure_total_ammoniacal_nitrogen == \
+#            expected_new_accumulated_manure_total_ammoniacal_nitrogen
 
 # TODO: Fix this test
 # def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:

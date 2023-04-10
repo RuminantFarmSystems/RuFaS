@@ -87,10 +87,14 @@ class ManureManagementPen:
             Barn area, m^2/animal.
 
         """
-        BarnArea = NamedTuple('BarnArea', [('has_cows', float), ('no_cows', float)])
-        tiestall = BarnArea(has_cows=1.2, no_cows=1.0)
-        bedded_pack = BarnArea(has_cows=5.0, no_cows=3.0)
-        freestall = BarnArea(has_cows=3.5, no_cows=2.5)
+        BarnArea = NamedTuple('BarnArea', [
+            ('for_cow', float),
+            ('for_calf_and_heiferI', float),
+            ('for_heiferII_and_heiferIII', float),
+        ])
+        tiestall = BarnArea(for_cow=1.5, for_calf_and_heiferI=1.2, for_heiferII_and_heiferIII=1.2)
+        bedded_pack = BarnArea(for_cow=5.0, for_calf_and_heiferI=3.0, for_heiferII_and_heiferIII=3.0)
+        freestall = BarnArea(for_cow=3.5, for_calf_and_heiferI=2.0, for_heiferII_and_heiferIII=2.5)
         default = freestall
 
         barn_area_by_pen_type = {
@@ -102,6 +106,8 @@ class ManureManagementPen:
         barn_area = barn_area_by_pen_type.get(self.pen_type, default)
 
         if 'Cow' in self.classes_in_pen:
-            return barn_area.has_cows
+            return barn_area.for_cow
+        elif 'Calf' in self.classes_in_pen or 'HeiferI' in self.classes_in_pen:
+            return barn_area.for_calf_and_heiferI
         else:
-            return barn_area.no_cows
+            return barn_area.for_heiferII_and_heiferIII

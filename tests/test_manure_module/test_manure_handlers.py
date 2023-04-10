@@ -329,13 +329,13 @@ def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
 #     )
 #     CH4_housing_loss = 2.0
 #     patch_for_calc_E_CH4_emission = mocker.patch(
-#         'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_methane_housing_emission',
+#         'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions.calc_housing_methane_emission',
 #         return_value=CH4_housing_loss
 #     )
 #     CO2_housing_loss = 3.0
 #     patch_for_calc_E_CO2_emission = mocker.patch(
 #         'RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissions'
-#         '.calc_carbon_dioxide_housing_emission',
+#         '.calc_housing_carbon_dioxide_emission',
 #         return_value=CO2_housing_loss
 #     )
 #

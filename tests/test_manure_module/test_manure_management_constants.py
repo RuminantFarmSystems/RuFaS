@@ -36,4 +36,4 @@ def test_gas_emission_constants() -> None:
     assert constants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH == approx(3.1)
     assert constants.SPECIFIC_GROWTH_RATE == approx(0.637)
 
-    assert constants.DEFAULT_HOUSING_SPECIFIC_CONSTANT == approx(260.0)
+    assert constants.DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING == approx(260.0)
