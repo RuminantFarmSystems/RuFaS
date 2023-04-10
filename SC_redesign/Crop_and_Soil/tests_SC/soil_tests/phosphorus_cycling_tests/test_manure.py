@@ -327,8 +327,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
     (0.12, 43, 0.07, 88, 0.11),
     (0.33, 3, 0.02, 120, 0.33),
 ])
-def test_decompose_surface_manure(temp_factor: float, machine_mass: float, machine_coverage: float, grazing_mass: float,
-                                  grazing_field: float) -> None:
+def test_determine_decomposed_surface_manure(temp_factor: float, machine_mass: float, machine_coverage: float,
+                                             grazing_mass: float, grazing_field: float) -> None:
     """Tests that the correct changes in mass and field coverage of machine and grazer applied manure are calculated."""
     data = SoilData(machine_manure_dry_mass=800, machine_manure_field_coverage=0.85, grazing_manure_dry_mass=500,
                     grazing_manure_field_coverage=0.44)
@@ -336,7 +336,7 @@ def test_decompose_surface_manure(temp_factor: float, machine_mass: float, machi
 
     incorp._determine_dry_matter_decomposition_rate = MagicMock(return_value=0.5)
 
-    observed = incorp._decompose_surface_manure(temp_factor)
+    observed = incorp._determine_decomposed_surface_manure(temp_factor)
 
     expected_machine_mass_decomp = min(max(0.0, incorp.data.machine_manure_dry_mass * 0.5),
                                        incorp.data.machine_manure_dry_mass)
@@ -356,42 +356,6 @@ def test_decompose_surface_manure(temp_factor: float, machine_mass: float, machi
     assert observed["decomposed_grazing_manure_coverage_change"] == expected_grazing_coverage_decomp
 
 
-@pytest.mark.parametrize("temp_factor", [
-    0.88,
-    0.44,
-    0.501,
-    0.2022,
-])
-def test_determine_mineralized_phosphorus_amount(temp_factor: float) -> None:
-    """Tests that the correct calls to subroutines are made, and that the method returns the right values."""
-    data = SoilData(machine_stable_organic_phosphorus=45, machine_stable_inorganic_phosphorus=50,
-                    machine_water_extractable_organic_phosphorus=55, machine_manure_moisture_factor=0.88,
-                    grazing_stable_organic_phosphorus=60, grazing_stable_inorganic_phosphorus=65,
-                    grazing_water_extractable_organic_phosphorus=70, grazing_manure_moisture_factor=0.79)
-    incorp = Manure(data)
-
-    incorp._determine_mineralized_surface_phosphorus = MagicMock(return_value=5)
-    expected_dict = {"machine_stable_organic_mineralized": 5,
-                     "machine_stable_inorganic_mineralized": 5,
-                     "machine_water_extractable_organic_mineralized": 5,
-                     "grazing_stable_organic_mineralized": 5,
-                     "grazing_stable_inorganic_mineralized": 5,
-                     "grazing_water_extractable_organic_mineralized": 5}
-    expected_calls = [
-        call(45, 0.01, temp_factor, 0.88),
-        call(50, 0.0025, temp_factor, 0.88),
-        call(55, 0.1, temp_factor, 0.88),
-        call(60, 0.01, temp_factor, 0.79),
-        call(65, 0.0025, temp_factor, 0.79),
-        call(70, 0.1, temp_factor, 0.79)
-    ]
-
-    observed = incorp._determine_mineralized_phosphorus_amounts(temp_factor)
-
-    incorp._determine_mineralized_surface_phosphorus.assert_has_calls(expected_calls)
-    assert observed == expected_dict
-
-
 @pytest.mark.parametrize("rain,runoff,area,mean_temp", [
     (12, 1.8, 2.1, 14),
     (14, 12.2, 3.4, 9),
@@ -405,7 +369,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     incorp._leach_and_update_phosphorus_pools = MagicMock()
     incorp._determine_temperature_factor = MagicMock(return_value=0.35)
     incorp._adjust_manure_moisture_factor = MagicMock()
-    incorp._decompose_surface_manure = MagicMock(return_value={
+    incorp._determine_decomposed_surface_manure = MagicMock(return_value={
         "decomposed_machine_manure_mass_change": 100,
         "decomposed_machine_manure_coverage_change": 0.22,
         "decomposed_grazing_manure_mass_change": 80,
@@ -426,5 +390,5 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
         incorp._determine_temperature_factor.assert_not_called()
         incorp._adjust_manure_moisture_factor.assert_not_called()
 
-    incorp._decompose_surface_manure.assert_called_once_with(0.35)
+    incorp._determine_decomposed_surface_manure.assert_called_once_with(0.35)
     incorp._determine_mineralized_phosphorus_amounts.assert_called_once_with(0.35)
