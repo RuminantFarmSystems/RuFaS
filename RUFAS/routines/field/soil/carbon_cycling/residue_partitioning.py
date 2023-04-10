@@ -1,5 +1,6 @@
 import math
 
+
 def update_all(soil, crop, weather, time):
     """
     Description:
@@ -59,37 +60,37 @@ def residue_partitioning(soil, crop_type, weather, time):
         AG_met_to_BG_met = layer.AG_met * layer.tillage_percent
 
         # S.6.B.I.4 / S.6.B.I.7
-       
-        if layer_number == 0: #for top layer
+
+        if layer_number == 0:  # for top layer
 
             # S.6.B.I.11
 
             AG_struct_to_BG_struct = layer.AG_struct * layer.tillage_percent
 
-            if crop_type.extracted == True: #if we extract biomass
-                
+            if crop_type.extracted:  # if we extract biomass
+
                 ag_biomass = soil.residue_harvest
-                
+
                 residue_incorp = layer.tillage_percent * ag_biomass
 
-            else: #if we incorporate biomass
+            else:  # if we incorporate biomass
                 ag_biomass = crop_type.yield_actual
-                
+
                 residue_incorp = layer.tillage_percent * ag_biomass
-            
+
             soil.ag_biomass += ag_biomass
 
-        else: #non top layers
-            
+        else:  # non top layers
+
             AG_struct_to_BG_struct = 0
 
-            residue_incorp =  0
+            residue_incorp = 0
 
             ag_biomass = 0
-        
+
         # S.6.B.I.4 / S.6.B.I.7
         layer.AG_met += ag_biomass * AG_met_percent - (
-            (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
+                (layer.AG_met_to_C_active - AG_met_to_BG_met) + AG_met_to_BG_met)
 
         # above ground structural residue
         K1 = 0.010857
@@ -101,16 +102,13 @@ def residue_partitioning(soil, crop_type, weather, time):
         layer.AG_struct_to_C_active = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
         layer.AG_struct_to_C_slow = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
 
-
-
         layer.AG_struct += ((ag_biomass * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
-                        (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
+                           (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
 
         # S.6.B.I.10
         layer.AG_struct_to_C_active = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
-        
-        layer.AG_struct_to_C_slow = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
 
+        layer.AG_struct_to_C_slow = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
 
         # below ground metabolic residue and roots
         # S.6.B.II
@@ -128,7 +126,7 @@ def residue_partitioning(soil, crop_type, weather, time):
         BG_L_to_N = 0
         if crop_type.fr_N != 0:
             BG_L_to_N = AG_L_to_N * lignin_res_percent + (((soil.BG_lignin_res_percent / 100) / crop_type.fr_N) / 100) \
-                          * (1 - lignin_res_percent)
+                        * (1 - lignin_res_percent)
 
         # S.6.B.II.5
         BG_met_percent = 0.85 - 0.18 * BG_L_to_N
@@ -156,7 +154,8 @@ def residue_partitioning(soil, crop_type, weather, time):
 
         # S.6.B.II.9 / S.6.B.II.11
         layer.BG_struct += (AG_struct_to_BG_struct + crop_type.bio_BG * (1 - BG_met_percent)) - \
-                          ((layer.BG_struct_to_C_active + layer.BG_struct_to_C_slow) + AG_struct_to_BG_struct)
+                           ((layer.BG_struct_to_C_active + layer.BG_struct_to_C_slow) + AG_struct_to_BG_struct)
+
 
 # TODO: add docstrings & pseudocode reference(s) - GitHub Issue #169
 def ADJ_crop_type_bio_BG_fun(layer_thickness, soil_profile_depth, crop_type_bio_BG):
