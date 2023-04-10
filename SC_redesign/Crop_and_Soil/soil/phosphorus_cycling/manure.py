@@ -33,7 +33,7 @@ class Manure:
         rainfall : float
             The amount of rainfall on the current day (mm)
         runoff : float
-            The amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
         field_size : float
             The size of the field (ha)
 
@@ -50,7 +50,7 @@ class Manure:
         rainfall : float
             The amount of rainfall on the current day (mm)
         runoff : float
-            The amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
         field_size : float
             The size of the field (ha)
 
@@ -139,7 +139,7 @@ class Manure:
         rainfall : float
             The amount of rainfall on the current day (mm)
         runoff : float
-            The amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
         field_size : float
             Area of the field (ha)
         manure_dry_mass : float
@@ -150,6 +150,13 @@ class Manure:
             The mass of the water extractable phosphorus pool that is being leached from (kg)
         is_organic : bool
             Is the phosphorus being leached organic (True / False)
+
+        Returns
+        -------
+        Dict
+            new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg)
+            infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg)
+            runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg)
 
         Notes
         -----
@@ -444,7 +451,7 @@ class Manure:
         rainfall : float
             Amount of rainfall on the current day (mm)
         runoff : float
-            Amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
 
         Returns
         -------
