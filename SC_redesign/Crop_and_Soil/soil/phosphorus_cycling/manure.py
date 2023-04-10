@@ -344,7 +344,6 @@ class Manure:
             max(0.0, water_extractable_organic_phosphorus * Manure._determine_mineralization_rate(0.1,
                                                                                                   temperature_factor,
                                                                                                   moisture_factor)))
-        
 
     @staticmethod
     def _determine_temperature_factor(mean_air_temperature: float) -> float:
