@@ -127,7 +127,11 @@ def test_error_manual_soil_data_configuration() -> None:
 def test_annual_reset() -> None:
     """Test that annual_reset() actually resets the values it should"""
     # Initialize objects
-    soil_data = SoilData(name="test", peak_runoff_rate=0.95)
+    soil_data = SoilData(name="test", peak_runoff_rate=0.95,
+                         annual_runoff_machine_manure_organic_phosphorus=10,
+                         annual_runoff_machine_manure_inorganic_phosphorus=10,
+                         annual_runoff_grazing_manure_organic_phosphorus=10,
+                         annual_runoff_grazing_manure_inorganic_phosphorus=10)
     evapotranspirator = Evapotranspiration(soil_data)
     infiltrator = Infiltration(soil_data)
     eroder = SoilErosion(soil_data)
@@ -155,6 +159,10 @@ def test_annual_reset() -> None:
         assert soil_data.annual_eroded_sediment_total != 0
         assert soil_data.annual_surface_runoff_total != 0
         assert soil_data.annual_runoff_fertilizer_phosphorus != 0
+        assert soil_data.annual_runoff_machine_manure_organic_phosphorus != 0
+        assert soil_data.annual_runoff_machine_manure_inorganic_phosphorus != 0
+        assert soil_data.annual_runoff_grazing_manure_organic_phosphorus != 0
+        assert soil_data.annual_runoff_grazing_manure_inorganic_phosphorus != 0
 
         # Run method
         soil_data.do_annual_reset()
@@ -170,6 +178,10 @@ def test_annual_reset() -> None:
         assert soil_data.annual_eroded_sediment_total == 0
         assert soil_data.annual_surface_runoff_total == 0
         assert soil_data.annual_runoff_fertilizer_phosphorus == 0
+        assert soil_data.annual_runoff_machine_manure_organic_phosphorus == 0
+        assert soil_data.annual_runoff_machine_manure_inorganic_phosphorus == 0
+        assert soil_data.annual_runoff_grazing_manure_organic_phosphorus == 0
+        assert soil_data.annual_runoff_grazing_manure_inorganic_phosphorus == 0
 
 
 def test_profile_soil_water_content() -> None:
