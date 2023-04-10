@@ -56,13 +56,13 @@ def test_determine_dry_manure_matter_assimilation(moisture: float, temp_factor: 
 
 
 @pytest.mark.parametrize("rain,moisture,current_mass,original_mass,temp_factor", [
-    (0.8, 0.7, 35, 80, 0.7),            # Moisture decreases
-    (0.2, 0.0, 45, 150, 0.95),          # Moisture decreases
-    (1.0, 0.4, 22, 87, 0.684),          # No moisture change
-    (3.99, 0.81, 76, 100, 0.182),       # No moisture change
-    (4.0, 0.44, 28.47, 50, 0.12),       # No moisture change
-    (5.6, 0.78, 35.673, 60, 0.081),     # Moisture increases
-    (7.8, .087, 97, 140, 0.345),        # Moisture increases
+    (0.8, 0.7, 35, 80, 0.7),  # Moisture decreases
+    (0.2, 0.0, 45, 150, 0.95),  # Moisture decreases
+    (1.0, 0.4, 22, 87, 0.684),  # No moisture change
+    (3.99, 0.81, 76, 100, 0.182),  # No moisture change
+    (4.0, 0.44, 28.47, 50, 0.12),  # No moisture change
+    (5.6, 0.78, 35.673, 60, 0.081),  # Moisture increases
+    (7.8, .087, 97, 140, 0.345),  # Moisture increases
 ])
 def test_determine_moisture_change(rain: float, moisture: float, current_mass: float, original_mass: float,
                                    temp_factor: float) -> None:
@@ -356,6 +356,42 @@ def test_decompose_surface_manure(temp_factor: float, machine_mass: float, machi
     assert observed["decomposed_grazing_manure_coverage_change"] == expected_grazing_coverage_decomp
 
 
+@pytest.mark.parametrize("temp_factor", [
+    0.88,
+    0.44,
+    0.501,
+    0.2022,
+])
+def test_determine_mineralized_phosphorus_amount(temp_factor: float) -> None:
+    """Tests that the correct calls to subroutines are made, and that the method returns the right values."""
+    data = SoilData(machine_stable_organic_phosphorus=45, machine_stable_inorganic_phosphorus=50,
+                    machine_water_extractable_organic_phosphorus=55, machine_manure_moisture_factor=0.88,
+                    grazing_stable_organic_phosphorus=60, grazing_stable_inorganic_phosphorus=65,
+                    grazing_water_extractable_organic_phosphorus=70, grazing_manure_moisture_factor=0.79)
+    incorp = Manure(data)
+
+    incorp._determine_mineralized_surface_phosphorus = MagicMock(return_value=5)
+    expected_dict = {"machine_stable_organic_mineralized": 5,
+                     "machine_stable_inorganic_mineralized": 5,
+                     "machine_water_extractable_organic_mineralized": 5,
+                     "grazing_stable_organic_mineralized": 5,
+                     "grazing_stable_inorganic_mineralized": 5,
+                     "grazing_water_extractable_organic_mineralized": 5}
+    expected_calls = [
+        call(45, 0.01, temp_factor, 0.88),
+        call(50, 0.0025, temp_factor, 0.88),
+        call(55, 0.1, temp_factor, 0.88),
+        call(60, 0.01, temp_factor, 0.79),
+        call(65, 0.0025, temp_factor, 0.79),
+        call(70, 0.1, temp_factor, 0.79)
+    ]
+
+    observed = incorp._determine_mineralized_phosphorus_amounts(temp_factor)
+
+    incorp._determine_mineralized_surface_phosphorus.assert_has_calls(expected_calls)
+    assert observed == expected_dict
+
+
 @pytest.mark.parametrize("rain,runoff,area,mean_temp", [
     (12, 1.8, 2.1, 14),
     (14, 12.2, 3.4, 9),
@@ -374,6 +410,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
         "decomposed_machine_manure_coverage_change": 0.22,
         "decomposed_grazing_manure_mass_change": 80,
         "decomposed_grazing_manure_coverage_change": 0.18})
+    incorp._determine_mineralized_phosphorus_amounts = MagicMock()
 
     incorp.daily_manure_update(rain, runoff, area, mean_temp)
 
@@ -390,3 +427,4 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
         incorp._adjust_manure_moisture_factor.assert_not_called()
 
     incorp._decompose_surface_manure.assert_called_once_with(0.35)
+    incorp._determine_mineralized_phosphorus_amounts.assert_called_once_with(0.35)

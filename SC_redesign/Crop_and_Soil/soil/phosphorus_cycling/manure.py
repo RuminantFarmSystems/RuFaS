@@ -49,12 +49,23 @@ class Manure:
         if rainfall < 1 or rainfall > 4:
             self._adjust_manure_moisture_factor(rainfall, temperature_factor)
 
-        # Decompose manure on soil surface
+        # Calculate manure decomposition on soil surface
         decomposition_changes = self._decompose_surface_manure(temperature_factor)
         machine_manure_mass_decrease = decomposition_changes["decomposed_machine_manure_mass_change"]
         machine_manure_coverage_decrease = decomposition_changes["decomposed_machine_manure_coverage_change"]
         grazing_manure_mass_decrease = decomposition_changes["decomposed_grazing_manure_mass_change"]
         grazing_manure_coverage_decrease = decomposition_changes["decomposed_grazing_manure_coverage_change"]
+
+        # Calculate phosphorus mineralization between pools
+        mineralized_phosphorus_amounts = self._determine_mineralized_phosphorus_amounts(temperature_factor)
+        machine_stable_organic_mineralized = mineralized_phosphorus_amounts["machine_stable_organic_mineralized"]
+        machine_stable_inorganic_mineralized = mineralized_phosphorus_amounts["machine_stable_inorganic_mineralized"]
+        machine_water_extractable_organic_mineralized = \
+            mineralized_phosphorus_amounts["machine_water_extractable_organic_mineralized"]
+        grazing_stable_organic_mineralized = mineralized_phosphorus_amounts["grazing_stable_organic_mineralized"]
+        grazing_stable_inorganic_mineralized = mineralized_phosphorus_amounts["grazing_stable_inorganic_mineralized"]
+        grazing_water_extractable_organic_mineralized = \
+            mineralized_phosphorus_amounts["grazing_water_extractable_organic_mineralized"]
 
         # Assimilate manure on soil surface
 
@@ -214,6 +225,52 @@ class Manure:
                        "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change,
                        "decomposed_grazing_manure_mass_change": decomposed_grazing_manure_mass_change,
                        "decomposed_grazing_manure_coverage_change": decomposed_grazing_manure_coverage_change}
+        return return_dict
+
+    def _determine_mineralized_phosphorus_amounts(self, temperature_factor: float) -> Dict:
+        """This method calculates how much phosphorus is mineralized from every pool that is this is applicable to and
+            is tracked.
+
+        Parameters
+        ----------
+        temperature_factor : float
+            The temperature factor on the current day (unitless)
+
+        Returns
+        -------
+        Dict
+            machine_stable_organic_mineralized: amount of stable organic phosphorus mineralized from the machine-applied
+                pool (kg)
+            machine_stable_inorganic_mineralized: amount of stable inorganic phosphorus mineralized from the
+                machine-applied pool (kg)
+            machine_water_extractable_organic_mineralized: amount of water-extractable organic phosphorus mineralized
+                from the machine-applied pool (kg)
+            grazing_stable_organic_mineralized: amount of stable organic phosphorus mineralized from the grazer-applied
+                pool (kg)
+            grazing_stable_inorganic_mineralized: amount of stable inorganic phosphorus mineralized from the
+                grazer-applied pool (kg)
+            grazing_water_extractable_organic_mineralized: amount of water-extractable organic phosphorus mineralized
+                from the grazer-applied pool (kg)
+
+        """
+        return_dict = {"machine_stable_organic_mineralized": self._determine_mineralized_surface_phosphorus(
+            self.data.machine_stable_organic_phosphorus, 0.01, temperature_factor,
+            self.data.machine_manure_moisture_factor),
+            "machine_stable_inorganic_mineralized": self._determine_mineralized_surface_phosphorus(
+                self.data.machine_stable_inorganic_phosphorus, 0.0025, temperature_factor,
+                self.data.machine_manure_moisture_factor),
+            "machine_water_extractable_organic_mineralized": self._determine_mineralized_surface_phosphorus(
+                self.data.machine_water_extractable_organic_phosphorus, 0.1, temperature_factor,
+                self.data.machine_manure_moisture_factor),
+            "grazing_stable_organic_mineralized": self._determine_mineralized_surface_phosphorus(
+                self.data.grazing_stable_organic_phosphorus, 0.01, temperature_factor,
+                self.data.grazing_manure_moisture_factor),
+            "grazing_stable_inorganic_mineralized": self._determine_mineralized_surface_phosphorus(
+                self.data.grazing_stable_inorganic_phosphorus, 0.0025, temperature_factor,
+                self.data.grazing_manure_moisture_factor),
+            "grazing_water_extractable_organic_mineralized": self._determine_mineralized_surface_phosphorus(
+                self.data.grazing_water_extractable_organic_phosphorus, 0.1, temperature_factor,
+                self.data.grazing_manure_moisture_factor)}
         return return_dict
 
     # --- Static Methods ---
