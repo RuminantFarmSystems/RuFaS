@@ -78,14 +78,17 @@ class Manure:
             self.data.grazing_manure_moisture_factor)
 
         # Calculate manure assimilation from soil surface into profile
-        assimilated_manure_changes = self._determine_assimilated_surface_manure(temperature_factor)
+        assimilated_manure_changes = self._determine_assimilated_surface_manure(temperature_factor, field_size)
         assimilated_machine_mass = assimilated_manure_changes["assimilated_machine_manure"]
         assimilated_machine_coverage = assimilated_manure_changes["machine_manure_coverage"]
         assimilated_grazing_mass = assimilated_manure_changes["assimilated_grazing_manure"]
         assimilated_grazing_coverage = assimilated_manure_changes["grazing_manure_coverage"]
 
         # Calculate amounts of phosphorus assimilated into the soil
-        machine_assimilation_ratio = assimilated_machine_mass / self.data.machine_manure_dry_mass
+        if self.data.machine_manure_dry_mass > 0:
+            machine_assimilation_ratio = assimilated_machine_mass / self.data.machine_manure_dry_mass
+        else:
+            machine_assimilation_ratio = 0
         assimilated_machine_stable_organic = self._determine_assimilated_phosphorus_amount(
             machine_assimilation_ratio, self.data.machine_stable_organic_phosphorus)
         assimilated_machine_stable_inorganic = self._determine_assimilated_phosphorus_amount(
@@ -95,7 +98,10 @@ class Manure:
         assimilated_machine_water_extractable_inorganic = self._determine_assimilated_phosphorus_amount(
             machine_assimilation_ratio, self.data.machine_water_extractable_inorganic_phosphorus)
 
-        grazing_assimilation_ratio = assimilated_grazing_mass / self.data.grazing_manure_dry_mass
+        if self.data.grazing_manure_dry_mass > 0:
+            grazing_assimilation_ratio = assimilated_grazing_mass / self.data.grazing_manure_dry_mass
+        else:
+            grazing_assimilation_ratio = 0
         assimilated_grazing_stable_organic = self._determine_assimilated_phosphorus_amount(
             grazing_assimilation_ratio, self.data.grazing_stable_organic_phosphorus)
         assimilated_grazing_stable_inorganic = self._determine_assimilated_phosphorus_amount(
@@ -161,7 +167,6 @@ class Manure:
             assimilated_machine_water_extractable_organic + assimilated_machine_water_extractable_inorganic + \
             assimilated_grazing_stable_organic + assimilated_grazing_stable_inorganic + \
             assimilated_grazing_water_extractable_organic + assimilated_grazing_water_extractable_inorganic
-
         self._add_infiltrated_phosphorus_to_soil(total_assimilated_phosphorus, field_size)
 
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
@@ -337,6 +342,7 @@ class Manure:
         -------
 
         """
+        assimilated_machine_manure, machine_manure_coverage = 0, 0
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
             machine_manure_cover_area = self._determine_covered_field_area(self.data.machine_manure_field_coverage,
                                                                            field_size)
@@ -347,6 +353,7 @@ class Manure:
                                           self.data.machine_manure_field_coverage)
             machine_manure_coverage = min(machine_manure_coverage, self.data.machine_manure_field_coverage)
 
+        assimilated_grazing_manure, grazing_manure_coverage = 0, 0
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
             grazing_manure_cover_area = self._determine_covered_field_area(self.data.grazing_manure_field_coverage,
                                                                            field_size)

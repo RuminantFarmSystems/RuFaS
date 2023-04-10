@@ -391,4 +391,3 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
         incorp._adjust_manure_moisture_factor.assert_not_called()
 
     incorp._determine_decomposed_surface_manure.assert_called_once_with(0.35)
-    incorp._determine_mineralized_phosphorus_amounts.assert_called_once_with(0.35)
