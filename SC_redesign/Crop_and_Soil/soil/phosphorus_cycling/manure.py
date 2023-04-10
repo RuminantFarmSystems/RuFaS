@@ -49,9 +49,14 @@ class Manure:
         if rainfall < 1 or rainfall > 4:
             self._adjust_manure_moisture_factor(rainfall, temperature_factor)
 
-        manure_dry_matter_decomposition_rate = self._determine_dry_matter_decomposition_rate(temperature_factor)
+        # Decompose manure on soil surface
+        decomposition_changes = self._decompose_surface_manure(temperature_factor)
+        machine_manure_mass_decrease = decomposition_changes["decomposed_machine_manure_mass_change"]
+        machine_manure_coverage_decrease = decomposition_changes["decomposed_machine_manure_coverage_change"]
+        grazing_manure_mass_decrease = decomposition_changes["decomposed_grazing_manure_mass_change"]
+        grazing_manure_coverage_decrease = decomposition_changes["decomposed_grazing_manure_coverage_change"]
 
-        # Calculate
+        # Assimilate manure on soil surface
 
     def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
         """This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
@@ -166,41 +171,52 @@ class Manure:
             self.data.grazing_manure_moisture_factor = min(0.9, max(self.data.grazing_manure_moisture_factor, 0.0))
 
     def _decompose_surface_manure(self, temperature_factor: float) -> Dict:
-        """This method orchestrates the calculation of how much manure should be decomposed on the current day, then
-        adjusts the manure pools' attributes accordingly.
+        """This method calculates how much manure in both the machine and grazer-applied pools decompose on a given day,
+            and how much the field coverage changes as a result.
 
         Parameters
         ----------
         temperature_factor : float
             The temperature factor on the current day (unitless)
 
+        Returns
+        -------
+        Dict
+            decomposed_machine_manure_mass_change: change in the mass of machine-applied manure on the field surface
+                decomposed on this day (kg)
+            decomposed_machine_manure_coverage_change: change in field coverage of machine-applied manure on the field
+                surface (unitless)
+            decomposed_grazing_manure_mass_change: change in the mass of grazer-applied manure on the field surface
+                decomposed on this day (kg)
+            decomposed_grazing_manure_coverage_change: change in field coverage of machine-applied manure on the field
+                surface (unitless)
+
         """
         manure_dry_matter_decomposition_rate = max(0.0,
                                                    self._determine_dry_matter_decomposition_rate(temperature_factor))
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
-            decomposed_machine_manure_mass = min(
+            decomposed_machine_manure_mass_change = min(
                 (self.data.machine_manure_dry_mass * manure_dry_matter_decomposition_rate),
                 self.data.machine_manure_dry_mass)
-            decomposed_machine_manure_coverage = min(
-                (decomposed_machine_manure_mass / self.data.machine_manure_dry_mass) *
+            decomposed_machine_manure_coverage_change = min(
+                (decomposed_machine_manure_mass_change / self.data.machine_manure_dry_mass) *
                 self.data.machine_manure_field_coverage, self.data.machine_manure_field_coverage)
 
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
-            decomposed_grazing_manure_mass = min(
+            decomposed_grazing_manure_mass_change = min(
                 (self.data.grazing_manure_dry_mass * manure_dry_matter_decomposition_rate),
                 self.data.machine_manure_dry_mass)
-            decomposed_grazing_manure_coverage = min(
-                (decomposed_grazing_manure_mass / self.data.grazing_manure_dry_mass) *
+            decomposed_grazing_manure_coverage_change = min(
+                (decomposed_grazing_manure_mass_change / self.data.grazing_manure_dry_mass) *
                 self.data.grazing_manure_field_coverage, self.data.grazing_manure_field_coverage)
 
-        return_dict = {"decomposed_machine_manure_mass": decomposed_machine_manure_mass,
-                       "decomposed_machine_manure_coverage": decomposed_machine_manure_coverage,
-                       "decomposed_grazing_manure_mass": decomposed_grazing_manure_mass,
-                       "decomposed_grazing_manure_coverage": decomposed_grazing_manure_coverage}
+        return_dict = {"decomposed_machine_manure_mass_change": decomposed_machine_manure_mass_change,
+                       "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change,
+                       "decomposed_grazing_manure_mass_change": decomposed_grazing_manure_mass_change,
+                       "decomposed_grazing_manure_coverage_change": decomposed_grazing_manure_coverage_change}
         return return_dict
 
     # --- Static Methods ---
-
     @staticmethod
     def _determine_phosphorus_leached_from_surface(rainfall: float, runoff: float, field_size: float,
                                                    manure_dry_mass: float, field_coverage: float,
@@ -295,8 +311,6 @@ class Manure:
     #
     #     """
     #     manure_decomposition_amount = min(max(0.0, dry_matter_mass * decomposition_rate), dry_matter_mass)
-
-
 
     @staticmethod
     def _determine_covered_field_area(field_coverage: float, field_size: float) -> float:

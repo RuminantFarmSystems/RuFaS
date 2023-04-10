@@ -321,6 +321,41 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         assert incorp3.data.grazing_manure_moisture_factor == 0.7
 
 
+@pytest.mark.parametrize("temp_factor,machine_mass,machine_coverage,grazing_mass,grazing_field", [
+    (0.45, 800, 0.85, 500, 0.44),
+    (0.66, 900, 0.92, 450, 0.38),
+    (0.12, 43, 0.07, 88, 0.11),
+    (0.33, 3, 0.02, 120, 0.33),
+])
+def test_decompose_surface_manure(temp_factor: float, machine_mass: float, machine_coverage: float, grazing_mass: float,
+                                  grazing_field: float) -> None:
+    """Tests that the correct changes in mass and field coverage of machine and grazer applied manure are calculated."""
+    data = SoilData(machine_manure_dry_mass=800, machine_manure_field_coverage=0.85, grazing_manure_dry_mass=500,
+                    grazing_manure_field_coverage=0.44)
+    incorp = Manure(data)
+
+    incorp._determine_dry_matter_decomposition_rate = MagicMock(return_value=0.5)
+
+    observed = incorp._decompose_surface_manure(temp_factor)
+
+    expected_machine_mass_decomp = min(max(0.0, incorp.data.machine_manure_dry_mass * 0.5),
+                                       incorp.data.machine_manure_dry_mass)
+    expected_machine_coverage_decomp = min(max(0.0, expected_machine_mass_decomp / incorp.data.machine_manure_dry_mass *
+                                               incorp.data.machine_manure_field_coverage),
+                                           incorp.data.machine_manure_field_coverage)
+    expected_grazing_mass_decomp = min(max(0.0, incorp.data.grazing_manure_dry_mass * 0.5),
+                                       incorp.data.grazing_manure_dry_mass)
+    expected_grazing_coverage_decomp = min(max(0.0, expected_grazing_mass_decomp / incorp.data.grazing_manure_dry_mass *
+                                               incorp.data.grazing_manure_field_coverage),
+                                           incorp.data.grazing_manure_field_coverage)
+
+    incorp._determine_dry_matter_decomposition_rate.assert_called_once_with(temp_factor)
+    assert observed["decomposed_machine_manure_mass_change"] == expected_machine_mass_decomp
+    assert observed["decomposed_machine_manure_coverage_change"] == expected_machine_coverage_decomp
+    assert observed["decomposed_grazing_manure_mass_change"] == expected_grazing_mass_decomp
+    assert observed["decomposed_grazing_manure_coverage_change"] == expected_grazing_coverage_decomp
+
+
 @pytest.mark.parametrize("rain,runoff,area,mean_temp", [
     (12, 1.8, 2.1, 14),
     (14, 12.2, 3.4, 9),
@@ -334,6 +369,11 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     incorp._leach_and_update_phosphorus_pools = MagicMock()
     incorp._determine_temperature_factor = MagicMock(return_value=0.35)
     incorp._adjust_manure_moisture_factor = MagicMock()
+    incorp._decompose_surface_manure = MagicMock(return_value={
+        "decomposed_machine_manure_mass_change": 100,
+        "decomposed_machine_manure_coverage_change": 0.22,
+        "decomposed_grazing_manure_mass_change": 80,
+        "decomposed_grazing_manure_coverage_change": 0.18})
 
     incorp.daily_manure_update(rain, runoff, area, mean_temp)
 
@@ -348,3 +388,5 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     else:
         incorp._determine_temperature_factor.assert_not_called()
         incorp._adjust_manure_moisture_factor.assert_not_called()
+
+    incorp._decompose_surface_manure.assert_called_once_with(0.35)
