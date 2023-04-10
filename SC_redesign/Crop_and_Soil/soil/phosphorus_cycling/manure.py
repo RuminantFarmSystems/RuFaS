@@ -281,7 +281,7 @@ class Manure:
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
         phosphorus_lost_to_runoff_in_kg = (runoff_dissolved_phosphorus_concentration * runoff_in_liters) * \
-            MILLIGRAMS_TO_KILOGRAMS
+                                          MILLIGRAMS_TO_KILOGRAMS
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
@@ -290,27 +290,6 @@ class Manure:
                        "infiltrated_phosphorus": infiltrated_phosphorus,
                        "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg}
         return return_dict
-
-    # @staticmethod
-    # def _determine_decomposed_manure_amount(decomposition_rate: float, dry_matter_mass: float,
-    #                                          field_coverage: float) -> Dict:
-    #     """This method calculates how much manure is decomposed from the surface phosphorus pools, and how much
-    #         phosphorus gets decomposed from the various pools.
-    #
-    #     Parameters
-    #     ----------
-    #     decomposition_rate : float
-    #         The rate of manure dry matter decomposition on the current day (unitless)
-    #     dry_matter_mass : float
-    #         Dry-weight equivalent of manure on the field (kg)
-    #     field_coverage : float
-    #         Percent of the field covered by manure, in range [0.0, 1.0] (unitless)
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #     manure_decomposition_amount = min(max(0.0, dry_matter_mass * decomposition_rate), dry_matter_mass)
 
     @staticmethod
     def _determine_covered_field_area(field_coverage: float, field_size: float) -> float:
@@ -332,6 +311,42 @@ class Manure:
         return field_coverage * field_size
 
     @staticmethod
+    def _determine_mineralized_surface_phosphorus(stable_inorganic_phosphorus: float, stable_organic_phosphorus: float,
+                                                  water_extractable_organic_phosphorus: float,
+                                                  temperature_factor: float, moisture_factor: float) -> Dict:
+        """Calculates the amounts of stable organic, inorganic, and water-extractable organic phosphorus that mineralize
+            into water-extractable inorganic phosphorus on the current day.
+
+        Parameters
+        ----------
+        stable_inorganic_phosphorus : float
+            Amount of stable inorganic phosphorus in the given manure pool on the current day (kg)
+        stable_organic_phosphorus : float
+            Amount of stable organic phosphorus in the given manure pool on the current day (kg)
+        water_extractable_organic_phosphorus : float
+            Amount of water-extractable organic phosphorus in the given manure pool on the current day (kg)
+        temperature_factor : float
+            The temperature factor on the current day (unitless)
+        moisture_factor : float
+            The moisture factor of the given manure pool on the current day (unitless)
+
+        Returns
+        -------
+
+        """
+        stable_organic_phosphorus_mineralized = min(stable_organic_phosphorus,
+            max(0.0, stable_organic_phosphorus * Manure._determine_mineralization_rate(0.01, temperature_factor,
+                                                                                       moisture_factor)))
+        stable_inorganic_phosphorus_mineralized = min(stable_inorganic_phosphorus,
+            max(0.0, stable_inorganic_phosphorus * Manure._determine_mineralization_rate(0.0025, temperature_factor,
+                                                                                         moisture_factor)))
+        water_extractable_organic_phosphorus_mineralized = min(water_extractable_organic_phosphorus,
+            max(0.0, water_extractable_organic_phosphorus * Manure._determine_mineralization_rate(0.1,
+                                                                                                  temperature_factor,
+                                                                                                  moisture_factor)))
+        
+
+    @staticmethod
     def _determine_temperature_factor(mean_air_temperature: float) -> float:
         """Calculates the temperature factor for the current day
 
@@ -351,7 +366,7 @@ class Manure:
 
         """
         calculated_temperature_factor = ((2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)) \
-            / (32 ** 4)
+                                        / (32 ** 4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
