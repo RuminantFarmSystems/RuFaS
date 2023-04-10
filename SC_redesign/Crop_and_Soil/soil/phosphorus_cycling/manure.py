@@ -110,6 +110,10 @@ class Manure:
         field_size : float
             The size of the field (ha)
 
+        References
+        ----------
+        SurPhos Theoretical, page 8, paragraph below [13]
+
         Notes
         -----
         This method follows what is outlined in SurPhos (theoretical documentation, page 8, paragraph just below eqn.
@@ -146,6 +150,17 @@ class Manure:
             The mass of the water extractable phosphorus pool that is being leached from (kg)
         is_organic : bool
             Is the phosphorus being leached organic (True / False)
+
+        Notes
+        -----
+        This method follows the steps outlined for how to calculate phosphorus lost from a field's surface as outlined
+        by the section with the header "Phosphorus Leaching from Manure by Rain" (page 8). Generally, the steps are
+            - Calculate the ratios of rainfall to manure mass and rainfall to runoff on the given day.
+            - Calculate the amounts of water extractable phosphorus lost by the surface manure pools on a given day.
+            - Calculate how much of the leached phosphorus runs off the field and how much infiltrates the soil based on
+                the ratios calculated above.
+            - Determine how much phosphorus is remains in the surface pool after leaching.
+            - Return all the above amounts of phosphorus (lost to runoff, infiltrated soil, still on field surface).
 
         """
         rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(rainfall, manure_dry_mass,
