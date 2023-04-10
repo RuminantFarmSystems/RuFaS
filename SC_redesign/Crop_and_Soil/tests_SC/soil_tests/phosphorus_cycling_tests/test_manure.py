@@ -55,22 +55,6 @@ def test_determine_dry_manure_matter_assimilation(moisture: float, temp_factor: 
     assert observe == expect
 
 
-@pytest.mark.parametrize("rate,temp,moisture", [
-    (0.01, 0.83, 0.67),
-    (0.1, 0.78, 0.85),
-    (0.0025, 0.43, 0.77),
-    (0.01, 0.66, 0.66),
-])
-def test_determine_mineralization_rate(rate: float, temp: float, moisture: float) -> float:
-    """Tests that the correct rate of mineralization is determined for a specific pool of phosphorus on a given day."""
-    observe = Manure._determine_mineralization_rate(rate, temp, moisture)
-    if temp <= moisture:
-        expect = rate * temp
-    else:
-        expect = rate * moisture
-    assert observe == expect
-
-
 @pytest.mark.parametrize("rain,moisture,current_mass,original_mass,temp_factor", [
     (0.8, 0.7, 35, 80, 0.7),            # Moisture decreases
     (0.2, 0.0, 45, 150, 0.95),          # Moisture decreases
@@ -209,6 +193,22 @@ def test_determine_phosphorus_leached_from_surface(rain: float, runoff: float, a
     assert observed["new_phosphorus_pool_amount"] == (phosphorus_mass - expected_water_extractable_phosphorus_leached)
     assert observed["infiltrated_phosphorus"] == expected_infiltrated_phosphorus
     assert observed["runoff_phosphorus"] == expected_runoff_phosphorus_in_kg
+
+
+@pytest.mark.parametrize("phosphorus,rate,temp_factor,moisture_factor", [
+    (25, 0.1, 0.33, 0.55),
+    (33, 0.01, 0.65, 0.78),
+    (21, 0.0025, 0.3423, 0.7768),
+    (0, 0.01, 0.012, 0.23),
+    (23, 0.0025, -0.13, 0.332),
+    (41, 0.1, -0.19, 0.0),
+])
+def test_determine_mineralized_surface_phosphorus(phosphorus: float, rate: float, temp_factor: float,
+                                                  moisture_factor: float) -> None:
+    """Tests that the correct amount of mineralized phosphorus is calculated."""
+    observed = Manure._determine_mineralized_surface_phosphorus(phosphorus, rate, temp_factor, moisture_factor)
+    expected = min(phosphorus, max(0.0, phosphorus * rate * min(temp_factor, moisture_factor)))
+    assert observed == expected
 
 
 # --- Helper method tests ---

@@ -281,7 +281,7 @@ class Manure:
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
         phosphorus_lost_to_runoff_in_kg = (runoff_dissolved_phosphorus_concentration * runoff_in_liters) * \
-                                          MILLIGRAMS_TO_KILOGRAMS
+            MILLIGRAMS_TO_KILOGRAMS
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
@@ -311,20 +311,17 @@ class Manure:
         return field_coverage * field_size
 
     @staticmethod
-    def _determine_mineralized_surface_phosphorus(stable_inorganic_phosphorus: float, stable_organic_phosphorus: float,
-                                                  water_extractable_organic_phosphorus: float,
-                                                  temperature_factor: float, moisture_factor: float) -> Dict:
-        """Calculates the amounts of stable organic, inorganic, and water-extractable organic phosphorus that mineralize
-            into water-extractable inorganic phosphorus on the current day.
+    def _determine_mineralized_surface_phosphorus(phosphorus_amount: float, rate: float, temperature_factor: float,
+                                                  moisture_factor: float) -> float:
+        """Calculates the amount of phosphorus that mineralizes into water-extractable inorganic phosphorus on the
+            current day from the given pool.
 
         Parameters
         ----------
-        stable_inorganic_phosphorus : float
-            Amount of stable inorganic phosphorus in the given manure pool on the current day (kg)
-        stable_organic_phosphorus : float
-            Amount of stable organic phosphorus in the given manure pool on the current day (kg)
-        water_extractable_organic_phosphorus : float
-            Amount of water-extractable organic phosphorus in the given manure pool on the current day (kg)
+        phosphorus_amount : float
+            The amount of phosphorus in the pool that is being mineralized (kg)
+        rate : float
+            The rate factor for the type of phosphorus being mineralized (unitless)
         temperature_factor : float
             The temperature factor on the current day (unitless)
         moisture_factor : float
@@ -332,18 +329,22 @@ class Manure:
 
         Returns
         -------
+        float
+            The amount of phosphorus that is mineralized from that pool that is passed (kg)
+
+        References
+        ----------
+        SurPhos theoretical documentation eqn. [4]
+
+        Notes
+        -----
+        As defined in the paragraph on page 6 of the SurPhos theoretical documentation underneath eqn. [4], the rates
+        for stable organic Phosphorus, stable inorganic phosphorus, and water-extractable organic phosphorus are 0.01,
+        0.0025, and 0.1, respectively.
 
         """
-        stable_organic_phosphorus_mineralized = min(stable_organic_phosphorus,
-            max(0.0, stable_organic_phosphorus * Manure._determine_mineralization_rate(0.01, temperature_factor,
-                                                                                       moisture_factor)))
-        stable_inorganic_phosphorus_mineralized = min(stable_inorganic_phosphorus,
-            max(0.0, stable_inorganic_phosphorus * Manure._determine_mineralization_rate(0.0025, temperature_factor,
-                                                                                         moisture_factor)))
-        water_extractable_organic_phosphorus_mineralized = min(water_extractable_organic_phosphorus,
-            max(0.0, water_extractable_organic_phosphorus * Manure._determine_mineralization_rate(0.1,
-                                                                                                  temperature_factor,
-                                                                                                  moisture_factor)))
+        mineralization_rate = rate * min(temperature_factor, moisture_factor)
+        return min(phosphorus_amount, max(0.0, phosphorus_amount * mineralization_rate))
 
     @staticmethod
     def _determine_temperature_factor(mean_air_temperature: float) -> float:
@@ -365,7 +366,7 @@ class Manure:
 
         """
         calculated_temperature_factor = ((2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)) \
-                                        / (32 ** 4)
+            / (32 ** 4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -423,37 +424,6 @@ class Manure:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
         return (30 * exponential_term) * temperature_term * manure_cover_area
-
-    @staticmethod
-    def _determine_mineralization_rate(rate: float, temperature_factor: float, moisture_factor: float) -> float:
-        """Determines the rate of mineralization of manure phosphorus on the current day.
-
-        Parameters
-        ----------
-        rate : float
-            The rate factor for the type of phosphorus being mineralized (unitless)
-        temperature_factor : float
-            The temperature factor on the current day (unitless)
-        moisture_factor : float
-            Manure moisture factor, in range [0.0, 1.0] (unitless)
-
-        Returns
-        -------
-        float
-            The rate of mineralization for a specific phosphorus pool on a given day
-
-        References
-        ----------
-        SurPhos [4]
-
-        Notes
-        -----
-        This method can be used to calculate the rate of mineralization for stable organic and inorganic phosphorus
-        pools, as well as for the water-extractable organic phosphorus pool. The rates for stable organic,
-        stable inorganic, and water-extractable organic phosphorus are 0.01, 0.0025, and 0.1 respectively.
-
-        """
-        return rate * min(temperature_factor, moisture_factor)
 
     @staticmethod
     def _determine_moisture_change(rainfall: float, current_moisture: float, current_mass: float, original_mass: float,
