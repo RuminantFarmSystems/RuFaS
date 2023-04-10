@@ -34,7 +34,7 @@ class Manure:
         rainfall : float
             The amount of rainfall on the current day (mm)
         runoff : float
-            The amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
         field_size : float
             The size of the field (ha)
         mean_air_temperature : float
@@ -62,7 +62,7 @@ class Manure:
         rainfall : float
             The amount of rainfall on the current day (mm)
         runoff : float
-            The amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
         field_size : float
             The size of the field (ha)
 
@@ -121,6 +121,10 @@ class Manure:
             The amount of phosphorus to be added to the soil profile (kg)
         field_size : float
             The size of the field (ha)
+
+        References
+        ----------
+        SurPhos Theoretical, page 8, paragraph below [13]
 
         Notes
         -----
@@ -189,7 +193,7 @@ class Manure:
         rainfall : float
             The amount of rainfall on the current day (mm)
         runoff : float
-            The amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
         field_size : float
             Area of the field (ha)
         manure_dry_mass : float
@@ -200,6 +204,24 @@ class Manure:
             The mass of the water extractable phosphorus pool that is being leached from (kg)
         is_organic : bool
             Is the phosphorus being leached organic (True / False)
+
+        Returns
+        -------
+        Dict
+            new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg)
+            infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg)
+            runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg)
+
+        Notes
+        -----
+        This method follows the steps outlined for how to calculate phosphorus lost from a field's surface as outlined
+        by the section with the header "Phosphorus Leaching from Manure by Rain" (page 8). Generally, the steps are
+            - Calculate the ratios of rainfall to manure mass and rainfall to runoff on the given day.
+            - Calculate the amounts of water extractable phosphorus lost by the surface manure pools on a given day.
+            - Calculate how much of the leached phosphorus runs off the field and how much infiltrates the soil based on
+                the ratios calculated above.
+            - Determine how much phosphorus is remains in the surface pool after leaching.
+            - Return all the above amounts of phosphorus (lost to runoff, infiltrated soil, still on field surface).
 
         """
         area_covered_by_manure = Manure._determine_covered_field_area(field_coverage, field_size)
@@ -511,7 +533,7 @@ class Manure:
         rainfall : float
             Amount of rainfall on the current day (mm)
         runoff : float
-            Amount of runoff on the current day (mm)
+            The amount of runoff from rainfall on the current day (mm)
 
         Returns
         -------
