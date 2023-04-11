@@ -293,4 +293,3 @@ def test_determine_soil_lignin_to_nitrogen_ratio(plant_lignin_nitrogen_ratio: fl
         expected = "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received " + \
                    str(nitrogen_fraction_plant_residue)
         assert expected == str(e.value)
-
