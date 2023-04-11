@@ -293,3 +293,15 @@ def test_determine_soil_lignin_to_nitrogen_ratio(plant_lignin_nitrogen_ratio: fl
         expected = "Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received " + \
                    str(nitrogen_fraction_plant_residue)
         assert expected == str(e.value)
+
+
+@pytest.mark.parametrize("soil_lignin_to_nitrogen_ratio", [
+    7,  # lower values
+    56,  # higher values
+    35.8,  # arbitrary
+    0  # zero ratio
+])
+def test_determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio: float) -> None:
+    """test that the fraction of soil residue that is metabolic was calculated correctly"""
+    expected = 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio
+    assert expected == ResiduePartition._determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio)

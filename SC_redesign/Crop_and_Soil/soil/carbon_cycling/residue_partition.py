@@ -424,3 +424,23 @@ class ResiduePartition:
         else:
             raise ValueError("Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
                              + str(nitrogen_fraction_plant_residue))
+
+    @staticmethod
+    def _determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio: float) -> float:
+        """This method calculates the fraction of soil residue that is metabolic
+
+        Parameters
+        ----------
+        soil_lignin_to_nitrogen_ratio: float
+            soil lignin to nitrogen fraction(unitless)
+
+        Returns
+        -------
+        float
+            the fraction of soil residue that is metabolic(unitless)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.5
+        """
+        return 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio
