@@ -114,25 +114,25 @@ class Manure:
         # Calculate bounding ratio
         # TODO: bound decomposition plus assimilation changes so that their sum cannot be greater than the original, ask
         #   Pete about best way to bound decomposition plus assimilation changes.
-        #   Possible Solution: ratio = total / (decomposition + assimilation), multiply amounts by ratio to bound
-        #   changes
+        #   Possible Solution: ratio = total / (decomposition + assimilation), multiply decomposition and assimilation
+        #   amounts by ratio to bound changes
 
         # Set machine attributes
-        self.data.machine_manure_dry_mass -= \
+        self.data.machine_manure_dry_mass = \
             max(0.0, self.data.machine_manure_dry_mass - assimilated_machine_mass - decomposed_machine_mass)
-        self.data.machine_manure_field_coverage -= \
+        self.data.machine_manure_field_coverage = \
             max(0.0,
                 self.data.machine_manure_field_coverage - assimilated_machine_coverage - decomposed_machine_coverage)
-        self.data.machine_stable_organic_phosphorus -= \
+        self.data.machine_stable_organic_phosphorus = \
             max(0.0, self.data.machine_stable_organic_phosphorus - assimilated_machine_stable_organic -
                 mineralized_machine_stable_organic)
-        self.data.machine_stable_inorganic_phosphorus -= \
+        self.data.machine_stable_inorganic_phosphorus = \
             max(0.0, self.data.machine_stable_inorganic_phosphorus - assimilated_machine_stable_inorganic -
                 mineralized_machine_stable_inorganic)
-        self.data.machine_water_extractable_organic_phosphorus -= \
+        self.data.machine_water_extractable_organic_phosphorus = \
             max(0.0, self.data.machine_water_extractable_organic_phosphorus -
                 assimilated_machine_water_extractable_organic - mineralized_machine_water_extractable_organic)
-        self.data.machine_water_extractable_inorganic_phosphorus -= \
+        self.data.machine_water_extractable_inorganic_phosphorus = \
             max(0.0, self.data.machine_water_extractable_inorganic_phosphorus -
                 assimilated_machine_water_extractable_inorganic)
 
@@ -141,21 +141,21 @@ class Manure:
         self.data.machine_water_extractable_organic_phosphorus += (0.25 * mineralized_machine_stable_organic)
 
         # Set grazing attributes
-        self.data.grazing_manure_dry_mass -= \
+        self.data.grazing_manure_dry_mass = \
             max(0.0, self.data.grazing_manure_dry_mass - assimilated_grazing_mass - decomposed_grazing_mass)
-        self.data.grazing_manure_field_coverage -= \
+        self.data.grazing_manure_field_coverage = \
             max(0.0,
                 self.data.grazing_manure_field_coverage - assimilated_grazing_coverage - decomposed_grazing_coverage)
-        self.data.grazing_stable_organic_phosphorus -= \
+        self.data.grazing_stable_organic_phosphorus = \
             max(0.0, self.data.grazing_stable_organic_phosphorus - assimilated_grazing_stable_organic -
                 mineralized_grazing_stable_organic)
-        self.data.grazing_stable_inorganic_phosphorus -= \
+        self.data.grazing_stable_inorganic_phosphorus = \
             max(0.0, self.data.grazing_stable_inorganic_phosphorus - assimilated_grazing_stable_inorganic -
                 mineralized_grazing_stable_inorganic)
-        self.data.grazing_water_extractable_organic_phosphorus -= \
+        self.data.grazing_water_extractable_organic_phosphorus = \
             max(0.0, self.data.grazing_water_extractable_organic_phosphorus -
                 assimilated_grazing_water_extractable_organic - mineralized_grazing_water_extractable_organic)
-        self.data.grazing_water_extractable_inorganic_phosphorus -= \
+        self.data.grazing_water_extractable_inorganic_phosphorus = \
             max(0.0, self.data.grazing_water_extractable_inorganic_phosphorus -
                 assimilated_grazing_water_extractable_inorganic)
 

@@ -437,31 +437,165 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
 ])
 def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp: float) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
-    data = SoilData()
-    incorp = Manure(data)
+    # Case 1: manure pools are empty
+    data1 = SoilData()
+    incorp1 = Manure(data1)
 
-    incorp._leach_and_update_phosphorus_pools = MagicMock()
-    incorp._determine_temperature_factor = MagicMock(return_value=0.35)
-    incorp._adjust_manure_moisture_factor = MagicMock()
-    incorp._determine_decomposed_surface_manure = MagicMock(return_value={
+    incorp1._leach_and_update_phosphorus_pools = MagicMock()
+    incorp1._determine_temperature_factor = MagicMock(return_value=0.32)
+    incorp1._adjust_manure_moisture_factor = MagicMock()
+    incorp1._determine_decomposed_surface_manure = MagicMock(return_value={
+        "decomposed_machine_manure_mass_change": 0,
+        "decomposed_machine_manure_coverage_change": 0.0,
+        "decomposed_grazing_manure_mass_change": 0,
+        "decomposed_grazing_manure_coverage_change": 0.0})
+    incorp1._determine_mineralized_surface_phosphorus = MagicMock(return_value=0)
+    incorp1._determine_assimilated_surface_manure = MagicMock(return_value={
+        "assimilated_machine_manure": 0,
+        "machine_manure_coverage": 0.0,
+        "assimilated_grazing_manure": 0,
+        "grazing_manure_coverage": 0.0})
+    incorp1._determine_assimilated_phosphorus_amount = MagicMock(return_value=0)
+    incorp1._add_infiltrated_phosphorus_to_soil = MagicMock()
+
+    incorp1.daily_manure_update(rain, runoff, area, mean_temp)
+
+    if rain > 0.0:
+        incorp1._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
+    else:
+        incorp1._leach_and_update_phosphorus_pools.assert_not_called()
+    incorp1._determine_temperature_factor.assert_called_once_with(mean_temp)
+    if rain < 1.0 or rain > 4.0:
+        incorp1._adjust_manure_moisture_factor.assert_called_once_with(rain, 0.32)
+    else:
+        incorp1._adjust_manure_moisture_factor.assert_not_called()
+    incorp1._determine_decomposed_surface_manure.assert_called_once_with(0.32)
+    assert incorp1._determine_mineralized_surface_phosphorus.call_count == 6
+    incorp1._determine_assimilated_surface_manure.assert_called_once_with(0.32, area)
+    assert incorp1._determine_assimilated_phosphorus_amount.call_count == 8
+    assert incorp1.data.machine_manure_dry_mass == 0
+    assert incorp1.data.machine_manure_field_coverage == 0.0
+    assert incorp1.data.machine_stable_organic_phosphorus == 0
+    assert incorp1.data.machine_stable_inorganic_phosphorus == 0
+    assert incorp1.data.machine_water_extractable_organic_phosphorus == 0
+    assert incorp1.data.machine_water_extractable_inorganic_phosphorus == 0
+    assert incorp1.data.grazing_manure_dry_mass == 0
+    assert pytest.approx(incorp1.data.grazing_manure_field_coverage) == 0.0
+    assert incorp1.data.grazing_stable_organic_phosphorus == 0
+    assert incorp1.data.grazing_stable_inorganic_phosphorus == 0
+    assert incorp1.data.grazing_water_extractable_organic_phosphorus == 0
+    assert incorp1.data.grazing_water_extractable_inorganic_phosphorus == 0
+    incorp1._add_infiltrated_phosphorus_to_soil.assert_called_once_with(0, area)
+
+    # Case 2: sum of amounts decomposed and assimilated are less than what is on the field
+    data2 = SoilData(machine_manure_dry_mass=300, machine_manure_field_coverage=0.91,
+                     machine_manure_moisture_factor=0.74, machine_stable_organic_phosphorus=20,
+                     machine_stable_inorganic_phosphorus=21, machine_water_extractable_organic_phosphorus=22,
+                     machine_water_extractable_inorganic_phosphorus=23, grazing_manure_dry_mass=200,
+                     grazing_manure_field_coverage=0.83, grazing_manure_moisture_factor=0.66,
+                     grazing_stable_organic_phosphorus=10, grazing_stable_inorganic_phosphorus=11,
+                     grazing_water_extractable_organic_phosphorus=12, grazing_water_extractable_inorganic_phosphorus=13)
+    incorp2 = Manure(data2)
+
+    incorp2._leach_and_update_phosphorus_pools = MagicMock()
+    incorp2._determine_temperature_factor = MagicMock(return_value=0.35)
+    incorp2._adjust_manure_moisture_factor = MagicMock()
+    incorp2._determine_decomposed_surface_manure = MagicMock(return_value={
         "decomposed_machine_manure_mass_change": 100,
         "decomposed_machine_manure_coverage_change": 0.22,
         "decomposed_grazing_manure_mass_change": 80,
         "decomposed_grazing_manure_coverage_change": 0.18})
-    incorp._determine_mineralized_phosphorus_amounts = MagicMock()
+    incorp2._determine_mineralized_surface_phosphorus = MagicMock(return_value=3)
+    incorp2._determine_assimilated_surface_manure = MagicMock(return_value={
+        "assimilated_machine_manure": 50,
+        "machine_manure_coverage": 0.15,
+        "assimilated_grazing_manure": 30,
+        "grazing_manure_coverage": 0.08})
+    incorp2._determine_assimilated_phosphorus_amount = MagicMock(return_value=2)
+    incorp2._add_infiltrated_phosphorus_to_soil = MagicMock()
 
-    incorp.daily_manure_update(rain, runoff, area, mean_temp)
+    incorp2.daily_manure_update(rain, runoff, area, mean_temp)
 
     if rain > 0.0:
-        incorp._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
+        incorp2._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     else:
-        incorp._leach_and_update_phosphorus_pools.assert_not_called()
-
+        incorp2._leach_and_update_phosphorus_pools.assert_not_called()
+    incorp2._determine_temperature_factor.assert_called_once_with(mean_temp)
     if rain < 1.0 or rain > 4.0:
-        incorp._determine_temperature_factor.assert_called_once_with(mean_temp)
-        incorp._adjust_manure_moisture_factor.assert_called_once_with(rain, 0.35)
+        incorp2._adjust_manure_moisture_factor.assert_called_once_with(rain, 0.35)
     else:
-        incorp._determine_temperature_factor.assert_not_called()
-        incorp._adjust_manure_moisture_factor.assert_not_called()
+        incorp2._adjust_manure_moisture_factor.assert_not_called()
+    incorp2._determine_decomposed_surface_manure.assert_called_once_with(0.35)
+    assert incorp2._determine_mineralized_surface_phosphorus.call_count == 6
+    incorp2._determine_assimilated_surface_manure.assert_called_once_with(0.35, area)
+    assert incorp2._determine_assimilated_phosphorus_amount.call_count == 8
+    assert incorp2.data.machine_manure_dry_mass == 150
+    assert incorp2.data.machine_manure_field_coverage == 0.54
+    assert incorp2.data.machine_stable_organic_phosphorus == 15
+    assert incorp2.data.machine_stable_inorganic_phosphorus == 16
+    assert incorp2.data.machine_water_extractable_organic_phosphorus == 17 + 0.75
+    assert incorp2.data.machine_water_extractable_inorganic_phosphorus == 21 + 8.25
+    assert incorp2.data.grazing_manure_dry_mass == 90
+    assert pytest.approx(incorp2.data.grazing_manure_field_coverage) == 0.57
+    assert incorp2.data.grazing_stable_organic_phosphorus == 5
+    assert incorp2.data.grazing_stable_inorganic_phosphorus == 6
+    assert incorp2.data.grazing_water_extractable_organic_phosphorus == 7 + 0.75
+    assert incorp2.data.grazing_water_extractable_inorganic_phosphorus == 11 + 8.25
+    incorp2._add_infiltrated_phosphorus_to_soil.assert_called_once_with(16, area)
 
-    incorp._determine_decomposed_surface_manure.assert_called_once_with(0.35)
+    # Case 3: more manure/phosphorus is decomposed and assimilated than there is on the field.
+    data3 = SoilData(machine_manure_dry_mass=50, machine_manure_field_coverage=0.19,
+                     machine_manure_moisture_factor=0.35, machine_stable_organic_phosphorus=2.0,
+                     machine_stable_inorganic_phosphorus=2.1, machine_water_extractable_organic_phosphorus=2.2,
+                     machine_water_extractable_inorganic_phosphorus=2.3, grazing_manure_dry_mass=38,
+                     grazing_manure_field_coverage=0.12, grazing_manure_moisture_factor=0.59,
+                     grazing_stable_organic_phosphorus=1.0, grazing_stable_inorganic_phosphorus=1.1,
+                     grazing_water_extractable_organic_phosphorus=1.2,
+                     grazing_water_extractable_inorganic_phosphorus=1.3)
+    incorp3 = Manure(data3)
+
+    incorp3._leach_and_update_phosphorus_pools = MagicMock()
+    incorp3._determine_temperature_factor = MagicMock(return_value=0.37)
+    incorp3._adjust_manure_moisture_factor = MagicMock()
+    incorp3._determine_decomposed_surface_manure = MagicMock(return_value={
+        "decomposed_machine_manure_mass_change": 35,
+        "decomposed_machine_manure_coverage_change": 0.11,
+        "decomposed_grazing_manure_mass_change": 20,
+        "decomposed_grazing_manure_coverage_change": 0.9})
+    incorp3._determine_mineralized_surface_phosphorus = MagicMock(return_value=2)
+    incorp3._determine_assimilated_surface_manure = MagicMock(return_value={
+        "assimilated_machine_manure": 25,
+        "machine_manure_coverage": 0.10,
+        "assimilated_grazing_manure": 23,
+        "grazing_manure_coverage": 0.05})
+    incorp3._determine_assimilated_phosphorus_amount = MagicMock(return_value=3)
+    incorp3._add_infiltrated_phosphorus_to_soil = MagicMock()
+
+    incorp3.daily_manure_update(rain, runoff, area, mean_temp)
+
+    if rain > 0.0:
+        incorp3._leach_and_update_phosphorus_pools.assert_called_once_with(rain, runoff, area)
+    else:
+        incorp3._leach_and_update_phosphorus_pools.assert_not_called()
+    incorp3._determine_temperature_factor.assert_called_once_with(mean_temp)
+    if rain < 1.0 or rain > 4.0:
+        incorp3._adjust_manure_moisture_factor.assert_called_once_with(rain, 0.37)
+    else:
+        incorp3._adjust_manure_moisture_factor.assert_not_called()
+    incorp3._determine_decomposed_surface_manure.assert_called_once_with(0.37)
+    assert incorp3._determine_mineralized_surface_phosphorus.call_count == 6
+    incorp3._determine_assimilated_surface_manure.assert_called_once_with(0.37, area)
+    assert incorp3._determine_assimilated_phosphorus_amount.call_count == 8
+    assert incorp3.data.machine_manure_dry_mass == 0
+    assert incorp3.data.machine_manure_field_coverage == 0.0
+    assert incorp3.data.machine_stable_organic_phosphorus == 0
+    assert incorp3.data.machine_stable_inorganic_phosphorus == 0
+    assert incorp3.data.machine_water_extractable_organic_phosphorus == 0.5
+    assert incorp3.data.machine_water_extractable_inorganic_phosphorus == 2 + 2 + 1.5
+    assert incorp3.data.grazing_manure_dry_mass == 0
+    assert pytest.approx(incorp3.data.grazing_manure_field_coverage) == 0.0
+    assert incorp3.data.grazing_stable_organic_phosphorus == 0
+    assert incorp3.data.grazing_stable_inorganic_phosphorus == 0
+    assert incorp3.data.grazing_water_extractable_organic_phosphorus == 0.5
+    assert incorp3.data.grazing_water_extractable_inorganic_phosphorus == 2 + 2 + 1.5
+    incorp3._add_infiltrated_phosphorus_to_soil.assert_called_once_with(24, area)
