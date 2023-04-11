@@ -149,6 +149,18 @@ def test_determine_water_extractable_phosphorus_runoff_concentration(manure: flo
     assert pytest.approx(observe) == expect
 
 
+@pytest.mark.parametrize("coverage,area", [
+    (0.88, 0.92),
+    (0.33, 2.31),
+    (0.55, 4.55),
+])
+def test_determine_covered_field_area(coverage: float, area: float) -> None:
+    """Tests that the correct area of the field that is covered by manure is calculated."""
+    observed = Manure._determine_covered_field_area(coverage, area)
+    expected = area * coverage
+    assert observed == expected
+
+
 @pytest.mark.parametrize("rain,runoff,area,manure_mass,field_coverage,phosphorus_mass,organic", [
     (11, 3, 1.8, 800, 0.7, 120, True),
     (14, 1.8, 3.1, 950, 0.91, 133, False),
@@ -208,6 +220,21 @@ def test_determine_mineralized_surface_phosphorus(phosphorus: float, rate: float
     """Tests that the correct amount of mineralized phosphorus is calculated."""
     observed = Manure._determine_mineralized_surface_phosphorus(phosphorus, rate, temp_factor, moisture_factor)
     expected = min(phosphorus, max(0.0, phosphorus * rate * min(temp_factor, moisture_factor)))
+    assert observed == expected
+
+
+@pytest.mark.parametrize("ratio,phosphorus", [
+    (0.88, 26),
+    (0.212, 12.13),
+    (0.0, 30.21),
+    (0.441, 0.0),
+    (0.0, 0.0),
+])
+def test_determine_assimilated_phosphorus_amount(ratio: float, phosphorus: float) -> None:
+    """Tests that the correct amount of phosphorus assimilated into the soil is calculated."""
+    observed = Manure._determine_assimilated_phosphorus_amount(ratio, phosphorus)
+    expected = max(0.0, ratio * phosphorus)
+    expected = min(phosphorus, expected)
     assert observed == expected
 
 
@@ -354,6 +381,68 @@ def test_determine_decomposed_surface_manure(temp_factor: float, machine_mass: f
     assert observed["decomposed_machine_manure_coverage_change"] == expected_machine_coverage_decomp
     assert observed["decomposed_grazing_manure_mass_change"] == expected_grazing_mass_decomp
     assert observed["decomposed_grazing_manure_coverage_change"] == expected_grazing_coverage_decomp
+
+
+@pytest.mark.parametrize("temp_factor,area", [
+    (0.44, 1.89),
+    (0.3223, 2.45),
+    (0.661, 1.23),
+])
+def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -> None:
+    """Tests that correct decrease in manure and field coverage due to assimilation are calculated."""
+    # Case 1: no manure in the pools
+    data1 = SoilData()
+    incorp1 = Manure(data1)
+    incorp1._determine_covered_field_area = MagicMock()
+    incorp1._determine_dry_manure_matter_assimilation = MagicMock()
+
+    observed1 = incorp1._determine_assimilated_surface_manure(temp_factor, area)
+    expected1 = {"assimilated_machine_manure": 0, "machine_manure_coverage": 0, "assimilated_grazing_manure": 0,
+                 "grazing_manure_coverage": 0}
+
+    incorp1._determine_covered_field_area.assert_not_called()
+    incorp1._determine_dry_manure_matter_assimilation.assert_not_called()
+    assert observed1 == expected1
+
+    # Case 2: manure in pools, not fully assimilated
+    data2 = SoilData(machine_manure_dry_mass=100, machine_manure_field_coverage=0.55,
+                     machine_manure_moisture_factor=0.77, grazing_manure_dry_mass=80,
+                     grazing_manure_field_coverage=0.4, grazing_manure_moisture_factor=0.83)
+    incorp2 = Manure(data2)
+    incorp2._determine_covered_field_area = MagicMock(return_value=1.4)
+    incorp2._determine_dry_manure_matter_assimilation = MagicMock(return_value=25)
+
+    observed2 = incorp2._determine_assimilated_surface_manure(temp_factor, area)
+    expected_machine_coverage2 = min(0.55, max(25 / 100 * 0.55, 0.0))
+    expected_grazing_coverage2 = min(0.4, max(25 / 80 * 0.4, 0.0))
+    expected2 = {"assimilated_machine_manure": 25, "machine_manure_coverage": expected_machine_coverage2,
+                 "assimilated_grazing_manure": 25, "grazing_manure_coverage": expected_grazing_coverage2}
+    expected_coverage_calls2 = [call(0.55, area), call(0.4, area)]
+    expected_assimilation_calls2 = [call(0.77, temp_factor, 1.4, False), call(0.83, temp_factor, 1.4, True)]
+
+    incorp2._determine_covered_field_area.assert_has_calls(expected_coverage_calls2)
+    incorp2._determine_dry_manure_matter_assimilation.assert_has_calls(expected_assimilation_calls2)
+    assert observed2 == expected2
+
+    # Case 3: manure in pools, all of it should be assimilated
+    data3 = SoilData(machine_manure_dry_mass=75, machine_manure_field_coverage=0.88,
+                     machine_manure_moisture_factor=0.80, grazing_manure_dry_mass=95,
+                     grazing_manure_field_coverage=0.85, grazing_manure_moisture_factor=0.79)
+    incorp3 = Manure(data3)
+    incorp3._determine_covered_field_area = MagicMock(return_value=2.1)
+    incorp3._determine_dry_manure_matter_assimilation = MagicMock(return_value=120)
+
+    observed3 = incorp3._determine_assimilated_surface_manure(temp_factor, area)
+    expected_machine_coverage3 = 0.88
+    expected_grazing_coverage3 = 0.85
+    expected3 = {"assimilated_machine_manure": 75, "machine_manure_coverage": expected_machine_coverage3,
+                 "assimilated_grazing_manure": 95, "grazing_manure_coverage": expected_grazing_coverage3}
+    expected_coverage_calls3 = [call(0.88, area), call(0.85, area)]
+    expected_assimilation_calls3 = [call(0.80, temp_factor, 2.1, False), call(0.79, temp_factor, 2.1, True)]
+
+    incorp3._determine_covered_field_area.assert_has_calls(expected_coverage_calls3)
+    incorp3._determine_dry_manure_matter_assimilation.assert_has_calls(expected_assimilation_calls3)
+    assert observed3 == expected3
 
 
 @pytest.mark.parametrize("rain,runoff,area,mean_temp", [

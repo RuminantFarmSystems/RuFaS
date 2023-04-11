@@ -114,7 +114,8 @@ class Manure:
         # Calculate bounding ratio
         # TODO: bound decomposition plus assimilation changes so that their sum cannot be greater than the original, ask
         #   Pete about best way to bound decomposition plus assimilation changes.
-        #   Possible Solution: ratio = total / (decomposition + assimilation), use ratio to bound changes
+        #   Possible Solution: ratio = total / (decomposition + assimilation), multiply amounts by ratio to bound
+        #   changes
 
         # Set machine attributes
         self.data.machine_manure_dry_mass -= \
@@ -303,8 +304,9 @@ class Manure:
                 surface (unitless)
 
         """
-        manure_dry_matter_decomposition_rate = max(0.0,
-                                                   self._determine_dry_matter_decomposition_rate(temperature_factor))
+        manure_dry_matter_decomposition_rate = \
+            max(0.0, self._determine_dry_matter_decomposition_rate(temperature_factor))
+        decomposed_machine_manure_mass_change, decomposed_machine_manure_coverage_change = 0, 0
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
             decomposed_machine_manure_mass_change = min(
                 (self.data.machine_manure_dry_mass * manure_dry_matter_decomposition_rate),
@@ -313,6 +315,7 @@ class Manure:
                 (decomposed_machine_manure_mass_change / self.data.machine_manure_dry_mass) *
                 self.data.machine_manure_field_coverage, self.data.machine_manure_field_coverage)
 
+        decomposed_grazing_manure_mass_change, decomposed_grazing_manure_coverage_change = 0, 0
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
             decomposed_grazing_manure_mass_change = min(
                 (self.data.grazing_manure_dry_mass * manure_dry_matter_decomposition_rate),
@@ -340,6 +343,13 @@ class Manure:
 
         Returns
         -------
+        Dict
+            assimilated_machine_manure: amount of machine-applied manure that is assimilated on a given day (kg)
+            machine_manure_coverage: amount of decrease in the fraction of field covered by machine-applied manure on a
+                given day (unitless)
+            assimilated_grazing_manure: amount of grazer-applied manure that is assimilated on a given day (kg)
+            grazing_manure_coverage: amount of decrease in the fraction of field covered by machine-applied manure on a
+                given day (unitless)
 
         """
         assimilated_machine_manure, machine_manure_coverage = 0, 0
@@ -361,7 +371,7 @@ class Manure:
                 self.data.grazing_manure_moisture_factor, temperature_factor, grazing_manure_cover_area, True))
             assimilated_grazing_manure = min(self.data.grazing_manure_dry_mass, assimilated_grazing_manure)
             grazing_manure_coverage = max(0.0, (assimilated_grazing_manure / self.data.grazing_manure_dry_mass) *
-                                          self.data.machine_manure_field_coverage)
+                                          self.data.grazing_manure_field_coverage)
             grazing_manure_coverage = min(grazing_manure_coverage, self.data.grazing_manure_field_coverage)
 
         return_dict = {"assimilated_machine_manure": assimilated_machine_manure,
@@ -446,14 +456,14 @@ class Manure:
         return return_dict
 
     @staticmethod
-    def _determine_assimilated_phosphorus_amount(assimilation_ratio: float, phosphorus_amount) -> float:
+    def _determine_assimilated_phosphorus_amount(assimilation_ratio: float, phosphorus_amount: float) -> float:
         """Calculates the amount of phosphorus that is removed through assimilation on a given day.
 
         Parameters
         ----------
         assimilation_ratio : float
             Ratio of manure mass assimilated to amount present before assimilation (unitless)
-        phosphorus_amount :
+        phosphorus_amount : float
             The amount of phosphorus in the pool being removed from (kg)
 
         Returns
