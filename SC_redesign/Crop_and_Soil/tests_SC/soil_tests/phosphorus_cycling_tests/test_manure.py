@@ -149,18 +149,6 @@ def test_determine_water_extractable_phosphorus_runoff_concentration(manure: flo
     assert pytest.approx(observe) == expect
 
 
-@pytest.mark.parametrize("coverage,area", [
-    (0.88, 0.92),
-    (0.33, 2.31),
-    (0.55, 4.55),
-])
-def test_determine_covered_field_area(coverage: float, area: float) -> None:
-    """Tests that the correct area of the field that is covered by manure is calculated."""
-    observed = Manure._determine_covered_field_area(coverage, area)
-    expected = area * coverage
-    assert observed == expected
-
-
 @pytest.mark.parametrize("rain,runoff,area,manure_mass,field_coverage,phosphorus_mass,organic", [
     (11, 3, 1.8, 800, 0.7, 120, True),
     (14, 1.8, 3.1, 950, 0.91, 133, False),
@@ -174,7 +162,6 @@ def test_determine_phosphorus_leached_from_surface(rain: float, runoff: float, a
                                                    field_coverage: float, phosphorus_mass: float,
                                                    organic: bool) -> None:
     """Test that subroutines are called correctly and that leached phosphorus amounts are calculated correctly."""
-    Manure._determine_covered_field_area = MagicMock(return_value=1.75)
     Manure._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
     Manure._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
     Manure._determine_water_extractable_organic_phosphorus_leached = MagicMock(return_value=25.0)
@@ -184,13 +171,13 @@ def test_determine_phosphorus_leached_from_surface(rain: float, runoff: float, a
     observed = Manure._determine_phosphorus_leached_from_surface(rain, runoff, area, manure_mass, field_coverage,
                                                                  phosphorus_mass, organic)
     runoff_in_liters = runoff * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+    expected_covered_area = area * field_coverage
     expected_water_extractable_phosphorus_leached = min(25.0, phosphorus_mass)
     expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * MILLIGRAMS_TO_KILOGRAMS
     expected_infiltrated_phosphorus = max(0, expected_water_extractable_phosphorus_leached
                                           - expected_runoff_phosphorus_in_kg)
 
-    Manure._determine_covered_field_area.assert_called_once_with(field_coverage, area)
-    Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, manure_mass, 1.75)
+    Manure._determine_rain_manure_dry_matter_ratio.assert_called_once_with(rain, manure_mass, expected_covered_area)
     Manure._determine_phosphorus_distribution_factor.assert_called_once_with(rain, runoff)
     if organic:
         Manure._determine_water_extractable_organic_phosphorus_leached.assert_called_once_with(phosphorus_mass, 0.4,
@@ -393,14 +380,12 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
     # Case 1: no manure in the pools
     data1 = SoilData()
     incorp1 = Manure(data1)
-    incorp1._determine_covered_field_area = MagicMock()
     incorp1._determine_dry_manure_matter_assimilation = MagicMock()
 
     observed1 = incorp1._determine_assimilated_surface_manure(temp_factor, area)
     expected1 = {"assimilated_machine_manure": 0, "machine_manure_coverage": 0, "assimilated_grazing_manure": 0,
                  "grazing_manure_coverage": 0}
 
-    incorp1._determine_covered_field_area.assert_not_called()
     incorp1._determine_dry_manure_matter_assimilation.assert_not_called()
     assert observed1 == expected1
 
@@ -409,18 +394,18 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
                      machine_manure_moisture_factor=0.77, grazing_manure_dry_mass=80,
                      grazing_manure_field_coverage=0.4, grazing_manure_moisture_factor=0.83)
     incorp2 = Manure(data2)
-    incorp2._determine_covered_field_area = MagicMock(return_value=1.4)
     incorp2._determine_dry_manure_matter_assimilation = MagicMock(return_value=25)
 
     observed2 = incorp2._determine_assimilated_surface_manure(temp_factor, area)
+    expected_machine_cover_area2 = area * 0.55
+    expected_grazing_cover_area2 = area * 0.4
     expected_machine_coverage2 = min(0.55, max(25 / 100 * 0.55, 0.0))
     expected_grazing_coverage2 = min(0.4, max(25 / 80 * 0.4, 0.0))
     expected2 = {"assimilated_machine_manure": 25, "machine_manure_coverage": expected_machine_coverage2,
                  "assimilated_grazing_manure": 25, "grazing_manure_coverage": expected_grazing_coverage2}
-    expected_coverage_calls2 = [call(0.55, area), call(0.4, area)]
-    expected_assimilation_calls2 = [call(0.77, temp_factor, 1.4, False), call(0.83, temp_factor, 1.4, True)]
+    expected_assimilation_calls2 = [call(0.77, temp_factor, expected_machine_cover_area2, False),
+                                    call(0.83, temp_factor, expected_grazing_cover_area2, True)]
 
-    incorp2._determine_covered_field_area.assert_has_calls(expected_coverage_calls2)
     incorp2._determine_dry_manure_matter_assimilation.assert_has_calls(expected_assimilation_calls2)
     assert observed2 == expected2
 
@@ -429,18 +414,18 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
                      machine_manure_moisture_factor=0.80, grazing_manure_dry_mass=95,
                      grazing_manure_field_coverage=0.85, grazing_manure_moisture_factor=0.79)
     incorp3 = Manure(data3)
-    incorp3._determine_covered_field_area = MagicMock(return_value=2.1)
     incorp3._determine_dry_manure_matter_assimilation = MagicMock(return_value=120)
 
     observed3 = incorp3._determine_assimilated_surface_manure(temp_factor, area)
+    expected_machine_cover_area3 = area * 0.88
+    expected_grazing_cover_area3 = area * 0.85
     expected_machine_coverage3 = 0.88
     expected_grazing_coverage3 = 0.85
     expected3 = {"assimilated_machine_manure": 75, "machine_manure_coverage": expected_machine_coverage3,
                  "assimilated_grazing_manure": 95, "grazing_manure_coverage": expected_grazing_coverage3}
-    expected_coverage_calls3 = [call(0.88, area), call(0.85, area)]
-    expected_assimilation_calls3 = [call(0.80, temp_factor, 2.1, False), call(0.79, temp_factor, 2.1, True)]
+    expected_assimilation_calls3 = [call(0.80, temp_factor,  expected_machine_cover_area3, False),
+                                    call(0.79, temp_factor, expected_grazing_cover_area3, True)]
 
-    incorp3._determine_covered_field_area.assert_has_calls(expected_coverage_calls3)
     incorp3._determine_dry_manure_matter_assimilation.assert_has_calls(expected_assimilation_calls3)
     assert observed3 == expected3
 

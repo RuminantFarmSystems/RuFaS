@@ -354,8 +354,7 @@ class Manure:
         """
         assimilated_machine_manure, machine_manure_coverage = 0, 0
         if self.data.machine_manure_dry_mass > 0 and self.data.machine_manure_field_coverage > 0:
-            machine_manure_cover_area = self._determine_covered_field_area(self.data.machine_manure_field_coverage,
-                                                                           field_size)
+            machine_manure_cover_area = self.data.machine_manure_field_coverage * field_size
             assimilated_machine_manure = max(0.0, self._determine_dry_manure_matter_assimilation(
                 self.data.machine_manure_moisture_factor, temperature_factor, machine_manure_cover_area, False))
             assimilated_machine_manure = min(self.data.machine_manure_dry_mass, assimilated_machine_manure)
@@ -365,8 +364,7 @@ class Manure:
 
         assimilated_grazing_manure, grazing_manure_coverage = 0, 0
         if self.data.grazing_manure_dry_mass > 0 and self.data.grazing_manure_field_coverage > 0:
-            grazing_manure_cover_area = self._determine_covered_field_area(self.data.grazing_manure_field_coverage,
-                                                                           field_size)
+            grazing_manure_cover_area = self.data.grazing_manure_field_coverage * field_size
             assimilated_grazing_manure = max(0.0, self._determine_dry_manure_matter_assimilation(
                 self.data.grazing_manure_moisture_factor, temperature_factor, grazing_manure_cover_area, True))
             assimilated_grazing_manure = min(self.data.grazing_manure_dry_mass, assimilated_grazing_manure)
@@ -424,7 +422,7 @@ class Manure:
             - Return all the above amounts of phosphorus (lost to runoff, infiltrated soil, still on field surface).
 
         """
-        area_covered_by_manure = Manure._determine_covered_field_area(field_coverage, field_size)
+        area_covered_by_manure = field_coverage * field_size
         rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(rainfall, manure_dry_mass,
                                                                                       area_covered_by_manure)
 
@@ -473,25 +471,6 @@ class Manure:
 
         """
         return min(phosphorus_amount, max(0.0, assimilation_ratio * phosphorus_amount))
-
-    @staticmethod
-    def _determine_covered_field_area(field_coverage: float, field_size: float) -> float:
-        """Determines the area of the field that is covered by manure.
-
-        Parameters
-        ----------
-        field_coverage : float
-            Percent of the field covered by manure, in range [0.0, 1.0] (unitless)
-        field_size : float
-            Area of the field (ha)
-
-        Returns
-        -------
-        float
-            The area of the field that is covered by manure (ha)
-
-        """
-        return field_coverage * field_size
 
     @staticmethod
     def _determine_mineralized_surface_phosphorus(phosphorus_amount: float, rate: float, temperature_factor: float,
