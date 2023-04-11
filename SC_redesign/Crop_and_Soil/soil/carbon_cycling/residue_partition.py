@@ -43,8 +43,8 @@ class ResiduePartition:
         # TODO: check source, 0.1 or 0.01, ask Hector about the value
 
     @staticmethod
-    def _determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float,
-                                                 nitrogen_fraction_plant_residue=0.4) -> float:
+    def _determine_plant_lignin_nitrogen_ratio(plant_residue_lignin_composition: float,
+                                               nitrogen_fraction_plant_residue=0.4) -> float:
         # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
         #  GitHub Issue #163
         """This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
@@ -60,13 +60,13 @@ class ResiduePartition:
         Returns
         -------
         float
-            plant lignin to nitrogen ratio (Dmnl)
+            plant lignin to nitrogen ratio (Dimensionless unit)
 
         References
         -------
         pseudocode_soil S.6.B.I.2
         """
-        if 0 < nitrogen_fraction_plant_residue < 1.0:
+        if 0 < nitrogen_fraction_plant_residue <= 1.0:
             return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
         elif nitrogen_fraction_plant_residue == 0:
             return 0
@@ -387,3 +387,43 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.3
         """
         return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
+
+    @staticmethod
+    def _determine_soil_lignin_to_nitrogen_ratio(plant_lignin_nitrogen_ratio: float,
+                                                 weighted_residue_dry_matter_lignin_fraction: float,
+                                                 soil_residue_lignin_fraction: float,
+                                                 nitrogen_fraction_plant_residue=0.4) -> float:
+        """This method calculates the soil lignin to nitrogen fraction
+
+        Parameters
+        ----------
+        plant_lignin_nitrogen_ratio: float
+            plant lignin to nitrogen ratio (dimensionless unit)
+        weighted_residue_dry_matter_lignin_fraction: float
+            weighted fraction of lignin in residue dry matter (unitless)
+        soil_residue_lignin_fraction: float
+            soil residue fraction that is comprised of lignin (unitless)
+        nitrogen_fraction_plant_residue: float default = 0.4
+            nitrogen fraction in plant residue at harvest (unitless)
+
+        Returns
+        -------
+        float
+            soil lignin to nitrogen fraction(unitless)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.4
+        """
+        if 0 < nitrogen_fraction_plant_residue <= 1:
+            return plant_lignin_nitrogen_ratio * weighted_residue_dry_matter_lignin_fraction + \
+                   (((soil_residue_lignin_fraction / 100) / nitrogen_fraction_plant_residue) / 100) \
+                   * (1 - weighted_residue_dry_matter_lignin_fraction)
+        elif nitrogen_fraction_plant_residue == 0:
+            return 0
+        else:
+            raise ValueError("Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
+                             + str(nitrogen_fraction_plant_residue))
+
+
+
