@@ -13,7 +13,7 @@ components.
 Here are the basic steps needed to apply SA:
 1) First, decide which component(s) of the model on which you would like to conduct SA. For this example, I chose to
 evaluate the effects of feed composition on phosphorus requirements and manure production (for a given set of animals)
-over the coarse of a single day. Within RuFaS, `AnimalManagement.daily_updates()` simulates the animals over the coarse
+over the course of a single day. Within RuFaS, `AnimalManagement.daily_updates()` simulates the animals over the course
 of a day, so this will be the basis for our objective function.
 2) Then, ensure that the method of interest can be called from an objective function that meets the requirements of the
 SAlib. 

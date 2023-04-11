@@ -2,7 +2,7 @@
 
 Authors: Clay J. Morrow, Joseph Waddell <!-- TODO: Joe, Varma, and others, please add your name here when you make changes/additions -->   
 Date Created: 17 Mar 2023   
-Last Updated: 31 Mar 2023 <!-- NOTE: please remember to change this date when editing this file --> 
+Last Updated: 11 Apr 2023 <!-- NOTE: please remember to change this date when editing this file --> 
 
 __Contents:__
 1. [Overview](#overview)
@@ -48,7 +48,7 @@ Successful analyses will:
 variables of interest. This includes variables that the users have direct agency over and intermediary variables
 (or hyper-parameters) that can be used to fine-tune behavior of the model.
 * Improve our understanding of the relationships between variables, especially across modules.
-* 
+
 
 ---
 
@@ -101,12 +101,87 @@ An alternative solution would be to simply conduct the global SA of the entire R
 relatively poor understanding of the whole system 
 (see [Additional Discussion of RuFaS SA](#additional-discussion-of-rufas-sa) below). 
 
+Comment from @JoeWaddell: I am going to outline my process for this alternative solution below. My proposal is that we develop - either as a separate class entirely, or as an option within the existing SensitivityAnalysis class - a global method, despite the drawbacks of that approach.
+
+## Full-model analysis, e.g. global sensitivity analysis
+
+@JoeWaddell is formalizing global/full-model Sensitivity Analysis for RuFaS.
+As outlined above, RuFaS involves many stochastic processes, and any interpretation of outputs must be made
+ with careful consideration to initial context. 
+For example, when interpreting results from a series of functions that take into account air temperature,
+ the results are specific to a given set of weather conditions. 
+Many methods in RuFaS are highly nonlinear, because the results of nonlinear processes are used as inputs for other 
+ nonlinear processes, and so forth.
+This means that the user must be cognizant of this drawback, but the user can also be confident that for a given
+ setup, the results are reporting a believable spread of variance across input variables. This is because 
+ practical concerns will indeed want to understand the way in which a specific aspect of RuFaS affects different
+ outcomes *in a given context.*
+ What I mean to say is that function/method-focused sensitivity analyses may be generally of higher importance to 
+ developers or some researchers focused on a specific subfield, farmers and other decision-makers may want to use 
+ these tools to better understand a given system/setup over a range of input variables that they may be responsible for.
+ The idea here being if they can simulate a given farm, a full-model sensitivity analysis may serve as a tool for 
+ assessing the impact of a given modification to their system.
+
+To formalize the process prior to my full implementation of the procedure (the old code follows this process, in part):
+The user will define a list of inputs they want to modify, their location in RUFAS (either in JSONs or
+ constants.py files)
+If serial analysis is used, this process is straightforward. 
+The input files are modified such that each input variable's value reflects the sampled value for a given run.
+RuFaS main.py runs using these modified JSONs.
+Output files are read, the desired output variables are collected in a new database.
+The output database is analyzed using the SALib methods.
+
+However, in parallel, as outlined in issue [#408](https://github.com/RuminantFarmSystems/MASM/issues/408), RuFaS can
+ encounter grave problems when trying to access the same file from multiple processes, and furthermore we must ensure
+ that a given run uses a specific set of input values.
+Therefore, my general approach is to predefine a new file for *each* run. 
+ For example: we want to modify a single variable inside animal_management_animal.json
+ A specified SALib sampling process is called, and we're given a list of 1024 values across our desired range.
+ So we then follow a "setup" process to generate 1024 animal_management_animal.jsons, so that each RuFaS run
+ is using an entirely separate file. 
+ Note that this also requires a separate input file, to "point" us toward the correct json holding the variable of interest.
+ So in this example the first run calls animal_management_0000.json as the main input file, which inside is pointing to 
+ animal_management_animal_0000.json, where a given input variable is modified to reflect the 0th value of SALib sampling.
+The final step in such an analysis - or a method every X runs - is cleanup, deleting out the jsons that have been used.
+
+### More detail on variable modification
+#### Input variables, their ranges, and their locations
+Here the user will need to define the input variables themselves, the ranges over which they will be evaluated, and
+ the location in which we can find this variable. This can be supplied as a dictionary, where the key is a location,
+ the value is another dictionary where the keys are individual variable names, with their values being the ranges.
+This allows a single dictionary to act as the repository for a given analysis, to modify multiple files at once.
+
+##### JSON input variables
+I have tools in the old/archived code that *recursively* searches a defined JSON, and modifies the value to reflect the 
+ value defined in the current problem (e.g. the stage after sampling within the defined range)
+This requires some tweaking, as the method I wrote will modify the first key found in the json with a given name. Unique 
+ names are therefore required for this to function properly, until I can improve the method.
+
+##### .py file locations
+One option is to modify the .py file itself, akin to the solution of creating "setup" files for parallel analyses
+The alternative option is to interrupt main and re-initialize the values according to the values desired here, however 
+ this is complex, and would possibly require an `alternative main.py` just for parallelized sensitivity analyses.
+
+### Output variable locations
+Currently, this process is similar to the input variable method. We need to define the location of the variables of interest,
+  which are spread across multiple output files.
+The ideal solution is contingent on the output manager's implementation, whereby we simply need to parse the single JSON variables
+  output file and add those values to a separate SA_output JSON for each run. 
+  Consideration must be taken when naming these given parallelization concerns. Writing to a dictioanry where keys are 
+  the run number may be optimal.
+
 ---
 
 ## Testability, Monitoring, and Alerting
 
-I am unsure how to test the `SensitivityAnalysis` module, and I am unsure if it even needs to be tested. Perhaps
-some aspects should have formal tests, but because it is a stochastic process, it will be difficult.
+Because RuFaS involves many stochastic processes, testing full-model sensitivity analysis will be difficult.
+
+Nevertheless, once we've settled on the approach, we can start to build  unit tests to ensure that individual methods are working as expected.
+
+Likewise, we will develop integration tests, so we can ensure that a given dummy function performs some rudimentary calculation correctly.
+With a set of inputs, and we test the process from start to finish.
+The example SA-wrapper on animal_management is an alternative candidate.
+
 
 ---
 
