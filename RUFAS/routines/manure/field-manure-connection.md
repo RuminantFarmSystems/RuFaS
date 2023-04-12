@@ -1,7 +1,7 @@
 Title: Field-manure connection design  
-Authors: Clay Morrow; Loi Pham; Vempalli Sudharsan Varma  
+Authors: Clay Morrow; Loi Pham; Vempalli Sudharsan Varma; Ed Hansen  
 Date Created: 6 Feb 2023  
-Last update: 6 Feb 2023  
+Last update: 12 Apr 2023  
 
 # Introduction
 
@@ -30,13 +30,19 @@ purposes of this document:
   * *sweep*
   * *disk*/*coulter*
 
-# Desired variables
+Ideally, the transaction between the Manure module and the Field module would be stateless. This means that when an 
+application of manure is added to the field, the Manure module will put all the necessary variables into some type of 
+object and then the Field module will read all of those variables from that object. Field will have no knowledge of how
+much manure the Manure module is tracking in total or how it calculated the variables for that application of manure, 
+and vice versa.
 
+# Desired variables
 In order to keep the model flexible, we should probably anticipate all the future cases that RuFaS will need
 to handle (without necessarily implementing all possible scenarios at present). At the most complex, a farm may wish to
-utilize both solid manure and liquid manure separately. Therefore, the manure should perhaps be
-partitioned into two pools: **solid manure** and **manure slurry**. The default (and perhaps most common) scenario would
-be to only have slurry and no solid manure, but it is important to allow for both. The following example would easily
+utilize both manure applied by machine and by animals, and manure produced by both cow and non-cow sources (resulting in
+4 different types of manure pools - machine-applied cow, machine-applied non-cow, animal-applied cow, animal-applied 
+non-cow). Because RuFaS is more oriented towards modeling dairy farms, it may make sense to only track cow manure by 
+default, while still allowing for non-cow manure to be tracked. The following example would easily
 allow for this extension in the future:
 
 ```python
@@ -50,8 +56,10 @@ class ManureData:
 @dataclass
 class ManurePools:
   """class containing the available manure, partitioned into solid and slurry. Defaults to liquid-only"""
-  liquid_manure: Optional[ManureData] = ManureData()
-  solid_manure: Optional[ManureData] = None
+  stored_cow_manure: Optional[ManureData] = ManureData()
+  stored_non_cow_manure: Optional[ManureData] = None
+  grazing_cow_manure: Optional[ManureData] = ManureData()
+  grazing_non_cow_manure: Optional[ManureData] = None
 ```
 
 Below are the variables that we anticipate the modules will need access to from the other module.
@@ -61,12 +69,15 @@ Below are the variables that we anticipate the modules will need access to from 
 The manure will need the following variables. The units don't matter for now (but should be metric), 
 just be clear on what units you are reporting in, and we can handle conversion later, if necessary.
 * Manure amount:
-  - mass
-  - volume (necessary for liquid) and/or density (nice to have for solid)
-  - percent solid (for slurry; >= 80% is considered solid manure)
+  - dry weight equivalent of the manure
+  - percent dry matter content
+  - source animal ([Optional] cow, swine, or poultry)
+  - field coverage (fraction of the field that is covered by manure)
 * Nutrient concentrations (percent of manure mass):
   - Nitrogen
   - Phosphorus
+    - fraction of phosphorus that is water-extractable and inorganic
+    - (possibly) fraction of phosphorus that is water-extractable and organic
   - Potassium
   - Water (if convenient)
   - Carbon (if convenient)
