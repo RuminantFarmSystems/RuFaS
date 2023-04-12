@@ -136,7 +136,7 @@ class ResiduePartition:
     def _determine_plant_metabolic_active_carbon_usage(decomposition_moisture_effect: float,
                                                        decomposition_temperature_effect: float,
                                                        plant_metabolic_carbon_amount: float,
-                                                       metabolic_active_carbon_rate=0.28) -> float:
+                                                       plant_metabolic_active_carbon_rate=0.28) -> float:
         # TODO: Double check the metabolic_active_carbon_rate, again, pseudocode_soil differs from the original code
         #  #issue 425
         """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
@@ -148,7 +148,7 @@ class ResiduePartition:
             temperature effect on decomposition factor (unitless)
         plant_metabolic_carbon_amount: float
             plant metabolic carbon amount (kg/ha)
-        metabolic_active_carbon_rate: float
+        plant_metabolic_active_carbon_rate: float default = 0.28
             rate of decomposition from metabolic to active carbon (unitless)
 
         Returns
@@ -161,7 +161,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.5
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * \
-            plant_metabolic_carbon_amount * metabolic_active_carbon_rate
+            plant_metabolic_carbon_amount * plant_metabolic_active_carbon_rate
 
     @staticmethod
     def _determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
@@ -479,5 +479,33 @@ class ResiduePartition:
             (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
         return result
 
-    # @staticmethod
-    # def _determine_soil_metabolic_to_active_carbon_amount() -> float:
+    @staticmethod
+    def _determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture_effect: float,
+                                                          decomposition_temperature_effect: float,
+                                                          soil_metabolic_carbon_amount: float,
+                                                          soil_metabolic_active_carbon_rate=0.35) -> float:
+        """This method calculates the amount of soil metabolic carbon decomposed into active carbon
+
+        Parameters
+        ----------
+        decomposition_moisture_effect: float
+            moisture effect on decomposition factor (unitless)
+        decomposition_temperature_effect: float
+            temperature effect on decomposition factor (unitless)
+        soil_metabolic_carbon_amount: float
+            soil metabolic carbon amount (kg/ha)
+        soil_metabolic_active_carbon_rate: float default = 0.35
+            rate of decomposition from soil metabolic to active carbon (unitless)
+
+        Returns
+        -------
+        float
+            amount of soil metabolic carbon decomposed into active carbon(kg/ha)
+
+        References:
+        -------
+        pseudocode_soil S.6.B.II.7
+
+        """
+        return decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
+            soil_metabolic_active_carbon_rate

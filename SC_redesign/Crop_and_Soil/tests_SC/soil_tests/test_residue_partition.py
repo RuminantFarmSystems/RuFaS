@@ -328,3 +328,22 @@ def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: fl
                                                                                 soil_biomass,
                                                                                 soil_residue_metabolic_fraction,
                                                                                 soil_metabolic_to_active_carbon_amount)
+
+
+@pytest.mark.parametrize("decomposition_moisture_effect, decomposition_temperature_effect, "
+                         "soil_metabolic_carbon_amount", [
+                             (3, 8, 7),
+                             (60, 64, 85),
+                             (1.8, 1.1, 3.27),
+                         ])
+def test__determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture_effect: float,
+                                                           decomposition_temperature_effect: float,
+                                                           soil_metabolic_carbon_amount: float) -> None:
+    """Tests that the amount of soil metabolic carbon decomposed into active carbon was calculated correctly"""
+    soil_metabolic_active_carbon_rate = 0.35
+    expected = decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
+        soil_metabolic_active_carbon_rate
+    assert expected == ResiduePartition._determine_soil_metabolic_to_active_carbon_amount(
+        decomposition_moisture_effect,
+        decomposition_temperature_effect,
+        soil_metabolic_carbon_amount)
