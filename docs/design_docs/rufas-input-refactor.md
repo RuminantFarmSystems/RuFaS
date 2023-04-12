@@ -63,6 +63,53 @@ starting conditions.
 
 ## Existing Solution
 
+The main method of the model `run_rufas()` accepts a path to a JSON file or a directory of JSON files, via the 
+`input_path` argument. The file path(s) are passed to `execute_simulations_from_files()` (and `SimulationEngine`) 
+which runs RuFaS model using input specified in the files. The input files are located in the [input/](../../input) 
+directory by default and have two main components: 
+* overall configuration data (the "config" field) such as the time periods to be simulated, the random seed, the 
+location to which output files should be saved, etc.
+* and references to *other* input files to use. 
+
+Take, for example, the following input file `ARL.json`:
+
+```json
+{
+    "config":
+    {
+        "start_date" : "1990:1",
+        "end_date" : "2019:365",
+        "csv_dir": "output/CSVs/",
+        "graphic_dir": "output/graphics/",
+        "set_seed": false,
+        "seed": 0,
+        "simulate_animals": false
+    },
+    "weather": "ARL_weather.csv",
+    "output": "field_report.json",
+    "farm":
+    {
+        "fields": {
+            "field_1": {
+                "soil": "ARL_soil.json",
+                "crop": "ARL_rotation.json",
+                "field_management": "ARL_no_fert_field_management.json"
+            }
+        },
+        "animal": "barnyard_animal.json",
+        "feed": "purchased_feed.json",
+        "manure": "manure_management.json"
+    }
+}
+```
+
+The "config" field specifies the configuration information and the remaining fields are paths to other files. The 
+"weather" field points to a csv file containing weather data and the others point to additional json files. 
+Importantly, these referenced files are required to be in specific sub-directories of [input/](../../input): the 
+soil file [ARL_soil.json](../../input/soil/ARL_soil.json) is located at [input/soil/](../../input/soil), and must be 
+for the model to work properly. The Soil and Crop module locates and parses this file to get the data it needs, once 
+the program enters this module. 
+
 ## Proposed Solution
 
 ## Alternative Solutions
