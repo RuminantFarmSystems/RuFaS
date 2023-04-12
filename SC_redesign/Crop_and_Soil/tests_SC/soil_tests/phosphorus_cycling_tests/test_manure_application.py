@@ -207,6 +207,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     assert incorp.data.grazing_manure_dry_mass == 5000
     assert incorp.data.grazing_manure_moisture_factor == 0.6
     assert incorp.data.grazing_manure_field_coverage == 0.8
+    assert incorp.data.grazing_manure_applied_mass == dry_mass
 
 
 @pytest.mark.parametrize("dry_mass,dry_fraction,total_phosphorus_mass,coverage,area,weiP_frac,source_animal", [
@@ -241,3 +242,4 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
     else:
         incorp._apply_solid_machine_manure.assert_called_once_with(dry_mass, dry_fraction, total_phosphorus_mass,
                                                                    coverage, expected_weiP_frac)
+    assert incorp.data.machine_manure_applied_mass == dry_mass

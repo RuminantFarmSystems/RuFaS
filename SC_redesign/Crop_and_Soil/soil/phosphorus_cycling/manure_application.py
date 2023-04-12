@@ -59,6 +59,7 @@ class ManureApplication:
         self.data.grazing_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
+        self.data.grazing_manure_applied_mass = dry_matter_mass
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
@@ -106,6 +107,7 @@ class ManureApplication:
         else:
             self._apply_solid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
                                              field_coverage, water_extractable_inorganic_phosphorus_fraction)
+        self.data.machine_manure_applied_mass = dry_matter_mass
 
     def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                     total_phosphorus_mass: float, field_coverage: float,
