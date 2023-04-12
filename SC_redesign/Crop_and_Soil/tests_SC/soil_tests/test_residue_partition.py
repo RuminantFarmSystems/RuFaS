@@ -347,3 +347,23 @@ def test__determine_soil_metabolic_to_active_carbon_amount(decomposition_moistur
         decomposition_moisture_effect,
         decomposition_temperature_effect,
         soil_metabolic_carbon_amount)
+
+
+@pytest.mark.parametrize("soil_structural_carbon_amount, decomposition_moisture_effect,"
+                         "decomposition_temperature_effect", [
+                             (3, 8, 7),
+                             (60, 64, 85),
+                             (1.8, 1.1, 3.2),
+                         ])
+def test_determine_plant_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
+                                                                 decomposition_temperature_effect: float,
+                                                                 soil_structural_carbon_amount: float,
+                                                                 ) -> float:
+    """Tests that the amount of soil structural carbon decomposed into slow or active carbon was calculated correctly"""
+    soil_structural_to_slow_or_active_rate = 0.094
+    expected = decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
+        soil_structural_to_slow_or_active_rate
+    assert expected == ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount(
+        decomposition_moisture_effect,
+        decomposition_temperature_effect,
+        soil_structural_carbon_amount)

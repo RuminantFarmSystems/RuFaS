@@ -509,3 +509,40 @@ class ResiduePartition:
         """
         return decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
             soil_metabolic_active_carbon_rate
+
+    @staticmethod
+    def _determine_soil_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
+                                                                decomposition_temperature_effect: float,
+                                                                soil_structural_carbon_amount: float,
+                                                                soil_structural_to_slow_or_active_rate=0.094)\
+            -> float:
+        # TODO: soil_structural_to_slow_or_active_rate default value in pseudocode conflict with original code
+        """This methods determines the amount of soil structural carbon decomposed into slow or active carbon
+
+        Parameters
+        ----------
+        soil_structural_to_slow_or_active_rate: float
+            rate at which soil structural carbon decomposes into slow or active carbon (unitless)
+        decomposition_moisture_effect: float
+            moisture effect on decomposition factor (unitless)
+        decomposition_temperature_effect: float
+            temperature effect on decomposition factor (unitless)
+        soil_structural_carbon_amount: float
+            soil structural carbon amount(kg/ha)
+
+        Returns
+        -------
+        float
+            amount of soil structural carbon decomposed into slow or active carbon (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.10
+
+        Notes
+        -------
+        This method can be used for both calculating amount of soil structural carbon decomposed into slow and amount
+        of soil structural carbon decomposed into slow
+        """
+        return decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
+            soil_structural_to_slow_or_active_rate
