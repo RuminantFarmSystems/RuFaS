@@ -110,6 +110,28 @@ soil file [ARL_soil.json](../../input/soil/ARL_soil.json) is located at [input/s
 for the model to work properly. The Soil and Crop module locates and parses this file to get the data it needs, once 
 the program enters this module. 
 
+### Set-up Details
+
+The `SimulationEngine` class handles the set-up of the objects needed for the simulation (and submodules) through the
+`_initialize_simulation()` method:
+* the main input file is converted to a dictionary called `data`,    
+* the `Config` class is initialized with `Config(data['config'], data['weather'])`, which creates the `self.config`
+attribute and uses the contained path to the weather file 
+(by prepending "~/input/weather" to the string) to parse the file **for dates ranges only**.
+* the `Weather` class is initialized with `Weather(data['weather'], self.config)`, which *again* reads the
+weather file (using similar code to `Config`).
+* the `Time` class is initialized with `Time(self.config)`
+* the `State` class is initialized with `State(data['farm'], self.config, self.weather, self.time)`, 
+which initializes the required objects for each of the modules (simplified below):
+    - Crop and Soil: `Fields(data['fields'], time)`
+    - Feed: `Feed(feed_path)` - where `feed_path` is an expanded path to the `data['feed']` json file
+    - Animal: `AnimalManagement(animal_config, config, self.feed, weather, time)` - where `animal_config` is a modified
+      version of the dictionary created from the `data['animal']` json file, with the addition of a sub-dictionary 
+      created from the 'data['manure']` json file
+    - Manure: `ManureStorage(self.animal_management)` and `ManureManagement` - where `self.animal_management` is the 
+      instance of `AnimalManagement` referenced previously and `manure_management_config` is the dictionary created from
+      `data['manure']`
+
 ## Proposed Solution
 
 ## Alternative Solutions
