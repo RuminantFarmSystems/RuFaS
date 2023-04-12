@@ -383,8 +383,8 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
                                                  soil_structural_carbon_amount: float) -> None:
     """Tests that the updated soil structural carbon amount is calculated correctly"""
     expected = soil_structural_carbon_amount + structural_carbon_transfer_amount + soil_biomass * \
-            (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
-            soil_structural_to_slow_carbon_amount
+        (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+        soil_structural_to_slow_carbon_amount
 
     assert expected == ResiduePartition._determine_soil_structural_carbon_amount(
         soil_residue_metabolic_fraction,
