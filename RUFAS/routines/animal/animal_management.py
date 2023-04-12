@@ -574,14 +574,19 @@ class AnimalManagement:
         Parameters
         ----------
         num_stalls : int
-            The number of stalls in the pen.
+            The number of stalls in the pen. Must be greater than or equal to 0.
         max_stocking_density : float
-            The maximum stocking density for the pen.
+            The maximum stocking density for the pen. Must be greater than or equal to 0.
 
         Returns
         -------
         int
             The maximum number of animal spaces available in the pen.
+
+        Raises
+        ------
+        ValueError
+            If the number of stalls or maximum stocking density is less than 0.
 
         Examples
         --------
@@ -591,6 +596,9 @@ class AnimalManagement:
         10
 
         """
+
+        if num_stalls < 0 or max_stocking_density < 0:
+            raise ValueError('The number of stalls and maximum stocking density must be greater than or equal to 0.')
 
         return int(num_stalls * max_stocking_density)
 
@@ -823,16 +831,18 @@ class AnimalManagement:
         Raises
         ------
         ValueError
-            If the length of the allocation plan does not match the number of pens.
+            If the length of the allocation plan does not match the number of pens, or if the sum of the
+            allocation plan does not match the number of animals.
 
         """
 
         if len(allocation_plan) != len(animal_pens):
             raise ValueError("The length of the allocation plan must match the number of pens.")
-
-        animal_combination = animal_pens[0].animal_combination
+        elif sum(allocation_plan) != len(animals):
+            raise ValueError("The sum of the allocation plan must match the number of animals.")
 
         for i, count in enumerate(allocation_plan):
+            animal_combination = animal_pens[i].animal_combination
             animal_pens[i].update_animals(animals[:count], animal_combination)
             animals = animals[count:]
 
