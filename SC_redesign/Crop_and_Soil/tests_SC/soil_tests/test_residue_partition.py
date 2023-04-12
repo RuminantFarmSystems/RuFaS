@@ -366,3 +366,30 @@ def test_determine_soil_structural_to_slow_active_carbon_amount(decomposition_mo
         decomposition_moisture_effect,
         decomposition_temperature_effect,
         soil_structural_carbon_amount)
+
+
+@pytest.mark.parametrize("soil_residue_metabolic_fraction, structural_carbon_transfer_amount,"
+                         "soil_structural_to_active_carbon_amount, soil_structural_to_slow_carbon_amount, "
+                         "soil_biomass, soil_structural_carbon_amount", [
+                             (3, 8, 7, 1, 2, 5),
+                             (60, 64, 85, 40, 30, 99),
+                             (1.8, 1.1, 3.2, 0.8, 0.7, 0.3),
+                         ])
+def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction: float,
+                                                 structural_carbon_transfer_amount: float,
+                                                 soil_structural_to_active_carbon_amount: float,
+                                                 soil_structural_to_slow_carbon_amount: float,
+                                                 soil_biomass: float,
+                                                 soil_structural_carbon_amount: float) -> None:
+    """Tests that the updated soil structural carbon amount is calculated correctly"""
+    expected = soil_structural_carbon_amount + structural_carbon_transfer_amount + soil_biomass * \
+            (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+            soil_structural_to_slow_carbon_amount
+
+    assert expected == ResiduePartition._determine_soil_structural_carbon_amount(
+        soil_residue_metabolic_fraction,
+        structural_carbon_transfer_amount,
+        soil_structural_to_active_carbon_amount,
+        soil_structural_to_slow_carbon_amount,
+        soil_biomass,
+        soil_structural_carbon_amount)
