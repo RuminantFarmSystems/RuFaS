@@ -796,7 +796,7 @@ class Feed:
                 self.update_available_feed(silo.feed_key, 'limit',
                                            silo.DMI_forage_max)
                 silo.days_since_feedout += 1
-                self.new_forages.pop(self.new_forages.index( silo))
+                self.new_forages.pop(self.new_forages.index(silo))
             else:
                 silo.days_since_feedout += 1
         # yearly reset of silos
