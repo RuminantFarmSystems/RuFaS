@@ -479,5 +479,5 @@ class ResiduePartition:
             (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
         return result
 
-    @staticmethod
-    def _determine
+    # @staticmethod
+    # def _determine_soil_metabolic_to_active_carbon_amount() -> float:
