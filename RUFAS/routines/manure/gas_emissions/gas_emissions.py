@@ -160,6 +160,7 @@ class GasEmissions:
 
     @classmethod
     def calc_storage_ammonia_emission(cls,
+                                      num_animals: int,
                                       manure_total_ammoniacal_nitrogen: float,
                                       manure_volume: float,
                                       total_solids: float,
@@ -179,7 +180,7 @@ class GasEmissions:
         M = manure_mass - total_solids
         Q = cls._calc_Q(tempK, pH)
         loss = (TAN * c * p) / (r * M * Q)
-        total_loss = loss * storage_area
+        total_loss = loss * storage_area * num_animals
 
         return max(0.0, total_loss)
 

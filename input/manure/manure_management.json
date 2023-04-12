@@ -5,7 +5,7 @@
       "bedding_type": "sawdust",
       "manure_handler": "manual scraping",
       "manure_separator": "none",
-      "manure_treatment": "slurry storage underfloor"
+      "manure_treatment": "anaerobic lagoon"
     },
     {
       "scenario_id": 1,
