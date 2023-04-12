@@ -305,3 +305,26 @@ def test_determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio
     """test that the fraction of soil residue that is metabolic was calculated correctly"""
     expected = 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio
     assert expected == ResiduePartition._determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio)
+
+
+@pytest.mark.parametrize("soil_metabolic_carbon_amount, plant_metabolic_to_soil_carbon_amount,"
+                         "soil_biomass, soil_residue_metabolic_fraction, "
+                         "soil_metabolic_to_active_carbon_amount", [
+                             (50, 60, 70, 0.55, 0.5),  # larger amount
+                             (15, 16, 17, 0.96, 0.99),  # larger fraction
+                             (0, 14, 12, 0.8, 0.7),  # no soil_metabolic_carbon_amount at all
+                         ])
+def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: float,
+                                                plant_metabolic_to_soil_carbon_amount: float,
+                                                soil_biomass: float,
+                                                soil_residue_metabolic_fraction: float,
+                                                soil_metabolic_to_active_carbon_amount: float) -> None:
+    """Test that the amount of soil metabolic carbon was updated correctly"""
+    expected = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
+            (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+
+    assert expected == ResiduePartition._determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount,
+                                                                                plant_metabolic_to_soil_carbon_amount,
+                                                                                soil_biomass,
+                                                                                soil_residue_metabolic_fraction,
+                                                                                soil_metabolic_to_active_carbon_amount)

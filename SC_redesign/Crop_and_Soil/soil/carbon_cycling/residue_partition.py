@@ -166,7 +166,7 @@ class ResiduePartition:
     @staticmethod
     def _determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
                                                          tillage_fraction: float) -> float:
-        """This method calculates the the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
+        """This method calculates the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
 
         Parameters
         ----------
@@ -444,3 +444,37 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.5
         """
         return 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio
+
+    @staticmethod
+    def _determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: float,
+                                                plant_metabolic_to_soil_carbon_amount: float,
+                                                soil_biomass: float,
+                                                soil_residue_metabolic_fraction: float,
+                                                soil_metabolic_to_active_carbon_amount: float) -> float:
+        """This method updates the amount of soil metabolic carbon
+
+        Parameters
+        ----------
+        soil_metabolic_carbon_amount: float
+            the amount of soil metabolic carbon (kg/ha)
+        plant_metabolic_to_soil_carbon_amount: float
+            the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
+        soil_biomass: float
+            below ground biomass (unknown)
+        soil_residue_metabolic_fraction: float
+            the fraction of soil residue that is metabolic (unitless)
+        soil_metabolic_to_active_carbon_amount: float
+            the amount of soil metabolic carbon decomposed into active carbon (kg/ha)
+
+        Returns
+        -------
+        float
+            the updated amount of soil metabolic carbon (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.6, S.6.B.II.8
+        """
+        result = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
+            (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+        return result
