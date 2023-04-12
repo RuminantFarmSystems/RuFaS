@@ -355,10 +355,9 @@ def test__determine_soil_metabolic_to_active_carbon_amount(decomposition_moistur
                              (60, 64, 85),
                              (1.8, 1.1, 3.2),
                          ])
-def test_determine_plant_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
-                                                                 decomposition_temperature_effect: float,
-                                                                 soil_structural_carbon_amount: float,
-                                                                 ) -> float:
+def test_determine_soil_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
+                                                                decomposition_temperature_effect: float,
+                                                                soil_structural_carbon_amount: float) -> float:
     """Tests that the amount of soil structural carbon decomposed into slow or active carbon was calculated correctly"""
     soil_structural_to_slow_or_active_rate = 0.094
     expected = decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
