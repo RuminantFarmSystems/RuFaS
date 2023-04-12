@@ -40,6 +40,13 @@ class Manure:
         mean_air_temperature : float
             Mean air temperature on the current day (degrees C)
 
+        Notes
+        -----
+        This method orchestrates the three major processes (and one more minor process) that act on manure on the manure
+        on the surface of the field. The three major processes are leaching, decomposition, and assimilation. The minor
+        process is the adjustment of the manure's moisture factor. Leaching is conducted first, then the adjustment of
+        the moisture factors. Decomposition and assimilation occur simultaneously.
+
         """
         if rainfall > 0:
             self._leach_and_update_phosphorus_pools(rainfall, runoff, field_size)
@@ -293,7 +300,7 @@ class Manure:
 
         Returns
         -------
-        Dict
+        Dict (keys listed below)
             decomposed_machine_manure_mass_change: change in the mass of machine-applied manure on the field surface
                 decomposed on this day (kg)
             decomposed_machine_manure_coverage_change: change in field coverage of machine-applied manure on the field
@@ -343,7 +350,7 @@ class Manure:
 
         Returns
         -------
-        Dict
+        Dict (keys listed below)
             assimilated_machine_manure: amount of machine-applied manure that is assimilated on a given day (kg)
             machine_manure_coverage: amount of decrease in the fraction of field covered by machine-applied manure on a
                 given day (unitless)
@@ -405,7 +412,7 @@ class Manure:
 
         Returns
         -------
-        Dict
+        Dict (keys listed below)
             new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg)
             infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg)
             runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg)
