@@ -32,6 +32,9 @@ class SupportedSensitivityMethods(Enum):
     MORRIS = "morris"
     # TODO: add fractional factorial method
 
+# TODO: for some reason, the docstring formatting in this and Example-animal_management_SA-wrapper.py isn't rendering
+#   properly (e.g., equations) in the Pycharm preview. They may need to be tweaked.
+
 
 class SensitivityAnalysis:
     """Object for performing generalized global sensitivity analysis on an objective function over a set of parameters.
@@ -72,7 +75,6 @@ class SensitivityAnalysis:
     def __init__(self, fun: Callable, pars: List[str], bounds: List[Tuple[float, float]], method: str = "fs",
                  groups: Optional[List[str]] = None, outputs: Optional[List[str]] = None, sample_n: int = 2**10,
                  n_cores: int = 1, *args, **kwargs):
-        # TODO: specify the structure that is needed for `fun`
         """Sets up the sensitivity analysis object
 
         This method first calls assigns attributes from the given arguments, after verifying them with `_check_inputs()`
@@ -93,7 +95,7 @@ class SensitivityAnalysis:
         outputs : list[str], optional
             Names of the output variables
         sample_n : int, optional
-            Target number of samples (passed to `SALib.ProblemSpec.sample()` as `N`). Defaults to :math:`2^10`
+            Target number of samples (passed to `SALib.ProblemSpec.sample()` as :math:`N`). Defaults to :math:`2^10`
         n_cores : int, optional
             Number of cores/threads across which SA will be conducted. Defaults to 1.
         *args
@@ -106,6 +108,17 @@ class SensitivityAnalysis:
         If `n_cores=None`, then all the processors on your machine will be used. Because of poor interaction with
         Pycharm's interactive console, this is not currently the default but might be in the future, since it is the
         most sensible option.
+
+        The callable `objective_function` needs to conform to the standards required by SALib. Namely, this function
+        must take a numpy array `X` as its first input and must return a numpy.array as its output. The `X` that is
+        passed to `objective_function()` by this module is an :math:`N \\times P` matrix where :math:`P` columns
+        correspond to the parameters of the function and :math:`N` rows correspond to the sampled values of those
+        parameters. The resulting array should be a matrix with :math:`N \\times K` dimensions where :math:`K` columns
+        correspond to outputs of the model for a given parameter set. Each row of the results should represent the
+        output for parameter values in the corresponding row of `X`. See
+        `ProblemSpec.evaluate() <https://salib.readthedocs.io/en/latest/_modules/SALib/util/problem.html#ProblemSpec.evaluate>`_
+        and `Wrapping and existing model <https://salib.readthedocs.io/en/latest/user_guide/wrappers.html>`_ for more
+        examples on how to wrap existing functions.
         """
 
         self._check_inputs(pars, bounds, groups)
@@ -201,6 +214,12 @@ class SensitivityAnalysis:
         if self.sensitivity_method == SupportedSensitivityMethods.MORRIS:
             self.problem.sample(func=morris_sampler.sample, N=self.sample_n, *args, **kwargs)
 
+        # add column names to the sample array (does not work, for some reason)
+        # self.problem.samples.dtype = {
+        #     "names": self.parameter_names,
+        #     "formats": [numpy.float64] * len(self.parameter_names)
+        # }
+
     def evaluate_model(self) -> None:
         """Evaluates the objective function over the entire parameter sample space
 
@@ -213,8 +232,8 @@ class SensitivityAnalysis:
         Running this method in parallel will always result in a warning, indicating that it is experimental.
         """
         if self.parallel_processors > 1:
-            self.problem.evaluate(func=self.objective_function, nprocs=self.parallel_processors,
-                                  *self.additional_args, **self.additional_kwargs)
+            self.problem.evaluate(func=self.objective_function, *self.additional_args, nprocs=self.parallel_processors,
+                                  **self.additional_kwargs)
         else:
             self.problem.evaluate(func=self.objective_function, *self.additional_args, **self.additional_kwargs)
 
@@ -261,13 +280,14 @@ class SensitivityAnalysis:
     #   of parameters, based on the results of FAST or MORRIS. I've chosen to exclude that from this PR due to
     #   complications that I have not yet worked out. Those compound methods may prove not to be all that useful.
 
-    def __str__(self):  # TODO: need to implement this - formatted output from printing the object
+    def __str__(self):  # TODO: need to implement this - formatted output for printing the object
         pass
 
     def __repr__(self):  # TODO: need to implement this too.
         pass
 
 
+# ---- Examples ----
 if __name__ == '__main__':
     # Run Examples
     from SALib.test_functions import Ishigami, oakley2004
@@ -275,12 +295,18 @@ if __name__ == '__main__':
 
     # -- Simple: Ishigami function --
     sens = SensitivityAnalysis(Ishigami.evaluate, pars=["x1", "x2", "x3"], bounds=[(-numpy.pi, numpy.pi)]*3,
-                               groups=None, outputs=["response"], method="fast", n_cores=4)
+                               groups=None, outputs=["response"], method="fast", n_cores=1)
     sens.define_problem()
     sens.sample_parameter_space()
     sens.evaluate_model()
     sens.analyze_model()
     print(sens.problem.analysis)
+
+    expect_results = numpy.empty(shape=sens.problem.samples.shape[0])
+    for i in range(sens.problem.samples.shape[0]):  # for each row
+        M = sens.problem.samples[i, :]
+        x1, x2, x3 = M
+        # expect_results[i] = Ishigami.evaluate(M)
 
     # -- More complex: Oakley 2004 --
     weights = numpy.array([[1.0]*5 + [0.1]*5 + [0.01]*5,  # first 5 params have strong main effects, others are weaker
@@ -303,3 +329,4 @@ if __name__ == '__main__':
     sens2.problem.heatmap()
     sens2.problem.plot()
     pyplot.show()
+
