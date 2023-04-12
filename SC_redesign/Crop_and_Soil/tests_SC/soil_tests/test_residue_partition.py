@@ -321,7 +321,7 @@ def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: fl
                                                 soil_metabolic_to_active_carbon_amount: float) -> None:
     """Test that the amount of soil metabolic carbon was updated correctly"""
     expected = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-            (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+        (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
 
     assert expected == ResiduePartition._determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount,
                                                                                 plant_metabolic_to_soil_carbon_amount,
