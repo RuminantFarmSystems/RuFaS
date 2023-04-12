@@ -112,16 +112,18 @@ the program enters this module.
 
 ### Set-up Details
 
-The `SimulationEngine` class handles the set-up of the objects needed for the simulation (and submodules) through the
+The `SimulationEngine` class handles the set-up of the objects needed for the simulation (and submodules) through its
 `_initialize_simulation()` method:
-* the main input file is converted to a dictionary called `data`,    
+* the main input file is converted to a dictionary called `data` (with a convoluted method: why not just use 
+`json.load()` directly?)    
 * the `Config` class is initialized with `Config(data['config'], data['weather'])`, which creates the `self.config`
 attribute and uses the contained path to the weather file 
 (by prepending "~/input/weather" to the string) to parse the file **for dates ranges only**.
 * the `Weather` class is initialized with `Weather(data['weather'], self.config)`, which *again* reads the
 weather file (using similar code to `Config`).
 * the `Time` class is initialized with `Time(self.config)`
-* the `State` class is initialized with `State(data['farm'], self.config, self.weather, self.time)`, 
+* the `State` class is the main container class where the simulation variables are tracked and 
+is initialized with `State(data['farm'], self.config, self.weather, self.time)`, 
 which initializes the required objects for each of the modules (simplified below):
     - Crop and Soil: `Fields(data['fields'], time)`
     - Feed: `Feed(feed_path)` - where `feed_path` is an expanded path to the `data['feed']` json file
@@ -132,14 +134,85 @@ which initializes the required objects for each of the modules (simplified below
       instance of `AnimalManagement` referenced previously and `manure_management_config` is the dictionary created from
       `data['manure']`
 
+---
+
 ## Proposed Solution
+
+A better solution would be to have an `InputData` class, upon which `State` depends. `InputData` would contain *all*
+the data needed to set up the simulation: all user-given input (required and optional). `State` then would use this
+class to set up the objects needed for the simulation. A series of methods would be needed to create the `InputData`
+object from different input streams (e.g, json files vs user-created dictionaries vs csv config files). 
+Fig. 1 shows the proposed structure of this `InputData` class. The main `run_rufas()` method would handle this setup,
+taking `InputData` as a parameter.
+
+![proposed input system class relationships](input-system-diagram.jpg){#fig_one}
+*Fig. 1: Class relationship diagram of the proposed input system for RuFaS. `InputData` is a composite class that
+contains other dataclasses, built from user input. Each of these classes has methods for creating instances from
+different types of input data (the examples given are dictionaries, json files, csv files, and an internal database).
+The `State` class depends upon `InputData` to create its own component classes (`Config`, `Weather`, `Field`, 
+`AnimalManagement`, `ManureStorage`, `ManureManagement`, `Weather`, and `Time`), which are the main objects
+tracked throughout the simulation for each module of RuFaS.* 
+
+Then, another set of methods would be needed to parse the current input JSON files (those that contain path references
+and not actual data) and create the dictionaries or input formats needed to create `InputData`.
+
+With this design, the current method of running RuFaS would remain intact and additional paths would also open up, by
+allowing users to create the `InputData` class by whatever means suit their needs. With this single input object, a full
+RuFaS simulation can be executed.
+
+---
 
 ## Alternative Solutions
 
+One intermediate solution would be to simply expand all the JSON files into the usable data dictionaries in a single 
+class, in a uniform way, and then pass those dictionaries to `run_rufas()`, which would in turn pass them to the
+`State` call to initialize the set-up objects. This would be simpler but not as versatile - and it is structurally
+similar to the proposed solution.
+
+---
+
 ## Testability, Monitoring and Alerting
+
+Unit tests need to ensure that:
+* `InputData` can be properly created from any of the supported input structures
+* optional/advanced options are set to default values when not specified by users and set to user-specified vallues
+otherwise. 
+* `State` can properly initialize all simulation objects given a properly formatted `InputData` instance
+* `run_rufas()` correctly can execute a full simulation given a properly formatted `InputData` instance
+* an external method sets up `InputData` from the default JSON files prior to calling `run_rufas()` during a standard 
+(legacy) execution of RuFaS. 
+
+The model should alert users if a proper `InputData` instance cannot be created with the inputs given.  
+
+---
 
 ## Cross-Team Impact
 
+This change may have a moderate impact across RuFaS teams. Since the full model would depend upon `InputData`, each
+module must be aware of it and make any updates to how their module handles input in the setup method 
+(e.g., `State.setup_components()` from Fig. 1). Modules would also be responsible for maintaining their module-specific
+input data component classes (`FeedInput`, `AnimalInput`, etc.). Overall, the expected impact is positive, as it 
+will standardize and localize how the model accepts input and make the simulations more flexible.
+
+These changes will also positively affect the validation team, as it will facilitate sensitivity analyses, model 
+validation testing, and mathematical optimization of RuFaS parameters. 
+
+---
+
 ## Open Questions
 
+Here is a list of potential questions that should be considered:
+* Should we (now or in the future) standardize the structure of the module-specific components of the input classes 
+(`FeedInput`, `AnimalInput`, etc.).
+* Should we switch to using full paths to files rather than relying on strict directory structures? Similarly, we could
+use `json.load()` instead of our wrappers in the `Utility` class. 
+* Should we also reformat the structure of the input files to better fit this design? One example would be to have all
+the components in separate files: a config.json would configure the general simulation parameters, an animal.json would 
+contain the animal management data (as it does now), etc. Then the user would need to give paths to each of these
+files during the main execution of the model. 
+
+---
+
 ## Detailed Scoping and Timeline
+
+**TBD**
