@@ -121,6 +121,10 @@ class Manure:
         # Calculate bounding ratio
         # TODO: bound decomposition plus assimilation changes so that their sum cannot be greater than the original, ask
         #   Pete about best way to bound decomposition plus assimilation changes.
+        #   Problem: when the sum of decomposition and assimilation changes are greater than the amount in the pool they
+        #   are changing, the code limits the amount of decrease in the pool to the amount currently in the pool. But it
+        #   doesn't reset the decomposition and assimilation changes, so when it calculates increases in the pools that
+        #   stuff is decomposed or assimilated into it can be more than the amount that was removed from the pools.
         #   Possible Solution: ratio = total / (decomposition + assimilation), multiply decomposition and assimilation
         #   amounts by ratio to bound changes
 
