@@ -18,6 +18,7 @@ Reviewers: Clay Morrow
    i. [Other Requirements](#other-requirement-details)
 4. [Open Questions](#open-questions)
 5. [Beyond Version 1](#beyond-version-1)
+6. [Scoping](#scoping)
 
 --- 
 
@@ -151,11 +152,26 @@ phosphorus. It does this by resetting the various factors it maintains to an ave
 phosphorus application and the phosphorus already on the field.
 
 ### Manure
-The `Manure` submodule handles all daily operations on the phosphorus from manure that is currently on the field, and 
-will only have one method that gets called by higher-level modules. These operations consist of
-* Transferring phosphorus from the surface pools to soil phosphorus pools
-* Transferring phosphorus between different surface pools to reflect the chemical composition of the manure changing
-* Removing phosphorus from the surface pools as runoff occurs.
+The `Manure` submodule handles all daily operations on the surface manure and the phosphorus in it, and will only have 
+one method that gets called by higher-level modules. The operations that the daily update routine consist of are
+* Leaching phosphorus from the surface based on rainfall and runoff.
+  * When rainfall (and optionally runoff) occur, water-extractable phosphorus is leached from the manure, and this 
+  leached phosphorus is either transferred to the soil profile or moved off the field. The distribution between 
+  phosphorus that enters the soil profile and the phosphorus that leaves the field is based on the ratio of runoff to 
+  rainfall.
+* Adjusting the moisture factor of the phosphorus pools.
+  * Depending on how much rainfall occurs and what the current temperature is, the manure on the soil surface either 
+  gains or loses moisture.
+* Decomposing manure and phosphorus.
+  * The manure on the soil surface breaks down as time goes by, and loses mass and field coverage as that happens. 
+  * The phosphorus in that manure also *mineralizes* i.e., stable organic and inorganic phosphorus, as well as 
+  water-extractable organic manure, turn into water-extractable inorganic phosphorus.
+* Assimilating manure and phosphorus.
+  * Manure mass gets assimilated into the soil through the process of bioturbation (assimilation into soil by 
+  macroinvertebrates).
+  * Phosphorus in the surface manure pools is also transferred into the soil through bioturbation.  
+
+Notably, assimilation and decomposition are treated as simultaneous processes. 
 
 ### Mineralization
 This submodule will model the chemical transformations of phosphorus in the soil profile as it is mineralized and 
