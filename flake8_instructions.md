@@ -15,9 +15,13 @@ Additionally, any fixes to legacy styleguide violations you can do within the fi
 
 ## Installing Flake8 Locally
 
-To get started, install flake8 locally by opening an interactive shell and run this command:
+To get started, install flake8 locally by opening an interactive shell or terminal and run this command:
 
     python<version> -m pip install flake8
+
+For reference, in interactive shell command examples, angle brackets <\> are used to show places where user input may vary. They are not expected to be written into the eventual command. So when you run this script, it should look like this but with your specific python version in place of the one used here:
+
+    python3.9 -m pip install flake8
 
 In case you need your Python version, you can run this command in the same interactive shell:
 
@@ -28,6 +32,12 @@ In case you need your Python version, you can run this command in the same inter
 **Before** pushing your code to GitHub, check it with flake8. To do this, run the `cleanup.sh` script which looks **only** at any files that you have changed (committed and uncommitted) and checks for flake8 violations according to RuFaS' flake8 guidelines. This script should be run from the main `/MASM` directory (same directory as where you would run the simulation from).
 
     sh cleanup.sh
+
+The above script will default to checking your branch's code against the master branch. If you need to compare it to a branch other than master \(e.g. your base branch is a part of a refactor), just add the branch you would like to compare the code to after the above command:
+
+    sh cleanup.sh <branch-name>
+
+This will hopefully minimize duplicating work.
 
 ## Fixing the Flake8 violations
 
