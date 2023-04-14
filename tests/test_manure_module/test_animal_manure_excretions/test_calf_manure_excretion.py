@@ -1,0 +1,98 @@
+from typing import Optional
+
+from pytest import approx
+from pytest_mock import MockFixture
+
+from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+
+
+def test_calf_manure_excretions(mocker: MockFixture) -> None:
+    """Unit test for the manure_calculations function in calf_manure_excretion.py."""
+    # Arrange
+    mock_ration_formulation = mocker.MagicMock()
+    mock_feed = mocker.MagicMock()
+    body_weight = 100.0
+    fecal_phosphorus = 1.0
+    urine_phosphorus_required = 2.0
+
+    total_manure_excreted = 0.0567 * body_weight
+    total_solids = 0.0093 * body_weight
+    total_volatile_solids = 0.0023 * body_weight
+    degradable_volatile_solids = 0.9 * total_volatile_solids
+    non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
+
+    dry_matter_intake = 10.0
+    mock_nutrient_amounts = {
+        'dm': dry_matter_intake
+    }
+    CP_concentration = 11.0
+    mock_nutrient_concentrations = {
+        'CP': CP_concentration
+    }
+    patch_for_ration_report = mocker.patch(
+        'RUFAS.routines.animal.manure.calf_manure_excretion.ration_report',
+        return_value=(mock_nutrient_amounts, mock_nutrient_concentrations)
+    )
+    manure_nitrogen = 112.55 * dry_matter_intake * (CP_concentration / 100)
+    urine_nitrogen = 0.45 * manure_nitrogen
+
+    methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+
+    total_phosphorus_excreted = 3.0
+    inorganic_phosphorus_fraction = 0.4
+    organic_phosphorus_fraction = 0.6
+    manure_phosphorus_excreted = 1.2
+    manure_phosphorus_fraction = 0.3
+    patch_for_calculate_phosphorus_excretion_values = mocker.patch(
+        'RUFAS.routines.animal.manure.calf_manure_excretion.calculate_phosphorus_excretion_values',
+        return_value=(
+            total_phosphorus_excreted,
+            inorganic_phosphorus_fraction,
+            organic_phosphorus_fraction,
+            manure_phosphorus_excreted,
+            manure_phosphorus_fraction
+        )
+    )
+
+    urea = 0.340
+    urine = 2
+    total_ammoniacal_nitrogen_concentration = 0.14
+    potassium = 0.0
+
+    # Act
+    actual_total_phosphorus_excreted: float
+    manure_excretion_values: AnimalManureExcretions
+    actual_total_phosphorus_excreted, manure_excretion_values = manure_calculations(
+        ration_formulation=mock_ration_formulation,
+        feed=mock_feed,
+        body_weight=body_weight,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
+    )
+
+    # Assert
+    patch_for_ration_report.assert_called_once_with(mock_ration_formulation, mock_feed.available_feeds)
+    patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
+        daily_milk_production=0,
+        total_manure_excreted=total_manure_excreted,
+        fecal_phosphorus=fecal_phosphorus,
+        urine_phosphorus_required=urine_phosphorus_required
+    )
+    assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
+    assert manure_excretion_values['urea'] == approx(urea)
+    assert manure_excretion_values['urine'] == approx(urine)
+    assert manure_excretion_values['total_ammoniacal_nitrogen_concentration'] == \
+           approx(total_ammoniacal_nitrogen_concentration)
+    assert manure_excretion_values['urine_nitrogen'] == approx(urine_nitrogen)
+    assert manure_excretion_values['manure_nitrogen'] == approx(manure_nitrogen)
+    assert manure_excretion_values['manure_mass'] == approx(total_manure_excreted)
+    assert manure_excretion_values['total_solids'] == approx(total_solids)
+    assert manure_excretion_values['degradable_volatile_solids'] == approx(degradable_volatile_solids)
+    assert manure_excretion_values['non_degradable_volatile_solids'] == approx(non_degradable_volatile_solids)
+    assert manure_excretion_values['inorganic_phosphorus_fraction'] == approx(inorganic_phosphorus_fraction)
+    assert manure_excretion_values['organic_phosphorus_fraction'] == approx(organic_phosphorus_fraction)
+    assert manure_excretion_values['phosphorus'] == approx(manure_phosphorus_excreted)
+    assert manure_excretion_values['phosphorus_fraction'] == approx(manure_phosphorus_fraction)
+    assert manure_excretion_values['potassium'] == approx(potassium)
+    assert manure_excretion_values['methane'] == approx(methane_emission)

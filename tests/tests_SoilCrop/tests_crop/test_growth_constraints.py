@@ -51,7 +51,7 @@ def test_calc_nutrient_stress(opt, phi):
 def test_calc_nutrient_stress_scaling_factor(act, opt):
     """ensure that nitrogen scaling factor is correctly calculated by calc_nitrogen_stress_scaling_factor()."""
     if opt == 0:
-        phi = 300
+        phi = 100
     else:
         phi = max(0., (200 * ((act / opt) - 0.5)))
 

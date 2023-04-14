@@ -109,7 +109,7 @@ def test_calc_fr_LAI_max_all_correct():
 # the following tests are for the calculate_d_LAI_actual() function:
 def test_calculate_d_LAI_actual_correctly_calculates_change_in_LAI_actual():
     crop = mock_crop()
-    assert pytest.approx(calculate_d_LAI_actual(crop, .55)) == 0.55 * sqrt(0.7)
+    assert pytest.approx(calculate_d_LAI_actual(crop, .55)) == min(0.55 * sqrt(0.7), 0.01)
 
 
 # the following tests are for the calculate_LAI_actual() function

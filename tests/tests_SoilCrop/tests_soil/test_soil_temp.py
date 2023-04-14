@@ -97,18 +97,18 @@ def mock_weather(radiation = [[3.5]],T_avg = [[20]]):
 
 #test 1 uses time.day = 250, which would not activate the snow flag
 def test_calc_bcv_correctly_calculates_weighing_factor():
-    crop = mock_crop()
-    time = mock_time(day = 250)
+    crop = mock_base_crop()
+    time = mock_time(day=250)
 
     bcv = 5.0 / (5.0 + exp(7.563 - .0001297 * (-5.0)))
-    bcv_snow = (0/ (0+ exp(6.055 - 0.3002 * 0)))
+    bcv_snow = (0 / (0 + exp(6.055 - 0.3002 * 0)))
 
-    weigh_factor = calc_bcv(crop,time)
-    assert pytest.approx(weigh_factor) == max(bcv,bcv_snow)
+    weigh_factor = calc_bcv(crop, time)
+    assert pytest.approx(weigh_factor) == max(bcv, bcv_snow)
 
 #this test uses time.day = 360, which activates the snow flag
 def test_calc_bcv_correctly_calculates_weighing_factor_snow():
-    crop = mock_crop()
+    crop = mock_base_crop()
     time = mock_time(day = 360)
 
     bcv = 5.0 / (5.0 + exp(7.563 - .0001297 * (-5.0)))
@@ -118,7 +118,7 @@ def test_calc_bcv_correctly_calculates_weighing_factor_snow():
     assert pytest.approx(weigh_factor) == max(bcv,bcv_snow)
 
 def test_calc_bcv_correctly_calculates_all_weighing_factor_scenarios():
-    crop = mock_crop()
+    crop = mock_base_crop()
     time1 = mock_time(day = 250)
     time2 = mock_time(day = 360)
 
@@ -139,7 +139,7 @@ def test_calc_bcv_correctly_calculates_all_weighing_factor_scenarios():
 #the following test is for the calc_albedo() function
 def test_calc_albedo_correctly_calculates_albedo():
     soil = mock_soil()
-    crop = mock_crop()
+    crop = mock_base_crop()
 
     albedo = calc_albedo(soil,crop)
 
@@ -192,7 +192,7 @@ def test_calc_dd_correctly_calculates_damping_depth():
 #calc_radiate() tests...assumes dependencies work properly
 def test_calc_radiate_correctly_calculates_radiation_term():
     soil = mock_soil()
-    crop = mock_crop()
+    crop = mock_base_crop()
     weather = mock_weather()
     time = mock_time()
 
@@ -203,7 +203,7 @@ def test_calc_radiate_correctly_calculates_radiation_term():
 #calc_T_bare()...assumes dependencies work properly
 def test_calc_T_bare_correctly_calculates_theoretical_bare_soil_temp():
     soil = mock_soil()
-    crop = mock_crop()
+    crop = mock_base_crop()
     weather = mock_weather()
     time = mock_time()
 
@@ -214,7 +214,7 @@ def test_calc_T_bare_correctly_calculates_theoretical_bare_soil_temp():
 #calc_T_surf...assumes dependencies work correctly
 def test_calc_T_surf_correctly_calculates_surface_temperature():
     soil = mock_soil()
-    crop = mock_crop()
+    crop = mock_base_crop()
     weather = mock_weather()
     time = mock_time()
 
