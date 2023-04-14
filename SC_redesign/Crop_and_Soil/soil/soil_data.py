@@ -180,6 +180,11 @@ class SoilData:
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
+    plant_residue_metabolic_fraction: float = 0
+    """plant residue fraction that is metabolic (unitless)"""
+    total_residue = 0
+    """"amount of total residue (kg/ha)"""
+
 
 
 

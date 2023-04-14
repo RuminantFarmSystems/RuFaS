@@ -166,6 +166,23 @@ class LayerData:
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
+    plant_structural_carbon_amount: Optional[float] = None
+    """amount of plant structural carbon (kg/ha)"""
+    plant_metabolic_carbon_amount: Optional[float] = None
+    """plant metabolic carbon amount (hg/ha)"""
+    tillage_fraction: Optional[float] = None
+    """Fraction of metabolic carbon incorporated into soil during tillage (unitless)"""
+    # TODO: needs to create a method to update this, not sure where it would be
+    structural_carbon_transfer_amount: Optional[float] = None
+    """the amount of transfer of structural carbon during tillage (kg/ha)"""
+    soil_dry_matter_residue_amount: Optional[float] = None
+    """the amount of soil dry matter residue at harvest (kg/ha)"""
+    plant_dry_matter_residue_amount: Optional[float] = None
+    """the amount of plant dry matter residue at harvest (kg/ha)"""
+    plant_residue_metabolic_fraction: Optional[float] = None
+    """fraction of plant residue that is metabolic (unitless)"""
+
+
 
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""

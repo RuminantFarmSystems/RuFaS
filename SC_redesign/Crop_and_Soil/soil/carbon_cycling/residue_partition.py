@@ -1,5 +1,6 @@
 from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 import math
 
 """
@@ -17,11 +18,54 @@ class ResiduePartition:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not
 
-    def partition_residue(self, rainfall: float):
+    def partition_residue(self, rainfall: float, crop: CropData):
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_ratio(
             self.data.plant_residue_lignin_composition)
+        self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
+            self.data.plant_lignin_nitrogen_ratio)
+
+        for layer in self.data.soil_layers:
+            layer.plant_metabolic_active_carbon_usage = self._determine_plant_metabolic_active_carbon_usage(
+                layer.decomposition_moisture_effect,
+                self.data.decomposition_temperature_effect,
+                layer.plant_metabolic_carbon_amount)
+
+            layer.plant_metabolic_to_soil_carbon_amount = self._determine_plant_metabolic_to_soil_carbon_amount(
+                layer.plant_metabolic_carbon_amount,
+                layer.tillage_fraction
+            )
+
+            if self.data.soil_layers.index(layer) == 0:
+                layer.structural_carbon_transfer_amount = self.determine_structural_carbon_transfer_amount(
+                    layer.plant_structural_carbon_amount,
+                    layer.tillage_fraction
+                )
+
+                if crop.yield_collected > 0:
+                    layer.soil_dry_matter_residue_amount = crop.yield_residue * layer.tillage_fraction
+
+                self.data.total_residue += crop.yield_residue
+            else:
+                layer.structural_carbon_transfer_amount = 0
+                layer.soil_dry_matter_residue_amount = 0
+                crop.yield_residue = 0
+
+            layer.plant_metabolic_carbon_amount = self._determine_plant_metabolic_carbon_amount(
+                layer.plant_metabolic_carbon_amount,
+                layer.plant_residue_metabolic_fraction,
+                layer.plant_dry_matter_residue_amount,
+                layer.plant_metabolic_active_carbon_usage,
+                layer.plant_metabolic_to_soil_carbon_amount)
+
+
+
+
+
+
+
+
 
 
 
@@ -580,7 +624,7 @@ class ResiduePartition:
 
         References
         -------
-        pseudocode_soil S.6.B.II.9, S.6.B.I.11
+        pseudocode_soil S.6.B.II.9, S.6.B.II.11
         """
         updated_amount = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
             (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
