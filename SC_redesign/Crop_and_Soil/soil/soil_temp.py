@@ -26,11 +26,18 @@ class SoilTemp:
             snow_cover: water content of the snow cover on the current day (mm)
             avg_annual_air_temp: average annual air temperature (degrees C)
 
-        Important: SWAT does not specify how to start the simulation i.e. it does not specify what to do on day 0, when
+        Notes:
+            SWAT does not specify how to start the simulation i.e. it does not specify what to do on day 0, when
             there is no previous day's temperature. Currently, the implementation just uses the temperature that the
             soil starts (it sets the previous days temperature equal to the current day's temperature). This assumption
             is fairly reasonable due to temporal auto-correlation, but does not account for the random fluctuations
             that can occur throughout the year.
+
+            Because this model now simulates the top 20 mm of the soil profile as its own layer for the purpose of
+            tracking phosphorus runoff, this module first performs operations specifically on the top 2 layers of soil.
+            The result is that this module treats the top two layers of soil as if they were 1, i.e. both layers are set
+            to be the same temperature every day. For every day of the of simulation besides potentially the first, the
+            top two layers of soil will have the same temperature.
 
         SWAT Reference: section 1:1.3.3
         """
@@ -44,10 +51,28 @@ class SoilTemp:
         cover_factor = self._determine_cover_weighting_factor(plant_cover, snow_cover)
         if self.data.soil_layers[0].previous_day_temperature is None:
             self.data.soil_layers[0].previous_day_temperature = self.data.soil_layers[0].temperature
+            self.data.soil_layers[1].previous_day_temperature = self.data.soil_layers[1].temperature
+        combined_previous_top_soil_layer_temp = self._determine_weighted_average_temperature(
+            self.data.soil_layers[0].previous_day_temperature, self.data.soil_layers[0].layer_thickness,
+            self.data.soil_layers[1].previous_day_temperature, self.data.soil_layers[1].layer_thickness)
         actual_soil_surface_temp = self._determine_soil_surface_temp(cover_factor,
-                                                                     self.data.soil_layers[0].previous_day_temperature,
+                                                                     combined_previous_top_soil_layer_temp,
                                                                      bare_soil_surface_temp)
-        for layer in self.data.soil_layers:
+
+        new_combined_previous_top_soil_temperature = self._determine_weighted_average_temperature(
+            self.data.soil_layers[0].temperature, self.data.soil_layers[0].layer_thickness,
+            self.data.soil_layers[1].temperature, self.data.soil_layers[1].layer_thickness
+        )
+        combined_top_layer_center_depth = self.data.soil_layers[1].bottom_depth / 2
+        depth_factor = self._determine_depth_factor(combined_top_layer_center_depth, damping_depth)
+        new_combined_top_soil_temperature = self._determine_average_soil_temperature(
+            self.data.previous_temperature_effect, new_combined_previous_top_soil_temperature, depth_factor,
+            avg_annual_air_temp, actual_soil_surface_temp)
+        for layer in self.data.soil_layers[:2]:
+            layer.previous_day_temperature = combined_previous_top_soil_layer_temp
+            layer.temperature = new_combined_top_soil_temperature
+
+        for layer in self.data.soil_layers[2:]:
             new_previous_temperature = layer.temperature
             layer_depth_factor = self._determine_depth_factor(layer.depth_of_layer_center, damping_depth)
             if layer.previous_day_temperature is None:
@@ -175,6 +200,32 @@ class SoilTemp:
         plant_factor = plant_cover / (plant_cover + exp(7.563 - ((1.297 * 10 ** (-4)) * plant_cover)))
         snow_factor = snow_cover / (snow_cover + exp(6.055 - (0.3002 * snow_cover)))
         return max(plant_factor, snow_factor)
+
+    @staticmethod
+    def _determine_weighted_average_temperature(first_layer_temp: float, first_layer_thickness: float,
+                                                second_layer_temp: float, second_layer_thickness: float) -> float:
+        """This method determines a weighted average temperature of two soil layers based on their thicknesses.
+
+        Parameters
+        ----------
+        first_layer_temp : float
+            Temperature of the first layer (degrees C)
+        first_layer_thickness : float
+            Thickness of the first layer (mm)
+        second_layer_temp : float
+            Temperature of the second layer (degrees C)
+        second_layer_thickness : float
+            Thickness of the second layer (mm)
+
+        Returns
+        -------
+        float
+            The weighted average temperature of the two soil layers passed (degrees C)
+
+        """
+        weighted_top_temp = first_layer_temp * first_layer_thickness
+        weighted_bottom_temp = second_layer_temp * second_layer_thickness
+        return (weighted_top_temp + weighted_bottom_temp) / (first_layer_thickness + second_layer_thickness)
 
     @staticmethod
     def _determine_soil_surface_temp(cover_weighting_factor: float, previous_top_soil_layer_temp: float,
