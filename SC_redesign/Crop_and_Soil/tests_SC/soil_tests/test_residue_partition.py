@@ -215,26 +215,26 @@ def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amoun
                                                                                   tillage_fraction)
 
 
-@pytest.mark.parametrize("soil_dry_matter_residue_amount, soil_biomass", [
+@pytest.mark.parametrize("soil_dry_matter_residue_amount, root_biomass", [
     (15, 14),  # default
     (50, 2.2),  # increased soil_dry_matter_residue_amount
-    (3, 24),  # increased soil_biomass
-    (1.8, 0.01),  # decreased soil_dry_matter_residue_amount & soil_biomass
+    (3, 24),  # increased root_biomass
+    (1.8, 0.01),  # decreased soil_dry_matter_residue_amount & root_biomass
     (0, 0.4),  # no soil_dry_matter_residue_amount
-    (2, 0),  # no soil_biomass
+    (2, 0),  # no root_biomass
     (0, 0),  # neither
 ])
 def test_determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
-                                                               soil_biomass: float) -> None:
+                                                               root_biomass: float) -> None:
     """Tests that the weighted fractional of lignin amount in residue dry matter was calculated correctly under each
      condition"""
-    if soil_dry_matter_residue_amount + soil_biomass != 0:
-        expected = soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + soil_biomass)
+    if soil_dry_matter_residue_amount + root_biomass != 0:
+        expected = soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + root_biomass)
     else:
         expected = 0
 
     assert expected == ResiduePartition._determine_weighted_residue_dry_matter_lignin_fraction(
-        soil_dry_matter_residue_amount, soil_biomass)
+        soil_dry_matter_residue_amount, root_biomass)
 
 
 @pytest.mark.parametrize("weighted_residue_dry_matter_lignin_fraction, rainfall", [
@@ -308,7 +308,7 @@ def test_determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio
 
 
 @pytest.mark.parametrize("soil_metabolic_carbon_amount, plant_metabolic_to_soil_carbon_amount,"
-                         "soil_biomass, soil_residue_metabolic_fraction, "
+                         "root_biomass, soil_residue_metabolic_fraction, "
                          "soil_metabolic_to_active_carbon_amount", [
                              (50, 60, 70, 0.55, 0.5),  # larger amount
                              (15, 16, 17, 0.96, 0.99),  # larger fraction
@@ -316,16 +316,16 @@ def test_determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio
                          ])
 def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: float,
                                                 plant_metabolic_to_soil_carbon_amount: float,
-                                                soil_biomass: float,
+                                                root_biomass: float,
                                                 soil_residue_metabolic_fraction: float,
                                                 soil_metabolic_to_active_carbon_amount: float) -> None:
     """Test that the amount of soil metabolic carbon was updated correctly"""
     expected = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-        (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+        (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
 
     assert expected == ResiduePartition._determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount,
                                                                                 plant_metabolic_to_soil_carbon_amount,
-                                                                                soil_biomass,
+                                                                                root_biomass,
                                                                                 soil_residue_metabolic_fraction,
                                                                                 soil_metabolic_to_active_carbon_amount)
 
@@ -370,7 +370,7 @@ def test_determine_soil_structural_to_slow_active_carbon_amount(decomposition_mo
 
 @pytest.mark.parametrize("soil_residue_metabolic_fraction, structural_carbon_transfer_amount,"
                          "soil_structural_to_active_carbon_amount, soil_structural_to_slow_carbon_amount, "
-                         "soil_biomass, soil_structural_carbon_amount", [
+                         "root_biomass, soil_structural_carbon_amount", [
                              (3, 8, 7, 1, 2, 5),
                              (60, 64, 85, 40, 30, 99),
                              (1.8, 1.1, 3.2, 0.8, 0.7, 0.3),
@@ -379,10 +379,10 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
                                                  structural_carbon_transfer_amount: float,
                                                  soil_structural_to_active_carbon_amount: float,
                                                  soil_structural_to_slow_carbon_amount: float,
-                                                 soil_biomass: float,
+                                                 root_biomass: float,
                                                  soil_structural_carbon_amount: float) -> None:
     """Tests that the updated soil structural carbon amount is calculated correctly"""
-    expected = soil_structural_carbon_amount + structural_carbon_transfer_amount + soil_biomass * \
+    expected = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
         (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
         soil_structural_to_slow_carbon_amount
 
@@ -391,5 +391,5 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
         structural_carbon_transfer_amount,
         soil_structural_to_active_carbon_amount,
         soil_structural_to_slow_carbon_amount,
-        soil_biomass,
+        root_biomass,
         soil_structural_carbon_amount)
