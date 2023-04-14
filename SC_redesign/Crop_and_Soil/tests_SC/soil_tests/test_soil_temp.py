@@ -6,6 +6,19 @@ from math import exp, log
 
 
 # --- Static function tests ---
+@pytest.mark.parametrize("top_temp,top_thickness,bottom_temp,bottom_thickness", [
+    (14.52, 20, 13.29, 30),
+    (16.99, 20, 16.78, 60),
+    (11, 20, 24, 66),
+])
+def test_determine_weighted_average_temperature(top_temp: float, top_thickness: float, bottom_temp: float,
+                                                bottom_thickness: float) -> None:
+    """Tests that the correct weighted average temperature is calculated for the two soil layers given."""
+    observe = SoilTemp._determine_weighted_average_temperature(top_temp, top_thickness, bottom_temp, bottom_thickness)
+    expect = (top_temp * top_thickness + bottom_temp * bottom_thickness) / (top_thickness + bottom_thickness)
+    assert observe == expect
+
+
 @pytest.mark.parametrize("bulk_density", [
     0,
     1.89,
@@ -43,7 +56,7 @@ def test_determine_scaling_factor(water_content, density, bottom_depth):
 def test_determine_damping_depth(max_damping_depth, scaling_factor):
     """tests _determine_damping_depth() in soil_temp.py"""
     observe = SoilTemp._determine_damping_depth(max_damping_depth, scaling_factor)
-    expect = max_damping_depth * exp(log(500 / max_damping_depth) * ((1 - scaling_factor) / (1 + scaling_factor))**2)
+    expect = max_damping_depth * exp(log(500 / max_damping_depth) * ((1 - scaling_factor) / (1 + scaling_factor)) ** 2)
     assert observe == expect
 
 
@@ -160,13 +173,14 @@ def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, 
     incorp._determine_radiation_factor = MagicMock(return_value=0.5)
     incorp._determine_bare_soil_surface_temp = MagicMock(return_value=20)
     incorp._determine_cover_weighting_factor = MagicMock(return_value=0.5)
+    incorp._determine_weighted_average_temperature = MagicMock(return_value=15)
     incorp._determine_soil_surface_temp = MagicMock(return_value=18.5)
     incorp._determine_depth_factor = MagicMock(return_value=0.5)
     incorp._determine_average_soil_temperature = MagicMock(return_value=14)
 
     # Record expected previous day temperature values
-    expect_prev_temps = []
-    for layer in incorp.data.soil_layers:
+    expect_prev_temps = [15, 15]
+    for layer in incorp.data.soil_layers[2:]:
         expect_prev_temps.append(layer.temperature)
 
     # Run method
@@ -185,8 +199,9 @@ def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, 
     incorp._determine_soil_surface_temp.assert_called_with(0.5, incorp.data.soil_layers[0].previous_day_temperature,
                                                            20)
 
-    assert incorp._determine_depth_factor.call_count == len(data.soil_layers)
-    assert incorp._determine_average_soil_temperature.call_count == len(data.soil_layers)
+    assert incorp._determine_weighted_average_temperature.call_count == 2
+    assert incorp._determine_depth_factor.call_count == len(data.soil_layers) - 1
+    assert incorp._determine_average_soil_temperature.call_count == len(data.soil_layers) - 1
     for layer_index in range(len(incorp.data.soil_layers)):
         assert 14 == incorp.data.soil_layers[layer_index].temperature
         assert expect_prev_temps[layer_index] == incorp.data.soil_layers[layer_index].previous_day_temperature
@@ -205,8 +220,12 @@ def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, 
     incorp._determine_bare_soil_surface_temp.assert_called_with(0.5, avg_temp, min_temp, max_temp)
     incorp._determine_cover_weighting_factor.assert_called_with(plant_cover, snow_cover)
     incorp._determine_soil_surface_temp.assert_called_with(0.5, expect_prev_temps[0], 20)
-    assert incorp._determine_depth_factor.call_count == 2 * len(data.soil_layers)
-    assert incorp._determine_average_soil_temperature.call_count == 2 * len(data.soil_layers)
-    for layer in incorp.data.soil_layers:
+    assert incorp._determine_weighted_average_temperature.call_count == 4
+    assert incorp._determine_depth_factor.call_count == 2 * (len(data.soil_layers) - 1)
+    assert incorp._determine_average_soil_temperature.call_count == 2 * (len(data.soil_layers) - 1)
+    for layer in incorp.data.soil_layers[:2]:
+        assert 14 == layer.temperature
+        assert 15 == layer.previous_day_temperature
+    for layer in incorp.data.soil_layers[2:]:
         assert 14 == layer.temperature
         assert 14 == layer.previous_day_temperature

@@ -67,7 +67,7 @@ def residue_partitioning(soil, crop_type, weather, time):
 
             AG_struct_to_BG_struct = layer.AG_struct * layer.tillage_percent
 
-            if crop_type.extracted == True:  # if we extract biomass
+            if crop_type.extracted:  # if we extract biomass
 
                 ag_biomass = soil.residue_harvest
 
