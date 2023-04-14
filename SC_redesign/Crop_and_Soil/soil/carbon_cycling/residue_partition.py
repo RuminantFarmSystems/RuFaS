@@ -17,6 +17,15 @@ class ResiduePartition:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not
 
+    def partition_residue(self, rainfall: float):
+        self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
+            self.data.plant_residue_lignin_composition, rainfall)
+        self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_ratio(
+            self.data.plant_residue_lignin_composition)
+
+
+
+
     @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float,
                                                     rainfall: float) -> None:
