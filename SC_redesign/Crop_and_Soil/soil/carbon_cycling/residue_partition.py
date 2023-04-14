@@ -60,7 +60,7 @@ class ResiduePartition:
         Returns
         -------
         float
-            plant lignin to nitrogen ratio (Dimensionless unit)
+            plant lignin to nitrogen ratio (unitless)
 
         References
         -------
@@ -81,7 +81,7 @@ class ResiduePartition:
         Parameters
         ----------
         plant_lignin_nitrogen_ratio : float
-            plant lignin to nitrogen ratio (Dimensionless unit)
+            plant lignin to nitrogen ratio (unitless)
 
         Returns
         -------
@@ -137,8 +137,6 @@ class ResiduePartition:
                                                        decomposition_temperature_effect: float,
                                                        plant_metabolic_carbon_amount: float,
                                                        plant_metabolic_active_carbon_rate=0.28) -> float:
-        # TODO: Double check the metabolic_active_carbon_rate, again, pseudocode_soil differs from the original code
-        #  #issue 425
         """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
         Parameters
         ----------
@@ -148,7 +146,7 @@ class ResiduePartition:
             temperature effect on decomposition factor (unitless)
         plant_metabolic_carbon_amount: float
             plant metabolic carbon amount (kg/ha)
-        plant_metabolic_active_carbon_rate: float default = 0.28
+        plant_metabolic_active_carbon_rate: float default = 0.28 (Parton et al. 1987)
             rate of decomposition from metabolic to active carbon (unitless)
 
         Returns
@@ -188,12 +186,11 @@ class ResiduePartition:
     @staticmethod
     def _determine_plant_structural_to_slow_or_active_rate(plant_residue_metabolic_fraction: float,
                                                            structural_decomposition_factor=0.076) -> float:
-        # TODO: check with subject expert for structural_decomposition_factor's default value. issue #428
         """This method calculates the rate at which above ground structural carbon decomposes into slow or active carbon
 
         Parameters
         ----------
-        structural_decomposition_factor: float, default = 0.076
+        structural_decomposition_factor: float, default = 0.076 (Parton et al. 1987)
             structural decomposition factor (unitless)
         plant_residue_metabolic_fraction: float
             fraction of plant residue that is metabolic (unitless)
@@ -210,7 +207,6 @@ class ResiduePartition:
         -------
         the equation used here currently follows the old code to make mathematical sense
         """
-        # TODO: contradiction with the equation in pseudocode_soil. issue #427
         return structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
 
     @staticmethod
@@ -329,21 +325,21 @@ class ResiduePartition:
 
         Notes
         -------
-        This calculation does not exits in the original code, it's added in order for its usage in S.6.B.II.2
+        This calculation does not exist in the original code, it's added in order for its usage in S.6.B.II.2
         """
         return plant_dry_matter_residue_amount * tillage_fraction
 
     @staticmethod
     def _determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
-                                                               soil_biomass: float) -> float:
+                                                               root_biomass: float) -> float:
         """Calculates the weighted fractional of lignin amount in residue dry matter
 
         Parameters
         ----------
         soil_dry_matter_residue_amount: float
             the amount of soil dry matter residue at harvest (kg/ha)
-        soil_biomass: float
-            below ground biomass (unknown)
+        root_biomass: float
+            root biomass (kg/ha)
 
         Returns
         -------
@@ -359,9 +355,8 @@ class ResiduePartition:
         the referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
         mention of biomass unit
         """
-        # TODO: check with subject experts to determine biomass's unit isse #432
-        if soil_dry_matter_residue_amount + soil_biomass != 0:
-            return soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + soil_biomass)
+        if soil_dry_matter_residue_amount + root_biomass != 0:
+            return soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + root_biomass)
         else:
             return 0
 
@@ -386,6 +381,7 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.II.3
         """
+        # TODO: Check where the 0.15 and 0.01 factors came from issue #445
         return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
 
     @staticmethod
@@ -398,7 +394,7 @@ class ResiduePartition:
         Parameters
         ----------
         plant_lignin_nitrogen_ratio: float
-            plant lignin to nitrogen ratio (dimensionless unit)
+            plant lignin to nitrogen ratio (unitless)
         weighted_residue_dry_matter_lignin_fraction: float
             weighted fraction of lignin in residue dry matter (unitless)
         soil_residue_lignin_fraction: float
@@ -422,7 +418,7 @@ class ResiduePartition:
         elif nitrogen_fraction_plant_residue == 0:
             return 0
         else:
-            raise ValueError("Expected nitrogen_fraction_plant_residue be between 0.0-1.0, received "
+            raise ValueError("Expected nitrogen_fraction_plant_residue to be between 0.0-1.0, received "
                              + str(nitrogen_fraction_plant_residue))
 
     @staticmethod
@@ -443,12 +439,12 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.II.5
         """
-        return 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio
+        return max(0.0, 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio)
 
     @staticmethod
     def _determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: float,
                                                 plant_metabolic_to_soil_carbon_amount: float,
-                                                soil_biomass: float,
+                                                root_biomass: float,
                                                 soil_residue_metabolic_fraction: float,
                                                 soil_metabolic_to_active_carbon_amount: float) -> float:
         """This method updates the amount of soil metabolic carbon
@@ -459,8 +455,8 @@ class ResiduePartition:
             the amount of soil metabolic carbon (kg/ha)
         plant_metabolic_to_soil_carbon_amount: float
             the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
-        soil_biomass: float
-            below ground biomass (unknown)
+        root_biomass: float
+            root biomass (kg/ha)
         soil_residue_metabolic_fraction: float
             the fraction of soil residue that is metabolic (unitless)
         soil_metabolic_to_active_carbon_amount: float
@@ -476,7 +472,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.6, S.6.B.II.8
         """
         result = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-            (soil_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+            (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
         return result
 
     @staticmethod
@@ -515,12 +511,11 @@ class ResiduePartition:
                                                                 decomposition_temperature_effect: float,
                                                                 soil_structural_carbon_amount: float,
                                                                 soil_structural_to_slow_or_active_rate=0.094) -> float:
-        # TODO: soil_structural_to_slow_or_active_rate default value in pseudocode conflict with original code issue#438
         """This methods determines the amount of soil structural carbon decomposed into slow or active carbon
 
         Parameters
         ----------
-        soil_structural_to_slow_or_active_rate: float
+        soil_structural_to_slow_or_active_rate: float default = 0.094 (Parton et al. 1987)
             rate at which soil structural carbon decomposes into slow or active carbon (unitless)
         decomposition_moisture_effect: float
             moisture effect on decomposition factor (unitless)
@@ -540,8 +535,8 @@ class ResiduePartition:
 
         Notes
         -------
-        This method can be used for both calculating amount of soil structural carbon decomposed into slow and amount
-        of soil structural carbon decomposed into slow
+        This method can be used for both calculating amount of soil structural carbon decomposed into slow carbon and
+        amount of soil structural carbon decomposed into active carbon.
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
             soil_structural_to_slow_or_active_rate
@@ -551,7 +546,7 @@ class ResiduePartition:
                                                  structural_carbon_transfer_amount: float,
                                                  soil_structural_to_active_carbon_amount: float,
                                                  soil_structural_to_slow_carbon_amount: float,
-                                                 soil_biomass: float,
+                                                 root_biomass: float,
                                                  soil_structural_carbon_amount: float) -> float:
         """Calculates the updated soil structural carbon amount
 
@@ -565,8 +560,8 @@ class ResiduePartition:
             amount of soil structural carbon decomposed into slow carbon (kg/ha)
         soil_structural_to_slow_carbon_amount: float
             amount of soil structural carbon decomposed into active carbon (kg/ha)
-        soil_biomass: float
-            below ground biomass (kg)
+        root_biomass: float
+            root biomass (kg/ha)
         soil_structural_carbon_amount: float
             soil structural carbon amount (kg/ha)
         Returns
@@ -578,7 +573,7 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.II.9, S.6.B.I.11
         """
-        updated_amount = soil_structural_carbon_amount + structural_carbon_transfer_amount + soil_biomass * \
+        updated_amount = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
             (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
             soil_structural_to_slow_carbon_amount
 
