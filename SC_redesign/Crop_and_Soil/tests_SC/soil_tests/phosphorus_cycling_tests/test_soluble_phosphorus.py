@@ -1,9 +1,10 @@
 import pytest
 from unittest.mock import MagicMock
+from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS
+    CUBIC_MILLIMETERS_TO_LITERS, CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
 
 
@@ -31,6 +32,33 @@ def test_determine_isotherm_intercept(slope: float) -> None:
     """Tests that the intercept of the phosphorus sorption isotherm is calculated correctly."""
     observed = SolublePhosphorus._determine_isotherm_intercept(slope)
     expected = (4.726 * slope) - 8.97
+    assert observed == expected
+
+
+@pytest.mark.parametrize("phosphorus,density,depth,area", [
+    (25, 22.13, 20, 1.88),
+    (13, 34.556, 9.12, 3.45),
+    (1.2344, 19.84, 15, 2.3341),
+])
+def test_determine_soil_phosphorus_concentration(phosphorus: float, density: float, depth: float, area: float) -> None:
+    """Tests that the soil phosphorus concentration is calculated correctly."""
+    observed = SolublePhosphorus._determine_soil_phosphorus_concentration(phosphorus, density, depth, area)
+    total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+    total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
+    total_phosphorus_mass = phosphorus * area
+    expected_concentration = (total_phosphorus_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
+    assert pytest.approx(observed) == expected_concentration
+
+
+@pytest.mark.parametrize("phosphorus,slope,intercept", [
+    (28, 60.29, 194),
+    (12, 33.294, 145.56),
+    (86, 46.792, 167.398),
+])
+def test_determine_dissolved_reactive_phosphorus_leachate(phosphorus: float, slope: float, intercept: float) -> float:
+    """Tests that the amount of phosphorus calculated to leach out of the layer is correct."""
+    observed = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(phosphorus, slope, intercept)
+    expected = min(20.0, exp(((phosphorus * 1.5) - intercept) / slope))
     assert observed == expected
 
 

@@ -1,8 +1,9 @@
 from typing import Optional
+from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS
+    CUBIC_MILLIMETERS_TO_LITERS, CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS
 
 """
 This module tracks the movement of phosphorus in the soil profile based on equations from APLE.
@@ -23,7 +24,7 @@ class SolublePhosphorus:
         """
         self.data = soil_data or SoilData()
 
-    def daily_update_routine(self, runoff: float) -> None:
+    def daily_update_routine(self, runoff: float, field_size: float) -> None:
         """Removes phosphorus from the top layer of soil due to runoff, and moves phosphorus downward through the soil
             profile as water percolates through it.
 
@@ -31,10 +32,22 @@ class SolublePhosphorus:
         ----------
         runoff : float
             Amount of rainfall that runs off the field on the current day (mm)
+        field_size : float
+            Size of the field (ha)
 
         """
         if runoff:
-            self._remove_runoff_phosphorus_from_top_soil(runoff)
+            self._remove_runoff_phosphorus_from_top_soil(runoff, self.data.soil_layers[0].bulk_density,
+                                                         self.data.soil_layers[0].layer_thickness, field_size)
+
+        for layer in self.data.soil_layers[:(len(self.data.soil_layers) - 1)]:
+            soil_phosphorus_concentration = self._determine_soil_phosphorus_concentration(
+                layer.labile_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
+
+            isotherm_slope = self._determine_isotherm_slope(layer.percent_clay_content)
+            isotherm_intercept = self._determine_isotherm_intercept(isotherm_slope)
+
+            # dissolved_reactive_phosphorus_leachate =
 
     def _remove_runoff_phosphorus_from_top_soil(self, runoff: float, field_size) -> None:
         """This method calculates how much phosphorus is lost from the top soil layer to runoff, then removes that
@@ -105,14 +118,14 @@ class SolublePhosphorus:
 
         References
         ----------
-        APLE Theoretical Documentation eqn. [15]
+        APLE Theoretical Documentation eqn. [16]
 
         """
         return 4.726 * isotherm_slope - 8.97
 
     @staticmethod
     def _determine_soil_phosphorus_concentration(labile_phosphorus: float, bulk_density: float,
-                                                 layer_thickness: float) -> float:
+                                                 layer_thickness: float, field_size: float) -> float:
         """Calculates the concentration of phosphorus in a soil layer.
 
         Parameters
@@ -123,6 +136,8 @@ class SolublePhosphorus:
             Bulk density of the soil layer (Megagram per cubic meter)
         layer_thickness : float
             Thickness of the soil layer (mm)
+        field_size : float
+            Area of the field (ha)
 
         Returns
         -------
@@ -130,5 +145,37 @@ class SolublePhosphorus:
             The concentration of phosphorus in the soil layer (mg phosphorous per kg soil)
 
         """
-        density_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS
-        pass
+        soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
+                                      CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        soil_phosphorus_mass_in_mg = labile_phosphorus * field_size * KILOGRAMS_TO_MILLIGRAMS
+        return soil_phosphorus_mass_in_mg / soil_mass_in_kg
+
+    @staticmethod
+    def _determine_dissolved_reactive_phosphorus_leachate(soil_phosphorus: float, isotherm_slope: float,
+                                                          isotherm_intercept: float) -> float:
+        """Calculates how much phosphorus can be leached out of a soil layer by percolation from layer.
+
+        Parameters
+        ----------
+        soil_phosphorus : float
+            Concentration of phosphorus in the soil layer (mg phosphorous per kg soil)
+        isotherm_slope : float
+            Slope of the phosphorus sorption isotherm (unitless)
+        isotherm_intercept
+             Intercept of the phosphorus sorption isotherm (unitless)
+
+        Returns
+        -------
+        float
+            The concentration of dissolved phosphorus in the soil water that can be leached into the next layer
+                                                                                                            (mg per L)
+
+        Notes
+        -----
+        TODO: this equation is in the code, both old RuFaS and SurPhos, but is not in the documentation. Also not clear
+            what the units are, amend this notes section after talking with Pete.
+
+        """
+        dissolved_reactive_phosphorus_leachate = exp((soil_phosphorus * 1.5 - isotherm_intercept) / isotherm_slope)
+        return min(20.0, dissolved_reactive_phosphorus_leachate)
