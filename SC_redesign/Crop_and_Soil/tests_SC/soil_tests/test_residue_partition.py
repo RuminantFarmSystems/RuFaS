@@ -303,7 +303,7 @@ def test_determine_soil_lignin_to_nitrogen_ratio(plant_lignin_nitrogen_ratio: fl
 ])
 def test_determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio: float) -> None:
     """test that the fraction of soil residue that is metabolic was calculated correctly"""
-    expected = 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio
+    expected = max(0.0, 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio)
     assert expected == ResiduePartition._determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio)
 
 
