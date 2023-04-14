@@ -1,6 +1,64 @@
 from math import exp
+from typing import Optional
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 # TODO These functions belone in either water_dynamics.py or as soil process methods
+
+class WaterUptake:
+    def __init__(self, crop_data: Optional[CropData] = None, soil_data: Optional[SoilData] = None):
+        self.crop_data = crop_data or CropData()
+        self.soil_data = soil_data or SoilData()
+
+    def _find_max_water_uptakes(self, soil_data: SoilData):
+        max_uptakes = []
+        for layer in soil_data.soil_layers:
+            top = self._determine_max_water_uptake_to_depth(self.crop_data.root_depth, layer.top_depth,
+                                                            self.crop_data.max_transpiration,
+                                                            self.crop_data.water_distro_parameter)
+            bottom = self._determine_max_water_uptake_to_depth(self.crop_data.root_depth, layer.bottom_depth_depth,
+                                                               self.crop_data.max_transpiration,
+                                                               self.crop_data.water_distro_parameter)
+            max_uptakes.append(bottom - top)
+
+        return max_uptakes
+
+
+    @staticmethod
+    def _determine_max_water_uptake_to_depth(root_depth: float, depth: float, max_transpiration: float,
+                                             water_distro_parameter: float):
+        """Calculate the amount of maximum amount water that can possibly be taken up by the plant under ideal
+        conditions.
+
+        SWAT equation: 5:2.2.1
+
+        Parameters
+        ----------
+        root_depth : float
+            current depth of root roots (mm)
+        depth : float
+            depth from the soil surface (mm)
+        max_transpiration : float
+            maximum transpiration possible for the plant during the current day (mm)
+        water_distro_parameter : float
+            water use distribution parameter (unitless)
+
+        Returns
+        -------
+        water : float
+            maximum amount of water potentially taken up by the plant (mm)
+        """
+        if root_depth <= 0:
+            return 0
+
+        term1 = max_transpiration / (1 - exp(-1 * water_distro_parameter))
+        term2 = 1 - exp(-1 * water_distro_parameter * depth / root_depth)
+        return term1 * term2
+
+
+# ------------
+
 
 def update_all(soil, crop_type):
     """
@@ -53,30 +111,6 @@ def calc_max_water_uptake_each_layer(soil, crop_type):
         upper_boundary_uptake = lower_boundary_uptake
 
     return max_uptake_each_layer
-
-
-def calc_max_water_uptake_z(soil, crop_type, z):
-    """
-    Description:
-        Calculates potential water uptake from the soil surface to a specified depth
-        z (mm H2O).
-        "pseudocode_crop" C.4.A.1
-
-    Args:
-        soil
-        crop_type
-        z: the given depth
-
-    Returns:
-        int: water uptake potential from the surface to a certain depth
-    """
-
-    if crop_type.z_root == 0:
-        return 0
-    else:
-        term1 = soil.trans_max / (1 - exp(-1 * crop_type.beta_w))
-        term2 = 1 - exp(-1*crop_type.beta_w * z / crop_type.z_root)
-        return term1 * term2
 
 
 def inc_lower_layer_uptake(soil, crop_type, uptake_each_layer):
