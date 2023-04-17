@@ -252,6 +252,8 @@ class SoilData:
         self.annual_runoff_grazing_manure_organic_phosphorus = 0
         self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
 
+        self.annual_soil_phosphorus_runoff = 0
+
     @property
     def profile_soil_water_content(self) -> float:
         """
