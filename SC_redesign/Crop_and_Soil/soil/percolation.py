@@ -41,7 +41,10 @@ class Percolation:
             if current_layer.temperature > 0 and can_percolate:
                 percolated_water = self._percolate_between_layers(self.data.time_step, current_layer, layer_below)
                 current_layer.water_content -= percolated_water
+                current_layer.percolated_water = percolated_water
                 layer_below.water_content += percolated_water
+            else:
+                current_layer.percolated_water = 0
 
     # --- Static methods ---
     @staticmethod
