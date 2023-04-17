@@ -190,8 +190,11 @@ class SolublePhosphorus:
         Returns
         -------
         float
-            The concentration of dissolved phosphorus in the soil water that can be leached into the next layer
-                                                                                                            (mg per L)
+            Concentration of dissolved phosphorus in the soil water that can be leached into the next layer (mg per L)
+
+        References
+        ----------
+        APLE Theoretical Documentation eqn. [14]
 
         Notes
         -----
