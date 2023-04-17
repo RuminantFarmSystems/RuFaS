@@ -223,3 +223,5 @@ def test_percolate(high_seasonal_water_table):
     assert observe == expect
     assert Percolation._determine_if_percolation_allowed.call_count == len(data.soil_layers)
     assert Percolation._percolate_between_layers.call_count == len(data.soil_layers)
+    for layer in incorp.data.soil_layers:
+        assert layer.percolated_water == 0.3
