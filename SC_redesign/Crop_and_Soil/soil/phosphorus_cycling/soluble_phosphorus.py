@@ -68,8 +68,8 @@ class SolublePhosphorus:
             else:
                 next_layer = self.data.vadose_zone_layer
 
-            current_layer.add_to_labile_phosphorus((-1 * actual_dissolved_reactive_phosphorus_leachate), field_size)
-            next_layer.add_to_labile_phosphorus(actual_dissolved_reactive_phosphorus_leachate, field_size)
+            current_layer.labile_phosphorus_content -= actual_dissolved_reactive_phosphorus_leachate
+            next_layer.labile_phosphorus_content += actual_dissolved_reactive_phosphorus_leachate
 
     def _remove_runoff_phosphorus_from_top_soil(self, runoff: float, field_size) -> None:
         """This method calculates how much phosphorus is lost from the top soil layer to runoff, then removes that
