@@ -43,8 +43,8 @@ class ResiduePartition:
         # TODO: check source, 0.1 or 0.01, ask Hector about the value
 
     @staticmethod
-    def _determine_metabolic_plant_residue_ratio(plant_residue_lignin_composition: float,
-                                                 nitrogen_fraction_plant_residue=0.4) -> float:
+    def _determine_plant_lignin_nitrogen_ratio(plant_residue_lignin_composition: float,
+                                               nitrogen_fraction_plant_residue=0.4) -> float:
         # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
         #  GitHub Issue #163
         """This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
@@ -60,13 +60,13 @@ class ResiduePartition:
         Returns
         -------
         float
-            plant lignin to nitrogen ratio (Dmnl)
+            plant lignin to nitrogen ratio (unitless)
 
         References
         -------
         pseudocode_soil S.6.B.I.2
         """
-        if 0 < nitrogen_fraction_plant_residue < 1.0:
+        if 0 < nitrogen_fraction_plant_residue <= 1.0:
             return (plant_residue_lignin_composition / 100) / nitrogen_fraction_plant_residue
         elif nitrogen_fraction_plant_residue == 0:
             return 0
@@ -81,7 +81,7 @@ class ResiduePartition:
         Parameters
         ----------
         plant_lignin_nitrogen_ratio : float
-            plant lignin to nitrogen ratio (Dimensionless unit)
+            plant lignin to nitrogen ratio (unitless)
 
         Returns
         -------
@@ -136,9 +136,7 @@ class ResiduePartition:
     def _determine_plant_metabolic_active_carbon_usage(decomposition_moisture_effect: float,
                                                        decomposition_temperature_effect: float,
                                                        plant_metabolic_carbon_amount: float,
-                                                       metabolic_active_carbon_rate=0.28) -> float:
-        # TODO: Double check the metabolic_active_carbon_rate, again, pseudocode_soil differs from the original code
-        #  #issue 425
+                                                       plant_metabolic_active_carbon_rate=0.28) -> float:
         """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
         Parameters
         ----------
@@ -148,7 +146,7 @@ class ResiduePartition:
             temperature effect on decomposition factor (unitless)
         plant_metabolic_carbon_amount: float
             plant metabolic carbon amount (kg/ha)
-        metabolic_active_carbon_rate: float
+        plant_metabolic_active_carbon_rate: float default = 0.28 (Parton et al. 1987)
             rate of decomposition from metabolic to active carbon (unitless)
 
         Returns
@@ -161,12 +159,12 @@ class ResiduePartition:
         pseudocode_soil S.6.B.I.5
         """
         return decomposition_moisture_effect * decomposition_temperature_effect * \
-            plant_metabolic_carbon_amount * metabolic_active_carbon_rate
+            plant_metabolic_carbon_amount * plant_metabolic_active_carbon_rate
 
     @staticmethod
     def _determine_plant_metabolic_to_soil_carbon_amount(plant_metabolic_carbon_amount: float,
                                                          tillage_fraction: float) -> float:
-        """This method calculates the the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
+        """This method calculates the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
 
         Parameters
         ----------
@@ -188,12 +186,11 @@ class ResiduePartition:
     @staticmethod
     def _determine_plant_structural_to_slow_or_active_rate(plant_residue_metabolic_fraction: float,
                                                            structural_decomposition_factor=0.076) -> float:
-        # TODO: check with subject expert for structural_decomposition_factor's default value. issue #428
         """This method calculates the rate at which above ground structural carbon decomposes into slow or active carbon
 
         Parameters
         ----------
-        structural_decomposition_factor: float, default = 0.076
+        structural_decomposition_factor: float, default = 0.076 (Parton et al. 1987)
             structural decomposition factor (unitless)
         plant_residue_metabolic_fraction: float
             fraction of plant residue that is metabolic (unitless)
@@ -210,7 +207,6 @@ class ResiduePartition:
         -------
         the equation used here currently follows the old code to make mathematical sense
         """
-        # TODO: contradiction with the equation in pseudocode_soil. issue #427
         return structural_decomposition_factor * math.exp(-3) * (1 - plant_residue_metabolic_fraction)
 
     @staticmethod
@@ -303,5 +299,282 @@ class ResiduePartition:
             * (1-plant_residue_metabolic_fraction) - structural_carbon_transfer_amount \
             - plant_structural_to_active_carbon_amount \
             - plant_structural_to_slow_carbon_amount
+
+        return updated_amount
+
+    @staticmethod
+    def _determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
+                                                  tillage_fraction: float) -> float:
+        """Calculates the amount of soil dry matter residue at harvest
+
+        Parameters
+        ----------
+        plant_dry_matter_residue_amount: float
+            plant dry matter residue at harvest (kg/ha)
+        tillage_fraction: float
+            fraction of metabolic carbon incorporated into soil during tillage (unitless)
+
+        Returns
+        -------
+        float
+            the amount of soil dry matter residue at harvest (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.1
+
+        Notes
+        -------
+        This calculation does not exist in the original code, it's added in order for its usage in S.6.B.II.2
+        """
+        return plant_dry_matter_residue_amount * tillage_fraction
+
+    @staticmethod
+    def _determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
+                                                               root_biomass: float) -> float:
+        """Calculates the weighted fractional of lignin amount in residue dry matter
+
+        Parameters
+        ----------
+        soil_dry_matter_residue_amount: float
+            the amount of soil dry matter residue at harvest (kg/ha)
+        root_biomass: float
+            root biomass (kg/ha)
+
+        Returns
+        -------
+        float
+            the weighted fractional of lignin amount in residue dry matter (unitless)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.2
+
+        Notes
+        -------
+        the referenced soil(below ground) biomass calculation was not found in the pseudocode_crop, neither is any
+        mention of biomass unit
+        """
+        if soil_dry_matter_residue_amount + root_biomass != 0:
+            return soil_dry_matter_residue_amount / (soil_dry_matter_residue_amount + root_biomass)
+        else:
+            return 0
+
+    @staticmethod
+    def _determine_soil_residue_lignin_fraction(weighted_residue_dry_matter_lignin_fraction: float,
+                                                rainfall: float) -> float:
+        """Calculates the fraction of soil residue that's comprised of lignin
+
+        Parameters
+        ----------
+        weighted_residue_dry_matter_lignin_fraction: float
+            the weighted fractional of lignin amount in residue dry matter (unitless)
+        rainfall: float
+            amount of rain (mm H2O)
+
+        Returns
+        -------
+        float
+            the fraction of soil residue that's comprised of lignin
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.3
+        """
+        # TODO: Check where the 0.15 and 0.01 factors came from issue #445
+        return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
+
+    @staticmethod
+    def _determine_soil_lignin_to_nitrogen_ratio(plant_lignin_nitrogen_ratio: float,
+                                                 weighted_residue_dry_matter_lignin_fraction: float,
+                                                 soil_residue_lignin_fraction: float,
+                                                 nitrogen_fraction_plant_residue=0.4) -> float:
+        """This method calculates the soil lignin to nitrogen fraction
+
+        Parameters
+        ----------
+        plant_lignin_nitrogen_ratio: float
+            plant lignin to nitrogen ratio (unitless)
+        weighted_residue_dry_matter_lignin_fraction: float
+            weighted fraction of lignin in residue dry matter (unitless)
+        soil_residue_lignin_fraction: float
+            soil residue fraction that is comprised of lignin (unitless)
+        nitrogen_fraction_plant_residue: float default = 0.4
+            nitrogen fraction in plant residue at harvest (unitless)
+
+        Returns
+        -------
+        float
+            soil lignin to nitrogen fraction(unitless)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.4
+        """
+        if 0 < nitrogen_fraction_plant_residue <= 1:
+            return plant_lignin_nitrogen_ratio * weighted_residue_dry_matter_lignin_fraction + \
+                   (((soil_residue_lignin_fraction / 100) / nitrogen_fraction_plant_residue) / 100) \
+                   * (1 - weighted_residue_dry_matter_lignin_fraction)
+        elif nitrogen_fraction_plant_residue == 0:
+            return 0
+        else:
+            raise ValueError("Expected nitrogen_fraction_plant_residue to be between 0.0-1.0, received "
+                             + str(nitrogen_fraction_plant_residue))
+
+    @staticmethod
+    def _determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio: float) -> float:
+        """This method calculates the fraction of soil residue that is metabolic
+
+        Parameters
+        ----------
+        soil_lignin_to_nitrogen_ratio: float
+            soil lignin to nitrogen fraction(unitless)
+
+        Returns
+        -------
+        float
+            the fraction of soil residue that is metabolic(unitless)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.5
+        """
+        return max(0.0, 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio)
+
+    @staticmethod
+    def _determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: float,
+                                                plant_metabolic_to_soil_carbon_amount: float,
+                                                root_biomass: float,
+                                                soil_residue_metabolic_fraction: float,
+                                                soil_metabolic_to_active_carbon_amount: float) -> float:
+        """This method updates the amount of soil metabolic carbon
+
+        Parameters
+        ----------
+        soil_metabolic_carbon_amount: float
+            the amount of soil metabolic carbon (kg/ha)
+        plant_metabolic_to_soil_carbon_amount: float
+            the amount of metabolic carbon incorporated into soil during tillage (kg/ha)
+        root_biomass: float
+            root biomass (kg/ha)
+        soil_residue_metabolic_fraction: float
+            the fraction of soil residue that is metabolic (unitless)
+        soil_metabolic_to_active_carbon_amount: float
+            the amount of soil metabolic carbon decomposed into active carbon (kg/ha)
+
+        Returns
+        -------
+        float
+            the updated amount of soil metabolic carbon (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.6, S.6.B.II.8
+        """
+        result = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
+            (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+        return result
+
+    @staticmethod
+    def _determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture_effect: float,
+                                                          decomposition_temperature_effect: float,
+                                                          soil_metabolic_carbon_amount: float,
+                                                          soil_metabolic_active_carbon_rate=0.35) -> float:
+        """This method calculates the amount of soil metabolic carbon decomposed into active carbon
+
+        Parameters
+        ----------
+        decomposition_moisture_effect: float
+            moisture effect on decomposition factor (unitless)
+        decomposition_temperature_effect: float
+            temperature effect on decomposition factor (unitless)
+        soil_metabolic_carbon_amount: float
+            soil metabolic carbon amount (kg/ha)
+        soil_metabolic_active_carbon_rate: float default = 0.35
+            rate of decomposition from soil metabolic to active carbon (unitless)
+
+        Returns
+        -------
+        float
+            amount of soil metabolic carbon decomposed into active carbon(kg/ha)
+
+        References:
+        -------
+        pseudocode_soil S.6.B.II.7
+
+        """
+        return decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
+            soil_metabolic_active_carbon_rate
+
+    @staticmethod
+    def _determine_soil_structural_to_slow_active_carbon_amount(decomposition_moisture_effect: float,
+                                                                decomposition_temperature_effect: float,
+                                                                soil_structural_carbon_amount: float,
+                                                                soil_structural_to_slow_or_active_rate=0.094) -> float:
+        """This methods determines the amount of soil structural carbon decomposed into slow or active carbon
+
+        Parameters
+        ----------
+        soil_structural_to_slow_or_active_rate: float default = 0.094 (Parton et al. 1987)
+            rate at which soil structural carbon decomposes into slow or active carbon (unitless)
+        decomposition_moisture_effect: float
+            moisture effect on decomposition factor (unitless)
+        decomposition_temperature_effect: float
+            temperature effect on decomposition factor (unitless)
+        soil_structural_carbon_amount: float
+            soil structural carbon amount(kg/ha)
+
+        Returns
+        -------
+        float
+            amount of soil structural carbon decomposed into slow or active carbon (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.10
+
+        Notes
+        -------
+        This method can be used for both calculating amount of soil structural carbon decomposed into slow carbon and
+        amount of soil structural carbon decomposed into active carbon.
+        """
+        return decomposition_moisture_effect * decomposition_temperature_effect * soil_structural_carbon_amount * \
+            soil_structural_to_slow_or_active_rate
+
+    @staticmethod
+    def _determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction: float,
+                                                 structural_carbon_transfer_amount: float,
+                                                 soil_structural_to_active_carbon_amount: float,
+                                                 soil_structural_to_slow_carbon_amount: float,
+                                                 root_biomass: float,
+                                                 soil_structural_carbon_amount: float) -> float:
+        """Calculates the updated soil structural carbon amount
+
+        Parameters
+        ----------
+        soil_residue_metabolic_fraction: float
+            fraction of soil residue that is metabolic (unitless)
+        structural_carbon_transfer_amount: float
+            the amount of transfer of structural carbon during tillage (kg/ha)
+        soil_structural_to_active_carbon_amount: float
+            amount of soil structural carbon decomposed into slow carbon (kg/ha)
+        soil_structural_to_slow_carbon_amount: float
+            amount of soil structural carbon decomposed into active carbon (kg/ha)
+        root_biomass: float
+            root biomass (kg/ha)
+        soil_structural_carbon_amount: float
+            soil structural carbon amount (kg/ha)
+        Returns
+        -------
+        float
+            updated soil structural carbon amount (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.6.B.II.9, S.6.B.I.11
+        """
+        updated_amount = soil_structural_carbon_amount + structural_carbon_transfer_amount + root_biomass * \
+            (1-soil_residue_metabolic_fraction) - soil_structural_to_active_carbon_amount - \
+            soil_structural_to_slow_carbon_amount
 
         return updated_amount
