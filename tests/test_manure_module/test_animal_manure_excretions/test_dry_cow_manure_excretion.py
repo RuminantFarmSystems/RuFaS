@@ -8,6 +8,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calculations
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 
+
 @pytest.mark.parametrize(
     'methane_model',
     [
@@ -55,12 +56,21 @@ def test_dry_cow_manure_calculations(methane_model: str,
     )
 
     urine = 15.4
-    total_manure_excreted = total_manure_excreted = (0.00711 * body_weight 
-                            + 0.324 * CP_concentration
-                            + 0.259 * NDF_concentration
-                            + 8.05) 
+    total_manure_excreted = total_manure_excreted = (0.00711 * body_weight
+                                                     + 0.324 * CP_concentration
+                                                     + 0.259 * NDF_concentration
+                                                     + 8.05)
     total_solids = 0.178 * dry_matter_intake + 2.733
-    organic_matter_intake = dry_matter_intake - ash_diet_content
+
+    Dry_DMI_Lower_Bound = 7.1  # kg
+    if dry_matter_intake >= Dry_DMI_Lower_Bound:
+        organic_matter_intake = dry_matter_intake * \
+            (100 - ASH_concentration) / 100
+    else:
+        dry_matter_intake = Dry_DMI_Lower_Bound
+        organic_matter_intake = dry_matter_intake * \
+            (100 - ASH_concentration) / 100
+
     total_volatile_solids = (-1.201
                              + 0.402 * organic_matter_intake
                              + 0.036 * NDF_concentration
@@ -74,8 +84,10 @@ def test_dry_cow_manure_calculations(methane_model: str,
                        ) * GeneralConstants.GRAMS_TO_KG
     urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
-    urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
-    urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    urine_urea_nitrogen_concentration = -1.16 + \
+        0.86 * urinary_nitrogen_concentration
     urine_urea_nitrogen_concentration_lower_bound = 2
     urine_urea_nitrogen_concentration_upper_bound = 12
     if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
@@ -85,19 +97,23 @@ def test_dry_cow_manure_calculations(methane_model: str,
     else:
         urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
-    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
-    
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    potassium = dry_matter_intake * \
+        (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+
     methane_emission = 0.0
-    if methane_model == "Mills": 
+    if methane_model == "Mills":
         methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
-                                                 * metabolizable_energy_intake * 4.184)) / 0.05565
+                                                     * metabolizable_energy_intake * 4.184)) / 0.05565
     else:
-        soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
-        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
-                                    + 0.198 * NDF_concentration + 0.160 * soluble_residue) 
-        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565 
-    
+        soluble_residue = (100 - ASH_concentration) - \
+            NDF_concentration - CP_concentration - EE_concentration
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)
+        methane_emission = (
+            0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565
+
     total_phosphorus_excreted = 5.0
     inorganic_phosphorus_fraction = 0.4
     organic_phosphorus_fraction = 0.6
@@ -129,27 +145,38 @@ def test_dry_cow_manure_calculations(methane_model: str,
     )
 
     # Assert
-    patch_for_ration_report.assert_called_once_with(mock_ration_formulation, mock_feed.available_feeds)
+    patch_for_ration_report.assert_called_once_with(
+        mock_ration_formulation, mock_feed.available_feeds)
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
         daily_milk_production=daily_milk_production,
         total_manure_excreted=total_manure_excreted,
         fecal_phosphorus=fecal_phosphorus,
         urine_phosphorus_required=urine_phosphorus_required
     )
-    assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
-    assert manure_excretion_values['urea'] == approx(urine_urea_nitrogen_concentration)
+    assert actual_total_phosphorus_excreted == approx(
+        total_phosphorus_excreted)
+    assert manure_excretion_values['urea'] == approx(
+        urine_urea_nitrogen_concentration)
     assert manure_excretion_values['urine'] == approx(urine)
     assert manure_excretion_values['total_ammoniacal_nitrogen_concentration'] == \
-           approx(total_ammoniacal_nitrogen_concentration)
+        approx(total_ammoniacal_nitrogen_concentration)
     assert manure_excretion_values['urine_nitrogen'] == approx(urine_nitrogen)
-    assert manure_excretion_values['manure_nitrogen'] == approx(manure_nitrogen)
-    assert manure_excretion_values['manure_mass'] == approx(total_manure_excreted)
+    assert manure_excretion_values['manure_nitrogen'] == approx(
+        manure_nitrogen)
+    assert manure_excretion_values['manure_mass'] == approx(
+        total_manure_excreted)
     assert manure_excretion_values['total_solids'] == approx(total_solids)
-    assert manure_excretion_values['degradable_volatile_solids'] == approx(degradable_volatile_solids)
-    assert manure_excretion_values['non_degradable_volatile_solids'] == approx(non_degradable_volatile_solids)
-    assert manure_excretion_values['inorganic_phosphorus_fraction'] == approx(inorganic_phosphorus_fraction)
-    assert manure_excretion_values['organic_phosphorus_fraction'] == approx(organic_phosphorus_fraction)
-    assert manure_excretion_values['phosphorus'] == approx(manure_phosphorus_excreted)
-    assert manure_excretion_values['phosphorus_fraction'] == approx(manure_phosphorus_fraction)
+    assert manure_excretion_values['degradable_volatile_solids'] == approx(
+        degradable_volatile_solids)
+    assert manure_excretion_values['non_degradable_volatile_solids'] == approx(
+        non_degradable_volatile_solids)
+    assert manure_excretion_values['inorganic_phosphorus_fraction'] == approx(
+        inorganic_phosphorus_fraction)
+    assert manure_excretion_values['organic_phosphorus_fraction'] == approx(
+        organic_phosphorus_fraction)
+    assert manure_excretion_values['phosphorus'] == approx(
+        manure_phosphorus_excreted)
+    assert manure_excretion_values['phosphorus_fraction'] == approx(
+        manure_phosphorus_fraction)
     assert manure_excretion_values['potassium'] == approx(potassium)
     assert manure_excretion_values['methane'] == approx(methane_emission)
