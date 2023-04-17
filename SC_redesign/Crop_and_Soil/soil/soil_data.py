@@ -207,6 +207,34 @@ class SoilData:
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
 
+    def get_vectorized_layer_attribute(self, attribute: str) -> List[any]:
+        """returns a list containing the specified attribute for each soil layer
+
+        Parameters
+        ----------
+        attribute : str
+            the LayerData attribute or property to be vectorized
+
+        Returns
+        -------
+        layered_attribute : list[any]
+            values of the specified attribute for each layer
+        """
+        return [getattr(layer, attribute) for layer in self.soil_layers]
+
+    def set_vectorized_layer_attribute(self, attribute: str, values: List[any]) -> None:
+        """sets a given attribute for all layers in soil_data
+
+        Parameters
+        ----------
+        attribute : str
+            the LayerData attribute to set
+        values : list[any]
+            values of the attribute to set for each layer
+        """
+        [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
+
+
     def _subdivide_top_layer(self) -> None:
         """This method ensures that the soil profile has a top layer that is 20 mm deep.
 

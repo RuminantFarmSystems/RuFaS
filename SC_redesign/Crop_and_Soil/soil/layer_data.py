@@ -231,6 +231,13 @@ class LayerData:
         return phosphorus_pool_amount / field_size
 
     @property
+    def available_water_capacity(self):
+        """available water capacity of the soil layer (mm)
+
+        SWAT Equation: 5:2.2.6"""
+        return self.field_capacity_content - self.wilting_point_content
+
+    @property
     def layer_thickness(self) -> float:
         """thickness of soil layer (mm)"""
         if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
