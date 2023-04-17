@@ -93,7 +93,7 @@ def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> No
 
 
 def test_simulate(
-        patch_simulation_engine: SimulationEngine, mocker: MockerFixture
+    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function simulate in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
@@ -108,7 +108,7 @@ def test_simulate(
 
 
 def test_show_final_messages(
-        patch_simulation_engine: SimulationEngine, mocker: MockerFixture
+    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function _show_final_messages in file RUFAS/simulation_engine.py"""
     mocker.patch("sys.stdout.write")
@@ -117,7 +117,7 @@ def test_show_final_messages(
 
 
 def test_daily_simulation(
-        patch_simulation_engine: SimulationEngine, mocker: MockerFixture
+    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function _daily_simulation in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.routines.daily_animal_routine")
@@ -132,7 +132,7 @@ def test_daily_simulation(
 
 
 def test_advance_time(
-        patch_simulation_engine: SimulationEngine, mocker: MockerFixture
+    patch_simulation_engine: SimulationEngine, mocker: MockerFixture
 ) -> None:
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.classes.Time.to_str")
@@ -353,8 +353,8 @@ def test_generate_key(mocker: MockerFixture) -> None:
 
 
 def test_add_error(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function add_error in file output_manager.py"""
     key = "dummy_key"
@@ -380,8 +380,8 @@ def test_add_error(
 
 
 def test_add_warning(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function add_warning in file output_manager.py"""
     key = "dummy_key"
@@ -407,8 +407,8 @@ def test_add_warning(
 
 
 def test_add_log(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function add_log in file output_manager.py"""
     key = "dummy_key"
@@ -434,8 +434,8 @@ def test_add_log(
 
 
 def test_add_variable(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for function add_variable in file output_manager.py"""
     key = "dummy_key"
@@ -520,7 +520,7 @@ def test_flush_pools() -> None:
 
 @pytest.fixture
 def output_manager_original_method_states(
-        mock_output_manager: OutputManager,
+    mock_output_manager: OutputManager,
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
@@ -540,8 +540,8 @@ def output_manager_original_method_states(
 
 
 def test_save_all_pools(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function save_all_pools in output_manager.py"""
     path = "dummy_path"
@@ -550,12 +550,20 @@ def test_save_all_pools(
     mock_output_manager.save_logs = MagicMock()
     mock_output_manager.save_variables = MagicMock()
 
-    mock_output_manager.save_all_pools(path)
+    mock_output_manager.save_all_pools(path, exclude_info_maps=False)
 
     mock_output_manager.save_errors.assert_called_once_with(path)
     mock_output_manager.save_warnings.assert_called_once_with(path)
     mock_output_manager.save_logs.assert_called_once_with(path)
-    mock_output_manager.save_variables.assert_called_once_with(path, exclude_info_maps=True)
+    mock_output_manager.save_variables.assert_called_once_with(
+        path, exclude_info_maps=False
+    )
+
+    mock_output_manager.save_all_pools(path, exclude_info_maps=True)
+    mock_output_manager.save_variables.assert_called_with(path, exclude_info_maps=True)
+    assert mock_output_manager.save_logs.call_count == 2
+    assert mock_output_manager.save_warnings.call_count == 2
+    assert mock_output_manager.save_errors.call_count == 2
 
     # Restore original methods
     mock_output_manager.save_variables = output_manager_original_method_states[
@@ -578,14 +586,14 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     extension = "ext"
     om = OutputManager()
     assert (
-            om._generate_file_name(base_name, extension)
-            == f"{base_name}_{timestamp}.{extension}"
+        om._generate_file_name(base_name, extension)
+        == f"{base_name}_{timestamp}.{extension}"
     )
 
 
 def test_save_variables(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function save_variables in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -608,8 +616,8 @@ def test_save_variables(
 
 
 def test_save_logs(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function save_logs in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -632,8 +640,8 @@ def test_save_logs(
 
 
 def test_save_warnings(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function save_warnings in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -656,8 +664,8 @@ def test_save_warnings(
 
 
 def test_save_errors(
-        mock_output_manager: OutputManager,
-        output_manager_original_method_states: Dict[str, Callable],
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function save_errors in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
@@ -689,38 +697,50 @@ class DummyNestedClass:
         self.value = DummyClass(value)
 
 
-@pytest.mark.parametrize('input_obj, depth, max_depth, expected_output', [
-    (42, 0, 1, 42),
-    (3.14, 0, 1, 3.14),
-    ('test', 0, 1, 'test'),
-    (True, 0, 1, True),
-    (False, 0, 1, False),
-    (None, 0, 1, None),
-    ([], 0, 1, []),
-    ((), 0, 1, ()),
-    ({}, 0, 1, {}),
-    (set(), 0, 1, []),
-    ([1, 'test', True], 0, 1, [1, 'test', True]),
-    ((1, 'test', True), 0, 1, (1, 'test', True)),
-    ({1, 2, 3}, 0, 1, [1, 2, 3]),
-    ({'a': 1, 'b': 2}, 0, 1, {'a': 1, 'b': 2}),
-    ({'a': [1, 2, 3], 'b': {'c': 4}}, 0, 3, {'a': [1, 2, 3], 'b': {'c': 4}}),
-    (['a', (1, 2), {'b': 3}], 0, 2, ['a', (1, 2), {'b': 3}]),
-    ([1, [2, [3, 4], 5], 6], 0, 2, [1, [2, '[3, 4]', 5], 6]),
-    ({'a': {'b': {'c': 42}}}, 0, 2, {'a': {'b': {'c': 42}}}),
-    (DummyClass(42), 0, 1, {'value': 42}),
-    (DummyNestedClass(42), 0, 2, {'value': {'value': 42}}),
-    ({'a': {'b': DummyClass(42)}}, 0, 3, {'a': {'b': {'value': 42}}}),
-    ([42, 'test', 3.14, True, None, [1, 2, 3], {'a': 1}], 0, 2, [42, 'test', 3.14, True, None, [1, 2, 3], {'a': 1}]),
-])
-def test_make_serializable_recursive(input_obj: object,
-                                     depth: int,
-                                     max_depth: int,
-                                     expected_output: object,
-                                     mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "input_obj, depth, max_depth, expected_output",
+    [
+        (42, 0, 1, 42),
+        (3.14, 0, 1, 3.14),
+        ("test", 0, 1, "test"),
+        (True, 0, 1, True),
+        (False, 0, 1, False),
+        (None, 0, 1, None),
+        ([], 0, 1, []),
+        ((), 0, 1, ()),
+        ({}, 0, 1, {}),
+        (set(), 0, 1, []),
+        ([1, "test", True], 0, 1, [1, "test", True]),
+        ((1, "test", True), 0, 1, (1, "test", True)),
+        ({1, 2, 3}, 0, 1, [1, 2, 3]),
+        ({"a": 1, "b": 2}, 0, 1, {"a": 1, "b": 2}),
+        ({"a": [1, 2, 3], "b": {"c": 4}}, 0, 3, {"a": [1, 2, 3], "b": {"c": 4}}),
+        (["a", (1, 2), {"b": 3}], 0, 2, ["a", (1, 2), {"b": 3}]),
+        ([1, [2, [3, 4], 5], 6], 0, 2, [1, [2, "[3, 4]", 5], 6]),
+        ({"a": {"b": {"c": 42}}}, 0, 2, {"a": {"b": {"c": 42}}}),
+        (DummyClass(42), 0, 1, {"value": 42}),
+        (DummyNestedClass(42), 0, 2, {"value": {"value": 42}}),
+        ({"a": {"b": DummyClass(42)}}, 0, 3, {"a": {"b": {"value": 42}}}),
+        (
+            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+            0,
+            2,
+            [42, "test", 3.14, True, None, [1, 2, 3], {"a": 1}],
+        ),
+    ],
+)
+def test_make_serializable_recursive(
+    input_obj: object,
+    depth: int,
+    max_depth: int,
+    expected_output: object,
+    mocker: MockerFixture,
+) -> None:
     """Unit test for function _make_serializable() in file util.py"""
     # Arrange
-    patch_for_get_str = mocker.patch.object(Utility, '_get_str', side_effect=lambda x: str(x))
+    patch_for_get_str = mocker.patch.object(
+        Utility, "_get_str", side_effect=lambda x: str(x)
+    )
 
     # Act
     result = Utility._make_serializable(input_obj, depth, max_depth)

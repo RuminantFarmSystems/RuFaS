@@ -8,7 +8,7 @@ import time
 from RUFAS.util import Utility
 
 
-class OutputManager (object):
+class OutputManager(object):
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
     logs, warnings, and errors into separate pools, and populates requested
@@ -29,34 +29,44 @@ class OutputManager (object):
     logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
         Contains logs reported to the output manager
     """
+
     __instance = None
     pool_element_type = Dict[str, List[Dict[str, Any]]]
 
     def __new__(cls):
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(OutputManager, cls).__new__(cls)
         return cls.instance
 
     def __init__(self) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
-            self.variables_pool: Dict[str,
-                                      OutputManager.pool_element_type] = {}
+            self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self.add_log("init_log", "Output Manager instantiated.",
-                         info_map={"class": self.__class__.__name__,
-                                   "function": self.__init__.__name__})
+            self.add_log(
+                "init_log",
+                "Output Manager instantiated.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                },
+            )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
         info_maps: List[Dict[str, Any]] = []
         values: List[Any] = []
-        return {'info_maps': info_maps, 'values': values}
+        return {"info_maps": info_maps, "values": values}
 
-    def _add_to_pool(self, pool: Dict[str, pool_element_type],
-                     key: str, value: Any, info_map: Dict[str, Any]) -> None:
+    def _add_to_pool(
+        self,
+        pool: Dict[str, pool_element_type],
+        key: str,
+        value: Any,
+        info_map: Dict[str, Any],
+    ) -> None:
         """Adds value and info map at key in the given pool."""
         key_not_exists_in_pool = pool.get(key) is None
         if key_not_exists_in_pool:
@@ -64,13 +74,13 @@ class OutputManager (object):
         # reduced_info_map is identical to info_map without the class key and
         # the function key; as they are already stored in element key and
         # having them increases the final file size.
-        reduced_info_map = {k: info_map[k]
-                            for k in info_map.keys() - {'class', 'function'}}
-        pool[key]['info_maps'].append(reduced_info_map)
-        pool[key]['values'].append(value)
+        reduced_info_map = {
+            k: info_map[k] for k in info_map.keys() - {"class", "function"}
+        }
+        pool[key]["info_maps"].append(reduced_info_map)
+        pool[key]["values"].append(value)
 
-    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]
-                     ) -> None:
+    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any]) -> None:
         """
         Adds a variable to the pool.
 
@@ -124,8 +134,7 @@ class OutputManager (object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
 
-    def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]
-                    ) -> None:
+    def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
         """
         Adds a warning message to the pool of warnings.
 
@@ -179,8 +188,7 @@ class OutputManager (object):
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
 
-    def _generate_key(self, name: str,
-                      info_map: Dict[str, Union[str, bool]]) -> str:
+    def _generate_key(self, name: str, info_map: Dict[str, Union[str, bool]]) -> str:
         """
         Generates key for the pool.
         See "add_variable" docs for detailed arg description.
@@ -200,11 +208,13 @@ class OutputManager (object):
         if info_map.get("prefix") is not None:
             prefix = info_map.get("prefix") + "."
         elif not info_map.get("suppress_prefix", False):
-            prefix = self._get_prefix(info_map.get(
-                "class"), info_map.get("function")) + "."
+            prefix = (
+                self._get_prefix(info_map.get("class"), info_map.get("function")) + "."
+            )
 
-        suffix = f'.{info_map.get("suffix")}' if info_map.get(
-            "suffix") is not None else ''
+        suffix = (
+            f'.{info_map.get("suffix")}' if info_map.get("suffix") is not None else ""
+        )
 
         return f"{prefix}{name}{suffix}"
 
@@ -253,64 +263,61 @@ class OutputManager (object):
 
         """
         try:
-            with open(path, 'w') as json_file:
-                json.dump(Utility.make_serializable(data_dict, max_depth=3),
-                          json_file,
-                          indent=0)
+            with open(path, "w") as json_file:
+                json.dump(
+                    Utility.make_serializable(data_dict, max_depth=3),
+                    json_file,
+                    indent=0,
+                )
         except Exception as e:
             raise e
 
-    def _generate_file_name(self, base_name: str, extension: str = "json"
-                            ) -> str:
+    def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
         """
         Returns a file name using the given base_name and timestamp.
         """
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
-    def save_variables(self, path: str, exclude_info_maps=False) -> None:
+    def save_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves variables_pool into a json file in the given path to a directory.
         """
         vars_pool = self.variables_pool.copy()
         if exclude_info_maps:
             for key, value in vars_pool.items():
-                if isinstance(value, dict) and 'info_maps' in value:
-                    value.pop('info_maps')
+                if isinstance(value, dict) and "info_maps" in value:
+                    value.pop("info_maps")
 
-        file_path = os.path.join(
-            path, self._generate_file_name("variables", "json"))
+        file_path = os.path.join(path, self._generate_file_name("variables", "json"))
         self._dict_to_file_json(self.variables_pool, file_path)
 
     def save_logs(self, path: str) -> None:
         """
         Saves logs_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(
-            path, self._generate_file_name("logs", "json"))
+        file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
     def save_warnings(self, path: str) -> None:
         """
         Saves warnings_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(
-            path, self._generate_file_name("warnings", "json"))
+        file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
     def save_errors(self, path: str) -> None:
         """
         Saves errors_pool into a json file in the given path to a directory.
         """
-        file_path = os.path.join(
-            path, self._generate_file_name("errors", "json"))
+        file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def save_all_pools(self, path: str) -> None:
+    def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves all pool into the given path to a directory.
         """
-        self.save_variables(path, exclude_info_maps=True)
+        self.save_variables(path, exclude_info_maps=exclude_info_maps)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)
