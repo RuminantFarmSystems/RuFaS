@@ -1,8 +1,9 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock, call
 from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_LITERS, CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
@@ -62,6 +63,18 @@ def test_determine_dissolved_reactive_phosphorus_leachate(phosphorus: float, slo
     assert observed == expected
 
 
+@pytest.mark.parametrize("percolated_water,area", [
+    (1.8, 3.4),
+    (2.3, 1.22),
+    (0.88, 0.97)
+])
+def test_determine_percolated_water_volume(percolated_water: float, area: float) -> None:
+    """Tests that a water amount is correctly converted to a volume."""
+    observed = SolublePhosphorus._determine_percolated_water_volume(percolated_water, area)
+    expected = percolated_water * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+    assert observed == expected
+
+
 # --- Test helper methods ---
 @pytest.mark.parametrize("runoff,field_size", [
     (1.3, 1.39),
@@ -85,6 +98,59 @@ def test_remove_runoff_phosphorus_from_top_soil(runoff: float, field_size: float
     expected_phosphorus_removed_in_kg = expected_actual_phosphorus_removed * field_size
 
     incorp._determine_soil_phosphorus_concentration.assert_called_once_with(20, incorp.data.soil_layers[0].bulk_density,
-                                                                            incorp.data.soil_layers[0].layer_thickness)
+                                                                            incorp.data.soil_layers[0].layer_thickness,
+                                                                            field_size)
     assert incorp.data.soil_layers[0].labile_phosphorus_content == expected_labile_phosphorus_left
     assert incorp.data.annual_soil_phosphorus_runoff == expected_phosphorus_removed_in_kg
+
+
+@pytest.mark.parametrize("runoff,field_size", [
+    (1.3, 2.34),
+    (0.0, 1.2),
+    (2.66, 1.9)
+])
+def test_daily_update_routine(runoff: float, field_size: float) -> None:
+    """Tests that the daily update routine for percolating phosphorus down through layers works correctly."""
+    layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, labile_phosphorus_content=0.0,
+                        percolated_water=3.4),
+              LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, labile_phosphorus_content=8.1,
+                        percolated_water=3.1),
+              LayerData(top_depth=50, bottom_depth=80, nitrate=1, labile_phosphorus_content=8.1,
+                        percolated_water=1.3),
+              LayerData(top_depth=80, bottom_depth=200, nitrate=5, labile_phosphorus_content=8.1,
+                        percolated_water=0.33)]
+    data = SoilData(soil_layers=layers)
+    incorp = SolublePhosphorus(data)
+
+    incorp._remove_runoff_phosphorus_from_top_soil = MagicMock()
+    incorp._determine_soil_phosphorus_concentration = MagicMock(return_value=3.8)
+    incorp._determine_isotherm_slope = MagicMock(return_value=35)
+    incorp._determine_isotherm_intercept = MagicMock(return_value=155)
+    incorp._determine_dissolved_reactive_phosphorus_leachate = MagicMock(return_value=18.2)
+    incorp._determine_percolated_water_volume = MagicMock(return_value=1.0)
+    for layer in incorp.data.soil_layers:
+        layer.add_to_labile_phosphorus = PropertyMock()
+    incorp.data.vadose_zone_layer.add_to_labile_phosphorus = PropertyMock()
+
+    incorp.daily_update_routine(runoff, field_size)
+
+    if runoff > 0:
+        incorp._remove_runoff_phosphorus_from_top_soil.assert_called_once_with(runoff, field_size)
+    else:
+        incorp._remove_runoff_phosphorus_from_top_soil.assert_not_called()
+    soil_phosphorus_concentration_calls = [call(0, 1.4, 20, field_size), call(8.1, 1.4, 30, field_size),
+                                           call(8.1, 1.4, 30, field_size), call(8.1, 1.4, 120, field_size)]
+    incorp._determine_soil_phosphorus_concentration.assert_has_calls(soil_phosphorus_concentration_calls)
+    isotherm_slope_calls = [call(18.7), call(18.7), call(18.7), call(18.7)]
+    incorp._determine_isotherm_slope.assert_has_calls(isotherm_slope_calls)
+    isotherm_intercept_calls = [call(35), call(35), call(35), call(35)]
+    incorp._determine_isotherm_intercept.assert_has_calls(isotherm_intercept_calls)
+    drp_leachate_calls = [call(3.8, 35, 155), call(3.8, 35, 155), call(3.8, 35, 155), call(3.8, 35, 155)]
+    incorp._determine_dissolved_reactive_phosphorus_leachate.assert_has_calls(drp_leachate_calls)
+    percolated_water_calls = [call(3.4, field_size), call(3.1, field_size), call(1.3, field_size),
+                              call(0.33, field_size)]
+    incorp._determine_percolated_water_volume.assert_has_calls(percolated_water_calls)
+    assert incorp.data.soil_layers[0].add_to_labile_phosphorus.call_count == 1
+    for layer in incorp.data.soil_layers[1:]:
+        assert layer.add_to_labile_phosphorus.call_count == 2
+    assert incorp.data.vadose_zone_layer.add_to_labile_phosphorus.call_count == 1
