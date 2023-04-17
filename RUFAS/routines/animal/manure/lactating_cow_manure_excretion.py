@@ -163,7 +163,7 @@ def manure_calculations(ration_formulation,
     # Methane Emissions
     methane_emission = 0.0
     if methane_model == "Mutian":  # [A.3E.C.1]
-        methane_emission = (- 12
+        methane_emission = (- 126
                             + 11.3 * dry_matter_intake
                             + 2.30 * NDF_concentration
                             + 28.8 * milk_fat
