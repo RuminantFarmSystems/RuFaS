@@ -474,7 +474,7 @@ class Pen:
             if type(animal).__name__ == 'Cow':
                 animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
             else:
-                animal.calc_manure_excretion(feed)
+                animal.calc_manure_excretion(feed, methane_model)
 
         manure = {}
         calf_total = {}
