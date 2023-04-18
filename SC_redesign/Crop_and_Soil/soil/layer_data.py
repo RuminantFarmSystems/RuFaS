@@ -181,7 +181,20 @@ class LayerData:
     """the amount of plant dry matter residue at harvest (kg/ha)"""
     plant_residue_metabolic_fraction: Optional[float] = None
     """fraction of plant residue that is metabolic (unitless)"""
-
+    plant_structural_to_slow_or_active_rate: Optional[float] = None
+    """the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)"""
+    weighted_residue_dry_matter_lignin_fraction: Optional[float] = None
+    """the weighted fractional of lignin amount in residue dry matter (unitless)"""
+    soil_residue_lignin_fraction: Optional[float] = None
+    """the fraction of soil residue that's comprised of lignin (unitless)"""
+    soil_lignin_to_nitrogen_fraction: Optional[float] = None
+    """soil lignin to nitrogen fraction(unitless)"""
+    soil_residue_metabolic_fraction: Optional[float] = None
+    """the fraction of soil residue that is metabolic(unitless)"""
+    soil_metabolic_carbon_amount: Optional[float] = None
+    """soil metabolic carbon amount (kg/ha)"""
+    soil_structural_carbon_amount: Optional[float] = None
+    """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
 
 
     def __post_init__(self):
