@@ -138,10 +138,10 @@ def test_determine_phosphorus_percolated_from_layer(phosphorus: float, density: 
 ])
 def test_daily_update_routine(runoff: float, field_size: float) -> None:
     """Tests that the daily update routine for percolating phosphorus down through layers works correctly."""
-    layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, labile_phosphorus_content=3.4),
-              LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, labile_phosphorus_content=3.18),
-              LayerData(top_depth=50, bottom_depth=80, nitrate=1, labile_phosphorus_content=2.8),
-              LayerData(top_depth=80, bottom_depth=200, nitrate=5, labile_phosphorus_content=2.9)]
+    layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, labile_inorganic_phosphorus_content=3.4),
+              LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, labile_inorganic_phosphorus_content=3.18),
+              LayerData(top_depth=50, bottom_depth=80, nitrate=1, labile_inorganic_phosphorus_content=2.8),
+              LayerData(top_depth=80, bottom_depth=200, nitrate=5, labile_inorganic_phosphorus_content=2.9)]
     data = SoilData(soil_layers=layers)
     incorp = SolublePhosphorus(data)
 
@@ -153,13 +153,13 @@ def test_daily_update_routine(runoff: float, field_size: float) -> None:
     if runoff > 0:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_called_once_with(runoff, field_size,
                                                                                   3.4, 1.4, 20)
-        assert incorp.data.soil_layers[0].labile_phosphorus_content == (3.4 - 0.9 - 1.1)
+        assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == (3.4 - 0.9 - 1.1)
         assert incorp.data.annual_soil_phosphorus_runoff == (0.9 * field_size)
     else:
         incorp._determine_phosphorus_runoff_from_top_soil.assert_not_called()
-        assert incorp.data.soil_layers[0].labile_phosphorus_content == 3.4 - 1.1
+        assert incorp.data.soil_layers[0].labile_inorganic_phosphorus_content == 3.4 - 1.1
     assert incorp._determine_phosphorus_percolated_from_layer.call_count == len(layers)
-    assert incorp.data.soil_layers[1].labile_phosphorus_content == 3.18
-    assert incorp.data.soil_layers[2].labile_phosphorus_content == 2.8
-    assert incorp.data.soil_layers[3].labile_phosphorus_content == 2.9
-    assert incorp.data.vadose_zone_layer.labile_phosphorus_content == 1.1
+    assert incorp.data.soil_layers[1].labile_inorganic_phosphorus_content == 3.18
+    assert incorp.data.soil_layers[2].labile_inorganic_phosphorus_content == 2.8
+    assert incorp.data.soil_layers[3].labile_inorganic_phosphorus_content == 2.9
+    assert incorp.data.vadose_zone_layer.labile_inorganic_phosphorus_content == 1.1

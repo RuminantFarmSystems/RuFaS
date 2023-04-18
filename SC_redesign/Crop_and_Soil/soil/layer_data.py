@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
+from math import log
 
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
@@ -15,8 +16,6 @@ class LayerData:
     """bottom depth of the layer (mm)"""
     nitrate: float = 1.5
     """nitrate level of the layer (kg/ha)"""
-    phosphate: float = 0.05
-    """phosphate content of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
     water_content:  float = field(init=False)
@@ -160,9 +159,31 @@ class LayerData:
     """soil carbon decomposed into the active carbon pool (kg/ha)"""
 
     # --- Phosphorus
-    labile_phosphorus_content: float = 0
+    initial_labile_inorganic_phosphorus_concentration: float = None
+    """Concentration of labile inorganic phosphorus at the beginning of the season (mg Phosphorus / kg soil)
+        Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable 
+        for soil in the plow layer of cropland.
+    """
+    labile_inorganic_phosphorus_concentration_record: List = field(default_factory=list)
+    """FIFO data structure that holds the last 10 years of values of labile inorganic phosphorus concentrations.
+        Note: each value in this list has the units (kg Phosphorus / kg soil), and this attribute is used for the annual
+        update of the phosphorus sorption parameter.
+    """
+    phosphorus_sorption_parameter: Optional[float] = None
+    """Parameter that determines the equilibria of the different inorganic phosphorus pools (unitless)
+        Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical 
+        documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical 
+        documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the 
+        user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an 
+        equation to compute it based off other soil attributes. Also, in the words of Pete, this variable "represents 
+        sort of a long term chemical characteristics of the soil and should NOT be calculated every day. There can be 
+        big changes in labile P when P is added to soils in fertilizer and manure, and we don’t want PSP changing 
+        rapidly." To account for this, the phosphorus sorption parameter is recalculated once a year based on the 
+        average amount of labile inorganic phosphorus in the soil over the (up-to) last 10 years.
+    """
+    labile_inorganic_phosphorus_content: float = 0
     """Labile phosphorus content of this soil layer (kg phosphorus / ha)"""
-    active_phosphorus_content: float = 0
+    active_inorganic_phosphorus_content: float = 0
     """Active phosphorus content of this soil layer (kg phosphorus / ha)"""
 
     # --- Residue partition
@@ -172,6 +193,16 @@ class LayerData:
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
+
+        if self.initial_labile_inorganic_phosphorus_concentration is None:
+            self.initial_labile_inorganic_phosphorus_concentration = 25
+
+        self.labile_inorganic_phosphorus_concentration_record.append(
+            self.initial_labile_inorganic_phosphorus_concentration)
+
+        self.phosphorus_sorption_parameter = self._calculate_phosphorus_sorption_parameter(
+            self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
+            self.percent_organic_carbon_content)
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
@@ -185,8 +216,8 @@ class LayerData:
                 Size of the field (ha)
 
         """
-        self.labile_phosphorus_content = self._add_phosphorus_to_pool(self.labile_phosphorus_content, phosphorus_to_add,
-                                                                      field_size)
+        self.labile_inorganic_phosphorus_content = self._add_phosphorus_to_pool(self.labile_inorganic_phosphorus_content, phosphorus_to_add,
+                                                                                field_size)
 
     def add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the active phosphorus content of this
@@ -200,8 +231,8 @@ class LayerData:
                 Size of the field (ha)
 
         """
-        self.active_phosphorus_content = self._add_phosphorus_to_pool(self.active_phosphorus_content, phosphorus_to_add,
-                                                                      field_size)
+        self.active_inorganic_phosphorus_content = self._add_phosphorus_to_pool(self.active_inorganic_phosphorus_content, phosphorus_to_add,
+                                                                                field_size)
 
     @staticmethod
     def _add_phosphorus_to_pool(pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
@@ -231,6 +262,36 @@ class LayerData:
         phosphorus_pool_amount = pool_to_add_to * field_size
         phosphorus_pool_amount += phosphorus_to_add
         return phosphorus_pool_amount / field_size
+
+    @staticmethod
+    def _calculate_phosphorus_sorption_parameter(percent_clay_content: float, labile_inorganic_phosphorus: float,
+                                                 percent_organic_carbon_content: float) -> float:
+        """Calculates the phosphorus sorption coefficient based on the current soil conditions.
+
+        Parameters
+        ----------
+        percent_clay_content : float
+            Percent of this soil layer that is clay, expressed in range [0, 100] (unitless)
+        labile_inorganic_phosphorus : float
+            Amount of labile inorganic phosphorus in this soil layer (mg Phosphorus / kg soil)
+        percent_organic_carbon_content : float
+            Percent of this soil layer that is organic carbon, expressed in range [0, 100] (unitless)
+
+        Returns
+        -------
+        float
+            The phosphorus sorption parameter based on how much clay, organic carbon, and labile inorganic phosphorus
+            are in the soil layer.
+
+        References
+        ----------
+        SurPhos theoretical documentation eqn. [18]
+
+        """
+        first_term = -0.045 * log(percent_clay_content)
+        second_term = 0.001 * labile_inorganic_phosphorus
+        third_term = 0.035 * percent_organic_carbon_content
+        return first_term + second_term - third_term + 0.43
 
     @property
     def layer_thickness(self) -> float:
