@@ -5,15 +5,23 @@ from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorp
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
-# TODO These functions belone in either water_dynamics.py or as soil process methods
-
+# TODO These functions belong in either water_dynamics.py or as soil process methods - GitHub Issue #450
 
 # TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
+#   I'm not entirely sure if that should happen for this module, since water can be uptaken from underlying layers in
+#   some cases.
 class WaterUptake:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.crop_data = crop_data or CropData()
 
     def uptake_water(self, soil_data: SoilData):
+        """main method that conducts all water uptake routines for a crop in a day.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            object tracking soil, from which water will be extracted.
+        """
         top_depths = soil_data.get_vectorized_layer_attribute("top_depth")
         bottom_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
         water_availabilities = soil_data.get_vectorized_layer_attribute("water_content")
@@ -25,7 +33,7 @@ class WaterUptake:
             upper_depths=top_depths, lower_depths=bottom_depths,
             water_distro_parameter=self.crop_data.water_distro_parameter
         )
-        self.data.unmet_water_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
+        self.crop_data.unmet_water_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
             uptake_potentials=self.crop_data.potential_water_uptakes,
             nutrient_availabilities=water_availabilities
         )
@@ -41,15 +49,32 @@ class WaterUptake:
             potential_uptakes=self.crop_data.potential_water_uptakes, water_availabilities=water_availabilities,
             wilting_points=wilting_points)
 
-        self.extract_water_from_soil()
+        self.extract_water_from_soil(soil_data)
 
-    def extract_water_from_soil(self, soil_data: SoilData):
+        self.crop_data.total_water_uptake = sum(self.crop_data.actual_water_uptakes)
+
+    def extract_water_from_soil(self, soil_data: SoilData) -> None:
+        """transfers the current day's water uptake from soil layers to the crop
+
+        Specifically, the module removes the smaller of the previously calculated "actual uptake" and the available
+        water in each layer. The actual uptake is updated, if relevant, and the equivalent amount is removed from the
+        layers in the SoilData object.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            the object that tracks soil properties, from which to extract water.
+        """
         if len(soil_data.soil_layers) != len(self.crop_data.actual_water_uptakes):
             raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
 
         available_water = soil_data.get_vectorized_layer_attribute("water_content")
-        diffs = [avail - request for avail, request in zip(available_water, self.crop_data.actual_water_uptakes)]
-
+        zipped = zip(available_water, self.crop_data.actual_water_uptakes)
+        extracts = [min(avail, request) for avail, request in zipped]
+        zipped = zip(available_water, extracts)
+        leftovers = [avail - extract for avail, extract in zipped]
+        soil_data.set_vectorized_layer_attribute("water_content", leftovers)
+        self.crop_data.actual_water_uptakes = extracts
 
 
     @staticmethod
