@@ -64,8 +64,8 @@ class ResiduePartition:
                 layer.plant_dry_matter_residue_amount,
                 layer.plant_residue_metabolic_fraction,
                 layer.structural_carbon_transfer_amount,
-                layer.plant_structural_to_active_carbon_amount,
-                layer.plant_structural_to_slow_carbon_amount,
+                layer.plant_structural_active_carbon_usage,
+                layer.plant_structural_slow_carbon_usage,
                 layer.plant_structural_carbon_amount)
 
             layer.plant_structural_active_carbon_usage = \
@@ -75,7 +75,7 @@ class ResiduePartition:
                     self.data.decomposition_temperature_effect,
                     layer.plant_structural_carbon_amount)
 
-            layer.plant_structural_to_slow_carbon_amount = \
+            layer.plant_structural_slow_carbon_usage = \
                 self._determine_plant_structural_to_slow_active_carbon_amount(
                     layer.plant_structural_to_slow_or_active_rate,
                     layer.decomposition_moisture_effect,

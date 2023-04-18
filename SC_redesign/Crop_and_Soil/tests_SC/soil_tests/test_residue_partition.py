@@ -404,13 +404,13 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
       LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
                 wilting_point_water_concentration=0.8, tillage_fraction=0.2),
       LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
-                wilting_point_water_concentration=0.3, tillage_fraction=0.2)], CropData(yield_residue=3)),
+                wilting_point_water_concentration=0.3, tillage_fraction=0.2)], CropData(yield_residue=300)),
     ([LayerData(top_depth=0, bottom_depth=30, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
                 wilting_point_water_concentration=1.8, tillage_fraction=0.2),
       LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
                 wilting_point_water_concentration=0.8, tillage_fraction=0.2),
       LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-                wilting_point_water_concentration=0.2, tillage_fraction=0.2)], CropData(yield_residue=3)),
+                wilting_point_water_concentration=0.2, tillage_fraction=0.2)], CropData(yield_residue=30)),
     ([LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
                 wilting_point_water_concentration=1.8, tillage_fraction=0.2),
       LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4,
@@ -420,7 +420,7 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
                 wilting_point_water_concentration=0.6, tillage_fraction=0.2)], CropData(yield_residue=3))
 ])
 def test_partition_residue(layers: list, crop: CropData, rainfall=10):
-
+    """Testing if main routine correctly updates the attributes"""
     data = SoilData(soil_layers=layers)
     partition = ResiduePartition(data)
 
@@ -444,12 +444,13 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     ResiduePartition._determine_soil_structural_to_slow_active_carbon_amount = MagicMock(return_value=2.9)
     ResiduePartition._determine_soil_structural_carbon_amount = MagicMock(return_value=3)
 
-    partition.partition_residue(rainfall,crop)
+    first_layer_yield_residue_value = crop.yield_residue
+    partition.partition_residue(rainfall, crop)
 
     # Checking if methods are called correct number of times
     assert ResiduePartition._determine_plant_residue_lignin_composition.call_count == 1
-    assert ResiduePartition._determine_plant_lignin_nitrogen_fraction == 1
-    assert ResiduePartition._determine_plant_residue_metabolic_fraction == 1
+    assert ResiduePartition._determine_plant_lignin_nitrogen_fraction.call_count == 1
+    assert ResiduePartition._determine_plant_residue_metabolic_fraction.call_count == 1
 
     assert ResiduePartition._determine_plant_metabolic_active_carbon_usage.call_count == len(layers)
     assert ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount.call_count == len(layers)
@@ -478,7 +479,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
 
         if layers.index(layer) == 0:
             assert layer.structural_carbon_transfer_amount == 2.3
-            assert layer.soil_dry_matter_residue_amount == crop.yield_residue * layer.tillage_fraction
+            assert layer.soil_dry_matter_residue_amount == first_layer_yield_residue_value * layer.tillage_fraction
         else:
             assert layer.structural_carbon_transfer_amount == 0
             assert layer.soil_dry_matter_residue_amount == 0
@@ -498,9 +499,3 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
         assert layer.soil_structural_active_carbon_usage == 2.9
         assert layer.soil_structural_slow_carbon_usage == 2.9
         assert layer.soil_structural_carbon_amount == 3
-
-
-
-
-
-
