@@ -21,7 +21,7 @@ class ResiduePartition:
     def partition_residue(self, rainfall: float, crop: CropData):
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
-        self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_ratio(
+        self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
             self.data.plant_residue_lignin_composition)
         self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(
             self.data.plant_lignin_nitrogen_ratio)
@@ -38,14 +38,12 @@ class ResiduePartition:
             )
 
             if self.data.soil_layers.index(layer) == 0:
-                layer.structural_carbon_transfer_amount = self.determine_structural_carbon_transfer_amount(
+                layer.structural_carbon_transfer_amount = self._determine_structural_carbon_transfer_amount(
                     layer.plant_structural_carbon_amount,
                     layer.tillage_fraction
                 )
 
-                if crop.yield_collected > 0:
-                    layer.soil_dry_matter_residue_amount = crop.yield_residue * layer.tillage_fraction
-
+                layer.soil_dry_matter_residue_amount = crop.yield_residue * layer.tillage_fraction
                 self.data.total_residue += crop.yield_residue
             else:
                 layer.structural_carbon_transfer_amount = 0
@@ -70,7 +68,7 @@ class ResiduePartition:
                 layer.plant_structural_to_slow_carbon_amount,
                 layer.plant_structural_carbon_amount)
 
-            layer. plant_structural_slow_carbon_usage = \
+            layer.plant_structural_active_carbon_usage = \
                 self._determine_plant_structural_to_slow_active_carbon_amount(
                     layer.plant_structural_to_slow_or_active_rate,
                     layer.decomposition_moisture_effect,
@@ -164,8 +162,8 @@ class ResiduePartition:
         # TODO: check source, 0.1 or 0.01, ask Hector about the value
 
     @staticmethod
-    def _determine_plant_lignin_nitrogen_ratio(plant_residue_lignin_composition: float,
-                                               nitrogen_fraction_plant_residue=0.4) -> float:
+    def _determine_plant_lignin_nitrogen_fraction(plant_residue_lignin_composition: float,
+                                                  nitrogen_fraction_plant_residue=0.4) -> float:
         # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
         #  GitHub Issue #163
         """This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
