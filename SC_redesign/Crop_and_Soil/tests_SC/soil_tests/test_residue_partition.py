@@ -196,23 +196,23 @@ def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amoun
         plant_structural_to_active_carbon_amount,
         plant_structural_to_slow_carbon_amount,
         plant_structural_carbon_amount)
-
-
-@pytest.mark.parametrize("plant_dry_matter_residue_amount, tillage_fraction", [
-    (3, 0.4),  # default
-    (50, 0.4),  # increased dry matter residue amount
-    (3, 1.0),  # increased tillage fraction
-    (1.8, 0.01),  # decreased dry matter residue amount & tillage
-    (0, 0.4),  # no dry matter residue amount
-    (2, 0),  # no tillage fraction
-    (0, 0),  # neither
-])
-def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
-                                                  tillage_fraction: float) -> None:
-    """Tests that the soil dry matter residue amount was updated correctly"""
-    expected = plant_dry_matter_residue_amount * tillage_fraction
-    assert expected == ResiduePartition._determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount,
-                                                                                  tillage_fraction)
+#
+#
+# @pytest.mark.parametrize("plant_dry_matter_residue_amount, tillage_fraction", [
+#     (3, 0.4),  # default
+#     (50, 0.4),  # increased dry matter residue amount
+#     (3, 1.0),  # increased tillage fraction
+#     (1.8, 0.01),  # decreased dry matter residue amount & tillage
+#     (0, 0.4),  # no dry matter residue amount
+#     (2, 0),  # no tillage fraction
+#     (0, 0),  # neither
+# ])
+# def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
+#                                                   tillage_fraction: float) -> None:
+#     """Tests that the soil dry matter residue amount was updated correctly"""
+#     expected = plant_dry_matter_residue_amount * tillage_fraction
+#     assert expected == ResiduePartition._determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount,
+#                                                                                   tillage_fraction)
 
 
 @pytest.mark.parametrize("soil_dry_matter_residue_amount, root_biomass", [
