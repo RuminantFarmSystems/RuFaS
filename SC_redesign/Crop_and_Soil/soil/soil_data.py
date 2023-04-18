@@ -57,6 +57,8 @@ class SoilData:
     annual_runoff_grazing_manure_organic_phosphorus: float = 0
     """Cumulative total of organic phosphorus from grazer-applied manure that was carried off the field by runoff
         (kg)"""
+    annual_soil_phosphorus_runoff: float = 0
+    """Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg)"""
 
     # ---- evapotranspiration
     potential_evapotranspiration: Optional[float] = None
@@ -249,6 +251,8 @@ class SoilData:
         self.annual_runoff_machine_manure_inorganic_phosphorus = 0
         self.annual_runoff_grazing_manure_organic_phosphorus = 0
         self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
+
+        self.annual_soil_phosphorus_runoff = 0
 
     @property
     def profile_soil_water_content(self) -> float:
