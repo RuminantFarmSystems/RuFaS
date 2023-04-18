@@ -45,9 +45,9 @@ class SolublePhosphorus:
         """
         if runoff > 0:
             phosphorus_runoff = self._determine_phosphorus_runoff_from_top_soil(
-                runoff, field_size, self.data.soil_layers[0].labile_phosphorus_content,
+                runoff, field_size, self.data.soil_layers[0].labile_inorganic_phosphorus_content,
                 self.data.soil_layers[0].bulk_density, self.data.soil_layers[0].layer_thickness)
-            self.data.soil_layers[0].labile_phosphorus_content -= phosphorus_runoff
+            self.data.soil_layers[0].labile_inorganic_phosphorus_content -= phosphorus_runoff
             self.data.annual_soil_phosphorus_runoff += phosphorus_runoff * field_size
 
         for layer_index in range(len(self.data.soil_layers)):
@@ -59,11 +59,11 @@ class SolublePhosphorus:
                 next_layer = self.data.vadose_zone_layer
 
             phosphorus_percolated = self._determine_phosphorus_percolated_from_layer(
-                current_layer.labile_phosphorus_content, current_layer.bulk_density, current_layer.layer_thickness,
+                current_layer.labile_inorganic_phosphorus_content, current_layer.bulk_density, current_layer.layer_thickness,
                 current_layer.percent_clay_content, current_layer.percolated_water, field_size)
 
-            current_layer.labile_phosphorus_content -= phosphorus_percolated
-            next_layer.labile_phosphorus_content += phosphorus_percolated
+            current_layer.labile_inorganic_phosphorus_content -= phosphorus_percolated
+            next_layer.labile_inorganic_phosphorus_content += phosphorus_percolated
 
     # --- Static methods ---
     @staticmethod

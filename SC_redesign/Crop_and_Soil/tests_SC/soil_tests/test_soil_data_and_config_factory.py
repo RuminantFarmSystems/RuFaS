@@ -443,13 +443,13 @@ def test_percent_organic_matter_content(percent_organic_carbon_content: float) -
 ])
 def test_add_to_labile_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
     """Tests that the labile phosphorus content of the top soil layer has phosphorus correctly added to it."""
-    layer = LayerData(top_depth=0, bottom_depth=30, labile_phosphorus_content=initial_labile_phosphorus)
+    layer = LayerData(top_depth=0, bottom_depth=30, labile_inorganic_phosphorus_content=initial_labile_phosphorus)
     layer._add_phosphorus_to_pool = MagicMock(return_value=100)
 
     layer.add_to_labile_phosphorus(added_phosphorus, field_size)
 
     layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
-    assert layer.labile_phosphorus_content == 100
+    assert layer.labile_inorganic_phosphorus_content == 100
 
 
 @pytest.mark.parametrize("added_phosphorus,initial_labile_phosphorus,field_size", [
@@ -460,13 +460,13 @@ def test_add_to_labile_phosphorus(added_phosphorus: float, initial_labile_phosph
 ])
 def test_add_to_active_phosphorus(added_phosphorus: float, initial_labile_phosphorus: float, field_size: float) -> None:
     """Tests that the stable phosphorus content of the top soil layer has phosphorus correctly added to it."""
-    layer = LayerData(top_depth=0, bottom_depth=27, labile_phosphorus_content=initial_labile_phosphorus)
+    layer = LayerData(top_depth=0, bottom_depth=27, labile_inorganic_phosphorus_content=initial_labile_phosphorus)
     layer._add_phosphorus_to_pool = MagicMock(return_value=200)
 
     layer.add_to_labile_phosphorus(added_phosphorus, field_size)
 
     layer._add_phosphorus_to_pool.assert_called_once_with(initial_labile_phosphorus, added_phosphorus, field_size)
-    assert layer.labile_phosphorus_content == 200
+    assert layer.labile_inorganic_phosphorus_content == 200
 
 
 @pytest.mark.parametrize("pool,added_phosphorus,area", [
