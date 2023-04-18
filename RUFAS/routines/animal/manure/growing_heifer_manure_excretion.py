@@ -18,7 +18,8 @@ def manure_calculations(ration_formulation,
                         feed,
                         body_weight: float,
                         fecal_phosphorus: float,
-                        urine_phosphorus_required: float) \
+                        urine_phosphorus_required: float,
+                        methane_model: str) \
         -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a growing heifer with information from the ration formulation.
 
@@ -34,6 +35,8 @@ def manure_calculations(ration_formulation,
         Amount of fecal phosphorus excreted by the current animal, g.
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
+    methane_model : str
+        Methane model used for methane emission calculations, including Boadi, IPCC.
 
     Returns
     -------
@@ -45,60 +48,86 @@ def manure_calculations(ration_formulation,
 
     """
     # TODO: Same TODOs as in dry_cow_manure_excretion.py
-    nutrient_amounts, nutrient_concentrations = ration_report(ration_formulation, feed.available_feeds)
+    nutrient_amounts, nutrient_concentrations = ration_report(
+        ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
     CP_concentration = nutrient_concentrations['CP']
     potassium_concentration = nutrient_concentrations['potassium']
     ASH_concentration = nutrient_concentrations["ash"]
     NDF_concentration = nutrient_concentrations['NDF']
     EE_concentration = nutrient_concentrations["EE"]
+    # Soluble residue
+    # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
+    soluble_residue = (100 - ASH_concentration) - \
+        NDF_concentration - CP_concentration - EE_concentration
 
     # Total urine, kg [A.3B.A.1]
     urine = 9.0
 
     # Manure excretion
     # Amount of feces and urine excreted daily by the growing heifer, kg [A.3B.A.2]
-    total_manure_excreted = 3.886 * dry_matter_intake - 0.029 * body_weight + 5.641
+    total_manure_excreted = 4.158 * dry_matter_intake - 0.0246 * body_weight
 
     # Total solids excretion
-    # Amount of dry material excreted by the growing heifer, kg [A.3B.A.2]
-    total_solids = 0.0084 * body_weight
+    # Amount of dry material excreted by the growing heifer, kg [A.3F.A.3]
+    total_solids = 0.178 * dry_matter_intake + 2.733
 
     # Total volatile solids, kg [A.3B.A.3]
     total_volatile_solids = 0.0073 * body_weight
 
-    # Degradable volatile solids, kg [A.3B.A.4]
+    # Degradable volatile solids, kg [A.3A.A.5]
     degradable_volatile_solids = 0.9 * total_volatile_solids
 
-    # Non-degradable volatile solids, kg
+    # Non-degradable volatile solids, kg [A.3A.A.6]
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
     # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
-    manure_nitrogen = 78.390 * dry_matter_intake * (CP_concentration / 100) + 51.35
+    manure_nitrogen = (15.1
+                       + 0.83 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                       (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
+                       ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in urine, kg [A.3F.B.2]
-    urine_nitrogen = (14.3 + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) * (CP_concentration / 100)
+    # Nitrogen excretion in urine, kg [A.3B.B.2]
+    urine_nitrogen = (14.3
+                      + 0.510 * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS) *
+                      (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN) / 100
                       ) * GeneralConstants.GRAMS_TO_KG
 
-    # Nitrogen excretion in feces, kg [A.3F.B.3]
+    # Nitrogen excretion in feces, kg [A.3B.B.3]
     fecal_nitrogen = manure_nitrogen - urine_nitrogen  # TODO: Unused
 
-    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.1]
-    urinary_nitrogen_concentration = (urine_nitrogen *GeneralConstants.KG_TO_GRAMS) / urine
-    urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
+    # Urinary N concentration, g N/kg [A.3G.B.1]
+    urinary_nitrogen_concentration = (
+        urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
+    # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+    urine_urea_nitrogen_concentration = -1.16 + \
+        0.86 * urinary_nitrogen_concentration
 
-    # Total ammoniacal nitrogen concentration in the manure slurry,
-    # g ammoniacal nitrogen/L manure slurry [A.3G.B.3]
+    # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
+    urine_urea_nitrogen_concentration_lower_bound = 2
+    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
+        urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
+
+    # Total ammoniacal nitrogen in the slurry top layer as a percentage of UUC, %, [A.3G.B.3]
     tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
+    # Total ammoniacal nitrogen concentration in the manure slurry,
+    # g ammoniacal nitrogen/L manure slurry [A.3G.B.4]
+    total_ammoniacal_nitrogen_concentration = (
+        tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
 
-    # Amount of potassium excreted, g [A.3D.B.3]
-    potassium = dry_matter_intake * (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
+    # Amount of potassium excreted, g [A.3B.B.4]
+    potassium = dry_matter_intake * \
+        (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
-    # Methane emissions, g/day [A.3B.C.1]
-    # Methane model = Boadi
-    methane_emission = (38.62 + 26.44 * dry_matter_intake) * 0.554
-    # TODO: Implement the other methane model - IPCC Tier 2
+    # Methane emissions, g/day
+    methane_emission = 0.0
+    if methane_model:
+        # Default: IPCC Tier 2
+        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)  # [A.3B.C.2]
+        methane_emission = (0.065 * gross_energy_concentration *
+                            dry_matter_intake) / 0.05565  # [A.3B.C.3]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=0,
