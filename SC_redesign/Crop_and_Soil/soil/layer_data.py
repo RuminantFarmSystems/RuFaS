@@ -36,6 +36,8 @@ class LayerData:
     """current temperature of this soil layer (degrees Celsius)"""
     saturated_hydraulic_conductivity: float = 9.5
     """saturated hydraulic conductivity for this layer of soil (mm per hour)"""
+    percolated_water: float = 0
+    """Amount of water that percolated out of the soil layer on the current day (mm)"""
 
     # --- Temperature
     bulk_density: float = 1.4
