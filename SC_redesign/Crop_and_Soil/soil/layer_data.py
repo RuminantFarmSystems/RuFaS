@@ -196,7 +196,6 @@ class LayerData:
     soil_structural_carbon_amount: Optional[float] = None
     """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
 
-
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
