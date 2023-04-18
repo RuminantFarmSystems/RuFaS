@@ -22,7 +22,6 @@ def test_determine_phosphorus_runoff_from_top_soil(runoff: float, field_size: fl
     with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus."
                "_determine_soil_phosphorus_concentration", new_callable=MagicMock, return_value=100) \
             as mocked_soil_phosphorus_concentration:
-        # SolublePhosphorus._determine_soil_phosphorus_concentration = MagicMock(return_value=100)
         expected_runoff_liters_per_ha = runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS * \
                                         CUBIC_MILLIMETERS_TO_LITERS / field_size
         expected_unadjusted_phosphorus_removed = 100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)

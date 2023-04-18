@@ -40,7 +40,7 @@ class SolublePhosphorus:
         This method is responsible for adjusting phosphorus levels in the soil profile as dictated by the two processes
         it simulates. First, if there is any runoff on the current day, it calculates how much phosphorus is lost from
         the top soil layer as a result and removes it. Then it iterates through the soil profile, calculating how much
-        phosphorus is carried downward by percolating water and moving that phosphorus between the layers..
+        phosphorus is carried downward by percolating water and moving that phosphorus between the layers.
 
         """
         if runoff > 0:
