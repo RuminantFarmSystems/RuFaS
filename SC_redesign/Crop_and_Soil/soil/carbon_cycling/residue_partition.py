@@ -59,16 +59,84 @@ class ResiduePartition:
                 layer.plant_metabolic_active_carbon_usage,
                 layer.plant_metabolic_to_soil_carbon_amount)
 
+            layer.plant_structural_to_slow_or_active_rate = self._determine_plant_structural_to_slow_or_active_rate(
+                self.data.plant_residue_metabolic_fraction)
 
+            layer.plant_structural_carbon_amount = self._determine_plant_structural_carbon_amount(
+                layer.plant_dry_matter_residue_amount,
+                layer.plant_residue_metabolic_fraction,
+                layer.structural_carbon_transfer_amount,
+                layer.plant_structural_to_active_carbon_amount,
+                layer.plant_structural_to_slow_carbon_amount,
+                layer.plant_structural_carbon_amount)
 
+            layer. plant_structural_slow_carbon_usage = \
+                self._determine_plant_structural_to_slow_active_carbon_amount(
+                    layer.plant_structural_to_slow_or_active_rate,
+                    layer.decomposition_moisture_effect,
+                    self.data.decomposition_temperature_effect,
+                    layer.plant_structural_carbon_amount)
 
+            layer.plant_structural_to_slow_carbon_amount = \
+                self._determine_plant_structural_to_slow_active_carbon_amount(
+                    layer.plant_structural_to_slow_or_active_rate,
+                    layer.decomposition_moisture_effect,
+                    self.data.decomposition_temperature_effect,
+                    layer.plant_structural_carbon_amount)
 
+            layer.weighted_residue_dry_matter_lignin_fraction = \
+                self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount,
+                                                                            crop.root_biomass)
 
+            layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
+                layer.weighted_residue_dry_matter_lignin_fraction,
+                rainfall
+            )
 
+            layer.soil_lignin_to_nitrogen_fraction = self._determine_soil_lignin_to_nitrogen_fraction(
+                self.data.plant_residue_metabolic_fraction,
+                layer.weighted_residue_dry_matter_lignin_fraction,
+                layer.soil_residue_lignin_fraction,
+            )
 
+            layer.soil_residue_metabolic_fraction = self._determine_soil_residue_metabolic_fraction(
+                layer.soil_lignin_to_nitrogen_fraction
+            )
 
+            layer.soil_metabolic_active_carbon_usage = self._determine_soil_metabolic_to_active_carbon_amount(
+                layer.decomposition_moisture_effect,
+                self.data.decomposition_temperature_effect,
+                layer.soil_metabolic_carbon_amount,
+            )
 
+            layer.soil_metabolic_carbon_amount = self._determine_soil_metabolic_carbon_amount(
+                layer.soil_metabolic_carbon_amount,
+                layer.plant_metabolic_to_soil_carbon_amount,
+                crop.root_biomass,
+                layer.soil_residue_metabolic_fraction,
+                layer.soil_metabolic_active_carbon_usage
+            )
 
+            layer.soil_structural_active_carbon_usage = self._determine_soil_structural_to_slow_active_carbon_amount(
+                layer.decomposition_moisture_effect,
+                self.data.decomposition_temperature_effect,
+                layer.soil_structural_carbon_amount
+            )
+
+            layer.soil_structural_slow_carbon_usage = self._determine_soil_structural_to_slow_active_carbon_amount(
+                layer.decomposition_moisture_effect,
+                self.data.decomposition_temperature_effect,
+                layer.soil_structural_carbon_amount
+            )
+
+            layer.soil_structural_carbon_amount = self._determine_soil_structural_carbon_amount(
+                layer.soil_residue_metabolic_fraction,
+                layer.structural_carbon_transfer_amount,
+                layer.soil_structural_active_carbon_usage,
+                layer.soil_structural_slow_carbon_usage,
+                crop.root_biomass,
+                layer.soil_structural_carbon_amount
+            )
 
     @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float,
@@ -355,32 +423,32 @@ class ResiduePartition:
 
         return updated_amount
 
-    @staticmethod
-    def _determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
-                                                  tillage_fraction: float) -> float:
-        """Calculates the amount of soil dry matter residue at harvest
-
-        Parameters
-        ----------
-        plant_dry_matter_residue_amount: float
-            plant dry matter residue at harvest (kg/ha)
-        tillage_fraction: float
-            fraction of metabolic carbon incorporated into soil during tillage (unitless)
-
-        Returns
-        -------
-        float
-            the amount of soil dry matter residue at harvest (kg/ha)
-
-        References
-        -------
-        pseudocode_soil S.6.B.II.1
-
-        Notes
-        -------
-        This calculation does not exist in the original code, it's added in order for its usage in S.6.B.II.2
-        """
-        return plant_dry_matter_residue_amount * tillage_fraction
+    # @staticmethod
+    # def _determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
+    #                                               tillage_fraction: float) -> float:
+    #     """Calculates the amount of soil dry matter residue at harvest
+    #
+    #     Parameters
+    #     ----------
+    #     plant_dry_matter_residue_amount: float
+    #         plant dry matter residue at harvest (kg/ha)
+    #     tillage_fraction: float
+    #         fraction of metabolic carbon incorporated into soil during tillage (unitless)
+    #
+    #     Returns
+    #     -------
+    #     float
+    #         the amount of soil dry matter residue at harvest (kg/ha)
+    #
+    #     References
+    #     -------
+    #     pseudocode_soil S.6.B.II.1
+    #
+    #     Notes
+    #     -------
+    #     This calculation does not exist in the original code, it's added in order for its usage in S.6.B.II.2
+    #     """
+    #     return plant_dry_matter_residue_amount * tillage_fraction
 
     @staticmethod
     def _determine_weighted_residue_dry_matter_lignin_fraction(soil_dry_matter_residue_amount: float,
@@ -428,7 +496,7 @@ class ResiduePartition:
         Returns
         -------
         float
-            the fraction of soil residue that's comprised of lignin
+            the fraction of soil residue that's comprised of lignin (unitless)
 
         References
         -------
@@ -438,10 +506,10 @@ class ResiduePartition:
         return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
 
     @staticmethod
-    def _determine_soil_lignin_to_nitrogen_ratio(plant_lignin_nitrogen_ratio: float,
-                                                 weighted_residue_dry_matter_lignin_fraction: float,
-                                                 soil_residue_lignin_fraction: float,
-                                                 nitrogen_fraction_plant_residue=0.4) -> float:
+    def _determine_soil_lignin_to_nitrogen_fraction(plant_lignin_nitrogen_ratio: float,
+                                                    weighted_residue_dry_matter_lignin_fraction: float,
+                                                    soil_residue_lignin_fraction: float,
+                                                    nitrogen_fraction_plant_residue=0.4) -> float:
         """This method calculates the soil lignin to nitrogen fraction
 
         Parameters
@@ -475,12 +543,12 @@ class ResiduePartition:
                              + str(nitrogen_fraction_plant_residue))
 
     @staticmethod
-    def _determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_ratio: float) -> float:
+    def _determine_soil_residue_metabolic_fraction(soil_lignin_to_nitrogen_fraction: float) -> float:
         """This method calculates the fraction of soil residue that is metabolic
 
         Parameters
         ----------
-        soil_lignin_to_nitrogen_ratio: float
+        soil_lignin_to_nitrogen_fraction: float
             soil lignin to nitrogen fraction(unitless)
 
         Returns
@@ -492,7 +560,7 @@ class ResiduePartition:
         -------
         pseudocode_soil S.6.B.II.5
         """
-        return max(0.0, 0.85 - 0.18 * soil_lignin_to_nitrogen_ratio)
+        return max(0.0, 0.85 - 0.18 * soil_lignin_to_nitrogen_fraction)
 
     @staticmethod
     def _determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: float,
