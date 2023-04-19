@@ -214,18 +214,22 @@ class SoilData:
 
         Notes
         -----
-        The presence of a top layer of soil that is 20 mm deep is a necessity to properly simulate SurPhos. This top 20
+        The presence of a top layer of soil that is 20 mm deep is a necessity to properly execute SurPhos. This top 20
         mm of soil is where most of the phosphorus that is applied stays in the soil profile, and keeping it in the top
         20 mm of soil makes it more available to be eroded off the field by runoff.
 
         This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
 
+        Because post_init() now appends to labile_inorganic_phosphorus_concentration_record, it cannot be called a
+        second time because it will add another value to that list when it should not.
+
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.__post_init__()
+        new_top_layer.water_content = new_top_layer.soil_water_concentration * new_top_layer.layer_thickness
         self.soil_layers[0].top_depth = 20
-        self.soil_layers[0].__post_init__()
+        self.soil_layers[0].water_content = \
+            self.soil_layers[0].soil_water_concentration * self.soil_layers[0].layer_thickness
         self.soil_layers.insert(0, new_top_layer)
 
     def do_annual_reset(self) -> None:

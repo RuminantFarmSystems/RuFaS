@@ -59,8 +59,9 @@ class SolublePhosphorus:
                 next_layer = self.data.vadose_zone_layer
 
             phosphorus_percolated = self._determine_phosphorus_percolated_from_layer(
-                current_layer.labile_inorganic_phosphorus_content, current_layer.bulk_density, current_layer.layer_thickness,
-                current_layer.percent_clay_content, current_layer.percolated_water, field_size)
+                current_layer.labile_inorganic_phosphorus_content, current_layer.bulk_density,
+                current_layer.layer_thickness, current_layer.percent_clay_content, current_layer.percolated_water,
+                field_size)
 
             current_layer.labile_inorganic_phosphorus_content -= phosphorus_percolated
             next_layer.labile_inorganic_phosphorus_content += phosphorus_percolated

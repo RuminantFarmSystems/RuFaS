@@ -161,7 +161,7 @@ class LayerData:
     # --- Phosphorus
     initial_labile_inorganic_phosphorus_concentration: float = None
     """Concentration of labile inorganic phosphorus at the beginning of the season (mg Phosphorus / kg soil)
-        Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable 
+        Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
         for soil in the plow layer of cropland.
     """
     labile_inorganic_phosphorus_concentration_record: List = field(default_factory=list)
@@ -171,14 +171,14 @@ class LayerData:
     """
     phosphorus_sorption_parameter: Optional[float] = None
     """Parameter that determines the equilibria of the different inorganic phosphorus pools (unitless)
-        Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical 
-        documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical 
-        documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the 
-        user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an 
-        equation to compute it based off other soil attributes. Also, in the words of Pete, this variable "represents 
-        sort of a long term chemical characteristics of the soil and should NOT be calculated every day. There can be 
-        big changes in labile P when P is added to soils in fertilizer and manure, and we don’t want PSP changing 
-        rapidly." To account for this, the phosphorus sorption parameter is recalculated once a year based on the 
+        Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical
+        documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical
+        documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the
+        user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an
+        equation to compute it based off other soil attributes. Also, in the words of Pete, this variable "represents
+        sort of a long term chemical characteristics of the soil and should NOT be calculated every day. There can be
+        big changes in labile P when P is added to soils in fertilizer and manure, and we don’t want PSP changing
+        rapidly." To account for this, the phosphorus sorption parameter is recalculated once a year based on the
         average amount of labile inorganic phosphorus in the soil over the (up-to) last 10 years.
     """
     labile_inorganic_phosphorus_content: float = 0
@@ -216,8 +216,8 @@ class LayerData:
                 Size of the field (ha)
 
         """
-        self.labile_inorganic_phosphorus_content = self._add_phosphorus_to_pool(self.labile_inorganic_phosphorus_content, phosphorus_to_add,
-                                                                                field_size)
+        self.labile_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
+            self.labile_inorganic_phosphorus_content, phosphorus_to_add, field_size)
 
     def add_to_active_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the active phosphorus content of this
@@ -231,8 +231,8 @@ class LayerData:
                 Size of the field (ha)
 
         """
-        self.active_inorganic_phosphorus_content = self._add_phosphorus_to_pool(self.active_inorganic_phosphorus_content, phosphorus_to_add,
-                                                                                field_size)
+        self.active_inorganic_phosphorus_content = self._add_phosphorus_to_pool(
+            self.active_inorganic_phosphorus_content, phosphorus_to_add, field_size)
 
     @staticmethod
     def _add_phosphorus_to_pool(pool_to_add_to: float, phosphorus_to_add: float, field_size: float) -> float:
