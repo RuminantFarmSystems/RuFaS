@@ -694,3 +694,6 @@ Here are my estimates:
 * Best case scenario: If everything goes right, the project might be finished in **early May**
 * Most likely scenario: A more realistic estimate is **mid-late May**
 * Worst case scenario: If things take longer than expected, I believe the project could be done **sometime in June**.
+
+See [our project board timeline](https://github.com/orgs/RuminantFarmSystems/projects/1/views/10) for a more 
+granular timeline of tasks.
