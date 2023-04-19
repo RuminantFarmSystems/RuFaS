@@ -37,10 +37,13 @@ def test_determine_max_water_uptake_to_depth():
     pass  # this is equivalent to the tests in test_nitrogen_incorporation and test_phosphorus_incorporation
 
 
-def test_uptake_water(max_trans=5):
+@pytest.mark.parametrize("max_trans", [
+    (5)
+])
+def test_uptake_water(max_trans):
     """ensure that uptake_water can run without error"""
     crop_data = CropData()
     crop_data.max_transpiration = max_trans
     soil_data = SoilData()
     wu = WaterUptake(crop_data)
-    wu.uptake_water(soil_data)
+    wu.uptake_water(soil_data)  # The mocked NitrogenIncorporation.determine_layer_nutrient_demand breaks this...
