@@ -13,6 +13,15 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 class WaterUptake:
     def __init__(self, crop_data: Optional[CropData] = None):
+    """This method initializes the CropData object that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        crop_data : CropData, optional
+            The CropData object used by this module to track water uptake, creates new one if one is not
+            provided.
+
+        """
         self.crop_data = crop_data or CropData()
 
     def uptake_water(self, soil_data: SoilData):

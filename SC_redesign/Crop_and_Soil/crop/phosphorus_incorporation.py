@@ -4,7 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorp
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 # TODO: Phosphorus has identical methods to NitrogenIncorporation, excluding nitrogen fixation. They
-#  should be combined into one class (NutrientIncorporation) and simplified.
+#  should be combined into one class (NutrientIncorporation) and simplified. Issue #450 
 
 """
 This module is based upon the 'Phosphorus Uptake" section (5:2.3.2) of of the SWAT model documentation
