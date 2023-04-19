@@ -373,6 +373,14 @@ class AnimalManagement:
             temp: the temperature on the current day
         """
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.daily_update_id_pen.__name__,
+                    "animals_added": animals_added,
+                    "ids_removed": ids_removed,
+                    "calves_born": calves_born,
+                    "temp": temp,
+                    }
+
         # stratifying the pens that lost animals by animal group
         # (values are dictionaries of pen IDs, with values being the number of animals removed)
         grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
@@ -447,14 +455,19 @@ class AnimalManagement:
                                                     feed, temp, pen_population_before_additions[pen.id])
 
         for i in range(len(self.all_pens)):
-            if len(self.all_pens[i].animals_in_pen) > 0:
-                if self.all_pens[i].ration == {}:
+            if self.all_pens[i].ration == {}:
+                if len(self.all_pens[i].animals_in_pen) > 0:            
                     available_feeds = ration_driver.AvailableFeeds()
                     available_feeds.feed_nutrients(feed)
                     self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
                     pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(
                         self.all_pens[i].allocated_feeds)
                     self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
+                    pen_specific_feed_data_pen_num = f"pen_specific_feed_data_pen_{i}"
+                    om.add_variable(pen_specific_feed_data_pen_num, pen_specific_feed_data, info_map)
+                    pen_ration_data = self.all_pens[i].ration
+                    pen_ration_data_pen_num = f"pen_ration_data_pen_{i}"
+                    om.add_variable(pen_ration_data_pen_num, pen_ration_data, info_map)
             else:
                 if len(self.all_pens[i].animals_in_pen) > 0:
                     # Need to adjust the ration totals for the pen attributes now
@@ -465,6 +478,9 @@ class AnimalManagement:
                                 (self.all_pens[i].ration[key] /
                                  pen_population_before_additions[i]) * len(
                                     self.all_pens[i].animals_in_pen)
+                            pen_ration_data = self.all_pens[i].ration
+                            pen_ration_data_pen_num = f"pen_ration_data_pen_{i}"
+                            om.add_variable(pen_ration_data_pen_num, pen_ration_data, info_map)
 
         for calf in calves_born:
             # getting valid pen to place calves in
