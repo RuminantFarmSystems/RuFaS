@@ -236,7 +236,6 @@ class SoilData:
         """
         [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
 
-
     def _subdivide_top_layer(self) -> None:
         """This method ensures that the soil profile has a top layer that is 20 mm deep.
 

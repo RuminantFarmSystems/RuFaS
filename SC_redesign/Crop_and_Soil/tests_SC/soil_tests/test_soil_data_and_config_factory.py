@@ -121,12 +121,14 @@ def test_get_vectorized_layer_attribute() -> None:
     with pytest.raises(Exception):
         soil_data.get_vectorized_layer_attribute("non_existant_variable")
 
+
 def test_set_vectorized_layer_attribute() -> None:
     """ensures that layer attributes are properly set"""
-    soil_data = SoilData() # 4 layers by default
+    soil_data = SoilData()  # 4 layers by default
     water_concentration = [0.1, 0.2, 1, 0.8]
     soil_data.set_vectorized_layer_attribute("soil_water_concentration", water_concentration)
     assert soil_data.get_vectorized_layer_attribute("soil_water_concentration") == water_concentration
+
 
 def test_manual_soil_data_configuration() -> None:
     """Test that creating a custom SoilData object actually has all the correct values in its fields"""
