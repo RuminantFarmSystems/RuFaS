@@ -452,12 +452,6 @@ class Pen:
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__,
-                    "feed": vars(feed),
-                    "available_feeds": available_feeds, }
-        om.add_variable("pen_ration_data", ration, info_map)
-
         return ration
 
     def calc_manure(self, feed, methane_model):
