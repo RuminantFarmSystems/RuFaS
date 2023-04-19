@@ -173,11 +173,7 @@ class LayerData:
         documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical
         documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the
         user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an
-        equation to compute it based off other soil attributes. Also, in the words of Pete, this variable "represents
-        sort of a long term chemical characteristics of the soil and should NOT be calculated every day. There can be
-        big changes in labile P when P is added to soils in fertilizer and manure, and we don’t want PSP changing
-        rapidly." To account for this, the phosphorus sorption parameter is recalculated once a year based on the
-        average amount of labile inorganic phosphorus in the soil over the (up-to) last 10 years.
+        equation to compute it based off other soil attributes.
     """
     mean_phosphorus_sorption_parameter: float = None
     """Phosphorus sorption parameter that has been adjusted so it is not sensitive to large immediate changes in the
@@ -201,7 +197,7 @@ class LayerData:
         if self.initial_labile_inorganic_phosphorus_concentration is None:
             self.initial_labile_inorganic_phosphorus_concentration = 25
 
-        self.mean_phosphorus_sorption_parameter = self._calculate_phosphorus_sorption_parameter(
+        self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
             self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
             self.percent_organic_carbon_content)
 
@@ -265,8 +261,8 @@ class LayerData:
         return phosphorus_pool_amount / field_size
 
     @staticmethod
-    def _calculate_phosphorus_sorption_parameter(percent_clay_content: float, labile_inorganic_phosphorus: float,
-                                                 percent_organic_carbon_content: float) -> float:
+    def calculate_phosphorus_sorption_parameter(percent_clay_content: float, labile_inorganic_phosphorus: float,
+                                                percent_organic_carbon_content: float) -> float:
         """Calculates the phosphorus sorption coefficient based on the current soil conditions.
 
         Parameters
@@ -286,13 +282,18 @@ class LayerData:
 
         References
         ----------
-        SurPhos theoretical documentation eqn. [18]
+        SurPhos theoretical documentation eqn. [18], APLE theoretical documentation paragraph below eqn. [11]
+
+        Notes
+        -----
+        The upper bound used here is 0.7 instead of 0.9 as specified in the APLE theoretical documentation, because 0.7
+        is used in the SurPhos code (see pminrl.f, line 49).
 
         """
         first_term = -0.045 * log(percent_clay_content)
         second_term = 0.001 * labile_inorganic_phosphorus
         third_term = 0.035 * percent_organic_carbon_content
-        return first_term + second_term - third_term + 0.43
+        return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
 
     @staticmethod
     def determine_soil_phosphorus_concentration(labile_phosphorus: float, bulk_density: float,
