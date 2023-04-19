@@ -4,8 +4,8 @@ from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS, CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
+    CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
 
 
@@ -19,9 +19,8 @@ from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import
 def test_determine_phosphorus_runoff_from_top_soil(runoff: float, field_size: float, phosphorus: float, density: float,
                                                    thickness: float) -> None:
     """Tests that the correct amount of phosphorus lost to runoff is calculated"""
-    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus.SolublePhosphorus."
-               "_determine_soil_phosphorus_concentration", new_callable=MagicMock, return_value=100) \
-            as mocked_soil_phosphorus_concentration:
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_phosphorus_concentration",
+               new_callable=MagicMock, return_value=100) as mocked_soil_phosphorus_concentration:
         expected_runoff_liters_per_ha = runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS * \
                                         CUBIC_MILLIMETERS_TO_LITERS / field_size
         expected_unadjusted_phosphorus_removed = 100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)
@@ -60,21 +59,6 @@ def test_determine_isotherm_intercept(slope: float) -> None:
     assert observed == expected
 
 
-@pytest.mark.parametrize("phosphorus,density,depth,area", [
-    (25, 22.13, 20, 1.88),
-    (13, 34.556, 9.12, 3.45),
-    (1.2344, 19.84, 15, 2.3341),
-])
-def test_determine_soil_phosphorus_concentration(phosphorus: float, density: float, depth: float, area: float) -> None:
-    """Tests that the soil phosphorus concentration is calculated correctly."""
-    observed = SolublePhosphorus._determine_soil_phosphorus_concentration(phosphorus, density, depth, area)
-    total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-    total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
-    total_phosphorus_mass = phosphorus * area
-    expected_concentration = (total_phosphorus_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
-    assert pytest.approx(observed) == expected_concentration
-
-
 @pytest.mark.parametrize("phosphorus,slope,intercept", [
     (28, 60.29, 194),
     (12, 33.294, 145.56),
@@ -110,7 +94,7 @@ def test_determine_percolated_water_volume(percolated_water: float, area: float)
 def test_determine_phosphorus_percolated_from_layer(phosphorus: float, density: float, thickness: float,
                                                     clay_content: float, percolated_water: float, area: float) -> None:
     """Tests that the correct amount of phosphorus removed from a layer of soil is calculated."""
-    SolublePhosphorus._determine_soil_phosphorus_concentration = MagicMock(return_value=3.8)
+    LayerData.determine_soil_phosphorus_concentration = MagicMock(return_value=3.8)
     SolublePhosphorus._determine_isotherm_slope = MagicMock(return_value=35)
     SolublePhosphorus._determine_isotherm_intercept = MagicMock(return_value=155)
     SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate = MagicMock(return_value=2_000_000)
@@ -121,8 +105,7 @@ def test_determine_phosphorus_percolated_from_layer(phosphorus: float, density: 
     observed = SolublePhosphorus._determine_phosphorus_percolated_from_layer(phosphorus, density, thickness,
                                                                              clay_content, percolated_water, area)
 
-    SolublePhosphorus._determine_soil_phosphorus_concentration.assert_called_once_with(phosphorus, density, thickness,
-                                                                                       area)
+    LayerData.determine_soil_phosphorus_concentration.assert_called_once_with(phosphorus, density, thickness, area)
     SolublePhosphorus._determine_isotherm_slope.assert_called_once_with(clay_content)
     SolublePhosphorus._determine_isotherm_intercept.assert_called_once_with(35)
     SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate.assert_called_once_with(3.8, 35, 155)

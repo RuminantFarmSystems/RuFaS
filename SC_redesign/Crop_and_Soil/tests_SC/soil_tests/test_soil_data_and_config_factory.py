@@ -11,6 +11,8 @@ from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS
 
 
 # --- Tests to validate Soil Config Factory module ---
@@ -479,3 +481,18 @@ def test_add_phosphorus_to_pool(pool: float, added_phosphorus: float, area: floa
     observe = LayerData._add_phosphorus_to_pool(pool, added_phosphorus, area)
     expect = pool + (added_phosphorus / area)
     assert observe == expect
+
+
+@pytest.mark.parametrize("phosphorus,density,depth,area", [
+    (25, 22.13, 20, 1.88),
+    (13, 34.556, 9.12, 3.45),
+    (1.2344, 19.84, 15, 2.3341),
+])
+def test_determine_soil_phosphorus_concentration(phosphorus: float, density: float, depth: float, area: float) -> None:
+    """Tests that the soil phosphorus concentration is calculated correctly."""
+    observed = LayerData.determine_soil_phosphorus_concentration(phosphorus, density, depth, area)
+    total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+    total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
+    total_phosphorus_mass = phosphorus * area
+    expected_concentration = (total_phosphorus_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
+    assert pytest.approx(observed) == expected_concentration

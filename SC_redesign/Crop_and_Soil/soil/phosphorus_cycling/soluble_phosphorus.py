@@ -2,8 +2,9 @@ from typing import Optional
 from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS, CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
+    CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
 
 """
 This module tracks the movement of phosphorus in the soil profile based on equations from APLE.
@@ -98,8 +99,10 @@ class SolublePhosphorus:
         runoff_in_liters = (runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
         runoff_in_liters_per_hectare = runoff_in_liters / field_size
 
-        top_layer_soil_phosphorus_concentration = SolublePhosphorus._determine_soil_phosphorus_concentration(
-            labile_phosphorus, bulk_density, layer_thickness, field_size)
+        top_layer_soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,
+                                                                                                    bulk_density,
+                                                                                                    layer_thickness,
+                                                                                                    field_size)
         extraction_coefficient = 0.005
         top_layer_dissolved_reactive_phosphorus_runoff = top_layer_soil_phosphorus_concentration * \
             extraction_coefficient * runoff_in_liters_per_hectare * (10 ** (-6))
@@ -148,34 +151,6 @@ class SolublePhosphorus:
 
         """
         return 4.726 * isotherm_slope - 8.97
-
-    @staticmethod
-    def _determine_soil_phosphorus_concentration(labile_phosphorus: float, bulk_density: float,
-                                                 layer_thickness: float, field_size: float) -> float:
-        """Calculates the concentration of phosphorus in a soil layer.
-
-        Parameters
-        ----------
-        labile_phosphorus : float
-            Labile phosphorus content of this soil layer (kg phosphorus per ha)
-        bulk_density : float
-            Bulk density of the soil layer (Megagram per cubic meter)
-        layer_thickness : float
-            Thickness of the soil layer (mm)
-        field_size : float
-            Area of the field (ha)
-
-        Returns
-        -------
-        float
-            The concentration of phosphorus in the soil layer (mg phosphorous / kg soil)
-
-        """
-        soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-            CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        soil_phosphorus_mass_in_mg = labile_phosphorus * field_size * KILOGRAMS_TO_MILLIGRAMS
-        return soil_phosphorus_mass_in_mg / soil_mass_in_kg
 
     @staticmethod
     def _determine_dissolved_reactive_phosphorus_leachate(soil_phosphorus: float, isotherm_slope: float,
@@ -259,8 +234,10 @@ class SolublePhosphorus:
             The amount of phosphorus that leaves this layer of soil on the current day (kg phosphorus / ha)
 
         """
-        soil_phosphorus_concentration = SolublePhosphorus._determine_soil_phosphorus_concentration(
-            labile_phosphorus, bulk_density, layer_thickness, field_size)
+        soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,
+                                                                                          bulk_density,
+                                                                                          layer_thickness,
+                                                                                          field_size)
 
         isotherm_slope = SolublePhosphorus._determine_isotherm_slope(percent_clay_content)
         isotherm_intercept = SolublePhosphorus._determine_isotherm_intercept(isotherm_slope)
