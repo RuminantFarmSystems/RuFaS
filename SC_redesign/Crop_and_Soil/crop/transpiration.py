@@ -40,7 +40,7 @@ class WaterUptake:
         )
         self.crop_data.potential_water_uptakes = self._adjust_water_uptakes(
             potential_uptakes=self.crop_data.potential_water_uptakes, unmet_demands=self.crop_data.unmet_water_demands,
-            uptake_compensation=self.crop_data.water_compensation_factor)
+            uptake_compensation=self.crop_data.water_compensation_factor, water_availabilities=water_availabilities)
         self.crop_data.potential_water_uptakes = self._reduce_efficiency_of_uptake(
             potential_uptakes=self.crop_data.potential_water_uptakes,
             water_availabilities=water_availabilities,
