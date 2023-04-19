@@ -1,6 +1,7 @@
 from typing import Optional, List
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 # TODO: Phosphorus has identical methods to NitrogenIncorporation, excluding nitrogen fixation. They
 #  should be combined into one class (NutrientIncorporation) and simplified.
@@ -17,17 +18,19 @@ class PhosphorusIncorporation:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def incorporate_phosphorus(self, layer_phosphates: List[float], layer_depths: List[float]) -> None:
+    def incorporate_phosphorus(self, soil_data: SoilData) -> None:
         """main phosphorus incorporation function - runs all phosphorus processes and stores phosphorus as biomass
 
         Args:
-            layer_phosphates: phosphates present in each layer of the soil profile
-            layer_depths: maximum depths of each soil layer
+            soil_data: the SoilData object that tracks soil properties
 
         Details: calling this function will execute all phosphorus incorporation routines. It determines the amount of
         phosphorus desired by the plant, extracts phosphorus from the accessible soil profile. Phosphorus is then
         added to plant biomass.
         """
+        layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
+        layer_phosphates = soil_data.get_vectorized_layer_attribute("phosphate")
+
         self.shift_phosphorus_time()
         self.data.phosphorus_shapes = NitrogenIncorporation.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction, self.data.mature_heat_fraction,
@@ -49,11 +52,13 @@ class PhosphorusIncorporation:
                 self.data.biomass_growth_max
             )
         self.uptake_phosphorus(layer_phosphates, layer_depths)
+        soil_data.set_vectorized_layer_attribute("phosphate", layer_phosphates)
+        # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         self.data.phosphorus = NitrogenIncorporation.determine_stored_nutrient(
             self.data.total_phosphorus_uptake, self.data.phosphorus, 0
         )
 
-    def uptake_phosphorus(self, layer_phosphates: List[float], layer_depths: List[float]) -> None:
+    def uptake_phosphorus(self, layer_phosphates: List[float], layer_depths: List[float]):
         """conducts steps necessary to uptake phosphorus from soil
 
         Args:

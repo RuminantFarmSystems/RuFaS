@@ -2,6 +2,7 @@ from math import log, exp
 from bisect import bisect
 from typing import List, Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
 This module is based upon the 'Nitrogen Uptake" section (5:2.3.1) of of the SWAT model documentation
@@ -13,19 +14,22 @@ class NitrogenIncorporation:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- wrapper functions (main routines) ----
-    def incorporate_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float],
-                             soil_water_factor: float) -> None:
+    def incorporate_nitrogen(self, soil_data: SoilData) -> None:
         """main nitrogen incorporation function - runs all nitrogen processes and stores nitrogen as biomass
 
         Args:
-            layer_nitrates: nitrates present in each layer of the soil profile
-            layer_depths: maximum depths of each soil layer
-            soil_water_factor: soil water factor [0, 1]
+            soil_data: the SoilData object that tracks soil properties
 
         Details: calling this function will execute all nitrogen incorporation routines. It determines the amount of
         nitrogen desired by the plant, extracts nitrogen from the accessible soil profile, and tries to fix nitrogen
         for any unmet demand. Nitrogen from extraction and fixation are added to plant biomass.
         """
+        # TODO: @isgotkowitz, would you double check that these are the correct layer attributes? If so, we should
+        #   be able to delete the attributes in `SoilData` (but not in the `LayerData`s)
+        layer_depths = soil_data.get_vectorized_layer_attribute('bottom_depth')
+        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate")
+        soil_water_factor = soil_data.soil_water_factor  # should this be vectorized as well?
+
         self.shift_nitrogen_time()
         self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction, self.data.mature_heat_fraction, self.data.emergence_nitrogen_fraction,
@@ -47,6 +51,8 @@ class NitrogenIncorporation:
                 self.data.biomass_growth_max
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
+        soil_data.set_vectorized_layer_attribute("nitrate", layer_nitrates)
+        # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         # TODO: fixing nitrogen does not increase biomass. Why not?
@@ -54,7 +60,7 @@ class NitrogenIncorporation:
             self.data.total_nitrogen_uptake, self.data.nitrogen, self.data.fixed_nitrogen
         )
 
-    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
+    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]):
         """conducts steps necessary to uptake nitrogen from soil
 
         Args:

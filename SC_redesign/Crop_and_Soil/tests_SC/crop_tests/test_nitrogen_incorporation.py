@@ -1,3 +1,4 @@
+import mock
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
@@ -5,6 +6,8 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from math import log, exp
 from pytest_mock import MockerFixture
 from unittest.mock import MagicMock
+
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 # --- static function tests ----
@@ -556,6 +559,14 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
                     emergence_nitrogen_fraction=0.71, half_mature_nitrogen_fraction=0.68,
                     near_mature_nitrogen_fraction=0.62, mature_nitrogen_fraction=0.60,
                     biomass=122.8, previous_nitrogen=0, biomass_growth_max=999)
+    SoilData.soil_water_factor = mock.PropertyMock(return_value=water_factor)
+    soil = SoilData()
+    del soil.soil_layers[3]  # delete 4th layer
+    top_depths = [0] + depths[:2]
+    soil.set_vectorized_layer_attribute("top_depth", top_depths)
+    soil.set_vectorized_layer_attribute("bottom_depth", depths)
+    soil.set_vectorized_layer_attribute("nitrate", nitrates)
+    # indirectly set soil_water_factor
     incorp = NitrogenIncorporation(data)
     # mock intermediate functions
     incorp.shift_nitrogen_time = MagicMock(return_value=None)
@@ -572,7 +583,7 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
     NitrogenIncorporation.determine_stored_nutrient = MagicMock(return_value=99.3)
 
     # run method
-    incorp.incorporate_nitrogen(nitrates, depths, water_factor)
+    incorp.incorporate_nitrogen(soil)
 
     # assertions
     incorp.shift_nitrogen_time.assert_called_once()
@@ -589,7 +600,6 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
         assert data.optimal_nitrogen == 268
         incorp.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
         assert data.potential_nitrogen_uptake == 123.1
-    incorp.uptake_nitrogen.assert_called_once_with(nitrates, depths)
     incorp.try_fixation.assert_called_once_with(5 + 10 + 15.3, water_factor)
     NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should be called_once_with() w/ attr mocked
     assert data.nitrogen == 99.3
