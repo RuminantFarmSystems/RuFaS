@@ -4,16 +4,20 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
+"""
+This module is based upon the "Water Uptake By Plants" section of SWAT (5:2.2.1)
+"""
+
 # TODO These functions belong in either water_dynamics.py or as soil process methods - GitHub Issue #450
 
 # TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
-#   I'm not entirely sure if that should happen for this module, since water can be uptaken from underlying layers in
-#   some cases.
+#   I'm not entirely sure if that should happen for this module, since the methods allow a crop to pull water up
+#   from deeper in the soil if the given layer does not have enough to meet the demands of that depth.
 
 
 class WaterUptake:
     def __init__(self, crop_data: Optional[CropData] = None):
-    """This method initializes the CropData object that this module will work with, or create one if none provided.
+        """This method initializes the CropData object that this module will work with, or create one if none provided.
 
         Parameters
         ----------
@@ -74,6 +78,12 @@ class WaterUptake:
         ----------
         soil_data : SoilData
             the object that tracks soil properties, from which to extract water.
+
+
+        Raises
+        ------
+        Exception
+            If the lengths of `soil_data.soil_layers` and `crop_data.actual_water_uptakes` aren't equal.
         """
         if len(soil_data.soil_layers) != len(self.crop_data.actual_water_uptakes):
             raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
@@ -97,6 +107,11 @@ class WaterUptake:
         -------
         uptakes: list[float]
             the actual water uptake from each layer of soil (mm)
+
+        Raises
+        ------
+        Exception
+            If the lengths of `potential_uptakes`, `water_availabilities`, and `wilting_points` are not all equal.
         """
         if not len(potential_uptakes) == len(water_availabilities) == len(wilting_points):
             raise Exception("potential_uptakes, water_availabilities, and wilting_points must be of equal length")
@@ -136,6 +151,11 @@ class WaterUptake:
         -------
         corrected_potentials : list[float]
             a list of corrected potential water that can be taken up from each layer by the crop on the current day.
+
+        Raises
+        ------
+        Exception
+            If `potential_uptakes`, `water_availabilities`, and `available_capacities` are not all equal lengths.
         """
         if not len(potential_uptakes) == len(water_availabilities) == len(available_capacities):
             raise Exception("potential_uptakes, water_availabilities, and available_capacities must be of equal length")
@@ -173,7 +193,7 @@ class WaterUptake:
 
     @staticmethod
     def _adjust_water_uptakes(potential_uptakes: List[float], water_availabilities: List[float],
-                              unmet_demands: List[float], uptake_compensation: float):
+                              unmet_demands: List[float], uptake_compensation: float) -> List[float]:
         """adjusts the potential water uptakes from each layer based by drawing from deeper layeres when possible.
 
         SWAT equation: 5:2.2.3
@@ -190,7 +210,13 @@ class WaterUptake:
 
         Returns
         -------
+        adjusted : list[float]
+            the adjusted potential water to be taken up from each layer (mm)
 
+        Raises
+        ------
+        Exception
+            If the lengths of `potential_uptakes` and `unmet_demands` are not equal.
         """
         if not len(potential_uptakes) == len(unmet_demands):
             raise Exception("potential_uptakes and unmet_demands must be the same length.")
@@ -223,6 +249,11 @@ class WaterUptake:
         -------
         potential_uptakes : list[float]
             the crop's maximum potential water uptake for each soil layer (mm) during the current day
+
+        Raises
+        ------
+        Exception
+            If the lengths of `upper_depths` and `lower_depths` are not equal.
         """
         if len(upper_depths) != len(lower_depths):
             raise Exception("upper_depths and lower_depths must be the same length")
