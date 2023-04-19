@@ -38,6 +38,8 @@ class ResiduePartition:
             )
 
             if self.data.soil_layers.index(layer) == 0:
+            # TODO: rather than simply mixing the crop residue into the top layer, this module should consider tillage
+            #     depth and mix the residue into all soil down to that depth. This is not a priority, though.
                 layer.structural_carbon_transfer_amount = self._determine_structural_carbon_transfer_amount(
                     layer.plant_structural_carbon_amount,
                     layer.tillage_fraction
