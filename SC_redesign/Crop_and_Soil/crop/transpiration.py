@@ -3,13 +3,14 @@ from typing import Optional, List
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 # TODO These functions belong in either water_dynamics.py or as soil process methods - GitHub Issue #450
 
 # TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
 #   I'm not entirely sure if that should happen for this module, since water can be uptaken from underlying layers in
 #   some cases.
+
+
 class WaterUptake:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.crop_data = crop_data or CropData()
@@ -76,7 +77,6 @@ class WaterUptake:
         soil_data.set_vectorized_layer_attribute("water_content", leftovers)
         self.crop_data.actual_water_uptakes = extracts
 
-
     @staticmethod
     def _take_up_water(potential_uptakes: List[float], water_availabilities: List[float],
                        wilting_points: List[float]) -> List[float]:
@@ -114,7 +114,6 @@ class WaterUptake:
             the actual water that the plant will uptake from the layer (mm)
         """
         return min(potential, available_water - wilting_point_water)
-
 
     @staticmethod
     def _reduce_efficiency_of_uptake(potential_uptakes: List[float], water_availabilities: List[float],
