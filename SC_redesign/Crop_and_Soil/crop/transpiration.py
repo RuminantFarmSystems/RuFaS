@@ -183,8 +183,8 @@ class WaterUptake:
         -------
 
         """
-        if len(potential_uptakes) != len(unmet_demands):
-            raise Exception("potential_uptakes and demands must be the same length.")
+        if not len(potential_uptakes) == len(unmet_demands):
+            raise Exception("potential_uptakes and unmet_demands must be the same length.")
 
         adjusted = [uptake + (demand * uptake_compensation) for uptake, demand in zip(potential_uptakes, unmet_demands)]
 
