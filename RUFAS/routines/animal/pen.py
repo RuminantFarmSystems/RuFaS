@@ -437,6 +437,15 @@ class Pen:
         self.MEdiet = ration_vals['ME_tot']
         self.dry_matter_intake = nutrient_amount['dm']
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_ration.__name__,
+                    "feed": vars(feed),
+                    "available_feeds": available_feeds, }
+        om.add_variable("ration_nutrient_amount", nutrient_amount, info_map)
+        om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
+        om.add_variable("MEdiet", self.MEdiet, info_map)
+        om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
+
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],
