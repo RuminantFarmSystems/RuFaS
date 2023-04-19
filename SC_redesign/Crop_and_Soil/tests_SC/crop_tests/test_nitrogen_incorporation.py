@@ -1,4 +1,3 @@
-import mock
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
