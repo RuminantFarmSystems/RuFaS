@@ -3,6 +3,7 @@ from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIncorporation
+from SC_redesign.Crop_and_Soil.crop.transpiration import WaterUptake
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
@@ -11,7 +12,9 @@ from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from typing import List, Optional
+from typing import Optional
+
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 class Crop:
@@ -33,8 +36,10 @@ class Crop:
         """Process component controlling growth constraints, limits plant growth as a function of stressors"""
         self.biomass_allocation = BiomassAllocation(self.data)
         """Process component controlling allocation of plant biomass as a function of growth and photosynthesis"""
-        self.water_dynamics = WaterDynamics(self.data)
+        self.water_dynamics = WaterDynamics(self.data)  # needs soil.evapotranspiration.evapotranspirate() called 1st
         """Process component controlling plant water dynamics"""
+        self.water_uptake = WaterUptake(self.data)
+        """Process component controlling water uptake from soil"""
         self.nitrogen_incorporation = NitrogenIncorporation(self.data)
         """Process component controlling plant nitrogen incorporation, including uptake and fixation"""
         self.phosphorus_incorporation = PhosphorusIncorporation(self.data)
@@ -50,33 +55,15 @@ class Crop:
         self.dormancy = Dormancy(self.data)
         """Process component performing dormancy operations"""
 
-    def grow_crop(self, layer_nitrates: List[float], layer_depths: List[float],
-                  layer_phosphates: List[float],
-                  soil_water_factor: float,
-                  max_transpiration: float,
-                  incoming_light: float,
-                  evaporation: float, transpiration: float,
-                  max_evapotranspiration: float,
+    def grow_crop(self, soil_data: SoilData, incoming_light: float,
                   mean_air_temperature: float, min_air_temperature: float,
-                  max_air_temperature: float, adjusted_potential_evapotranspiration: float) -> None:
+                  max_air_temperature: float) -> None:
         """main function for growing the crop on a daily basis
 
         Args:
-            adjusted_potential_evapotranspiration: potential evapotranspiration adjusted for evaporation of free water
-                in canopy (mm)
-            layer_nitrates: nitrates present in each layer of the soil profile (kg/ha)
-            layer_depths: the maximum depth of each soil layer
-            layer_phosphates: phosphates present in each layer of the soil profile (kg/ha)
-            soil_water_factor: the soil water factor
-
-            max_transpiration: maximum amount of transpiration possible (mm), as determined by soil, on this day
+            soil_data: the SoilData object that tracks soil properties.
 
             incoming_light: incoming light radiation energy (MJ/m)
-
-            evaporation: total evaporation occurring (mm) as determined by soil, on a given day
-            transpiration: total transpiration occurring (mm) as determined by soil, on a given day
-            max_evapotranspiration: maximum amount of evapotranspiration possible (mm), as determined by soil on
-            a given day.
 
             mean_air_temperature: average air temperature for the day (C)
             min_air_temperature: minimum air temperature for the day (C)
@@ -86,6 +73,7 @@ class Crop:
             process sub-routines. It should be called every day that the crop
             is alive and growing in the simulation
         """
+        max_transpiration = soil_data.potential_evapotranspiration_adjusted
 
         # don't perform growth if the plant can't grow
         cannot_grow = not self.data.is_alive or not self.data.is_growing or self.data.is_dormant
@@ -95,8 +83,8 @@ class Crop:
         # grow otherwise
         self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
         self.root_development.develop_roots()
-        self.nitrogen_incorporation.incorporate_nitrogen(layer_nitrates, layer_depths, soil_water_factor)
-        self.phosphorus_incorporation.incorporate_phosphorus(layer_phosphates, layer_depths)
+        self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
+        self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
         self.growth_constraints.constrain_growth(max_transpiration, mean_air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)

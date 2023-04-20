@@ -99,6 +99,37 @@ def test_soil_factory_alteration_error(config: str, args_dict: Dict) -> None:
 
 
 # --- Tests to verify correct behavior of SoilData module
+def test_get_vectorized_layer_attribute() -> None:
+    """ensures that layer data can be vectorized."""
+    soil_layers = [
+        LayerData(top_depth=0, bottom_depth=20, soil_water_concentration=500, field_capacity_water_concentration=0.15,
+                  saturation_point_water_concentration=0.2),
+        LayerData(top_depth=20, bottom_depth=25, soil_water_concentration=1000, field_capacity_water_concentration=0.5,
+                  saturation_point_water_concentration=0.8),
+        LayerData(top_depth=25, bottom_depth=30, soil_water_concentration=30, field_capacity_water_concentration=0.10,
+                  saturation_point_water_concentration=0.11),
+        LayerData(top_depth=30, bottom_depth=100, soil_water_concentration=5000, field_capacity_water_concentration=0.5,
+                  saturation_point_water_concentration=0.5),
+    ]
+    soil_data = SoilData(soil_layers=soil_layers)
+
+    assert soil_data.get_vectorized_layer_attribute("top_depth") == [0, 20, 25, 30]
+    assert soil_data.get_vectorized_layer_attribute("bottom_depth") == [20, 25, 30, 100]
+    assert soil_data.get_vectorized_layer_attribute("soil_water_concentration") == [500, 1000, 30, 5000]
+    assert soil_data.get_vectorized_layer_attribute("field_capacity_water_concentration") == [0.15, 0.5, 0.10, 0.5]
+    assert soil_data.get_vectorized_layer_attribute("saturation_point_water_concentration") == [0.2, 0.8, 0.11, 0.5]
+    with pytest.raises(Exception):
+        soil_data.get_vectorized_layer_attribute("non_existant_variable")
+
+
+def test_set_vectorized_layer_attribute() -> None:
+    """ensures that layer attributes are properly set"""
+    soil_data = SoilData()  # 4 layers by default
+    water_concentration = [0.1, 0.2, 1, 0.8]
+    soil_data.set_vectorized_layer_attribute("soil_water_concentration", water_concentration)
+    assert soil_data.get_vectorized_layer_attribute("soil_water_concentration") == water_concentration
+
+
 def test_manual_soil_data_configuration() -> None:
     """Test that creating a custom SoilData object actually has all the correct values in its fields"""
     mollisols = SoilData(name="mollisols", soil_layers=[LayerData(top_depth=0, bottom_depth=80, nitrate=1.8),
