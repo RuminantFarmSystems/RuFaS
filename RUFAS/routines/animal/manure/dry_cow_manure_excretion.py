@@ -93,14 +93,10 @@ def manure_calculations(ration_formulation,
 
     # Organic matter intake, kg [A.2.A.3]
     # Dry cow dry matter intake lower bound from Appuhamy 2018
-    Dry_DMI_Lower_Bound = 7.1  # kg
-    if dry_matter_intake >= Dry_DMI_Lower_Bound:
-        organic_matter_intake = dry_matter_intake * \
-            (100 - ASH_concentration) / 100
-    else:
-        dry_matter_intake = Dry_DMI_Lower_Bound
-        organic_matter_intake = dry_matter_intake * \
-            (100 - ASH_concentration) / 100
+    Dry_DMI_Lower_Bound = 7.1  # kg, we can move this to a constants file later
+    dry_matter_intake = max(dry_matter_intake, Dry_DMI_Lower_Bound)
+    organic_matter_intake = dry_matter_intake * \
+        (100 - ASH_concentration) / 100
 
     # Total volatile solids, kg [A.3E.A.6]
     total_volatile_solids = (-1.201
