@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 
+from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
@@ -37,7 +38,9 @@ class Soil:
         self.soil_erosion = SoilErosion(self.data)
         """Process component that track erosion from the soil profile"""
         self.fertilizer_phosphorus = Fertilizer(self.data)
-        """Process component that tracks fertilizer added to the soil via """
+        """Process component that tracks fertilizer added to the soil"""
+        self.residue_partitioning = ResiduePartition(self.data)
+        """Process component that adds crop residue into the soil"""
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:

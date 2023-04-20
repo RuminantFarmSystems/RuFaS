@@ -95,6 +95,7 @@ class Field:
 
             if self.field_data.is_harvest_day:
                 self.harvest_crops()
+                self.add_residue_to_soil()
 
         # annual resets
         if self.is_last_day_of_the_year:
@@ -137,6 +138,13 @@ class Field:
         """amend the soil with nutrients"""
         self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(0)
         return
+
+    def add_residue_to_soil(self) -> None:
+        """add residue from the cut crops to the soil"""
+        self.soil.data.new_residue = 0
+        for crop in self.crops:
+            self.soil.data.new_residue += crop.data.yield_residue
+            self.soil.residue_partitioning.partition_residue(crop)
 
     # </editor-fold>
 

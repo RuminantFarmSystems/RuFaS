@@ -184,8 +184,10 @@ class SoilData:
     """plant lignin to nitrogen ratio (unitless)"""
     plant_residue_metabolic_fraction: float = 0
     """plant residue fraction that is metabolic (unitless)"""
+    new_residue = 0
+    """amount of new plant material added to the field during the most recent harvest event (kg/ha)"""
     total_residue = 0
-    """"amount of total residue (kg/ha)"""
+    """"amount of total plant material added to the soil from all all cuttings (kg/ha)"""
 
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
