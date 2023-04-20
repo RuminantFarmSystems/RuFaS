@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
+from math import exp, log
 
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
 
@@ -65,4 +66,32 @@ def test_determine_desorption_base(sorption_parameter: float) -> None:
     """Tests that the base variable is calculated correctly."""
     observed = PhosphorusMineralization._determine_desorption_base(sorption_parameter)
     expected = -1.0 * sorption_parameter + 0.8
+    assert observed == expected
+
+
+@pytest.mark.parametrize("sorption_parameter", [
+    0.124,
+    0.05,
+    0.7,
+    0.3345,
+    0.66752
+])
+def test_determine_sorption_scalar(sorption_parameter: float) -> None:
+    """Tests that the scalar used in the sorption rate factor is calculated correctly."""
+    observed = PhosphorusMineralization._determine_sorption_scalar(sorption_parameter)
+    expected = 0.918 * exp(sorption_parameter * -4.603)
+    assert observed == expected
+
+
+@pytest.mark.parametrize("scalar", [
+    0.518,
+    0.729,
+    0.0366,
+    0.1968,
+    0.0425
+])
+def test_determine_sorption_exponent(scalar: float) -> None:
+    """Tests that the exponential term used to determine the sorption rate factor is calculated correctly."""
+    observed = PhosphorusMineralization._determine_sorption_exponent(scalar)
+    expected = -0.238 * log(scalar) - 1.126
     assert observed == expected
