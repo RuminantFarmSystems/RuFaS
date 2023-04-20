@@ -1,7 +1,8 @@
 #from . import decomposition, pool_gas_partition, residue_partition
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from typing import Optional
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import *
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS,\
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS
 
 
 class CarbonCycle:
@@ -169,43 +170,3 @@ class CarbonCycle:
         pseudoode_soil S.6.D.4
         """
         return active_carbon_amount + slow_carbon_amount + passive_carbon_amount
-
-    @staticmethod
-    def _determine_total_soil_carbon_amount_mg(total_soil_carbon_amount: float):
-        """This method calculates the total amount of soil carbon in mg
-
-        Parameters
-        ----------
-        total_soil_carbon_amount: float
-            the total amount of soil carbon (kg/ha)
-
-        Returns
-        -------
-        float
-            the total amount of soil carbon (mg/ha)
-
-        References
-        -------
-        pseudoode_soil S.6.D.4
-        """
-        return total_soil_carbon_amount * KILOGRAMS_TO_MILLIGRAMS
-
-    @staticmethod
-    def _determine_total_soil_carbon_amount_g(total_soil_carbon_amount: float):
-        """This method calculates the total amount of soil carbon in g
-
-        Parameters
-        ----------
-        total_soil_carbon_amount: float
-            the total amount of soil carbon (kg/ha)
-
-        Returns
-        -------
-        float
-            the total amount of soil carbon (g/ha)
-
-        References
-        -------
-        pseudoode_soil S.6.D.4
-        """
-        return total_soil_carbon_amount * KILOGRAMS_TO_GRAMS
