@@ -185,7 +185,7 @@ class SoilData:
     plant_residue_metabolic_fraction: float = 0
     """plant residue fraction that is metabolic (unitless)"""
     total_residue = 0
-    """"amount of total residue (kg/ha)"""
+    """"amount of total residue ever added to the field(kg/ha)"""
 
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
