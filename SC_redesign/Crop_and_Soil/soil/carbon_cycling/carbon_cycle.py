@@ -170,3 +170,57 @@ class CarbonCycle:
         pseudoode_soil S.6.D.4
         """
         return active_carbon_amount + slow_carbon_amount + passive_carbon_amount
+
+    @staticmethod
+    def _determine_total_plant_carbon_loss(plant_metabolic_active_carbon_loss: float,
+                                           plant_structural_active_carbon_loss: float,
+                                           plant_structural_slow_carbon_loss: float) -> float:
+        """This method calculates the total amount plant carbon lost as CO2
+
+        Parameters
+        ----------
+        plant_metabolic_active_carbon_loss: float
+            plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        plant_structural_active_carbon_loss: float
+            plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        plant_structural_slow_carbon_loss: float
+            plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)
+
+        Returns
+        -------
+        float
+            total amount plant carbon lost as CO2 (kg/ha)
+
+        References
+        -------
+        pseudoode_soil S.6.D.5
+        """
+        return plant_metabolic_active_carbon_loss + plant_structural_active_carbon_loss + \
+            plant_structural_slow_carbon_loss
+
+    @staticmethod
+    def _determine_total_soil_carbon_loss(soil_metabolic_active_carbon_loss: float,
+                                          soil_structural_active_carbon_loss: float,
+                                          soil_structural_slow_carbon_loss: float) -> float:
+        """This method calculates the total amount soil carbon lost as CO2
+
+        Parameters
+        ----------
+        soil_metabolic_active_carbon_loss: float
+            soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        soil_structural_active_carbon_loss: float
+            soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)
+        soil_structural_slow_carbon_loss: float
+            soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)
+
+        Returns
+        -------
+        float
+            total amount soil carbon lost as CO2 (kg/ha)
+
+        References
+        -------
+        pseudoode_soil S.6.D.5
+        """
+        return soil_metabolic_active_carbon_loss + soil_structural_active_carbon_loss + \
+            soil_structural_slow_carbon_loss
