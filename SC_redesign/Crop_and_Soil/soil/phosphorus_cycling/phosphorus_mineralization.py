@@ -34,7 +34,7 @@ class PhosphorusMineralization:
 
         Notes
         -----
-        The constants used in many of this modules subroutines differ in between the old code and the literature, the
+        The constants used in many of this module's subroutines differ in between the old code and the literature, the
         constants from the old code are used here.
 
         """
@@ -50,25 +50,37 @@ class PhosphorusMineralization:
                                                            layer.active_inorganic_phosphorus_content,
                                                            layer.mean_phosphorus_sorption_parameter)
 
-            if balance < 0:  # Desorption
+            if balance < 0:
                 layer.active_inorganic_unbalanced_counter += 1
                 layer.labile_inorganic_unbalanced_counter = 0
 
-                phosphorus_amount_to_transfer = self._calculate_phosphorus_desorption(
+                phosphorus_mineralized = self._calculate_phosphorus_desorption(
                     layer.active_inorganic_unbalanced_counter, layer.mean_phosphorus_sorption_parameter, balance)
-                phosphorus_amount_to_transfer = min(layer.active_inorganic_phosphorus_content,
-                                                    phosphorus_amount_to_transfer)
-            elif balance > 0:  # Sorption
+                phosphorus_mineralized = min(layer.active_inorganic_phosphorus_content, phosphorus_mineralized)
+            elif balance > 0:
                 layer.active_inorganic_unbalanced_counter = 0
+                if layer.previous_phosphorus_balance is not None and layer.previous_phosphorus_balance < balance:
+                    layer.labile_inorganic_unbalanced_counter = 0
                 layer.labile_inorganic_unbalanced_counter += 1
 
-                phosphorus_amount_to_transfer = self._calculate_phosphorus_sorption()
-            else:  # Balanced
+                phosphorus_mineralized = self._calculate_phosphorus_sorption(
+                    layer.labile_inorganic_unbalanced_counter, layer.mean_phosphorus_sorption_parameter, balance)
+                phosphorus_mineralized = min(layer.labile_inorganic_phosphorus_content, phosphorus_mineralized)
+                phosphorus_mineralized *= -1
+            else:
                 layer.labile_inorganic_unbalanced_counter = 0
                 layer.active_inorganic_unbalanced_counter = 0
-                phosphorus_amount_to_transfer = 0
+                phosphorus_mineralized = 0
 
-            pass
+            layer.active_inorganic_phosphorus_content -= phosphorus_mineralized
+            layer.labile_inorganic_phosphorus_content += phosphorus_mineralized
+
+            layer.previous_phosphorus_balance = balance
+
+            stable_to_active_mineralization_amount = self._determine_stable_to_active_phosphorus_mineralization(
+                layer.stable_inorganic_phosphorus_content, layer.active_inorganic_phosphorus_content)
+            layer.stable_inorganic_phosphorus_content -= stable_to_active_mineralization_amount
+            layer.active_inorganic_phosphorus_content += stable_to_active_mineralization_amount
 
     # --- Static methods ---
     @staticmethod
@@ -231,8 +243,10 @@ class PhosphorusMineralization:
 
         """
         scalar = PhosphorusMineralization._determine_sorption_scalar(sorption_parameter)
-        # exponent = PhosphorusMineralization._determine_sorption_exponent(scalar)
-        pass
+        exponent = PhosphorusMineralization._determine_sorption_exponent(scalar)
+        sorption_factor = scalar * (labile_inorganic_unbalanced_counter ** exponent)
+        amount_transferred = sorption_factor * phosphorus_balance
+        return amount_transferred
 
     @staticmethod
     def _determine_sorption_scalar(sorption_parameter: float) -> float:
@@ -284,3 +298,33 @@ class PhosphorusMineralization:
 
         """
         return (-0.238 * log(sorption_scalar)) - 1.126
+
+    @staticmethod
+    def _determine_stable_to_active_phosphorus_mineralization(stable_phosphorus: float,
+                                                              active_phosphorus: float) -> float:
+        """Determines how much phosphorus should be transferred from the stable pool to the active pool.
+
+        Parameters
+        ----------
+        stable_phosphorus : float
+            Stable inorganic phosphorus content of this soil layer (kg phosphorus / ha)
+        active_phosphorus : float
+            Active inorganic phosphorus content of this soil layer (kg phosphorus / ha)
+
+        Returns
+        -------
+        float
+            The amount of phosphorus to be transferred from the stable inorganic phosphorus pool to the active
+            phosphorus inorganic pool.
+
+        References
+        ----------
+        SurPhos pminrl.f, lines 108 - 110
+
+        """
+        amount_to_transfer = 0.0006 * (stable_phosphorus - (4.0 * active_phosphorus))
+        if amount_to_transfer > 0:
+            amount_to_transfer = min(stable_phosphorus, amount_to_transfer)
+        elif (-1 * amount_to_transfer) > active_phosphorus:
+            amount_to_transfer = -1 * active_phosphorus
+        return amount_to_transfer

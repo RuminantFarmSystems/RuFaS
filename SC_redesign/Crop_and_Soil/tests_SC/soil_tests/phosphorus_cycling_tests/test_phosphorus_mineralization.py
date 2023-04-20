@@ -69,6 +69,28 @@ def test_determine_desorption_base(sorption_parameter: float) -> None:
     assert observed == expected
 
 
+@pytest.mark.parametrize("labile_counter,sorption_parameter,balance", [
+    (1, 0.05, -1.34),
+    (2, 0.4434, -0.887),
+    (4, 0.6778, -0.33)
+])
+def test_calculate_phosphorus_sorption(labile_counter: int, sorption_parameter: float, balance: float) -> None:
+    """Tests that the correct amount of phosphorus to remove from the labile inorganic pool is calculated."""
+    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
+               "._determine_sorption_scalar", new_callable=MagicMock, return_value=0.4) as mocked_sorption:
+        with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization"
+                   ".PhosphorusMineralization._determine_sorption_exponent",
+                   new_callable=MagicMock, return_value=-0.91) as mocked_exponent:
+            observed = PhosphorusMineralization._calculate_phosphorus_sorption(labile_counter, sorption_parameter,
+                                                                               balance)
+            expected_sorption_factor = 0.4 * labile_counter ** -0.91
+            expected_amount = expected_sorption_factor * balance
+
+            mocked_sorption.assert_called_once_with(sorption_parameter)
+            mocked_exponent.assert_called_once_with(0.4)
+            assert observed == expected_amount
+
+
 @pytest.mark.parametrize("sorption_parameter", [
     0.124,
     0.05,
@@ -94,4 +116,21 @@ def test_determine_sorption_exponent(scalar: float) -> None:
     """Tests that the exponential term used to determine the sorption rate factor is calculated correctly."""
     observed = PhosphorusMineralization._determine_sorption_exponent(scalar)
     expected = -0.238 * log(scalar) - 1.126
+    assert observed == expected
+
+
+@pytest.mark.parametrize("stable,active", [
+    (14.55, 2.334),
+    (18.4948, 9.5495),
+    (3.49587, 5.6938),
+    (0.0, 0.0),
+    (0.0, 4.596),
+    (6.592, 0.0)
+])
+def test_determine_stable_to_active_phosphorus_mineralization(stable: float, active: float) -> None:
+    """Tests that the amount mineralized between the stable and active pools is calculated correctly."""
+    observed = PhosphorusMineralization._determine_stable_to_active_phosphorus_mineralization(stable, active)
+    expected = 0.0006 * (stable - 4 * active)
+    expected = min(stable, expected)
+    expected = max(-1.0 * active, expected)
     assert observed == expected

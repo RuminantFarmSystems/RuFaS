@@ -192,6 +192,8 @@ class LayerData:
     labile_inorganic_unbalanced_counter: int = 0
     """The number of days that the labile inorganic phosphorus pool has been greater than the it would be when in
             equilibrium with the active inorganic phosphorus pool."""
+    previous_phosphorus_balance: float = None
+    """The phosphorus balance on the previous day (unitless)"""
 
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
