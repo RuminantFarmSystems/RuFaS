@@ -95,7 +95,8 @@ class Field:
 
             if self.field_data.is_harvest_day:
                 self.harvest_crops()
-                self.add_residue_to_soil()
+
+            self.add_residue_to_soil(current_weather.rainfall)
 
         # annual resets
         if self.is_last_day_of_the_year:
@@ -139,12 +140,14 @@ class Field:
         self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(0)
         return
 
-    def add_residue_to_soil(self) -> None:
+    def add_residue_to_soil(self, current_rainfall) -> None:
         """add residue from the cut crops to the soil"""
+        # TODO: because partition_residue depends on a crop, the residue will not cycle when there are not crops
+        #     (i.e., after the last crop is killed residue should still cycle but won't.)
         self.soil.data.new_residue = 0
         for crop in self.crops:
             self.soil.data.new_residue += crop.data.yield_residue
-            self.soil.residue_partitioning.partition_residue(crop)
+            self.soil.residue_partitioning.partition_residue(current_rainfall, crop)
 
     # </editor-fold>
 

@@ -19,9 +19,7 @@ class ResiduePartition:
         self.data = soil_data or SoilData()  # initialize with defaults, if not
 
     def partition_residue(self, rainfall: float, crop: CropData) -> None:
-        """Main routine to updates attributes by using static methods, this method should only be called (by the field/
-        field manager) on the day that a cut, harvest, or kill operation occurs and should be called after that
-        operation.
+        """Main routine to updates attributes by using static methods
 
         Parameters
         ----------
@@ -270,7 +268,7 @@ class ResiduePartition:
                                                        decomposition_temperature_effect: float,
                                                        plant_metabolic_carbon_amount: float,
                                                        plant_metabolic_active_carbon_rate=0.28) -> float:
-        """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
+        """Calculates the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
         Parameters
         ----------
         decomposition_moisture_effect: float
