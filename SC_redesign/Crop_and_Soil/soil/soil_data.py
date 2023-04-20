@@ -177,6 +177,16 @@ class SoilData:
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
+    # ---- Residue partition (Carbon Cycling)
+    plant_residue_lignin_composition: float = 0
+    """lignin fraction of plant residue (unitless)"""
+    plant_lignin_nitrogen_ratio: float = 0
+    """plant lignin to nitrogen ratio (unitless)"""
+    plant_residue_metabolic_fraction: float = 0
+    """plant residue fraction that is metabolic (unitless)"""
+    total_residue = 0
+    """"amount of total residue ever added to the field(kg/ha)"""
+
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set

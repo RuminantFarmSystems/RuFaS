@@ -168,6 +168,35 @@ class LayerData:
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
+    plant_structural_carbon_amount: Optional[float] = None
+    """amount of plant structural carbon (kg/ha)"""
+    plant_metabolic_carbon_amount: Optional[float] = None
+    """plant metabolic carbon amount (hg/ha)"""
+    tillage_fraction: Optional[float] = None
+    """Fraction of metabolic carbon incorporated into soil during tillage (unitless)"""
+    # TODO: needs to create a method to update this, not sure where it would be
+    structural_carbon_transfer_amount: Optional[float] = None
+    """the amount of transfer of structural carbon during tillage (kg/ha)"""
+    soil_dry_matter_residue_amount: Optional[float] = None
+    """the amount of soil dry matter residue at harvest (kg/ha)"""
+    plant_dry_matter_residue_amount: Optional[float] = None
+    """the amount of plant dry matter residue at harvest (kg/ha)"""
+    plant_residue_metabolic_fraction: Optional[float] = None
+    """fraction of plant residue that is metabolic (unitless)"""
+    plant_structural_to_slow_or_active_rate: Optional[float] = None
+    """the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)"""
+    weighted_residue_dry_matter_lignin_fraction: Optional[float] = None
+    """the weighted fractional of lignin amount in residue dry matter (unitless)"""
+    soil_residue_lignin_fraction: Optional[float] = None
+    """the fraction of soil residue that's comprised of lignin (unitless)"""
+    soil_lignin_to_nitrogen_fraction: Optional[float] = None
+    """soil lignin to nitrogen fraction(unitless)"""
+    soil_residue_metabolic_fraction: Optional[float] = None
+    """the fraction of soil residue that is metabolic(unitless)"""
+    soil_metabolic_carbon_amount: Optional[float] = None
+    """soil metabolic carbon amount (kg/ha)"""
+    soil_structural_carbon_amount: Optional[float] = None
+    """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
 
     def __post_init__(self):
         """Initialize all attributes in the dataclass that depend on other attributes"""
