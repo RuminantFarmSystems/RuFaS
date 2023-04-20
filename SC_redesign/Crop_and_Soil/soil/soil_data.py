@@ -187,6 +187,9 @@ class SoilData:
     total_residue = 0
     """"amount of total residue ever added to the field(kg/ha)"""
 
+    # ---- Carbon cycle (Carbon Cycling)
+    field_size: float = None
+
     def __post_init__(self):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
