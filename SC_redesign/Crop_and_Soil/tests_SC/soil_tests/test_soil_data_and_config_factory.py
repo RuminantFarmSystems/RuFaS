@@ -1,6 +1,6 @@
 import pytest
 from typing import Dict, List
-from math import inf
+from math import inf, log
 from dataclasses import asdict
 from unittest.mock import patch, PropertyMock, MagicMock
 
@@ -481,6 +481,23 @@ def test_add_phosphorus_to_pool(pool: float, added_phosphorus: float, area: floa
     observe = LayerData._add_phosphorus_to_pool(pool, added_phosphorus, area)
     expect = pool + (added_phosphorus / area)
     assert observe == expect
+
+
+@pytest.mark.parametrize("clay,phosphorus,carbon", [
+    (23.1, 23, 14.22),
+    (55.43, 12.11, 8.45),
+    (3.24, 15.66, 34.85),
+    (0.0, 0.0, 0.0),
+])
+def test_calculate_phosphorus_sorption_parameter(clay: float, phosphorus: float, carbon: float) -> None:
+    """Tests the that the phosphorus sorption parameter is calculated properly based on the clay, labile inorganic
+        phosphorus, and carbon contents of the soil."""
+    observed = LayerData.calculate_phosphorus_sorption_parameter(clay, phosphorus, carbon)
+    if clay <= 0.0:
+        clay = 10 ** -8
+    expected = -0.045 * log(clay) + 0.001 * phosphorus - 0.035 * carbon + 0.43
+    expected = max(0.05, min(0.7, expected))
+    assert observed == expected
 
 
 @pytest.mark.parametrize("phosphorus,density,depth,area", [
