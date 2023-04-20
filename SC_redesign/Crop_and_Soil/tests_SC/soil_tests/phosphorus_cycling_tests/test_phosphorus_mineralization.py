@@ -2,6 +2,7 @@ import pytest
 
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
 
+
 # --- Static method tests ---
 @pytest.mark.parametrize("old_parameter,current_parameter", [
     (0.05, 0.05),

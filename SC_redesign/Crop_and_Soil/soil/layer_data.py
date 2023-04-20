@@ -187,10 +187,10 @@ class LayerData:
     """Stable inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
 
     active_inorganic_unbalanced_counter: int = 0
-    """The number of days that the active inorganic phosphorus pool has been greater than the it would be when in 
+    """The number of days that the active inorganic phosphorus pool has been greater than the it would be when in
         equilibrium with the labile inorganic phosphorus pool."""
     labile_inorganic_unbalanced_counter: int = 0
-    """The number of days that the labile inorganic phosphorus pool has been greater than the it would be when in 
+    """The number of days that the labile inorganic phosphorus pool has been greater than the it would be when in
             equilibrium with the active inorganic phosphorus pool."""
 
     # --- Residue partition
