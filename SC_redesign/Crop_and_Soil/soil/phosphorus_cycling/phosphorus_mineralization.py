@@ -1,4 +1,5 @@
 from typing import Optional
+from math import exp, log
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
@@ -30,6 +31,11 @@ class PhosphorusMineralization:
         ----------
         field_size : float
             Size of the field (ha)
+
+        Notes
+        -----
+        The constants used in many of this modules subroutines differ in between the old code and the literature, the
+        constants from the old code are used here.
 
         """
         for layer in self.data.soil_layers:
@@ -161,11 +167,6 @@ class PhosphorusMineralization:
             pools: Updating the EPIC model. Soil Science Society of America Journal 70:736-743. DOI:
             Doi 10.2136/Sssaj2005.0067. (Eqn. [8])
 
-        Notes
-        -----
-        The constants used differ between the old code and the literature, the constants from the old code are used
-        here.
-
         """
         base = PhosphorusMineralization._determine_desorption_base(sorption_parameter)
         desorption_factor = base * (active_inorganic_unbalanced_counter ** -0.32)
@@ -196,10 +197,90 @@ class PhosphorusMineralization:
             pools: Updating the EPIC model. Soil Science Society of America Journal 70:736-743. DOI:
             Doi 10.2136/Sssaj2005.0067. (Eqn. [7])
 
-        Notes
-        -----
-        The constants used differ between the old code and the literature, the constants from the old code are used
-        here.
-
         """
         return (-1 * sorption_parameter) + 0.8
+
+    @staticmethod
+    def _calculate_phosphorus_sorption(labile_inorganic_unbalanced_counter: int, sorption_parameter: float,
+                                       phosphorus_balance: float) -> float:
+        """Calculates how much phosphorus should be sorped in the given soil layer.
+
+        Parameters
+        ----------
+        labile_inorganic_unbalanced_counter : int
+            The number of days that the labile inorganic phosphorus pool has been greater than it would be when in
+            equilibrium with the labile inorganic phosphorus pool
+        sorption_parameter : float
+            The mean phosphorus sorption parameter that has been adjusted for the current day's amount of labile
+            inorganic phosphorus present (unitless)
+        phosphorus_balance : float
+            A value indicating how unbalanced the labile and active inorganic phosphorus pools are (unitless)
+
+        Returns
+        -------
+        float
+            The amount of phosphorus that should be removed from the labile inorganic phosphorus pool to put it in
+            equilibrium with the active inorganic phosphorus pool (kg phosphorus / ha)
+
+        References
+        ----------
+        SurPhos pminrl.f, lines 92, 94
+        Vadas P.A., Krogstad T., Sharpley A.N. (2006) Modeling phosphorus transfer between labile and nonlabile soil
+            pools: Updating the EPIC model. Soil Science Society of America Journal 70:736-743. DOI:
+            Doi 10.2136/Sssaj2005.0067. (Eqn. [4])
+
+        """
+        scalar = PhosphorusMineralization._determine_sorption_scalar(sorption_parameter)
+        # exponent = PhosphorusMineralization._determine_sorption_exponent(scalar)
+        pass
+
+    @staticmethod
+    def _determine_sorption_scalar(sorption_parameter: float) -> float:
+        """Determines the scalar used to calculate the sorption factor.
+
+        Parameters
+        ----------
+        sorption_parameter : float
+            The mean phosphorus sorption parameter that has been adjusted for the current day's amount of labile
+            inorganic phosphorus present (unitless)
+
+        Returns
+        -------
+        float
+            The scalar used in determining how much phosphorus is removed from the labile inorganic phosphorus pool and
+            transferred to the active inorganic phosphorus pool (unitless)
+
+        References
+        ----------
+        SurPhos pminrl.f, line 56
+        Vadas P.A., Krogstad T., Sharpley A.N. (2006) Modeling phosphorus transfer between labile and nonlabile soil
+            pools: Updating the EPIC model. Soil Science Society of America Journal 70:736-743. DOI:
+            Doi 10.2136/Sssaj2005.0067. (Eqn. [6])
+
+        """
+        return 0.918 * exp(-4.603 * sorption_parameter)
+
+    @staticmethod
+    def _determine_sorption_exponent(sorption_scalar: float) -> float:
+        """Determines the exponential term used to calculate the sorption factor.
+
+        Parameters
+        ----------
+        sorption_scalar
+            The scalar used in determining how much phosphorus is removed from the labile inorganic phosphorus pool and
+            transferred to the active inorganic phosphorus pool (unitless)
+
+        Returns
+        -------
+        float
+            A value used as an exponential term when determining the phosphorus sorption rate (unitless)
+
+        References
+        ----------
+        SurPhos pminrl.f, line 57
+        Vadas P.A., Krogstad T., Sharpley A.N. (2006) Modeling phosphorus transfer between labile and nonlabile soil
+            pools: Updating the EPIC model. Soil Science Society of America Journal 70:736-743. DOI:
+            Doi 10.2136/Sssaj2005.0067. (Eqn. [5])
+
+        """
+        return (-0.238 * log(sorption_scalar)) - 1.126
