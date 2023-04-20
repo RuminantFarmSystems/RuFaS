@@ -59,7 +59,6 @@ def residue_partitioning(soil, crop_type, weather, time):
         # S.6.B.I.6
         AG_met_to_BG_met = layer.AG_met * layer.tillage_percent
 
-        # S.6.B.I.4 / S.6.B.I.7
 
         if layer_number == 0:  # for top layer
 
@@ -98,10 +97,8 @@ def residue_partitioning(soil, crop_type, weather, time):
         # S.6.B.I.9
         AG_struct_decomp = K1 * math.exp(-3) * (1 - AG_met_percent)
 
-        # S.6.B.I.10
-        layer.AG_struct_to_C_active = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
-        layer.AG_struct_to_C_slow = AG_struct_decomp * layer.M_d * soil.T_d * layer.AG_struct
 
+        # S.6.B.I.8 # S.6.B.I.12
         layer.AG_struct += ((ag_biomass * (1 - AG_met_percent)) - AG_struct_to_BG_struct) - \
                            (layer.AG_struct_to_C_active + layer.AG_struct_to_C_slow)
 
