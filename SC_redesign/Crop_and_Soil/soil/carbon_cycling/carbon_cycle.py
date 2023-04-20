@@ -188,7 +188,7 @@ class CarbonCycle:
         -------
         pseudoode_soil S.6.D.4
         """
-        return total_soil_carbon_amount * 0.001
+        return total_soil_carbon_amount * KILOGRAMS_TO_MILLIGRAMS
 
     @staticmethod
     def _determine_total_soil_carbon_amount_g(total_soil_carbon_amount: float):
@@ -208,4 +208,4 @@ class CarbonCycle:
         -------
         pseudoode_soil S.6.D.4
         """
-        return total_soil_carbon_amount * 0.1
+        return total_soil_carbon_amount * KILOGRAMS_TO_GRAMS
