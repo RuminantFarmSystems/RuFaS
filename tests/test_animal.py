@@ -9,6 +9,8 @@ from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 import pytest
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
 
 
@@ -300,12 +302,12 @@ def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         heifer_a['animal_type'], heifer_a['body_weight'], heifer_a['day_of_pregnancy'], heifer_a['DIM'], heifer_a['lactating'],
         heifer_a['Milk'], heifer_a['Fat_Milk'])
-    assert (result_DMIest) == pytest.approx((0), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((4.9), rel=1e-1)
 
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         heifer_b['animal_type'], heifer_b['body_weight'], heifer_b['day_of_pregnancy'], heifer_b['DIM'], heifer_b['lactating'],
         heifer_b['Milk'], heifer_b['Fat_Milk'])
-    assert (result_DMIest) == pytest.approx((0), rel=1e-1)
+    assert (result_DMIest) == pytest.approx((6.7), rel=1e-1)
 
 
 def test_calculate_NASEM_energy_lactation_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -458,22 +460,22 @@ def test_calculate_NASEM_calcium_requirements(cow_a:dict, cow_b:dict, heifer_a:d
     """Unit test for function calculate_NASEM_calcium_requirements in file routines/animal/ration/animal_requirements.py"""
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], 1,
-        22, cow_a['milk_protein'], cow_a['Milk'])
+        22, cow_a['milk_protein'], cow_a['Milk'], cow_a['parity'])
     assert (result_Ca_req) == pytest.approx((54), rel=1e-1)
 
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['day_of_pregnancy'], 1,
-        8, cow_b['milk_protein'], cow_b['Milk'])
+        8, cow_b['milk_protein'], cow_b['Milk'], cow_b['parity'])
     assert (result_Ca_req) == pytest.approx((38), rel=1e-1)
 
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], 1,
-        7, heifer_a['milk_protein'], heifer_a['Milk'])
+        7, heifer_a['milk_protein'], heifer_a['Milk'], heifer_a['parity'])
     assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
 
     result_Ca_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_calcium_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], 1,
-        7, heifer_b['milk_protein'], heifer_b['Milk'])
+        7, heifer_b['milk_protein'], heifer_b['Milk'], heifer_b['parity'])
     assert (result_Ca_req) == pytest.approx((7), rel=1e-1)
 
 
@@ -481,22 +483,22 @@ def test_calculate_NASEM_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_
     """Unit test for function calculate_NASEM_phosphorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['animal_type'], cow_a['day_of_pregnancy'], 1, 20,
-        cow_a['milk_protein'], cow_a['Milk'])
+        cow_a['milk_protein'], cow_a['Milk'], cow_a['parity'])
     assert (result_P_req) == pytest.approx((55), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['animal_type'], cow_b['day_of_pregnancy'], 1, 8,
-        cow_b['milk_protein'], cow_b['Milk'])
-    assert (result_P_req) == pytest.approx((28), rel=1e-1)
+        cow_b['milk_protein'], cow_b['Milk'], cow_b['parity'])
+    assert (result_P_req) == pytest.approx((22), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['animal_type'], heifer_a['day_of_pregnancy'], 1, 7,
-        heifer_a['milk_protein'], heifer_a['Milk'])
+        heifer_a['milk_protein'], heifer_a['Milk'], heifer_a['parity'])
     assert (result_P_req) == pytest.approx((13), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['animal_type'], heifer_b['day_of_pregnancy'], 1, 7,
-        heifer_b['milk_protein'], heifer_b['Milk'])
+        heifer_b['milk_protein'], heifer_b['Milk'], heifer_b['parity'])
     assert (result_P_req) == pytest.approx((12.4), rel=1e-1)
 
 
@@ -527,11 +529,6 @@ def test_call_animal_nutrient_rqmts():
 
 def test_calc_avg_nutrient_rqmts():
     """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/pen.py"""
-    pass
-
-
-def test_calc_avg_stats():
-    """Unit test for function calc_avg_stats in file routines/animal/pen.py"""
     pass
 
 
@@ -605,9 +602,31 @@ def test_set_p_intake():
     pass
 
 
-def test_daily_p_update():
+@pytest.fixture
+def cow_fixture() -> AnimalBase:
+    """simple AnimalBase fixture for use in animal tests"""
+    initsetup = {
+        'id': '1',
+        'breed': 'HO',
+        'birth_date': '200',
+        'days_born': '201',
+        'semen_type': 'conventional',
+        'body_weight': 600,
+        'pen_history': []
+    }
+    AnimalBase.nutrients = {'dummy1': 'dummyval1', 'dummy2': 'dummyval2'}
+    AnimalBase.config = {'semen_type': 'dummy'}
+    cowfixture = AnimalBase(initsetup)
+    return cowfixture
+
+@pytest.mark.parametrize("dP_reserves,p_intake,p_req,expected", [(0,1,0,0),(-10,10,1, -3.7),(10,10,1,0)])
+def test_daily_p_update(dP_reserves, p_intake, p_req, expected, cow_fixture: AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
-    pass
+    cow_fixture.dP_reserves = dP_reserves
+    cow_fixture.p_intake = p_intake
+    cow_fixture.p_req = p_req
+    cow_fixture.daily_p_update()
+    assert cow_fixture.dP_reserves == expected
 
 
 def test_calc_base_manure():
@@ -620,14 +639,57 @@ def test_set_p_purchased():
     pass
 
 
-def test_update_pen_history():
-    """Unit test for function update_pen_history in file routines/animal/life_cycle/animal_base.py"""
-    pass
+def test_update_pen_history(cow_fixture: AnimalBase) -> None:
+    """Unit test for update_pen_history in file routines/animal/life_cycle/animal_base.py"""
+
+    # Case 1
+    # update hist with designated vals, using the time and the obj itself
+    cow_fixture.update_pen_history(
+        3, 2, ['Cow'])
+    assert cow_fixture.pen_history[0].pen == 3
+    assert cow_fixture.pen_history[-1].pen == 3
+    assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow_fixture.pen_history[-1].start_date == 2
+    assert cow_fixture.pen_history[-1].end_date == 2
+
+    # Case 2
+    # check that it changes pens to 4
+    cow_fixture.update_pen_history(
+        4, 3, ['Cow'])
+    # check previous history remains the same, then check newest
+    assert cow_fixture.pen_history[0].pen == 3
+    assert cow_fixture.pen_history[-1].pen == 4
+    assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow_fixture.pen_history[-1].start_date == 3
+    assert cow_fixture.pen_history[-1].end_date == 3
+
+    # Case 3
+    # check that the start date remains the date of the change
+    cow_fixture.update_pen_history(
+        4, 4, ['Cow'])
+    assert cow_fixture.pen_history[0].pen == 3
+    assert cow_fixture.pen_history[-1].pen == 4
+    assert cow_fixture.pen_history[-1].classes_in_pen == ['Cow']
+    assert cow_fixture.pen_history[-1].start_date == 3
+    assert cow_fixture.pen_history[-1].end_date == 4
 
 
-def test_update_body_weight_history():
-    """Unit test for function update_body_weight_history in file routines/animal/life_cycle/animal_base.py"""
-    pass
+def test_update_body_weight_history(cow_fixture: AnimalBase) -> None:
+    """Unit test for update_body_weight_history in file routines/animal/life_cycle/animal_base.py"""
+    histories = [(1, 200, 650),
+                 (2, 300, 600),
+                 (3, 400, 550)]
+    # use update function 3x
+    for history in histories:
+        sim_day = history[0]
+        cow_fixture.days_born = history[1]
+        cow_fixture.body_weight = history[2]
+        cow_fixture.update_body_weight_history(sim_day)
+    # asserts for each update
+    for idx, history in enumerate(histories):
+        assert cow_fixture.body_weight_history[idx].simulation_day == history[0]
+        assert cow_fixture.body_weight_history[idx].days_born == history[1]
+        assert cow_fixture.body_weight_history[idx].body_weight == history[2]
 
 
 def test_init_from_string():
@@ -635,9 +697,33 @@ def test_init_from_string():
     pass
 
 
-def test_add_event():
+def test_add_event()->None:
     """Unit test for function add_event in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    animal_event = AnimalEvents()
+    # Case 0 check that no events are found
+    assert animal_event.events == {}
+
+    # Case 1: add an event
+    animal_age = 100
+    simulation_day = 200
+    event_description = 'dummy'
+    animal_event.add_event(animal_age, simulation_day, event_description)
+    assert animal_event.events[100] == ['simulation_day=200', 'dummy']
+
+    # Case 2: another event on the next day
+    animal_age = 101
+    simulation_day = 201
+    event_description = 'dummy201'
+    animal_event.add_event(animal_age, simulation_day, event_description)
+    assert animal_event.events[101] == ['simulation_day=201', 'dummy201']
+
+    # Case 3: another event on the first day
+    animal_age = 100
+    simulation_day = 200
+    event_description = 'dummy2'
+    animal_event.add_event(animal_age, simulation_day, event_description)
+    assert animal_event.events[100] == [
+        'simulation_day=200', 'dummy', 'dummy2']
 
 
 def test___str__():
@@ -1167,9 +1253,15 @@ def test_set_globals():
     pass
 
 
-def test_list_reconfig():
+@pytest.mark.parametrize(
+        "input,expected",
+        [([1, 2, 3, 4],[1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4]),
+    (['1', '2', '3', '4'], ['1', '1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4'])
+        ]
+)
+def test_list_reconfig(input, expected)->None:
     """Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py"""
-    pass
+    assert list_reconfig(input) == expected
 
 
 def test_objective():
