@@ -96,13 +96,6 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
 
-    ###
-    # Pyomo Nutrients Stuff
-    # available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
-    # req.pyomo_req['BW'] = BW
-    # pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
-    ####
-
     solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
@@ -174,8 +167,7 @@ def ration_report(ration, available_feeds):
                 # [A.2.A.1]
                 else:
                     denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] /
-                                          (denom * 100)) * val
+                nutrient_amount[nutr] += (available_feeds[key]['CP'] / (denom * 100)) * val
             else:
                 nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
@@ -183,12 +175,10 @@ def ration_report(ration, available_feeds):
     dm_amount = nutrient_amount['dm']
     for nutr in nutrients:
         if nutr == 'DM':
-            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) \
-                                  * 100
+            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100
         else:
             # all values on a 100% dry matter basis
-            nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) \
-                                  * 100
+            nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
     return nutrient_amount, nutrient_conc
 
 
@@ -227,8 +217,6 @@ class Requirements:
         # TODO: add documentation for avg_milk and avg_CP_milk
         self.avg_milk = 0
         self.avg_CP_milk = 0
-        # pyomo requirements dictionary
-        self.pyomo_req = {}
 
     def set_requirements(self, pen, animal_type, recalc):
         """
@@ -364,17 +352,6 @@ class Requirements:
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
-
-        # pyomo requirements dictionary
-        self.pyomo_req['NEmaint'] = self.NEmaint
-        self.pyomo_req['NEa'] = self.NEa
-        self.pyomo_req['NEg'] = self.NEg
-        self.pyomo_req['NEpreg'] = self.NEpreg
-        self.pyomo_req['NEl'] = self.NEl
-        self.pyomo_req['MP_req'] = self.MP_req
-        self.pyomo_req['Ca_req'] = self.Ca_req
-        self.pyomo_req['P_req'] = self.P_req
-        self.pyomo_req['DMIest'] = self.DMIest
 
 
 class AvailableFeeds:
