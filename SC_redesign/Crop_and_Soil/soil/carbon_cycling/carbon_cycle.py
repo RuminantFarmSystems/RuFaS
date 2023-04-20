@@ -1,7 +1,7 @@
 #from . import decomposition, pool_gas_partition, residue_partition
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from typing import Optional
-from from SC_redesign.Crop_and_Soil.crop_and_soil_constants import *
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import *
 
 
 class CarbonCycle:
