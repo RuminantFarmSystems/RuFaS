@@ -199,23 +199,6 @@ def test_determine_plant_structural_carbon_amount(plant_dry_matter_residue_amoun
         plant_structural_to_active_carbon_amount,
         plant_structural_to_slow_carbon_amount,
         plant_structural_carbon_amount)
-#
-#
-# @pytest.mark.parametrize("plant_dry_matter_residue_amount, tillage_fraction", [
-#     (3, 0.4),  # default
-#     (50, 0.4),  # increased dry matter residue amount
-#     (3, 1.0),  # increased tillage fraction
-#     (1.8, 0.01),  # decreased dry matter residue amount & tillage
-#     (0, 0.4),  # no dry matter residue amount
-#     (2, 0),  # no tillage fraction
-#     (0, 0),  # neither
-# ])
-# def test_determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount: float,
-#                                                   tillage_fraction: float) -> None:
-#     """Tests that the soil dry matter residue amount was updated correctly"""
-#     expected = plant_dry_matter_residue_amount * tillage_fraction
-#     assert expected == ResiduePartition._determine_soil_dry_matter_residue_amount(plant_dry_matter_residue_amount,
-#                                                                                   tillage_fraction)
 
 
 @pytest.mark.parametrize("soil_dry_matter_residue_amount, root_biomass", [
@@ -339,9 +322,9 @@ def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: fl
                              (60, 64, 85),
                              (1.8, 1.1, 3.27),
                          ])
-def test__determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture_effect: float,
-                                                           decomposition_temperature_effect: float,
-                                                           soil_metabolic_carbon_amount: float) -> None:
+def test_determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture_effect: float,
+                                                          decomposition_temperature_effect: float,
+                                                        soil_metabolic_carbon_amount: float) -> None:
     """Tests that the amount of soil metabolic carbon decomposed into active carbon was calculated correctly"""
     soil_metabolic_active_carbon_rate = 0.35
     expected = decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
@@ -451,7 +434,6 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     assert ResiduePartition._determine_plant_residue_lignin_composition.call_count == 1
     assert ResiduePartition._determine_plant_lignin_nitrogen_fraction.call_count == 1
     assert ResiduePartition._determine_plant_residue_metabolic_fraction.call_count == 1
-
     assert ResiduePartition._determine_plant_metabolic_active_carbon_usage.call_count == len(layers)
     assert ResiduePartition._determine_plant_metabolic_to_soil_carbon_amount.call_count == len(layers)
 

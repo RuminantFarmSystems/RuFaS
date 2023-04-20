@@ -18,7 +18,18 @@ class ResiduePartition:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not
 
-    def partition_residue(self, rainfall: float, crop: CropData):
+    def partition_residue(self, rainfall: float, crop: CropData) -> None:
+        """Main routine to updates attributes by using static methods, this method should only be called (by the field/
+        field manager) on the day that a cut, harvest, or kill operation occurs and should be called after that
+        operation.
+
+        Parameters
+        ----------
+        rainfall: float
+            amount of rain (mm)
+        crop: CropData
+            crop (unitless)
+        """
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
@@ -38,8 +49,9 @@ class ResiduePartition:
             )
 
             if self.data.soil_layers.index(layer) == 0:
-            # TODO: rather than simply mixing the crop residue into the top layer, this module should consider tillage
-            #     depth and mix the residue into all soil down to that depth. This is not a priority, though.
+                # TODO: rather than simply mixing the crop residue into the top layer, this module should consider
+                #  tillage
+                #     depth and mix the residue into all soil down to that depth. This is not a priority, though.
                 layer.structural_carbon_transfer_amount = self._determine_structural_carbon_transfer_amount(
                     layer.plant_structural_carbon_amount,
                     layer.tillage_fraction
@@ -140,7 +152,7 @@ class ResiduePartition:
 
     @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float,
-                                                    rainfall: float) -> None:
+                                                    rainfall: float) -> float:
         """This method calculates and updates the plant_residue_lignin_composition based on the amount of rainfall
 
         Parameters
@@ -540,7 +552,7 @@ class ResiduePartition:
                                                 plant_metabolic_to_soil_carbon_amount: float,
                                                 root_biomass: float,
                                                 soil_residue_metabolic_fraction: float,
-                                                soil_metabolic_to_active_carbon_amount: float) -> float:
+                                                soil_metabolic_active_carbon_usage: float) -> float:
         """This method updates the amount of soil metabolic carbon
 
         Parameters
@@ -553,7 +565,7 @@ class ResiduePartition:
             root biomass (kg/ha)
         soil_residue_metabolic_fraction: float
             the fraction of soil residue that is metabolic (unitless)
-        soil_metabolic_to_active_carbon_amount: float
+        soil_metabolic_active_carbon_usage: float
             the amount of soil metabolic carbon decomposed into active carbon (kg/ha)
 
         Returns
@@ -566,7 +578,7 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.6, S.6.B.II.8
         """
         result = soil_metabolic_carbon_amount + plant_metabolic_to_soil_carbon_amount + \
-            (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_to_active_carbon_amount
+            (root_biomass * soil_residue_metabolic_fraction) - soil_metabolic_active_carbon_usage
         return result
 
     @staticmethod
