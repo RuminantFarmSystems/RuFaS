@@ -168,6 +168,8 @@ class WaterUptake:
                                       available_capacity: float) -> float:
         """adjusts the potential water uptake from a layer by the uptake efficiency that is concentration-dependent
 
+        References
+        ----------
         SWAT Equation: 5:2.2.4, 5:2.2.5
 
         Parameters
@@ -196,6 +198,8 @@ class WaterUptake:
                               unmet_demands: List[float], uptake_compensation: float) -> List[float]:
         """adjusts the potential water uptakes from each layer based by drawing from deeper layeres when possible.
 
+        References
+        ----------
         SWAT equation: 5:2.2.3
 
         Parameters
@@ -230,6 +234,8 @@ class WaterUptake:
                                            upper_depths: List[float], lower_depths: List[float]) -> List[float]:
         """calculates the crop's maximum water uptake from each soil layer during the current day.
 
+        References
+        ----------
         SWAT Equation: 5:2.2.2
 
         Parameters
@@ -274,6 +280,8 @@ class WaterUptake:
         """Calculate the amount of maximum amount water that can possibly be taken up by the plant under ideal
         conditions.
 
+        References
+        ----------
         SWAT Equation: 5:2.2.1
 
         Parameters
