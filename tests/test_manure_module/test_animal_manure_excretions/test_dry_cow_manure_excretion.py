@@ -62,14 +62,10 @@ def test_dry_cow_manure_calculations(methane_model: str,
                                                      + 8.05)
     total_solids = 0.178 * dry_matter_intake + 2.733
 
-    Dry_DMI_Lower_Bound = 7.1  # kg
-    if dry_matter_intake >= Dry_DMI_Lower_Bound:
-        organic_matter_intake = dry_matter_intake * \
-            (100 - ASH_concentration) / 100
-    else:
-        dry_matter_intake = Dry_DMI_Lower_Bound
-        organic_matter_intake = dry_matter_intake * \
-            (100 - ASH_concentration) / 100
+    Dry_DMI_Lower_Bound = 7.1  # kg, we can move this to a constants file later
+    dry_matter_intake = max(dry_matter_intake, Dry_DMI_Lower_Bound)
+    organic_matter_intake = dry_matter_intake * \
+        (100 - ASH_concentration) / 100
 
     total_volatile_solids = (-1.201
                              + 0.402 * organic_matter_intake
