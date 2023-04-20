@@ -324,7 +324,7 @@ def test_determine_soil_metabolic_carbon_amount(soil_metabolic_carbon_amount: fl
                          ])
 def test_determine_soil_metabolic_to_active_carbon_amount(decomposition_moisture_effect: float,
                                                           decomposition_temperature_effect: float,
-                                                        soil_metabolic_carbon_amount: float) -> None:
+                                                          soil_metabolic_carbon_amount: float) -> None:
     """Tests that the amount of soil metabolic carbon decomposed into active carbon was calculated correctly"""
     soil_metabolic_active_carbon_rate = 0.35
     expected = decomposition_temperature_effect * decomposition_moisture_effect * soil_metabolic_carbon_amount * \
