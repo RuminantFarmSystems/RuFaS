@@ -186,6 +186,13 @@ class LayerData:
     stable_inorganic_phosphorus_content: float = 0
     """Stable inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
 
+    active_inorganic_unbalanced_counter: int = 0
+    """The number of days that the active inorganic phosphorus pool has been greater than the it would be when in 
+        equilibrium with the labile inorganic phosphorus pool."""
+    labile_inorganic_unbalanced_counter: int = 0
+    """The number of days that the labile inorganic phosphorus pool has been greater than the it would be when in 
+            equilibrium with the active inorganic phosphorus pool."""
+
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
@@ -290,7 +297,8 @@ class LayerData:
         is used in the SurPhos code (see pminrl.f, line 49).
 
         """
-        first_term = -0.045 * log(percent_clay_content)
+        adjusted_clay_content = max(10 ** -8, percent_clay_content)
+        first_term = -0.045 * log(adjusted_clay_content)
         second_term = 0.001 * labile_inorganic_phosphorus
         third_term = 0.035 * percent_organic_carbon_content
         return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
