@@ -341,23 +341,18 @@ class OutputManager(object):
         Saves names of all variables added to variables_pool into a json file in the given path to a directory.
         """
         vars_pool = self.variables_pool.copy()
+        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
+        var_set = set()
         for key, value in vars_pool.items():
             if isinstance(value, dict) and "info_maps" in value:
                 value.pop("info_maps")
-        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
-        var_list = []
-        for key, value in vars_pool.items():
-            for values_list in value.values():
-                for variable_dict in values_list:
-                    if isinstance(variable_dict, dict):
-                        for variable_name in variable_dict.keys():
-                            variable_name_to_write = f"{key}: {variable_name}"
-                            if variable_name_to_write not in var_list:
-                                var_list.append(variable_name_to_write)
-                    else:
-                        if key not in var_list:
-                            var_list.append(key)
-                            
+            else:
+                var_set.add(key)
+                var_set.update(f"{key}: {variable_name}" for values_list in value.values() for variable_dict in
+                               values_list if isinstance(variable_dict, dict) for variable_name in variable_dict.keys())
+        var_set = sorted(var_set)
+        var_list = list(var_set)
+
         self._list_to_file_txt(var_list, file_path)
 
     def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
