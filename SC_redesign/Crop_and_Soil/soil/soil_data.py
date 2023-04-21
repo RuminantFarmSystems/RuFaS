@@ -182,6 +182,16 @@ class SoilData:
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
+    # ---- Residue partition (Carbon Cycling)
+    plant_residue_lignin_composition: float = 0
+    """lignin fraction of plant residue (unitless)"""
+    plant_lignin_nitrogen_ratio: float = 0
+    """plant lignin to nitrogen ratio (unitless)"""
+    plant_residue_metabolic_fraction: float = 0
+    """plant residue fraction that is metabolic (unitless)"""
+    total_residue = 0
+    """"amount of total residue ever added to the field(kg/ha)"""
+
     def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
@@ -253,6 +263,33 @@ class SoilData:
         self.soil_layers[0].top_depth = 20
         self.soil_layers[0].__post_init__(field_size)
         self.soil_layers.insert(0, new_top_layer)
+
+    def get_vectorized_layer_attribute(self, attribute: str) -> List[any]:
+        """returns a list containing the specified attribute for each soil layer
+
+        Parameters
+        ----------
+        attribute : str
+            the LayerData attribute or property to be vectorized
+
+        Returns
+        -------
+        layered_attribute : list[any]
+            values of the specified attribute for each layer
+        """
+        return [getattr(layer, attribute) for layer in self.soil_layers]
+
+    def set_vectorized_layer_attribute(self, attribute: str, values: List[any]) -> None:
+        """sets a given attribute for all layers in soil_data
+
+        Parameters
+        ----------
+        attribute : str
+            the LayerData attribute to set
+        values : list[any]
+            values of the attribute to set for each layer
+        """
+        [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
 
     def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""

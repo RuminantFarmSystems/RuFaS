@@ -93,7 +93,7 @@ class Soil:
         self.evapotranspiration.evapotranspirate(solar_radiation, max_air_temp, min_air_temp, avg_air_temp,
                                                  above_ground_biomass, residue, snow_water_content,
                                                  initial_canopy_free_water)
-        self.soil_erosion.erode(minimum_cover_management_factor, residue)
+        self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue)
         self.fertilizer_phosphorus.do_fertilizer_phosphorus_operations(rainfall,
                                                                        self.data.accumulated_runoff * field_size,
                                                                        field_size)

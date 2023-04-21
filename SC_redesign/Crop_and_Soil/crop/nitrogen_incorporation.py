@@ -2,6 +2,7 @@ from math import log, exp
 from bisect import bisect
 from typing import List, Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
 This module is based upon the 'Nitrogen Uptake" section (5:2.3.1) of of the SWAT model documentation
@@ -13,19 +14,22 @@ class NitrogenIncorporation:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- wrapper functions (main routines) ----
-    def incorporate_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float],
-                             soil_water_factor: float) -> None:
+    def incorporate_nitrogen(self, soil_data: SoilData) -> None:
         """main nitrogen incorporation function - runs all nitrogen processes and stores nitrogen as biomass
 
         Args:
-            layer_nitrates: nitrates present in each layer of the soil profile
-            layer_depths: maximum depths of each soil layer
-            soil_water_factor: soil water factor [0, 1]
+            soil_data: the SoilData object that tracks soil properties
 
         Details: calling this function will execute all nitrogen incorporation routines. It determines the amount of
         nitrogen desired by the plant, extracts nitrogen from the accessible soil profile, and tries to fix nitrogen
         for any unmet demand. Nitrogen from extraction and fixation are added to plant biomass.
         """
+        layer_depths = soil_data.get_vectorized_layer_attribute('bottom_depth')
+        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate")
+        soil_water_factor = soil_data.soil_water_factor
+        # TODO: soil_water_factor should be vectorized (methods need updating) instead of just using the average.
+        #   That will require refactoring the subroutines. - GitHub Issue #450
+
         self.shift_nitrogen_time()
         self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction, self.data.mature_heat_fraction, self.data.emergence_nitrogen_fraction,
@@ -47,14 +51,16 @@ class NitrogenIncorporation:
                 self.data.biomass_growth_max
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
+        soil_data.set_vectorized_layer_attribute("nitrate", layer_nitrates)
+        # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         # TODO: fixing nitrogen does not increase biomass. Why not?
-        self.data.nitrogen = NitrogenIncorporation.determine_stored_nutrient(
+        self.data.nitrogen = self.determine_stored_nutrient(
             self.data.total_nitrogen_uptake, self.data.nitrogen, self.data.fixed_nitrogen
         )
 
-    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
+    def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]):
         """conducts steps necessary to uptake nitrogen from soil
 
         Args:
@@ -67,14 +73,14 @@ class NitrogenIncorporation:
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nitrates)
-        self.data.layer_nitrogen_potentials = NitrogenIncorporation.determine_layer_nutrient_uptake_potential(
+        self.data.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths, self.data.potential_nitrogen_uptake, self.data.root_depth,
             self.data.nitrogen_distro_param)
-        self.data.unmet_nitrogen_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
+        self.data.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
             self.data.layer_nitrogen_potentials, accessible_nitrates)
-        self.data.nitrogen_requests = NitrogenIncorporation.determine_layer_nutrient_uptake(
+        self.data.nitrogen_requests = self.determine_layer_nutrient_uptake(
             self.data.unmet_nitrogen_demands, self.data.layer_nitrogen_potentials, accessible_nitrates)
-        self.data.actual_nitrogen_uptakes = NitrogenIncorporation.determine_layer_extracted_resource(
+        self.data.actual_nitrogen_uptakes = self.determine_layer_extracted_resource(
             self.data.nitrogen_requests, accessible_nitrates)
         self.extend_nitrate_uptakes_to_full_profile()
         self.extract_nitrogen_from_soil_layers(layer_nitrates)
@@ -95,7 +101,7 @@ class NitrogenIncorporation:
         and the number of layers that remain inaccessible to the plant.
         """
         self.data.total_soil_layers = len(depths)
-        self.data.accessible_soil_layers = NitrogenIncorporation.determine_deepest_accessible_layer(
+        self.data.accessible_soil_layers = self.determine_deepest_accessible_layer(
             self.data.root_depth, depths)
         self.data.inaccessible_soil_layers = max(len(depths) - self.data.accessible_soil_layers, 0)
 
@@ -154,8 +160,8 @@ class NitrogenIncorporation:
         Args:
             total_accessible_nitrates: the total nitrates accessible to roots
         """
-        self.data.nitrate_factor = NitrogenIncorporation._determine_nitrate_factor(total_accessible_nitrates)
-        self.data.fixation_stage_factor = NitrogenIncorporation._determine_fixation_stage_factor(
+        self.data.nitrate_factor = self._determine_nitrate_factor(total_accessible_nitrates)
+        self.data.fixation_stage_factor = self._determine_fixation_stage_factor(
             self.data.heat_fraction
         )
 
@@ -163,7 +169,7 @@ class NitrogenIncorporation:
         """fix nitrogen, based on any remaining demand not met by actual uptake"""
         unmet_demand = self.data.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
         if unmet_demand > 0:
-            self.data.fixed_nitrogen = NitrogenIncorporation._determine_fixed_nitrogen(
+            self.data.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
                 stage_factor=self.data.fixation_stage_factor,
                 water_factor=water_factor,

@@ -5,6 +5,8 @@ from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIn
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from unittest.mock import MagicMock
 
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+
 
 @pytest.mark.parametrize("old,new", [
     (None, 1),  # no start
@@ -144,6 +146,12 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
                     emergence_phosphorus_fraction=0.71, half_mature_phosphorus_fraction=0.68,
                     near_mature_phosphorus_fraction=0.62, mature_phosphorus_fraction=0.60,
                     biomass=122.8, previous_phosphorus=0, biomass_growth_max=999)
+    soil = SoilData(field_size=1.55)
+    del soil.soil_layers[3]
+    top_depths = [0] + depths[:2]
+    soil.set_vectorized_layer_attribute("top_depth", top_depths)
+    soil.set_vectorized_layer_attribute("bottom_depth", depths)
+    soil.set_vectorized_layer_attribute("phosphate", phosphates)
     incorp = PhosphorusIncorporation(data)
 
     # mock intermediate functions
@@ -160,7 +168,7 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
     NitrogenIncorporation.determine_stored_nutrient = MagicMock(return_value=99.3)
 
     # run method
-    incorp.incorporate_phosphorus(phosphates, depths)
+    incorp.incorporate_phosphorus(soil)
 
     # assertions
     incorp.shift_phosphorus_time.assert_called_once()
