@@ -13,7 +13,7 @@ This module adds and tracks manure phosphorus dynamics based on the SurPhos mode
 
 class Manure:
 
-    def __init__(self, soil_data: Optional[SoilData] = None):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -21,9 +21,11 @@ class Manure:
         soil_data : SoilData, optional
             The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
             provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if none provided (ha)
 
         """
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_manure_update(self, rainfall: float, runoff: float, field_size: float,
                             mean_air_temperature: float) -> None:

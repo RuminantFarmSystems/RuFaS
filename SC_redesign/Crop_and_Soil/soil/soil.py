@@ -11,7 +11,7 @@ from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertili
 
 
 class Soil:
-    def __init__(self, soil_data: Optional[SoilData] = None):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """creates a Soil object based on a SoilData object
 
         Args:
@@ -22,7 +22,7 @@ class Soil:
             If no SoilData object is passed, default configuration is used.
 
         """
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData(field_size=field_size)
         """object that tracks all soil variable throughout the simulation"""
 
         # Process components

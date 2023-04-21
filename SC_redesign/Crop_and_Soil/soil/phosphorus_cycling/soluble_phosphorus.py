@@ -13,17 +13,19 @@ This module tracks the movement of phosphorus in the soil profile based on equat
 
 class SolublePhosphorus:
 
-    def __init__(self, soil_data: Optional[SoilData] = None):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
         ----------
         soil_data : SoilData, optional
-            The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
-            provided.
+            The SoilData object used by this module to track phosphorus as it moves through the soil profile, creates
+            new one if one is not provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if none provided (ha)
 
         """
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_update_routine(self, runoff: float, field_size: float) -> None:
         """Removes phosphorus from the top layer of soil due to runoff, and moves phosphorus downward through the soil

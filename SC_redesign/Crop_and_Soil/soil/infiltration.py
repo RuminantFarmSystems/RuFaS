@@ -8,8 +8,19 @@ This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) 
 
 
 class Infiltration:
-    def __init__(self, soil_data: Optional[SoilData] = None):
-        self.data = soil_data or SoilData()
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        soil_data : SoilData, optional
+            The SoilData object used by this module to track infiltration of water into the soil profile, creates new
+            one if one is not provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if none provided (ha)
+
+        """
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def infiltrate(self, rainfall: float, weighting_coefficient: float) -> None:
         """main routine for determining runoff and infiltration of soil for a given day

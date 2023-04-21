@@ -10,8 +10,8 @@ This module is based on the section 'Percolation' (2:3.2) in SWAT
 
 
 class Percolation:
-    def __init__(self, soil_data: Optional[SoilData] = None):
-        self.data = soil_data or SoilData()
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+        self.data = soil_data or SoilData(field_size=field_size)  # Initialize with defaults, if not given
 
     def percolate(self, has_seasonal_high_water_table: bool) -> None:
         """executes percolation of excess water in each layer of soil profile to the layer directly beneath it
