@@ -172,9 +172,9 @@ class CarbonCycle:
         return active_carbon_amount + slow_carbon_amount + passive_carbon_amount
 
     @staticmethod
-    def _determine_total_plant_carbon_loss(plant_metabolic_active_carbon_loss: float,
-                                           plant_structural_active_carbon_loss: float,
-                                           plant_structural_slow_carbon_loss: float) -> float:
+    def _determine_total_plant_carbon_CO2_loss(plant_metabolic_active_carbon_loss: float,
+                                               plant_structural_active_carbon_loss: float,
+                                               plant_structural_slow_carbon_loss: float) -> float:
         """This method calculates the total amount plant carbon lost as CO2
 
         Parameters
@@ -199,9 +199,9 @@ class CarbonCycle:
             plant_structural_slow_carbon_loss
 
     @staticmethod
-    def _determine_total_soil_carbon_loss(soil_metabolic_active_carbon_loss: float,
-                                          soil_structural_active_carbon_loss: float,
-                                          soil_structural_slow_carbon_loss: float) -> float:
+    def _determine_total_soil_carbon_CO2_loss(soil_metabolic_active_carbon_loss: float,
+                                              soil_structural_active_carbon_loss: float,
+                                              soil_structural_slow_carbon_loss: float) -> float:
         """This method calculates the total amount soil carbon lost as CO2
 
         Parameters
@@ -224,3 +224,54 @@ class CarbonCycle:
         """
         return soil_metabolic_active_carbon_loss + soil_structural_active_carbon_loss + \
             soil_structural_slow_carbon_loss
+
+    @staticmethod
+    def _determine_total_decomposition_carbon_CO2_lost(active_carbon_to_slow_loss: float,
+                                                       slow_carbon_co2_lost_amount: float,
+                                                       passive_carbon_co2_lost_amount: float) -> float:
+        """This method calculates the total amount of carbon lost as CO2 during decomposition
+
+        Parameters
+        ----------
+        active_carbon_to_slow_loss: float
+            active carbon lost as CO2 during decomposition into slow carbon (kg/ha)
+        slow_carbon_co2_lost_amount: float
+            slow carbon lost as CO2 during decomposition (kg/ha)
+        passive_carbon_co2_lost_amount: float
+            passive carbon lost as CO2 during decomposition (kg/ha)
+
+        Returns
+        -------
+        float
+            amount of total carbon lost as CO2 during decomposition(kg/ha)
+
+        References
+        -------
+        pseudoode_soil S.6.D.6
+        """
+        return active_carbon_to_slow_loss + slow_carbon_co2_lost_amount + passive_carbon_co2_lost_amount
+
+    @staticmethod
+    def __determine_total_carbon_CO2_Lost(total_plant_carbon_CO2_loss: float,
+                                          total_soil_carbon_CO2_loss: float,
+                                          total_decomposition_carbon_CO2_lost: float) -> float:
+        """This method calculates the total amount of carbon lost as CO2
+
+        Parameters
+        ----------
+        total_plant_carbon_CO2_loss: float
+            total amount plant carbon lost as CO2 (kg/ha)
+        total_soil_carbon_CO2_loss: float
+            total amount soil carbon lost as CO2 (kg/ha)
+        total_decomposition_carbon_CO2_lost: float
+            amount of total carbon lost as CO2 during decomposition(kg/ha)
+        Returns
+        -------
+        float
+            total amount of carbon lost as CO2 (kg/ha)
+
+        References
+        -------
+        pseudoode_soil S.6.D.7
+        """
+        return total_decomposition_carbon_CO2_lost + total_plant_carbon_CO2_loss + total_soil_carbon_CO2_loss
