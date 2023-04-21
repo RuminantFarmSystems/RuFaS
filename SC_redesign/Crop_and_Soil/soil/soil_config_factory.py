@@ -25,7 +25,6 @@ class SoilConfigFactory:
             SoilConfiguration.GENERIC: SoilData
         }
         config_class = configuration_by_type[config]
-        # pdb.set_trace()
         config_instance = config_class(field_size=field_size)
 
         # handle any attributes that need to be modified
