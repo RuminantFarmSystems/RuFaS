@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
@@ -177,7 +177,9 @@ class SoilData:
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
-    def __post_init__(self):
+    field_size: InitVar[float] = None
+
+    def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
 
@@ -187,11 +189,16 @@ class SoilData:
             If the bottom depth of the top layer of soil is < 20
 
         """
+        if field_size is None:
+            raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
+        elif field_size <= 0:
+            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+
         if self.soil_layers is None:
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5),
-                                LayerData(top_depth=20, bottom_depth=50, nitrate=0.5),
-                                LayerData(top_depth=50, bottom_depth=80, nitrate=1),
-                                LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=field_size),
+                                LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=field_size),
+                                LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=field_size),
+                                LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=field_size)]
         elif self.soil_layers[0].bottom_depth < 20:
             raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
                              f"'{self.soil_layers[0].bottom_depth}'.")
@@ -203,7 +210,8 @@ class SoilData:
             self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
                                                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
                                                soil_water_concentration=0,
-                                               saturation_point_water_concentration=inf)
+                                               saturation_point_water_concentration=inf,
+                                               field_size=field_size)
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content

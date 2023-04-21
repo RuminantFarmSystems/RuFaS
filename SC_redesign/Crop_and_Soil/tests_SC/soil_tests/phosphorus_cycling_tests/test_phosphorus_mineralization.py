@@ -134,3 +134,13 @@ def test_determine_stable_to_active_phosphorus_mineralization(stable: float, act
     expected = min(stable, expected)
     expected = max(-1.0 * active, expected)
     assert observed == expected
+
+
+# --- Main routine test ---
+# @pytest.mark.parametrize("field_size, balance", [
+#     ()
+# ])
+# def test_mineralize_phosphorus(field_size: float, balance: float) -> None:
+#     """Tests that the main routine correctly calls all subroutines and updates values correctly."""
+#     layers = [LayerData(top_depth=0, bottom_depth=20, labile_inorganic_phosphorus_content=)]
+#     data = SoilData()

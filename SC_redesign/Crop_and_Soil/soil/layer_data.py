@@ -1,9 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from typing import Optional
 from math import log
 
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
 
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
@@ -21,7 +21,7 @@ class LayerData:
     """nitrate level of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
-    water_content:  float = field(init=False)
+    water_content: float = field(init=False)
     """water present in the layer (mm)"""
     field_capacity_water_concentration: float = 0.3  # arbitrary
     """water concentration of soil layer at field capacity (mm water / mm soil)"""
@@ -199,7 +199,9 @@ class LayerData:
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
 
-    def __post_init__(self):
+    field_size: InitVar[float] = None
+
+    def __post_init__(self, field_size: float):
         """Initialize all attributes in the dataclass that depend on other attributes"""
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
@@ -209,6 +211,23 @@ class LayerData:
         self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
             self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
             self.percent_organic_carbon_content)
+
+        initial_active_inorganic_phosphorus_concentration = \
+            self.initial_labile_inorganic_phosphorus_concentration * \
+            ((1 - self.mean_phosphorus_sorption_parameter) / self.mean_phosphorus_sorption_parameter)
+        initial_stable_inorganic_phosphorus_concentration = 4 * initial_active_inorganic_phosphorus_concentration
+
+        if field_size is None:
+            raise TypeError("'field_size' attribute is NoneType, must be given value when LayerData is initialized.")
+        elif field_size <= 0:
+            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+
+        self.labile_inorganic_phosphorus_content = self.determine_soil_phosphorus_area_density(
+            self.initial_labile_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
+        self.active_inorganic_phosphorus_content = self.determine_soil_phosphorus_area_density(
+            initial_active_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
+        self.stable_inorganic_phosphorus_content = self.determine_soil_phosphorus_area_density(
+            initial_stable_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
@@ -313,9 +332,9 @@ class LayerData:
         Parameters
         ----------
         labile_phosphorus : float
-            Labile phosphorus content of this soil layer (kg phosphorus per ha)
+            Labile phosphorus content of this soil layer (kg phosphorus / ha)
         bulk_density : float
-            Bulk density of the soil layer (Megagram per cubic meter)
+            Bulk density of the soil layer (Megagram / cubic meter)
         layer_thickness : float
             Thickness of the soil layer (mm)
         field_size : float
@@ -332,6 +351,34 @@ class LayerData:
         soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
         soil_phosphorus_mass_in_mg = labile_phosphorus * field_size * KILOGRAMS_TO_MILLIGRAMS
         return soil_phosphorus_mass_in_mg / soil_mass_in_kg
+
+    @staticmethod
+    def determine_soil_phosphorus_area_density(labile_phosphorus: float, bulk_density: float,
+                                               layer_thickness: float, field_size: float) -> float:
+        """Converts a concentration of soil from (mg Phosphorus / kg soil) to (kg Phosphorus / ha)
+
+        Parameters
+        ----------
+        labile_phosphorus : float
+            Labile phosphorus content of this soil layer (mg phosphorous / kg soil)
+        bulk_density : float
+            Bulk density of the soil layer (Megagram / cubic meter)
+        layer_thickness : float
+            Thickness of the soil layer (mm)
+        field_size : float
+            Area of the field (ha)
+
+        Returns
+        -------
+        float
+            The area concentration of phosphorus in the soil layer (kg Phosphorus / ha)
+
+        """
+        soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
+            CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        total_phosphorus_mass_in_kg = labile_phosphorus * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
+        return total_phosphorus_mass_in_kg / field_size
 
     @property
     def layer_thickness(self) -> float:

@@ -37,6 +37,13 @@ class PhosphorusMineralization:
         The constants used in many of this module's subroutines differ in between the old code and the literature, the
         constants from the old code are used here.
 
+        Sorption is the process of phosphorus mineralizing from the labile inorganic pool to the active inorganic pool,
+        and desorption is the other way around.
+
+        When sorption occurs, the program checks whether the current phosphorus imbalance is greater than it was the day
+        before, and if so it resets unbalanced counter for the labile pool, which has the effect of sorping more
+        phosphorus from the active pool.
+
         """
         for layer in self.data.soil_layers:
             soil_phosphorus_content = layer.determine_soil_phosphorus_concentration(
