@@ -18,6 +18,11 @@ class SoilData:
     soil_layers: Optional[List[LayerData]] = None
     """list of soil layer data objects, top layer is 0th element, bottom is nth element"""
 
+    field_size: InitVar[float] = None
+    """Size of the field (ha)
+        Note: this attribute is only used for initialization. After that it cannot be used.
+    """
+
     # Track annual soil profile totals
     initial_water_content: float = None
     """Total soil water content at the beginning of a year, for use in determining annual change (mm)"""
@@ -177,24 +182,36 @@ class SoilData:
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
-    field_size: InitVar[float] = None
-
     def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
 
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha)
+
         Raises
         ------
+        TypeError
+            If the field size is None (meaning it likely was not included when the SoilData() object was initialized).
         ValueError
-            If the bottom depth of the top layer of soil is < 20
+            If the field size specified is not greater than 0.
+        ValueError
+            If the bottom depth of the top layer of soil is < 20.
+
+        Notes
+        -----
+        The SoilData class itself does not need the field size, but it requires it if the soil layers are not defined
+        for it.
 
         """
-        if field_size is None:
-            raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
-        elif field_size <= 0:
-            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
-
         if self.soil_layers is None:
+            if field_size is None:
+                raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
+            elif field_size <= 0:
+                raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+
             self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=field_size),
                                 LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=field_size),
                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=field_size),
