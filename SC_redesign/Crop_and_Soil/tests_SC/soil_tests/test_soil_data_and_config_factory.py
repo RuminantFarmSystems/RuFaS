@@ -12,7 +12,7 @@ from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
 
 
 # --- Tests to validate Soil Config Factory module ---
@@ -542,3 +542,18 @@ def test_determine_soil_phosphorus_concentration(phosphorus: float, density: flo
     total_phosphorus_mass = phosphorus * area
     expected_concentration = (total_phosphorus_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
     assert pytest.approx(observed) == expected_concentration
+
+
+@pytest.mark.parametrize("phosphorus,density,thickness,field_size", [
+    (30.45, 1.9, 30, 1.88),
+    (11.495, 0.66, 35.66, 2.13),
+    (76.35, 1.1, 12, 0.95)
+])
+def test_determine_soil_phosphorus_area_density(phosphorus: float, density: float, thickness: float,
+                                                field_size: float) -> None:
+    """Tests that the conversion from mg / kg soil to kg / ha is performed correctly."""
+    observed = LayerData.determine_soil_phosphorus_area_density(phosphorus, density, thickness, field_size)
+    expected_soil_mass_kg = density * MEGAGRAMS_TO_KILOGRAMS * (thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS
+                                                                * CUBIC_MILLIMETERS_TO_CUBIC_METERS)
+    expected = phosphorus * MILLIGRAMS_TO_KILOGRAMS * expected_soil_mass_kg * (1 / field_size)
+    assert pytest.approx(observed) == expected
