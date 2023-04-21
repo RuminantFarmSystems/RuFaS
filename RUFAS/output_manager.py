@@ -324,15 +324,20 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
         var_dict = {}
         with open(file_path, 'w') as var_names_file:
-            for k1, v1 in vars_pool.items():
-                for v2 in v1.values():
-                    for v3 in v2:
-                        if isinstance(v3, dict):
-                            for variable_name in v3.keys():
-                                variable_name_to_write = f"{key}: {variable_name}"
-                                if variable_name_to_write not in var_dict.keys():
-                                    var_dict[variable_name_to_write] = 1
-                                    var_names_file.write(variable_name_to_write + '\n')
+            for key, value in vars_pool.items():
+                if isinstance(value, dict) or isinstance(value, list):
+                    for v2 in value.values():
+                        for variable_dict in v2:
+                            if isinstance(variable_dict, dict):
+                                for variable_name in variable_dict.keys():
+                                    variable_name_to_write = f"{key}: {variable_name}"
+                                    if variable_name_to_write not in var_dict.keys():
+                                        var_dict[variable_name_to_write] = 1
+                                        var_names_file.write(variable_name_to_write + '\n')
+                            else:
+                                if key not in var_dict.keys():
+                                    var_dict[key] = 1
+                                    var_names_file.write(key + '\n')
 
     def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
