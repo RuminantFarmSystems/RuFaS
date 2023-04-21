@@ -168,7 +168,6 @@ class AnimalManagement:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            # self.allocate_all_pens()
             self.allocate_animals_to_pens()
 
         self._print_animal_num_warnings(data['herd_information'])
@@ -617,7 +616,7 @@ class AnimalManagement:
         Returns
         -------
         int
-            The shortage of animal spaces. If there is no shortage, the result will be 0.
+            The shortage of animal spaces. If there is a shortage, this will be a positive integer.
 
         """
         max_animal_spaces = 0
@@ -910,20 +909,21 @@ class AnimalManagement:
         [22, 15, 10]
 
         """
-        num_pens = len(max_spaces_in_pens)
+        num_pens_for_combination = len(max_spaces_in_pens)
         overall_density = cls._calc_density(num_animals=num_animals, num_spaces=sum(max_spaces_in_pens))
 
         if overall_density > 1.0:
             raise ValueError("The number of animals cannot exceed the total number of spaces.")
 
-        num_animals_in_pens = [0] * num_pens
+        num_animals_in_pens = [0] * num_pens_for_combination
         allocation_limits = [math.ceil(overall_density * max_spaces) for max_spaces in max_spaces_in_pens]
         # Sort pens by allocation limit, then by index
-        sorted_pen_indices = sorted(range(num_pens), key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx))
+        sorted_pen_indices = sorted(range(num_pens_for_combination),
+                                    key=lambda pen_idx: (allocation_limits[pen_idx], pen_idx))
 
-        for i in sorted_pen_indices[:num_pens - 1]:
+        for i in sorted_pen_indices[:num_pens_for_combination - 1]:
             num_animals_to_allocate = min(num_animals, allocation_limits[i])
-            num_animals_in_pens[i] += num_animals_to_allocate
+            num_animals_in_pens[i] = num_animals_to_allocate
             num_animals -= num_animals_to_allocate
         num_animals_in_pens[sorted_pen_indices[-1]] += num_animals
 
@@ -962,207 +962,6 @@ class AnimalManagement:
             self.all_pens.extend(new_default_pens)
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
-
-        self.fully_update_id_pen()
-
-    def allocate_all_pens(self):
-        # TODO: Refactor this function, currently nearly 200 lines long
-        # TODO
-        # -mark pens after grouping
-        # -adding new animals to pens with lowest stocking density
-
-        # separate into lactating and dry cow pens
-        lactating_cows = []
-        dry_cows = []
-        for cow in self.cows:
-            if cow.milking:
-                lactating_cows.append(cow)
-            else:
-                dry_cows.append(cow)
-        # lists for sorting the type of pen types
-        # TODO: change these lists to a dictionary instead
-        lac_cow_pens = []
-        close_up_pens = []
-        growing_pens = []
-        calf_pens = []
-
-        self.pens_by_animal_combination = {Pen.AnimalCombination.CALF: [], Pen.AnimalCombination.GROWING: [],
-                                           Pen.AnimalCombination.CLOSE_UP: [],
-                                           Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [],
-                                           Pen.AnimalCombination.LAC_COW: []}
-        # hasable mixed type pens (by pen_id)
-        mixed_type_pens = {}
-        # lists of types hashed pen_id
-        mixed_types = {}
-        # dictionary showing the shortage of animals
-        stall_shortage = {Pen.AnimalCombination.CALF: len(self.calves),
-                          Pen.AnimalCombination.GROWING: len(self.heiferIs) + len(self.heiferIIs),
-                          Pen.AnimalCombination.CLOSE_UP: len(self.heiferIIIs) + len(dry_cows),
-                          Pen.AnimalCombination.LAC_COW: len(lactating_cows)}
-
-        # sorting the available pen types
-        # Pen types : [calf, growing, close_up, 'lac_cow']
-        for pen in self.all_pens:
-
-            if pen.animal_combination == Pen.AnimalCombination.CALF:
-                calf_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
-                stall_shortage[Pen.AnimalCombination.CALF] -= pen.num_stalls * pen.max_stocking_density
-            elif pen.animal_combination == Pen.AnimalCombination.GROWING:
-                growing_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
-                stall_shortage[Pen.AnimalCombination.GROWING] -= pen.num_stalls * pen.max_stocking_density
-            elif pen.animal_combination == Pen.AnimalCombination.CLOSE_UP:
-                close_up_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
-                stall_shortage[Pen.AnimalCombination.CLOSE_UP] -= pen.num_stalls * pen.max_stocking_density
-            elif pen.animal_combination == Pen.AnimalCombination.LAC_COW:
-                lac_cow_pens.append(pen)
-                self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
-                stall_shortage[Pen.AnimalCombination.LAC_COW] -= pen.num_stalls * pen.max_stocking_density
-            else:
-                # TODO: Update mixed_types and mixed_type_pens to use enum
-                # also figure out what mixed type does
-                mixed_type_pens[pen.id] = pen
-                if pen.animal_combination == Pen.AnimalCombination.NONE:
-                    mixed_types[pen.id] = [Pen.AnimalCombination.CALF, Pen.AnimalCombination.GROWING,
-                                           Pen.AnimalCombination.CLOSE_UP, Pen.AnimalCombination.LAC_COW]
-                else:
-                    mixed_types[pen.id] = pen.animal_combination
-        # organizing pens by class and ensuring sufficient storage
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.allocate_all_pens.__name__,
-                    "all_pens": self.all_pens, }
-        while True:
-            max_value = max(stall_shortage.values())
-            if max_value > 0:
-                max_key = [k for k, v in stall_shortage.items() if v == max_value]
-                pen = None
-                stalls = 0
-                # finding best pen for group with max stall_shortage
-                # (AKA, a pen that allows this group with most stalls)
-                for key, val in mixed_types.items():
-                    if (max_key[0] in val) and (mixed_type_pens[key].num_stalls > stalls):
-                        pen = mixed_type_pens[key]
-                        stalls = pen.num_stalls
-                # if no available pens for this group in mixed types
-                if pen is None:
-                    om.add_warning("pen_shortage_warning",
-                                   f"Warning: shortage of {max_key[0].name} pens,"
-                                   + " initializing new pen,",
-                                   info_map)
-                    # initializing a default pen to be used for any class
-                    pen = Pen(len(self.all_pens), 0.1, 1.6, max_value,
-                              'open air barn', 'straw', 'tiestall', 'manual_scraping',
-                              'sedimentation', 'storage_pit', max_key[0], 1.2)
-
-                    self.all_pens.append(pen)
-                # if available pen
-                else:
-                    del mixed_type_pens[pen.id]
-                    del mixed_types[pen.id]
-
-                # Assigning pen to relevant pen list
-                if max_key[0].name == 'CALF':
-                    calf_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.CALF].append(pen)
-                elif max_key[0].name == 'GROWING':
-                    growing_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.GROWING].append(pen)
-                elif max_key[0].name == 'CLOSE_UP':
-                    close_up_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.CLOSE_UP].append(pen)
-                else:
-                    lac_cow_pens.append(pen)
-                    self.pens_by_animal_combination[Pen.AnimalCombination.LAC_COW].append(pen)
-                # updating stall shortage
-                stall_shortage[max_key[0]] -= pen.num_stalls * pen.max_stocking_density
-
-            else:
-                break
-
-        ###########################
-        # Assigning animals (sans Lactating Cows) to appropriate pens
-        ###########################
-
-        # Calf pen allocation
-        stalls = [pen.num_stalls for pen in calf_pens]
-        # density per-pen for even distribution across pens for calves
-        density = len(self.calves) / sum(stalls)
-        group = []
-        for calf in self.calves:
-            if len(group) / calf_pens[0].num_stalls <= density:
-                group.append(calf)
-            else:
-                # condition to make sure all animals are grouped
-                if len(calf_pens) > 1:
-                    calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
-                    calf_pens.pop(0)
-                    group = [calf]
-        # final pen for this class
-        calf_pens[0].update_animals(group, Pen.AnimalCombination.CALF)
-
-        # Growing Pen Allocation
-        stalls = [pen.num_stalls for pen in growing_pens]
-        # density per-pen for even distribution
-        density = (len(self.heiferIs) + len(self.heiferIIs)) / sum(stalls)
-        group = []
-        # grouping by heiferIs first
-        for hef1 in self.heiferIs:
-            if len(group) / growing_pens[0].num_stalls <= density:
-                group.append(hef1)
-            else:
-                growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-                growing_pens.pop(0)
-                group = [hef1]
-        # continuing with heiferIIs
-        for hef2 in self.heiferIIs:
-            if len(group) / growing_pens[0].num_stalls <= density:
-                group.append(hef2)
-            else:
-                if len(growing_pens) > 1:
-                    growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-                    growing_pens.pop(0)
-                    group = [hef2]
-        # final pen for this class
-        growing_pens[0].update_animals(group, Pen.AnimalCombination.GROWING)
-
-        # Close_up Pen Allocation
-        stalls = [pen.num_stalls for pen in close_up_pens]
-        # density per-pen for even distribution
-        density = (len(self.heiferIIIs) + len(dry_cows)) / sum(stalls)
-        group = []
-        # grouping by heiferIIs first
-        for hef3 in self.heiferIIIs:
-            if len(group) / close_up_pens[0].num_stalls <= density:
-                group.append(hef3)
-            else:
-                close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
-                close_up_pens.pop(0)
-                group = [hef3]
-        # continuing with dry cows
-        for cow in dry_cows:
-            if len(group) / close_up_pens[0].num_stalls <= density:
-                group.append(cow)
-            else:
-                if len(close_up_pens) > 1:
-                    close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
-                    close_up_pens.pop(0)
-                    group = [cow]
-        # final pen for this class
-        close_up_pens[0].update_animals(group, Pen.AnimalCombination.CLOSE_UP)
-
-        # Lactating Cow Pen Allocation
-        stalls = [pen.num_stalls for pen in lac_cow_pens]
-        # density per-pen for even distribution
-        density = len(lactating_cows) / sum(stalls)
-        # Grouping for Lactating Cows
-        pen_grouping = grouping(lactating_cows, lac_cow_pens, density)
-        # Assigning Lactating Cows to Pens based on the grouping output
-        for key in pen_grouping:
-            lac_cow_pens[0].update_animals(pen_grouping[key], Pen.AnimalCombination.LAC_COW)
-            lac_cow_pens.remove(lac_cow_pens[0])
-        #####################
 
         self.fully_update_id_pen()
 
@@ -1325,7 +1124,6 @@ class AnimalManagement:
             if self.end_ration_interval():
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                # self.allocate_all_pens()
                 self.allocate_animals_to_pens()
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
