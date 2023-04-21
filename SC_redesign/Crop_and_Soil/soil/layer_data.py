@@ -167,7 +167,7 @@ class LayerData:
 
     # --- Phosphorus
     initial_labile_inorganic_phosphorus_concentration: float = None
-    """Concentration of labile inorganic phosphorus at the beginning of the season (mg Phosphorus / kg soil)
+    """Concentration of labile inorganic phosphorus at the beginning of the simulation (mg Phosphorus / kg soil)
         Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
         for soil in the plow layer of cropland.
     """
