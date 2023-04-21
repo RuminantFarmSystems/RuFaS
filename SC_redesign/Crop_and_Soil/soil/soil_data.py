@@ -228,6 +228,7 @@ class SoilData:
                                                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
                                                soil_water_concentration=0,
                                                saturation_point_water_concentration=inf,
+                                               initial_labile_inorganic_phosphorus_concentration=0,
                                                field_size=field_size)
 
         # Set the initial water content for the first year of the simulation

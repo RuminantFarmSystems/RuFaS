@@ -61,7 +61,7 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
                                                days_since_application: int, cover_type: str, field_size: float) -> None:
     """Tests that soil absorbs the correct amount of phosphorus from the available phosphorus pool"""
     data = SoilData(full_available_phosphorus_pool=initial_pool_amount, available_phosphorus_pool=available_pool_amount,
-                    days_since_application=days_since_application, cover_type=cover_type)
+                    days_since_application=days_since_application, cover_type=cover_type, field_size=field_size)
     fert = Fertilizer(data)
 
     fert._add_to_labile_phosphorus = MagicMock()
@@ -89,7 +89,7 @@ def test_absorb_phosphorus_from_available_pool(initial_pool_amount: float, avail
 def test_leach_phosphorus(pool_amount: float, days_since_application: int,
                           rainfall_events: int, rainfall: float, runoff: float, field_size: float) -> None:
     """Tests that the correct amounts of phosphorus to be removed by runoff and soil absorption are calculated."""
-    data = SoilData(days_since_application=days_since_application,
+    data = SoilData(days_since_application=days_since_application, field_size=field_size,
                     rain_events_after_fertilizer_application=rainfall_events)
     if rainfall_events == 1:
         data.available_phosphorus_pool = pool_amount
@@ -134,7 +134,7 @@ def test_update_before_and_at_first_rain(rainfall: float, runoff: float, field_s
     """Test that _update_before_and_at_first_rain() chooses correct operations to perform on the available phosphorus
         pool based on day's conditions and temporal counters
     """
-    data = SoilData(rain_events_after_fertilizer_application=rain_events,
+    data = SoilData(rain_events_after_fertilizer_application=rain_events, field_size=field_size,
                     full_available_phosphorus_pool=full_available_pool, available_phosphorus_pool=available_pool,
                     days_since_application=days_since_application)
     fert = Fertilizer(data)
@@ -172,7 +172,7 @@ def test_update_after_first_rain(recalcitrant_pool: float, rain_events: int, rai
     """Test that _update_after_first_rain() correctly removes phosphorus from the recalcitrant pool and correctly calls
         all subroutines.
     """
-    data = SoilData(recalcitrant_phosphorus_pool=recalcitrant_pool,
+    data = SoilData(recalcitrant_phosphorus_pool=recalcitrant_pool, field_size=field_size,
                     rain_events_after_fertilizer_application=rain_events)
     fert = Fertilizer(data)
 
@@ -217,7 +217,7 @@ def test_add_fertilizer_phosphorus(available_pool: float, full_available_pool: f
         temporal counters.
     """
     data = SoilData(available_phosphorus_pool=available_pool, full_available_phosphorus_pool=full_available_pool,
-                    recalcitrant_phosphorus_pool=recalcitrant_pool,
+                    recalcitrant_phosphorus_pool=recalcitrant_pool, field_size=1.0,
                     rain_events_after_fertilizer_application=rain_events, days_since_application=days_since_application)
     fert = Fertilizer(data)
 
@@ -250,7 +250,8 @@ def test_do_fertilizer_phosphorus_operations(rain_events: int, days_since_applic
     """Tests that correct action is taken on fertilizer phosphorus in the system, and that temporal counters are
         incremented correctly.
     """
-    data = SoilData(rain_events_after_fertilizer_application=rain_events, days_since_application=days_since_application)
+    data = SoilData(rain_events_after_fertilizer_application=rain_events, days_since_application=days_since_application,
+                    field_size=field_size)
     fert = Fertilizer(data)
 
     fert._update_before_and_at_first_rain = MagicMock()
