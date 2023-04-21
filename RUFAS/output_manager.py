@@ -313,11 +313,33 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
+    def save_variable_names(self, path: str) -> None:
+        """
+        Saves names of all variables added to variables_pool into a json file in the give path to a directory.
+        """
+        vars_pool = self.variables_pool.copy()
+        for key, value in vars_pool.items():
+            if isinstance(value, dict) and "info_maps" in value:
+                value.pop("info_maps")
+        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
+        var_dict = {}
+        with open(file_path, 'w') as var_names_file:
+            for k1, v1 in vars_pool.items():
+                for v2 in v1.values():
+                    for v3 in v2:
+                        if isinstance(v3, dict):
+                            for variable_name in v3.keys():
+                                variable_name_to_write = f"{key}: {variable_name}"
+                                if variable_name_to_write not in var_dict.keys():
+                                    var_dict[variable_name_to_write] = 1
+                                    var_names_file.write(variable_name_to_write + '\n')
+
     def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves all pool into the given path to a directory.
         """
         self.save_variables(path, exclude_info_maps=exclude_info_maps)
+        self.save_variable_names(path)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)
@@ -330,3 +352,5 @@ class OutputManager(object):
         self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
         self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
+    
+    
