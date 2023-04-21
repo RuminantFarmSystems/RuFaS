@@ -13,6 +13,10 @@ to represent its soil
 
 @dataclass
 class LayerData:
+    field_size: InitVar[float] = None
+    """Size of the field (ha)
+        Note: this attribute is only used for initialization. After that it cannot be used.
+    """
     top_depth: Optional[float] = None
     """top depth of the layer (mm)"""
     bottom_depth: Optional[float] = None
@@ -167,17 +171,14 @@ class LayerData:
         Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
         for soil in the plow layer of cropland.
     """
-    # phosphorus_sorption_parameter: Optional[float] = None
-    """Parameter that determines the equilibria of the different inorganic phosphorus pools (unitless)
+    mean_phosphorus_sorption_parameter: float = None
+    """Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it
+        is not sensitive to large immediate changes in the soil chemistry (unitless).
         Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical
         documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical
         documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the
         user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an
         equation to compute it based off other soil attributes.
-    """
-    mean_phosphorus_sorption_parameter: float = None
-    """Phosphorus sorption parameter that has been adjusted so it is not sensitive to large immediate changes in the
-        soil chemistry.
     """
     labile_inorganic_phosphorus_content: float = 0
     """Labile inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
@@ -199,10 +200,26 @@ class LayerData:
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
 
-    field_size: InitVar[float] = None
-
     def __post_init__(self, field_size: float):
-        """Initialize all attributes in the dataclass that depend on other attributes"""
+        """Initialize all attributes in the dataclass that depend on other attributes
+
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha)
+
+        Raises
+        ------
+        TypeError
+            If the field size is None (meaning it likely was not included when the SoilData() object was initialized).
+        ValueError
+            If the field size specified is not greater than 0.
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:2.1.1, 2 and the last paragraph on page 208
+
+        """
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
         if self.initial_labile_inorganic_phosphorus_concentration is None:
