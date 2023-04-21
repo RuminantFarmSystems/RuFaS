@@ -206,12 +206,12 @@ class SoilData:
         for it.
 
         """
-        if self.soil_layers is None:
-            if field_size is None:
-                raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
-            elif field_size <= 0:
-                raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+        if field_size is None:
+            raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
+        elif field_size <= 0:
+            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
+        if self.soil_layers is None:
             self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=field_size),
                                 LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=field_size),
                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=field_size),
@@ -220,7 +220,7 @@ class SoilData:
             raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
                              f"'{self.soil_layers[0].bottom_depth}'.")
         elif self.soil_layers[0].bottom_depth > 20:
-            self._subdivide_top_layer()
+            self._subdivide_top_layer(field_size)
 
         if self.vadose_zone_layer is None:
             # configures the vadose zone LayerData object based on where the soil profile ends
@@ -234,7 +234,7 @@ class SoilData:
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
 
-    def _subdivide_top_layer(self) -> None:
+    def _subdivide_top_layer(self, field_size: float) -> None:
         """This method ensures that the soil profile has a top layer that is 20 mm deep.
 
         Notes
@@ -245,16 +245,12 @@ class SoilData:
 
         This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
 
-        Because post_init() now appends to labile_inorganic_phosphorus_concentration_record, it cannot be called a
-        second time because it will add another value to that list when it should not.
-
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.water_content = new_top_layer.soil_water_concentration * new_top_layer.layer_thickness
+        new_top_layer.__post_init__(field_size)
         self.soil_layers[0].top_depth = 20
-        self.soil_layers[0].water_content = \
-            self.soil_layers[0].soil_water_concentration * self.soil_layers[0].layer_thickness
+        self.soil_layers[0].__post_init__(field_size)
         self.soil_layers.insert(0, new_top_layer)
 
     def do_annual_reset(self) -> None:

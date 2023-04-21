@@ -237,7 +237,7 @@ class LayerData:
         if field_size is None:
             raise TypeError("'field_size' attribute is NoneType, must be given value when LayerData is initialized.")
         elif field_size <= 0:
-            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+            raise ValueError(f"Expected field_size to be greater than 0, received '{field_size}'.")
 
         self.labile_inorganic_phosphorus_content = self.determine_soil_phosphorus_area_density(
             self.initial_labile_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)

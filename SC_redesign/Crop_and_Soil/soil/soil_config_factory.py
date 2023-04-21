@@ -16,7 +16,8 @@ class SoilConfiguration(Enum):
 
 class SoilConfigFactory:
     @staticmethod
-    def create_soil_data(config: SoilConfiguration = SoilConfiguration("generic"), **kwargs) -> SoilData:
+    def create_soil_data(field_size: float, config: SoilConfiguration = SoilConfiguration("generic"),
+                         **kwargs) -> SoilData:
         """Creates a soil data object from a SoilConfiguration enum, with the defaults from that configurations and the
             optional ability to modify attributes
         """
@@ -24,7 +25,8 @@ class SoilConfigFactory:
             SoilConfiguration.GENERIC: SoilData
         }
         config_class = configuration_by_type[config]
-        config_instance = config_class()
+        # pdb.set_trace()
+        config_instance = config_class(field_size=field_size)
 
         # handle any attributes that need to be modified
         if kwargs:
