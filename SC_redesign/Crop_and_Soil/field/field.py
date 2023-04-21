@@ -26,7 +26,7 @@ class Field:
         """field data component"""
 
         # soil attributes
-        self.soil = soil or Soil()  # default soil if not given.
+        self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
         """the soil component of the field"""
 
         # crop attributes
