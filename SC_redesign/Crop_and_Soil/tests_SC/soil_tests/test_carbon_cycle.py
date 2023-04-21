@@ -1,10 +1,14 @@
 import pytest
-# from unittest.mock import MagicMock
+from unittest.mock import MagicMock
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycle
-# from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-# from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS,\
     CUBIC_MILLIMETERS_TO_CUBIC_METERS
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.soil.carbon_cycling.decomposition import Decomposition
+from SC_redesign.Crop_and_Soil.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
+from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
 
 
 @pytest.mark.parametrize("layer_thickness, field_size", [
@@ -155,3 +159,80 @@ def test_determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss: float,
     assert expected == CarbonCycle._determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss,
                                                                     total_soil_carbon_CO2_loss,
                                                                     total_decomposition_carbon_CO2_lost)
+
+
+@pytest.mark.parametrize("layers", [
+    ([LayerData(top_depth=0, bottom_depth=40, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
+                wilting_point_water_concentration=0.9),
+      LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
+                wilting_point_water_concentration=0.8),
+      LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
+                wilting_point_water_concentration=0.3)]),
+    ([LayerData(top_depth=0, bottom_depth=30, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
+                wilting_point_water_concentration=1.8),
+      LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
+                wilting_point_water_concentration=0.8),
+      LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+                wilting_point_water_concentration=0.2)]),
+    ([LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
+                wilting_point_water_concentration=1.8),
+      LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4,
+                field_capacity_water_concentration=1.8,
+                wilting_point_water_concentration=0.8),
+      LayerData(top_depth=200, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
+                wilting_point_water_concentration=0.6)])
+])
+def test_soil_carbon_aggregation(layers) -> None:
+    """test that attributes are aggregated correctly"""
+    data = SoilData(soil_layers=layers)
+    cycle = CarbonCycle(data)
+    CarbonCycle._determine_soil_volume = MagicMock(return_value=1)
+    CarbonCycle._determine_soil_mass = MagicMock(return_value=2)
+    CarbonCycle._determine_soil_active_carbon_fraction = MagicMock(return_value=3)
+    CarbonCycle._determine_soil_slow_carbon_fraction = MagicMock(return_value=4)
+    CarbonCycle._determine_soil_passive_carbon_fraction = MagicMock(return_value=5)
+    CarbonCycle._determine_soil_overall_carbon_fraction = MagicMock(return_value=6)
+    CarbonCycle._determine_total_soil_carbon_amount = MagicMock(return_value=7)
+    CarbonCycle._determine_total_plant_carbon_CO2_loss = MagicMock(return_value=8)
+    CarbonCycle._determine_total_soil_carbon_CO2_loss = MagicMock(return_value=9)
+    CarbonCycle._determine_total_decomposition_carbon_CO2_lost = MagicMock(return_value=10)
+    CarbonCycle._determine_total_carbon_CO2_lost = MagicMock(return_value=11)
+
+    cycle._soil_carbon_aggregation(10)
+
+    assert CarbonCycle._determine_soil_volume.call_count == len(layers)
+    assert CarbonCycle._determine_soil_mass.call_count == len(layers)
+    assert CarbonCycle._determine_soil_active_carbon_fraction.call_count == len(layers)
+    assert CarbonCycle._determine_soil_slow_carbon_fraction.call_count == len(layers)
+    assert CarbonCycle._determine_soil_passive_carbon_fraction.call_count == len(layers)
+    assert CarbonCycle._determine_soil_overall_carbon_fraction.call_count == len(layers)
+    assert CarbonCycle._determine_total_soil_carbon_amount.call_count == len(layers)
+    assert CarbonCycle._determine_total_plant_carbon_CO2_loss.call_count == len(layers)
+    assert CarbonCycle._determine_total_soil_carbon_CO2_loss.call_count == len(layers)
+    assert CarbonCycle._determine_total_decomposition_carbon_CO2_lost.call_count == len(layers)
+    assert CarbonCycle._determine_total_carbon_CO2_lost.call_count == len(layers)
+
+    for layer in layers:
+        assert layer.soil_overall_carbon_fraction == 6
+        assert layer.total_soil_carbon_amount == 7
+        assert layer.total_decomposition_carbon_CO2_lost == 10
+        assert layer.total_carbon_CO2_lost == 11
+
+
+@pytest.mark.parametrize("rainfall, crop, temp_average, field_size", [
+    (1, CropData(yield_residue=300), 3, 4)
+])
+def test_carbon_cycle(rainfall: float, crop: CropData, temp_average: float, field_size: float) -> None:
+    """tests that routines are called"""
+    data = SoilData()
+    cycle = CarbonCycle(data)
+    Decomposition.decompose = MagicMock()
+    PoolGasPartition.partition_pool_gas = MagicMock()
+    ResiduePartition.partition_residue = MagicMock()
+    cycle._soil_carbon_aggregation = MagicMock()
+
+    cycle.cycle_carbon(rainfall, crop, temp_average, field_size)
+
+    assert Decomposition.decompose.call_count == 1
+    assert PoolGasPartition.partition_pool_gas.call_count == 1
+    assert ResiduePartition.partition_residue.call_count == 1
