@@ -291,22 +291,10 @@ class Field:
 
     def grow_crops(self, incoming_light, min_air_temperature, mean_air_temperature, max_air_temperature) -> None:
         """allow the current crops to execute their daily growth routines"""
-        soil_layer_attributes = self._get_soil_layer_attributes_for_crop_growth()
         for this_crop in self.crops:
-            this_crop.grow_crop(
-                layer_nitrates=soil_layer_attributes["nitrates"],
-                layer_depths=soil_layer_attributes["depths"],
-                layer_phosphates=soil_layer_attributes["phosphates"],
-                soil_water_factor=self.soil.data.water_factor,
-                max_transpiration=self.field_data.max_transpiration,
-                incoming_light=incoming_light,
-                evaporation=self.field_data.evaporation,
-                transpiration=self.field_data.transpiration,
-                adjusted_potential_evapotranspiration=self.field_data.potential_evapotranspiration_adjusted,
-                max_evapotranspiration=self.field_data.max_evapotranspiration,
-                mean_air_temperature=mean_air_temperature, min_air_temperature=min_air_temperature,
-                max_air_temperature=max_air_temperature
-            )
+            this_crop.grow_crop(soil_data=self.soil.data, incoming_light=incoming_light,
+                                mean_air_temperature=mean_air_temperature, min_air_temperature=min_air_temperature,
+                                max_air_temperature=max_air_temperature)
 
     def harvest_crops(self):
         """perform the harvest operation on all crops in the field, depending on the harvest operation"""
@@ -358,7 +346,8 @@ class Field:
         total_initial_canopy_free_water = 0
         for crop in self.crops:
             crop.water_dynamics.cycle_water()  # TODO: tweak this once water method sare more solidified.
-            total_initial_canopy_free_water += crop.crop_data.initial_canopy_free_water
+            total_initial_canopy_free_water += crop.data.initial_canopy_free_water
+            crop.water_uptake.uptake_water()
 
         # TODO: track snow cover on soil surface somewhere - Issue #317
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
@@ -380,7 +369,7 @@ class Field:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
         for crop in self.crops:
-            total_above_ground_biomass += crop.crop_data.above_ground_biomass
+            total_above_ground_biomass += crop.data.above_ground_biomass
         return total_above_ground_biomass
 
     # </editor-fold>

@@ -287,6 +287,21 @@ class CropData:
     initial_canopy_free_water: float = 0    # TODO: track this - Issue #316
     """initial amount of free water held in the canopy on a given day (mm)"""
 
+    # ---- transpiration
+    water_distro_parameter: float = 10
+    """water-use distribution parameter governing water-uptake from the soil. Defaults to 10 for all crops in SWAT
+    (unitless)."""
+    potential_water_uptakes: Optional[List[float]] = None
+    """the maximum amount of water to be potentially taken up by a crop, from each soil layer (mm)"""
+    water_compensation_factor: float = 0.01
+    """factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+    (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+    can be drawn from deeper layers."""
+    unmet_water_demands: Optional[List[float]] = None
+    """cumulative water demands not met by all previous layers"""
+    actual_water_uptakes: Optional[List[float]] = None
+    """the actual amount of water to be removed from the soil"""
+
     # ---- yields
     harvest_efficiency: float = 1.0
     """efficiency of the harvest operation: the proportion of yield that will be extracted from the field
