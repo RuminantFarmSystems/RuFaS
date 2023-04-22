@@ -675,11 +675,6 @@ class Pen:
 
         self.animals_in_pen.append(animal)
 
-        # # updating stocking density
-        # # self.stocking_density = len(self.animals_in_pen) + 1 / self.num_stalls
-        # self.stocking_density = 999
-        #
-
     def clear(self):
         """
         Clears the pen attributes for re-allocation.
