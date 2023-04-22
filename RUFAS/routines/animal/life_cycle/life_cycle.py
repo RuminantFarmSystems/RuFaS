@@ -205,7 +205,8 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII, herd_data['heiferII_num'], herd_data['breed'])
         heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num'], herd_data['breed'])
         cows = self._get_animals(Cow, herd_data['cow_num'], herd_data['breed'])
-        self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'], herd_data['breed'])
+        self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'],
+                                                                               herd_data['breed'])
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
@@ -245,7 +246,7 @@ class LifeCycleManager:
                      heiferIIs: List[HeiferII],
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
-            -> Tuple[List[Cow], List[int], List[Calf], List[Calf],
+            -> Tuple[List[Cow], List[Cow], List[Calf], List[Calf],
             List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.

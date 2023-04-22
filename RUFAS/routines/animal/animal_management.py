@@ -456,8 +456,9 @@ class AnimalManagement:
 
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
-                                                               original_pen_populations[pen_for_insert.id])
-
+                                                               original_pen_populations[
+                                                                   pen_for_insert.id])
+            pen_for_insert.stocking_density = (len(pen_for_insert.animals_in_pen) + 1) / pen_for_insert.num_stalls
         self.calculate_pen_rations(original_pen_populations)
 
     def allocate_all_pens(self):
