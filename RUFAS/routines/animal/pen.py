@@ -338,7 +338,7 @@ class Pen:
         """
         Updates the stocking density of the pen
         """
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+        self.stocking_density = len(self.animals_in_pen) / self.num_stalls
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
@@ -674,8 +674,11 @@ class Pen:
         animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
-        # updating stocking density
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+
+        # # updating stocking density
+        # # self.stocking_density = len(self.animals_in_pen) + 1 / self.num_stalls
+        # self.stocking_density = 999
+        #
 
     def clear(self):
         """
