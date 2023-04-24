@@ -61,7 +61,7 @@ class LayerData:
     """sand proportion expressed as percent of soil in this layer (unitless)"""
     percent_silt_proportion: float = 64.5
     """silt proportion expressed as percent of soil in this layer (unitless)"""
-    percent_rock_content: float = 1
+    percent_rock_proportion: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
     # --- Decomposition

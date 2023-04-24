@@ -12,7 +12,7 @@ the "Inorganic Soil P Model" section of SurPhos.
 
 class PhosphorusMineralization:
 
-    def __init__(self, soil_data: Optional[SoilData] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -20,9 +20,12 @@ class PhosphorusMineralization:
         soil_data : SoilData, optional
             The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
             provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+            not provided (ha)
 
         """
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def mineralize_phosphorus(self, field_size) -> None:
         """This method handles the daily re-averaging of the phosphorus sorption parameter, then iterates through the
@@ -50,7 +53,7 @@ class PhosphorusMineralization:
             soil_phosphorus_content = layer.determine_soil_phosphorus_concentration(
                 layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
             current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
-                layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)
+                layer.percent_clay_proportion, soil_phosphorus_content, layer.percent_organic_carbon_proportion)
             layer.mean_phosphorus_sorption_parameter = self._recompute_mean_phosphorus_sorption_parameter(
                 layer.mean_phosphorus_sorption_parameter, current_phosphorus_sorption_parameter)
 

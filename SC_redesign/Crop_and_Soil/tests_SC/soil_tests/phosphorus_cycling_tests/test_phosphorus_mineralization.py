@@ -2,6 +2,8 @@ import pytest
 from unittest.mock import MagicMock, patch
 from math import exp, log
 
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
 
 
@@ -137,10 +139,116 @@ def test_determine_stable_to_active_phosphorus_mineralization(stable: float, act
 
 
 # --- Main routine test ---
-# @pytest.mark.parametrize("field_size, balance", [
-#     ()
-# ])
-# def test_mineralize_phosphorus(field_size: float, balance: float) -> None:
-#     """Tests that the main routine correctly calls all subroutines and updates values correctly."""
-#     layers = [LayerData(top_depth=0, bottom_depth=20, labile_inorganic_phosphorus_content=)]
-#     data = SoilData()
+@pytest.mark.parametrize("field_size", [
+    1.55,
+    0.88,
+    2.33,
+    1.5
+])
+def test_mineralize_phosphorus(field_size: float) -> None:
+    """Tests that the main routine correctly calls all subroutines and updates values correctly.
+
+    Notes
+    -----
+    `calculate_phosphorus_sorption_parameter()` has a call count of 7 because it is called once for when each layer in
+    the soil profile in initialized, once for the vadose zone layer, and once for each iteration of the for loop in
+    `mineralize_phosphorus()`
+
+    """
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_phosphorus_area_density",
+               new_callable=MagicMock, return_value=20):
+        # Case 1: tests that desorption occurs correctly
+        LayerData.determine_soil_phosphorus_concentration = MagicMock()
+        LayerData.calculate_phosphorus_sorption_parameter = MagicMock()
+        layers1 = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size),
+                   LayerData(top_depth=20, bottom_depth=65, field_size=field_size),
+                   LayerData(top_depth=65, bottom_depth=120, field_size=field_size)]
+        data1 = SoilData(soil_layers=layers1, field_size=field_size)
+        incorp1 = PhosphorusMineralization(data1)
+
+        incorp1._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.35)
+        incorp1._determine_phosphorus_imbalance = MagicMock(return_value=-0.5)
+        incorp1._calculate_phosphorus_desorption = MagicMock(return_value=5)
+        incorp1._calculate_phosphorus_sorption = MagicMock()
+        incorp1._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=6)
+
+        incorp1.mineralize_phosphorus(field_size)
+
+        assert LayerData.determine_soil_phosphorus_concentration.call_count == 3
+        assert LayerData.calculate_phosphorus_sorption_parameter.call_count == 7
+        assert incorp1._recompute_mean_phosphorus_sorption_parameter.call_count == 3
+        assert incorp1._determine_phosphorus_imbalance.call_count == 3
+        assert incorp1._calculate_phosphorus_desorption.call_count == 3
+        assert incorp1._calculate_phosphorus_sorption.call_count == 0
+        assert incorp1._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        for layer in incorp1.data.soil_layers:
+            assert layer.mean_phosphorus_sorption_parameter == 0.35
+            assert layer.active_inorganic_unbalanced_counter == 1
+            assert layer.labile_inorganic_unbalanced_counter == 0
+            assert layer.labile_inorganic_phosphorus_content == 25
+            assert layer.active_inorganic_phosphorus_content == 21
+            assert layer.stable_inorganic_phosphorus_content == 14
+
+        # Case 2: tests that sorption occurs correctly
+        LayerData.determine_soil_phosphorus_concentration = MagicMock()
+        LayerData.calculate_phosphorus_sorption_parameter = MagicMock()
+        layers2 = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size),
+                   LayerData(top_depth=20, bottom_depth=78, field_size=field_size),
+                   LayerData(top_depth=78, bottom_depth=200, field_size=field_size)]
+        data2 = SoilData(soil_layers=layers2, field_size=field_size)
+        incorp2 = PhosphorusMineralization(data2)
+
+        incorp2._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.37)
+        incorp2._determine_phosphorus_imbalance = MagicMock(return_value=0.5)
+        incorp2._calculate_phosphorus_desorption = MagicMock()
+        incorp2._calculate_phosphorus_sorption = MagicMock(return_value=4)
+        incorp2._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=2)
+
+        incorp2.mineralize_phosphorus(field_size)
+
+        assert LayerData.determine_soil_phosphorus_concentration.call_count == 3
+        assert LayerData.calculate_phosphorus_sorption_parameter.call_count == 7
+        assert incorp2._recompute_mean_phosphorus_sorption_parameter.call_count == 3
+        assert incorp2._determine_phosphorus_imbalance.call_count == 3
+        assert incorp2._calculate_phosphorus_desorption.call_count == 0
+        assert incorp2._calculate_phosphorus_sorption.call_count == 3
+        assert incorp2._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        for layer in incorp2.data.soil_layers:
+            assert layer.mean_phosphorus_sorption_parameter == 0.37
+            assert layer.active_inorganic_unbalanced_counter == 0
+            assert layer.labile_inorganic_unbalanced_counter == 1
+            assert layer.labile_inorganic_phosphorus_content == 16
+            assert layer.active_inorganic_phosphorus_content == 26
+            assert layer.stable_inorganic_phosphorus_content == 18
+
+        # Case 3: tests that when there is no imbalance, no phosphorus is transferred between active and labile pools
+        LayerData.determine_soil_phosphorus_concentration = MagicMock()
+        LayerData.calculate_phosphorus_sorption_parameter = MagicMock()
+        layers3 = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size),
+                   LayerData(top_depth=20, bottom_depth=56, field_size=field_size),
+                   LayerData(top_depth=56, bottom_depth=200, field_size=field_size)]
+        data3 = SoilData(soil_layers=layers3, field_size=field_size)
+        incorp3 = PhosphorusMineralization(data3)
+
+        incorp3._recompute_mean_phosphorus_sorption_parameter = MagicMock(return_value=0.44)
+        incorp3._determine_phosphorus_imbalance = MagicMock(return_value=0.0)
+        incorp3._calculate_phosphorus_desorption = MagicMock()
+        incorp3._calculate_phosphorus_sorption = MagicMock()
+        incorp3._determine_stable_to_active_phosphorus_mineralization = MagicMock(return_value=5)
+
+        incorp3.mineralize_phosphorus(field_size)
+
+        assert LayerData.determine_soil_phosphorus_concentration.call_count == 3
+        assert LayerData.calculate_phosphorus_sorption_parameter.call_count == 7
+        assert incorp3._recompute_mean_phosphorus_sorption_parameter.call_count == 3
+        assert incorp3._determine_phosphorus_imbalance.call_count == 3
+        assert incorp3._calculate_phosphorus_desorption.call_count == 0
+        assert incorp3._calculate_phosphorus_sorption.call_count == 0
+        assert incorp3._determine_stable_to_active_phosphorus_mineralization.call_count == 3
+        for layer in incorp3.data.soil_layers:
+            assert layer.mean_phosphorus_sorption_parameter == 0.44
+            assert layer.active_inorganic_unbalanced_counter == 0
+            assert layer.labile_inorganic_unbalanced_counter == 0
+            assert layer.labile_inorganic_phosphorus_content == 20
+            assert layer.active_inorganic_phosphorus_content == 25
+            assert layer.stable_inorganic_phosphorus_content == 15

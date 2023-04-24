@@ -46,7 +46,7 @@ class SoilErosion:
         support_practice_factor = self._determine_support_practice_factor()
         topographic_factor = self._determine_topographic_factor(self.data.slope_length,
                                                                 self.data.average_subbasin_slope)
-        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
+        fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_proportion)
 
         if self.data.peak_runoff_rate is None:
             raise TypeError("SoilData peak_runoff_rate cannot be NoneType")
