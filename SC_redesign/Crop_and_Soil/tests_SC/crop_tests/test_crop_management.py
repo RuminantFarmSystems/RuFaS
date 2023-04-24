@@ -5,7 +5,7 @@ from mock.mock import MagicMock
 from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from math import exp
-from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
 
 # ---- Test Static Functions ----
@@ -90,6 +90,35 @@ def test_graze():
 
 def test_collect_cut_yields():
     warnings.warn("no collect cut yields method implemented")
+
+
+@pytest.mark.parametrize("heat_sched,heat_frac,harv_day,harv_yr,this_day,this_yr", [
+    (False, 1.20, 100, 0, 80, 0),  # scheduled, too early (conflicting heat)
+    (False, 1.00, 100, 0, 100, 0),  # scheduled, exactly right (conflicting heat)
+    (False, 1.10, 100, 0, 110, 0),  # scheduled, too late (conflicting heat)
+
+    (True, 1.08, 100, 0, 110, 0),  # heat-scheduled, too early (conflicting dates)
+    (True, 1.10, 100, 0, 80, 0),  # heat-scheduled, exactly right (conflicting dates)
+    (True, 1.20, 100, 0, 80, 0),  # heat-scheduled, passed time (conflicting dates)
+])
+def test_check_harvest_schedule(heat_sched: bool, heat_frac: float, harv_day: int, harv_yr: int,
+                                this_day: int, this_yr: int):
+    """ensure that is_harvest_day is correctly set"""
+    data = CropData(use_heat_scheduling=heat_sched, heat_fraction=heat_frac, next_harvest_day=harv_day,
+                    next_harvest_year=harv_yr, harvest_heat_fraction=1.10)
+    cm = CropManagement(data)
+    cm.check_harvest_schedule(this_day, this_yr)
+    scheduled_and_correct = (this_day == harv_day) & (this_yr == harv_yr) & (heat_sched is False)
+    print(scheduled_and_correct)
+    heat_scheduled_and_correct = (heat_sched is True) & (heat_frac >= 1.10)
+    print(heat_scheduled_and_correct)
+    if scheduled_and_correct or heat_scheduled_and_correct:
+        assert data.is_harvest_day is True
+    else:
+        assert data.is_harvest_day is False
+
+
+
 
 
 @pytest.mark.parametrize("harvest,heat_frac,water_def", [
