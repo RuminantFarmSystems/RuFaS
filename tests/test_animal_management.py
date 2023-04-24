@@ -6,6 +6,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
 from typing import List, Dict, Union, Any
+from typing import List, Dict, Union
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -228,12 +229,16 @@ def animal_management() -> AnimalManagement:
     init_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_pens')
     init_animals_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_animals')
     init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts')
-    init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
+    # init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
+    allocate_animals_to_pens_patch = patch(
+        'RUFAS.routines.animal.animal_management.AnimalManagement.allocate_animals_to_pens'
+    )
 
     init_pens_patch.start()
     init_animals_patch.start()
     init_nutrient_rqmts_patch.start()
-    init_allocate_all_pens_patch.start()
+    # init_allocate_all_pens_patch.start()
+    allocate_animals_to_pens_patch.start()
 
     data = MagicMock()
     config = MagicMock()
@@ -246,7 +251,8 @@ def animal_management() -> AnimalManagement:
     init_pens_patch.stop()
     init_animals_patch.stop()
     init_nutrient_rqmts_patch.stop()
-    init_allocate_all_pens_patch.stop()
+    # init_allocate_all_pens_patch.stop()
+    allocate_animals_to_pens_patch.stop()
 
     return animal_management
 
