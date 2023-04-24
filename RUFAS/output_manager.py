@@ -278,7 +278,7 @@ class OutputManager(object):
         Parameters
         ----------
         data_list : List[str]
-            The list to be saved
+            The list of variable names to be saved
         path : str
             The path to the file to be saved
 
@@ -290,8 +290,8 @@ class OutputManager(object):
         """
         try:
             with open(path, 'w') as var_names_file:
-                for item in data_list:
-                    var_names_file.write(item + '\n')
+                for variable_name in data_list:
+                    var_names_file.write(variable_name + '\n')
         except Exception as e:
             raise e
 
@@ -350,8 +350,7 @@ class OutputManager(object):
                 var_set.add(key)
                 var_set.update(f"{key}: {variable_name}" for values_list in value.values() for variable_dict in
                                values_list if isinstance(variable_dict, dict) for variable_name in variable_dict.keys())
-        var_set = sorted(var_set)
-        var_list = list(var_set)
+        var_list = sorted(var_set)  # sorted(set) converts set into a sorted list
 
         self._list_to_file_txt(var_list, file_path)
 
