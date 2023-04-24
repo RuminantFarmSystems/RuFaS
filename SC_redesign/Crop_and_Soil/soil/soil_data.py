@@ -18,6 +18,11 @@ class SoilData:
     soil_layers: Optional[List[LayerData]] = None
     """list of soil layer data objects, top layer is 0th element, bottom is nth element"""
 
+    field_size: InitVar[float] = None
+    """Size of the field (ha)
+        Note: this attribute is only used for initialization. After that it cannot be used.
+    """
+
     # Track annual soil profile totals
     initial_water_content: float = None
     """Total soil water content at the beginning of a year, for use in determining annual change (mm)"""
@@ -177,16 +182,38 @@ class SoilData:
     grazing_stable_organic_phosphorus: float = 0
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
-    field_size: InitVar[float] = None
+    # ---- Residue partition (Carbon Cycling)
+    plant_residue_lignin_composition: float = 0
+    """lignin fraction of plant residue (unitless)"""
+    plant_lignin_nitrogen_ratio: float = 0
+    """plant lignin to nitrogen ratio (unitless)"""
+    plant_residue_metabolic_fraction: float = 0
+    """plant residue fraction that is metabolic (unitless)"""
+    total_residue = 0
+    """"amount of total residue ever added to the field(kg/ha)"""
 
     def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
 
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha)
+
         Raises
         ------
+        TypeError
+            If the field size is None (meaning it likely was not included when the SoilData() object was initialized).
         ValueError
-            If the bottom depth of the top layer of soil is < 20
+            If the field size specified is not greater than 0.
+        ValueError
+            If the bottom depth of the top layer of soil is < 20.
+
+        Notes
+        -----
+        The SoilData class itself does not need the field size, but it requires it if the soil layers are not defined
+        for it.
 
         """
         if field_size is None:
@@ -203,7 +230,7 @@ class SoilData:
             raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
                              f"'{self.soil_layers[0].bottom_depth}'.")
         elif self.soil_layers[0].bottom_depth > 20:
-            self._subdivide_top_layer()
+            self._subdivide_top_layer(field_size)
 
         if self.vadose_zone_layer is None:
             # configures the vadose zone LayerData object based on where the soil profile ends
@@ -211,13 +238,14 @@ class SoilData:
                                                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
                                                soil_water_concentration=0,
                                                saturation_point_water_concentration=inf,
+                                               initial_labile_inorganic_phosphorus_concentration=0,
                                                field_size=field_size)
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
 
-    def _subdivide_top_layer(self) -> None:
+    def _subdivide_top_layer(self, field_size: float) -> None:
         """This method ensures that the soil profile has a top layer that is 20 mm deep.
 
         Notes
@@ -228,17 +256,40 @@ class SoilData:
 
         This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
 
-        Because post_init() now appends to labile_inorganic_phosphorus_concentration_record, it cannot be called a
-        second time because it will add another value to that list when it should not.
-
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.water_content = new_top_layer.soil_water_concentration * new_top_layer.layer_thickness
+        new_top_layer.__post_init__(field_size)
         self.soil_layers[0].top_depth = 20
-        self.soil_layers[0].water_content = \
-            self.soil_layers[0].soil_water_concentration * self.soil_layers[0].layer_thickness
+        self.soil_layers[0].__post_init__(field_size)
         self.soil_layers.insert(0, new_top_layer)
+
+    def get_vectorized_layer_attribute(self, attribute: str) -> List[any]:
+        """returns a list containing the specified attribute for each soil layer
+
+        Parameters
+        ----------
+        attribute : str
+            the LayerData attribute or property to be vectorized
+
+        Returns
+        -------
+        layered_attribute : list[any]
+            values of the specified attribute for each layer
+        """
+        return [getattr(layer, attribute) for layer in self.soil_layers]
+
+    def set_vectorized_layer_attribute(self, attribute: str, values: List[any]) -> None:
+        """sets a given attribute for all layers in soil_data
+
+        Parameters
+        ----------
+        attribute : str
+            the LayerData attribute to set
+        values : list[any]
+            values of the attribute to set for each layer
+        """
+        [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
 
     def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""

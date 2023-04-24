@@ -233,7 +233,7 @@ def test_determine_assimilated_phosphorus_amount(ratio: float, phosphorus: float
 ])
 def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size: float) -> None:
     """Test that methods are called correctly on correct layers of soil profile."""
-    data = SoilData()
+    data = SoilData(field_size=field_size)
     incorp = Manure(data)
     with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_labile_phosphorus",
                new_callable=PropertyMock) as mocked_add_to_labile_phosphorus:
@@ -249,7 +249,7 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
 ])
 def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: float) -> None:
     """Tests that the update subroutine for phosphorus pools in Manure correctly calls methods and sets attributes."""
-    data = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
+    data = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86, field_size=area,
                     machine_water_extractable_inorganic_phosphorus=200, machine_water_extractable_organic_phosphorus=90,
                     grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.78,
                     grazing_water_extractable_inorganic_phosphorus=125, grazing_water_extractable_organic_phosphorus=70)
@@ -292,7 +292,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         data1 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
                          machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
                          grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.76,
-                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900)
+                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900,
+                         field_size=1.1)
         incorp1 = Manure(data1)
 
         incorp1._adjust_manure_moisture_factor(rain, temp_factor)
@@ -308,7 +309,7 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         data2 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
                          machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
                          grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.76,
-                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900)
+                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900, field_size=1.1)
         incorp2 = Manure(data2)
 
         incorp2._adjust_manure_moisture_factor(rain, temp_factor)
@@ -324,7 +325,7 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         data3 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
                          machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
                          grazing_manure_dry_mass=800, grazing_manure_field_coverage=0.76,
-                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900)
+                         grazing_manure_moisture_factor=0.6, grazing_manure_applied_mass=900, field_size=1.1)
         incorp3 = Manure(data3)
 
         incorp3._adjust_manure_moisture_factor(rain, temp_factor)
@@ -345,7 +346,7 @@ def test_determine_decomposed_surface_manure(temp_factor: float, machine_mass: f
                                              grazing_mass: float, grazing_field: float) -> None:
     """Tests that the correct changes in mass and field coverage of machine and grazer applied manure are calculated."""
     data = SoilData(machine_manure_dry_mass=800, machine_manure_field_coverage=0.85, grazing_manure_dry_mass=500,
-                    grazing_manure_field_coverage=0.44)
+                    grazing_manure_field_coverage=0.44, field_size=1.1)
     incorp = Manure(data)
 
     incorp._determine_dry_matter_decomposition_rate = MagicMock(return_value=0.5)
@@ -378,7 +379,7 @@ def test_determine_decomposed_surface_manure(temp_factor: float, machine_mass: f
 def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -> None:
     """Tests that correct decrease in manure and field coverage due to assimilation are calculated."""
     # Case 1: no manure in the pools
-    data1 = SoilData()
+    data1 = SoilData(field_size=1.1)
     incorp1 = Manure(data1)
     incorp1._determine_dry_manure_matter_assimilation = MagicMock()
 
@@ -392,7 +393,7 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
     # Case 2: manure in pools, not fully assimilated
     data2 = SoilData(machine_manure_dry_mass=100, machine_manure_field_coverage=0.55,
                      machine_manure_moisture_factor=0.77, grazing_manure_dry_mass=80,
-                     grazing_manure_field_coverage=0.4, grazing_manure_moisture_factor=0.83)
+                     grazing_manure_field_coverage=0.4, grazing_manure_moisture_factor=0.83, field_size=1.1)
     incorp2 = Manure(data2)
     incorp2._determine_dry_manure_matter_assimilation = MagicMock(return_value=25)
 
@@ -412,7 +413,7 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
     # Case 3: manure in pools, all of it should be assimilated
     data3 = SoilData(machine_manure_dry_mass=75, machine_manure_field_coverage=0.88,
                      machine_manure_moisture_factor=0.80, grazing_manure_dry_mass=95,
-                     grazing_manure_field_coverage=0.85, grazing_manure_moisture_factor=0.79)
+                     grazing_manure_field_coverage=0.85, grazing_manure_moisture_factor=0.79, field_size=1.1)
     incorp3 = Manure(data3)
     incorp3._determine_dry_manure_matter_assimilation = MagicMock(return_value=120)
 
@@ -438,7 +439,7 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
 def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp: float) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
     # Case 1: manure pools are empty
-    data1 = SoilData()
+    data1 = SoilData(field_size=area)
     incorp1 = Manure(data1)
 
     incorp1._leach_and_update_phosphorus_pools = MagicMock()
@@ -488,7 +489,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     incorp1._add_infiltrated_phosphorus_to_soil.assert_called_once_with(0, area)
 
     # Case 2: sum of amounts decomposed and assimilated are less than what is on the field
-    data2 = SoilData(machine_manure_dry_mass=300, machine_manure_field_coverage=0.91,
+    data2 = SoilData(machine_manure_dry_mass=300, machine_manure_field_coverage=0.91, field_size=area,
                      machine_manure_moisture_factor=0.74, machine_stable_organic_phosphorus=20,
                      machine_stable_inorganic_phosphorus=21, machine_water_extractable_organic_phosphorus=22,
                      machine_water_extractable_inorganic_phosphorus=23, grazing_manure_dry_mass=200,
@@ -544,7 +545,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     incorp2._add_infiltrated_phosphorus_to_soil.assert_called_once_with(16, area)
 
     # Case 3: more manure/phosphorus is decomposed and assimilated than there is on the field.
-    data3 = SoilData(machine_manure_dry_mass=50, machine_manure_field_coverage=0.19,
+    data3 = SoilData(machine_manure_dry_mass=50, machine_manure_field_coverage=0.19, field_size=area,
                      machine_manure_moisture_factor=0.35, machine_stable_organic_phosphorus=2.0,
                      machine_stable_inorganic_phosphorus=2.1, machine_water_extractable_organic_phosphorus=2.2,
                      machine_water_extractable_inorganic_phosphorus=2.3, grazing_manure_dry_mass=38,

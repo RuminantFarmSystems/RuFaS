@@ -13,6 +13,10 @@ to represent its soil
 
 @dataclass
 class LayerData:
+    field_size: InitVar[float] = None
+    """Size of the field (ha)
+        Note: this attribute is only used for initialization. After that it cannot be used.
+    """
     top_depth: Optional[float] = None
     """top depth of the layer (mm)"""
     bottom_depth: Optional[float] = None
@@ -163,21 +167,18 @@ class LayerData:
 
     # --- Phosphorus
     initial_labile_inorganic_phosphorus_concentration: float = None
-    """Concentration of labile inorganic phosphorus at the beginning of the season (mg Phosphorus / kg soil)
+    """Concentration of labile inorganic phosphorus at the beginning of the simulation (mg Phosphorus / kg soil)
         Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
         for soil in the plow layer of cropland.
     """
-    # phosphorus_sorption_parameter: Optional[float] = None
-    """Parameter that determines the equilibria of the different inorganic phosphorus pools (unitless)
+    mean_phosphorus_sorption_parameter: float = None
+    """Parameter that determines the equilibria of the different inorganic phosphorus pools and has been adjusted so it
+        is not sensitive to large immediate changes in the soil chemistry (unitless).
         Note: This value is very important, and is used a lot in both SurPhos and SWAT (SurPhos theoretical
         documentation refers to it as the "Phosphorus Sorption Coefficient" - see eqn. [18], and SWAT theoretical
         documentation as the "Phosphorus Availability Index" - section 3:2.1). In SWAT this value is entered by the
         user, but as Pete Vadas found this was not a well understood or easily measured parameter, so SurPhos uses an
         equation to compute it based off other soil attributes.
-    """
-    mean_phosphorus_sorption_parameter: float = None
-    """Phosphorus sorption parameter that has been adjusted so it is not sensitive to large immediate changes in the
-        soil chemistry.
     """
     labile_inorganic_phosphorus_content: float = 0
     """Labile inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
@@ -198,11 +199,56 @@ class LayerData:
     # --- Residue partition
     plant_metabolic_to_soil_carbon_amount: Optional[float] = None
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
-
-    field_size: InitVar[float] = None
+    plant_structural_carbon_amount: Optional[float] = None
+    """amount of plant structural carbon (kg/ha)"""
+    plant_metabolic_carbon_amount: Optional[float] = None
+    """plant metabolic carbon amount (hg/ha)"""
+    tillage_fraction: Optional[float] = None
+    """Fraction of metabolic carbon incorporated into soil during tillage (unitless)"""
+    # TODO: needs to create a method to update this, not sure where it would be
+    structural_carbon_transfer_amount: Optional[float] = None
+    """the amount of transfer of structural carbon during tillage (kg/ha)"""
+    soil_dry_matter_residue_amount: Optional[float] = None
+    """the amount of soil dry matter residue at harvest (kg/ha)"""
+    plant_dry_matter_residue_amount: Optional[float] = None
+    """the amount of plant dry matter residue at harvest (kg/ha)"""
+    plant_residue_metabolic_fraction: Optional[float] = None
+    """fraction of plant residue that is metabolic (unitless)"""
+    plant_structural_to_slow_or_active_rate: Optional[float] = None
+    """the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)"""
+    weighted_residue_dry_matter_lignin_fraction: Optional[float] = None
+    """the weighted fractional of lignin amount in residue dry matter (unitless)"""
+    soil_residue_lignin_fraction: Optional[float] = None
+    """the fraction of soil residue that's comprised of lignin (unitless)"""
+    soil_lignin_to_nitrogen_fraction: Optional[float] = None
+    """soil lignin to nitrogen fraction(unitless)"""
+    soil_residue_metabolic_fraction: Optional[float] = None
+    """the fraction of soil residue that is metabolic(unitless)"""
+    soil_metabolic_carbon_amount: Optional[float] = None
+    """soil metabolic carbon amount (kg/ha)"""
+    soil_structural_carbon_amount: Optional[float] = None
+    """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
 
     def __post_init__(self, field_size: float):
-        """Initialize all attributes in the dataclass that depend on other attributes"""
+        """Initialize all attributes in the dataclass that depend on other attributes
+
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha)
+
+        Raises
+        ------
+        TypeError
+            If the field size is None (meaning it likely was not included when the SoilData() object was initialized).
+        ValueError
+            If the field size specified is not greater than 0.
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:2.1.1, 2 and the last paragraph on page 208
+
+        """
         self.water_content = self.soil_water_concentration * self.layer_thickness
 
         if self.initial_labile_inorganic_phosphorus_concentration is None:
@@ -220,7 +266,7 @@ class LayerData:
         if field_size is None:
             raise TypeError("'field_size' attribute is NoneType, must be given value when LayerData is initialized.")
         elif field_size <= 0:
-            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+            raise ValueError(f"Expected field_size to be greater than 0, received '{field_size}'.")
 
         self.labile_inorganic_phosphorus_content = self.determine_soil_phosphorus_area_density(
             self.initial_labile_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
@@ -379,6 +425,13 @@ class LayerData:
         soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
         total_phosphorus_mass_in_kg = labile_phosphorus * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
         return total_phosphorus_mass_in_kg / field_size
+
+    @property
+    def available_water_capacity(self):
+        """available water capacity of the soil layer (mm)
+
+        SWAT Equation: 5:2.2.6"""
+        return self.field_capacity_content - self.wilting_point_content
 
     @property
     def layer_thickness(self) -> float:

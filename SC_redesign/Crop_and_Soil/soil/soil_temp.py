@@ -10,8 +10,19 @@ This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)
 
 class SoilTemp:
 
-    def __init__(self, soil_data: Optional[SoilData] = None):
-        self.data = soil_data or SoilData()     # Initialize with defaults, if not given
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        soil_data : SoilData, optional
+            The SoilData object used by this module to track the temperatures within the soil profile, creates new one
+            if one is not provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if none provided (ha)
+
+        """
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_soil_temperature_update(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
                                       plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:

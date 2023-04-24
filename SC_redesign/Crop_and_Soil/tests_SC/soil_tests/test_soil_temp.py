@@ -163,7 +163,7 @@ def test_daily_soil_temperature_update(radiation, avg_temp, min_temp, max_temp, 
                                        avg_annual_temp):
     """tests that daily_soil_update() in soil_temp.py correctly uses and updates all functions"""
     # Initialize objects
-    data = SoilData()
+    data = SoilData(field_size=1.0)
     incorp = SoilTemp(data)
 
     # Mock helper functions
