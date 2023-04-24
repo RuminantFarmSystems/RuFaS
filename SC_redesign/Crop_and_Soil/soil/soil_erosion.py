@@ -39,7 +39,7 @@ class SoilErosion:
         """
         erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_content,
                                                                      self.data.soil_layers[0].percent_silt_content,
-                                                                     self.data.soil_layers[0].percent_clay_content,
+                                                                     self.data.soil_layers[0].percent_clay_proportion,
                                                                      self.data.soil_layers[0]
                                                                      .percent_organic_carbon_proportion)
         cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)

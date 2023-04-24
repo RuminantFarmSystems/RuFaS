@@ -370,7 +370,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
 
             # Check everything
             assert layer.water_content == expected_water_content
-            calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_proportion)
+            calc_psp.assert_called_once_with(layer.percent_clay_proportion, 25, layer.percent_organic_carbon_proportion)
             assert determine_phosphorus_amount.call_count == 3
             assert layer.mean_phosphorus_sorption_parameter == 0.5
             assert layer.labile_inorganic_phosphorus_content == 22
