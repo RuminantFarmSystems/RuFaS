@@ -55,8 +55,8 @@ class LayerData:
     # --- Erosion
     percent_organic_carbon_proportion: float = 1.2
     """organic carbon content expressed as percent of soil in this layer (unitless)"""
-    percent_clay_content: float = 18.7
-    """clay content expressed as percent of soil in this layer (unitless)"""
+    percent_clay_proportion: float = 18.7
+    """clay proportion expressed as percent of soil in this layer (unitless)"""
     percent_sand_content: float = 14.5
     """sand content expressed as percent of soil in this layer (unitless)"""
     percent_silt_content: float = 64.5
@@ -255,7 +255,7 @@ class LayerData:
             self.initial_labile_inorganic_phosphorus_concentration = 25
 
         self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
-            self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
+            self.percent_clay_proportion, self.initial_labile_inorganic_phosphorus_concentration,
             self.percent_organic_carbon_proportion)
 
         initial_active_inorganic_phosphorus_concentration = \
@@ -501,4 +501,4 @@ class LayerData:
     @property
     def silt_clay_content(self):
         """silt and clay fraction in the soil (unitless)"""
-        return self.percent_silt_content / self.percent_clay_content
+        return self.percent_silt_content / self.percent_clay_proportion
