@@ -38,7 +38,7 @@ class SoilErosion:
             the soil, and the geometry of the field.
         """
         erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_proportion,
-                                                                     self.data.soil_layers[0].percent_silt_content,
+                                                                     self.data.soil_layers[0].percent_silt_proportion,
                                                                      self.data.soil_layers[0].percent_clay_proportion,
                                                                      self.data.soil_layers[0]
                                                                      .percent_organic_carbon_proportion)
