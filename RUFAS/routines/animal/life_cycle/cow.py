@@ -299,7 +299,7 @@ class Cow(HeiferIII):
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
         else:
             self.estimated_daily_milk_produced = 0
-
+        estimated_daily_milk_produced += self.milk_production_reduction
         self.estimated_daily_milk_produced += self.milk_production_reduction
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
