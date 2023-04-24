@@ -47,8 +47,8 @@ and in the soil, including
   * Amount of phosphorus that have been lost from the field due to runoff.
 * Provide ability to add phosphorus via fertilizer to a field.
 * Provide ability to add phosphorus via manure to a field, with options for
-  * Manure applied with a machine.
-  * Manure applied with by animals grazing in said field.
+  * Manure applied with a machine (with both cow and now-cow manure).
+  * Manure applied by animals grazing in said field (with both cow and now-cow manure).
 
 * This section does not flush out the requirements that may be addressed in future versions of this module. See 
 [Beyond Version 1](#beyond-version-1)
@@ -182,7 +182,17 @@ immobilized (i.e. is transferred between different pools within the soil profile
 This submodule will be responsible for maintaining an accurate state of the soil profile in regard to its phosphorus 
 content. There are two main processes it will need to simulate in order to accomplish this
 * Erosion from the top layer of soil
+  * The main routine of `SolublePhosphorus` checks if any rainfall runoff occurred on that day, and if so calculates 
+  the concentration of phosphorus dissolved in the runoff.
+  * Based on the concentration of dissolved phosphorus and volume of rainfall runoff, phosphorus is removed from the 
+  labile inorganic phosphorus pool of the top layer of soil.
 * Phosphorus movement between different layers in the soil profile
+  * After determining how much (if any) phosphorus is removed from the soil profile by runoff, it iterates through the 
+  soil profile top down.
+  * Whenever a soil layer has had water percolated out of it that day, it calculates the amount of labile inorganic 
+  phosphorus dissolved in it and transfers it from that layer to the one below it.
+  * When phosphorus percolates out of the bottom layer, it is transferred to the Vadose zone layer where it accumulates
+  there.
 
 ### Other Details
 * The SurPhos model specifically tracks the amount of phosphorus in the top 20 mm of the soil profile, as this 
