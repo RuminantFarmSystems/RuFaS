@@ -471,9 +471,6 @@ class AnimalManagement:
             candidate_pens = self.pens_by_animal_combination[group]
             pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
-            new_pen_population = (pen_for_insert.stocking_density * pen_for_insert.num_stalls) + 1
-            pen_for_insert.stocking_density = new_pen_population / pen_for_insert.num_stalls
-
             self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
             self.all_pens[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
                                                                original_pen_populations[pen_for_insert.id])
