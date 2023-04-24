@@ -144,6 +144,7 @@ def test_check_harvest_schedules():
     crop2.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
     crop3.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
 
+
 def test_harvest_scheduled_crops():
     """ensure that crops are harvested when appropriate"""
     field = Field()
@@ -157,7 +158,6 @@ def test_harvest_scheduled_crops():
     crop1.crop_management.manage_harvest.assert_called_once()
     crop2.crop_management.manage_harvest.assert_not_called()
     crop3.crop_management.manage_harvest.assert_called_once()
-
 
 
 def test_amend_soil() -> None:

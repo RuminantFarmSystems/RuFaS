@@ -96,7 +96,6 @@ class Field:
             self.check_harvest_schedules(day, year)
             self.harvest_scheduled_crops()
 
-
         # annual resets
         if self.is_last_day_of_the_year:
             self.perform_annual_reset()
