@@ -6,6 +6,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
 
+
 @pytest.mark.parametrize(
     'methane_model',
     [
@@ -71,12 +72,15 @@ def test_growing_heifer_manure_calculations(methane_model: str,
         tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
     potassium = dry_matter_intake * \
         (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
-    methane_emission = 0.0
-    if methane_model:
-        soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
-        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration 
-                                    + 0.198 * NDF_concentration + 0.160 * soluble_residue) 
-        methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565
+
+    methane_emission = {}
+    soluble_residue = (100 - ASH_concentration) - \
+        NDF_concentration - CP_concentration - EE_concentration
+    gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+                                  + 0.198 * NDF_concentration + 0.160 * soluble_residue)
+    methane_emission_IPCC = (0.065 * gross_energy_concentration *
+                             dry_matter_intake) / 0.05565
+    methane_emission["IPCC"] = methane_emission_IPCC
 
     total_phosphorus_excreted = 4.0
     inorganic_phosphorus_fraction = 0.4

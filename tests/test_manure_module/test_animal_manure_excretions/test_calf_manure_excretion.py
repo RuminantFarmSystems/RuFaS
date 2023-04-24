@@ -49,9 +49,10 @@ def test_calf_manure_excretions(methane_model: str,
                        (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
     urine_nitrogen = 0.45 * manure_nitrogen
 
-    methane_emission = 0.0
-    if methane_model:
-        methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission = {}
+    methane_emission_Pattanaik = (
+        0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission["Pattanaik"] = methane_emission_Pattanaik
 
     total_phosphorus_excreted = 3.0
     inorganic_phosphorus_fraction = 0.4
@@ -100,7 +101,7 @@ def test_calf_manure_excretions(methane_model: str,
     assert manure_excretion_values['urea'] == approx(urea)
     assert manure_excretion_values['urine'] == approx(urine)
     assert manure_excretion_values['total_ammoniacal_nitrogen_concentration'] == \
-           approx(total_ammoniacal_nitrogen_concentration)
+        approx(total_ammoniacal_nitrogen_concentration)
     assert manure_excretion_values['urine_nitrogen'] == approx(urine_nitrogen)
     assert manure_excretion_values['manure_nitrogen'] == approx(
         manure_nitrogen)

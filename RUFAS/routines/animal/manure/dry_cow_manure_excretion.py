@@ -153,17 +153,19 @@ def manure_calculations(ration_formulation,
         (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
     # Methane emissions, g/day
-    methane_emission = 0.0
-    if methane_model == "Mills":
-        # Methane model = 'Mills' [A.3E.C.2]
-        methane_emission = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
+    methane_emission = {}
+    
+    # Methane model = 'Mills' [A.3E.C.2]
+    methane_emission_Mills = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
                                                      * metabolizable_energy_intake * 4.184)) / 0.05565
-    else:
-        # Default: IPCC Tier 2
-        gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
+    methane_emission["Mills"] = methane_emission_Mills
+    
+    # IPCC Tier 2
+    gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
                                       + 0.198 * NDF_concentration + 0.160 * soluble_residue)  # [A.3B.C.2]
-        methane_emission = (0.065 * gross_energy_concentration *
+    methane_emission_IPCC = (0.065 * gross_energy_concentration *
                             dry_matter_intake) / 0.05565  # [A.3B.C.3]
+    methane_emission["IPCC"] = methane_emission_IPCC
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,

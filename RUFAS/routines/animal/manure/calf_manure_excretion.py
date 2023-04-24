@@ -81,9 +81,10 @@ def manure_calculations(ration_formulation,
     urine_nitrogen = 0.45 * manure_nitrogen
 
     # Methane emissions, g/day [A.3A.C.1]
-    methane_emission = 0.0
-    if methane_model:
-        methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission = {}
+    methane_emission_Pattanaik = (
+        0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+    methane_emission["Pattanaik"] = methane_emission_Pattanaik
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=0,
