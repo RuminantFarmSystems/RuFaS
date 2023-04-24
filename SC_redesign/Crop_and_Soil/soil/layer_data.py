@@ -53,7 +53,7 @@ class LayerData:
     """temperature of soil layer on the previous day (degrees C)"""
 
     # --- Erosion
-    percent_organic_carbon_content: float = 1.2
+    percent_organic_carbon_proportion: float = 1.2
     """organic carbon content expressed as percent of soil in this layer (unitless)"""
     percent_clay_content: float = 18.7
     """clay content expressed as percent of soil in this layer (unitless)"""
@@ -256,7 +256,7 @@ class LayerData:
 
         self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
             self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
-            self.percent_organic_carbon_content)
+            self.percent_organic_carbon_proportion)
 
         initial_active_inorganic_phosphorus_concentration = \
             self.initial_labile_inorganic_phosphorus_concentration * \
@@ -474,12 +474,12 @@ class LayerData:
         return max(0.0, self.saturation_content - self.water_content)
 
     @property
-    def percent_organic_matter_content(self) -> float:
+    def percent_organic_matter_proportion(self) -> float:
         """percent organic matter content of this soil layer
 
         SWAT Reference: 4:1.1.4
         """
-        return 1.72 * self.percent_organic_carbon_content
+        return 1.72 * self.percent_organic_carbon_proportion
 
     @property
     def soil_water_content(self):
