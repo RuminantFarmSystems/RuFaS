@@ -41,8 +41,8 @@ class PhosphorusMineralization:
         and desorption is the other way around.
 
         When sorption occurs, the program checks whether the current phosphorus imbalance is greater than it was the day
-        before, and if so it resets unbalanced counter for the labile pool, which has the effect of sorping more
-        phosphorus from the active pool.
+        before, and if so it resets unbalanced counter for the labile pool, which has the effect of sorping the maximum
+        amount possible from the labile pool.
 
         """
         for layer in self.data.soil_layers:
