@@ -17,7 +17,8 @@ class Evapotranspiration:
             The SoilData object used by this module to track evaporation and transpiration from the soil profile,
             creates new one if one is not provided.
         field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if none provided (ha)
+            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+            not provided (ha)
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
