@@ -300,7 +300,7 @@ class Cow(HeiferIII):
         else:
             self.estimated_daily_milk_produced = 0
 
-        self.estimated_daily_milk_produced -= self.milk_production_reduction
+        self.estimated_daily_milk_produced += self.milk_production_reduction
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
