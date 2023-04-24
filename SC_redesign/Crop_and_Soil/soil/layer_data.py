@@ -57,8 +57,8 @@ class LayerData:
     """organic carbon content expressed as percent of soil in this layer (unitless)"""
     percent_clay_proportion: float = 18.7
     """clay proportion expressed as percent of soil in this layer (unitless)"""
-    percent_sand_content: float = 14.5
-    """sand content expressed as percent of soil in this layer (unitless)"""
+    percent_sand_proportion: float = 14.5
+    """sand proportion expressed as percent of soil in this layer (unitless)"""
     percent_silt_content: float = 64.5
     """silt content expressed as percent of soil in this layer (unitless)"""
     percent_rock_content: float = 1

@@ -37,7 +37,7 @@ class SoilErosion:
             soil, how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into
             the soil, and the geometry of the field.
         """
-        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_content,
+        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_proportion,
                                                                      self.data.soil_layers[0].percent_silt_content,
                                                                      self.data.soil_layers[0].percent_clay_proportion,
                                                                      self.data.soil_layers[0]
