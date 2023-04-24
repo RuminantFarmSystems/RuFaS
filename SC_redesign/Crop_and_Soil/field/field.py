@@ -310,10 +310,10 @@ class Field:
             if not crop.data.is_harvest_day:
                 continue  # move on to checking next crop
 
-            if crop.data.harvest_type == HarvestOperation.HARVEST:
+            if crop.data.next_harvest_operation == HarvestOperation.HARVEST:
                 crop.crop_management.manage_harvest(cut=True, collect=True, kill=True)
 
-            if crop.data.harvest_type == HarvestOperation.HARVEST_NOKILL:
+            if crop.data.next_harvest_operation == HarvestOperation.HARVEST_NOKILL:
                 crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
 
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS

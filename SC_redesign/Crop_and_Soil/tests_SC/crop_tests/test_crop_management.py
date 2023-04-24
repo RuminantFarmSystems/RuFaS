@@ -118,9 +118,6 @@ def test_check_harvest_schedule(heat_sched: bool, heat_frac: float, harv_day: in
         assert data.is_harvest_day is False
 
 
-
-
-
 @pytest.mark.parametrize("harvest,heat_frac,water_def", [
     (None, 0, 0),  # base case
     (None, 0.5, 0),  # accumulated half heat
