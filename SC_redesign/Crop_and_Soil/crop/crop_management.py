@@ -184,7 +184,6 @@ class CropManagement:
             is_harvest_day = current_year == self.data.next_harvest_year
             self.data.is_harvest_day = is_harvest_year & is_harvest_day
 
-
     # ---- Helper Methods ----
     @staticmethod
     def _determine_potential_harvest_index(heat_fraction: float, optimal_harvest_index: float) -> float:

@@ -1,6 +1,5 @@
 from typing import Optional, List, Dict
 from dataclasses import dataclass
-from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 
 

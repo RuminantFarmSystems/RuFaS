@@ -71,7 +71,6 @@ class CropData:
     next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST
     """the specific harvest operation to be executed next for this plant"""
 
-
     # SWAT Table A-3
     minimum_temperature: float = 0
     """minimum temperature below which plant growth cannot occur (Celsius)"""
