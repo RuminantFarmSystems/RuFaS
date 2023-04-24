@@ -265,7 +265,7 @@ class OutputManager(object):
         try:
             with open(path, "w") as json_file:
                 json.dump(
-                    Utility.make_serializable(data_dict, max_depth=3),
+                    Utility.make_serializable(data_dict, max_depth=2),
                     json_file,
                     indent=0,
                 )

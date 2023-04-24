@@ -111,6 +111,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
 
             for animal in pen.animals_in_pen:
                 animal.estimated_daily_milk_produced -= reduction
+                animal.milk_production_reduction -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)

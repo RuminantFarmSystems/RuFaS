@@ -355,6 +355,11 @@ class AnimalManagement:
         for cow in self.cows:
             cow.set_nutrient_rqmts()
 
+    def reset_milk_production_reduction(self):
+        for pen in self.all_pens:
+            for animal in pen.animals_in_pen:
+                animal.milk_production_reduction = 0
+
     def fully_update_id_pen(self):
         """
         Updates the entire id_pen dictionary so that each animal's ID is
@@ -1122,6 +1127,7 @@ class AnimalManagement:
             self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
+                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_animals_to_pens()

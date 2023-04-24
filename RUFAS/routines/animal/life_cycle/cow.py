@@ -109,6 +109,7 @@ class Cow(HeiferIII):
         self.milking = False
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
+        self.milk_production_reduction = 0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -298,6 +299,8 @@ class Cow(HeiferIII):
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
         else:
             self.estimated_daily_milk_produced = 0
+
+        self.estimated_daily_milk_produced -= self.milk_production_reduction
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
