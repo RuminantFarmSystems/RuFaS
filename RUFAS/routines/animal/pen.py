@@ -22,13 +22,7 @@ from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
-from RUFAS import util, errors
 from enum import Enum
 
 om = OutputManager()
@@ -440,7 +434,6 @@ class Pen:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_ration.__name__,
-                    "feed": vars(feed),
                     "available_feeds": available_feeds, }
         om.add_variable("ration_nutrient_amount", nutrient_amount, info_map)
         om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
@@ -522,9 +515,12 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure.__name__,
-                    "feed": vars(feed)}
+                    "pen_id": self.id,
+                    "pen_animal_combination": self.animal_combination,
+                    }
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
@@ -614,7 +610,7 @@ class Pen:
 
         if class_name == 'Cow':
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
-                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow', 
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow',
                                           parity=animal.calves, calving_interval=animal.CI,
                                           milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
                                           milk_lactose=animal.lactose_milk,
