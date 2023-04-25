@@ -38,7 +38,7 @@ class PhosphorusMineralization:
 
         Notes
         -----
-        The constants used in many of this module's subroutines differ in between the old code and the literature, the
+        The constants used in many of this module's subroutines differed between older versions of this code and the literature. The
         constants from the old code are used here.
 
         Sorption is the process of phosphorus mineralizing from the labile inorganic pool to the active inorganic pool,
@@ -211,7 +211,7 @@ class PhosphorusMineralization:
         -------
         float
             A value (named 'base' in code and literature) that is used to determine how much phosphorus is transferred
-            from the active inorganic phosphorus pool to the labile inorganic phosphorus pool.
+            from the active inorganic phosphorus pool to the labile inorganic phosphorus pool. (unitless)
 
         References
         ----------
