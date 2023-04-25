@@ -53,14 +53,14 @@ class LayerData:
     """temperature of soil layer on the previous day (degrees C)"""
 
     # --- Erosion
-    percent_organic_carbon_proportion: float = 1.2
+    percent_organic_carbon_content: float = 1.2
     """organic carbon content expressed as percent of soil in this layer (unitless)"""
-    percent_clay_proportion: float = 18.7
-    """clay proportion expressed as percent of soil in this layer (unitless)"""
-    percent_sand_proportion: float = 14.5
-    """sand proportion expressed as percent of soil in this layer (unitless)"""
-    percent_silt_proportion: float = 64.5
-    """silt proportion expressed as percent of soil in this layer (unitless)"""
+    percent_clay_content: float = 18.7
+    """clay content expressed as percent of soil in this layer (unitless)"""
+    percent_sand_content: float = 14.5
+    """sand content expressed as percent of soil in this layer (unitless)"""
+    percent_silt_content: float = 64.5
+    """silt content expressed as percent of soil in this layer (unitless)"""
     percent_rock_content: float = 1
     """rock content expressed as percent of soil in this layer (unitless)"""
 
@@ -255,8 +255,8 @@ class LayerData:
             self.initial_labile_inorganic_phosphorus_concentration = 25
 
         self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
-            self.percent_clay_proportion, self.initial_labile_inorganic_phosphorus_concentration,
-            self.percent_organic_carbon_proportion)
+            self.percent_clay_content, self.initial_labile_inorganic_phosphorus_concentration,
+            self.percent_organic_carbon_content)
 
         initial_active_inorganic_phosphorus_concentration = \
             self.initial_labile_inorganic_phosphorus_concentration * \
@@ -479,7 +479,7 @@ class LayerData:
 
         SWAT Reference: 4:1.1.4
         """
-        return 1.72 * self.percent_organic_carbon_proportion
+        return 1.72 * self.percent_organic_carbon_content
 
     @property
     def soil_water_content(self):
@@ -501,4 +501,4 @@ class LayerData:
     @property
     def silt_clay_content(self):
         """silt and clay fraction in the soil (unitless)"""
-        return self.percent_silt_proportion / self.percent_clay_proportion
+        return self.percent_silt_content / self.percent_clay_content
