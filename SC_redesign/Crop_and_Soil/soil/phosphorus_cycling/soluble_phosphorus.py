@@ -83,7 +83,7 @@ class SolublePhosphorus:
         field_size : float
             Size of the field (ha)
         labile_phosphorus : float
-            Concentration of labile phosphorus in the soil layer (kg phosphorus / ha)
+            Concentration of labile phosphorus in the soil layer (kg / ha)
         bulk_density : float
             Density of the soil layer (megagrams / cubic meter)
         layer_thickness : float
@@ -219,7 +219,7 @@ class SolublePhosphorus:
         Parameters
         ----------
         labile_phosphorus : float
-            The labile phosphorus content of this layer of soil (kg phosphorus / ha)
+            The labile phosphorus content of this layer of soil (kg / ha)
         bulk_density : float
             The density of this soil layer (megagrams / cubic meter)
         layer_thickness : float
@@ -234,7 +234,7 @@ class SolublePhosphorus:
         Returns
         -------
         float
-            The amount of phosphorus that leaves this layer of soil on the current day (kg phosphorus / ha)
+            The amount of phosphorus that leaves this layer of soil on the current day (kg / ha)
 
         """
         soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,

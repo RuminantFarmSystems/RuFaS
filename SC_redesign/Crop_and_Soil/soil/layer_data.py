@@ -181,11 +181,11 @@ class LayerData:
         equation to compute it based off other soil attributes.
     """
     labile_inorganic_phosphorus_content: float = 0
-    """Labile inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
+    """Labile inorganic phosphorus content of this soil layer (kg / ha)"""
     active_inorganic_phosphorus_content: float = 0
-    """Active inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
+    """Active inorganic phosphorus content of this soil layer (kg / ha)"""
     stable_inorganic_phosphorus_content: float = 0
-    """Stable inorganic phosphorus content of this soil layer (kg phosphorus / ha)"""
+    """Stable inorganic phosphorus content of this soil layer (kg / ha)"""
 
     active_inorganic_unbalanced_counter: int = 0
     """The number of days that the active inorganic phosphorus pool has been greater than it would be when in
@@ -312,7 +312,7 @@ class LayerData:
         Parameters
         ----------
         pool_to_add_to : float
-            The phosphorus pool in this soil layer that is having phosphorus added (kg phosphorus / ha)
+            The phosphorus pool in this soil layer that is having phosphorus added (kg / ha)
         phosphorus_to_add : float
             Amount of phosphorus to add (kg)
         field_size : float
@@ -321,7 +321,7 @@ class LayerData:
         Returns
         -------
         float
-            The new value of the phosphorus pool that was added to (kg phosphorus / ha)
+            The new value of the phosphorus pool that was added to (kg / ha)
 
         Notes
         -----
@@ -378,7 +378,7 @@ class LayerData:
         Parameters
         ----------
         labile_phosphorus : float
-            Labile phosphorus content of this soil layer (kg phosphorus / ha)
+            Labile phosphorus content of this soil layer (kg / ha)
         bulk_density : float
             Bulk density of the soil layer (Megagram / cubic meter)
         layer_thickness : float
@@ -401,7 +401,7 @@ class LayerData:
     @staticmethod
     def determine_soil_phosphorus_area_density(labile_phosphorus: float, bulk_density: float,
                                                layer_thickness: float, field_size: float) -> float:
-        """Converts a concentration of soil from (mg Phosphorus / kg soil) to (kg Phosphorus / ha)
+        """Converts a concentration of soil from (mg Phosphorus / kg soil) to (kg / ha)
 
         Parameters
         ----------
@@ -417,7 +417,7 @@ class LayerData:
         Returns
         -------
         float
-            The area concentration of phosphorus in the soil layer (kg Phosphorus / ha)
+            The area concentration of phosphorus in the soil layer (kg / ha)
 
         """
         soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
