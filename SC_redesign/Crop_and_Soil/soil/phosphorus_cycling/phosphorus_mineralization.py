@@ -1,4 +1,3 @@
-
 from typing import Optional
 from math import exp, log
 
@@ -38,8 +37,8 @@ class PhosphorusMineralization:
 
         Notes
         -----
-        The constants used in many of this module's subroutines differed between older versions of this code and the literature. The
-        constants from the old code are used here.
+        The constants used in many of this module's subroutines differed between older versions of this code and the
+        literature. The constants from the old code are used here.
 
         Sorption is the process of phosphorus mineralizing from the labile inorganic pool to the active inorganic pool,
         and desorption is the other way around.
@@ -137,9 +136,9 @@ class PhosphorusMineralization:
         Parameters
         ----------
         labile_phosphorus : float
-            Labile inorganic phosphorus content of this soil layer (kg phosphorus / ha)
+            Labile inorganic phosphorus content of this soil layer (kg / ha)
         active_phosphorus : float
-            Active inorganic phosphorus content of this soil layer (kg phosphorus / ha)
+            Active inorganic phosphorus content of this soil layer (kg / ha)
         sorption_parameter : float
             The phosphorus sorption parameter of this layer (unitless)
 
@@ -181,7 +180,7 @@ class PhosphorusMineralization:
         -------
         float
             The amount of phosphorus that should be removed from the active inorganic phosphorus pool to put it in
-            equilibrium with the labile inorganic phosphorus pool (kg phosphorus / ha)
+            equilibrium with the labile inorganic phosphorus pool (kg / ha)
 
         References
         ----------
@@ -243,7 +242,7 @@ class PhosphorusMineralization:
         -------
         float
             The amount of phosphorus that should be removed from the labile inorganic phosphorus pool to put it in
-            equilibrium with the active inorganic phosphorus pool (kg phosphorus / ha)
+            equilibrium with the active inorganic phosphorus pool (kg / ha)
 
         References
         ----------
@@ -318,15 +317,15 @@ class PhosphorusMineralization:
         Parameters
         ----------
         stable_phosphorus : float
-            Stable inorganic phosphorus content of this soil layer (kg phosphorus / ha)
+            Stable inorganic phosphorus content of this soil layer (kg / ha)
         active_phosphorus : float
-            Active inorganic phosphorus content of this soil layer (kg phosphorus / ha)
+            Active inorganic phosphorus content of this soil layer (kg / ha)
 
         Returns
         -------
         float
             The amount of phosphorus to be transferred from the stable inorganic phosphorus pool to the active
-            phosphorus inorganic pool (kg phosphorus / ha)
+            phosphorus inorganic pool (kg / ha)
 
         References
         ----------
