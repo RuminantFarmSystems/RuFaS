@@ -40,27 +40,27 @@ def test_calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float 
 
 @pytest.mark.parametrize("temp_average, layers", [
     (70, [LayerData(top_depth=0, bottom_depth=40, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
-                    wilting_point_water_concentration=0.9),
-          LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9,
+                    wilting_point_water_concentration=0.9, field_size=1.33),
+          LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9, field_size=1.33,
                     field_capacity_water_concentration=1.2, wilting_point_water_concentration=0.8),
-          LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8,
+          LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8, field_size=1.33,
                     field_capacity_water_concentration=0.8, wilting_point_water_concentration=0.3)]),  # lower values
     (150, [LayerData(top_depth=0, bottom_depth=30, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
-                     wilting_point_water_concentration=1.8),
-           LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9,
+                     wilting_point_water_concentration=1.8, field_size=1.33),
+           LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9, field_size=1.33,
                      field_capacity_water_concentration=1.8, wilting_point_water_concentration=0.8),
-           LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8,
+           LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8, field_size=1.33,
                      field_capacity_water_concentration=1, wilting_point_water_concentration=0.2)]),  # higher values
-    (88.8, [LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3,
+    (88.8, [LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3, field_size=1.33,
                       field_capacity_water_concentration=2.9, wilting_point_water_concentration=1.8),
-            LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4,
+            LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4, field_size=1.33,
                       field_capacity_water_concentration=1.8, wilting_point_water_concentration=0.8),
-            LayerData(top_depth=200, bottom_depth=220, soil_water_concentration=0.8,
+            LayerData(top_depth=200, bottom_depth=220, soil_water_concentration=0.8, field_size=1.33,
                       field_capacity_water_concentration=1, wilting_point_water_concentration=0.6)])  # arbitrary
 ])
 def test_decompose(temp_average, layers):
     """ensures that all SoilData attributes were correctly updated"""
-    data = SoilData(soil_layers=layers)
+    data = SoilData(field_size=1.33, soil_layers=layers)
     decomp = Decomposition(data)
     Decomposition._calc_moisture_factor = MagicMock(return_value=1.89)
     Decomposition._calc_temp_factor = MagicMock(return_value=3.99)

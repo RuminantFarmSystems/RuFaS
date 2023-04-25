@@ -146,7 +146,7 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
                     emergence_phosphorus_fraction=0.71, half_mature_phosphorus_fraction=0.68,
                     near_mature_phosphorus_fraction=0.62, mature_phosphorus_fraction=0.60,
                     biomass=122.8, previous_phosphorus=0, biomass_growth_max=999)
-    soil = SoilData()
+    soil = SoilData(field_size=1.55)
     del soil.soil_layers[3]
     top_depths = [0] + depths[:2]
     soil.set_vectorized_layer_attribute("top_depth", top_depths)

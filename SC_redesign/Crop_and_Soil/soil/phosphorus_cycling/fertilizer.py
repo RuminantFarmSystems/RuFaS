@@ -13,8 +13,20 @@ to the soil surface being absorbed into the soil and/or removed from the field b
 
 class Fertilizer:
 
-    def __init__(self, soil_data: Optional[SoilData] = None):
-        self.data = soil_data or SoilData()  # initialize with defaults, if not given
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        soil_data : SoilData, optional
+            The SoilData object used by this module to track all activity within the soil profile, creates new one if
+            one is not provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+            not provided (ha)
+
+        """
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def do_fertilizer_phosphorus_operations(self, rainfall: float, runoff: float, field_size: float) -> None:
         """The main routine that updates phosphorus in surface-applied fertilizer on a daily basis.

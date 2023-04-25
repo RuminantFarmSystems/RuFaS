@@ -194,14 +194,18 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient):
     # initialize objects
     if is_top_frozen:
         data = SoilData(potential_evapotranspiration=1.5, average_subbasin_slope=0.07, previous_retention_parameter=27,
+                        field_size=1.33,
                         soil_layers=[LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, temperature=-1,
-                                               soil_water_concentration=0),
+                                               soil_water_concentration=0, field_size=1.33),
                                      LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, temperature=-1,
-                                               soil_water_concentration=0)])
+                                               soil_water_concentration=0, field_size=1.33)])
     else:
         data = SoilData(potential_evapotranspiration=1.5, average_subbasin_slope=0.07, previous_retention_parameter=27,
-                        soil_layers=[LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, soil_water_concentration=0),
-                                     LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, soil_water_concentration=0)])
+                        field_size=1.33,
+                        soil_layers=[LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, soil_water_concentration=0,
+                                               field_size=1.33),
+                                     LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, soil_water_concentration=0,
+                                               field_size=1.33)])
     incorp = Infiltration(data)
     assert incorp.data.potential_evapotranspiration == 1.5
     assert incorp.data.average_subbasin_slope == 0.07

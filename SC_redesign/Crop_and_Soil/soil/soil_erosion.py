@@ -9,8 +9,19 @@ This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1
 
 
 class SoilErosion:
-    def __init__(self, soil_data: Optional[SoilData]):
-        self.data = soil_data or SoilData()  # Initialize with defaults, if not given
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        soil_data : SoilData, optional
+            The SoilData object used by this module to track erosion, creates new one if one is not provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+            not provided (ha)
+
+        """
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float) -> None:
         """This is the main routine for SoilErosion. It is responsible for running all the necessary soil erosion
@@ -27,11 +38,11 @@ class SoilErosion:
             soil, how the soil is being farmed, how much rainfall there is and how much of that rain gets absorbed into
             the soil, and the geometry of the field.
         """
-        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_content,
-                                                                     self.data.soil_layers[0].percent_silt_content,
-                                                                     self.data.soil_layers[0].percent_clay_content,
+        erodibility_factor = self._determine_soil_erodibility_factor(self.data.soil_layers[0].percent_sand_proportion,
+                                                                     self.data.soil_layers[0].percent_silt_proportion,
+                                                                     self.data.soil_layers[0].percent_clay_proportion,
                                                                      self.data.soil_layers[0]
-                                                                     .percent_organic_carbon_content)
+                                                                     .percent_organic_carbon_proportion)
         cover_factor = self._determine_cover_management_factor(minimum_cover_management_factor, surface_residue)
         support_practice_factor = self._determine_support_practice_factor()
         topographic_factor = self._determine_topographic_factor(self.data.slope_length,

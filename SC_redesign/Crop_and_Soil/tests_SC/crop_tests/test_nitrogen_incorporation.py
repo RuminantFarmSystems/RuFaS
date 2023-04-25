@@ -559,7 +559,7 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
                     biomass=122.8, previous_nitrogen=0, biomass_growth_max=999)
     with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.soil_water_factor", new_callable=PropertyMock,
                return_value=water_factor):
-        soil = SoilData()
+        soil = SoilData(field_size=1.3)
         # soil.soil_water_factor = mock.PropertyMock(return_value=water_factor)
         del soil.soil_layers[3]  # delete 4th layer
         top_depths = [0] + depths[:2]

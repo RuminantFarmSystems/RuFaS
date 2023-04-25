@@ -108,7 +108,7 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
                                     weiP_frac: float) -> None:
     """Tests that manure with greater than 15% solid matter content is added to the field correctly."""
     data = SoilData(machine_manure_dry_mass=3000, machine_manure_moisture_factor=0.65,
-                    machine_manure_field_coverage=0.77)
+                    machine_manure_field_coverage=0.77, field_size=1.1)
     incorp = ManureApplication(data)
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 4000,
                                                                            "new_moisture_factor": 0.83,
@@ -140,7 +140,8 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
         sets surface pool characteristics.
     """
-    data = SoilData(machine_manure_dry_mass=1000, machine_manure_moisture_factor=0.8, machine_manure_field_coverage=0.9)
+    data = SoilData(machine_manure_dry_mass=1000, machine_manure_moisture_factor=0.8, machine_manure_field_coverage=0.9,
+                    field_size=1.1)
     incorp = ManureApplication(data)
     incorp._determine_wet_rate_factor = MagicMock(return_value=2000)
     incorp._determine_infiltration_factor = MagicMock(return_value=0.5)
@@ -187,7 +188,7 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
 ])
 def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, field_size: float) -> None:
     """Tests that the grazing manure related attributes are correctly updated when grazing manure is applied."""
-    data = SoilData(grazing_manure_dry_mass=4000, grazing_manure_moisture_factor=0.75,
+    data = SoilData(grazing_manure_dry_mass=4000, grazing_manure_moisture_factor=0.75, field_size=field_size,
                     grazing_manure_field_coverage=0.6)
     incorp = ManureApplication(data)
     incorp._determine_grazing_manure_field_coverage = MagicMock(return_value=0.8)
@@ -219,7 +220,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
 def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosphorus_mass: float, coverage: float,
                               area: float, weiP_frac: float, source_animal: float) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
-    data = SoilData()
+    data = SoilData(field_size=1.1)
     incorp = ManureApplication(data)
 
     incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)

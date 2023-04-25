@@ -2,8 +2,9 @@ from typing import Optional
 from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS, CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
+    CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
 
 """
 This module tracks the movement of phosphorus in the soil profile based on equations from APLE.
@@ -12,17 +13,20 @@ This module tracks the movement of phosphorus in the soil profile based on equat
 
 class SolublePhosphorus:
 
-    def __init__(self, soil_data: Optional[SoilData] = None):
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
         ----------
         soil_data : SoilData, optional
-            The SoilData object used by this module to track manure phosphorus activity, creates new one if one is not
-            provided.
+            The SoilData object used by this module to track phosphorus as it moves through the soil profile, creates
+            new one if one is not provided.
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+            not provided (ha)
 
         """
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData(field_size=field_size)
 
     def daily_update_routine(self, runoff: float, field_size: float) -> None:
         """Removes phosphorus from the top layer of soil due to runoff, and moves phosphorus downward through the soil
@@ -45,9 +49,9 @@ class SolublePhosphorus:
         """
         if runoff > 0:
             phosphorus_runoff = self._determine_phosphorus_runoff_from_top_soil(
-                runoff, field_size, self.data.soil_layers[0].labile_phosphorus_content,
+                runoff, field_size, self.data.soil_layers[0].labile_inorganic_phosphorus_content,
                 self.data.soil_layers[0].bulk_density, self.data.soil_layers[0].layer_thickness)
-            self.data.soil_layers[0].labile_phosphorus_content -= phosphorus_runoff
+            self.data.soil_layers[0].labile_inorganic_phosphorus_content -= phosphorus_runoff
             self.data.annual_soil_phosphorus_runoff += phosphorus_runoff * field_size
 
         for layer_index in range(len(self.data.soil_layers)):
@@ -59,11 +63,12 @@ class SolublePhosphorus:
                 next_layer = self.data.vadose_zone_layer
 
             phosphorus_percolated = self._determine_phosphorus_percolated_from_layer(
-                current_layer.labile_phosphorus_content, current_layer.bulk_density, current_layer.layer_thickness,
-                current_layer.percent_clay_content, current_layer.percolated_water, field_size)
+                current_layer.labile_inorganic_phosphorus_content, current_layer.bulk_density,
+                current_layer.layer_thickness, current_layer.percent_clay_proportion, current_layer.percolated_water,
+                field_size)
 
-            current_layer.labile_phosphorus_content -= phosphorus_percolated
-            next_layer.labile_phosphorus_content += phosphorus_percolated
+            current_layer.labile_inorganic_phosphorus_content -= phosphorus_percolated
+            next_layer.labile_inorganic_phosphorus_content += phosphorus_percolated
 
     # --- Static methods ---
     @staticmethod
@@ -78,7 +83,7 @@ class SolublePhosphorus:
         field_size : float
             Size of the field (ha)
         labile_phosphorus : float
-            Concentration of labile phosphorus in the soil layer (kg phosphorus / ha)
+            Concentration of labile phosphorus in the soil layer (kg / ha)
         bulk_density : float
             Density of the soil layer (megagrams / cubic meter)
         layer_thickness : float
@@ -97,8 +102,10 @@ class SolublePhosphorus:
         runoff_in_liters = (runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
         runoff_in_liters_per_hectare = runoff_in_liters / field_size
 
-        top_layer_soil_phosphorus_concentration = SolublePhosphorus._determine_soil_phosphorus_concentration(
-            labile_phosphorus, bulk_density, layer_thickness, field_size)
+        top_layer_soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,
+                                                                                                    bulk_density,
+                                                                                                    layer_thickness,
+                                                                                                    field_size)
         extraction_coefficient = 0.005
         top_layer_dissolved_reactive_phosphorus_runoff = top_layer_soil_phosphorus_concentration * \
             extraction_coefficient * runoff_in_liters_per_hectare * (10 ** (-6))
@@ -147,34 +154,6 @@ class SolublePhosphorus:
 
         """
         return 4.726 * isotherm_slope - 8.97
-
-    @staticmethod
-    def _determine_soil_phosphorus_concentration(labile_phosphorus: float, bulk_density: float,
-                                                 layer_thickness: float, field_size: float) -> float:
-        """Calculates the concentration of phosphorus in a soil layer.
-
-        Parameters
-        ----------
-        labile_phosphorus : float
-            Labile phosphorus content of this soil layer (kg phosphorus per ha)
-        bulk_density : float
-            Bulk density of the soil layer (Megagram per cubic meter)
-        layer_thickness : float
-            Thickness of the soil layer (mm)
-        field_size : float
-            Area of the field (ha)
-
-        Returns
-        -------
-        float
-            The concentration of phosphorus in the soil layer (mg phosphorous / kg soil)
-
-        """
-        soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
-            CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        soil_phosphorus_mass_in_mg = labile_phosphorus * field_size * KILOGRAMS_TO_MILLIGRAMS
-        return soil_phosphorus_mass_in_mg / soil_mass_in_kg
 
     @staticmethod
     def _determine_dissolved_reactive_phosphorus_leachate(soil_phosphorus: float, isotherm_slope: float,
@@ -240,7 +219,7 @@ class SolublePhosphorus:
         Parameters
         ----------
         labile_phosphorus : float
-            The labile phosphorus content of this layer of soil (kg phosphorus / ha)
+            The labile phosphorus content of this layer of soil (kg / ha)
         bulk_density : float
             The density of this soil layer (megagrams / cubic meter)
         layer_thickness : float
@@ -255,11 +234,13 @@ class SolublePhosphorus:
         Returns
         -------
         float
-            The amount of phosphorus that leaves this layer of soil on the current day (kg phosphorus / ha)
+            The amount of phosphorus that leaves this layer of soil on the current day (kg / ha)
 
         """
-        soil_phosphorus_concentration = SolublePhosphorus._determine_soil_phosphorus_concentration(
-            labile_phosphorus, bulk_density, layer_thickness, field_size)
+        soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,
+                                                                                          bulk_density,
+                                                                                          layer_thickness,
+                                                                                          field_size)
 
         isotherm_slope = SolublePhosphorus._determine_isotherm_slope(percent_clay_content)
         isotherm_intercept = SolublePhosphorus._determine_isotherm_intercept(isotherm_slope)
