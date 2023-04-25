@@ -110,6 +110,7 @@ class Cow(HeiferIII):
         self.milking = False
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
+        self.milk_production_reduction = 0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -224,10 +225,17 @@ class Cow(HeiferIII):
                                                           AnimalBase.config['b']) / 2) * \
                                             math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
         if self.milking:
-            self.estimated_daily_milk_produced = estimated_daily_milk_produced
+            # if sim_day % 30 == 1:
+            #     self.estimated_daily_milk_produced = estimated_daily_milk_produced
+            # else:
+            #     self.estimated_daily_milk_produced = estimated_daily_milk_produced + self.milk_production_reduction
+            self.estimated_daily_milk_produced = estimated_daily_milk_produced + self.milk_production_reduction
+            #if self.milk_production_reduction != 0: print(self.milk_production_reduction)
+            #estimated_daily_milk_produced += self.milk_production_reduction
+            #self.estimated_daily_milk_produced += self.milk_production_reduction
         else:
             self.estimated_daily_milk_produced = 0
-        self.single_acc_milk_prod += estimated_daily_milk_produced
+        self.single_acc_milk_prod += self.estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
         if self.milking:
@@ -235,8 +243,8 @@ class Cow(HeiferIII):
                 0.0926 * (math.log(self.days_in_milk)) ** 2) * \
                           (math.log(self.days_in_milk) ** 1.107)
             daily_fat_correct_milk_production = \
-                0.4 * estimated_daily_milk_produced + \
-                0.15 * fat_percent * estimated_daily_milk_produced
+                0.4 * self.estimated_daily_milk_produced + \
+                0.15 * fat_percent * self.estimated_daily_milk_produced
         else:
             fat_percent = 0
             daily_fat_correct_milk_production = 0
@@ -248,7 +256,7 @@ class Cow(HeiferIII):
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
-        return estimated_daily_milk_produced, fat_percent, \
+        return self.estimated_daily_milk_produced, fat_percent, \
                daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, ME_intake):

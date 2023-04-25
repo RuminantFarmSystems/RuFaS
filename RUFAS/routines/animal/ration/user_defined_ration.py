@@ -151,7 +151,7 @@ def ration_to_use(pen_animal_combo):
     elif group == 'GROWING':
         ration_percents = udrv.heifer_ration
     elif group == 'CLOSE_UP':
-        ration_percents = udrv.close_up_ration
+        ration_percents = udrv.dry_cow_ration
     else: 
         ration_percents = udrv.calf_ration
     return ration_percents

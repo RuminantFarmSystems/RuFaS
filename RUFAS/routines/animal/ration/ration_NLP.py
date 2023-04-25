@@ -522,21 +522,24 @@ def get_ration_vals(x):
     return ration_vals
 
 
-def userbounds():
-    ration_calf = udrv.calf_ration
-    ration_all_heifers = udrv.heifer_ration
-    ration_cow_lactating = udrv.lactating_cow_ration
-    ration_cow_dry = udrv.lactating_cow_ration
-    if animal_type == 'cow':
-        if cow_type == True:
-            ration_percents = ration_cow_lactating
-            # print('çów')
-        else:
-            ration_percents = ration_cow_dry
-    elif animal_type == 'heifer':
-        ration_percents = ration_all_heifers
-    else: 
-        ration_percents = ration_calf
+def userbounds(ration_percents):
+
+    ration_percents
+
+    # ration_calf = udrv.calf_ration
+    # ration_all_heifers = udrv.heifer_ration
+    # ration_cow_lactating = udrv.lactating_cow_ration
+    # ration_cow_dry = udrv.lactating_cow_ration
+    # if animal_type == 'cow':
+    #     if cow_type == True:
+    #         ration_percents = ration_cow_lactating
+    #         # print('çów')
+    #     else:
+    #         ration_percents = ration_cow_dry
+    # elif animal_type == 'heifer':
+    #     ration_percents = ration_all_heifers
+    # else: 
+    #     ration_percents = ration_calf
 
     tribounds = []
     # udr = user defined ration
@@ -550,7 +553,7 @@ def userbounds():
     return tribounds
 
 
-def optimize(user_defined_ration_select):
+def optimize(user_defined_ration_select, ration_percents):
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -571,7 +574,7 @@ def optimize(user_defined_ration_select):
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if user_defined_ration_select:
-        bnds = userbounds()
+        bnds = userbounds(ration_percents)
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))

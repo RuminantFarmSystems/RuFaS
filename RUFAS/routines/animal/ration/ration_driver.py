@@ -18,7 +18,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration
 udrv = user_defined_ration_values()
 from RUFAS.routines.animal.ration.user_defined_ration import ration_to_use as ration_to_use
 
-def optimization(pen, requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False):
+def optimization(pen, requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False, ration_percents = None):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -61,7 +61,7 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
     #print('optimization_attempt')
     while i < 1:
         try:
-            solution = NLP.optimize(user_defined_ration_select)
+            solution = NLP.optimize(user_defined_ration_select, ration_percents)
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
@@ -131,7 +131,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
         user_defined_ration_select: Boolean of whether user input selected
     """
     ration_percents = ration_to_use(pen.animal_combination)
-    solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select)
+    solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select, ration_percents)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
         total_milk_in_pen = 0.0
@@ -158,6 +158,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
             for animal in pen.animals_in_pen:
                 if animal.estimated_daily_milk_produced > 1.0:
                     animal.estimated_daily_milk_produced -= reduction
+                    animal.milk_production_reduction -= reduction
                 running_total_milk += animal.estimated_daily_milk_produced
             average_running_total_milk = running_total_milk / num_animals
             chanchodebug = False
@@ -167,7 +168,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
                 print('average_running_total_milk = '+ str(average_running_total_milk))
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select)
+            solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select, ration_percents)
             if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
@@ -249,6 +250,7 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
             
             for animal in pen.animals_in_pen:
                 animal.estimated_daily_milk_produced -= reduction
+                animal.milk_production_reduction -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type)
@@ -320,7 +322,37 @@ def ration_report(ration, available_feeds):
             # all values on a 100% dry matter basis
             nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) \
                                   * 100
+
     return nutrient_amount, nutrient_conc
+
+def ration_net_energy_maintenance(ration, available_feeds):
+    """
+    Returns actual net energy for maintenance of feed i, Mcal for given ration total
+
+    first calculates actual metabolizable energy of feed i, Mcal/kg
+
+    Then from the metabolizable energy, calculates the maintenance for each feed
+
+    """  
+    MEact = []
+    for key, val in ration.items():
+        if available_feeds[key]['type'] == 'Mineral':
+            MEact.append(0)
+        elif available_feeds[key]['is_fat'] == 1:
+            MEact.append(val*available_feeds[key]['DE'])
+        elif available_feeds[key]['EE'] >= 3:
+            MEact.append(val*(1.01 * available_feeds[key]['DE'] - 0.45 + 0.0046 * (available_feeds[key]['EE'] - 3)))
+        else:
+            MEact.append(val*(1.01 * available_feeds[key]['DE'] - 0.45))
+    NEm_act = []
+    i = 0
+    for key, val in ration.items():
+        if available_feeds[key]['is_fat'] == 1:
+            NEm_act.append(0.8 * MEact[i])
+        else:
+            NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
+        i+=1
+    return sum(NEm_act)
 
 
 class Requirements:

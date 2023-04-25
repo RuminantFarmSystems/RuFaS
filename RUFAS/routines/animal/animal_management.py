@@ -821,6 +821,13 @@ class AnimalManagement:
             if pen.populated:
                 pen.daily_p_update()
 
+    
+    def reset_milk_production_reduction(self):
+        for pen in self.all_pens:
+            for animal in pen.animals_in_pen:
+                animal.milk_production_reduction = 0.0
+
+
     def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
@@ -852,6 +859,7 @@ class AnimalManagement:
             self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
+                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_all_pens()
