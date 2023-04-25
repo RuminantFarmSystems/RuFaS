@@ -1,7 +1,7 @@
 from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
 """
 This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
@@ -156,6 +156,33 @@ class CropManagement:
 
         # TODO: are above- and below-ground lignin residue (percent) needed?
         #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
+
+    # ---- Harvest Scheduling ----
+
+    def check_harvest_schedule(self, current_day, current_year):
+        """checks if the crop should be harvested today and sets the corresponding is_harvest_day attribute.
+
+        If the heat unit scheduling is used for this crop (`use_heat_scheduling = True`), then the current heat
+        fraction is used to decide if the crop should be harvested today. Otherwise, we simply check if the current
+        day is the day on which the harvest is scheduled.
+
+        References
+        ----------
+        SWAT 5:1.1.1 (Heat Unit Scheduling)
+
+        Parameters
+        ----------
+        current_day : int
+            the current (julian) day
+        current_year : int
+            the current year
+        """
+        if self.data.use_heat_scheduling:
+            self.data.is_harvest_day = self.data.heat_fraction >= self.data.harvest_heat_fraction
+        else:
+            is_harvest_year = current_day == self.data.next_harvest_day
+            is_harvest_day = current_year == self.data.next_harvest_year
+            self.data.is_harvest_day = is_harvest_year & is_harvest_day
 
     # ---- Helper Methods ----
     @staticmethod
