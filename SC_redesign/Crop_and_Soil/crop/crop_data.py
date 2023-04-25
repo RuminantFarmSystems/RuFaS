@@ -63,7 +63,8 @@ class CropData:
     next_harvest_day: int = 250
     """the (julian) day on which this crop should be harvested next"""
     use_heat_scheduling: bool = False
-    """Status indicating if heat unit scheduling will be used to determine harvesting instead of user-specified harvest dates"""
+    """Status indicating if heat unit scheduling will be used to determine harvesting instead of user-specified
+    harvest dates"""
     harvest_heat_fraction: float = 1.10
     """the fraction of potential heat units that denotes the optimal growth stage for harvest"""
     is_harvest_day: bool = False
