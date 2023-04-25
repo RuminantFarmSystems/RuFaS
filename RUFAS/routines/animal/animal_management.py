@@ -23,7 +23,6 @@ from typing import Any, Dict, Tuple, List
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -384,12 +383,12 @@ class AnimalManagement:
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
-
+        calf_id_list = [calf.id for calf in calves_born]
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update_id_pen.__name__,
                     "animals_added": animals_added,
                     "ids_removed": ids_removed,
-                    "calves_born": calves_born,
+                    "calves_born_id_list": calf_id_list,
                     "temp": temp,
                     }
 
@@ -468,7 +467,7 @@ class AnimalManagement:
 
         for i in range(len(self.all_pens)):
             if self.all_pens[i].ration == {}:
-                if len(self.all_pens[i].animals_in_pen) > 0:            
+                if len(self.all_pens[i].animals_in_pen) > 0:
                     available_feeds = ration_driver.AvailableFeeds()
                     available_feeds.feed_nutrients(feed)
                     self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
