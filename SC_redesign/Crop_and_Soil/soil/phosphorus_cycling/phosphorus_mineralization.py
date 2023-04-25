@@ -326,7 +326,7 @@ class PhosphorusMineralization:
         -------
         float
             The amount of phosphorus to be transferred from the stable inorganic phosphorus pool to the active
-            phosphorus inorganic pool.
+            phosphorus inorganic pool (kg phosphorus / ha)
 
         References
         ----------
