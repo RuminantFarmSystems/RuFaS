@@ -47,8 +47,8 @@ and in the soil, including
   * Amount of phosphorus that have been lost from the field due to runoff.
 * Provide ability to add phosphorus via fertilizer to a field.
 * Provide ability to add phosphorus via manure to a field, with options for
-  * Manure applied with a machine.
-  * Manure applied with by animals grazing in said field.
+  * Manure applied with a machine (with both cow and now-cow manure).
+  * Manure applied by animals grazing in said field (with both cow and now-cow manure).
 
 * This section does not flush out the requirements that may be addressed in future versions of this module. See 
 [Beyond Version 1](#beyond-version-1)
@@ -99,6 +99,11 @@ including:
 * Nitrogen and organic matter. Pete Vadas (one of the SurPhos creators) has noted that methods and practices from 
 SurPhos can be applied to nitrogen and organic matter, which would result in a more accurate picture of the soil profile
 overall.
+* Organic Phosphorus. The `phosphorus_cycling` module does track organic phosphorus pools within the soil profile. In 
+future versions, this support should be added, and may include some or all of the following pools (from SWAT)
+  * Active organic
+  * Stable organic
+  * Fresh organic
 Note that both the above enhancements will almost certainly require conversations with Pete to make sure they are 
 implemented correctly, and possibly the development of some novel features in SurPhos.
 
@@ -175,14 +180,35 @@ Notably, assimilation and decomposition are treated as simultaneous processes.
 
 ### Mineralization
 This submodule will model the chemical transformations of phosphorus in the soil profile as it is mineralized and 
-immobilized (i.e. is transferred between different pools within the soil profile).
+immobilized, called sorption and desorption in the module. `PhosphorusMineralization` executes the same set of steps in
+each layer of the soil profile.
+* Determine the phosphorus sorption parameter on that day and use it to recalculate the average phosphorus sorption 
+parameter.
+* Calculate the level of imbalance between the labile and active inorganic phosphorus pools, then transfer phosphorus 
+from one to the other depending on the imbalance.
+  * Sorption is when phosphorus moves from the labile to active pool, and desorption is the opposite direction.
+  * `PhosphorusMineralization` maintains counters for the consecutive number of days that sorption and desorption have 
+  occurred on before the current day, and this is a factor in determining how much phosphorus is transferred on the
+  current day.
+* Calculate the level of imbalance between the stable and active inorganic phosphorus pools, then transfer phosphorus
+between them depending on the imbalance.
 
 
 ### Soluble Phosphorus
 This submodule will be responsible for maintaining an accurate state of the soil profile in regard to its phosphorus 
 content. There are two main processes it will need to simulate in order to accomplish this
 * Erosion from the top layer of soil
+  * The main routine of `SolublePhosphorus` checks if any rainfall runoff occurred on that day, and if so calculates 
+  the concentration of phosphorus dissolved in the runoff.
+  * Based on the concentration of dissolved phosphorus and volume of rainfall runoff, phosphorus is removed from the 
+  labile inorganic phosphorus pool of the top layer of soil.
 * Phosphorus movement between different layers in the soil profile
+  * After determining how much (if any) phosphorus is removed from the soil profile by runoff, it iterates through the 
+  soil profile top down.
+  * Whenever a soil layer has had water percolated out of it that day, it calculates the amount of labile inorganic 
+  phosphorus dissolved in it and transfers it from that layer to the one below it.
+  * When phosphorus percolates out of the bottom layer, it is transferred to the Vadose zone layer where it accumulates
+  there.
 
 ### Other Details
 * The SurPhos model specifically tracks the amount of phosphorus in the top 20 mm of the soil profile, as this 
