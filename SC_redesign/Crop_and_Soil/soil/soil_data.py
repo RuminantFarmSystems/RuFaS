@@ -248,6 +248,11 @@ class SoilData:
     def _subdivide_top_layer(self, field_size: float) -> None:
         """This method ensures that the soil profile has a top layer that is 20 mm deep.
 
+        Parameters
+        ----------
+        field_size : float
+            Size of the field (ha)
+
         Notes
         -----
         The presence of a top layer of soil that is 20 mm deep is a necessity to properly execute SurPhos. This top 20
