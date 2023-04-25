@@ -2,6 +2,8 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List
 
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+
 
 class PlantCategory(Enum):
     """Enum of all plant types supported by RuFaS. Listed for supported plant types in SWAT Appendix A, table A-1"""
@@ -50,6 +52,25 @@ class CropData:
     """the proportion of the field that this crop occupies. Should be 1 when this is the only crop in the field"""
     is_alive: bool = True
     """is the crop currently alive in the field?"""
+
+    # Management variables
+    planting_year: int = 0
+    """the year that this crop was planted"""
+    planting_day: int = 100
+    """the (julian) day that this crop was planted"""
+    next_harvest_year: int = 0
+    """the year in which this crop should be harvested next"""
+    next_harvest_day: int = 250
+    """the (julian) day on which this crop should be harvested next"""
+    use_heat_scheduling: bool = False
+    """Status indicating if heat unit scheduling will be used to determine harvesting instead of user-specified
+    harvest dates"""
+    harvest_heat_fraction: float = 1.10
+    """the fraction of potential heat units that denotes the optimal growth stage for harvest"""
+    is_harvest_day: bool = False
+    """Status indicating if today is the day on which harvest operations should occur for this plant"""
+    next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST
+    """the specific harvest operation to be executed next for this plant"""
 
     # SWAT Table A-3
     minimum_temperature: float = 0
