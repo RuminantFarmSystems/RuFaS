@@ -167,7 +167,7 @@ class LayerData:
 
     # --- Phosphorus
     initial_labile_inorganic_phosphorus_concentration: float = None
-    """Concentration of labile inorganic phosphorus at the beginning of the simulation (mg Phosphorus / kg soil)
+    """Concentration of labile inorganic phosphorus at the beginning of the simulation (mg / kg soil)
         Note: default = 25, is from page 208 (bottom paragraph) of the SWAT theoretical documentation, and is reasonable
         for soil in the plow layer of cropland.
     """
@@ -344,7 +344,7 @@ class LayerData:
         percent_clay_content : float
             Percent of this soil layer that is clay, expressed in range [0, 100] (unitless)
         labile_inorganic_phosphorus : float
-            Amount of labile inorganic phosphorus in this soil layer (mg Phosphorus / kg soil)
+            Amount of labile inorganic phosphorus in this soil layer (mg / kg soil)
         percent_organic_carbon_content : float
             Percent of this soil layer that is organic carbon, expressed in range [0, 100] (unitless)
 
@@ -401,7 +401,7 @@ class LayerData:
     @staticmethod
     def determine_soil_phosphorus_area_density(labile_phosphorus: float, bulk_density: float,
                                                layer_thickness: float, field_size: float) -> float:
-        """Converts a concentration of soil from (mg Phosphorus / kg soil) to (kg / ha)
+        """Converts a concentration of soil from (mg / kg soil) to (kg / ha)
 
         Parameters
         ----------
