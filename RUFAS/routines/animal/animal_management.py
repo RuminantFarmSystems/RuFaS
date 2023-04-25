@@ -385,7 +385,7 @@ class AnimalManagement:
         for animal in animals_removed:
             if animal.id in self.animal_to_pen_id_map:
                 pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
-                pen.animals_in_pen.remove(animal)
+                pen.remove_animals_by_ids([animal.id])
                 pen.stocking_density = len(pen.animals_in_pen) / pen.num_stalls
                 del self.animal_to_pen_id_map[animal.id]
 

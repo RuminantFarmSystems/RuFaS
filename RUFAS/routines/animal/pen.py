@@ -9,6 +9,8 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+import copy
+from enum import Enum
 from typing import List, Dict, DefaultDict, Any
 
 from RUFAS.output_manager import OutputManager
@@ -18,18 +20,9 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
-import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-
-from RUFAS import util, errors
-from enum import Enum
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
 om = OutputManager()
 
@@ -675,6 +668,27 @@ class Pen:
         animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
+
+    def remove_animals_by_ids(self, animal_ids: List[int]):
+        """
+        Removes animals from the pen by their ids.
+
+        Notes
+        -----
+        Because this method takes O(n) time, it is recommended that the caller of this method
+        should prepare a list of animal ids to be removed from the pen first, and then call this
+        method with that list once.
+
+        Parameters
+        ----------
+        animal_ids : List[int]
+            List of animals that match the given ids to be removed from the pen.
+
+        """
+        if not animal_ids:
+            return
+        animal_ids = set(animal_ids)
+        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id not in animal_ids]
 
     def clear(self):
         """
