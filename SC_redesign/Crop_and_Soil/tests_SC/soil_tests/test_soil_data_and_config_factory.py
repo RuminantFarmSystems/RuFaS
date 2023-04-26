@@ -41,10 +41,14 @@ def test_config_factory_defaults():
         defaults"""
     generic = SoilConfigFactory.create_soil_data(1)
     assert generic.name == "generic soil configuration"
-    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=1),
-                                   LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=1),
-                                   LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=1),
-                                   LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=1)]
+    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, initial_soil_nitrate_concentration=0.5,
+                                             field_size=1),
+                                   LayerData(top_depth=20, bottom_depth=50, initial_soil_nitrate_concentration=0.5,
+                                             field_size=1),
+                                   LayerData(top_depth=50, bottom_depth=80, initial_soil_nitrate_concentration=1,
+                                             field_size=1),
+                                   LayerData(top_depth=80, bottom_depth=200, initial_soil_nitrate_concentration=5,
+                                             field_size=1)]
     assert generic.potential_evapotranspiration is None
     assert generic.potential_evapotranspiration_adjusted is None
     assert generic.transpiration == 30
@@ -136,15 +140,22 @@ def test_set_vectorized_layer_attribute() -> None:
 def test_manual_soil_data_configuration() -> None:
     """Test that creating a custom SoilData object actually has all the correct values in its fields"""
     mollisols = SoilData(name="mollisols", field_size=1.8,
-                         soil_layers=[LayerData(top_depth=0, bottom_depth=80, nitrate=1.8, field_size=1.8),
-                                      LayerData(top_depth=80, bottom_depth=150, nitrate=2.6, field_size=1.8),
-                                      LayerData(top_depth=150, bottom_depth=300, nitrate=5, field_size=1.8)])
+                         soil_layers=[LayerData(top_depth=0, bottom_depth=80, initial_soil_nitrate_concentration=1.8,
+                                                field_size=1.8),
+                                      LayerData(top_depth=80, bottom_depth=150, initial_soil_nitrate_concentration=2.6,
+                                                field_size=1.8),
+                                      LayerData(top_depth=150, bottom_depth=300, initial_soil_nitrate_concentration=5,
+                                                field_size=1.8)])
 
     assert mollisols.name == "mollisols"
-    assert mollisols.soil_layers[0] == LayerData(top_depth=0, bottom_depth=20, nitrate=1.8, field_size=1.8)
-    assert mollisols.soil_layers[1] == LayerData(top_depth=20, bottom_depth=80, nitrate=1.8, field_size=1.8)
-    assert mollisols.soil_layers[2] == LayerData(top_depth=80, bottom_depth=150, nitrate=2.6, field_size=1.8)
-    assert mollisols.soil_layers[3] == LayerData(top_depth=150, bottom_depth=300, nitrate=5, field_size=1.8)
+    assert mollisols.soil_layers[0] == LayerData(top_depth=0, bottom_depth=20, initial_soil_nitrate_concentration=1.8,
+                                                 field_size=1.8)
+    assert mollisols.soil_layers[1] == LayerData(top_depth=20, bottom_depth=80, initial_soil_nitrate_concentration=1.8,
+                                                 field_size=1.8)
+    assert mollisols.soil_layers[2] == LayerData(top_depth=80, bottom_depth=150, initial_soil_nitrate_concentration=2.6,
+                                                 field_size=1.8)
+    assert mollisols.soil_layers[3] == LayerData(top_depth=150, bottom_depth=300, initial_soil_nitrate_concentration=5,
+                                                 field_size=1.8)
     assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000,
                                                     soil_water_concentration=0, field_size=1.8,
                                                     saturation_point_water_concentration=inf,
@@ -154,19 +165,22 @@ def test_manual_soil_data_configuration() -> None:
 def test_error_manual_soil_data_configuration() -> None:
     """Test that an error is correctly raised when an invalid input is used to create SoilData object."""
     with pytest.raises(TypeError) as e:
-        SoilData(field_size=1.8, soil_layers=[LayerData(top_depth=0, bottom_depth=19, nitrate=1.8),
-                                              LayerData(top_depth=19, bottom_depth=150, nitrate=2.6),
-                                              LayerData(top_depth=150, bottom_depth=300, nitrate=5)])
+        SoilData(field_size=1.8, soil_layers=[
+            LayerData(top_depth=0, bottom_depth=19, initial_soil_nitrate_concentration=1.8),
+            LayerData(top_depth=19, bottom_depth=150, initial_soil_nitrate_concentration=2.6),
+            LayerData(top_depth=150, bottom_depth=300, initial_soil_nitrate_concentration=5)])
     assert str(e.value) == "'field_size' attribute is NoneType, must be given value when LayerData is initialized."
     with pytest.raises(ValueError) as e:
-        SoilData(field_size=1.8, soil_layers=[LayerData(top_depth=0, bottom_depth=19, nitrate=1.8, field_size=1.8),
-                                              LayerData(top_depth=19, bottom_depth=150, nitrate=2.6, field_size=1.8),
-                                              LayerData(top_depth=150, bottom_depth=300, nitrate=5, field_size=-1.8)])
+        SoilData(field_size=1.8, soil_layers=[
+            LayerData(top_depth=0, bottom_depth=19, initial_soil_nitrate_concentration=1.8, field_size=1.8),
+            LayerData(top_depth=19, bottom_depth=150, initial_soil_nitrate_concentration=2.6, field_size=1.8),
+            LayerData(top_depth=150, bottom_depth=300, initial_soil_nitrate_concentration=5, field_size=-1.8)])
     assert str(e.value) == "Expected field_size to be greater than 0, received '-1.8'."
     with pytest.raises(ValueError) as e:
-        SoilData(field_size=1.8, soil_layers=[LayerData(top_depth=0, bottom_depth=19, nitrate=1.8, field_size=1.8),
-                                              LayerData(top_depth=19, bottom_depth=150, nitrate=2.6, field_size=1.8),
-                                              LayerData(top_depth=150, bottom_depth=300, nitrate=5, field_size=1.8)])
+        SoilData(field_size=1.8, soil_layers=[
+            LayerData(top_depth=0, bottom_depth=19, initial_soil_nitrate_concentration=1.8, field_size=1.8),
+            LayerData(top_depth=19, bottom_depth=150, initial_soil_nitrate_concentration=2.6, field_size=1.8),
+            LayerData(top_depth=150, bottom_depth=300, initial_soil_nitrate_concentration=5, field_size=1.8)])
     assert str(e.value) == "Expected bottom depth of top soil layer must be 20 mm or greater, received '19'."
 
 
@@ -303,23 +317,23 @@ def test_profile_bulk_density(layers: List[LayerData]) -> None:
 
 
 @pytest.mark.parametrize("layers", [
-    [LayerData(top_depth=0, bottom_depth=30, nitrate=3.8, field_size=0.95),
-     LayerData(top_depth=30, bottom_depth=76, nitrate=2.9, field_size=0.95),
-     LayerData(top_depth=76, bottom_depth=145, nitrate=1.99, field_size=0.95)],
-    [LayerData(top_depth=0, bottom_depth=140, nitrate=10.9983, field_size=0.95),
-     LayerData(top_depth=140, bottom_depth=369, nitrate=8.9384785, field_size=0.95),
-     LayerData(top_depth=369, bottom_depth=798, nitrate=7.485968, field_size=0.95)],
-    [LayerData(top_depth=0, bottom_depth=99, nitrate=5.3950, field_size=0.95),
-     LayerData(top_depth=99, bottom_depth=213, nitrate=3.20583, field_size=0.95),
-     LayerData(top_depth=213, bottom_depth=359, nitrate=2.556948, field_size=0.95)],
+    [LayerData(top_depth=0, bottom_depth=30, initial_soil_nitrate_concentration=3.8, field_size=0.95),
+     LayerData(top_depth=30, bottom_depth=76, initial_soil_nitrate_concentration=2.9, field_size=0.95),
+     LayerData(top_depth=76, bottom_depth=145, initial_soil_nitrate_concentration=1.99, field_size=0.95)],
+    [LayerData(top_depth=0, bottom_depth=140, initial_soil_nitrate_concentration=10.9983, field_size=0.95),
+     LayerData(top_depth=140, bottom_depth=369, initial_soil_nitrate_concentration=8.9384785, field_size=0.95),
+     LayerData(top_depth=369, bottom_depth=798, initial_soil_nitrate_concentration=7.485968, field_size=0.95)],
+    [LayerData(top_depth=0, bottom_depth=99, initial_soil_nitrate_concentration=5.3950, field_size=0.95),
+     LayerData(top_depth=99, bottom_depth=213, initial_soil_nitrate_concentration=3.20583, field_size=0.95),
+     LayerData(top_depth=213, bottom_depth=359, initial_soil_nitrate_concentration=2.556948, field_size=0.95)],
 ])
 def test_profile_nitrates_total(layers: List[LayerData]) -> None:
     """Test that SoilData correctly sums nitrates contained in soil profile"""
     soil_data = SoilData(field_size=0.95, soil_layers=layers)
+    expect = 10 * len(soil_data.soil_layers)
+    for layer in soil_data.soil_layers:
+        layer.nitrate_content = 10
     observe = soil_data.profile_nitrates_total
-    expect = 0
-    for layer in layers:
-        expect += layer.nitrate
     assert observe == expect
 
 
@@ -359,7 +373,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
     """Test that __post_init__() runs and correctly initializes attributes in LayerData"""
     with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter',
                new_callable=MagicMock, return_value=0.5) as calc_psp:
-        with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_phosphorus_area_density',
+        with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density',
                    new_callable=MagicMock, return_value=22) as determine_phosphorus_amount:
             # Initialize object
             layer = LayerData(top_depth=top, bottom_depth=bottom, soil_water_concentration=concentration,
@@ -371,7 +385,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
             # Check everything
             assert layer.water_content == expected_water_content
             calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_content)
-            assert determine_phosphorus_amount.call_count == 3
+            assert determine_phosphorus_amount.call_count == 6
             assert layer.mean_phosphorus_sorption_parameter == 0.5
             assert layer.labile_inorganic_phosphorus_content == 22
             assert layer.active_inorganic_phosphorus_content == 22
@@ -580,8 +594,8 @@ def test_determine_soil_phosphorus_concentration(phosphorus: float, density: flo
     (11.495, 0.66, 35.66, 2.13),
     (76.35, 1.1, 12, 0.95)
 ])
-def test_determine_soil_phosphorus_area_density(phosphorus: float, density: float, thickness: float,
-                                                field_size: float) -> None:
+def test_determine_soil_nutrient_area_density(phosphorus: float, density: float, thickness: float,
+                                              field_size: float) -> None:
     """Tests that the conversion from mg / kg soil to kg / ha is performed correctly."""
     observed = LayerData.determine_soil_nutrient_area_density(phosphorus, density, thickness, field_size)
     expected_soil_mass_kg = density * MEGAGRAMS_TO_KILOGRAMS * (thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS

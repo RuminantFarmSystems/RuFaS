@@ -1,3 +1,4 @@
+import pdb
 from dataclasses import dataclass, field, InitVar
 from typing import Optional
 from math import log, exp
@@ -25,8 +26,6 @@ class LayerData:
     """top depth of the layer (mm)"""
     bottom_depth: Optional[float] = None
     """bottom depth of the layer (mm)"""
-    nitrate: float = 1.5
-    """nitrate level of the layer (kg/ha)"""
     soil_water_concentration: float = 0.25  # arbitrary
     """soil water concentration of the layer (mm)"""
     water_content: float = field(init=False)
@@ -234,7 +233,9 @@ class LayerData:
     """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
 
     # ---- Nitrogen
-    nitrate_content: float = field(init=False)
+    initial_soil_nitrate_concentration: Optional[float] = None
+    """Concentration of nitrates in this soil layer at beginning of the simulation (mg / kg soil)"""
+    nitrate_content: Optional[float] = None
     """Nitrate (NO3) content of this soil layer (kg / ha)"""
     ammonium_content: float = 0
     """Ammonium (NH4+) content of this soil layer (kg / ha)"""
@@ -242,7 +243,7 @@ class LayerData:
     """Active organic nitrogen content of this soil layer (kg / ha)"""
     stable_organic_nitrogen_content: float = field(init=False)
     """Stable organic nitrogen content of this soil layer (kg / ha)"""
-    fresh_organic_nitrogen_content: float = field(init=False)
+    fresh_organic_nitrogen_content: float = 0
     """Fresh organic nitrogen content of this soil layer (kg / ha)
         Note: all layers except the top layer are initialized with 0 fresh organic nitrogen."""
 
@@ -303,25 +304,53 @@ class LayerData:
             initial_stable_inorganic_phosphorus_concentration, self.bulk_density, self.layer_thickness, field_size)
         # --------------------------------------------------------------------------------------------------------------
 
-        # ---- Nitrogen initialization operations ----------------------------------------------------------------------
-        initial_nitrate_soil_concentration = 7 * exp(-1 * self.depth_of_layer_center / 1000)  # SWAT eqn. 3:1.1.1
-        self.nitrate_content = self.determine_soil_nutrient_area_density(initial_nitrate_soil_concentration,
+        self._initialize_nitrogen_pools(field_size, residue)
+
+    def _initialize_nitrogen_pools(self, field_size: float, residue: float) -> None:
+        """Initializes the nitrogen pools in the soil layer
+
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha)
+        residue: float
+            Amount of residue on the soil surface when this soil layer is initialized (kg / ha)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.1.1 - 5 and paragraph beneath eqn. 3:1.1.4
+
+        Notes
+        -----
+        The active humic nitrogen fraction is defined as 0.02 in the SWAT Theoretical documentation page 186, beneath
+        eqn. 3:1.1.4.
+
+        """
+        if self.initial_soil_nitrate_concentration is None:
+            # SWAT eqn. 3:1.1.1
+            self.initial_soil_nitrate_concentration = 7 * exp(-1 * self.depth_of_layer_center / 1000)
+
+        self.nitrate_content = self.determine_soil_nutrient_area_density(self.initial_soil_nitrate_concentration,
                                                                          self.bulk_density, self.layer_thickness,
                                                                          field_size)
-        humic_organic_nitrogen_concentration = (10 ** 4) * (self.percent_organic_carbon_content / 14)
+
         # SWAT eqn. 3:1.1.2
-        active_humic_nitrogen_fraction = 0.02  # SWAT paragraph beneath eqn. 3:1.1.4
+        humic_organic_nitrogen_concentration = (10 ** 4) * (self.percent_organic_carbon_content / 14)
+
+        active_humic_nitrogen_fraction = 0.02
+
         initial_active_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * \
-            active_humic_nitrogen_fraction  # SWAT eqn. 3:1.1.3
+            active_humic_nitrogen_fraction          # SWAT eqn. 3:1.1.3
         initial_stable_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * \
             (1 - active_humic_nitrogen_fraction)    # SWAT eqn. 3:1.1.4
+
         self.active_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
             initial_active_organic_nitrogen_concentration, self.bulk_density, self.layer_thickness, field_size)
         self.stable_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
             initial_stable_organic_nitrogen_concentration, self.bulk_density, self.layer_thickness, field_size)
+
         if self.top_depth == 0:
             self.fresh_organic_nitrogen_content = 0.0015 * residue  # SWAT eqn. 3:1.1.5
-        # --------------------------------------------------------------------------------------------------------------
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
