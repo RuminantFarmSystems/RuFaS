@@ -97,3 +97,23 @@ class LeachingRunoffErosion:
         pseudocode_soil S.6.C.2
         """
         return nitrogen_concentration*runoff*runoff_extraction_coef
+
+    @staticmethod
+    def _determine_nitrogen_erosion_concentration(nitrogen_amount: float,
+                                                  layer_thickness: float,
+                                                  bulk_density: float) -> float:
+        """This method calculates the soil nitrogen concentrations for the Fresh, Active, and Stable pools
+
+        Parameters
+        ----------
+        nitrogen_amount: float
+            amount of Fresh, Active, and Stable nitrogen (kg/ha)
+            Thickness of the soil layer (mm)
+        bulk_density: float
+    `       bulk density of the soil layer (Mg per cubic meter)
+        Returns
+        -------
+        float
+            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
+        """
+        return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
