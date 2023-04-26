@@ -370,7 +370,7 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
 
             # Check everything
             assert layer.water_content == expected_water_content
-            calc_psp.assert_called_once_with(layer.percent_clay_proportion, 25, layer.percent_organic_carbon_proportion)
+            calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_content)
             assert determine_phosphorus_amount.call_count == 3
             assert layer.mean_phosphorus_sorption_parameter == 0.5
             assert layer.labile_inorganic_phosphorus_content == 22
@@ -487,7 +487,7 @@ def test_acceptable_percolation_amount(water_content: float, saturation_content:
 def test_percent_organic_matter_proportion(percent_organic_carbon_proportion: float) -> None:
     """Test that percent_organic_matter_proportion() in LayerData correctly calculates the percent of organic matter
         content in a layer of soil"""
-    layer = LayerData(top_depth=0, bottom_depth=30, percent_organic_carbon_proportion=percent_organic_carbon_proportion,
+    layer = LayerData(top_depth=0, bottom_depth=30, percent_organic_carbon_content=percent_organic_carbon_proportion,
                       field_size=1.98)
     observe = layer.percent_organic_matter_proportion
     expect = 1.72 * percent_organic_carbon_proportion
