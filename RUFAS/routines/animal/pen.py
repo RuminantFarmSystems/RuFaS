@@ -286,6 +286,21 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
+    # TODO: (Not used yet) Use this property instead of self.stocking_density because it is dynamically calculated
+    @property
+    def current_stocking_density(self) -> float:
+        """
+        Return the current stocking density of the pen.
+
+        Returns
+        -------
+        float
+            the current stocking density of the pen.
+
+        """
+
+        return len(self.animals_in_pen) / self.num_stalls
+
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
         Sets the pen's average nutrient requirements

@@ -22,6 +22,7 @@ from typing import Any, Dict, Tuple, List
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -72,6 +73,17 @@ class AnimalManagement:
         Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
         Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN
     }
+
+    ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
+
+    @classmethod
+    def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
+        """
+        Sets the animal grouping scenario to the given scenario.
+        Parameters    ----------    scenario : AnimalGroupingScenario        The scenario to set the animal grouping scenario to.
+        Returns    -------    None
+        """
+        cls.ANIMAL_GROUPING_SCENARIO = scenario
 
     @staticmethod
     def get_animal_config(data):
@@ -928,6 +940,32 @@ class AnimalManagement:
             Pen.AnimalCombination.CLOSE_UP: self.heiferIIIs + self._get_dry_cows(self.cows),
             Pen.AnimalCombination.LAC_COW: self._get_lactating_cows(self.cows),
         }
+
+        for animal_combination, animals in animals_by_combination.items():
+            new_default_pens = self._create_default_pens_for_potential_space_shortage(
+                num_animals=len(animals),
+                pens=self.pens_by_animal_combination[animal_combination],
+                animal_combination=animal_combination,
+                start_pen_id=len(self.all_pens)
+            )
+            self.all_pens.extend(new_default_pens)
+            self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
+            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
+
+        self.fully_update_animal_to_pen_id_map()
+
+    def allocate_animals_to_pens2(self, all_animals) -> None:
+        """
+        Allocate animals to pens based on the current animal population and the number of pens available.
+        New default pens will be created if necessary. This method distributes the animals among the pens,    ensuring that the animal density of each pen matches the overall density as closely as possible.
+        Returns    -------    None
+        """
+        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
+
+        animals_by_combination = collections.defaultdict(list)
+        for animal in all_animals:
+            animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+            animals_by_combination[animal_combination].append(animal)
 
         for animal_combination, animals in animals_by_combination.items():
             new_default_pens = self._create_default_pens_for_potential_space_shortage(
