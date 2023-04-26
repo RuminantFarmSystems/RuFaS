@@ -268,7 +268,6 @@ class LayerData:
         References
         ----------
         SWAT Theoretical documentation eqn. 3:2.1.1, 2 and last paragraph on page 208 (for phosphorus initialization)
-                                       eqn. 3:1.1.1 - 5 and paragraph beneath eqn. 3:1.1.4
 
         """
         if self.top_depth < 0 or self.bottom_depth <= 0 or self.top_depth >= self.bottom_depth:
