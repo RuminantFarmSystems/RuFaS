@@ -1,6 +1,5 @@
 from typing import Optional, List, Dict
 from dataclasses import dataclass
-from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 
 
@@ -20,15 +19,6 @@ class FieldData:
     scheduling, whereby harvest operations are conducted to maximize yield (based on heat unit accumulation)."""
     is_planting_day: bool = False
     """is today the day to plant new crops?"""
-    is_harvest_day: bool = False
-    """is today the day to cut crops in the field?"""
-    cut_fraction: float = 0.5
-    """proportion of crop biomass present in the field that should be cut at the next/current cut (or harvest) event
-    (unitless)"""
-    harvest_proportion: float = 1.0
-    """proportion of the cut biomass to be removed from the field after the next/current cut event (unitless)"""
-    harvest_type: Optional[HarvestOperation] = HarvestOperation("default")
-    """the HarvestOperation, specifying which harvest operation to use"""
     absolute_latitude: float = 43.5     # TODO: set default to somewhere other than Wisconsin, or no default?
     """The absolute latitude value (degrees above or below equator) where field is located (degrees)"""
     minimum_daylength: float = 6.33     # TODO: set default to somewhere other than Wisconsin, or no default?

@@ -18,6 +18,8 @@ N/A
 
 # Resources
 
+[RuFaS Version 1 High Level Functional Requirements](https://docs.google.com/document/d/1fJ3lIOtUJjHKWdaDx2M0c2ZVwCTE-Qy4mK2Vvjt012g/edit?usp=sharing)
+
 [Onboarding Document](https://docs.google.com/document/d/1zN92KK2OkTDkutVmT96u7eEu3B2UDWgP/edit?usp=sharing&ouid=111321898904316595397&rtpof=true&sd=true)
 
 [Uncle Bob Clean Code Lessons](https://youtube.com/playlist?list=PLs4sTjbm8kLhbJy-rT4DILg-kKw3ZCwDx)

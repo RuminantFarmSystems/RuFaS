@@ -80,11 +80,11 @@ def test_percolate_between_layers():
     """
     # Case 1: amount to percolate is greater than amount that can be accepted by lower layer
     # Initialize objects
-    layers1 = [LayerData(top_depth=0, bottom_depth=20),
-               LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers1 = [LayerData(top_depth=0, bottom_depth=20, field_size=1.33),
+               LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1, field_size=1.33)]
     layers1[0].water_content = 15
     layers1[1].water_content = 3.8
-    data1 = SoilData(soil_layers=layers1)
+    data1 = SoilData(soil_layers=layers1, field_size=1.33)
     incorp1 = Percolation(data1)
 
     # Mock intermediate functions
@@ -112,11 +112,11 @@ def test_percolate_between_layers():
 
     # Case 2: amount to percolate is less than amount that can be accepted by lower layer
     # Initialize objects
-    layers2 = [LayerData(top_depth=0, bottom_depth=20),
-               LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1)]
+    layers2 = [LayerData(top_depth=0, bottom_depth=20, field_size=1.33),
+               LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1, field_size=1.33)]
     layers2[0].water_content = 15
     layers2[1].water_content = 3.8
-    data2 = SoilData(soil_layers=layers2)
+    data2 = SoilData(soil_layers=layers2, field_size=1.33)
     incorp2 = Percolation(data2)
 
     # Only need to re-mock the amount that will be percolated to next layer
@@ -145,11 +145,11 @@ def test_percolate_between_layers():
     # Initialize objects
     with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.excess_water_available", new_callable=PropertyMock,
                return_value=0):
-        layers3 = [LayerData(top_depth=0, bottom_depth=20),
-                   LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1)]
+        layers3 = [LayerData(top_depth=0, bottom_depth=20, field_size=1.33),
+                   LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1, field_size=1.33)]
         layers3[0].water_content = 8.9
         layers3[1].water_content = 3.8
-        data3 = SoilData(soil_layers=layers3)
+        data3 = SoilData(soil_layers=layers3, field_size=1.33)
         incorp3 = Percolation(data3)
 
         # Neither intermediate functions need to be re-mocked
@@ -187,15 +187,16 @@ def helper_percolate_between_layers(excess_water, amount_to_percolate, acceptabl
 def test_percolate(high_seasonal_water_table):
     """tests the main routine of percolation.py (percolate()) and check that it updates all values correctly"""
     # Initialize objects
-    layers = [LayerData(top_depth=0, bottom_depth=39),
-              LayerData(top_depth=39, bottom_depth=87),
-              LayerData(top_depth=87, bottom_depth=217)]
+    layers = [LayerData(top_depth=0, bottom_depth=39, field_size=1.33),
+              LayerData(top_depth=39, bottom_depth=87, field_size=1.33),
+              LayerData(top_depth=87, bottom_depth=217, field_size=1.33)]
     # Set soil water content of layers so that water actually percolates
     layers[0].water_content = 17
     layers[1].water_content = 21
     layers[2].water_content = 40
-    data = SoilData(soil_layers=layers, vadose_zone_layer=LayerData(top_depth=100000, bottom_depth=200000,
-                                                                    soil_water_concentration=0))
+    data = SoilData(field_size=1.33, soil_layers=layers,
+                    vadose_zone_layer=LayerData(top_depth=100000, bottom_depth=200000,
+                                                soil_water_concentration=0, field_size=1.33))
     incorp = Percolation(data)
 
     # Mock intermediate functions
