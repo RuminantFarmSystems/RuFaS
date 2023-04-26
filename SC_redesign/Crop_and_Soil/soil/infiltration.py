@@ -84,7 +84,7 @@ class Infiltration:
                                                                         first_moisture_condition_retention_parameter,
                                                                         retention_parameter)
         # --------------------------------------------------------------------------------------------------------------
-
+        # TODO: bound runoff by the amount of rainfall that occurred before storing it - Issue #468
         self.data.accumulated_runoff = self._determine_accumulated_runoff(rainfall, retention_parameter)
         infiltrated_water = max(0.0, rainfall - self.data.accumulated_runoff)
         self.data.soil_layers[0].water_content += infiltrated_water

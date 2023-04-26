@@ -7,7 +7,7 @@ from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
 
 """
-This module contains the composite class for phosphorus cycling, which contains and manages all the necessary all 
+This module contains the composite class for phosphorus cycling, which contains and manages all the necessary all
 necessary aspects for managing phosphorus in and on top of a soil profile.
 """
 

@@ -89,6 +89,8 @@ class SoilData:
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
     """accumulated runoff or rainfall excess (mm)"""
+    # TODO: rewrite this docstring so that it more clearly indicates this is the amount of rainfall that ranoff the
+    #   on the current day.
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
