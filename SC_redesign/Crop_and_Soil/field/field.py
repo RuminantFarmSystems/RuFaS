@@ -303,7 +303,10 @@ class Field:
 
     def harvest_scheduled_crops(self) -> None:
         """perform the harvest operation on all crops in the field, depending on the harvest operation, if today is
-        the crop's harvest day
+        the crop's harvest day.
+
+        After the harvest, this method adds any residue to the soil. Root residue is only added if the
+        harvest operation killed the crop.
         """
         for crop in self.crops:
             if not crop.data.is_harvest_day:
@@ -314,6 +317,10 @@ class Field:
 
             if crop.data.next_harvest_operation == HarvestOperation.HARVEST_NOKILL:
                 crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
+
+            self.soil.data.plant_surface_residue += crop.data.yield_residue
+            if not crop.data.is_alive:
+                self.soil.data.plant_root_residue += crop.data.root_biomass
 
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
         """allow grazers to graze in the field during the current day"""

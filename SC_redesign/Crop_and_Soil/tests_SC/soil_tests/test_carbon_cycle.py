@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycle
+from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS,\
@@ -16,7 +16,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 def test_determine_soil_volume(layer_thickness: float, field_size: float) -> None:
     """Checks that soil volume was calculated correctly"""
     expected = (layer_thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-    assert expected == CarbonCycle._determine_soil_volume(layer_thickness, field_size)
+    assert expected == CarbonCycling._determine_soil_volume(layer_thickness, field_size)
 
 
 @pytest.mark.parametrize("bulk_density, soil_volume, ", [
@@ -27,7 +27,7 @@ def test_determine_soil_volume(layer_thickness: float, field_size: float) -> Non
 def test_determine_soil_mass(bulk_density: float, soil_volume: float) -> None:
     """Checks that soil mass was calculated correctly"""
     expected = bulk_density * soil_volume
-    assert expected == CarbonCycle._determine_soil_mass(bulk_density, soil_volume)
+    assert expected == CarbonCycling._determine_soil_mass(bulk_density, soil_volume)
 
 
 @pytest.mark.parametrize("active_carbon_amount, soil_mass, field_size", [
@@ -40,7 +40,7 @@ def test_determine_soil_active_carbon_fraction(active_carbon_amount: float,
                                                field_size: float) -> None:
     """Checks that the fraction of active carbon in the soil was calculated correctly"""
     expected = active_carbon_amount*field_size/soil_mass
-    assert expected == CarbonCycle._determine_soil_active_carbon_fraction(active_carbon_amount, soil_mass, field_size)
+    assert expected == CarbonCycling._determine_soil_active_carbon_fraction(active_carbon_amount, soil_mass, field_size)
 
 
 @pytest.mark.parametrize("slow_carbon_amount, soil_mass, field_size", [
@@ -51,7 +51,7 @@ def test_determine_soil_active_carbon_fraction(active_carbon_amount: float,
 def test_determine_soil_slow_carbon_fraction(slow_carbon_amount: float, soil_mass: float, field_size: float) -> None:
     """Checks that the fraction of slow carbon in the soil was calculated correctly"""
     expected = slow_carbon_amount*field_size/soil_mass
-    assert expected == CarbonCycle._determine_soil_slow_carbon_fraction(slow_carbon_amount, soil_mass, field_size)
+    assert expected == CarbonCycling._determine_soil_slow_carbon_fraction(slow_carbon_amount, soil_mass, field_size)
 
 
 @pytest.mark.parametrize("passive_carbon_amount, soil_mass, field_size", [
@@ -64,7 +64,8 @@ def test_determine_soil_passive_carbon_fraction(passive_carbon_amount: float,
                                                 field_size: float) -> None:
     """Checks that the fraction of passive carbon in the soil was calculated correctly"""
     expected = passive_carbon_amount*field_size/soil_mass
-    assert expected == CarbonCycle._determine_soil_passive_carbon_fraction(passive_carbon_amount, soil_mass, field_size)
+    assert expected == CarbonCycling._determine_soil_passive_carbon_fraction(passive_carbon_amount, soil_mass,
+                                                                             field_size)
 
 
 @pytest.mark.parametrize("soil_active_carbon_fraction, soil_slow_carbon_fraction, soil_passive_carbon_fraction", [
@@ -76,9 +77,9 @@ def test_determine_soil_overall_carbon_fraction(soil_active_carbon_fraction: flo
                                                 soil_passive_carbon_fraction: float) -> None:
     """Checks that the total fraction of carbon in the soil was calculated correctly"""
     expected = soil_active_carbon_fraction + soil_passive_carbon_fraction + soil_slow_carbon_fraction
-    assert expected == CarbonCycle._determine_soil_overall_carbon_fraction(soil_active_carbon_fraction,
-                                                                           soil_slow_carbon_fraction,
-                                                                           soil_passive_carbon_fraction)
+    assert expected == CarbonCycling._determine_soil_overall_carbon_fraction(soil_active_carbon_fraction,
+                                                                             soil_slow_carbon_fraction,
+                                                                             soil_passive_carbon_fraction)
 
 
 @pytest.mark.parametrize("active_carbon_amount, slow_carbon_amount, passive_carbon_amount", [
@@ -91,9 +92,9 @@ def test_determine_total_soil_carbon_amount(active_carbon_amount: float,
                                             passive_carbon_amount: float) -> None:
     """Checks that the total amount of soil carbon was calculated correctly"""
     expected = active_carbon_amount + slow_carbon_amount + passive_carbon_amount
-    assert expected == CarbonCycle._determine_total_soil_carbon_amount(active_carbon_amount,
-                                                                       slow_carbon_amount,
-                                                                       passive_carbon_amount)
+    assert expected == CarbonCycling._determine_total_soil_carbon_amount(active_carbon_amount,
+                                                                         slow_carbon_amount,
+                                                                         passive_carbon_amount)
 
 
 @pytest.mark.parametrize("plant_metabolic_active_carbon_loss, plant_structural_active_carbon_loss, "
@@ -108,9 +109,9 @@ def test_determine_total_plant_carbon_CO2_loss(plant_metabolic_active_carbon_los
     """Checks that the total amount of plant carbon lost as CO2 was calculated correctly"""
     expected = plant_metabolic_active_carbon_loss + plant_structural_active_carbon_loss + \
         plant_structural_slow_carbon_loss
-    assert expected == CarbonCycle._determine_total_plant_carbon_CO2_loss(plant_metabolic_active_carbon_loss,
-                                                                          plant_structural_active_carbon_loss,
-                                                                          plant_structural_slow_carbon_loss)
+    assert expected == CarbonCycling._determine_total_plant_carbon_CO2_loss(plant_metabolic_active_carbon_loss,
+                                                                            plant_structural_active_carbon_loss,
+                                                                            plant_structural_slow_carbon_loss)
 
 
 @pytest.mark.parametrize("soil_metabolic_active_carbon_loss, soil_structural_active_carbon_loss, "
@@ -125,9 +126,9 @@ def test_determine_total_soil_carbon_CO2_loss(soil_metabolic_active_carbon_loss:
     """Checks that the total amount of soil carbon lost as CO2 was calculated correctly"""
     expected = soil_metabolic_active_carbon_loss + soil_structural_active_carbon_loss + \
         soil_structural_slow_carbon_loss
-    assert expected == CarbonCycle._determine_total_soil_carbon_CO2_loss(soil_metabolic_active_carbon_loss,
-                                                                         soil_structural_active_carbon_loss,
-                                                                         soil_structural_slow_carbon_loss)
+    assert expected == CarbonCycling._determine_total_soil_carbon_CO2_loss(soil_metabolic_active_carbon_loss,
+                                                                           soil_structural_active_carbon_loss,
+                                                                           soil_structural_slow_carbon_loss)
 
 
 @pytest.mark.parametrize("active_carbon_to_slow_loss, slow_carbon_co2_lost_amount, "
@@ -141,9 +142,9 @@ def test_determine_total_decomposition_carbon_CO2_lost(active_carbon_to_slow_los
                                                        passive_carbon_co2_lost_amount: float) -> None:
     """Checks that the total amount of carbon lost as CO2 during decomposition was calculated correctly"""
     expected = active_carbon_to_slow_loss + slow_carbon_co2_lost_amount + passive_carbon_co2_lost_amount
-    assert expected == CarbonCycle._determine_total_decomposition_carbon_CO2_lost(active_carbon_to_slow_loss,
-                                                                                  slow_carbon_co2_lost_amount,
-                                                                                  passive_carbon_co2_lost_amount)
+    assert expected == CarbonCycling._determine_total_decomposition_carbon_CO2_lost(active_carbon_to_slow_loss,
+                                                                                    slow_carbon_co2_lost_amount,
+                                                                                    passive_carbon_co2_lost_amount)
 
 
 @pytest.mark.parametrize("total_plant_carbon_CO2_loss, total_soil_carbon_CO2_loss, "
@@ -157,9 +158,9 @@ def test_determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss: float,
                                          total_decomposition_carbon_CO2_lost: float) -> None:
     """Checks that the total amount of carbon lost as CO2 was calculated correctly"""
     expected = total_decomposition_carbon_CO2_lost + total_plant_carbon_CO2_loss + total_soil_carbon_CO2_loss
-    assert expected == CarbonCycle._determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss,
-                                                                    total_soil_carbon_CO2_loss,
-                                                                    total_decomposition_carbon_CO2_lost)
+    assert expected == CarbonCycling._determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss,
+                                                                      total_soil_carbon_CO2_loss,
+                                                                      total_decomposition_carbon_CO2_lost)
 
 
 @pytest.mark.parametrize("layers", [
@@ -186,32 +187,32 @@ def test_determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss: float,
 def test_soil_carbon_aggregation(layers) -> None:
     """test that attributes are aggregated correctly"""
     data = SoilData(soil_layers=layers, field_size=5)
-    cycle = CarbonCycle(data)
-    CarbonCycle._determine_soil_volume = MagicMock(return_value=1)
-    CarbonCycle._determine_soil_mass = MagicMock(return_value=2)
-    CarbonCycle._determine_soil_active_carbon_fraction = MagicMock(return_value=3)
-    CarbonCycle._determine_soil_slow_carbon_fraction = MagicMock(return_value=4)
-    CarbonCycle._determine_soil_passive_carbon_fraction = MagicMock(return_value=5)
-    CarbonCycle._determine_soil_overall_carbon_fraction = MagicMock(return_value=6)
-    CarbonCycle._determine_total_soil_carbon_amount = MagicMock(return_value=7)
-    CarbonCycle._determine_total_plant_carbon_CO2_loss = MagicMock(return_value=8)
-    CarbonCycle._determine_total_soil_carbon_CO2_loss = MagicMock(return_value=9)
-    CarbonCycle._determine_total_decomposition_carbon_CO2_lost = MagicMock(return_value=10)
-    CarbonCycle._determine_total_carbon_CO2_lost = MagicMock(return_value=11)
+    cycle = CarbonCycling(data)
+    CarbonCycling._determine_soil_volume = MagicMock(return_value=1)
+    CarbonCycling._determine_soil_mass = MagicMock(return_value=2)
+    CarbonCycling._determine_soil_active_carbon_fraction = MagicMock(return_value=3)
+    CarbonCycling._determine_soil_slow_carbon_fraction = MagicMock(return_value=4)
+    CarbonCycling._determine_soil_passive_carbon_fraction = MagicMock(return_value=5)
+    CarbonCycling._determine_soil_overall_carbon_fraction = MagicMock(return_value=6)
+    CarbonCycling._determine_total_soil_carbon_amount = MagicMock(return_value=7)
+    CarbonCycling._determine_total_plant_carbon_CO2_loss = MagicMock(return_value=8)
+    CarbonCycling._determine_total_soil_carbon_CO2_loss = MagicMock(return_value=9)
+    CarbonCycling._determine_total_decomposition_carbon_CO2_lost = MagicMock(return_value=10)
+    CarbonCycling._determine_total_carbon_CO2_lost = MagicMock(return_value=11)
 
     cycle._soil_carbon_aggregation(10)
 
-    assert CarbonCycle._determine_soil_volume.call_count == len(layers)
-    assert CarbonCycle._determine_soil_mass.call_count == len(layers)
-    assert CarbonCycle._determine_soil_active_carbon_fraction.call_count == len(layers)
-    assert CarbonCycle._determine_soil_slow_carbon_fraction.call_count == len(layers)
-    assert CarbonCycle._determine_soil_passive_carbon_fraction.call_count == len(layers)
-    assert CarbonCycle._determine_soil_overall_carbon_fraction.call_count == len(layers)
-    assert CarbonCycle._determine_total_soil_carbon_amount.call_count == len(layers)
-    assert CarbonCycle._determine_total_plant_carbon_CO2_loss.call_count == len(layers)
-    assert CarbonCycle._determine_total_soil_carbon_CO2_loss.call_count == len(layers)
-    assert CarbonCycle._determine_total_decomposition_carbon_CO2_lost.call_count == len(layers)
-    assert CarbonCycle._determine_total_carbon_CO2_lost.call_count == len(layers)
+    assert CarbonCycling._determine_soil_volume.call_count == len(layers)
+    assert CarbonCycling._determine_soil_mass.call_count == len(layers)
+    assert CarbonCycling._determine_soil_active_carbon_fraction.call_count == len(layers)
+    assert CarbonCycling._determine_soil_slow_carbon_fraction.call_count == len(layers)
+    assert CarbonCycling._determine_soil_passive_carbon_fraction.call_count == len(layers)
+    assert CarbonCycling._determine_soil_overall_carbon_fraction.call_count == len(layers)
+    assert CarbonCycling._determine_total_soil_carbon_amount.call_count == len(layers)
+    assert CarbonCycling._determine_total_plant_carbon_CO2_loss.call_count == len(layers)
+    assert CarbonCycling._determine_total_soil_carbon_CO2_loss.call_count == len(layers)
+    assert CarbonCycling._determine_total_decomposition_carbon_CO2_lost.call_count == len(layers)
+    assert CarbonCycling._determine_total_carbon_CO2_lost.call_count == len(layers)
 
     for layer in layers:
         assert layer.soil_overall_carbon_fraction == 6
@@ -226,7 +227,7 @@ def test_soil_carbon_aggregation(layers) -> None:
 def test_carbon_cycle(rainfall: float, crop: CropData, temp_average: float, field_size: float) -> None:
     """tests that routines are called"""
     data = SoilData(field_size=5)
-    cycle = CarbonCycle(data)
+    cycle = CarbonCycling(data)
     cycle.decomposition.decompose = MagicMock()
     cycle.pool_gas_partition.partition_pool_gas = MagicMock()
     cycle.residue_partition.partition_residue = MagicMock()
