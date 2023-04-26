@@ -239,9 +239,6 @@ class LayerData:
     annual_carbon_CO2_lost: Optional[float] = None
     """total amount of carbon lost as CO2 (kg/ha)"""
 
-    def __post_init__(self):
-        """Initialize all attributes in the dataclass that depend on other attributes"""
-
     def __post_init__(self, field_size: float):
         """Initialize all attributes in the dataclass that depend on other attributes
 
