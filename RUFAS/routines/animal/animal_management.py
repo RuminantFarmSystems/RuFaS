@@ -23,7 +23,6 @@ from typing import Any, Dict, Tuple, List
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
@@ -378,12 +377,21 @@ class AnimalManagement:
         they were assigned.
 
         Args:
-            animals_added: list of animal IDs that have been added to the herd
+            animals_added: list of animal (cow) objects that have been added to the herd
             ids_removed: list of animal IDs that have been removed from the herd
             calves_born: list of Calf objects that have been added to the herd
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
+        animals_added_id_list = [cow.id for cow in animals_added]
+        calf_id_list = [calf.id for calf in calves_born]
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.daily_update_id_pen.__name__,
+                    "animals_added_id_list": animals_added_id_list,
+                    "ids_removed": ids_removed,
+                    "calves_born_id_list": calf_id_list,
+                    "temp": temp,
+                    }
 
         # stratifying the pens that lost animals by animal group
         # (values are dictionaries of pen IDs, with values being the number of animals removed)
@@ -459,14 +467,19 @@ class AnimalManagement:
                                                     feed, temp, pen_population_before_additions[pen.id])
 
         for i in range(len(self.all_pens)):
-            if len(self.all_pens[i].animals_in_pen) > 0:
-                if self.all_pens[i].ration == {}:
+            if self.all_pens[i].ration == {}:
+                if len(self.all_pens[i].animals_in_pen) > 0:
                     available_feeds = ration_driver.AvailableFeeds()
                     available_feeds.feed_nutrients(feed)
                     self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
                     pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(
                         self.all_pens[i].allocated_feeds)
                     self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
+                    pen_specific_feed_data_pen_num = f"pen_specific_feed_data_pen_{i}"
+                    om.add_variable(pen_specific_feed_data_pen_num, pen_specific_feed_data, info_map)
+                    pen_ration_data = self.all_pens[i].ration
+                    pen_ration_data_pen_num = f"pen_ration_data_pen_{i}"
+                    om.add_variable(pen_ration_data_pen_num, pen_ration_data, info_map)
             else:
                 if len(self.all_pens[i].animals_in_pen) > 0:
                     # Need to adjust the ration totals for the pen attributes now
@@ -477,6 +490,9 @@ class AnimalManagement:
                                 (self.all_pens[i].ration[key] /
                                  pen_population_before_additions[i]) * len(
                                     self.all_pens[i].animals_in_pen)
+                            pen_ration_data = self.all_pens[i].ration
+                            pen_ration_data_pen_num = f"pen_ration_data_pen_{i}"
+                            om.add_variable(pen_ration_data_pen_num, pen_ration_data, info_map)
 
         for calf in calves_born:
             # getting valid pen to place calves in
