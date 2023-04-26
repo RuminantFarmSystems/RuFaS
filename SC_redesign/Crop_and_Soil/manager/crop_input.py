@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Optional, Any, List, Tuple
 from collections.abc import Sequence
 
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
-from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
 
 
 @dataclass(kw_only=True)

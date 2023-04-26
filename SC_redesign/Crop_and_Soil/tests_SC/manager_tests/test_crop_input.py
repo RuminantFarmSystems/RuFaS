@@ -2,7 +2,7 @@ from typing import Any, Tuple
 
 import pytest
 
-from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
 
 
