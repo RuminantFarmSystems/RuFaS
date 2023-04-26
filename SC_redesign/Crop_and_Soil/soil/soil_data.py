@@ -322,6 +322,10 @@ class SoilData:
 
         self.annual_soil_phosphorus_runoff = 0
 
+        # Reset carbon cycle
+        for layer in self.soil_layers:
+            layer.do_annual_reset()
+
     @property
     def profile_soil_water_content(self) -> float:
         """
