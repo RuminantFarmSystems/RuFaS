@@ -363,7 +363,7 @@ class AnimalManagement:
         for cow in self.cows:
             cow.set_nutrient_rqmts()
 
-    def fully_update_animal_to_pen_id_map(self):
+    def fully_update_animal_to_pen_id_map(self) -> None:
         """
         Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
         associated with the pen that animal is in.

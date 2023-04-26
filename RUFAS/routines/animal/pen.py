@@ -11,7 +11,7 @@ Author(s): Militsa Sotirova, militsasotirova@gmail.com
 """
 import copy
 from enum import Enum
-from typing import List, Dict, DefaultDict, Any
+from typing import List, Dict, Union, DefaultDict, Any
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -311,7 +311,7 @@ class Pen:
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
 
-    def add_new_animals(self, new_animals: List[Any]) -> None:
+    def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """
         Adds all animals in new_animals to the pen.
 
@@ -669,7 +669,7 @@ class Pen:
 
         self.animals_in_pen.append(animal)
 
-    def remove_animals_by_ids(self, animal_ids: List[int]):
+    def remove_animals_by_ids(self, animal_ids: List[int]) -> None:
         """
         Removes animals from the pen by their ids.
 
