@@ -377,16 +377,17 @@ class AnimalManagement:
         they were assigned.
 
         Args:
-            animals_added: list of animal IDs that have been added to the herd
+            animals_added: list of animal (cow) objects that have been added to the herd
             ids_removed: list of animal IDs that have been removed from the herd
             calves_born: list of Calf objects that have been added to the herd
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
+        animals_added_id_list = [cow.id for cow in animals_added]
         calf_id_list = [calf.id for calf in calves_born]
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update_id_pen.__name__,
-                    "animals_added": animals_added,
+                    "animals_added_id_list": animals_added_id_list,
                     "ids_removed": ids_removed,
                     "calves_born_id_list": calf_id_list,
                     "temp": temp,
