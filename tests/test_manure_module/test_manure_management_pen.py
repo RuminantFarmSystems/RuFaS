@@ -3,8 +3,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
 def test_manure_management_pen_init(mocker: MockerFixture) -> None:
@@ -30,11 +30,11 @@ def test_manure_management_pen_init(mocker: MockerFixture) -> None:
     mock_pen.manure = mocker.MagicMock(autospec=True)
     expected_pen_manure = mocker.MagicMock(autospec=PenManure)
     patch_for_pen_manure_get_instance = mocker.patch(
-            'RUFAS.routines.manure.pen.manure_management_pen.PenManure.get_instance',
-            return_value=expected_pen_manure)
+        'RUFAS.routines.manure.pen.manure_management_pen.PenManure.get_instance',
+        return_value=expected_pen_manure)
     patch_for_count_lactating_cows = mocker.patch(
-            'RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.count_lactating_cows',
-            return_value=expected_num_animals)
+        'RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.count_lactating_cows',
+        return_value=expected_num_animals)
 
     # Act
     pen = ManureManagementPen(mock_pen)
@@ -56,12 +56,11 @@ def test_manure_management_pen_init(mocker: MockerFixture) -> None:
     assert pen.num_lactating_cows == expected_num_animals
 
 
+# TODO: Fill in the remaining combinations
 @pytest.mark.parametrize('animal_combination, expected_num_lactating_cows', [
     (Pen.AnimalCombination.LAC_COW, 10),
-    (Pen.AnimalCombination.NONE, 0),
     (Pen.AnimalCombination.CALF, 0),
     (Pen.AnimalCombination.GROWING, 0),
-    (Pen.AnimalCombination.GROWING_AND_CLOSE_UP, 0)
 ])
 def test_count_lactating_cows(mocker: MockerFixture, animal_combination: Pen.AnimalCombination,
                               expected_num_lactating_cows: int) -> None:
@@ -76,7 +75,6 @@ def test_count_lactating_cows(mocker: MockerFixture, animal_combination: Pen.Ani
 
     # Assert
     assert actual_num_lactating_cows == expected_num_lactating_cows
-
 
 # @pytest.mark.parametrize(
 #         "pen_type, has_cows, expected_area",

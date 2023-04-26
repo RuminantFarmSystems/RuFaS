@@ -19,6 +19,8 @@ Description: This file updates the cow form first calving to leaving the herd.
 import math
 import numpy as np
 from scipy.stats import truncnorm
+
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
@@ -134,6 +136,78 @@ class Cow(HeiferIII):
             self.milking = self.days_in_milk != 0
             self.calves = args['parity']
             self.CI = args['calving_interval']
+
+    @property
+    def is_pregnant(self):
+        """
+        Check if the cow is pregnant.
+
+        Returns
+        -------
+        bool
+            True if the cow is pregnant, False otherwise.
+
+        """
+
+        return self.days_in_preg > 0
+
+    @property
+    def is_lactating(self):
+        """
+        Check if the cow is lactating.
+
+        Returns
+        -------
+        bool
+            True if the cow is lactating, False otherwise.
+
+        """
+
+        return self.milking
+
+    @property
+    def is_dry(self):
+        """
+        Check if the cow is in the dry state.
+
+        Returns
+        -------
+
+        """
+
+        return not self.is_lactating
+
+    # TODO: Not used yet & check for correctness
+    @property
+    def is_far_off_dry(self):
+        """
+        Check if the cow is in the far-off dry state.
+
+        Returns
+        -------
+        bool
+            True if the cow is in the far-off dry state, False otherwise.
+
+        """
+
+        return (self.is_pregnant and self.is_dry and
+                (self.days_in_preg < AnimalModuleConstants.DRY_CLOSE_UP_START_DATE))
+
+    # TODO: Not used yet & check for correctness
+    @property
+    def is_close_up_dry(self):
+        """
+        Check if the cow is in the close-up dry state.
+
+        Returns
+        -------
+        bool
+            True if the cow is in the close-up dry state, False otherwise.
+
+        """
+
+        return (self.is_pregnant and self.is_dry and
+                self.days_in_preg >= AnimalModuleConstants.DRY_CLOSE_UP_START_DATE)
 
     def update_milk_production_history(self, sim_day):
         """
