@@ -19,7 +19,7 @@ def test_determine_soil_volume(layer_thickness: float, field_size: float) -> Non
     assert expected == CarbonCycle._determine_soil_volume(layer_thickness, field_size)
 
 
-@pytest.mark.parametrize("bulk_density, soil_volume", [
+@pytest.mark.parametrize("bulk_density, soil_volume, ", [
     (65, 42),  # higher value
     (0.6, 1.3),  # arbitrary values
     (1, 9)  # lower value
@@ -30,37 +30,41 @@ def test_determine_soil_mass(bulk_density: float, soil_volume: float) -> None:
     assert expected == CarbonCycle._determine_soil_mass(bulk_density, soil_volume)
 
 
-@pytest.mark.parametrize("active_carbon_amount, soil_mass", [
-    (66, 100),  # higher value
-    (0.5, 1.8),  # arbitrary values
-    (2, 9)  # lower value
+@pytest.mark.parametrize("active_carbon_amount, soil_mass, field_size", [
+    (66, 100, 50),  # higher value
+    (0.5, 1.8, 20.5),  # arbitrary values
+    (2, 9, 3)  # lower value
 ])
-def test_determine_soil_active_carbon_fraction(active_carbon_amount: float, soil_mass: float) -> None:
+def test_determine_soil_active_carbon_fraction(active_carbon_amount: float,
+                                               soil_mass: float,
+                                               field_size: float) -> None:
     """Checks that the fraction of active carbon in the soil was calculated correctly"""
-    expected = active_carbon_amount/soil_mass
-    assert expected == CarbonCycle._determine_soil_active_carbon_fraction(active_carbon_amount, soil_mass)
+    expected = active_carbon_amount*field_size/soil_mass
+    assert expected == CarbonCycle._determine_soil_active_carbon_fraction(active_carbon_amount, soil_mass, field_size)
 
 
-@pytest.mark.parametrize("slow_carbon_amount, soil_mass", [
-    (66, 100),  # higher value
-    (0.5, 1.8),  # arbitrary values
-    (2, 9)  # lower value
+@pytest.mark.parametrize("slow_carbon_amount, soil_mass, field_size", [
+    (66, 100, 50),  # higher value
+    (0.5, 1.8, 20.5),  # arbitrary values
+    (2, 9, 3)  # lower value
 ])
-def test_determine_soil_slow_carbon_fraction(slow_carbon_amount: float, soil_mass: float) -> None:
+def test_determine_soil_slow_carbon_fraction(slow_carbon_amount: float, soil_mass: float, field_size: float) -> None:
     """Checks that the fraction of slow carbon in the soil was calculated correctly"""
-    expected = slow_carbon_amount/soil_mass
-    assert expected == CarbonCycle._determine_soil_slow_carbon_fraction(slow_carbon_amount, soil_mass)
+    expected = slow_carbon_amount*field_size/soil_mass
+    assert expected == CarbonCycle._determine_soil_slow_carbon_fraction(slow_carbon_amount, soil_mass, field_size)
 
 
-@pytest.mark.parametrize("passive_carbon_amount, soil_mass", [
-    (66, 100),  # higher value
-    (0.5, 1.8),  # arbitrary values
-    (2, 9)  # lower value
+@pytest.mark.parametrize("passive_carbon_amount, soil_mass, field_size", [
+    (66, 100, 50),  # higher value
+    (0.5, 1.8, 25.5),  # arbitrary values
+    (2, 9, 1)  # lower value
 ])
-def test_determine_soil_passive_carbon_fraction(passive_carbon_amount: float, soil_mass: float) -> None:
+def test_determine_soil_passive_carbon_fraction(passive_carbon_amount: float,
+                                                soil_mass: float,
+                                                field_size: float) -> None:
     """Checks that the fraction of passive carbon in the soil was calculated correctly"""
-    expected = passive_carbon_amount/soil_mass
-    assert expected == CarbonCycle._determine_soil_passive_carbon_fraction(passive_carbon_amount, soil_mass)
+    expected = passive_carbon_amount*field_size/soil_mass
+    assert expected == CarbonCycle._determine_soil_passive_carbon_fraction(passive_carbon_amount, soil_mass, field_size)
 
 
 @pytest.mark.parametrize("soil_active_carbon_fraction, soil_slow_carbon_fraction, soil_passive_carbon_fraction", [
@@ -212,8 +216,8 @@ def test_soil_carbon_aggregation(layers) -> None:
     for layer in layers:
         assert layer.soil_overall_carbon_fraction == 6
         assert layer.total_soil_carbon_amount == 7
-        assert layer.total_decomposition_carbon_CO2_lost == 10
-        assert layer.total_carbon_CO2_lost == 11
+        assert layer.annual_decomposition_carbon_CO2_lost == 10
+        assert layer.annual_carbon_CO2_lost == 11
 
 
 @pytest.mark.parametrize("rainfall, crop, temp_average, field_size", [
@@ -232,3 +236,4 @@ def test_carbon_cycle(rainfall: float, crop: CropData, temp_average: float, fiel
     assert cycle.decomposition.decompose.call_count == 1
     assert cycle.pool_gas_partition.partition_pool_gas.call_count == 1
     assert cycle.residue_partition.partition_residue.call_count == 1
+    assert cycle._soil_carbon_aggregation.call_count == 1
