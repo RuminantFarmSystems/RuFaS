@@ -41,14 +41,10 @@ def test_config_factory_defaults():
         defaults"""
     generic = SoilConfigFactory.create_soil_data(1)
     assert generic.name == "generic soil configuration"
-    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, initial_soil_nitrate_concentration=0.5,
-                                             field_size=1),
-                                   LayerData(top_depth=20, bottom_depth=50, initial_soil_nitrate_concentration=0.5,
-                                             field_size=1),
-                                   LayerData(top_depth=50, bottom_depth=80, initial_soil_nitrate_concentration=1,
-                                             field_size=1),
-                                   LayerData(top_depth=80, bottom_depth=200, initial_soil_nitrate_concentration=5,
-                                             field_size=1)]
+    assert generic.soil_layers == [LayerData(top_depth=0, bottom_depth=20, field_size=1),
+                                   LayerData(top_depth=20, bottom_depth=50, field_size=1),
+                                   LayerData(top_depth=50, bottom_depth=80, field_size=1),
+                                   LayerData(top_depth=80, bottom_depth=200, field_size=1)]
     assert generic.potential_evapotranspiration is None
     assert generic.potential_evapotranspiration_adjusted is None
     assert generic.transpiration == 30

@@ -227,14 +227,10 @@ class SoilData:
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
         if self.soil_layers is None:
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, initial_soil_nitrate_concentration=0.5,
-                                          field_size=field_size, residue=self.residue),
-                                LayerData(top_depth=20, bottom_depth=50, initial_soil_nitrate_concentration=0.5,
-                                          field_size=field_size),
-                                LayerData(top_depth=50, bottom_depth=80, initial_soil_nitrate_concentration=1,
-                                          field_size=field_size),
-                                LayerData(top_depth=80, bottom_depth=200, initial_soil_nitrate_concentration=5,
-                                          field_size=field_size)]
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size, residue=self.residue),
+                                LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
+                                LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
+                                LayerData(top_depth=80, bottom_depth=200, field_size=field_size)]
         elif self.soil_layers[0].bottom_depth < 20:
             raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
                              f"'{self.soil_layers[0].bottom_depth}'.")
