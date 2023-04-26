@@ -193,9 +193,10 @@ class SoilData:
     """plant lignin to nitrogen ratio (unitless)"""
     plant_residue_metabolic_fraction: float = 0
     """plant residue fraction that is metabolic (unitless)"""
-
+    total_residue: float = 0
+    """total amount of soil residue ever added to the field"""  # TODO: needed?
     @property
-    def total_residue(self) -> float:  # TODO: not currently used.
+    def all_residue(self) -> float:  # TODO: not currently used.
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
         return self.plant_surface_residue + self.plant_root_residue
 

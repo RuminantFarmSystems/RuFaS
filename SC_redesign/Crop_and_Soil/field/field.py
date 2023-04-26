@@ -318,9 +318,9 @@ class Field:
             if crop.data.next_harvest_operation == HarvestOperation.HARVEST_NOKILL:
                 crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
 
-            self.soil.data.plant_surface_residue += crop.data.yield_residue
+            self.soil.data.plant_surface_residue += (crop.data.yield_residue or 0)
             if not crop.data.is_alive:
-                self.soil.data.plant_root_residue += crop.data.root_biomass
+                self.soil.data.plant_root_residue += (crop.data.root_biomass or 0)
 
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
         """allow grazers to graze in the field during the current day"""
