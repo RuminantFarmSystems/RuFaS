@@ -326,7 +326,6 @@ class SoilData:
         for layer in self.soil_layers:
             layer.do_annual_rest()
 
-
     @property
     def profile_soil_water_content(self) -> float:
         """
