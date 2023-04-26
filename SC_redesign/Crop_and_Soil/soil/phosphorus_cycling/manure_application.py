@@ -9,6 +9,7 @@ SurPhos model.
 """
 
 
+# TODO: Move this module up to be part of field, manager, soil, whatever is decided to be best - Issue #433
 class ManureApplication:
 
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):

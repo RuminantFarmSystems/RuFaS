@@ -88,7 +88,7 @@ class SoilData:
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
-    """accumulated runoff or rainfall excess (mm)"""
+    """the amount of rainfall discharged as runoff during the day (mm)"""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
