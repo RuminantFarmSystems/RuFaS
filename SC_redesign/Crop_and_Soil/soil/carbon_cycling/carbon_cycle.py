@@ -3,6 +3,7 @@ from SC_redesign.Crop_and_Soil.soil.carbon_cycling.pool_gas_partition import Poo
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS
 
 
 from typing import Optional
@@ -45,7 +46,7 @@ class CarbonCycle:
         """
         for layer in self.data.soil_layers:
             soil_volume = self._determine_soil_volume(layer.layer_thickness, field_size)
-            soil_mass = self._determine_soil_mass(layer.bulk_density, soil_volume)
+            soil_mass = self._determine_soil_mass(layer.bulk_density, soil_volume)*MEGAGRAMS_TO_KILOGRAMS
             soil_active_carbon_fraction = self._determine_soil_active_carbon_fraction(layer.active_carbon_amount,
                                                                                       soil_mass)
             soil_slow_carbon_fraction = self._determine_soil_slow_carbon_fraction(layer.slow_carbon_amount,

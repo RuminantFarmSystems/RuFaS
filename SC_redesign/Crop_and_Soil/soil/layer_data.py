@@ -513,6 +513,6 @@ class LayerData:
         """silt and clay fraction in the soil (unitless)"""
         return self.percent_silt_content / self.percent_clay_content
 
-    def do_annual_rest(self):
+    def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0

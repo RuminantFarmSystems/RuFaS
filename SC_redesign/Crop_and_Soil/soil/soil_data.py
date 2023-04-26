@@ -324,7 +324,7 @@ class SoilData:
 
         # Reset carbon cycle
         for layer in self.soil_layers:
-            layer.do_annual_rest()
+            layer.do_annual_reset()
 
     @property
     def profile_soil_water_content(self) -> float:
