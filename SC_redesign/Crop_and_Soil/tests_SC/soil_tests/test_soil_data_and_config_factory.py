@@ -583,7 +583,7 @@ def test_determine_soil_phosphorus_concentration(phosphorus: float, density: flo
 def test_determine_soil_phosphorus_area_density(phosphorus: float, density: float, thickness: float,
                                                 field_size: float) -> None:
     """Tests that the conversion from mg / kg soil to kg / ha is performed correctly."""
-    observed = LayerData.determine_soil_phosphorus_area_density(phosphorus, density, thickness, field_size)
+    observed = LayerData.determine_soil_nutrient_area_density(phosphorus, density, thickness, field_size)
     expected_soil_mass_kg = density * MEGAGRAMS_TO_KILOGRAMS * (thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS
                                                                 * CUBIC_MILLIMETERS_TO_CUBIC_METERS)
     expected = phosphorus * MILLIGRAMS_TO_KILOGRAMS * expected_soil_mass_kg * (1 / field_size)
