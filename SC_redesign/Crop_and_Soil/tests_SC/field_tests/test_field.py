@@ -163,9 +163,9 @@ def test_harvest_scheduled_crops():
 def test_amend_soil() -> None:
     """Tests that amend_soil() properly calls all the subroutines that add nutrients to the field"""
     field = Field()
-    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus = MagicMock()
+    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
     field.amend_soil()
-    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus.assert_called_once_with(0)
+    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
 
 
 def test_annual_reset() -> None:
