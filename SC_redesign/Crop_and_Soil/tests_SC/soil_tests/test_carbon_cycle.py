@@ -164,28 +164,28 @@ def test_determine_total_carbon_CO2_lost(total_plant_carbon_CO2_loss: float,
 
 @pytest.mark.parametrize("layers", [
     ([LayerData(top_depth=0, bottom_depth=40, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
-                wilting_point_water_concentration=0.9),
+                wilting_point_water_concentration=0.9, field_size=5),
       LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
-                wilting_point_water_concentration=0.8),
+                wilting_point_water_concentration=0.8, field_size=5),
       LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
-                wilting_point_water_concentration=0.3)]),
+                wilting_point_water_concentration=0.3, field_size=5)]),
     ([LayerData(top_depth=0, bottom_depth=30, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
-                wilting_point_water_concentration=1.8),
+                wilting_point_water_concentration=1.8, field_size=5),
       LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
-                wilting_point_water_concentration=0.8),
+                wilting_point_water_concentration=0.8, field_size=5),
       LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-                wilting_point_water_concentration=0.2)]),
+                wilting_point_water_concentration=0.2, field_size=5)]),
     ([LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
-                wilting_point_water_concentration=1.8),
+                wilting_point_water_concentration=1.8, field_size=5),
       LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4,
                 field_capacity_water_concentration=1.8,
-                wilting_point_water_concentration=0.8),
+                wilting_point_water_concentration=0.8, field_size=5),
       LayerData(top_depth=200, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-                wilting_point_water_concentration=0.6)])
+                wilting_point_water_concentration=0.6, field_size=5)])
 ])
 def test_soil_carbon_aggregation(layers) -> None:
     """test that attributes are aggregated correctly"""
-    data = SoilData(soil_layers=layers)
+    data = SoilData(soil_layers=layers, field_size=5)
     cycle = CarbonCycle(data)
     CarbonCycle._determine_soil_volume = MagicMock(return_value=1)
     CarbonCycle._determine_soil_mass = MagicMock(return_value=2)
@@ -225,7 +225,7 @@ def test_soil_carbon_aggregation(layers) -> None:
 ])
 def test_carbon_cycle(rainfall: float, crop: CropData, temp_average: float, field_size: float) -> None:
     """tests that routines are called"""
-    data = SoilData()
+    data = SoilData(field_size=5)
     cycle = CarbonCycle(data)
     cycle.decomposition.decompose = MagicMock()
     cycle.pool_gas_partition.partition_pool_gas = MagicMock()
