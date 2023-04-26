@@ -155,7 +155,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
     `mineralize_phosphorus()`
 
     """
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_phosphorus_area_density",
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
                new_callable=MagicMock, return_value=20):
         # Case 1: tests that desorption occurs correctly
         LayerData.determine_soil_phosphorus_concentration = MagicMock()
