@@ -431,6 +431,14 @@ class Pen:
         self.MEdiet = ration_vals['ME_tot']
         self.dry_matter_intake = nutrient_amount['dm']
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_ration.__name__,
+                    "available_feeds": available_feeds, }
+        om.add_variable("ration_nutrient_amount", nutrient_amount, info_map)
+        om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
+        om.add_variable("MEdiet", self.MEdiet, info_map)
+        om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
+
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],
@@ -445,12 +453,6 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__,
-                    "feed": vars(feed),
-                    "available_feeds": available_feeds, }
-        om.add_variable("pen_ration_data", ration, info_map)
 
         return ration
 
@@ -512,9 +514,12 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure.__name__,
-                    "feed": vars(feed)}
+                    "pen_id": self.id,
+                    "pen_animal_combination": self.animal_combination,
+                    }
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
