@@ -235,7 +235,7 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     """Tests that erode() properly calls methods and stores values"""
 
     # Initialize objects
-    data = SoilData(accumulated_runoff=13, peak_runoff_rate=0.11)
+    data = SoilData(accumulated_runoff=13, peak_runoff_rate=0.11, field_size=1.33)
     incorp = SoilErosion(data)
 
     # Mock helper function

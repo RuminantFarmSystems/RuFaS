@@ -2,6 +2,7 @@ from typing import Optional, List, Dict
 from unittest.mock import MagicMock
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
 
@@ -130,12 +131,41 @@ def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     assert len(field.crops) == len(config_list)
 
 
+def test_check_harvest_schedules():
+    """ensure that harvest schedules are checked for all crops"""
+    field = Field()
+    crop1, crop2, crop3 = Crop(), Crop(), Crop()
+    crop1.crop_management.check_harvest_schedule = MagicMock()
+    crop2.crop_management.check_harvest_schedule = MagicMock()
+    crop3.crop_management.check_harvest_schedule = MagicMock()
+    field.crops = [crop1, crop2, crop3]
+    field.check_harvest_schedules(100, 0)
+    crop1.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
+    crop2.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
+    crop3.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
+
+
+def test_harvest_scheduled_crops():
+    """ensure that crops are harvested when appropriate"""
+    field = Field()
+    crop1, crop2, crop3 = Crop(CropData(is_harvest_day=True)), Crop(CropData(is_harvest_day=False)), \
+        Crop(CropData(is_harvest_day=True))
+    crop1.crop_management.manage_harvest = MagicMock()
+    crop2.crop_management.manage_harvest = MagicMock()
+    crop3.crop_management.manage_harvest = MagicMock()
+    field.crops = [crop1, crop2, crop3]
+    field.harvest_scheduled_crops()
+    crop1.crop_management.manage_harvest.assert_called_once()
+    crop2.crop_management.manage_harvest.assert_not_called()
+    crop3.crop_management.manage_harvest.assert_called_once()
+
+
 def test_amend_soil() -> None:
     """Tests that amend_soil() properly calls all the subroutines that add nutrients to the field"""
     field = Field()
-    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus = MagicMock()
+    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
     field.amend_soil()
-    field.soil.fertilizer_phosphorus.add_fertilizer_phosphorus.assert_called_once_with(0)
+    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
 
 
 def test_annual_reset() -> None:

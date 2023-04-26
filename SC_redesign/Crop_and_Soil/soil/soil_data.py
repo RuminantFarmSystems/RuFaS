@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
@@ -17,6 +17,11 @@ class SoilData:
 
     soil_layers: Optional[List[LayerData]] = None
     """list of soil layer data objects, top layer is 0th element, bottom is nth element"""
+
+    field_size: InitVar[float] = None
+    """Size of the field (ha)
+        Note: this attribute is only used for initialization. After that it cannot be used.
+    """
 
     # Track annual soil profile totals
     initial_water_content: float = None
@@ -83,7 +88,7 @@ class SoilData:
     moisture_condition_parameter: Optional[float] = None
     """curve number value adjusted for moisture content (unitless) (SWAT 2:1.1.11)"""
     accumulated_runoff: Optional[float] = None
-    """accumulated runoff or rainfall excess (mm)"""
+    """the amount of rainfall discharged as runoff during the day (mm)"""
 
     # ---- percolation
     vadose_zone_layer: Optional[LayerData] = None
@@ -187,37 +192,82 @@ class SoilData:
     total_residue = 0
     """"amount of total residue ever added to the field(kg/ha)"""
 
-    def __post_init__(self):
+    def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
 
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha)
+
         Raises
         ------
+        TypeError
+            If the field size is None (meaning it likely was not included when the SoilData() object was initialized).
         ValueError
-            If the bottom depth of the top layer of soil is < 20
+            If the field size specified is not greater than 0.
+        ValueError
+            If the bottom depth of the top layer of soil is < 20.
+
+        Notes
+        -----
+        The SoilData class itself does not need the field size, but it requires it if the soil layers are not defined
+        for it.
 
         """
+        if field_size is None:
+            raise TypeError("'field_size' attribute is NoneType, must be given value when SoilData is initialized.")
+        elif field_size <= 0:
+            raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
+
         if self.soil_layers is None:
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5),
-                                LayerData(top_depth=20, bottom_depth=50, nitrate=0.5),
-                                LayerData(top_depth=50, bottom_depth=80, nitrate=1),
-                                LayerData(top_depth=80, bottom_depth=200, nitrate=5)]
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=field_size),
+                                LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=field_size),
+                                LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=field_size),
+                                LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=field_size)]
         elif self.soil_layers[0].bottom_depth < 20:
             raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
                              f"'{self.soil_layers[0].bottom_depth}'.")
         elif self.soil_layers[0].bottom_depth > 20:
-            self._subdivide_top_layer()
+            self._subdivide_top_layer(field_size)
 
         if self.vadose_zone_layer is None:
             # configures the vadose zone LayerData object based on where the soil profile ends
             self.vadose_zone_layer = LayerData(top_depth=self.soil_layers[-1].bottom_depth,
                                                bottom_depth=10000000,  # bottom depth is 10,000 meters by default
                                                soil_water_concentration=0,
-                                               saturation_point_water_concentration=inf)
+                                               saturation_point_water_concentration=inf,
+                                               initial_labile_inorganic_phosphorus_concentration=0,
+                                               field_size=field_size)
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
+
+    def _subdivide_top_layer(self, field_size: float) -> None:
+        """This method ensures that the soil profile has a top layer that is 20 mm deep.
+
+        Parameters
+        ----------
+        field_size : float
+            Size of the field (ha)
+
+        Notes
+        -----
+        The presence of a top layer of soil that is 20 mm deep is a necessity to properly execute SurPhos. This top 20
+        mm of soil is where most of the phosphorus that is applied stays in the soil profile, and keeping it in the top
+        20 mm of soil makes it more available to be eroded off the field by runoff.
+
+        This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
+
+        """
+        new_top_layer = deepcopy(self.soil_layers[0])
+        new_top_layer.bottom_depth = 20
+        new_top_layer.__post_init__(field_size)
+        self.soil_layers[0].top_depth = 20
+        self.soil_layers[0].__post_init__(field_size)
+        self.soil_layers.insert(0, new_top_layer)
 
     def get_vectorized_layer_attribute(self, attribute: str) -> List[any]:
         """returns a list containing the specified attribute for each soil layer
@@ -246,25 +296,6 @@ class SoilData:
         """
         [setattr(layer, attribute, val) for layer, val in zip(self.soil_layers, values)]
 
-    def _subdivide_top_layer(self) -> None:
-        """This method ensures that the soil profile has a top layer that is 20 mm deep.
-
-        Notes
-        -----
-        The presence of a top layer of soil that is 20 mm deep is a necessity to properly simulate SurPhos. This top 20
-        mm of soil is where most of the phosphorus that is applied stays in the soil profile, and keeping it in the top
-        20 mm of soil makes it more available to be eroded off the field by runoff.
-
-        This method assumes that the top layer of soil defined by the user is greater than 20 mm thick.
-
-        """
-        new_top_layer = deepcopy(self.soil_layers[0])
-        new_top_layer.bottom_depth = 20
-        new_top_layer.__post_init__()
-        self.soil_layers[0].top_depth = 20
-        self.soil_layers[0].__post_init__()
-        self.soil_layers.insert(0, new_top_layer)
-
     def do_annual_reset(self) -> None:
         """This method resets all annual totals to zero at the end of the year/beginning of a new year"""
         # Reset soil profile totals
@@ -290,6 +321,10 @@ class SoilData:
         self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
 
         self.annual_soil_phosphorus_runoff = 0
+
+        # Reset carbon cycle
+        for layer in self.soil_layers:
+            layer.do_annual_reset()
 
     @property
     def profile_soil_water_content(self) -> float:

@@ -7,22 +7,28 @@ from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
+from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
+from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application import ManureApplication
 
 
 class Soil:
-    def __init__(self, soil_data: Optional[SoilData] = None):
-        """creates a Soil object based on a SoilData object
+    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+        """Creates a Soil object based on a SoilData object.
 
-        Args:
-            soil_data: a SoilData object containing initial attribute values as well as attributes tracked and updated
-                throughout the simulation
+        Parameters
+        ----------
+        soil_data: a SoilData object containing initial attribute values as well as attributes tracked and updated
+            throughout the simulation
+        field_size : float, optional
+            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
+            not provided (ha)
 
-        Details:
-            If no SoilData object is passed, default configuration is used.
+        Notes
+        -----
+        If no SoilData object is passed, default configuration is used.
 
         """
-        self.data = soil_data or SoilData()
+        self.data = soil_data or SoilData(field_size=field_size)
         """object that tracks all soil variable throughout the simulation"""
 
         # Process components
@@ -36,8 +42,11 @@ class Soil:
         """Process component that tracks and updates the temperatures within the soil profile"""
         self.soil_erosion = SoilErosion(self.data)
         """Process component that track erosion from the soil profile"""
-        self.fertilizer_phosphorus = Fertilizer(self.data)
-        """Process component that tracks fertilizer added to the soil via """
+        self.phosphorus_cycling = PhosphorusCycling(self.data)
+        """Process component managing phosphorus on top of and in the soil profile"""
+        self.manure_applicator = ManureApplication(self.data)
+        """Process component that provides interface for adding manure to a field
+            TODO: move this component up into a higher level, more sensible module - Issue #433"""
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
@@ -87,6 +96,12 @@ class Soil:
             minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
                 to land cover/plant (unitless)
             field_size: size of the field (ha)
+
+        Notes
+        -----
+        The daily phosphorus cycling method is called here because in large part the phosphorus dynamics of the soil
+        profile depend on how much water enters and move through the soil profile.
+
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient)
         self.percolation.percolate(has_seasonal_high_water_table)
@@ -94,6 +109,4 @@ class Soil:
                                                  above_ground_biomass, residue, snow_water_content,
                                                  initial_canopy_free_water)
         self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue)
-        self.fertilizer_phosphorus.do_fertilizer_phosphorus_operations(rainfall,
-                                                                       self.data.accumulated_runoff * field_size,
-                                                                       field_size)
+        self.phosphorus_cycling.cycle_phosphorus(rainfall, self.data.accumulated_runoff, field_size, avg_air_temp)

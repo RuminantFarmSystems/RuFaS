@@ -185,7 +185,7 @@ def test_determine_amount_water_removed(reduced_evap_demand, soil_water, wilting
 ])
 def test_determine_potential_evapotranspiration_adjusted(initial_canopy_water):
     # initialize object
-    data = SoilData(transpiration=0.356)
+    data = SoilData(transpiration=0.356, field_size=1.05)
     assert data.transpiration == 0.356
     incorp = Evapotranspiration(data)
 
@@ -212,9 +212,10 @@ def test_determine_potential_evapotranspiration_adjusted(initial_canopy_water):
 def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_temp, above_ground_mass, residue,
                           snow_water, initial_canopy_water):
     # initialize objects
-    data = SoilData(transpiration=0.4325, soil_layers=[LayerData(top_depth=0, bottom_depth=50, nitrate=0.5),
-                                                       LayerData(top_depth=50, bottom_depth=80, nitrate=1),
-                                                       LayerData(top_depth=80, bottom_depth=200, nitrate=5)])
+    data = SoilData(field_size=1.33, transpiration=0.4325,
+                    soil_layers=[LayerData(top_depth=0, bottom_depth=50, nitrate=0.5, field_size=1.33),
+                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=1.33),
+                                 LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=1.33)])
     assert data.transpiration == 0.4325
     incorp = Evapotranspiration(data)
 
@@ -245,27 +246,27 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
 
 @pytest.mark.parametrize("layers", [
     [LayerData(top_depth=0, bottom_depth=40, soil_water_concentration=1.8, field_capacity_water_concentration=1.6,
-               wilting_point_water_concentration=0.9),
+               wilting_point_water_concentration=0.9, field_size=1.33),
      LayerData(top_depth=40, bottom_depth=120, soil_water_concentration=0.9, field_capacity_water_concentration=1.2,
-               wilting_point_water_concentration=0.8),
+               wilting_point_water_concentration=0.8, field_size=1.33),
      LayerData(top_depth=120, bottom_depth=200, soil_water_concentration=0.8, field_capacity_water_concentration=0.8,
-               wilting_point_water_concentration=0.3)],
+               wilting_point_water_concentration=0.3, field_size=1.33)],
     [LayerData(top_depth=0, bottom_depth=30, soil_water_concentration=2.8, field_capacity_water_concentration=2.3,
-               wilting_point_water_concentration=1.8),
+               wilting_point_water_concentration=1.8, field_size=1.33),
      LayerData(top_depth=30, bottom_depth=150, soil_water_concentration=1.9, field_capacity_water_concentration=1.8,
-               wilting_point_water_concentration=0.8),
+               wilting_point_water_concentration=0.8, field_size=1.33),
      LayerData(top_depth=150, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-               wilting_point_water_concentration=0.2)],
+               wilting_point_water_concentration=0.2, field_size=1.33)],
     [LayerData(top_depth=0, bottom_depth=80, soil_water_concentration=2.3, field_capacity_water_concentration=2.9,
-               wilting_point_water_concentration=1.8),
+               wilting_point_water_concentration=1.8, field_size=1.33),
      LayerData(top_depth=80, bottom_depth=200, soil_water_concentration=1.4, field_capacity_water_concentration=1.8,
-               wilting_point_water_concentration=0.8),
+               wilting_point_water_concentration=0.8, field_size=1.33),
      LayerData(top_depth=200, bottom_depth=220, soil_water_concentration=0.8, field_capacity_water_concentration=1,
-               wilting_point_water_concentration=0.6)],
+               wilting_point_water_concentration=0.6, field_size=1.33)],
 ])
 def test_evaporate_from_soil(layers):
     # initialize objects
-    soildata = SoilData(maximum_soil_evaporation=0.3, soil_layers=layers)
+    soildata = SoilData(field_size=1.33, maximum_soil_evaporation=0.3, soil_layers=layers)
     assert soildata.maximum_soil_evaporation == 0.3
     assert soildata.soil_layers == layers
     incorp = Evapotranspiration(soildata)

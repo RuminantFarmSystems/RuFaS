@@ -166,7 +166,7 @@
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 850,
+			"number_of_stalls": 1000,
 			"housing_type": "open air barn",
 			"pen_type": "tiestall",
 			"max_stocking_density": 1.2,
