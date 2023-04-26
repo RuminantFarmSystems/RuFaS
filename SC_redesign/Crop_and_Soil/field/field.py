@@ -135,7 +135,7 @@ class Field:
 
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
-        self.soil.fertilizer_phosphorus.add_fertilizer_phosphorus(0)
+        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(0)
         return
 
     # </editor-fold>
