@@ -5,17 +5,13 @@ Description: Implements test cases for the AnimalManagement class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
-import pytest
+from typing import List, Dict, Union
 from unittest.mock import MagicMock, patch
+
+import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.output_manager import OutputManager
-
-from typing import List, Dict, Union
-
-import io
-import sys
 
 
 def create_mock_object_list(attribute_dicts: List[Dict]) -> List[MagicMock]:
@@ -184,12 +180,16 @@ def animal_management() -> AnimalManagement:
     init_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_pens')
     init_animals_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_animals')
     init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts')
-    init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
+    # init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
+    allocate_animals_to_pens_patch = patch(
+        'RUFAS.routines.animal.animal_management.AnimalManagement.allocate_animals_to_pens'
+    )
 
     init_pens_patch.start()
     init_animals_patch.start()
     init_nutrient_rqmts_patch.start()
-    init_allocate_all_pens_patch.start()
+    # init_allocate_all_pens_patch.start()
+    allocate_animals_to_pens_patch.start()
 
     data = MagicMock()
     config = MagicMock()
@@ -202,7 +202,8 @@ def animal_management() -> AnimalManagement:
     init_pens_patch.stop()
     init_animals_patch.stop()
     init_nutrient_rqmts_patch.stop()
-    init_allocate_all_pens_patch.stop()
+    # init_allocate_all_pens_patch.stop()
+    allocate_animals_to_pens_patch.stop()
 
     return animal_management
 
@@ -476,3 +477,8 @@ def test_get_life_cycle_output():
 def test_get_initialize_db_summary():
     """Unit test for function get_initialize_db_summary in file routines/animal/animal_management.py"""
     pass
+
+
+
+
+

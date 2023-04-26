@@ -5,7 +5,7 @@ from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from typing import Optional, List, Dict
-from SC_redesign.Crop_and_Soil.field.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -93,8 +93,8 @@ class Field:
             if self.field_data.grazers_present:
                 self.graze_field()
 
-            if self.field_data.is_harvest_day:
-                self.harvest_crops()
+            self.check_harvest_schedules(day, year)
+            self.harvest_scheduled_crops()
 
         # annual resets
         if self.is_last_day_of_the_year:
@@ -296,13 +296,23 @@ class Field:
                                 mean_air_temperature=mean_air_temperature, min_air_temperature=min_air_temperature,
                                 max_air_temperature=max_air_temperature)
 
-    def harvest_crops(self):
-        """perform the harvest operation on all crops in the field, depending on the harvest operation"""
+    def check_harvest_schedules(self, day, year) -> None:
+        """executes the check_harvest_schedule method for each crop, passing the current day and year"""
         for crop in self.crops:
-            if self.field_data.harvest_type == HarvestOperation.HARVEST:
+            crop.crop_management.check_harvest_schedule(current_day=day, current_year=year)
+
+    def harvest_scheduled_crops(self) -> None:
+        """perform the harvest operation on all crops in the field, depending on the harvest operation, if today is
+        the crop's harvest day
+        """
+        for crop in self.crops:
+            if not crop.data.is_harvest_day:
+                continue  # move on to checking next crop
+
+            if crop.data.next_harvest_operation == HarvestOperation.HARVEST:
                 crop.crop_management.manage_harvest(cut=True, collect=True, kill=True)
 
-            if self.field_data.harvest_type == HarvestOperation.HARVEST_NOKILL:
+            if crop.data.next_harvest_operation == HarvestOperation.HARVEST_NOKILL:
                 crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
 
     def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
