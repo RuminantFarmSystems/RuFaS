@@ -246,6 +246,16 @@ class LayerData:
     """Fresh organic nitrogen content of this soil layer (kg / ha)
         Note: all layers except the top layer are initialized with 0 fresh organic nitrogen."""
 
+    # --- Carbon cycling
+    soil_overall_carbon_fraction: Optional[float] = None
+    """the total fraction of carbon in the soil (unitless)"""
+    total_soil_carbon_amount: Optional[float] = None
+    """the total amount of soil carbon (kg/ha)"""
+    annual_decomposition_carbon_CO2_lost: Optional[float] = None
+    """amount of total carbon lost as CO2 during decomposition(kg/ha)"""
+    annual_carbon_CO2_lost: Optional[float] = None
+    """total amount of carbon lost as CO2 (kg/ha)"""
+
     def __post_init__(self, field_size: float, residue: float):
         """Initialize all attributes in the dataclass that depend on other attributes
 
@@ -574,3 +584,7 @@ class LayerData:
     def silt_clay_content(self):
         """silt and clay fraction in the soil (unitless)"""
         return self.percent_silt_content / self.percent_clay_content
+
+    def do_annual_reset(self):
+        self.annual_carbon_CO2_lost = 0
+        self.annual_decomposition_carbon_CO2_lost = 0
