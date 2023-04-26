@@ -22,8 +22,12 @@ class PhosphorusCycling:
         soil_data : SoilData, optional
             The SoilData object used by this module to track phosphorus cycling, creates new one if one is not provided.
         field_size : float, optional
-            Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
+            Size of the field (ha)
+
+        Notes
+        -----
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is not
+        provided (ha)
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
