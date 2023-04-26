@@ -121,10 +121,10 @@ def test_determine_phosphorus_percolated_from_layer(phosphorus: float, density: 
 ])
 def test_daily_update_routine(runoff: float, field_size: float) -> None:
     """Tests that the daily update routine for percolating phosphorus down through layers works correctly."""
-    layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=1.1),
-              LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=1.1),
-              LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=1.1),
-              LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=1.1)]
+    layers = [LayerData(top_depth=0, bottom_depth=20, initial_soil_nitrate_concentration=0.5, field_size=1.1),
+              LayerData(top_depth=20, bottom_depth=50, initial_soil_nitrate_concentration=0.5, field_size=1.1),
+              LayerData(top_depth=50, bottom_depth=80, initial_soil_nitrate_concentration=1, field_size=1.1),
+              LayerData(top_depth=80, bottom_depth=200, initial_soil_nitrate_concentration=5, field_size=1.1)]
     layers[0].labile_inorganic_phosphorus_content = 3.4
     layers[1].labile_inorganic_phosphorus_content = 3.18
     layers[2].labile_inorganic_phosphorus_content = 2.8
