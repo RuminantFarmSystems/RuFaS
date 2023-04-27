@@ -31,7 +31,8 @@ class HumusMineralization:
 
     # --- Static methods ---
     @staticmethod
-    def determine_intra_organic_mineralization(active_organic_nitrogen: float, stable_organic_nitrogen: float) -> float:
+    def _determine_intra_organic_mineralization(active_organic_nitrogen: float,
+                                                stable_organic_nitrogen: float) -> float:
         """Calculates the amount of nitrogen transferred between different organic pools.
 
         Parameters
