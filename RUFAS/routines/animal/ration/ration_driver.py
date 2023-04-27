@@ -307,8 +307,7 @@ def ration_report(ration, available_feeds):
                 # [A.2.A.1]
                 else:
                     denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] /
-                                          (denom * 100)) * val
+                nutrient_amount[nutr] += (available_feeds[key]['CP'] / (denom * 100)) * val
             else:
                 nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
@@ -316,8 +315,7 @@ def ration_report(ration, available_feeds):
     dm_amount = nutrient_amount['dm']
     for nutr in nutrients:
         if nutr == 'DM':
-            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) \
-                                  * 100
+            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100
         else:
             # all values on a 100% dry matter basis
             nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) \

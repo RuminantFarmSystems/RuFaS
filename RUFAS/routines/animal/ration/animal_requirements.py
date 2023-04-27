@@ -14,6 +14,7 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 from typing import Optional
 from typing import Dict
+from RUFAS.routines.animal.ration import ration_constants
 
 def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: int, animal_type: str, parity: Optional[int] = 0,
                calving_interval: Optional[int] = None, milk_true_protein: Optional[float] = 0.0,
@@ -888,8 +889,8 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
                      (day_of_pregnancy - 1)) * (body_weight/715)
     Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
     calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
-    if calcium_requirement < 0.0: calcium_requirement = 0.0
-    return calcium_requirement
+
+    return max(calcium_requirement, ration_constants.minimum_calcium)
 
 
 def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight: float, 
@@ -1014,8 +1015,8 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     else:
         P_Lact = milk_production * (0.49 + 0.13*milk_true_protein)
     phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
-    if phosphorus_requirement < 0.0: phosphorus_requirement = 0.0
-    return phosphorus_requirement
+
+    return max(phosphorus_requirement, ration_constants.minimum_phosophorus)
 
 
 def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
@@ -1067,11 +1068,21 @@ def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: in
             dry_matter_intake_estimate = (
                 (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
     else:
-        # TODO: Actual calculation for dry_matter_intake_estimate
-        dry_matter_intake_estimate = 0.0
+        net_energy_maintenance_diet = 1 # TODO update this method to retrieve values from nutrient composition of 
+                                        # ration from previous formulation.
+                                        # Currently using magic value set by Edward and Haowen
+        dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_maintenance_diet 
+                                                          - 0.0466*net_energy_maintenance_diet**2 
+                                                          - 0.1128) / net_energy_maintenance_diet
+        if day_of_pregnancy and day_of_pregnancy >= 210:
+            adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
+            dry_matter_intake_estimate -= adjustment_factor
         # this comment is a holdover from the previous version
-    if dry_matter_intake_estimate < 2.0: dry_matter_intake_estimate = 2.0
-    return dry_matter_intake_estimate
+
+    dry_matter_intake_estimate_minimum_flat = ration_constants.minimum_DMI
+    dry_matter_intake_estimate_minimum_percentage = ration_constants.minimum_DMI_percentage * body_weight
+    return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
+               dry_matter_intake_estimate_minimum_flat)
 
 
 def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_milk: Optional[int],
@@ -1131,8 +1142,11 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
             -(0.082*(NDF_concentration_percentage\
             -(23.1+56*(body_weight/mature_body_weight)-30.6(body_weight/mature_body_weight)^2)))
         """
-    if dry_matter_intake_estimate < 2.0: dry_matter_intake_estimate = 2.0
-    return dry_matter_intake_estimate
+
+    dry_matter_intake_estimate_minimum_flat = ration_constants.minimum_DMI
+    dry_matter_intake_estimate_minimum_percentage = ration_constants.minimum_DMI_percentage * body_weight
+    return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
+               dry_matter_intake_estimate_minimum_flat)
 
 
 def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[float]) -> float:
