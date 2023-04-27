@@ -355,16 +355,13 @@ class Requirements:
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
         info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
+                    "function": self.set_requirements.__name__,
                     }
 
         avg_nutrient_rqmts["pen_id"] = pen.id
         avg_nutrient_rqmts["pen_animal_combination"] = pen.animal_combination._name_
 
         om.add_variable("avg_nutrient_rqmts", avg_nutrient_rqmts, info_map)
-
-        # del avg_nutrient_rqmts["pen_id"]
-        # del avg_nutrient_rqmts["pen_animal_combination"]
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
 
