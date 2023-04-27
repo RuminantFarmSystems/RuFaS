@@ -519,8 +519,9 @@ class Pen:
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure.__name__,
                     "pen_id": self.id,
-                    "pen_animal_combination": self.animal_combination,
+                    "pen_animal_combination": self.animal_combination._name_,
                     }
+
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
