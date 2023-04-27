@@ -1,7 +1,7 @@
 #!/bin/sh
 
 display_usage() {
-    echo "Usage: ./runflake8onbranch.sh [BASEBRANCH]"
+    echo "Usage: ./cleanup.sh [BASEBRANCH]"
     echo "Lint all files different between current branch and BASEBRANCH with Flake8."
     echo ""
     echo "With no BASEBRANCH, compare current branch to master."
