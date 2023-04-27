@@ -247,6 +247,10 @@ class LayerData:
     """Fresh organic nitrogen content of this soil layer (kg / ha)
         Note: all layers except the top layer are initialized with 0 fresh organic nitrogen."""
 
+    humus_mineralization_rate_factor: float = 0.0003
+    """Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless)
+        Reference: SWAT Input .BSN file."""
+
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None
     """the total fraction of carbon in the soil (unitless)"""
@@ -509,6 +513,39 @@ class LayerData:
         soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
         total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
         return total_nutrient_mass_in_kg / field_size
+
+    # TODO: coordinate with Matthew to find best place for this so that it can be accessed by multiple modules
+    @property
+    def calculate_nutrient_cycling_water_factor(self) -> float:
+        """The nutrient cycling water factor (unitless)
+
+        References
+        ----------
+        SWAT eqn. 3:1.2.2
+
+        Notes
+        -----
+        This factor is lower bounded at 0.05
+
+        """
+        return max(0.05, self.water_content / self.field_capacity_content)
+
+    @property
+    def calculate_nutrient_cycling_temp_factor(self) -> float:
+        """The nutrient cycling temperature factor (unitless)
+
+        References
+        ----------
+        SWAT eqn. 3:1.2.1
+
+        Notes
+        -----
+        This factor is lower bounded at 0.1
+
+        """
+        second_term = self.temperature / (self.temperature + exp(9.93 - 0.312 * self.temperature))
+        factor = 0.9 * second_term + 0.1
+        return max(0.1, factor)
 
     @property
     def available_water_capacity(self):
