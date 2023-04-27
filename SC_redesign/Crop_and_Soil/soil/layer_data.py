@@ -3,7 +3,8 @@ from typing import Optional
 from math import log, exp
 
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS, \
+    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
 
 """
 Each instance of this class represents a layer of soil. Each SoilData object should contain a list of LayerData objects
@@ -345,12 +346,10 @@ class LayerData:
         # SWAT eqn. 3:1.1.2
         humic_organic_nitrogen_concentration = (10 ** 4) * (self.percent_organic_carbon_content / 14)
 
-        active_humic_nitrogen_fraction = 0.02
-
         initial_active_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * \
-            active_humic_nitrogen_fraction          # SWAT eqn. 3:1.1.3
+            FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL         # SWAT eqn. 3:1.1.3
         initial_stable_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * \
-            (1 - active_humic_nitrogen_fraction)    # SWAT eqn. 3:1.1.4
+            (1 - FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL)    # SWAT eqn. 3:1.1.4
 
         self.active_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
             initial_active_organic_nitrogen_concentration, self.bulk_density, self.layer_thickness, field_size)
