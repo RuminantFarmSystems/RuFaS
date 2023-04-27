@@ -58,8 +58,8 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize()
-            #solution = NLP.optimize(available_feeds['feed_key'])
+            #solution = NLP.optimize()
+            solution = NLP.optimize(available_feeds['feed_key'])
         except:
             i -= 1
         finally:
