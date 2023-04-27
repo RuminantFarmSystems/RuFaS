@@ -22,7 +22,7 @@ class CropScheduleSpec:
     Parameters
     ----------
     crop_reference : str
-        A string referring to the identifier of crop that should be planted. Either the name of one of supported
+        A string referring to the identifier for the crop that should be planted. Either the name of a supported
         `CropSpecies` or a reference to the name of a custom, user-specified crop
     planting_years : int | sequence[int]
         the years during which the crop should be planted. For each value, a new crop will be initialized
