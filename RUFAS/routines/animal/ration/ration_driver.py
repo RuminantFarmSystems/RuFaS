@@ -8,12 +8,15 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
 from typing import Dict, List, Set
 import collections
 import math
 import statistics as stat
+
+om = OutputManager()
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type):
@@ -350,6 +353,18 @@ class Requirements:
                               'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    }
+
+        avg_nutrient_rqmts["pen_id"] = pen.id
+        avg_nutrient_rqmts["pen_animal_combination"] = pen.animal_combination._name_
+
+        om.add_variable("avg_nutrient_rqmts", avg_nutrient_rqmts, info_map)
+
+        # del avg_nutrient_rqmts["pen_id"]
+        # del avg_nutrient_rqmts["pen_animal_combination"]
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
 
