@@ -67,3 +67,34 @@ class HumusMineralization:
             amount_transferred = -1 * min(stable_organic_nitrogen, -1 * amount_transferred)
 
         return amount_transferred
+
+    @staticmethod
+    def _determine_organic_to_nitrate_mineralization(active_organic_nitrogen: float, temperature_factor: float,
+                                                     water_factor: float,
+                                                     humus_active_organic_mineralization_coefficient: float) -> float:
+        """Calculates phosphorus mineralized from the active inorganic pool that goes to the nitrate pool.
+
+        Parameters
+        ----------
+        active_organic_nitrogen : float
+            Active organic nitrogen content of this soil layer (kg / ha)
+        temperature_factor : float
+            The nutrient cycling temperature factor of this soil layer (unitless)
+        water_factor : float
+            The nutrient cycling water factor of this soil layer (unitless)
+        humus_active_organic_mineralization_coefficient : float
+            The rate coefficient for mineralization of the humus active organic nutrients (unitless)
+
+        Returns
+        -------
+        float
+            The amount of phosphorus mineralized from the active inorganic pool to be transferred to the nitrogen pool
+            (kg / ha)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.4
+
+        """
+        return humus_active_organic_mineralization_coefficient * ((temperature_factor * water_factor) ** 0.5) * \
+            active_organic_nitrogen

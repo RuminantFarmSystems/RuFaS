@@ -23,3 +23,17 @@ def test_determine_intra_organic_mineralization(active: float, stable: float) ->
     elif expect < 0:
         expect = max(-1 * stable, expect)
     assert observed == expect
+
+
+@pytest.mark.parametrize("active,temp_factor,water_factor,mineralization_rate", [
+    (13, 0.1, 0.05, 0.0003),
+    (10.91, 0.334, 0.112, 0.0003),
+    (23.445, 0.7754, 0.4461, 0.00028),
+])
+def test_determine_organic_to_nitrate_mineralization(active: float, temp_factor: float, water_factor: float,
+                                                     mineralization_rate: float) -> float:
+    """Tests that the correct amount of active organic nitrogen mineralized is calculated."""
+    observed = HumusMineralization._determine_organic_to_nitrate_mineralization(active, temp_factor, water_factor,
+                                                                                mineralization_rate)
+    expected = mineralization_rate * (temp_factor * water_factor) ** 0.5 * active
+    assert observed == expected
