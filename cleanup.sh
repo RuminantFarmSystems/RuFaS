@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 display_usage() {
     echo "Usage: ./runflake8onbranch.sh [BASEBRANCH]"
