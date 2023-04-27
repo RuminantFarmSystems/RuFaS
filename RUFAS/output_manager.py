@@ -272,6 +272,29 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
+    def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
+        """Saves a list into a text file
+
+        Parameters
+        ----------
+        data_list : List[str]
+            The list of variable names to be saved
+        path : str
+            The path to the file to be saved
+
+        Raises
+        ------
+        Exception
+            If an error occurs while saving the file
+        
+        """
+        try:
+            with open(path, 'w') as var_names_file:
+                for variable_name in data_list:
+                    var_names_file.write(variable_name + '\n')
+        except Exception as e:
+            raise e
+
     def _generate_file_name(self, base_name: str, extension: str = "json") -> str:
         """
         Returns a file name using the given base_name and timestamp.
@@ -313,11 +336,30 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
+    def save_variable_names(self, path: str) -> None:
+        """
+        Saves names of all variables added to variables_pool into a json file in the given path to a directory.
+        """
+        vars_pool = self.variables_pool.copy()
+        for key, value in vars_pool.items():
+            if isinstance(value, dict) and "info_maps" in value:
+                value.pop("info_maps")
+        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
+        var_set = set()
+        for key, value in vars_pool.items():
+            var_set.add(key)
+            var_set.update(f"{key}: {variable_name}" for values_list in value.values() for variable_dict in values_list
+                           if isinstance(variable_dict, dict) for variable_name in variable_dict.keys())
+        var_list = sorted(var_set)  # sorted(set) sorts and then converts set into a list
+
+        self._list_to_file_txt(var_list, file_path)
+
     def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves all pool into the given path to a directory.
         """
         self.save_variables(path, exclude_info_maps=exclude_info_maps)
+        self.save_variable_names(path)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)
