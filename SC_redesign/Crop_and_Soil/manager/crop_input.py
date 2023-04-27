@@ -10,35 +10,67 @@ from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 @dataclass(kw_only=True)
 class CropScheduleSpec:
     """This class specifies a crop management schedule, to be used by the field manager to plant (initialize) and
-    harvest crops at the appropriate times"""
+    harvest crops at the appropriate times
+
+    Notes
+    -----
+    The arguments of the __init__ method are documented in the Parameters section but the attributes are altered by
+    the __post_init__ method. The final altered attributes are documented in the Attributes section. Regardless of
+    input, the final versions of `planting_years`, `planting_days`, `harvest_years`, `harvest_days`, and
+    `harvest_operations` are all the same length, expanded by __post_init__.
+
+    Parameters
+    ----------
+    crop_reference : str
+        A string referring to the identifier of crop that should be planted. Either the name of one of supported
+        `CropSpecies` or a reference to the name of a custom, user-specified crop
+    planting_years : int | sequence[int]
+        the years during which the crop should be planted. For each value, a new crop will be initialized
+    planting_days : int | sequence[int]
+        the (Julian) day on which the crop should be planted. If a single value is given, it will be repeated for
+        all years. Otherwise, there should be one value for each value in `planting_years`.
+    harvest_years : int | sequence[int]
+        the years during which the crop should undergo a harvest operation
+    harvest_days : int | sequence[int] | sequence[sequence[int]]
+        the (Julian) day on which the crop should be harvested. If a single value/element is given, it will be repeated
+        for all harvest years. Otherwise, there must be one element for each present in `harvest_years`. If multiple
+        harvests can occur for the same crop instance, the corresponding element should be a list whose elements
+        correspond to separate harvest events.
+    harvest_operations : str | sequence[str]
+        the harvest operation that should occur. If a single value is given, it will be repeated for all harvests.
+        Otherwise, the structure/dimensions should correspond to those of `harvest_days`.
+    pattern_skip : int, optional
+        the number of years to wait before repeating the pattern
+    pattern_repeat : int, optional
+        the number of times the specified crop management pattern should be repeated
+    use_custom_crop : bool
+        status variable that indicates whether the `crop_references` refers to a custom (user-defined) crop instead of
+        on of the supported crop species.
+
+    Attributes
+    ----------
+    planting_years: tuple[int]
+        the expanded list of years during which this crop should be planted.
+    planting_days: tuple[int]
+        the expanded list of days (corresponding to planting_years) on which this crop should be planted.
+    harvest_years: tuple[int]
+        the expanded list of years during which this crop should be harvested.
+    harvest_days: tuple[int]
+        the expanded list of days (corresponding to harvest_years) on which this crop should be harvested
+    harvest_operations: tuple[HarvestOperation]
+        the expanded list of `HarvestOperation`s matched by the input string(s), corresponding to each harvest
+    """
 
     # TODO: This class does not yet handle heat-scheduling specifications.
-
-    crop_reference: float = "corn"
-    """A reference to the crop to be planted. Either the name of one of supported `CropSpecies` or a reference to the
-    name of a custom, user-specified crop"""
+    crop_reference: str = "corn"
     planting_years: int | Sequence[int] = (1, 2, 3)
-    """the years during which the crop should be planted. For each value, a new crop will be initialized"""
     planting_days: int | Sequence[int] = 120
-    """the (Julian) day on which the crop should be planted. If a single value is given, it will be repeated for
-    all years. Otherwise, there should be one value for each value in `planting_years`."""
     harvest_years: int | Sequence[int] = (1, 2, 3)
-    """the years during which the crop should undergo a harvest operation"""
     harvest_days: int | Sequence[int] | Sequence[Sequence[int]] = 220
-    """the (Julian) day on which the crop should be harvested. If a single value/element is given, it will be repeated
-    for all harvest years. Otherwise, there must be one element for each present in `harvest_years`. If multiple
-    harvests can occur for the same crop instance, the corresponding element should be a list whose elements correspond.
-    to separate harvest events"""
     harvest_operations: str | Sequence[str] = "default"
-    """the harvest operation that should occur. If a single value is given, it will be repeated for all harvests.
-    Otherwise, the structure/dimensions should correspond to those of `harvest_days`."""
     pattern_skip: Optional[int] = None
-    """the number of years to wait before repeating the pattern"""
     pattern_repeat: Optional[int] = None
-    """the number of times the specified crop management pattern should be repeated"""
     uses_custom_crop: bool = False
-    """status variable that indicates whether the `crop_references` refers to a custom (user-defined) crop instead of
-    on of the supported crop species."""
 
     @staticmethod
     def _convert_to_tuple(x: Any):
@@ -62,6 +94,9 @@ class CropScheduleSpec:
         return tuple([x])
 
     def __post_init__(self):
+        """This method expands the user-specified input into a full-blown schedule for a crop. Users are able
+        to initialize the class with simplified inputs and a pattern. That pattern is projected into the future by
+        this method"""
         if self.crop_reference in CropSpecies.__members__:
             self.uses_custom_crop = False
         else:
@@ -122,7 +157,7 @@ def repeat_pattern(pattern: Sequence[int] = (1, 2, 5), skip: int = 2, repeat: in
     Parameters
     ----------
     pattern : list[int] | tuple[int]
-        a sequence of numbers that establishes the pattern
+        a sequence of (ascending) numbers that establishes the pattern
     skip : int
         the number of integers to skip before restarting the pattern. Positive values will ascend to the next piece
         while negative values will descend.

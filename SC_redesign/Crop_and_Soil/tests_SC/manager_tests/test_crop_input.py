@@ -3,7 +3,20 @@ from typing import Any, Tuple
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
+from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec, repeat_pattern
+
+
+def test_repeat_pattern():
+    """check that repeat_pattern projects into the future correctly"""
+    assert repeat_pattern([1, 2, 3], skip=0, repeat=2) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert repeat_pattern((1, 2, 3), skip=1, repeat=1) == [1, 2, 3, 5, 6, 7]
+    assert repeat_pattern([1, 2, 4], skip=2, repeat=2) == [1, 2, 4, 7, 8, 10, 13, 14, 16]
+    assert repeat_pattern([1], skip=0, repeat=4) == [1, 2, 3, 4, 5]
+    assert repeat_pattern([1], skip=-1, repeat=4) == [1, 1, 1, 1, 1]
+    assert repeat_pattern([2, 4], skip=1, repeat=2) == [2, 4, 6, 8, 10, 12]
+    assert repeat_pattern([2, 4], skip=2, repeat=2) == [2, 4, 7, 9, 12, 14]
+    assert repeat_pattern([1], skip=2, repeat=3) == [1, 4, 7, 10]
+    assert repeat_pattern([3, 4, 6], skip=0, repeat=2) == [3, 4, 6, 7, 8, 10, 11, 12, 14]
 
 
 @pytest.mark.parametrize("x,expect", [
