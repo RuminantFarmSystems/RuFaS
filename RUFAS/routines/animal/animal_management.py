@@ -1091,6 +1091,8 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
+        if self.end_ration_interval():
+            self.reset_milk_production_reduction()
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.populated = len(pen.animals_in_pen) > 0
@@ -1109,7 +1111,6 @@ class AnimalManagement:
             self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
-                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_animals_to_pens()
