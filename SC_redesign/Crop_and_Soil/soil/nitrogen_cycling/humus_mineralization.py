@@ -29,6 +29,23 @@ class HumusMineralization:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
+    def mineralize_organic_nitrogen(self) -> None:
+        """Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic
+        nitrogen pools, and between the active organic and nitrate pools.
+
+        """
+        for layer in self.data.soil_layers:
+            active_to_stable_mineralized_nitrogen = self._determine_intra_organic_mineralization(
+                layer.active_organic_nitrogen_content, layer.stable_organic_nitrogen_content)
+            layer.active_organic_nitrogen_content -= active_to_stable_mineralized_nitrogen
+            layer.stable_organic_nitrogen_content += active_to_stable_mineralized_nitrogen
+
+            active_to_nitrate_mineralized_nitrogen = self._determine_organic_to_nitrate_mineralization(
+                layer.active_organic_nitrogen_content, layer.nutrient_cycling_temp_factor,
+                layer.nutrient_cycling_water_factor, layer.humus_mineralization_rate_factor)
+            layer.active_organic_nitrogen_content -= active_to_nitrate_mineralized_nitrogen
+            layer.nitrate_content += active_to_nitrate_mineralized_nitrogen
+
     # --- Static methods ---
     @staticmethod
     def _determine_intra_organic_mineralization(active_organic_nitrogen: float,

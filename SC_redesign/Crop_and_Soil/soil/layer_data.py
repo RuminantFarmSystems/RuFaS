@@ -516,27 +516,12 @@ class LayerData:
 
     # TODO: coordinate with Matthew to find best place for this so that it can be accessed by multiple modules
     @property
-    def calculate_nutrient_cycling_water_factor(self) -> float:
-        """The nutrient cycling water factor (unitless)
-
-        References
-        ----------
-        SWAT eqn. 3:1.2.2
-
-        Notes
-        -----
-        This factor is lower bounded at 0.05
-
-        """
-        return max(0.05, self.water_content / self.field_capacity_content)
-
-    @property
-    def calculate_nutrient_cycling_temp_factor(self) -> float:
+    def nutrient_cycling_temp_factor(self) -> float:
         """The nutrient cycling temperature factor (unitless)
 
         References
         ----------
-        SWAT eqn. 3:1.2.1
+        SWAT Theoretical documentation eqn. 3:1.2.1
 
         Notes
         -----
@@ -546,6 +531,21 @@ class LayerData:
         second_term = self.temperature / (self.temperature + exp(9.93 - 0.312 * self.temperature))
         factor = 0.9 * second_term + 0.1
         return max(0.1, factor)
+
+    @property
+    def nutrient_cycling_water_factor(self) -> float:
+        """The nutrient cycling water factor (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.2
+
+        Notes
+        -----
+        This factor is lower bounded at 0.05
+
+        """
+        return max(0.05, self.water_content / self.field_capacity_content)
 
     @property
     def available_water_capacity(self):
