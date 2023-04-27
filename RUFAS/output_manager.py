@@ -267,7 +267,7 @@ class OutputManager(object):
                 json.dump(
                     Utility.make_serializable(data_dict, max_depth=3),
                     json_file,
-                    indent=4,
+                    indent=0,
                 )
         except Exception as e:
             raise e
