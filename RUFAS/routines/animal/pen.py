@@ -9,7 +9,9 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from typing import List, Dict, DefaultDict, Any
+import copy
+from enum import Enum
+from typing import List, Dict, Union, DefaultDict, Any
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -18,18 +20,9 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
-import copy
 from RUFAS.routines.animal.ration import animal_requirements as req
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-
-from RUFAS import util, errors
-from enum import Enum
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
 om = OutputManager()
 
@@ -173,12 +166,13 @@ class Pen:
         """
         Enumeration that represents the valid combinations of animals in a pen.
         """
-        NONE = 0
-        CALF = 1
-        GROWING = 2
-        CLOSE_UP = 3
-        GROWING_AND_CLOSE_UP = 4
-        LAC_COW = 5
+        CALF = 0  # calves
+        GROWING = 1  # heiferIs, heiferIIs
+        CLOSE_UP = 2  # heiferIIIs, dry cows
+        LAC_COW = 3  # lactating cows
+
+        GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
+        NONE = 5  # TODO: Remove this option after fixing _init_default_pens() in AnimalManagement
 
     def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
                  number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
@@ -260,21 +254,21 @@ class Pen:
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = AnimalManureExcretions(
-                urea=0.0,
-                urine=0.0,
-                total_ammoniacal_nitrogen_concentration=0.0,
-                urine_nitrogen=0.0,
-                manure_nitrogen=0.0,
-                manure_mass=0.0,
-                total_solids=0.0,
-                degradable_volatile_solids=0.0,
-                non_degradable_volatile_solids=0.0,
-                inorganic_phosphorus_fraction=0.0,
-                organic_phosphorus_fraction=0.0,
-                phosphorus=0.0,
-                phosphorus_fraction=0.0,
-                potassium=0.0,
-                methane=0.0
+            urea=0.0,
+            urine=0.0,
+            total_ammoniacal_nitrogen_concentration=0.0,
+            urine_nitrogen=0.0,
+            manure_nitrogen=0.0,
+            manure_mass=0.0,
+            total_solids=0.0,
+            degradable_volatile_solids=0.0,
+            non_degradable_volatile_solids=0.0,
+            inorganic_phosphorus_fraction=0.0,
+            organic_phosphorus_fraction=0.0,
+            phosphorus=0.0,
+            phosphorus_fraction=0.0,
+            potassium=0.0,
+            methane=0.0
         )
 
         # manure attributes are initialized in the reset_manure method
@@ -317,7 +311,7 @@ class Pen:
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
 
-    def add_new_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]) -> None:
+    def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """
         Adds all animals in new_animals to the pen.
 
@@ -338,7 +332,7 @@ class Pen:
         """
         Updates the stocking density of the pen
         """
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+        self.stocking_density = len(self.animals_in_pen) / self.num_stalls
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
@@ -361,7 +355,7 @@ class Pen:
             life_cycle_stage = type(animal).__name__
             self.classes_in_pen.add(life_cycle_stage)
 
-    def update_animals(self, new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII],
+    def update_animals(self, new_animals: List[Any],
                        animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -437,6 +431,14 @@ class Pen:
         self.MEdiet = ration_vals['ME_tot']
         self.dry_matter_intake = nutrient_amount['dm']
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_ration.__name__,
+                    "available_feeds": available_feeds, }
+        om.add_variable("ration_nutrient_amount", nutrient_amount, info_map)
+        om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
+        om.add_variable("MEdiet", self.MEdiet, info_map)
+        om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
+
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],
@@ -451,12 +453,6 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__,
-                    "feed": vars(feed),
-                    "available_feeds": available_feeds, }
-        om.add_variable("pen_ration_data", ration, info_map)
 
         return ration
 
@@ -518,9 +514,12 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_manure.__name__,
-                    "feed": vars(feed)}
+                    "pen_id": self.id,
+                    "pen_animal_combination": self.animal_combination,
+                    }
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
@@ -610,7 +609,7 @@ class Pen:
 
         if class_name == 'Cow':
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
-                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow', 
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow',
                                           parity=animal.calves, calving_interval=animal.CI,
                                           milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
                                           milk_lactose=animal.lactose_milk,
@@ -674,8 +673,27 @@ class Pen:
         animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
-        # updating stocking density
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+
+    def remove_animals_by_ids(self, animal_ids: List[int]) -> None:
+        """
+        Removes animals from the pen by their ids.
+
+        Notes
+        -----
+        Because this method takes O(n) time, it is recommended that the caller of this method
+        should prepare a list of animal ids to be removed from the pen first, and then call this
+        method with that list once.
+
+        Parameters
+        ----------
+        animal_ids : List[int]
+            List of animals that match the given ids to be removed from the pen.
+
+        """
+        if not animal_ids:
+            return
+        animal_ids = set(animal_ids)
+        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id not in animal_ids]
 
     def clear(self):
         """
