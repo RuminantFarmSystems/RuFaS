@@ -995,7 +995,7 @@ def pen_1() -> dict:
     return pen_1_dict
 
 
-def test_reset_milk_production_reduction(pen_1:dict) -> None:
+def test_reset_milk_production_reduction() -> None:
     """Unit test for function reset_milk_production_reduction in file routines/animal/animal_management.py"""
     # AnimalManagement.reset_milk_production_reduction(pen_1)
     # assert pen_1.animal_1.milk_production_reduction==0.0
