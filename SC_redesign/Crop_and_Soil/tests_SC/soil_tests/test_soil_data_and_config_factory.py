@@ -1,6 +1,6 @@
 import pytest
 from typing import Dict, List
-from math import inf, log
+from math import inf, log, exp
 from dataclasses import asdict
 from unittest.mock import patch, PropertyMock, MagicMock
 
@@ -598,3 +598,34 @@ def test_determine_soil_nutrient_area_density(phosphorus: float, density: float,
                                                                 * CUBIC_MILLIMETERS_TO_CUBIC_METERS)
     expected = phosphorus * MILLIGRAMS_TO_KILOGRAMS * expected_soil_mass_kg * (1 / field_size)
     assert pytest.approx(observed) == expected
+
+
+@pytest.mark.parametrize("temp", [
+    13,
+    2.233,
+    -3.445,
+    24,
+])
+def test_nutrient_cycling_temp_factor(temp: float) -> None:
+    """Tests the nutrient cycling temperature factor is correctly calculated as a property of LayerData."""
+    layer = LayerData(top_depth=23, bottom_depth=67, field_size=1.5, temperature=temp)
+    observed = layer.nutrient_cycling_temp_factor
+    expected = 0.9 * (temp / (temp + exp(9.93 - 0.312 * temp))) + 0.1
+    expected = max(0.1, expected)
+    assert observed == expected
+
+
+@pytest.mark.parametrize("water_content,field_capacity", [
+    (13.44, 16.77),
+    (14.332, 12.445),
+    (0, 5.334)
+])
+def test_nutrient_cycling_water_factor(water_content: float, field_capacity: float) -> float:
+    """Tests that the nutrient cycling water factor is correctly calculated as a property of LayerData."""
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content",
+               new_callable=PropertyMock, return_value=field_capacity):
+        layer = LayerData(top_depth=15, bottom_depth=40, field_size=1.8)
+        layer.water_content = water_content
+        observed = layer.nutrient_cycling_water_factor
+        expected = max(0.05, water_content / field_capacity)
+        assert observed == expected
