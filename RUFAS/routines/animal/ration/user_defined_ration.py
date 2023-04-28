@@ -132,10 +132,7 @@ def ration_to_use(pen_animal_combo):
     
     Parameters
     ----------
-    animal_type: str
-        animal type e.g. 'calf', 'heifer', 'cow'
-    lactating: bool
-        state of whether a cow is actively lactating or not 
+    pen_animal_combo
 
     Returns
     -------

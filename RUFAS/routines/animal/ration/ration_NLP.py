@@ -523,9 +523,7 @@ def get_ration_vals(x):
 
 
 def userbounds(ration_percents):
-
-    ration_percents
-
+    # ration_percents
     # ration_calf = udrv.calf_ration
     # ration_all_heifers = udrv.heifer_ration
     # ration_cow_lactating = udrv.lactating_cow_ration
@@ -547,9 +545,10 @@ def userbounds(ration_percents):
     for key in ration_percents.keys():
         target = ration_percents[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
         # target = ration_percents[key]
-        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
-        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
-        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
+        targetbounds = ((target-target*udr_tolerance)/3,(target+target*udr_tolerance)/3)
+        tribounds.append(targetbounds)
+        tribounds.append(targetbounds)
+        tribounds.append(targetbounds)
     return tribounds
 
 
@@ -581,7 +580,6 @@ def optimize(user_defined_ration_select, ration_percents):
         bnds = tuple(bnds)
         #print(bnds)
 
-
     # establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
     con2 = {'type': 'ineq', 'fun': NEl_constraint}
@@ -596,7 +594,8 @@ def optimize(user_defined_ration_select, ration_percents):
     con11 = {'type': 'ineq', 'fun': DMI_constraint}
     cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
     heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
-    user_cons = [con1, con2, con3, con4, con5, con6, con7, con9, con10]
+    user_cons_cow = [con1, con2, con3, con4, con5, con6, con7, con9, con10, con11]
+    user_cons_heif = [con1, con3, con4, con5, con6, con7, con9, con10, con11]
 
     def is_constraint_violated(solution, constraint) -> bool:
         result = constraint['fun'](solution)
@@ -612,44 +611,19 @@ def optimize(user_defined_ration_select, ration_percents):
 
     if user_defined_ration_select:
         # accumulator = []
-        usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons)
-        # plt.plot(accumulator[:, 0], accumulator[:, 1])
-        # plt.show()
-        chanchodebug = False
-        if chanchodebug:
-            print(usermod)
-        if usermod.success == False:
-            # TODO figure out a better way to check which constraints are failing
-            if chanchodebug: print(animal_type)
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con1)
-            if chanchodebug: print('constraint 1 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con2)
-            if chanchodebug: print('constraint 2 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con3)
-            if chanchodebug: print('constraint 3 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con4)
-            if chanchodebug: print('constraint 4 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con5)
-            if chanchodebug: print('constraint 5 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con6)
-            if chanchodebug: print('constraint 6 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con7)
-            if chanchodebug: print('constraint 7 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con8)
-            if chanchodebug: print('constraint 8 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con9)
-            if chanchodebug: print('constraint 9 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con10)
-            if chanchodebug: print('constraint 10 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con11)
-            if chanchodebug: print('constraint 11 ' + str(constraint_check_.success))
-
+        if animal_type == "cow":
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons_cow)
+        else:
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons_heif)
         # Uncomment to use
+        if usermod.success:
+            print(animal_type)
+            print('No constraints violated')
         if not usermod.success:
-            failed_constraints = find_failed_constraints(usermod.x, user_cons)
+            failed_constraints = find_failed_constraints(usermod.x, user_cons_cow)
             if not failed_constraints:
                 print('No constraints violated')
-        
+            print(animal_type)
             for constr in failed_constraints:
                 # add warnings to output manager
                 # or print out to console or both
@@ -657,7 +631,6 @@ def optimize(user_defined_ration_select, ration_percents):
                 #print(f'Constraint value: {constr["fun"](usermod.x)}')
                 #print(f'Constraint type: {constr["type"]}')
                 print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
-
         return usermod
     elif animal_type == 'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
