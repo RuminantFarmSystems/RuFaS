@@ -407,6 +407,8 @@ def test_determine_soil_structural_carbon_amount(soil_residue_metabolic_fraction
 def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     """Testing if main routine correctly updates the attributes"""
     data = SoilData(soil_layers=layers, field_size=1.1)
+    data.plant_surface_residue = crop.yield_residue or 0
+    data.plant_root_residue = crop.root_biomass or 0
     partition = ResiduePartition(data)
 
     ResiduePartition._determine_plant_residue_lignin_composition = MagicMock(return_value=0.55)
@@ -430,7 +432,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
     ResiduePartition._determine_soil_structural_carbon_amount = MagicMock(return_value=3)
 
     first_layer_yield_residue_value = crop.yield_residue
-    partition.partition_residue(rainfall, crop)
+    partition.partition_residue(rainfall)
 
     # Checking if methods are called correct number of times
     assert ResiduePartition._determine_plant_residue_lignin_composition.call_count == 1
@@ -467,7 +469,7 @@ def test_partition_residue(layers: list, crop: CropData, rainfall=10):
         else:
             assert layer.structural_carbon_transfer_amount == 0
             assert layer.soil_dry_matter_residue_amount == 0
-            assert crop.yield_residue == 0
+            assert data.plant_surface_residue == 0
 
         assert layer.plant_metabolic_carbon_amount == 2.4
         assert layer.plant_structural_to_slow_or_active_rate == 0.58

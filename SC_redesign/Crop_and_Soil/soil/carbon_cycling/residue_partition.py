@@ -1,6 +1,5 @@
 from typing import Optional
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 import math
 
 """
@@ -30,7 +29,7 @@ class ResiduePartition:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def partition_residue(self, rainfall: float, crop: CropData) -> None:
+    def partition_residue(self, rainfall: float) -> None:
         """Main routine to updates attributes by using static methods, this method should only be called (by the field/
         field manager) on the day that a cut, harvest, or kill operation occurs and should be called after that
         operation.
@@ -39,8 +38,6 @@ class ResiduePartition:
         ----------
         rainfall: float
             amount of rain (mm)
-        crop: CropData
-            crop (unitless)
         """
         self.data.plant_residue_lignin_composition = self._determine_plant_residue_lignin_composition(
             self.data.plant_residue_lignin_composition, rainfall)
@@ -69,12 +66,12 @@ class ResiduePartition:
                     layer.tillage_fraction
                 )
 
-                layer.soil_dry_matter_residue_amount = crop.yield_residue * layer.tillage_fraction
-                self.data.total_residue += crop.yield_residue
+                layer.soil_dry_matter_residue_amount = self.data.plant_surface_residue * layer.tillage_fraction
+                self.data.total_residue += self.data.plant_surface_residue
             else:
                 layer.structural_carbon_transfer_amount = 0
                 layer.soil_dry_matter_residue_amount = 0
-                crop.yield_residue = 0
+                self.data.plant_surface_residue = 0  # TODO: why is this not also done for root residue?
 
             layer.plant_metabolic_carbon_amount = self._determine_plant_metabolic_carbon_amount(
                 layer.plant_metabolic_carbon_amount,
@@ -110,7 +107,7 @@ class ResiduePartition:
 
             layer.weighted_residue_dry_matter_lignin_fraction = \
                 self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount,
-                                                                            crop.root_biomass)
+                                                                            self.data.plant_root_residue)
 
             layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
                 layer.weighted_residue_dry_matter_lignin_fraction,
@@ -136,7 +133,7 @@ class ResiduePartition:
             layer.soil_metabolic_carbon_amount = self._determine_soil_metabolic_carbon_amount(
                 layer.soil_metabolic_carbon_amount,
                 layer.plant_metabolic_to_soil_carbon_amount,
-                crop.root_biomass,
+                self.data.plant_root_residue,
                 layer.soil_residue_metabolic_fraction,
                 layer.soil_metabolic_active_carbon_usage
             )
@@ -158,7 +155,7 @@ class ResiduePartition:
                 layer.structural_carbon_transfer_amount,
                 layer.soil_structural_active_carbon_usage,
                 layer.soil_structural_slow_carbon_usage,
-                crop.root_biomass,
+                self.data.plant_root_residue,
                 layer.soil_structural_carbon_amount
             )
 
@@ -247,7 +244,7 @@ class ResiduePartition:
                                                  plant_metabolic_active_carbon_usage: float,
                                                  plant_metabolic_to_soil_carbon_amount: float) -> float:
         """This method calculates the updated plant metabolic carbon amount after adding the metabolic carbon
-        in dry matter at harvest and and reduced by the amount that's decomposed and incorporated
+        in dry matter at harvest and reduced by the amount that's decomposed and incorporated
 
         Parameters
         ----------
@@ -282,7 +279,7 @@ class ResiduePartition:
                                                        decomposition_temperature_effect: float,
                                                        plant_metabolic_carbon_amount: float,
                                                        plant_metabolic_active_carbon_rate=0.28) -> float:
-        """Calculates the the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
+        """Calculates the amount of plant metabolic carbon decomposed to active carbon (kg/ha)
         Parameters
         ----------
         decomposition_moisture_effect: float
@@ -359,7 +356,7 @@ class ResiduePartition:
                                                                  decomposition_moisture_effect: float,
                                                                  decomposition_temperature_effect: float,
                                                                  plant_structural_carbon_amount: float) -> float:
-        """This methods determines the amount of plant structural carbon decomposed into slow or active carbon
+        """This method determines the amount of plant structural carbon decomposed into slow or active carbon
 
         Parameters
         ----------
@@ -516,7 +513,7 @@ class ResiduePartition:
         weighted_residue_dry_matter_lignin_fraction: float
             weighted fraction of lignin in residue dry matter (unitless)
         soil_residue_lignin_fraction: float
-            soil residue fraction that is comprised of lignin (unitless)
+            soil residue fraction that is composed of lignin (unitless)
         nitrogen_fraction_plant_residue: float default = 0.4
             nitrogen fraction in plant residue at harvest (unitless)
 
@@ -629,7 +626,7 @@ class ResiduePartition:
                                                                 decomposition_temperature_effect: float,
                                                                 soil_structural_carbon_amount: float,
                                                                 soil_structural_to_slow_or_active_rate=0.094) -> float:
-        """This methods determines the amount of soil structural carbon decomposed into slow or active carbon
+        """This method determines the amount of soil structural carbon decomposed into slow or active carbon
 
         Parameters
         ----------

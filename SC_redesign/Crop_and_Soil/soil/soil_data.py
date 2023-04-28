@@ -183,14 +183,22 @@ class SoilData:
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
     # ---- Residue partition (Carbon Cycling)
+    plant_surface_residue = 0
+    """plant residue on the surface of the soil (kg/ha)"""
+    plant_root_residue = 0
+    """plant residue below the surface of the soil (kg/ha)"""
     plant_residue_lignin_composition: float = 0
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
     plant_residue_metabolic_fraction: float = 0
     """plant residue fraction that is metabolic (unitless)"""
-    total_residue = 0
-    """"amount of total residue ever added to the field(kg/ha)"""
+    total_residue: float = 0
+    """total amount of soil residue ever added to the field"""  # TODO: needed?
+    @property
+    def all_residue(self) -> float:  # TODO: not currently used.
+        """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
+        return self.plant_surface_residue + self.plant_root_residue
 
     def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
@@ -222,10 +230,11 @@ class SoilData:
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
         if self.soil_layers is None:
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, nitrate=0.5, field_size=field_size),
-                                LayerData(top_depth=20, bottom_depth=50, nitrate=0.5, field_size=field_size),
-                                LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=field_size),
-                                LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=field_size)]
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size,
+                                          residue=self.plant_surface_residue),
+                                LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
+                                LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
+                                LayerData(top_depth=80, bottom_depth=200, field_size=field_size)]
         elif self.soil_layers[0].bottom_depth < 20:
             raise ValueError(f"Expected bottom depth of top soil layer must be 20 mm or greater, received "
                              f"'{self.soil_layers[0].bottom_depth}'.")
@@ -264,9 +273,9 @@ class SoilData:
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.__post_init__(field_size)
+        new_top_layer.__post_init__(field_size, self.plant_surface_residue)
         self.soil_layers[0].top_depth = 20
-        self.soil_layers[0].__post_init__(field_size)
+        self.soil_layers[0].__post_init__(field_size, 0)
         self.soil_layers.insert(0, new_top_layer)
 
     def get_vectorized_layer_attribute(self, attribute: str) -> List[any]:
@@ -403,7 +412,7 @@ class SoilData:
         else:
             nitrates_sum = 0
             for layer in self.soil_layers:
-                nitrates_sum += layer.nitrate
+                nitrates_sum += layer.nitrate_content
             return nitrates_sum
 
     @property
