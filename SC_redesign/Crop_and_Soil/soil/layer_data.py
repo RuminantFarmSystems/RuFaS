@@ -189,6 +189,9 @@ class LayerData:
     """Active inorganic phosphorus content of this soil layer (kg / ha)"""
     stable_inorganic_phosphorus_content: float = 0
     """Stable inorganic phosphorus content of this soil layer (kg / ha)"""
+    fresh_organic_phosphorus_content: float = 0
+    """Fresh organic phosphorus content of this soil layer (kg / ha)"""
+    # TODO: organic phosphorus still needs to be implemented - issue #444
 
     active_inorganic_unbalanced_counter: int = 0
     """The number of days that the active inorganic phosphorus pool has been greater than it would be when in

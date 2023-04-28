@@ -25,6 +25,47 @@ class MineralizationDecomposition:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
+    def mineralize_and_decompose_nitrogen(self) -> None:
+        """Conducts the daily mineralization and decomposition operations on the fresh organic nitrogen and residue in
+            the top soil layer.
+
+        References
+        ----------
+        SWAT Theoretical documentation section 3:1.2.2
+
+        """
+        if self.data.soil_layers[0].temperature <= 0:
+            return
+
+        # TODO: in SWAT, this nutrient ratios do not work directly with the carbon in the soil but with the content of
+        #   residue in the soil layer. Currently this not tracked - issue #481
+        carbon_nitrogen_ratio = self._calculate_residue_nutrient_ratio(
+            self.data.soil_layers[0].total_soil_carbon_amount, self.data.soil_layers[0].fresh_organic_nitrogen_content,
+            self.data.soil_layers[0].nitrate_content)
+        carbon_phosphorus_ratio = self._calculate_residue_nutrient_ratio(
+            self.data.soil_layers[0].total_soil_carbon_amount,
+            self.data.soil_layers[0].fresh_organic_phosphorus_content,
+            self.data.soil_layers[0].labile_inorganic_phosphorus_content)
+
+        residue_composition_factor = self._calculate_nutrient_cycling_residue_composition_factor(
+            carbon_nitrogen_ratio, carbon_phosphorus_ratio)
+
+        decay_rate_constant = self._calculate_decay_rate_constant(
+            self.data.soil_layers[0].residue_fresh_organic_mineralization_rate, residue_composition_factor,
+            self.data.soil_layers[0].nutrient_cycling_temp_factor,
+            self.data.soil_layers[0].nutrient_cycling_water_factor)
+
+        # TODO: reduce the amount of residue in the soil layer by the decay amount when a residue tracker gets added to
+        #   LayerData - issue #481
+
+        fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[0].fresh_organic_nitrogen_content
+        fresh_organic_nitrogen_removed = min(self.data.soil_layers[0].fresh_organic_nitrogen_content,
+                                             fresh_organic_nitrogen_removed)
+
+        self.data.soil_layers[0].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_removed
+        self.data.soil_layers[0].nitrate_content += 0.8 * fresh_organic_nitrogen_removed
+        self.data.soil_layers[0].active_organic_nitrogen_content += 0.2 * fresh_organic_nitrogen_removed
+
     # --- Static methods ---
     @staticmethod
     def _calculate_residue_nutrient_ratio(carbon_amount: float, organic_nutrient: float,
@@ -56,7 +97,7 @@ class MineralizationDecomposition:
 
         TODO: In SWAT, this method takes the amount of residue in the soil (instead of carbon) and multiplies it by 0.58
             to get the amount of carbon in the soil. This method should be refactored to do that when we get a tracker
-            for residue in LayerData.
+            for residue in LayerData - issue #481
 
         """
         nutrient_total = organic_nutrient + inorganic_nutrient
@@ -134,7 +175,7 @@ class MineralizationDecomposition:
         Parameters
         ----------
         fresh_organic_residue_mineralization_rate : float
-            Rate coefficient for mineralization of fresh organic nutrients (unitless)
+            Rate coefficient for mineralization of fresh organic nutrients from residue (unitless)
         composition_factor : float
             Nutrient cycling residue composition factor for the current soil layer (unitless)
         temp_factor : float
