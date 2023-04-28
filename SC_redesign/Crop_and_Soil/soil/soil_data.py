@@ -183,14 +183,22 @@ class SoilData:
     """Amount of stable organic phosphorus on the field that was applied by grazing (kg)"""
 
     # ---- Residue partition (Carbon Cycling)
+    plant_surface_residue = 0
+    """plant residue on the surface of the soil (kg/ha)"""
+    plant_root_residue = 0
+    """plant residue below the surface of the soil (kg/ha)"""
     plant_residue_lignin_composition: float = 0
     """lignin fraction of plant residue (unitless)"""
     plant_lignin_nitrogen_ratio: float = 0
     """plant lignin to nitrogen ratio (unitless)"""
     plant_residue_metabolic_fraction: float = 0
     """plant residue fraction that is metabolic (unitless)"""
-    total_residue = 0
-    """"amount of total residue ever added to the field(kg/ha)"""
+    total_residue: float = 0
+    """total amount of soil residue ever added to the field"""  # TODO: needed?
+    @property
+    def all_residue(self) -> float:  # TODO: not currently used.
+        """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
+        return self.plant_surface_residue + self.plant_root_residue
 
     residue: float = 0
     """TEMPORARY: the amount of residue currently on the soil surface (kg / ha)"""

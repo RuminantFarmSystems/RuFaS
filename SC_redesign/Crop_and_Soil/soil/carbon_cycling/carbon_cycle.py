@@ -20,7 +20,7 @@ pseudocode_soil S.6.D.1 to S.6.D.7
 """
 
 
-class CarbonCycle:
+class CarbonCycling:
     def __init__(self, soil_data: Optional[SoilData] = None):
         self.data = soil_data or SoilData()  # initialize with defaults, if not given
 
