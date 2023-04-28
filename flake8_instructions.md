@@ -15,7 +15,8 @@ Additionally, any fixes to legacy styleguide violations you can do within the fi
 
 ## Installing Flake8 Locally
 
-To get started, install flake8 locally by opening an interactive shell or terminal and run this command:
+To get started, first make sure that your virtual environment is activated.
+Then install flake8 locally by opening an interactive shell or terminal and run this command:
 
     python<version> -m pip install flake8
 
