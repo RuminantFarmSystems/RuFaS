@@ -23,6 +23,7 @@ from scipy.stats import truncnorm
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
@@ -30,6 +31,8 @@ from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class MilkProductionHistory:
@@ -346,6 +349,11 @@ class Cow(HeiferIII):
         """
         Calculates this Cow's nutrient requirements.
         """
+
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.set_nutrient_rqmts.__name__,
+                    }
+
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
@@ -369,6 +377,15 @@ class Cow(HeiferIII):
         self.DMIest = req['DMIest']
         self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
         self.DMDP_req = (req['MP_req']) / self.DMIest
+
+        milk_data = {}
+        milk_data["milk_protein"] = self.mPrt
+        milk_data["milk_fat"] = self.fat_percent
+        milk_data["milk_lactose"] = self.lactose_milk
+        milk_data["lactating"] = self.milking
+
+        om.add_variable("milk_data", milk_data, info_map)
+
 
     def phosphorus_rqmts(self, DMI):
         """
