@@ -125,3 +125,36 @@ class MineralizationDecomposition:
         phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
             carbon_phosphorus_ratio, 200)
         return min(nitrogen_term, phosphorus_term, 1.0)
+
+    @staticmethod
+    def _calculate_decay_rate_constant(fresh_organic_residue_mineralization_rate: float, composition_factor: float,
+                                       temp_factor: float, water_factor) -> float:
+        """Calculates the decay rate constant for residue.
+
+        Parameters
+        ----------
+        fresh_organic_residue_mineralization_rate : float
+            Rate coefficient for mineralization of fresh organic nutrients (unitless)
+        composition_factor : float
+            Nutrient cycling residue composition factor for the current soil layer (unitless)
+        temp_factor : float
+            Nutrient cycling temperature factor for the current soil layer (unitless)
+        water_factor : float
+            Nutrient cycling water factor for the current soil layer (unitless)
+
+        Returns
+        -------
+        The decay rate constant for residue decomposition (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.7
+
+        Notes
+        -----
+        The definition for the rate coefficient for mineralization of the residue fresh organic nutrients can be found
+        in the SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page 205)
+
+        """
+        root_term = (temp_factor * water_factor) ** 0.5
+        return fresh_organic_residue_mineralization_rate * composition_factor * root_term
