@@ -1,6 +1,6 @@
 """
 Quick tool to explore ration_reports faster than doing these calcs in excel
-
+Currently hardcoded to my (Joe Waddell) laptop, but will update the method to use relative position of MASM
 """
 
 import csv
@@ -25,11 +25,6 @@ def read_csv(filename):
             csvout.append(line)
     return csvout
 
-pen0 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_0/ration_report/ration_report.csv')
-pen1 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_1/ration_report/ration_report.csv')
-pen2 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_2/ration_report/ration_report.csv')
-pen3 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_3/ration_report/ration_report.csv')
-
 def quickprint(ccc, pen_name):
     print('\n ~~~~~~~ summary of ration_report for '+ str(pen_name) + ' ~~~~~~~ \n')
     print(ccc[0][4:])
@@ -44,6 +39,12 @@ def quickprint(ccc, pen_name):
         print('total kg of ration = '+str(summed))
         print('percentage of DMI = '+str([round(float(pos)/float(num_animals)/summed,4) for pos in ccc[i][4:]]))
         print('\n')
+
+pen0 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_0/ration_report/ration_report.csv')
+pen1 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_1/ration_report/ration_report.csv')
+pen2 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_2/ration_report/ration_report.csv')
+pen3 = read_csv('C:/Users/jw2574/Documents/data/vm2/MASM/output/CSVs/pen_report/pen_3/ration_report/ration_report.csv')
+        
 quickprint(pen0, 'pen0')
 quickprint(pen1, 'pen1')
 quickprint(pen2, 'pen2')
