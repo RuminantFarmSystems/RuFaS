@@ -249,7 +249,7 @@ class LayerData:
 
     humus_mineralization_rate_factor: float = 0.0003
     """Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless)
-        Reference: SWAT Input .BSN file."""
+        Reference: SWAT Input .BSN file, see "CMN" on page 101."""
 
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None

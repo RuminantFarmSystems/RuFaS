@@ -33,8 +33,16 @@ class HumusMineralization:
         """Iterates through each layer in the soil profile, transfers nitrogen between active and stable organic
         nitrogen pools, and between the active organic and nitrate pools.
 
+        Notes
+        -----
+        Mineralization and decomposition can only occur if the soil temperature is greater than 0 degrees C (see first
+        paragraph on page 188 of SWAT Theoretical documentation).
+
         """
         for layer in self.data.soil_layers:
+            if layer.temperature <= 0:
+                continue
+
             active_to_stable_mineralized_nitrogen = self._determine_intra_organic_mineralization(
                 layer.active_organic_nitrogen_content, layer.stable_organic_nitrogen_content)
             layer.active_organic_nitrogen_content -= active_to_stable_mineralized_nitrogen
