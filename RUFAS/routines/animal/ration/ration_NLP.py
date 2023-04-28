@@ -581,6 +581,7 @@ def optimize(user_defined_ration_select, ration_percents):
         bnds = tuple(bnds)
         #print(bnds)
 
+
     # establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
     con2 = {'type': 'ineq', 'fun': NEl_constraint}
