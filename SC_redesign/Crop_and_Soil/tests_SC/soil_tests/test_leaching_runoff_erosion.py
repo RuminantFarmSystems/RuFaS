@@ -39,7 +39,7 @@ def test_determine_NO3_runoff_amount(nitrate_concentration: float, runoff: float
     (54.3, 92.4),
     (1, 5)
 ])
-def test_determine_NH4_runoff_amount(ammonium_concentration: float, runoff: float) -> None:
+def test_determine_ammonium_runoff_amount(ammonium_concentration: float, runoff: float) -> None:
     """Tests that the amount of NH4 runoff for the first layer was calculated correctly"""
     runoff_extraction_coef = 1
     expected = ammonium_concentration * runoff * runoff_extraction_coef
