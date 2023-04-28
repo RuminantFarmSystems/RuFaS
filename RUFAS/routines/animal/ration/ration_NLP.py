@@ -521,8 +521,8 @@ def optimize(id_key):
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     for key in id_key:
         if key == '36':
-            bnds.append((2, (limit[i] / 3) + 0.0001))
-            bnds.append((2, (limit[i] / 3) + 0.0001))
+            bnds.append((0, (limit[i] / 3) + 0.0001))
+            bnds.append((0, (limit[i] / 3) + 0.0001))
             bnds.append((2, (limit[i] / 3) + 0.0001))
         else:
             bnds.append((0, (limit[i] / 3) + 0.0001))
