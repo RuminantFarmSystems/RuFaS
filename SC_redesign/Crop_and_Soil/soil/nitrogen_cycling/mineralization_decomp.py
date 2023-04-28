@@ -59,19 +59,54 @@ class MineralizationDecomposition:
             for residue in LayerData.
 
         """
-        return carbon_amount / (organic_nutrient + inorganic_nutrient)
+        nutrient_total = organic_nutrient + inorganic_nutrient
+        if nutrient_total == 0:
+            nutrient_total = 0.000_001
+        return carbon_amount / nutrient_total
 
-    # @staticmethod
-    # def _calculate_nutrient_cycling_residue_composition_factor(carbon_nitrogen_ratio, carbon_phosphorus_ratio) -> float:
-    #     """Calculates the residue composition factor for use in computing the decay rate constant.
-    #
-    #     Parameters
-    #     ----------
-    #     carbon_nitrogen_ratio : float
-    #
-    #     carbon_phosphorus_ratio
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
+    @staticmethod
+    def _calculate_nutrient_term_for_residue_composition_factor(nutrient_ratio: float, constant_term: float) -> float:
+        """Calculates terms that used to determine the nutrient cycling composition factor.
+
+        Parameters
+        ----------
+        nutrient_ratio : float
+            The ratio of carbon to a specific nutrient (unitless)
+        constant_term : float
+            The constant term used in this equation (unitless)
+
+        Returns
+        -------
+        float
+            One of the terms used in the equation to calculate the nutrient cycling residue composition factor.
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.8
+
+        Notes
+        -----
+        This is a helper method for the method that actually calculates the nutrient cycling residue composition factor.
+        It is used for both the nitrogen and phosphorus terms, hence why it takes a generic "nutrient_ratio" and
+        different constants.
+
+        When calculating the nitrogen term, the constant is 25. For phosphorus, it is 200.
+
+        """
+        inner_term = -0.693 * ((nutrient_ratio - constant_term) / constant_term)
+        return exp(inner_term)
+
+    @staticmethod
+    def _calculate_nutrient_cycling_residue_composition_factor(carbon_nitrogen_ratio, carbon_phosphorus_ratio) -> float:
+        """Calculates the residue composition factor for use in computing the decay rate constant.
+
+        Parameters
+        ----------
+        carbon_nitrogen_ratio : float
+
+        carbon_phosphorus_ratio
+
+        Returns
+        -------
+
+        """
