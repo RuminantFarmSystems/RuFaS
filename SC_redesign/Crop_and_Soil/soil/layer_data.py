@@ -489,7 +489,7 @@ class LayerData:
     @staticmethod
     def determine_soil_nutrient_area_density(nutrient_concentration: float, bulk_density: float,
                                              layer_thickness: float, field_size: float) -> float:
-        """Converts a concentration of nutrients in the soil from (mg / kg soil) to (kg / ha)
+        """Converts a mass per mass concentration of nutrients in the soil to a mass per area concentration.
 
         Parameters
         ----------
