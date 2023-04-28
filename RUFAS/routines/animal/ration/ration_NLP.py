@@ -498,8 +498,8 @@ def get_ration_vals(x):
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
-def optimize(id_key):
-    #optimize()
+def optimize():
+    #optimize(id_key)
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -519,22 +519,22 @@ def optimize(id_key):
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    for key in id_key:
-        if key == '36':
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-        else:
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-    n = len(price)
-    x0 = [1]
-    for i in range(n-1):
-        x0.append(random.random() * 10)
+    # for key in id_key:
+    #     if key == '36':
+    #         bnds.append((0, (limit[i] / 3) + 0.0001))
+    #         bnds.append((0, (limit[i] / 3) + 0.0001))
+    #         bnds.append((0, (limit[i] / 3) + 0.0001))
+    #     else:
+    #         bnds.append((0, (limit[i] / 3) + 0.0001))
+    #         bnds.append((0, (limit[i] / 3) + 0.0001))
+    #         bnds.append((0, (limit[i] / 3) + 0.0001))
+    #n = len(price)
+    #x0 = [1]
+    #for i in range(n-1):
+    #    x0.append(random.random() * 10)
     
-    #for i in range(len(limit)):
-    #    bnds.append((0, (limit[i] / 3) + 0.0001))
+    for i in range(len(limit)):
+        bnds.append((0, (limit[i] / 3) + 0.0001))
     
     bnds = tuple(bnds)
 
