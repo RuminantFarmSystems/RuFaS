@@ -22,7 +22,7 @@ from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
-
+import copy
 
 om = OutputManager()
 
@@ -107,9 +107,17 @@ class BaseManureHandler:
         Returns:
             A ManureHandlerDailyOutput object.
         """
+
+        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                        "bedding_density": bedding.bedding_density,
+                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                        "bedding_type": bedding.bedding_type._name_,
+                        }
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
-                    "bedding": vars(bedding),
+                    "bedding": bedding_data,
                     "sim_day": sim_day, }
 
         NH3_housing_emission = GasEmissions.calc_ammonia_emission(
