@@ -17,7 +17,8 @@ class HumusMineralization:
         Parameters
         ----------
         soil_data : SoilData, optional
-            The SoilData object used by this module to track phosphorus cycling, creates new one if one is not provided.
+            The SoilData object used by this module to track the mineralization of organic nitrogen, creates new one if
+            one is not provided.
         field_size : float, optional
             Size of the field (ha)
 
