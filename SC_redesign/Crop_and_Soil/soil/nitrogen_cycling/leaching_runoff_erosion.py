@@ -42,7 +42,7 @@ class LeachingRunoffErosion:
 
         References
         -------
-        pseudocode_soil S.6.C.1
+        pseudocode_soil S.4.C.1
         """
         return soluble_nitrogen_amount * (1 - (exp(-soil_water_runoff_sum/saturation_content))/soil_water_runoff_sum)
 
@@ -68,7 +68,7 @@ class LeachingRunoffErosion:
 
         References
         -------
-        pseudocode_soil S.6.C.2
+        pseudocode_soil S.4.C.2
         """
         return nitrogen_concentration*runoff*runoff_extraction_coef
 
@@ -94,7 +94,7 @@ class LeachingRunoffErosion:
 
         References
         -------
-        pseudocode_soil S.6.C.2
+        pseudocode_soil S.4.C.2
         """
         return nitrogen_concentration*runoff*runoff_extraction_coef
 
@@ -108,12 +108,40 @@ class LeachingRunoffErosion:
         ----------
         nitrogen_amount: float
             amount of Fresh, Active, and Stable nitrogen (kg/ha)
-            Thickness of the soil layer (mm)
         bulk_density: float
     `       bulk density of the soil layer (Mg per cubic meter)
         Returns
         -------
         float
             the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
+        References
+        -------
+        pseudocode_soil S.4.C.3
         """
         return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
+
+    @staticmethod
+    def _determine_erosion_nitrogen_loss_content(nitrogen_erosion_concentration: float,
+                                                 daily_soil_lost: float,
+                                                 enrichment_ratio: float) -> float:
+        """This method determines nitrogen mass loss in erosion
+
+        Parameters
+        ----------
+        nitrogen_erosion_concentration: float
+            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
+        daily_soil_lost: float
+            daily soil loss (Metric Tons/ha)
+        enrichment_ratio: float
+            Enrichment ratio (unitless)
+        Returns
+        -------
+        float
+            nitrogen mass loss in erosion (kg/ha)
+
+        References
+        -------
+        pseudocode_soil S.4.C.4
+
+        """
+        return 0.001*nitrogen_erosion_concentration*daily_soil_lost*enrichment_ratio
