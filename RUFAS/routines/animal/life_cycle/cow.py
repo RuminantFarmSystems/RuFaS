@@ -109,7 +109,7 @@ class Cow(HeiferIII):
         self.milking = False
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
-        self.milk_production_reduction = 0
+        self.milk_production_reduction = 0.0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -519,8 +519,6 @@ class Cow(HeiferIII):
             cull_stage: True if a cow is culled, false if it stays in the herd
             new_born: True if a calf is born
         """
-        self.update_body_weight_history(sim_day)
-        self.update_milk_production_history(sim_day)
         if self.culled:
             return None
 
@@ -551,6 +549,10 @@ class Cow(HeiferIII):
         # if self.milking:
         estimated_daily_milk_produced, fat_percent, \
         daily_fat_correct_milk_production = self.milking_update(sim_day, calving_interval)
+
+        self.update_body_weight_history(sim_day)
+        self.update_milk_production_history(sim_day)
+
         if not self.do_not_breed:
             if self.repro_program == 'ED':
                 self.ed_update(sim_day)

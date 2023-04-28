@@ -363,10 +363,17 @@ class AnimalManagement:
         for cow in self.cows:
             cow.set_nutrient_rqmts()
 
-    def reset_milk_production_reduction(self):
+    def reset_milk_production_reduction(self) -> None:
+        """
+        Resets reduction value for milk production to 0.0 for all animals in all pens
+
+        The milk_production_reduction attribute is a flat value generated in ration_driver.py, 
+            in cases where a ration cannot be formualted such that it meets animal requirements
+
+        """
         for pen in self.all_pens:
             for animal in pen.animals_in_pen:
-                animal.milk_production_reduction = 0
+                animal.milk_production_reduction = 0.0
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -1086,8 +1093,6 @@ class AnimalManagement:
             weather: instance of the Weather class defined in classes.py
             time: instance of the Time class defined in classes.py
         """
-        if self.end_ration_interval():
-            self.reset_milk_production_reduction()
         if self.simulate_animals:
             for pen in self.all_pens:
                 pen.populated = len(pen.animals_in_pen) > 0
@@ -1106,6 +1111,7 @@ class AnimalManagement:
             self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
+                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_animals_to_pens()
