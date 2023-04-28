@@ -1,5 +1,5 @@
 from typing import Optional
-from math import exp
+from math import exp, log
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
@@ -24,7 +24,7 @@ class LeachingRunoffErosion:
     def _determine_nitrogen_concentration(soluble_nitrogen_amount: float,
                                           soil_water_runoff_sum: float,
                                           saturation_content: float) -> float:
-        """This method determines the concentration (kg N/mm H20) of the inorganic pools NO3/NH4 in the top soil layer
+        """This method determines the concentration of the inorganic pools NO3/NH4 in the top soil layer
 
         Parameters
         ----------
@@ -47,16 +47,16 @@ class LeachingRunoffErosion:
         return soluble_nitrogen_amount * (1 - (exp(-soil_water_runoff_sum/saturation_content))/soil_water_runoff_sum)
 
     @staticmethod
-    def _determine_NO3_runoff_amount(nitrogen_concentration: float,
-                                     runoff: float,
-                                     runoff_extraction_coef=0.1) -> float:
-        """This method determines the amount of NO3 runoff for the first layer
+    def _determine_nitrate_runoff_amount(nitrate_concentration: float,
+                                         runoff: float,
+                                         runoff_extraction_coef=0.1) -> float:
+        """This method determines the amount of nitrate runoff for the first layer
 
         Parameters
         ----------
-        nitrogen_concentration: float
+        nitrate_concentration: float
             the concentration of the inorganic pools NO3/NH4 in the top soil layer (kg N/mm H20)
-        runoff_extraction_coef: float default for NO3 = 0.1
+        runoff_extraction_coef: float default for nitrate = 0.1
             coefficient of extraction for runoff (unitless)
         runoff: float
             daily runoff of H2O (mm)
@@ -64,23 +64,23 @@ class LeachingRunoffErosion:
         Returns
         -------
         float:
-            the amount of NO3 runoff from the first layer (kg/ha)
+            the amount of nitrate runoff from the first layer (kg/ha)
 
         References
         -------
         pseudocode_soil S.4.C.2
         """
-        return nitrogen_concentration*runoff*runoff_extraction_coef
+        return nitrate_concentration * runoff * runoff_extraction_coef
 
     @staticmethod
-    def _determine_NH4_runoff_amount(nitrogen_concentration: float,
-                                     runoff: float,
-                                     runoff_extraction_coef=1) -> float:
-        """This method determines the amount of NH4 runoff for the first layer
+    def _determine_ammonium_runoff_amount(ammonium_concentration: float,
+                                          runoff: float,
+                                          runoff_extraction_coef=1) -> float:
+        """This method determines the amount of ammonium runoff for the first layer
 
         Parameters
         ----------
-        nitrogen_concentration: float
+        ammonium_concentration: float
             the concentration of the inorganic pools NO3/NH4 in the top soil layer (kg N/mm H20)
         runoff_extraction_coef: float default for NH4 = 1
             coefficient of extraction for runoff (unitless)
@@ -90,13 +90,13 @@ class LeachingRunoffErosion:
         Returns
         -------
         float:
-            the amount of NH4 runoff from the first layer (kg/ha)
+            the amount of ammonium runoff from the first layer (kg/ha)
 
         References
         -------
         pseudocode_soil S.4.C.2
         """
-        return nitrogen_concentration*runoff*runoff_extraction_coef
+        return ammonium_concentration * runoff * runoff_extraction_coef
 
     @staticmethod
     def _determine_nitrogen_erosion_concentration(nitrogen_amount: float,
@@ -145,3 +145,29 @@ class LeachingRunoffErosion:
 
         """
         return 0.001*nitrogen_erosion_concentration*daily_soil_lost*enrichment_ratio
+
+    @staticmethod
+    def _determine_enrichment_ratio(daily_soil_lost: float) -> float:
+        """This method determines the enrichment ratio
+
+        Parameters
+        ----------
+        daily_soil_lost: float
+            daily soil loss (Metric Tons/ha)
+
+        Returns
+        -------
+        float
+            enrichment ratio (unitless)
+
+        References
+        -------
+        pseudocode_soil S.4.C.5
+
+        Notes
+        -------
+        These numbers are modified ans suspected of retrieved from other references instead of SWAT, it will be kept
+        until futher discussions with Pete
+        """
+
+        return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
