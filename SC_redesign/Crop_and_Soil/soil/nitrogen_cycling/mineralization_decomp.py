@@ -103,10 +103,25 @@ class MineralizationDecomposition:
         Parameters
         ----------
         carbon_nitrogen_ratio : float
-
-        carbon_phosphorus_ratio
+            Ratio of carbon to nitrogen in this layer of the soil profile (unitless)
+        carbon_phosphorus_ratio : float
+            Ratio of carbon to phosphorus in this layer of the soil profile (unitless)
 
         Returns
         -------
+        The nutrient cycling residue composition factor (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.2.8
+
+        Notes
+        -----
+        The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
 
         """
+        nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
+            carbon_nitrogen_ratio, 25)
+        phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(
+            carbon_phosphorus_ratio, 200)
+        return min(nitrogen_term, phosphorus_term, 1.0)
