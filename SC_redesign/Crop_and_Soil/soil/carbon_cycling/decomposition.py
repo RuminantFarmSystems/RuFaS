@@ -14,7 +14,7 @@ class Decomposition:
         Parameters
         ----------
         soil_data : SoilData, optional
-            The SoilData object used by this module to track the decomposition of carbong in the soil profile, creates
+            The SoilData object used by this module to track the decomposition of carbon in the soil profile, creates
             new one if one is not provided.
         field_size : float, optional
             Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is

@@ -213,9 +213,9 @@ def test_evapotranspirate(extraterrestrial_radiation, max_temp, min_temp, avg_te
                           snow_water, initial_canopy_water):
     # initialize objects
     data = SoilData(field_size=1.33, transpiration=0.4325,
-                    soil_layers=[LayerData(top_depth=0, bottom_depth=50, nitrate=0.5, field_size=1.33),
-                                 LayerData(top_depth=50, bottom_depth=80, nitrate=1, field_size=1.33),
-                                 LayerData(top_depth=80, bottom_depth=200, nitrate=5, field_size=1.33)])
+                    soil_layers=[LayerData(top_depth=0, bottom_depth=50, field_size=1.33),
+                                 LayerData(top_depth=50, bottom_depth=80, field_size=1.33),
+                                 LayerData(top_depth=80, bottom_depth=200, field_size=1.33)])
     assert data.transpiration == 0.4325
     incorp = Evapotranspiration(data)
 
