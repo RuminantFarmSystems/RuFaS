@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional
 
+from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
@@ -32,21 +33,27 @@ class Soil:
         """object that tracks all soil variable throughout the simulation"""
 
         # Process components
+        self.soil_temp = SoilTemp(self.data)
+        """Process component that tracks and updates the temperatures within the soil profile"""
+        self.phosphorus_cycling = PhosphorusCycling(self.data)
+        """Process component managing phosphorus on top of and in the soil profile"""
+        self.manure_applicator = ManureApplication(self.data)
+        """Process component that provides interface for adding manure to a field
+            TODO: move this component up into a higher level, more sensible module - Issue #433"""
+        self.carbon_cycling = CarbonCycling(self.data)
+        """Process component that handles carbon cycling (through decomposition) in the soil."""
+        # TODO: need to add phosphorus, manure, and carbon cycling main methods methods to the soil methods.
+        #   It is unclear to me how best to do that.
+
+        # Water components
         self.evapotranspiration = Evapotranspiration(self.data)
         """Process component that controls evapotranspiration from the soil"""
         self.infiltration = Infiltration(self.data)
         """Process component that controls water infiltration from the soil surface into the profile"""
         self.percolation = Percolation(self.data)
         """Process component that controls percolation of water from upper layers to lower layers"""
-        self.soil_temp = SoilTemp(self.data)
-        """Process component that tracks and updates the temperatures within the soil profile"""
         self.soil_erosion = SoilErosion(self.data)
         """Process component that track erosion from the soil profile"""
-        self.phosphorus_cycling = PhosphorusCycling(self.data)
-        """Process component managing phosphorus on top of and in the soil profile"""
-        self.manure_applicator = ManureApplication(self.data)
-        """Process component that provides interface for adding manure to a field
-            TODO: move this component up into a higher level, more sensible module - Issue #433"""
 
     @classmethod
     def make_from_config(cls, soil_config) -> Soil:
