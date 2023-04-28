@@ -200,9 +200,6 @@ class SoilData:
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
         return self.plant_surface_residue + self.plant_root_residue
 
-    residue: float = 0
-    """TEMPORARY: the amount of residue currently on the soil surface (kg / ha)"""
-
     def __post_init__(self, field_size: float):
         """This method initializes attributes that either cannot be set to a default above or depend on other
             attributes in the object to be set before they can be set
@@ -233,7 +230,8 @@ class SoilData:
             raise ValueError(f"Expected field_size to be greater than 0, received {field_size}.")
 
         if self.soil_layers is None:
-            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size, residue=self.residue),
+            self.soil_layers = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size,
+                                          residue=self.plant_surface_residue),
                                 LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
                                 LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
                                 LayerData(top_depth=80, bottom_depth=200, field_size=field_size)]
@@ -275,7 +273,7 @@ class SoilData:
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.__post_init__(field_size, self.residue)
+        new_top_layer.__post_init__(field_size, self.plant_surface_residue)
         self.soil_layers[0].top_depth = 20
         self.soil_layers[0].__post_init__(field_size, 0)
         self.soil_layers.insert(0, new_top_layer)
