@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, call
 
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
 
+
 # --- Static method tests ---
 @pytest.mark.parametrize("carbon,organic,inorganic", [
     (55, 22, 44),
@@ -52,4 +53,18 @@ def test_calculate_nutrient_cycling_residue_composition_factor(nitrogen_ratio: f
 
     calls = [call(nitrogen_ratio, 25), call(phosphorus_ratio, 200)]
     MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor.assert_has_calls(calls)
+    assert observed == expected
+
+
+@pytest.mark.parametrize("mineralization_rate,composition_factor,temp_factor,water_factor", [
+    (0.05, 0.8, 0.15, 0.8),
+    (0.045, 0.7753, 0.66754, 0.05),
+    (0.051134, 0.5562, 0.996, 0.66745)
+])
+def test_calculate_rate_constant(mineralization_rate: float, composition_factor: float, temp_factor: float,
+                                 water_factor: float) -> float:
+    """Tests that the decay rate constant is correctly calculated."""
+    observed = MineralizationDecomposition._calculate_decay_rate_constant(mineralization_rate, composition_factor,
+                                                                          temp_factor, water_factor)
+    expected = mineralization_rate * composition_factor * (temp_factor * water_factor) ** 0.5
     assert observed == expected
