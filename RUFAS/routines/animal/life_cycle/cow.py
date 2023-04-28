@@ -319,6 +319,23 @@ class Cow(HeiferIII):
 
         self.body_weight += self.daily_growth
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.milking_update.__name__,
+                    "simulation_day": sim_day,
+                    "calving_interval": calving_interval,
+                    }
+
+        milk_data_update = {}
+        milk_data_update["days_in_milk"] = self.days_in_milk
+        milk_data_update["estimated_daily_milk_produced"] = self.estimated_daily_milk_produced
+        milk_data_update["milk_protein"] = self.mPrt
+        milk_data_update["milk_fat"] = self.fat_percent
+        milk_data_update["milk_lactose"] = self.lactose_milk
+        milk_data_update["lactating"] = self.milking
+        milk_data_update["cow_id"] = self.id
+
+        om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
+
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
@@ -350,10 +367,6 @@ class Cow(HeiferIII):
         Calculates this Cow's nutrient requirements.
         """
 
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.set_nutrient_rqmts.__name__,
-                    }
-
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
@@ -377,15 +390,6 @@ class Cow(HeiferIII):
         self.DMIest = req['DMIest']
         self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
         self.DMDP_req = (req['MP_req']) / self.DMIest
-
-        milk_data = {}
-        milk_data["milk_protein"] = self.mPrt
-        milk_data["milk_fat"] = self.fat_percent
-        milk_data["milk_lactose"] = self.lactose_milk
-        milk_data["lactating"] = self.milking
-
-        om.add_variable("milk_data", milk_data, info_map)
-
 
     def phosphorus_rqmts(self, DMI):
         """
