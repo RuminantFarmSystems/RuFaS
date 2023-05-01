@@ -31,7 +31,8 @@ class MineralizationDecomposition:
 
         References
         ----------
-        SWAT Theoretical documentation section 3:1.2.2
+        SWAT Theoretical documentation section 3:1.2.2, specifically eqn. 3:1.2.9 (used to determine how much nitrogen
+        gets transferred to the nitrate and active inorganic pools).
 
         """
         if self.data.soil_layers[0].temperature <= 0:
