@@ -286,7 +286,6 @@ class OutputManager(object):
         ------
         Exception
             If an error occurs while saving the file
-        
         """
         try:
             with open(path, 'w') as var_names_file:
