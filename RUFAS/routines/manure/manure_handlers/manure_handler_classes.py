@@ -173,12 +173,12 @@ class BaseManureHandler:
                     "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
                     }
 
-        clean_water_volume = num_animals * self.config.cleaning_water_use_rate
+        cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
 
         om.add_variable(
-            "cleaning_water_volume_in_main_barn", clean_water_volume, info_map)
+            "cleaning_water_volume_in_main_barn", cleaning_water_volume, info_map)
 
-        return clean_water_volume
+        return cleaning_water_volume
 
 
 class FlushSystem(BaseManureHandler):
