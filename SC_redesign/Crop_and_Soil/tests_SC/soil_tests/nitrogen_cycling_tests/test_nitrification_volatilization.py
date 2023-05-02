@@ -1,4 +1,5 @@
 import pytest
+from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
 
@@ -30,4 +31,17 @@ def test_calculate_nitrification_soil_water_factor(water: float, wilting: float,
         expected = (water - wilting) / (0.25 * (field - wilting))
     else:
         expected = 1.0
+    assert observed == expected
+
+
+@pytest.mark.parametrize("depth", [
+    12,
+    33.5,
+    94,
+    120.394,
+])
+def test_calculate_volatilization_depth_factor(depth: float) -> float:
+    """Tests that the volatilization depth factor is calculated correctly."""
+    observed = NitrificationVolatilization._calculate_volatilization_depth_factor(depth)
+    expected = 1 - depth / (depth + exp(4.706 - 0.0305 * depth))
     assert observed == expected
