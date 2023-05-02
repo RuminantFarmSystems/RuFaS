@@ -149,6 +149,7 @@ class LeachingRunoffErosion:
         Notes
         -------
         @TODO These numbers are modified ans suspected of retrieved from other references instead of SWAT, kept here
+        issue #486
 
         """
 
