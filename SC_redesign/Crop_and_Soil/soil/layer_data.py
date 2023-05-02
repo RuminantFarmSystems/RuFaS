@@ -250,6 +250,12 @@ class LayerData:
     humus_mineralization_rate_factor: float = 0.0003
     """Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless)
         Reference: SWAT Input .BSN file, see "CMN" on page 101."""
+    ammonium_volatilization_cation_exchange_factor: float = 0.15
+    """Exchange factor that accounts for the soil's cation exchange capacity, default = 0.15 (unitless)
+        Reference: SWAT Theoretical documentation eqn. 3:1.3.5"""
+
+    annual_volatilized_ammonium_total: float = 0
+    """Cumulative total of ammonium volatilized in this year (kg / ha)"""
 
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None
