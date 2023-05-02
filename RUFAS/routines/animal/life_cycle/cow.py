@@ -91,6 +91,7 @@ class Cow(HeiferIII):
         """
         super().__init__(args)
 
+        #self.simulation_day = sim_day
         # current hard-coded values necessary for nutrient requirement
         # calculations
         self.BCS = 3.5  # body condition score
@@ -371,7 +372,10 @@ class Cow(HeiferIII):
         self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
         self.DMDP_req = (req['MP_req']) / self.DMIest
 
-        csvline = [self.id,
+        #self.simulation_day,
+
+        csvline = [
+                   self.id,
                    'cow',
                    self.mPrt,
                    self.fat_percent,
