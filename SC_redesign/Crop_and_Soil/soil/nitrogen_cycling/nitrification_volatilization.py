@@ -29,6 +29,45 @@ class NitrificationVolatilization:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
+    def do_daily_nitrification_and_volatilization(self) -> None:
+        """Conducts the nitrification and volatilization of ammonium within the soil profile on a daily basis.
+
+        References
+        ----------
+        SWAT Theoretical documentation section 3:1.3
+
+        """
+        for layer in self.data.soil_layers:
+            if layer.temperature <= 5:
+                continue
+
+            temp_factor = self._calculate_nitrification_volatilization_temp_factor(layer.temperature)
+            water_factor = self._calculate_nitrification_soil_water_factor(layer.water_content,
+                                                                           layer.wilting_point_content,
+                                                                           layer.field_capacity_content)
+            depth_factor = self._calculate_volatilization_depth_factor(layer.depth_of_layer_center)
+
+            nitrification_regulator = self._calculate_nitrification_regulator(temp_factor, water_factor)
+            volatilization_regulator = self._calculate_volatilization_regulator(
+                temp_factor, depth_factor, layer.ammonium_volatilization_cation_exchange_factor)
+
+            nitrification_loss_fraction = self._calculate_ammonium_loss_fraction(nitrification_regulator)
+            volatilization_loss_fraction = self._calculate_ammonium_loss_fraction(volatilization_regulator)
+
+            total_ammonium_lost = self._calculate_total_ammonium_lost(layer.ammonium_content, nitrification_regulator,
+                                                                      volatilization_regulator)
+
+            nitrified_ammonium = self._calculate_ammonium_lost_to_process(total_ammonium_lost,
+                                                                          nitrification_loss_fraction,
+                                                                          volatilization_loss_fraction)
+            volatilized_ammonium = self._calculate_ammonium_lost_to_process(total_ammonium_lost,
+                                                                            volatilization_loss_fraction,
+                                                                            nitrification_loss_fraction)
+
+            layer.ammonium_content -= total_ammonium_lost
+            layer.nitrate_content += nitrified_ammonium
+            layer.annual_volatilized_ammonium_total += volatilized_ammonium
+
     # --- Static methods ---
     @staticmethod
     def _calculate_nitrification_volatilization_temp_factor(temperature: float) -> float:
