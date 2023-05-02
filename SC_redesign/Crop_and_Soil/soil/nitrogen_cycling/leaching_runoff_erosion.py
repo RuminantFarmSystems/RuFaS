@@ -154,3 +154,7 @@ class LeachingRunoffErosion:
         """
 
         return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
+
+    @staticmethod
+    def _determine_nitrate_percolation_water_concentration():
+        return 0
