@@ -42,7 +42,12 @@ class LeachingRunoffErosion:
 
         References
         -------
-        pseudocode_soil S.4.C.1
+        SWAT Theoretical documentation eqn. 4:2.1.2
+
+        Notes
+        -----
+        This equation has been modified for use in RuFaS, it no longer accounts for the fraction of porosity from which
+        anions are excluded.
         """
         return soluble_nitrogen_amount * (1 - (exp(-soil_water_runoff_sum/saturation_content))/soil_water_runoff_sum)
 
@@ -93,7 +98,7 @@ class LeachingRunoffErosion:
             the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
         References
         -------
-        pseudocode_soil S.4.C.3
+        SWAT Theoretical documentation eqn. 4:2.2.2
         """
         return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
 
@@ -118,7 +123,7 @@ class LeachingRunoffErosion:
 
         References
         -------
-        pseudocode_soil S.4.C.4
+        SWAT Theoretical documentation eqn. 4:2.2.1
 
         """
         return 0.001*nitrogen_erosion_concentration*daily_soil_lost*enrichment_ratio
@@ -143,8 +148,8 @@ class LeachingRunoffErosion:
 
         Notes
         -------
-        These numbers are modified ans suspected of retrieved from other references instead of SWAT, it will be kept
-        until futher discussions with Pete
+        @TODO These numbers are modified ans suspected of retrieved from other references instead of SWAT, kept here
+
         """
 
         return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))

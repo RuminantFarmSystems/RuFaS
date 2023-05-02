@@ -18,32 +18,20 @@ def test_determine_nitrogen_concentration(soluble_nitrogen_amount: float,
                                                                                saturation_content)
 
 
-@pytest.mark.parametrize("nitrate_concentration, runoff", [
-    (0, 56),
-    (51, 0),
-    (108, 110),
-    (54.3, 92.4),
-    (1, 5)
+@pytest.mark.parametrize("nitrogen_concentration, runoff, runoff_extraction_coef", [
+    (0, 56, 0.1),
+    (51, 0, 0.2),
+    (108, 110, 0.3),
+    (54.3, 92.4, 0),
+    (1, 5, 0.6)
 ])
-def test_determine_NO3_runoff_amount(nitrate_concentration: float, runoff: float) -> None:
-    """Tests that the amount of NO3 runoff for the first layer was calculated correctly"""
-    runoff_extraction_coef = 0.1
-    expected = nitrate_concentration*runoff*runoff_extraction_coef
-    assert expected == LeachingRunoffErosion._determine_nitrate_runoff_amount(nitrate_concentration, runoff)
-
-
-@pytest.mark.parametrize("ammonium_concentration, runoff", [
-    (0, 56),
-    (51, 0),
-    (108, 110),
-    (54.3, 92.4),
-    (1, 5)
-])
-def test_determine_ammonium_runoff_amount(ammonium_concentration: float, runoff: float) -> None:
-    """Tests that the amount of NH4 runoff for the first layer was calculated correctly"""
-    runoff_extraction_coef = 1
-    expected = ammonium_concentration * runoff * runoff_extraction_coef
-    assert expected == LeachingRunoffErosion._determine_ammonium_runoff_amount(ammonium_concentration, runoff)
+def test_determine_nitrate_runoff_amount(nitrogen_concentration: float, runoff: float,
+                                         runoff_extraction_coef: float) -> None:
+    """Tests that the amount of nitrate runoff for the first layer was calculated correctly"""
+    expected = nitrogen_concentration * runoff * runoff_extraction_coef
+    assert expected == LeachingRunoffErosion._determine_nitrate_runoff_amount(nitrogen_concentration,
+                                                                              runoff,
+                                                                              runoff_extraction_coef)
 
 
 @pytest.mark.parametrize("nitrogen_amount, layer_thickness,bulk_density", [
