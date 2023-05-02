@@ -1,4 +1,5 @@
 from typing import Optional
+from math import exp
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
@@ -71,12 +72,33 @@ class NitrificationVolatilization:
 
         References
         ----------
-        SWAT Theoretical documentation 3:1.3.2, 3
+        SWAT Theoretical documentation eqn. 3:1.3.2, 3
 
         """
         if water_content >= 0.25 * field_capacity - 0.75 * wilting_point:
             return 1.0
-
         upper_term = water_content - wilting_point
         bottom_term = 0.25 * (field_capacity - wilting_point)
         return upper_term / bottom_term
+
+    @staticmethod
+    def _calculate_volatilization_depth_factor(depth: float) -> float:
+        """Calculates the depth factor for use in determining volatilization.
+
+        Parameters
+        ----------
+        depth : float
+            The depth of the center of this soil layer (mm)
+
+        Returns
+        -------
+        float
+            The volatilization depth factor (mm)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.3.4
+
+        """
+        exponential_term = exp(4.706 - 0.0305 * depth)
+        return 1 - (depth / (depth + exponential_term))
