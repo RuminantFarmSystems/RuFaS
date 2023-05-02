@@ -11,8 +11,8 @@ class LeachingRunoffErosion:
         Parameters
         ----------
         soil_data : SoilData, optional
-            The SoilData object used by this module to track carbon in the soil profile, creates new one if one is not
-            provided.
+            The SoilData object used by this module to track nitrogen leaching and runoff in the soil profile, creates
+            new one if one is not provided.
         field_size : float, optional
             Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
             not provided (ha)
