@@ -47,56 +47,33 @@ class LeachingRunoffErosion:
         return soluble_nitrogen_amount * (1 - (exp(-soil_water_runoff_sum/saturation_content))/soil_water_runoff_sum)
 
     @staticmethod
-    def _determine_nitrate_runoff_amount(nitrate_concentration: float,
+    def _determine_nitrate_runoff_amount(nitrogen_concentration: float,
                                          runoff: float,
-                                         runoff_extraction_coef=0.1) -> float:
+                                         runoff_extraction_coef: float) -> float:
         """This method determines the amount of nitrate runoff for the first layer
-
         Parameters
         ----------
-        nitrate_concentration: float
-            the concentration of the inorganic pools NO3/NH4 in the top soil layer (kg N/mm H20)
-        runoff_extraction_coef: float default for nitrate = 0.1
+        nitrogen_concentration: float
+            the content of inorganic (nitrate or ammonium) nitrogen in the top soil layer (kg N/mm H20)
+        runoff_extraction_coef: float
             coefficient of extraction for runoff (unitless)
         runoff: float
             daily runoff of H2O (mm)
-
         Returns
         -------
         float:
             the amount of nitrate runoff from the first layer (kg/ha)
-
         References
         -------
-        pseudocode_soil S.4.C.2
+        SWAT Theoretical documentation eqn. 4:2.1.5
+
+        Notes
+        -----
+        The SWAT equation uses beta_NO3 as the runoff extraction coefficient (see SWAT Input file .BSN "NPERCO", page
+        104). RuFaS instead simplifies the runoff extraction coefficient to be 0.1 for determining nitrate runoff and
+        1.0 for ammonium runoff.
         """
-        return nitrate_concentration * runoff * runoff_extraction_coef
-
-    @staticmethod
-    def _determine_ammonium_runoff_amount(ammonium_concentration: float,
-                                          runoff: float,
-                                          runoff_extraction_coef=1) -> float:
-        """This method determines the amount of ammonium runoff for the first layer
-
-        Parameters
-        ----------
-        ammonium_concentration: float
-            the concentration of the inorganic pools NO3/NH4 in the top soil layer (kg N/mm H20)
-        runoff_extraction_coef: float default for NH4 = 1
-            coefficient of extraction for runoff (unitless)
-        runoff: float
-            daily runoff of H2O (mm)
-
-        Returns
-        -------
-        float:
-            the amount of ammonium runoff from the first layer (kg/ha)
-
-        References
-        -------
-        pseudocode_soil S.4.C.2
-        """
-        return ammonium_concentration * runoff * runoff_extraction_coef
+        return nitrogen_concentration * runoff * runoff_extraction_coef
 
     @staticmethod
     def _determine_nitrogen_erosion_concentration(nitrogen_amount: float,
