@@ -49,3 +49,34 @@ class NitrificationVolatilization:
 
         """
         return 0.41 * ((temperature - 5) / 10)
+
+    @staticmethod
+    def _calculate_nitrification_soil_water_factor(water_content: float, wilting_point: float,
+                                                   field_capacity: float) -> float:
+        """Calculates the soil water factor for nitrification.
+
+        Parameters
+        ----------
+        water_content : float
+            Water present in this soil layer (mm)
+        wilting_point : float
+            Amount of water in this soil layer when at wilting point (mm)
+        field_capacity : float
+            Amount of water in this soil layer when at field capacity (mm)
+
+        Returns
+        -------
+        float
+            The nitrification soil water factor (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation 3:1.3.2, 3
+
+        """
+        if water_content >= 0.25 * field_capacity - 0.75 * wilting_point:
+            return 1.0
+
+        upper_term = water_content - wilting_point
+        bottom_term = 0.25 * (field_capacity - wilting_point)
+        return upper_term / bottom_term
