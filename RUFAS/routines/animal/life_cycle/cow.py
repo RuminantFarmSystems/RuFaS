@@ -383,6 +383,16 @@ class Cow(HeiferIII):
                    self.estimated_daily_milk_produced,
                    self.days_in_milk,
                    self.milking,
+                   self.NEmaint,
+                   self.NEg,
+                   self.NEpreg,
+                   self.NEl,
+                   self.MP_req,
+                   self.Ca_req,
+                   self.P_req,
+                   self.DMIest,
+                   self.DNED_req,
+                   self.DMDP_req,
                    ]
         with open('/Users/haowenhu/Library/Mobile Documents/com~apple~CloudDocs/Reed Lab/Conferences/CJAS/CJAS 2023/milkcomponents.csv', 'a', newline='') as file:
             csvout = csv.writer(file)
