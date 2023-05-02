@@ -93,7 +93,7 @@ class NitrificationVolatilization:
         Returns
         -------
         float
-            The volatilization depth factor (mm)
+            The volatilization depth factor (unitless)
 
         References
         ----------
@@ -102,3 +102,137 @@ class NitrificationVolatilization:
         """
         exponential_term = exp(4.706 - 0.0305 * depth)
         return 1 - (depth / (depth + exponential_term))
+
+    @staticmethod
+    def _calculate_nitrification_regulator(temp_factor: float, water_factor: float) -> float:
+        """Calculates the nitrification regulator for this layer of soil.
+
+        Parameters
+        ----------
+        temp_factor : float
+            The nitrification/volatilization temperature factor of the current layer of soil (unitless)
+        water_factor : float
+            The nitrification soil water factor of the current soil layer (unitless)
+
+        Returns
+        -------
+        float
+            The nitrification regulator for this layer of soil (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.3.6
+
+        """
+        return temp_factor * water_factor
+
+    @staticmethod
+    def _calculate_volatilization_regulator(temp_factor: float, depth_factor: float,
+                                            cation_exchange_factor: float) -> float:
+        """Calculates the volatilization regulator for this layer of soil.
+
+        Parameters
+        ----------
+        temp_factor : float
+            The nitrification/volatilization temperature factor of the current layer of soil (unitless)
+        depth_factor : float
+            The volatilization depth factor (unitless)
+        cation_exchange_factor : float
+            The volatilization cation exchange factor (unitless)
+
+        Returns
+        -------
+        float
+            The volatilization regulator for this layer of soil (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.3.7
+
+        """
+        return temp_factor * depth_factor * cation_exchange_factor
+
+    @staticmethod
+    def _calculate_total_ammonium_lost(ammonium_content: float, nitrification_regulator: float,
+                                       volatilization_regulator: float) -> float:
+        """Calculates the amount of ammonium lost to nitrification and volatilization.
+
+        Parameters
+        ----------
+        ammonium_content : float
+            The ammonium content of this soil layer (kg / ha)
+        nitrification_regulator : float
+            The nitrification regulator for this layer of soil (unitless)
+        volatilization_regulator : float
+            The volatilization regulator for this layer of soil (unitless)
+
+        Returns
+        -------
+        float
+            The amount of ammonium lost to nitrification and volatilization (kg / ha)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.3.8
+
+        """
+        exponential_term = exp(-1 * nitrification_regulator - volatilization_regulator)
+        return ammonium_content * (1 - exponential_term)
+
+    @staticmethod
+    def _calculate_ammonium_loss_fraction(regulator: float) -> float:
+        """Calculates the fraction of lost ammonium that is lost to the specified process.
+
+        Parameters
+        ----------
+        regulator : float
+            The regulator for the process that ammonium is being lost to (unitless)
+
+        Returns
+        -------
+        float
+            Fraction of lost ammonium that is lost due to the given process (unitless)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.3.9, 10
+
+        Notes
+        -----
+        This method is used to calculate the fraction of ammonium lost to both nitrification and volatilization.
+
+        """
+        return 1 - exp(-1 * regulator)
+
+    @staticmethod
+    def _calculate_ammonium_lost_to_process(total_lost_ammonium: float, actual_loss_fraction: float,
+                                            other_loss_fraction: float) -> float:
+        """Calculates the amount of ammonium lost to the specified process.
+
+        Parameters
+        ----------
+        total_lost_ammonium : float
+            The total ammonium content lost to nitrification and volatilization (kg / ha)
+        actual_loss_fraction : float
+            The loss fraction for the specified process that ammonium is being lost to (unitless)
+        other_loss_fraction : float
+            The loss fraction for the other process that ammonium is lost to (unitless)
+
+        Returns
+        -------
+        float
+            The amount of ammonium that is lost to the specified process (kg / ha)
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 3:1.3.11, 12
+
+        Notes
+        -----
+        This method is intended to be used to calculate both the amount of ammonium lost to nitrification and to
+        volatilization. To calculate the amount lost to nitrification, pass the nitrification loss fraction as the
+        `actual_loss_fraction` and the volatilization loss fraction as the `other_loss_fraction`, and vice versa for
+        calculating the amount lost to volatilization.
+
+        """
+        return (actual_loss_fraction / (actual_loss_fraction + other_loss_fraction)) * total_lost_ammonium
