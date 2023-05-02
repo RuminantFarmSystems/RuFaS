@@ -152,3 +152,43 @@ def ration_to_use(pen_animal_combo):
     else: 
         ration_percents = udrv.calf_ration
     return ration_percents
+
+
+def ration_constraint_check(ration, available_feeds, requirements):
+    # for each of the following, should assess whether the ration as fed meets the requirements
+    
+    # requirements here are from the set_requirements method in class Requirements in ration_driver.py
+
+    # ration will be the ration values as calculated using the DMI est from the req, e.g. avg. for the pen
+
+    # call ration_report - but include additional required returns
+
+    # NEmact_constraint(x):
+    # NEl_constraint(x):
+    # NEgact_constraint(x):
+    # calcium_constraint(x):
+    # phosphorus_constraint(x):
+    # protien_constraint(x):
+    # NDF_constraint_1(x):
+    # NDF_constraint_2(x):
+    # forage_NDF_constraint(x):
+    # fat_constraint(x):
+    # DMI_constraint_lower(x):
+    # DMI_constraint_upper(x):
+    # energy_req_limit_constraint(x):
+    pass
+
+
+def reduce_lactation():
+    # for each animal in a pen reduce lactation and add to the penalty
+    pass
+
+
+def user_defined_logic():
+    # for a given pen, and a given ration_per_animal, given requirements
+    # check that it passes the constraints
+    # if yes - return the ration
+    # if no - reduce lactation and try again (also return warning)
+    # if reduction from original lactation amount (avg. per pen) below threshold -> 
+    # -> then return ration and add warning
+    pass

@@ -31,6 +31,6 @@
             "136":3.00,
             "139":0.30
         },
-"tolerance": 0.05,
-"milk_reduction_percent": 0.75
+"tolerance": 0.25,
+"milk_reduction_percent": 0.25
 }
