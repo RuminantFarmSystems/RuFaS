@@ -433,7 +433,7 @@ class Pen:
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.calc_ration.__name__,
-                    "available_feeds": available_feeds, }
+                    "available_feeds": available_feeds['feed_id'], }
         om.add_variable("ration_nutrient_amount", nutrient_amount, info_map)
         om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
         om.add_variable("MEdiet", self.MEdiet, info_map)
