@@ -634,3 +634,4 @@ class LayerData:
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
+        self.annual_denitrified_nitrogen_total = 0
