@@ -461,7 +461,7 @@ def fat_constraint(x):
 def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    less than the DMI_est + 20% calculated in the requirements
+    greater than the DMI_est + 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
@@ -472,7 +472,7 @@ def DMI_constraint_lower(x):
 def DMI_constraint_upper(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    greater than the DMI_est calculated in the requirements.
+    less than the DMI_est + 20% calculated in the requirements.
 
     Args:
         x: The decision vector of the NLP
