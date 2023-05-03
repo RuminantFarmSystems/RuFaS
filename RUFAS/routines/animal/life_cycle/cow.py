@@ -321,8 +321,7 @@ class Cow(HeiferIII):
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.milking_update.__name__,
-                    "simulation_day": sim_day,
-                    "calving_interval": calving_interval,
+                    "simulation_day": sim_day
                     }
 
         milk_data_update = {}
