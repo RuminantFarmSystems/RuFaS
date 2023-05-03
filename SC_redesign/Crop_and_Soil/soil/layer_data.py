@@ -630,3 +630,4 @@ class LayerData:
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
+        self.annual_volatilized_ammonium_total = 0

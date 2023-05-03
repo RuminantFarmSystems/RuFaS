@@ -1,6 +1,6 @@
 import pytest
 from math import exp
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, PropertyMock, call
 
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -116,31 +116,56 @@ def test_calculate_ammonium_lost_to_process(ammonium_lost: float, actual: float,
 # --- Main routine test ---
 def test_do_daily_nitrification_and_volatilization() -> None:
     """Tests that the main routine of NitrificationVolatilization correctly calculates and updates attributes."""
-    data = SoilData(field_size=1.8)
-    incorp = NitrificationVolatilization(data)
-    incorp.data.set_vectorized_layer_attribute("ammonium_content", [25, 25, 25, 25])
-    incorp.data.set_vectorized_layer_attribute("nitrate_content", [25, 25, 25, 25])
+    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+                        wilting_point_content=PropertyMock(return_value=2.33),
+                        field_capacity_content=PropertyMock(return_value=5.77),
+                        depth_of_layer_center=PropertyMock(return_value=57.89)):
+        data = SoilData(field_size=1.8)
+        incorp = NitrificationVolatilization(data)
+        incorp.data.set_vectorized_layer_attribute("temperature", [18, 4, 18, 18])
+        incorp.data.set_vectorized_layer_attribute("water_content", [3.67, 3.67, 3.67, 3.67])
+        incorp.data.set_vectorized_layer_attribute("ammonium_volatilization_cation_exchange_factor", [0.18, 0.18, 0.18,
+                                                                                                      0.18])
+        incorp.data.set_vectorized_layer_attribute("ammonium_content", [25, 25, 25, 25])
+        incorp.data.set_vectorized_layer_attribute("nitrate_content", [25, 25, 25, 25])
 
-    incorp._calculate_nitrification_volatilization_temp_factor = MagicMock(return_value=0.8)
-    incorp._calculate_nitrification_soil_water_factor = MagicMock(return_value=0.75)
-    incorp._calculate_volatilization_depth_factor = MagicMock(return_value=0.46)
-    incorp._calculate_nitrification_regulator = MagicMock(return_value=0.55)
-    incorp._calculate_volatilization_regulator = MagicMock(return_value=0.08)
-    incorp._calculate_ammonium_loss_fraction = MagicMock(return_value=0.35)
-    incorp._calculate_total_ammonium_lost = MagicMock(return_value=6.5)
-    incorp._calculate_ammonium_lost_to_process = MagicMock(return_value=3.25)
+        incorp._calculate_nitrification_volatilization_temp_factor = MagicMock(return_value=0.8)
+        incorp._calculate_nitrification_soil_water_factor = MagicMock(return_value=0.75)
+        incorp._calculate_volatilization_depth_factor = MagicMock(return_value=0.46)
+        incorp._calculate_nitrification_regulator = MagicMock(return_value=0.55)
+        incorp._calculate_volatilization_regulator = MagicMock(return_value=0.08)
+        incorp._calculate_ammonium_loss_fraction = MagicMock(return_value=0.35)
+        incorp._calculate_total_ammonium_lost = MagicMock(return_value=6.5)
+        incorp._calculate_ammonium_lost_to_process = MagicMock(return_value=3.25)
 
-    incorp.do_daily_nitrification_and_volatilization()
+        incorp.do_daily_nitrification_and_volatilization()
 
-    assert incorp._calculate_nitrification_volatilization_temp_factor.call_count == 4
-    assert incorp._calculate_nitrification_soil_water_factor.call_count == 4
-    assert incorp._calculate_volatilization_depth_factor.call_count == 4
-    assert incorp._calculate_nitrification_regulator.call_count == 4
-    assert incorp._calculate_volatilization_regulator.call_count == 4
-    assert incorp._calculate_ammonium_loss_fraction.call_count == 8
-    assert incorp._calculate_total_ammonium_lost.call_count == 4
-    assert incorp._calculate_ammonium_lost_to_process.call_count == 8
-    for layer in incorp.data.soil_layers:
-        assert layer.ammonium_content == 18.5
-        assert layer.nitrate_content == 28.25
-        assert layer.annual_volatilized_ammonium_total == 3.25
+        temp_factor_calls = [call(18)] * 3
+        incorp._calculate_nitrification_volatilization_temp_factor.assert_has_calls(temp_factor_calls)
+        water_factor_calls = [call(3.67, 2.33, 5.77)] * 3
+        incorp._calculate_nitrification_soil_water_factor.assert_has_calls(water_factor_calls)
+        depth_factor_calls = [call(57.89)] * 3
+        incorp._calculate_volatilization_depth_factor.assert_has_calls(depth_factor_calls)
+        nitrification_regulator_calls = [call(0.8, 0.75)] * 3
+        incorp._calculate_nitrification_regulator.assert_has_calls(nitrification_regulator_calls)
+        volatilization_regulator_calls = [call(0.8, 0.46, 0.18)] * 3
+        incorp._calculate_volatilization_regulator.assert_has_calls(volatilization_regulator_calls)
+        ammonium_loss_frac_calls = [call(0.55), call(0.08)] * 3
+        incorp._calculate_ammonium_loss_fraction.assert_has_calls(ammonium_loss_frac_calls)
+        total_ammonium_lost_calls = [call(25, 0.55, 0.08)] * 3
+        incorp._calculate_total_ammonium_lost.assert_has_calls(total_ammonium_lost_calls)
+        ammonium_lost_calls = [call(6.5, 0.35, 0.35)] * 6
+        incorp._calculate_ammonium_lost_to_process.assert_has_calls(ammonium_lost_calls)
+
+        assert incorp.data.soil_layers[0].ammonium_content == 18.5
+        assert incorp.data.soil_layers[0].nitrate_content == 28.25
+        assert incorp.data.soil_layers[0].annual_volatilized_ammonium_total == 3.25
+
+        assert incorp.data.soil_layers[1].ammonium_content == 25
+        assert incorp.data.soil_layers[1].nitrate_content == 25
+        assert incorp.data.soil_layers[1].annual_volatilized_ammonium_total == 0
+
+        for layer in incorp.data.soil_layers[2:]:
+            assert layer.ammonium_content == 18.5
+            assert layer.nitrate_content == 28.25
+            assert layer.annual_volatilized_ammonium_total == 3.25
