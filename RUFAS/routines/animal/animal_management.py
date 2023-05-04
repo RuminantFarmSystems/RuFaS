@@ -367,8 +367,8 @@ class AnimalManagement:
         """
         Resets reduction value for milk production to 0.0 for all animals in all pens
 
-        The milk_production_reduction attribute is a flat value generated in ration_driver.py, 
-            in cases where a ration cannot be formualted such that it meets animal requirements
+        The milk_production_reduction attribute is a value generated in ration_driver.py, 
+            in cases where a ration cannot be formulated such that it meets animal requirements
 
         """
         for pen in self.all_pens:

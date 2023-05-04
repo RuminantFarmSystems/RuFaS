@@ -38,6 +38,26 @@ def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[Magic
 
 
 @pytest.fixture
+def pens_with_mock_animals() -> List[MagicMock]:
+    mock_animal_1=MagicMock()
+    mock_animal_2=MagicMock()
+    mock_animal_3=MagicMock()
+    mock_animal_4=MagicMock()
+    mock_animals_in_pens = [
+        {
+            "id": 0,
+            "animals_in_pen": [mock_animal_1, mock_animal_2]
+        },
+        {
+            "id": 1,
+            "animals_in_pen": [mock_animal_3, mock_animal_4]
+        }
+    ]
+
+    return create_mock_object_list(mock_animals_in_pens)
+
+
+@pytest.fixture
 def mock_pens() -> List[MagicMock]:
     pen_attribute_dicts = [
         {
@@ -995,11 +1015,29 @@ def pen_1() -> dict:
     return pen_1_dict
 
 
-def test_reset_milk_production_reduction() -> None:
+def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
     """Unit test for function reset_milk_production_reduction in file routines/animal/animal_management.py"""
-    # AnimalManagement.reset_milk_production_reduction(pen_1)
-    # assert pen_1.animal_1.milk_production_reduction==0.0
-    pass
+
+    # Set milk_production_reduction to some value
+    for pen in pens_with_mock_animals:
+        for animal in pen.animals_in_pen:
+            animal.milk_production_reduction = 100.1
+
+    # mock an animal_management object, but specifically so it returns a list of pens
+    penlist = MagicMock()
+    penlist.all_pens = pens_with_mock_animals
+
+    for pen in penlist.all_pens:
+        for animal in pen.animals_in_pen:
+            assert animal.milk_production_reduction == 100.1
+
+    # call the function once on the list of pens
+    AnimalManagement.reset_milk_production_reduction(penlist)
+
+    # then assert that all animals in all pens are 0.0
+    for pen in penlist.all_pens:
+        for animal in pen.animals_in_pen:
+            assert animal.milk_production_reduction == 0.0
 
 
 def test_daily_updates():
