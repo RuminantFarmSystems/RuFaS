@@ -331,6 +331,7 @@ class Cow(HeiferIII):
         milk_data_update["milk_fat"] = self.fat_percent
         milk_data_update["milk_lactose"] = self.lactose_milk
         milk_data_update["lactating"] = self.milking
+        milk_data_update["parity"] = self.calves
         milk_data_update["cow_id"] = self.id
 
         om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
@@ -338,8 +339,7 @@ class Cow(HeiferIII):
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
-        return estimated_daily_milk_produced, fat_percent, \
-               daily_fat_correct_milk_production
+        return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, ME_intake):
         """
