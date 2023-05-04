@@ -436,10 +436,10 @@ class AnimalManagement:
         """
 
         all_animals_added = animals_added + calves_born
+        
+        original_pen_populations = self.track_former_pen_population()
 
         self.remove_animals_from_herd(animals_removed)
-
-        original_pen_populations = self.track_former_pen_population()
 
         animal_type_mapping_dict = {
             'Calf': {'p_conc': self.p_conc['calf'], 'animal_list': self.calves,
