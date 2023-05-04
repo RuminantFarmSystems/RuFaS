@@ -11,7 +11,8 @@ This module handles the nitrification and volatilization operations for the ammo
 class NitrificationVolatilization:
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or creates one if one is not provided.
+        """This method initializes the SoilData object that this module will work with, or creates one if one is not
+            provided.
 
         Parameters
         ----------
