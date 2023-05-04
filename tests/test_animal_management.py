@@ -999,22 +999,6 @@ def test_daily_p_update():
     pass
 
 
-@pytest.fixture
-def cow_a() -> dict:
-    cow_a_dict = {
-        'milk_production_reduction': 600,
-    }
-    return cow_a_dict
-
-
-@pytest.fixture
-def pen_1() -> dict:
-    pen_1_dict = {
-        'animal1': cow_a(),
-    }
-    return pen_1_dict
-
-
 def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
     """Unit test for function reset_milk_production_reduction in file routines/animal/animal_management.py"""
 
