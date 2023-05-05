@@ -98,19 +98,21 @@ def test_dry_cow_manure_calculations(methane_model: str,
     potassium = dry_matter_intake * \
         (potassium_concentration / 100) * GeneralConstants.KG_TO_GRAMS
 
-    methane_emission = {}
-
+    methane_emission_dict = {}
+    
     methane_emission_Mills = (45.98 - 45.98 * math.exp(-((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
-                                                       * metabolizable_energy_intake * 4.184)) / 0.05565
-    methane_emission["Mills"] = methane_emission_Mills
-
+                                                     * metabolizable_energy_intake * 4.184)) / 0.05565
+    methane_emission_dict["Mills"] = methane_emission_Mills
+    
     soluble_residue = (100 - ASH_concentration) - \
         NDF_concentration - CP_concentration - EE_concentration
     gross_energy_concentration = (0.263 * CP_concentration + 0.522 * EE_concentration
-                                  + 0.198 * NDF_concentration + 0.160 * soluble_residue)  # [A.3B.C.2]
+                                      + 0.198 * NDF_concentration + 0.160 * soluble_residue)  
     methane_emission_IPCC = (0.065 * gross_energy_concentration *
-                             dry_matter_intake) / 0.05565  # [A.3B.C.3]
-    methane_emission["IPCC"] = methane_emission_IPCC
+                            dry_matter_intake) / 0.05565  
+    methane_emission_dict["IPCC"] = methane_emission_IPCC
+
+    methane_emission = methane_emission_dict[methane_model] 
 
     total_phosphorus_excreted = 5.0
     inorganic_phosphorus_fraction = 0.4

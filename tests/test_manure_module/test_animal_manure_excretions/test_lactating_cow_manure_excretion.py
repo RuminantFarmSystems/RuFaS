@@ -133,20 +133,20 @@ def test_lactating_cow_manure_calculations(methane_model: str,
         )
     )
 
-    methane_emission = {}
+    methane_emission_dict = {}
     methane_emission_Mutian = (- 126
                                + 11.3 * dry_matter_intake
                                + 2.30 * NDF_concentration
                                + 28.8 * milk_fat
                                + 0.148 * body_weight)
-    methane_emission["Mutian"] = methane_emission_Mutian
+    methane_emission_dict["Mutian"] = methane_emission_Mutian
 
     starch_to_ADF_concentration_ratio = -0.0011 * \
         starch_concentration / ADF_concentration
     temp = -(starch_to_ADF_concentration_ratio + 0.0045) * \
         metabolizable_energy_intake * 4.184
     methane_emission_Mills = 45.98 * (1 - math.exp(temp)) / 0.05565
-    methane_emission["Mills"] = methane_emission_Mills
+    methane_emission_dict["Mills"] = methane_emission_Mills
 
     soluble_residue = 100 - ASH_concentration - \
         NDF_concentration - CP_concentration - EE_concentration
@@ -156,7 +156,9 @@ def test_lactating_cow_manure_calculations(methane_model: str,
                                   + 0.160 * soluble_residue)
     methane_emission_IPCC = 0.065 * gross_energy_concentration * \
         dry_matter_intake / 0.05565
-    methane_emission["IPCC"] = methane_emission_IPCC
+    methane_emission_dict["IPCC"] = methane_emission_IPCC
+
+    methane_emission = methane_emission_dict[methane_model]
 
     # Act
     actual_total_phosphorus_excreted: float

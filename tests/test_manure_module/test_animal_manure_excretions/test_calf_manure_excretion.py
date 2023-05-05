@@ -49,10 +49,13 @@ def test_calf_manure_excretions(methane_model: str,
                        (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
     urine_nitrogen = 0.45 * manure_nitrogen
 
-    methane_emission = {}
+    methane_emission_dict = {}
     methane_emission_Pattanaik = (
         0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
-    methane_emission["Pattanaik"] = methane_emission_Pattanaik
+    methane_emission_dict["Pattanaik"] = methane_emission_Pattanaik
+
+    if methane_model:
+        methane_emission = methane_emission_dict['Pattanaik']
 
     total_phosphorus_excreted = 3.0
     inorganic_phosphorus_fraction = 0.4
