@@ -10,12 +10,9 @@ import math
 from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
-
-om = OutputManager()
 
 def manure_calculations(ration_formulation,
                         feed,
@@ -27,7 +24,8 @@ def manure_calculations(ration_formulation,
                         urine_phosphorus_required: float,
                         methane_model: str,
                         milk_fat: float,
-                        metabolizable_energy_intake: float) \
+                        metabolizable_energy_intake: float
+                        ) \
         -> Tuple[float, AnimalManureExcretions]:
     """Calculates the manure excretion values for a cow with information from the ration formulation.
 
@@ -65,9 +63,6 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
-    #info_map = {"class": self._class_._name_,
-    #            "function": self.manure_calculations._name_}
-
     nutrient_amounts, nutrient_concentrations = ration_report(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
@@ -225,4 +220,4 @@ def manure_calculations(ration_formulation,
         methane=methane_emission
     )
 
-    return total_phosphorus_excreted, manure_excretion_values
+    return total_phosphorus_excreted, manure_excretion_values, methane_emission_dict 

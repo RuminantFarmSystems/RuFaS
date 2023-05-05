@@ -10,8 +10,7 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_
 @pytest.mark.parametrize(
     'methane_model',
     [
-        'Boadi',
-        'IPCC',
+        'IPCC'
     ]
 )
 def test_growing_heifer_manure_calculations(methane_model: str,

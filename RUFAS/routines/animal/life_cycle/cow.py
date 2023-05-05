@@ -20,6 +20,7 @@ import math
 import numpy as np
 from scipy.stats import truncnorm
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -31,7 +32,7 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
-
+om = OutputManager()
 class MilkProductionHistory:
     def __init__(self, sim_day, days_in_milk, milk_prod, days_born):
         self.simulation_day = sim_day
@@ -330,17 +331,22 @@ class Cow(HeiferIII):
             methane_model: methane model used for methane emission calculations
             ME_intake: metabolizable energy intake, Mcal/kg DM
         """
+        info_map = {"class": self._class_._name_,
+                "function": self.calc_manure_excretion._name_}
+
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         if self.milking:
-            self.p_excrt, self.manure_excretion = lactating_manure_calculations(
+            self.p_excrt, self.manure_excretion, self.methane_emission_dict = lactating_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
                 self.days_in_milk, self.mPrt, self.estimated_daily_milk_produced,
                 p_feces_excrt, p_urine, methane_model, self.fat_percent, ME_intake)
         else:
-            self.p_excrt, self.manure_excretion = dry_manure_calculations(
+            self.p_excrt, self.manure_excretion, _ = dry_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
+
+        om.add_variable("methane emissions", self.methane_emission_dict, info_map)
 
     def set_nutrient_rqmts(self):
         """

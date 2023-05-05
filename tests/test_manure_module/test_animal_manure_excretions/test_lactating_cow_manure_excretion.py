@@ -163,7 +163,8 @@ def test_lactating_cow_manure_calculations(methane_model: str,
     # Act
     actual_total_phosphorus_excreted: float
     manure_excretion_values: AnimalManureExcretions
-    actual_total_phosphorus_excreted, manure_excretion_values = manure_calculations(
+    actual_methane_emission_dict: dict
+    actual_total_phosphorus_excreted, manure_excretion_values, actual_methane_emission_dict = manure_calculations(
         ration_formulation=mock_ration_formulation,
         feed=mock_feed,
         body_weight=body_weight,
@@ -213,3 +214,5 @@ def test_lactating_cow_manure_calculations(methane_model: str,
         manure_phosphorus_fraction)
     assert manure_excretion_values['potassium'] == approx(potassium)
     assert manure_excretion_values['methane'] == approx(methane_emission)
+    assert actual_methane_emission_dict == approx(
+        methane_emission_dict)

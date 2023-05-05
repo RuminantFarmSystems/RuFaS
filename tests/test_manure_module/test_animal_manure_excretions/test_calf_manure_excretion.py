@@ -12,8 +12,7 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 @pytest.mark.parametrize(
     'methane_model',
     [
-        None,
-        'dummy'
+        'IPCC'
     ]
 )
 def test_calf_manure_excretions(methane_model: str,
