@@ -10,10 +10,12 @@ import math
 from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
 
+om = OutputManager()
 
 def manure_calculations(ration_formulation,
                         feed,
@@ -63,6 +65,9 @@ def manure_calculations(ration_formulation,
             in the AnimalManureExcretions class definition.
 
     """
+    #info_map = {"class": self._class_._name_,
+    #            "function": self.manure_calculations._name_}
+
     nutrient_amounts, nutrient_concentrations = ration_report(
         ration_formulation, feed.available_feeds)
     dry_matter_intake = nutrient_amounts['dm']
@@ -161,14 +166,14 @@ def manure_calculations(ration_formulation,
         potassium_concentration / 100 - 164.5
 
     # Methane Emissions
-    methane_emission = {}
+    methane_emission_dict = {}
     # "Mutian", [A.3E.C.1]
     methane_emission_Mutian = (- 126
                                + 11.3 * dry_matter_intake
                                + 2.30 * NDF_concentration
                                + 28.8 * milk_fat
                                + 0.148 * body_weight)
-    methane_emission["Mutian"] = methane_emission_Mutian
+    methane_emission_dict["Mutian"] = methane_emission_Mutian
 
     # "Mills", [A.3E.C.2]
     starch_to_ADF_concentration_ratio = -0.0011 * \
@@ -176,7 +181,7 @@ def manure_calculations(ration_formulation,
     temp = -(starch_to_ADF_concentration_ratio + 0.0045) * \
         metabolizable_energy_intake * 4.184
     methane_emission_Mills = 45.98 * (1 - math.exp(temp)) / 0.05565
-    methane_emission["Mills"] = methane_emission_Mills
+    methane_emission_dict["Mills"] = methane_emission_Mills
 
     # IPCC
     # Calculating gross energy concentration (Moraes et al. 2014)
@@ -188,7 +193,9 @@ def manure_calculations(ration_formulation,
                                   + 0.160 * soluble_residue)  # [A.3B.C.2]
     methane_emission_IPCC = 0.065 * gross_energy_concentration * \
         dry_matter_intake / 0.05565  # [A.3B.C.3]
-    methane_emission["IPCC"] = methane_emission_IPCC
+    methane_emission_dict["IPCC"] = methane_emission_IPCC
+
+    methane_emission = methane_emission_dict[methane_model]
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,
