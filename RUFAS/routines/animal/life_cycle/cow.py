@@ -331,22 +331,22 @@ class Cow(HeiferIII):
             methane_model: methane model used for methane emission calculations
             ME_intake: metabolizable energy intake, Mcal/kg DM
         """
-        info_map = {"class": self._class_._name_,
-                "function": self.calc_manure_excretion._name_}
-
         p_urine, p_feces_excrt = self.calc_base_manure()
 
         if self.milking:
-            self.p_excrt, self.manure_excretion, self.methane_emission_dict = lactating_manure_calculations(
+            info_map = {"class": self.__class__.__name__,
+                "function": self.calc_manure_excretion.__name__,}
+
+            self.p_excrt, self.manure_excretion, methane_emission_dict = lactating_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
                 self.days_in_milk, self.mPrt, self.estimated_daily_milk_produced,
                 p_feces_excrt, p_urine, methane_model, self.fat_percent, ME_intake)
+            
+            om.add_variable("methane emissions", methane_emission_dict, info_map)
         else:
-            self.p_excrt, self.manure_excretion, _ = dry_manure_calculations(
+            self.p_excrt, self.manure_excretion = dry_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
-
-        om.add_variable("methane emissions", self.methane_emission_dict, info_map)
 
     def set_nutrient_rqmts(self):
         """
