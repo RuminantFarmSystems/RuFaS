@@ -714,7 +714,25 @@ def test_save_variable_names(
     mock_output_manager._generate_file_name = output_manager_original_method_states[
         "_generate_file_name"
     ]
-    mock_output_manager._dict_to_file_json = output_manager_original_method_states[
+    mock_output_manager._list_to_file_txt = output_manager_original_method_states[
+        "_list_to_file_txt"
+    ]
+
+
+def test_list_to_file_txt(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    tmpdir,
+) -> None:
+    """Test case for function _list_to_file_text in output_manager.py"""
+    dummy_file_path = tmpdir.join('dummy_file.txt')
+    dummy_list = ['apple', 'banana', 'cherry']
+    mock_output_manager._list_to_file_txt(dummy_list, dummy_file_path)
+    with open(dummy_file_path) as read_dummy_file:
+        dummy_file_content = read_dummy_file.read().strip().split('\n')
+    assert dummy_file_content == dummy_list
+
+    mock_output_manager._list_to_file_txt = output_manager_original_method_states[
         "_list_to_file_txt"
     ]
 
