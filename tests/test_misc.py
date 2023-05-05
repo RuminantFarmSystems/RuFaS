@@ -727,11 +727,23 @@ def test_list_to_file_txt(
     """Test case for function _list_to_file_text in output_manager.py"""
     dummy_file_path = tmpdir.join('dummy_file.txt')
     dummy_list = ['apple', 'banana', 'cherry']
+
     mock_output_manager._list_to_file_txt(dummy_list, dummy_file_path)
     with open(dummy_file_path) as read_dummy_file:
         dummy_file_content = read_dummy_file.read().strip().split('\n')
     assert dummy_file_content == dummy_list
 
+    with pytest.raises(TypeError) as e:
+        mock_output_manager._list_to_file_txt(1234, dummy_file_path)
+        assert "object is not iterable" in str(e.value)
+
+    dummy_broken_file_path = ''
+
+    with pytest.raises(FileNotFoundError) as e:
+        mock_output_manager._list_to_file_txt(dummy_list, dummy_broken_file_path)
+        assert "No such file or directory" in str(e.value)
+
+    # Restore original method
     mock_output_manager._list_to_file_txt = output_manager_original_method_states[
         "_list_to_file_txt"
     ]
