@@ -23,11 +23,20 @@ from typing import Any, Dict, Tuple, List
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.feed.feed import Feed
+
+import random
+from statistics import mean
+from typing import Any, Dict, Tuple, List
 
 om = OutputManager()
 
@@ -121,7 +130,7 @@ class AnimalManagement:
         self.all_pens = []
 
         # dictionary: key is animal ID, value is the pen ID that animal is in
-        self.id_pen = {}
+        self.animal_to_pen_id_map = {}
 
         # dictionary for keeping track of what animal types each pen is holding
         # (value of the dictionaries are lists of pen objects)
@@ -354,170 +363,122 @@ class AnimalManagement:
         for cow in self.cows:
             cow.set_nutrient_rqmts()
 
-    def fully_update_id_pen(self):
+    def fully_update_animal_to_pen_id_map(self) -> None:
         """
-        Updates the entire id_pen dictionary so that each animal's ID is
+        Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
         associated with the pen that animal is in.
         """
         for pen in self.all_pens:
             animals_in_pen = pen.animals_in_pen
             for animal in animals_in_pen:
-                self.id_pen[animal.id] = pen.id
+                self.animal_to_pen_id_map[animal.id] = pen.id
 
-    def daily_update_id_pen(self, animals_added, ids_removed, calves_born, feed, temp):
+    def remove_animals_from_herd(self, animals_removed: List[AnimalBase]) -> None:
         """
-        For animals removed from the herd in daily animal updates, the ids of
-        the pens from which they were removed are stored in the
-        pens_needing_animals queue.
-        Animals added to the herd from the replacement herd are temporarily
-        assigned to a pen that had animals removed from it.
-        Calves that were born are assigned (currently) to the hard coded pen
-        for calves.
-        All new animals are set up with the characteristics of the pen to which
-        they were assigned.
+        Deletes the IDs of animals from animal_to_pen_id_map dictionary when the animal
+        was removed from the herd; updates the relevant pen's stocking density.
 
         Args:
-            animals_added: list of animal (cow) objects that have been added to the herd
-            ids_removed: list of animal IDs that have been removed from the herd
+            animals_removed: list of animal objects that are to be removed from the herd
+        """
+
+        for animal in animals_removed:
+            if animal.id in self.animal_to_pen_id_map:
+                pen = self.all_pens[self.animal_to_pen_id_map[animal.id]]
+                pen.remove_animals_by_ids([animal.id])
+                pen.stocking_density = len(pen.animals_in_pen) / pen.num_stalls
+                del self.animal_to_pen_id_map[animal.id]
+
+    def track_former_pen_population(self) -> List[int]:
+        """
+        Creates a list containing the original pen populations of a simulated
+        farm before any updates are made to pens. The original pens' information
+        would get lost as animals get added.
+
+        Returns: a list of the populations of each pen on the farm prior to
+                 any additions due to daily pen updates
+        """
+
+        pen_population_before_additions = [0] * len(self.all_pens)
+
+        for index, pen in enumerate(self.all_pens):
+            pen_population_before_additions[index] = len(pen.animals_in_pen)
+
+        return pen_population_before_additions
+
+    def calculate_pen_rations(self, prior_pen_populations: List[int]) -> None:
+        """
+        Adjusts the amount of each feed within a ration that is delivered to a pen
+            when the number of animals in the pen is changed
+
+        Args:
+            prior_pen_populations: list of the number of animals in each pen, since
+                pens are zero-indexed
+        """
+
+        for index, pen in enumerate(self.all_pens):
+            for key in pen.ration:
+                if key != 'status' and key != 'objective':
+                    pen.ration[key] = (pen.ration[key] / prior_pen_populations[index]) * len(pen.animals_in_pen)
+
+    def daily_update_id_map(self, animals_added: List[AnimalBase], animals_removed: List[AnimalBase],
+                            calves_born: List[Calf], feed: Feed, temp: float):
+        """
+        Updates the dictionary that maps animal IDs to the ID of the pen they are housed in when
+        new animals are born or purchased and when animals leave the herd due to death or culling
+
+        Args:
+            animals_added: list of animal objects that have been added to the herd
+            animals_removed: list of animal objects that have been removed from the herd
             calves_born: list of Calf objects that have been added to the herd
             feed: an instance of the Feed class defined in feed.py
             temp: the temperature on the current day
         """
-        animals_added_id_list = [cow.id for cow in animals_added]
-        calf_id_list = [calf.id for calf in calves_born]
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.daily_update_id_pen.__name__,
-                    "animals_added_id_list": animals_added_id_list,
-                    "ids_removed": ids_removed,
-                    "calves_born_id_list": calf_id_list,
-                    "temp": temp,
-                    }
 
-        # stratifying the pens that lost animals by animal group
-        # (values are dictionaries of pen IDs, with values being the number of animals removed)
-        grouped_pens_short = {Pen.AnimalCombination.CALF: {}, Pen.AnimalCombination.GROWING: {},
-                              Pen.AnimalCombination.CLOSE_UP: {}, Pen.AnimalCombination.GROWING_AND_CLOSE_UP: {},
-                              Pen.AnimalCombination.LAC_COW: {}}
-        for i in ids_removed:
-            if i in self.id_pen:
-                pen = self.all_pens[self.id_pen[i]]
-                # adding count to animals that left pen
-                if pen.id in grouped_pens_short[pen.animal_combination]:
-                    grouped_pens_short[pen.animal_combination][pen.id] += 1
+        all_animals_added = animals_added + calves_born
+        
+        original_pen_populations = self.track_former_pen_population()
+
+        self.remove_animals_from_herd(animals_removed)
+
+        animal_type_mapping_dict = {
+            'Calf': {'p_conc': self.p_conc['calf'], 'animal_list': self.calves,
+                     'animal_group': Pen.AnimalCombination.CALF},
+            'HeiferI': {'p_conc': self.p_conc['heiferI'], 'animal_list': self.heiferIs,
+                        'animal_group': Pen.AnimalCombination.GROWING},
+            'HeiferII': {'p_conc': self.p_conc['heiferII'], 'animal_list': self.heiferIIs,
+                         'animal_group': Pen.AnimalCombination.GROWING},
+            'HeiferIII': {'p_conc': self.p_conc['heiferIII'], 'animal_list': self.heiferIIIs,
+                          'animal_group': Pen.AnimalCombination.CLOSE_UP},
+            'Lac_Cow': {'p_conc': self.p_conc['cow'], 'animal_list': self.cows,
+                        'animal_group': Pen.AnimalCombination.LAC_COW},
+            'Dry_Cow': {'p_conc': self.p_conc['cow'], 'animal_list': self.cows,
+                        'animal_group': Pen.AnimalCombination.CLOSE_UP}}
+
+        for animal in all_animals_added:
+            animal_class = type(animal).__name__
+
+            if animal_class == 'Cow':
+                if animal.milking:
+                    animal_class = 'Lac_Cow'
                 else:
-                    grouped_pens_short[pen.animal_combination][pen.id] = 1
+                    animal_class = 'Dry_Cow'
 
-                del self.id_pen[i]
+            animal_p_conc = (animal_type_mapping_dict.get(animal_class)['p_conc'])
+            animal_type_mapping_dict.get(animal_class)['animal_list'].append(animal)
+            group = animal_type_mapping_dict.get(animal_class)['animal_group']
 
-        pen_population_before_additions = {}
-        for i, pen in enumerate(self.all_pens):
-            pen_population_before_additions[i] = len(pen.animals_in_pen)
+            candidate_pens = self.pens_by_animal_combination[group]
+            pen_for_insert = min(candidate_pens, key=lambda p: p.stocking_density)
 
-        for animal in animals_added:
-            if type(animal).__name__ == 'Calf':
-                animal_p_conc = self.p_conc['calf']
-                self.calves.append(animal)
-                group = Pen.AnimalCombination.CALF
-            elif type(animal).__name__ == 'HeiferI':
-                animal_p_conc = self.p_conc['heiferI']
-                self.heiferIs.append(animal)
-                group = Pen.AnimalCombination.GROWING
-            elif type(animal).__name__ == 'HeiferII':
-                animal_p_conc = self.p_conc['heiferII']
-                self.heiferIIs.append(animal)
-                group = Pen.AnimalCombination.GROWING
-            elif type(animal).__name__ == 'HeiferIII':
-                animal_p_conc = self.p_conc['heiferIII']
-                self.heiferIIIs.append(animal)
-                group = Pen.AnimalCombination.CLOSE_UP
-            elif not animal.milking:
-                animal_p_conc = self.p_conc['cow']
-                self.cows.append(animal)
-                group = Pen.AnimalCombination.CLOSE_UP
-            else:  # animal is of class Cow
-                animal_p_conc = self.p_conc['cow']
-                # self.all_pens[pen].animals_in_pen.append(animal)
-                self.cows.append(animal)
-                group = Pen.AnimalCombination.LAC_COW
+            new_pen_population = (pen_for_insert.stocking_density * pen_for_insert.num_stalls) + 1
+            pen_for_insert.stocking_density = new_pen_population / pen_for_insert.num_stalls
 
-            # Choosing pen to place new animal first by checking if there are
-            # pens that lost animals, and choosing the pen with the lowest
-            # stocking density
-            # if there are no pens of group calves that lost animals
-            if grouped_pens_short[group] == {}:
-                # variable to track lowest stocking density
-                dens = 10000
-                for p in self.pens_by_animal_combination[group]:
-                    if p.stocking_density < dens:
-                        pen = p
-                        dens = p.stocking_density
-            # if there are pens of group calves that lost animals
-            else:
-                # variable to track highest animal shortage across these pens
-                n = 0
-                for id, v in grouped_pens_short[group].items():
-                    if v > n:
-                        pen = self.all_pens[id]
-                        n = v
+            self.animal_to_pen_id_map[animal.id] = pen_for_insert.id
+            self.all_pens[pen_for_insert.id].set_up_new_animal(animal, animal_p_conc, feed, temp,
+                                                               original_pen_populations[pen_for_insert.id])
 
-            # updating id_pen variable
-            self.id_pen[animal.id] = pen.id
-            # setting up new animal
-            self.all_pens[pen.id].set_up_new_animal(animal, animal_p_conc,
-                                                    feed, temp, pen_population_before_additions[pen.id])
-
-        for i in range(len(self.all_pens)):
-            if self.all_pens[i].ration == {}:
-                if len(self.all_pens[i].animals_in_pen) > 0:
-                    available_feeds = ration_driver.AvailableFeeds()
-                    available_feeds.feed_nutrients(feed)
-                    self.all_pens[i].allocated_feeds = feed.input_feed_combinations[self.all_pens[i].animal_combination]
-                    pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(
-                        self.all_pens[i].allocated_feeds)
-                    self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
-                    pen_specific_feed_data_pen_num = f"pen_specific_feed_data_pen_{i}"
-                    om.add_variable(pen_specific_feed_data_pen_num, pen_specific_feed_data, info_map)
-                    pen_ration_data = self.all_pens[i].ration
-                    pen_ration_data_pen_num = f"pen_ration_data_pen_{i}"
-                    om.add_variable(pen_ration_data_pen_num, pen_ration_data, info_map)
-            else:
-                if len(self.all_pens[i].animals_in_pen) > 0:
-                    # Need to adjust the ration totals for the pen attributes now
-                    # that all new animals have been added
-                    for key in self.all_pens[i].ration:
-                        if key != 'status' and key != 'objective' and pen_population_before_additions[i] > 0:
-                            self.all_pens[i].ration[key] = \
-                                (self.all_pens[i].ration[key] /
-                                 pen_population_before_additions[i]) * len(
-                                    self.all_pens[i].animals_in_pen)
-                            pen_ration_data = self.all_pens[i].ration
-                            pen_ration_data_pen_num = f"pen_ration_data_pen_{i}"
-                            om.add_variable(pen_ration_data_pen_num, pen_ration_data, info_map)
-
-        for calf in calves_born:
-            # getting valid pen to place calves in
-            # if there are no pens of group calves that lost animals
-            pen = None
-            if grouped_pens_short[Pen.AnimalCombination.CALF] == {}:
-                # variable to track lowest stocking density
-                dens = 10000
-                for p in self.pens_by_animal_combination[Pen.AnimalCombination.CALF]:
-                    if p.stocking_density < dens:
-                        pen = p
-                        dens = p.stocking_density
-            # if there are pens of group calves that lost animals
-            else:
-                # variable to track highest animal shortage across these pens
-                n = 0
-                for id, v in grouped_pens_short[Pen.AnimalCombination.CALF].items():
-                    if v > n:
-                        pen = self.all_pens[id]
-                        n = v
-            self.id_pen[calf.id] = pen.id
-            self.calves.append(calf)
-            self.all_pens[pen.id].set_up_new_animal(calf, self.pasture_concentrate,
-                                                    feed, temp, pen_population_before_additions[pen.id])
-            # self.all_pens[pen].animals_in_pen.append(calf)
+        self.calculate_pen_rations(original_pen_populations)
 
     @classmethod
     def _get_dry_cows(cls, cows: List[Cow]) -> List[Cow]:
@@ -979,7 +940,7 @@ class AnimalManagement:
             self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
             self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
 
-        self.fully_update_id_pen()
+        self.fully_update_animal_to_pen_id_map()
 
     def clear_pens(self):
         """
@@ -1035,16 +996,16 @@ class AnimalManagement:
     def gather_cow_class_history(self, cow_class):
         """
         Gathers all the pen history data for a given cow class type. Checks the current pen
-        and pen composition of all animals of a given cow class, before then update the
+        and pen composition of all animals of a given cow class, before then updating the
         pen history for that class using the update_pen_history() method
 
         Args:
-            cow_class: instance of whatever cow type's pen history is being gathered
+            cow_class: list of instances of whatever cow type's pen history is being gathered
         """
         for cow in cow_class:
-            current_pen = self.id_pen[cow.id]
-            classes_in_pen = self.all_pens[current_pen].classes_in_pen
-            cow.update_pen_history(current_pen, self.simulation_day, classes_in_pen)
+            current_pen_id = self.animal_to_pen_id_map[cow.id]
+            classes_in_pen = self.all_pens[current_pen_id].classes_in_pen
+            cow.update_pen_history(current_pen_id, self.simulation_day, classes_in_pen)
 
     def record_pen_history(self):
         """
@@ -1124,7 +1085,7 @@ class AnimalManagement:
             for pen in self.all_pens:
                 pen.populated = len(pen.animals_in_pen) > 0
 
-            animals_added, ids_removed, calves_born, self.calves, self.heiferIs, \
+            animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
                 self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
                                                      self.calves,
@@ -1132,7 +1093,7 @@ class AnimalManagement:
                                                      self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_pen(animals_added, ids_removed, calves_born, feed, temp)
+            self.daily_update_id_map(animals_added, animals_removed, calves_born, feed, temp)
 
             # phosphorus requirements for daily updates
             self.calc_p_rqmts()  # per animal
