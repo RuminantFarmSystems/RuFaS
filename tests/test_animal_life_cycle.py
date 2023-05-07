@@ -885,8 +885,6 @@ def test_handle_cow_milking(mocker: MockerFixture,
     }
     life_cycle_manager.dry_cow_num = 5
 
-   expected_new_daily_milk_production = (life_cycle_manager.daily_milk_production +
-                                          mock_cow.estimated_daily_milk_produced)
     expected_new_milking_cow_num = life_cycle_manager.milking_cow_num + 1
     expected_new_avg_days_in_milk = (life_cycle_manager.avg_days_in_milk * life_cycle_manager.milking_cow_num +
                                      mock_cow.days_in_milk) / expected_new_milking_cow_num
