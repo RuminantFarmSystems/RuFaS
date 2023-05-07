@@ -793,7 +793,6 @@ class LifeCycleManager:
 
         """
         if cow.milking:
-            self.daily_milk_production += cow.estimated_daily_milk_produced
             self.milking_cow_num, self.avg_days_in_milk = \
                 Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)
 

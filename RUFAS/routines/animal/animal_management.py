@@ -372,8 +372,9 @@ class AnimalManagement:
 
         """
         for pen in self.all_pens:
-            for animal in pen.animals_in_pen:
-                animal.milk_production_reduction = 0.0
+            if pen.animal_combination.name == 'LAC_COW':
+                for animal in pen.animals_in_pen:
+                    animal.milk_production_reduction = 0.0
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -1005,6 +1006,19 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_avg_growth()
 
+    def sum_daily_milk(self, cows) -> float:
+        """
+        sums the daily milk production across all cows
+
+        Args: the list of cows in the animal management class
+
+        Returns: the total milk produced in the herd (kg milk/day)
+        """
+        total_milk = 0.0
+        for cow in cows:
+            total_milk += cow.estimated_daily_milk_produced
+        return(total_milk)
+
     def gather_cow_class_history(self, cow_class):
         """
         Gathers all the pen history data for a given cow class type. Checks the current pen
@@ -1097,6 +1111,11 @@ class AnimalManagement:
             for pen in self.all_pens:
                 pen.populated = len(pen.animals_in_pen) > 0
 
+            if self.end_ration_interval():
+                for pen in self.all_pens:
+                    if pen.animal_combination.name == 'LAC_COW':
+                        self.reset_milk_production_reduction()
+
             animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
                 self.heiferIIs, self.heiferIIIs, self.cows = \
                 self.life_cycle_manager.daily_update(self.simulation_day,
@@ -1111,7 +1130,6 @@ class AnimalManagement:
             self.calc_p_rqmts()  # per animal
 
             if self.end_ration_interval():
-                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_animals_to_pens()
@@ -1121,6 +1139,7 @@ class AnimalManagement:
             # manure excretion
             self.calc_manure_excretion(feed, self.methane_model)  # per animal
 
+            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
             # phosphorus updates
             self.daily_p_update()  # per animal
             self.calc_all_p_conc()  # per animal
