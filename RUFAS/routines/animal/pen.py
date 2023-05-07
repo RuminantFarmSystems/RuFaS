@@ -251,6 +251,7 @@ class Pen:
         self.avg_growth = 0.0
 
         self.MEdiet = 0.0
+        self.avg_milk_production_reduction = 0.0
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = AnimalManureExcretions(
@@ -297,7 +298,7 @@ class Pen:
         """
         self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction:float) -> None:
         """
         Sets the pen's average milk and average CP milk
 
@@ -310,6 +311,7 @@ class Pen:
         """
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
+        self.avg_milk_production_reduction = avg_milk_production_reduction
 
     def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """

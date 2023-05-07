@@ -241,6 +241,7 @@ class Requirements:
         DMIest = []
         BW = []
         milk = [0]
+        milk_production_reduction = [0]
         CP_milk = [0]
 
         if recalc:
@@ -289,6 +290,7 @@ class Requirements:
                                                                         pen.housing_type,
                                                                         (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
                     milk.append(animal.estimated_daily_milk_produced)
+                    milk_production_reduction.append(animal.milk_production_reduction)
                     CP_milk.append(animal.CP_milk)
                 else:
                     NEa_val = 0
@@ -314,6 +316,7 @@ class Requirements:
                                                                         pen.housing_type,
                                                                         (math.sqrt(animal.DVD ** 2 + animal.DHD ** 2)))
                     milk.append(animal.estimated_daily_milk_produced)
+                    milk_production_reduction.append(animal.milk_production_reduction)
                     CP_milk.append(animal.CP_milk)
                 else:
                     NEa_val = 0
@@ -343,6 +346,7 @@ class Requirements:
         self.avg_BW = stat.mean(BW)
         self.avg_milk = stat.mean(milk)
         self.avg_CP_milk = stat.mean(CP_milk)
+        self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
 
         # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
@@ -352,7 +356,7 @@ class Requirements:
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
-        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
+        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
 
 class AvailableFeeds:
