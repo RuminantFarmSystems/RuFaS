@@ -47,7 +47,7 @@ class SoilData:
     annual_surface_runoff_total: float = 0
     """Cumulative total of volume of surface runoff that occurred in a year (mm per hectare)"""
 
-    # Track annual nutrient activity
+    # Track annual phosphorus activity
     annual_runoff_fertilizer_phosphorus: float = 0
     """Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff (kg)"""
     annual_runoff_machine_manure_inorganic_phosphorus: float = 0
@@ -64,6 +64,12 @@ class SoilData:
         (kg)"""
     annual_soil_phosphorus_runoff: float = 0
     """Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg)"""
+
+    # Track annual nitrogen loss from field
+    annual_runoff_nitrates_total: float = 0
+    """Cumulative total of nitrates that were removed from the top soil layer by runoff (kg)"""
+    annual_runoff_ammonium_total: float = 0
+    """Cumulative total of ammonium that was removed from the top soil layer by runoff (kg)"""
 
     # ---- evapotranspiration
     potential_evapotranspiration: Optional[float] = None

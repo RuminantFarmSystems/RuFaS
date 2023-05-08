@@ -4,6 +4,12 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import METRIC_TONS_TO_KILOGRAMS
 
 
+"""
+This module handles the movement and loss of nitrogen due to erosion and leaching within the soil profile, and is based
+on SWAT sections 4:2.1, 2
+"""
+
+
 class LeachingRunoffErosion:
 
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
@@ -21,6 +27,49 @@ class LeachingRunoffErosion:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
+    def leach_runoff_and_erode_nitrogen(self, field_size: float) -> None:
+        """This is the main routine for updating nitrogen leaching, runoff, and erosion within the soil profile.
+
+        Parameters
+        ----------
+        field_size : float
+            Size of the field (ha)
+
+        Notes
+        -----
+        This equation simply calls two helper methods, one executes runoff and erosion operations and the second
+        executes leaching operations.
+
+        """
+        pass
+
+    def _erode_nitrogen(self, field_size: float) -> None:
+        """This method handles the erosion of nitrogen and updating the soil profile accordingly.
+
+        Parameters
+        ----------
+        field_size : float
+            Size of the field (ha)
+
+        Notes
+        -----
+        This method only removes nitrogen from the top soil layer. Inorganic nitrogen is removed by runoff, while
+        organic nitrogen is removed by sediment erosion.
+
+        """
+        if self.data.accumulated_runoff > 0.0:
+            nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
+                self.data.soil_layers[0].nitrate_content, self.data.soil_layers[0].water_content,
+                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 0.1)
+            ammonium_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
+                self.data.soil_layers[0].ammonium_content, self.data.soil_layers[0].water_content,
+                self.data.soil_layers[0].saturation_content, self.data.accumulated_runoff, 1.0)
+
+            self.data.soil_layers[0].nitrate_content -= nitrates_lost_to_runoff
+            self.data.annual_runoff_nitrates_total += nitrates_lost_to_runoff * field_size
+            self.data.soil_layers[0].ammonium_content -= ammonium_lost_to_runoff
+            self.data.annual_runoff_ammonium_total += ammonium_lost_to_runoff * field_size
+
     # --- Static methods ---
     @staticmethod
     def _determine_nitrogen_concentration(soluble_nitrogen_amount: float,
@@ -31,16 +80,16 @@ class LeachingRunoffErosion:
         Parameters
         ----------
         soluble_nitrogen_amount: float
-            amount of soluble nitrogen (kg /mm H20)
+            Amount of soluble nitrogen (kg / ha)
         soil_water_runoff_sum: float
             Sum of runoff and soil water for layer (mm H2O)
         saturation_content: float
-            volume of water in layer when saturated (mm)
+            Volume of water in layer when saturated (mm)
 
         Returns
         -------
         float
-            the concentration of the inorganic pools NO3/NH4 in the top soil layer (kg /mm H20)
+            The concentration of the inorganic pools NO3/NH4 in the top soil layer (kg / mm H20)
 
         References
         ----------
@@ -55,24 +104,24 @@ class LeachingRunoffErosion:
         return soluble_nitrogen_amount * (1 - (exp(-soil_water_runoff_sum/saturation_content))/soil_water_runoff_sum)
 
     @staticmethod
-    def _determine_nitrate_runoff_amount(nitrogen_concentration: float,
-                                         runoff: float,
-                                         runoff_extraction_coef: float) -> float:
-        """This method determines the amount of nitrate runoff for the first layer
+    def _determine_nitrogen_runoff_amount(nitrogen_concentration: float,
+                                          runoff: float,
+                                          runoff_extraction_coef: float) -> float:
+        """This method determines the amount of nitrate runoff for the first layer.
 
         Parameters
         ----------
         nitrogen_concentration: float
-            the content of inorganic (nitrate or ammonium) nitrogen in the top soil layer (kg N/mm H20)
+            The content of inorganic (nitrate or ammonium) nitrogen in the top soil layer (kg N/mm H20)
         runoff_extraction_coef: float
-            coefficient of extraction for runoff (unitless)
+            Coefficient of extraction for runoff (unitless)
         runoff: float
-            daily runoff of H2O (mm)
+            Daily runoff of H2O (mm)
 
         Returns
         -------
         float:
-            the amount of nitrate runoff from the first layer (kg/ha)
+            The amount of nitrate runoff from the first layer (kg/ha)
 
         References
         ----------
@@ -85,6 +134,43 @@ class LeachingRunoffErosion:
         1.0 for ammonium runoff.
         """
         return nitrogen_concentration * runoff * runoff_extraction_coef
+
+    @staticmethod
+    def _calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_content: float, saturation_content: float,
+                                           runoff: float, runoff_extraction_coefficient: float) -> float:
+        """Calculates the amount of nitrogen lost from the given pool due to runoff.
+
+        Parameters
+        ----------
+        nitrogen_content : float
+            Amount of inorganic nitrogen in the top soil layer (kg / ha)
+        water_content : float
+            Water content of the top soil layer (mm)
+        saturation_content : float
+            Amount of water in the top soil layer when saturated (mm)
+        runoff : float
+            Amount of precipitation than left the field through runoff on the current day (mm)
+        runoff_extraction_coefficient : float
+            Coefficient of extraction for runoff (unitless)
+
+        Returns
+        -------
+        float
+            The amount of inorganic nitrogen lost from the top layer of soil on the current day (kg / ha)
+
+        Notes
+        -----
+        Precipitation that runs off the field only effects the top soil layer, so this method should only ever be used
+        to calculate nitrogen lost from the top soil layer.
+
+        """
+        water_sum = water_content + runoff
+        nitrogen_concentration = LeachingRunoffErosion._determine_nitrogen_concentration(nitrogen_content, water_sum,
+                                                                                         saturation_content)
+        nitrogen_lost_to_runoff = LeachingRunoffErosion._determine_nitrogen_runoff_amount(nitrogen_concentration,
+                                                                                          runoff,
+                                                                                          runoff_extraction_coefficient)
+        return nitrogen_lost_to_runoff
 
     @staticmethod
     def _determine_nitrogen_erosion_concentration(nitrogen_amount: float,
