@@ -67,9 +67,35 @@ def test_determine_enrichment_ratio(daily_soil_lost: float) -> None:
     (66.887, 12.331, 9.009)
 ])
 def test_determine_nitrogen_percolation_water_concentration(nitrogen: float, field_capacity: float,
-                                                            percolation: float) -> float:
+                                                            percolation: float) -> None:
     """Tests that the correct concentration of nitrogen in soil water is determined before leaching."""
     observed = LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration(nitrogen, field_capacity,
                                                                                          percolation)
     expected = nitrogen / (field_capacity + percolation)
+    assert observed == expected
+
+
+@pytest.mark.parametrize("active_nitrogen_concentration", [
+    12.4496,
+    10.4058,
+    0.0,
+    56.681
+])
+def test_adjust_active_organic_nitrogen_concentration(active_nitrogen_concentration: float) -> None:
+    """Tests that the active organic nitrogen concentration is correctly adjusted."""
+    observed = LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration(active_nitrogen_concentration)
+    expected = active_nitrogen_concentration / 50
+    assert observed == expected
+
+
+@pytest.mark.parametrize("nitrogen,percolation,leaching_coefficient", [
+    (15.33, 1.22, 1.0),
+    (22.683, 5.694, 2.5),
+    (66.74, 8.5576, 1.0),
+    (4.556, 0.671, 2.5)
+])
+def test_determine_leached_nitrogen(nitrogen: float, percolation: float, leaching_coefficient: float) -> float:
+    """Tests that the amount of nitrogen calculated to percolate out of the current layer is calculated correctly."""
+    observed = LeachingRunoffErosion._determine_leached_nitrogen(nitrogen, percolation, leaching_coefficient)
+    expected = (nitrogen / leaching_coefficient) * percolation
     assert observed == expected
