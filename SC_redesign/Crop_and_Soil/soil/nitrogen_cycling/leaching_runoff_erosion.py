@@ -1,6 +1,7 @@
 from typing import Optional
 from math import exp, log
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import METRIC_TONS_TO_KILOGRAMS
 
 
 class LeachingRunoffErosion:
@@ -41,13 +42,14 @@ class LeachingRunoffErosion:
             the concentration of the inorganic pools NO3/NH4 in the top soil layer (kg /mm H20)
 
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 4:2.1.2
 
         Notes
         -----
         This equation has been modified for use in RuFaS, it no longer accounts for the fraction of porosity from which
         anions are excluded.
+
         """
         return soluble_nitrogen_amount * (1 - (exp(-soil_water_runoff_sum/saturation_content))/soil_water_runoff_sum)
 
@@ -56,6 +58,7 @@ class LeachingRunoffErosion:
                                          runoff: float,
                                          runoff_extraction_coef: float) -> float:
         """This method determines the amount of nitrate runoff for the first layer
+
         Parameters
         ----------
         nitrogen_concentration: float
@@ -64,12 +67,14 @@ class LeachingRunoffErosion:
             coefficient of extraction for runoff (unitless)
         runoff: float
             daily runoff of H2O (mm)
+
         Returns
         -------
         float:
             the amount of nitrate runoff from the first layer (kg/ha)
+
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 4:2.1.5
 
         Notes
@@ -92,13 +97,16 @@ class LeachingRunoffErosion:
             amount of Fresh, Active, and Stable nitrogen (kg/ha)
         bulk_density: float
     `       bulk density of the soil layer (Mg per cubic meter)
+
         Returns
         -------
         float
             the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
+
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 4:2.2.2
+
         """
         return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
 
@@ -116,17 +124,18 @@ class LeachingRunoffErosion:
             daily soil loss (Metric Tons/ha)
         enrichment_ratio: float
             Enrichment ratio (unitless)
+
         Returns
         -------
         float
             nitrogen mass loss in erosion (kg/ha)
 
         References
-        -------
+        ----------
         SWAT Theoretical documentation eqn. 4:2.2.1
 
         """
-        return 0.001*nitrogen_erosion_concentration*daily_soil_lost*enrichment_ratio
+        return 0.001 * nitrogen_erosion_concentration * daily_soil_lost * enrichment_ratio
 
     @staticmethod
     def _determine_enrichment_ratio(daily_soil_lost: float) -> float:
@@ -143,18 +152,47 @@ class LeachingRunoffErosion:
             enrichment ratio (unitless)
 
         References
-        -------
+        ----------
         pseudocode_soil S.4.C.5
 
         Notes
-        -------
-        @TODO These numbers are modified ans suspected of retrieved from other references instead of SWAT, kept here
+        -----
+        TODO These numbers are modified ans suspected of retrieved from other references instead of SWAT, kept here
         issue #486
 
         """
-
-        return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
+        return exp(1.21 - 0.16 * log(daily_soil_lost * METRIC_TONS_TO_KILOGRAMS))
 
     @staticmethod
-    def _determine_nitrate_percolation_water_concentration():
-        return 0
+    def _determine_nitrogen_percolation_water_concentration(nitrogen_content: float,
+                                                            field_capacity_content: float,
+                                                            percolation_amount: float) -> float:
+        """Calculates concentration of nitrogen in the soil water for determining the amount of nitrogen leached between
+            soil layers.
+
+        Parameters
+        ----------
+        nitrogen_content : float
+            Amount of nitrogen in a specific pool in this layer of soil (kg / ha)
+        field_capacity_content : float
+            Amount of water in this soil layer when at field capacity (mm)
+        percolation_amount : float
+            The amount of water that percolated out of this layer of soil on the current day (mm)
+
+        Returns
+        -------
+        float
+            The concentration of nitrogen in the soil layer for use in calculating the amount of nitrogen leached by
+            percolation (kg / mm water)
+
+        References
+        ----------
+        pseudocode_soil eqn. [S.4.C.6]
+
+        Notes
+        -----
+        The origin of this equation is currently unknown, but reflects experimentally observed results.
+        TODO: find equation, issue #495
+
+        """
+        return nitrogen_content / (field_capacity_content + percolation_amount)

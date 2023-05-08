@@ -59,3 +59,17 @@ def test_determine_enrichment_ratio(daily_soil_lost: float) -> None:
     """Tests that the enrichment ratio was calculated correctly"""
     expected = exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
     assert expected == LeachingRunoffErosion._determine_enrichment_ratio(daily_soil_lost)
+
+
+@pytest.mark.parametrize("nitrogen,field_capacity,percolation", [
+    (33.41, 6.88, 1.44),
+    (21.99, 9.664, 4.556),
+    (66.887, 12.331, 9.009)
+])
+def test_determine_nitrogen_percolation_water_concentration(nitrogen: float, field_capacity: float,
+                                                            percolation: float) -> float:
+    """Tests that the correct concentration of nitrogen in soil water is determined before leaching."""
+    observed = LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration(nitrogen, field_capacity,
+                                                                                         percolation)
+    expected = nitrogen / (field_capacity + percolation)
+    assert observed == expected
