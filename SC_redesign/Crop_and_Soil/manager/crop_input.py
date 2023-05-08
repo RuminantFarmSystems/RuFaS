@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Optional, Any, List, Tuple
 from collections.abc import Sequence
@@ -147,6 +148,21 @@ class CropScheduleSpec:
 
     def make_from_tabular(self, file: Path, extension: Optional[str] = None):
         pass
+
+
+@dataclass(kw_only=True)
+class CropRotation:
+    """This class specifies the overall crop rotation pattern/schedule for a field or management unit. It contains
+    a list of `CropScheduleSpec` instances, each of which specify the scheduling for a specific pattern (for a single
+    crop)
+    """
+    crop_schedules: List[CropScheduleSpec]
+
+
+class CommonRotations(Enum):
+    """Enum containing all the default supported crop rotation patterns"""
+    CORN_ALFALFA_A = "corn_alfalfa_a"  # corn-alf-alf-alf
+    CORN_ALFALFA_B = "corn_alfalfa_b"  # corn-corn-alf-alf-alf
 
 
 def repeat_pattern(pattern: Sequence[int] = (1, 2, 5), skip: int = 2, repeat: int = 2) -> List[int]:
