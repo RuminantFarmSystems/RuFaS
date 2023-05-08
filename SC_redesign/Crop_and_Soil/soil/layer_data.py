@@ -189,6 +189,9 @@ class LayerData:
     """Active inorganic phosphorus content of this soil layer (kg / ha)"""
     stable_inorganic_phosphorus_content: float = 0
     """Stable inorganic phosphorus content of this soil layer (kg / ha)"""
+    fresh_organic_phosphorus_content: float = 0
+    """Fresh organic phosphorus content of this soil layer (kg / ha)"""
+    # TODO: organic phosphorus still needs to be implemented - issue #444
 
     active_inorganic_unbalanced_counter: int = 0
     """The number of days that the active inorganic phosphorus pool has been greater than it would be when in
@@ -250,6 +253,16 @@ class LayerData:
     humus_mineralization_rate_factor: float = 0.0003
     """Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless)
         Reference: SWAT Input .BSN file, see "CMN" on page 101."""
+    residue_fresh_organic_mineralization_rate: float = 0.05
+    """Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless)
+        Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
+        205)"""
+    ammonium_volatilization_cation_exchange_factor: float = 0.15
+    """Exchange factor that accounts for the soil's cation exchange capacity, default = 0.15 (unitless)
+        Reference: SWAT Theoretical documentation eqn. 3:1.3.5"""
+
+    annual_volatilized_ammonium_total: float = 0
+    """Cumulative total of ammonium volatilized in this year (kg / ha)"""
 
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None
@@ -624,3 +637,4 @@ class LayerData:
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
+        self.annual_volatilized_ammonium_total = 0
