@@ -14,6 +14,7 @@ from typing import Dict, List, Set
 import collections
 import math
 import statistics as stat
+import numpy as np
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type):
@@ -333,21 +334,38 @@ class Requirements:
                 BW.append(animal.body_weight)
                 # milk.append(milk)
                 # CP_milk.append(CP_milk)
-        # populating the class variables as an average across cows for each requirement
-        self.NEmaint = stat.mean(NEmaint)
-        self.NEa = stat.mean(NEa)
-        self.NEg = stat.mean(NEg)
-        self.NEpreg = stat.mean(NEpreg)
-        self.NEl = stat.mean(NEl)
-        self.MP_req = stat.mean(MP_req)
-        self.Ca_req = stat.mean(Ca_req)
-        self.P_req = stat.mean(P_req)
-        self.DMIest = stat.mean(DMIest)
-        self.avg_BW = stat.mean(BW)
-        self.avg_milk = stat.mean(milk)
-        self.avg_CP_milk = stat.mean(CP_milk)
-        self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
-
+        usethemean = False
+        if usethemean == True:
+            # populating the class variables as an average across cows for each requirement
+            self.NEmaint = stat.mean(NEmaint)
+            self.NEa = stat.mean(NEa)
+            self.NEg = stat.mean(NEg)
+            self.NEpreg = stat.mean(NEpreg)
+            self.NEl = stat.mean(NEl)
+            self.MP_req = stat.mean(MP_req)
+            self.Ca_req = stat.mean(Ca_req)
+            self.P_req = stat.mean(P_req)
+            self.DMIest = stat.mean(DMIest)
+            self.avg_BW = stat.mean(BW)
+            self.avg_milk = stat.mean(milk)
+            self.avg_CP_milk = stat.mean(CP_milk)
+            self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
+        else:
+            requirement_percentile = 80
+            self.NEmaint = np.percentile(NEmaint, requirement_percentile)
+            self.NEa = np.percentile(NEa, requirement_percentile)
+            self.NEg = np.percentile(NEg, requirement_percentile)
+            self.NEpreg = np.percentile(NEpreg, requirement_percentile)
+            self.NEl = np.percentile(NEl, requirement_percentile)
+            self.MP_req = np.percentile(MP_req, requirement_percentile)
+            self.Ca_req = np.percentile(Ca_req, requirement_percentile)
+            self.P_req = np.percentile(P_req, requirement_percentile)
+            self.DMIest = np.percentile(DMIest, requirement_percentile)
+            self.avg_BW = np.percentile(BW, requirement_percentile)
+            self.avg_milk = np.percentile(milk, requirement_percentile)
+            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
+            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
+            print('worked')
         # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
                               'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,

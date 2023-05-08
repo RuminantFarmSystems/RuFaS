@@ -257,6 +257,9 @@ class Cow(HeiferIII):
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
+            self.milk_production_reduction = 0.0
+            #print(self.id)
+            #print(self.milk_production_history)
 
             return 0, 0, 0
 
