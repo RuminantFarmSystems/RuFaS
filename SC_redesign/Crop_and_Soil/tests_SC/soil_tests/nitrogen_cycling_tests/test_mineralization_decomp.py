@@ -28,7 +28,8 @@ def test_calculate_residue_nutrient_ratio(carbon: float, organic: float, inorgan
     (1.334, 25),
     (0.4465, 25),
     (0.234, 200),
-    (0, 200)
+    (0, 200),
+    (inf, 25)
 ])
 def test_calculate_nutrient_term_for_residue_composition_factor(ratio: float, constant: float) -> None:
     """Tests that the nitrogen and phosphorus ratio terms are calculated correctly for use in calculating the nutrient
