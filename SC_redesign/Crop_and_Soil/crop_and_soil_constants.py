@@ -38,7 +38,3 @@ MILLIMETERS_TO_CENTIMETERS = 1 / CENTIMETERS_TO_MILLIMETERS
 # Nitrogen
 FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL = 0.02
 """Defined in SWAT Theoretical documentation, page 186 in paragraph beneath eqn. 3:1.1.4."""
-
-MINIMUM_NUTRIENT_TOTAL = 0.000_000_001
-"""Used to prevent a divide-by-zero error in eqn. 3:1.2.5, 6 (SWAT Theoretical documentation), implemented in the
-    _calculate_residue_nutrient_ratio() method in nitrogen_cycling/mineralization_decomp.py"""

@@ -1,11 +1,10 @@
 import pytest
-from math import exp
+from math import exp, inf
 from unittest.mock import MagicMock, call
 
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MINIMUM_NUTRIENT_TOTAL
 
 
 # --- Static method tests ---
@@ -18,8 +17,8 @@ from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MINIMUM_NUTRIENT_T
 def test_calculate_residue_nutrient_ratio(carbon: float, organic: float, inorganic: float) -> None:
     """Tests that the correct carbon-residue ratio is calculated."""
     observed = MineralizationDecomposition._calculate_residue_nutrient_ratio(carbon, organic, inorganic)
-    if organic + inorganic < MINIMUM_NUTRIENT_TOTAL:
-        expected = carbon / MINIMUM_NUTRIENT_TOTAL
+    if organic + inorganic == 0.0:
+        expected = inf
     else:
         expected = carbon / (organic + inorganic)
     assert observed == expected

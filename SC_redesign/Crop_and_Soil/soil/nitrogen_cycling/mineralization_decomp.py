@@ -1,8 +1,7 @@
 from typing import Optional
-from math import exp
+from math import exp, inf
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MINIMUM_NUTRIENT_TOTAL
 
 
 class MineralizationDecomposition:
@@ -95,8 +94,8 @@ class MineralizationDecomposition:
         Notes
         -----
         The equations for determining the carbon-nitrogen ratio and carbon-phosphorus ratio are identical in structure
-        so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, the
-        nutrient total is lower-bounded to avoid a divide-by-zero error.
+        so they have been implemented in the same method, hence why this method takes in a generic nutrient. Also, if
+        there are no nutrients in the soil, the carbon to nutrient ratio is set to be infinite.
 
         TODO: In SWAT, this method takes the amount of residue in the soil (instead of carbon) and multiplies it by 0.58
             to get the amount of carbon in the soil. This method should be refactored to do that when we get a tracker
@@ -104,7 +103,8 @@ class MineralizationDecomposition:
 
         """
         nutrient_total = organic_nutrient + inorganic_nutrient
-        nutrient_total = max(nutrient_total, MINIMUM_NUTRIENT_TOTAL)
+        if nutrient_total == 0.0:
+            return inf
         return carbon_amount / nutrient_total
 
     @staticmethod
