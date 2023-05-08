@@ -1010,6 +1010,8 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
     # mock an animal_management object, but specifically so it returns a list of pens
     penlist = MagicMock()
     penlist.all_pens = pens_with_mock_animals
+    for pen in penlist.all_pens:
+        pen.animal_combination.name = "LAC_COW"
 
     for pen in penlist.all_pens:
         for animal in pen.animals_in_pen:
