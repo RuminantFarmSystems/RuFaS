@@ -19,7 +19,9 @@ def test_calculate_nitrification_amount(nitrates: float, denitrification_rate: f
     """Tests that the amount of nitrified nitrates is calculated correctly."""
     observed = Denitrification._calculate_nitrification_amount(nitrates, denitrification_rate, temp_factor,
                                                                percent_carbon)
-    expected = nitrates * (1 - exp(-1 * denitrification_rate * temp_factor * percent_carbon))
+    expected_nitrification_factor = max(min(1 - exp(-1 * denitrification_rate * temp_factor * percent_carbon), 1.0),
+                                        0.0)
+    expected = nitrates * expected_nitrification_factor
     assert observed == expected
 
 

@@ -75,6 +75,12 @@ class Denitrification:
         ----------
         SWAT Theoretical documentation eqn. 3:1.4.1
 
+        Notes
+        -----
+        This calculates the fraction of nitrates lost to nitrification as nitrification factor, and bounds it to be in
+        the range [0.0, 1.0].
+
         """
         exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * percent_organic_carbon_content)
-        return nitrate_content * (1 - exponential_term)
+        nitrification_factor = max(min(1.0, (1 - exponential_term)), 0.0)
+        return nitrate_content * nitrification_factor
