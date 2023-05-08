@@ -148,8 +148,9 @@ def ration_report(ration, available_feeds):
                        'N': 0, "EE": 0, "starch": 0}
     nutrient_conc = {}
     ration = ration.copy()
-    ration.pop('status')
-    ration.pop('objective')
+    for non_numeric_key in ['status', 'objective']:
+        if non_numeric_key in ration:
+            del ration[non_numeric_key]
     nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
                  'potassium', 'N', 'EE', 'starch']
 
@@ -173,6 +174,8 @@ def ration_report(ration, available_feeds):
 
     # feed nutrient concentrations
     dm_amount = nutrient_amount['dm']
+    if dm_amount == 0:
+        dm_amount = 1
     for nutr in nutrients:
         if nutr == 'DM':
             nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100

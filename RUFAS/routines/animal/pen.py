@@ -9,6 +9,7 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+import collections
 import copy
 from enum import Enum
 from typing import List, Dict, Union, DefaultDict, Any
@@ -19,7 +20,8 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
+    get_default_animal_manure_excretions, scalar_mult_animal_manure_excretions
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
@@ -226,11 +228,11 @@ class Pen:
         self.avg_p_req = 0.0
         self.avg_p_animal = 0.0
 
-        self.animals_in_pen = []
-        self.populated = False
+        self.animals_in_pen = []  # TODO: We should use a dictionary to map animal id to animal object.
+        self.populated = False  # TODO: To be removed. Use the property 'is_populated' instead.
 
         self.classes_in_pen = set()
-        self.stocking_density = 0.0
+        self.stocking_density = 0.0  # TODO: To be removed. Use the property 'current_stocking_density' instead.
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -242,10 +244,13 @@ class Pen:
         self.avg_CP_milk = 0.0
 
         self.ration = {}
+        self.ration_per_animal = {}
         self.ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
                                        'NDF': 0, 'lignin': 0, 'ash': 0,
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
-        self.ration_nutrient_conc = {}
+        self.ration_nutrient_conc = {'dm': 0, 'CP': 0, 'ADF': 0,
+                                     'NDF': 0, 'lignin': 0, 'ash': 0,
+                                     'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.dry_matter_intake = 0.0
 
         self.avg_growth = 0.0
@@ -300,6 +305,23 @@ class Pen:
         """
 
         return len(self.animals_in_pen) / self.num_stalls
+
+    @property
+    def is_populated(self) -> bool:
+        """
+        Returns whether the pen is populated.
+
+        Returns
+        -------
+        bool
+            True if the pen is populated, False otherwise.
+
+        """
+        return len(self.animals_in_pen) > 0
+
+    @property
+    def current_pen_ration(self):
+        pass
 
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
@@ -480,6 +502,8 @@ class Pen:
             feed: instance of the Feed class
             methane_model: methane model used for methane emission calculations
         """
+        if len(self.animals_in_pen) == 0:
+            return
 
         for animal in self.animals_in_pen:
             if type(animal).__name__ == 'Cow':
@@ -731,3 +755,112 @@ class Pen:
         """
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
+
+    # Refactoring Zone
+    # =========================================================================
+    # Manure-related methods
+    # ----------------------
+    def calc_total_manure(self, feed, methane_model: str):
+        self.manure = get_default_animal_manure_excretions()
+
+        if not self.is_populated:
+            return
+
+        for animal in self.animals_in_pen:
+            if type(animal) == Cow:
+                animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
+            else:
+                animal.calc_manure_excretion(feed, methane_model)
+
+        for animal in self.animals_in_pen:
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
+
+    # Ration-related methods
+    # ----------------------
+    def _set_animal_nutrient_values(self, animal, feed, temp, phosphorus_concentration):
+        if type(animal) == Cow:
+            requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow',
+                                          parity=animal.calves, calving_interval=animal.CI,
+                                          milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
+                                          milk_lactose=animal.lactose_milk,
+                                          milk_production=animal.estimated_daily_milk_produced,
+                                          days_in_milk=animal.days_in_milk, lactating=animal.milking)
+            animal.NEmaint = requirements['NEmaint']
+            animal.NEg = requirements['NEg']
+            animal.NEpreg = requirements['NEpreg']
+            animal.NEl = requirements['NEl']
+            animal.MP_req = requirements['MP_req']
+            animal.Ca_req = requirements['Ca_req']
+            animal.P_req = requirements['P_req']
+            animal.DMIest = requirements['DMIest']
+            animal.DNED_req = (requirements['NEmaint'] + requirements[
+                'NEl']) / animal.DMIest
+            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+
+            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+
+        if type(animal) == Calf:
+            if self.avg_calf_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
+            else:
+                animal.calc_nutrient_rqmts(feed, temp)
+        elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
+            if self.avg_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_nutrient_rqmts
+            else:
+                animal.set_nutrient_rqmts(temp)
+        else:
+            if self.avg_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_nutrient_rqmts
+            else:
+                animal.set_nutrient_rqmts()
+
+        if phosphorus_concentration != -1:
+            animal.p_animal = animal.body_weight * phosphorus_concentration
+
+        animal.dry_matter_intake = self.dry_matter_intake
+        animal.set_ration(self.ration_per_animal, self.ration_nutrient_amount['dm'])
+
+        # animal.p_intake = self.avg_p_intake
+        animal.set_p_intake(self.ration_nutrient_amount['phosphorus'], self.ration_nutrient_conc['phosphorus'])
+
+    def _calc_new_ration(self, num_animals: int):
+        ration = {}
+        for key in self.ration_per_animal:
+            if key == 'status':
+                ration[key] = self.ration_per_animal[key]
+            else:  # feeds and price
+                ration[key] = self.ration_per_animal[key] * num_animals
+        return ration
+
+    # Population-related methods
+    def add_animal(self, animal, feed, temp, phosphorus_concentration: float) -> None:
+        """
+        Add an animal to the pen.
+
+        """
+
+        self._set_animal_nutrient_values(animal, feed, temp, phosphorus_concentration)
+        self.animals_in_pen.append(animal)
+        self.ration = self._calc_new_ration(len(self.animals_in_pen))
+
+    def remove_animal(self, animal_id: int) -> None:
+        """
+        Remove an animal from the pen by its id.
+
+        Parameters
+        ----------
+        animal_id : int
+            The id of the animal to be removed from the pen.
+
+        Returns
+        -------
+        None
+
+        """
+
+        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id != animal_id]
+        self.ration = self._calc_new_ration(len(self.animals_in_pen))
+
+
