@@ -260,6 +260,12 @@ class LayerData:
     denitrification_threshold_water_content: float = 1.10
     """Fraction of field capacity water content above which denitrification takes place (unitless)
         Reference: SWAT Input .BSN file, see "SDNCO" on page 102."""
+    ammonium_volatilization_cation_exchange_factor: float = 0.15
+    """Exchange factor that accounts for the soil's cation exchange capacity, default = 0.15 (unitless)
+        Reference: SWAT Theoretical documentation eqn. 3:1.3.5"""
+
+    annual_volatilized_ammonium_total: float = 0
+    """Cumulative total of ammonium volatilized in this year (kg / ha)"""
 
     # --- Carbon cycling
     soil_overall_carbon_fraction: Optional[float] = None
@@ -635,3 +641,4 @@ class LayerData:
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
         self.annual_denitrified_nitrogen_total = 0
+        self.annual_volatilized_ammonium_total = 0
