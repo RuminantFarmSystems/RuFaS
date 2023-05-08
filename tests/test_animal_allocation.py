@@ -500,8 +500,8 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         '_allocate_animals_to_pens_helper',
         return_value=None
     )
-    patch_for_fully_update_id_pen = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_id_pen',
+    patch_for_fully_update_animal_to_pen_id_map = mocker.patch(
+        'RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_animal_to_pen_id_map',
         return_value=None
     )
     mocker.patch(
@@ -536,4 +536,4 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         assert pens_by_animal_combination[animal_combination][-num_new_default_pens:] == dummy_new_default_pens
 
     assert patch_for_allocate_animals_to_pens_helper.call_count == len(animals_by_combination)
-    patch_for_fully_update_id_pen.assert_called_once()
+    patch_for_fully_update_animal_to_pen_id_map.assert_called_once()
