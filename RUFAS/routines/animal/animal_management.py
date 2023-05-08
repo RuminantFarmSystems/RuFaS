@@ -27,6 +27,9 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -34,6 +37,8 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
+
 
 import random
 from statistics import mean
@@ -56,7 +61,7 @@ def daily_animal_routine(animal_management, feed, weather, time):
         time: instance of the Time class as defined in classes.py
     """
 
-    animal_management.daily_updates(feed, weather, time)
+    animal_management.daily_updates2(feed, weather, time)
 
 
 class AnimalManagement:
@@ -139,7 +144,7 @@ class AnimalManagement:
         self.cows_culled = []
 
         # list of all the pens on the farm
-        self.all_pens = []
+        self.all_pens: List[Pen] = []
 
         # dictionary: key is animal ID, value is the pen ID that animal is in
         self.animal_to_pen_id_map = {}
@@ -165,6 +170,9 @@ class AnimalManagement:
             'cow': 0
         }
 
+        self.phosphorus_concentration_by_animal_type = {animal_type: 0.0
+                                                        for animal_type in [Calf, HeiferI, HeiferII, HeiferIII, Cow]}
+
         # housing type: barn or pasture
         self.housing = data['housing']
 
@@ -188,9 +196,19 @@ class AnimalManagement:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens()
+            self.allocate_animals_to_pens2()
 
         self._print_animal_num_warnings(data['herd_information'])
+
+    @property
+    def animal_list_by_type(self):
+        return {
+            Calf: self.calves,
+            HeiferI: self.heiferIs,
+            HeiferII: self.heiferIIs,
+            HeiferIII: self.heiferIIIs,
+            Cow: self.cows
+        }
 
     def init_pens(self, all_pen_data, herd_data: Dict[str, Any], manure_management_scenarios):
         """
@@ -449,7 +467,7 @@ class AnimalManagement:
 
         all_animals_added = animals_added + calves_born
 
-        self.remove_animals_from_herd(animals_removed)
+        # self.remove_animals_from_herd(animals_removed)
 
         original_pen_populations = self.track_former_pen_population()
 
@@ -954,16 +972,20 @@ class AnimalManagement:
 
         self.fully_update_animal_to_pen_id_map()
 
-    def allocate_animals_to_pens2(self, all_animals) -> None:
+    def allocate_animals_to_pens2(self) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,    ensuring that the animal density of each pen matches the overall density as closely as possible.
-        Returns    -------    None
-        """
-        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
 
+        Returns
+        -------
+        None
+
+        """
+
+        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
         animals_by_combination = collections.defaultdict(list)
-        for animal in all_animals:
+        for animal in [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]:
             animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
             animals_by_combination[animal_combination].append(animal)
 
@@ -1000,7 +1022,7 @@ class AnimalManagement:
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         for i, pen in enumerate(self.all_pens):
-            if pen.populated:
+            if pen.is_populated:
                 pen.subset_class_feeds(feed)
                 pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
                 self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
@@ -1330,3 +1352,180 @@ class AnimalManagement:
         database
         """
         return self.life_cycle_manager.initialize_db_summary
+
+    # Refactoring zone
+    # =========================================================================
+    @classmethod
+    def _calc_phosphorus_concentration(cls, animals):
+        if len(animals) == 0:
+            return 0.0
+
+        total_phosphorus = 0.0
+        total_body_weight = 0.0
+        for animal in animals:
+            total_phosphorus += animal.p_animal * GeneralConstants.GRAMS_TO_KG
+            total_body_weight += animal.body_weight
+
+        return total_phosphorus / total_body_weight
+
+    def _update_phosphorus_concentrations(self):
+        for animal_type in self.phosphorus_concentration_by_animal_type:
+            animals = self.animal_list_by_type[animal_type]
+            self.phosphorus_concentration_by_animal_type[animal_type] = \
+                self._calc_phosphorus_concentration(animals)
+
+    def _calc_ration_at_interval(self, feed):
+        """
+        Calls each pens's method to calculate the ration for that pen. This is
+        part of the routines that happen every ration interval.
+
+        Args:
+            feed: instance of the Feed class
+        """
+        available_feeds = ration_driver.AvailableFeeds()
+        available_feeds.feed_nutrients(feed)
+        for pen in self.all_pens:
+            if pen.is_populated:
+                pen.subset_class_feeds(feed)
+                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+                # pen.ration = pen.calc_ration(feed, pen_specific_feed_data)
+                classes_in_pen = self._get_classes_in_pen(pen)
+
+                ration_per_animal = {}
+                ration_vals = {}
+                while True:  # TODO: Change the condition to check for non-optimal status
+                    # TODO: Should probably use pen animal combinations instead
+                    if 'Calf' in classes_in_pen:
+                        ration_per_animal = calf_optimize()
+                        ration_vals = {'ME_tot': 0}
+
+                    elif classes_in_pen.intersection({'HeiferI', 'HeiferII', 'HeiferIII'}):
+                        ration_per_animal, ration_vals = \
+                            ration_driver.ration_formulation(pen, pen_specific_feed_data, 'heifer', False)
+
+                    elif 'LacCow' in classes_in_pen:
+                        ration_per_animal, ration_vals = \
+                            ration_driver.ration_formulation(pen, pen_specific_feed_data, 'cow', True)
+
+                    elif 'DryCow' in classes_in_pen:
+                        ration_per_animal, ration_vals = \
+                            ration_driver.ration_formulation(pen, pen_specific_feed_data, 'cow', False)
+
+                    else:  # this should never occur
+                        print('error in pen ration calculation')
+                        ration_per_animal = {'status': 'Infeasible'}
+
+                    if ration_per_animal['status'] == 'Optimal':
+                        break
+
+                # recording ration nutrition information in pen
+                nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
+                pen.ration_nutrient_amount = nutrient_amount
+                pen.ration_nutrient_conc = nutrient_conc
+                pen.MEdiet = ration_vals['ME_tot']
+                pen.dry_matter_intake = nutrient_amount['dm']
+
+                for animal in pen.animals_in_pen:
+                    animal.set_ration(ration_per_animal, nutrient_amount['dm'])
+                    animal.set_p_intake(nutrient_amount['phosphorus'], nutrient_conc['phosphorus'])
+
+                ration = {}
+                num_animals = len(pen.animals_in_pen)
+                for key in ration_per_animal:
+                    if key == 'status':
+                        ration[key] = ration_per_animal[key]
+                    else:  # feeds and price
+                        ration[key] = ration_per_animal[key] * num_animals
+
+                pen.ration = ration
+                pen.ration_per_animal = ration_per_animal
+
+    @classmethod
+    def _get_classes_in_pen(cls, pen: Pen):
+        classes_in_pen = set()
+        for animal in pen.animals_in_pen:
+            animal_name = cls.ANIMAL_GROUPING_SCENARIO.get_animal_name(animal)
+            classes_in_pen.add(animal_name)
+        return classes_in_pen
+
+    def daily_updates2(self, feed, weather, time):
+        """
+        Executes the daily routines relating to Animals. All animals are
+        updated through the life_cycle_manager's daily_update() method. The
+        daily phosphorus calculations are also done. If it is the end of the
+        ration interval, the animals are allocated to new pens and the ration &
+        manure calculations are done.
+
+        Args:
+            feed: instance of the Feed class defined in feed.py
+            weather: instance of the Weather class defined in classes.py
+            time: instance of the Time class defined in classes.py
+        """
+        if self.simulate_animals:
+            temp = weather.T_avg[time.year - 1][time.day - 1]
+            calves_before_update = set(self.calves)
+            heiferIs_before_update = set(self.heiferIs)
+            heiferIIs_before_update = set(self.heiferIIs)
+            heiferIIIs_before_update = set(self.heiferIIIs)
+            cows_before_update = set(self.cows)
+
+            animals_added, animals_removed, calves_born, *rest = \
+                self.life_cycle_manager.daily_update(self.simulation_day, self.calves,
+                                                     self.heiferIs, self.heiferIIs,
+                                                     self.heiferIIIs, self.cows)
+
+            # Reasons for removal: graduated, sold, culled
+            # What was present before but not now?
+            calves_removed_after_update = calves_before_update.difference(set(self.calves))
+            heiferIs_removed_after_update = heiferIs_before_update.difference(set(self.heiferIs))
+            heiferIIs_removed_after_update = heiferIIs_before_update.difference(set(self.heiferIIs))
+            heiferIIIs_removed_after_update = heiferIIIs_before_update.difference(set(self.heiferIIIs))
+            cows_removed_after_update = cows_before_update.difference(set(self.cows))
+
+            for animal in [*calves_removed_after_update, *heiferIs_removed_after_update,
+                           *heiferIIs_removed_after_update, *heiferIIIs_removed_after_update,
+                           *cows_removed_after_update]:
+                pen_id = self.animal_to_pen_id_map[animal.id]
+                self.all_pens[pen_id].remove_animal(animal.id)
+                del self.animal_to_pen_id_map[animal.id]
+
+            # TODO: Check status of animals that stayed, they may need to change pens
+            #  eg. dry cow back and forth with lac cow
+
+            # What is present now but not before?
+            heiferIs_from_graduated_calves = list(set(self.heiferIs).difference(heiferIs_before_update))
+            heiferIIs_from_graduated_heiferIs = list(set(self.heiferIIs).difference(heiferIIs_before_update))
+            heiferIIIs_from_graduated_heiferIIs = list(set(self.heiferIIIs).difference(heiferIIIs_before_update))
+            cows_from_graduated_heiferIIIs = list(set(self.cows).difference(cows_before_update))
+
+            for animal in [*heiferIs_from_graduated_calves, *heiferIIs_from_graduated_heiferIs,
+                           *heiferIIIs_from_graduated_heiferIIs, *cows_from_graduated_heiferIIIs,
+                           *animals_added, *calves_born]:
+                animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+                pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
+                                                    key=lambda p: p.current_stocking_density)
+                pen_with_min_stocking_density.add_animal(animal, feed, temp,
+                                                         self.phosphorus_concentration_by_animal_type[type(animal)])
+                self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
+
+            for animal in [*animals_added, *calves_born]:
+                self.animal_list_by_type[type(animal)].append(animal)
+
+            if self.simulation_day == 25:
+                print('debug')
+
+            for pen in self.all_pens:
+                pen.classes_in_pen = self._get_classes_in_pen(pen)
+                pen.calc_total_manure(feed, self.methane_model)
+                pen.call_p_rqmts()
+                pen.daily_p_update()  # Average phosphorus concentration per pen
+
+            self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
+            self.record_pen_history()
+
+            if self.end_ration_interval():
+                self.calc_nutrient_rqmts(feed, temp)  # per animal
+                self.clear_pens()
+                self.allocate_animals_to_pens2()  # TODO: Allocate cows based on days_in_milk first
+                self._calc_ration_at_interval(feed)  # per pen
+                self.calc_avg_growth()  # per pen

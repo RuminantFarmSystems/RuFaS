@@ -690,6 +690,8 @@ class LifeCycleManager:
         buy_threshold = 1.01
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * buy_threshold \
                 and sim_day > 1:
+            if len(self.replacement_market) == 0:
+                break
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
             replacement.set_p_purchased()

@@ -1,0 +1,3 @@
+- Add the combination in Pen.AnimalCombination.
+- Specify the details of combination in AnimalGroupingScenario.
+- Adjust any subtype names based on scenario. 

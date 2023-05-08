@@ -1,0 +1,57 @@
+classDiagram
+    AnimalManagement *-- AnimalGroupingScenario  : has
+    AnimalManagement *-- LifeCycleManager : has
+    AnimalManagement *-- Pen : has
+    Pen *-- AnimalBase : has
+    AnimalBase <|-- Calf
+    AnimalBase <|-- HeiferI
+    AnimalBase <|-- HeiferII
+    AnimalBase <|-- HeiferIII
+    AnimalBase <|-- Cow
+    class AnimalGroupingScenario {
+        <<Enumeration>>
+        CALF__GROWING__CLOSE_UP__LACCOW : Dict[AnimalCombination, List[str]]
+        CALF__GROWING_AND_CLOSE_UP__LACCOW : Dict[AnimalCombination, List[str]]
+        -type_name_by_scenario : Dict[AnimalGroupingScenario, str]
+        +get_animal_name(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) str
+        +find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) AnimalCombination
+    }
+
+    class AnimalManagement {
+        ANIMAL_GROUPING_SCENARIO$ : AnimalGroupingScenario
+        +set_animal_grouping_scenario(cls, AnimalGroupingScenario)$ None
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+    class LifeCycleManager {
+
+    }
+
+    class Pen {
+        +update_animals(self, new_animals, animal_combination: AnimalCombination) None
+        +calc_manure(self, feed, methane_model: str) None
+    }
+
+    class AnimalBase {
+        +calc_manure_base(self) None
+    }
+
+    class Calf {
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+    class HeiferI {
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+    class HeiferII {
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+    class HeiferIII {
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+    class Cow {
+        +calc_manure_excretion(self, feed, methane_model: str, ME_intake) None
+    }
