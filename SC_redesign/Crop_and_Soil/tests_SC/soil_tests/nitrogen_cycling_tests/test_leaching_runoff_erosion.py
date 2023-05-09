@@ -211,8 +211,58 @@ def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: 
         assert incorp.data.annual_eroded_active_organic_nitrogen_total == 3 * field_size
 
 
-# def test_leach_nitrogen() -> None:
-#     """Tests that nitrogen is properly removed from a layer and percolated to the next during the leaching process."""
-#    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
-#                return_value=6.8):
-#         data = SoilData(field_size=2.0)
+def test_leach_nitrogen() -> None:
+    """Tests that nitrogen is properly removed from a layer and percolated to the next during the leaching process."""
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
+               return_value=6.8):
+        data = SoilData(field_size=2.0)
+        incorp = LeachingRunoffErosion(data)
+
+        incorp.data.set_vectorized_layer_attribute("nitrate_content", [40] * 4)
+        incorp.data.set_vectorized_layer_attribute("ammonium_content", [35] * 4)
+        incorp.data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [15] * 4)
+        incorp.data.set_vectorized_layer_attribute("percolated_water", [3.5, 0, 3.5, 3.5])
+
+        LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching = MagicMock(return_value=10)
+
+        incorp._leach_nitrogen()
+
+        top_layer_nitrogen_lost_calls = [call(40, 6.8, 3.5, 1.0, False), call(35, 6.8, 3.5, 1.0, False),
+                                         call(15, 6.8, 3.5, 1.0, True)]
+        lower_layer_nitrogen_lost_calls = [call(40, 6.8, 3.5, 2.5, False), call(35, 6.8, 3.5, 1.0, False),
+                                           call(15, 6.8, 3.5, 1.0, True)] * 2
+        all_nitrogen_lost_calls = top_layer_nitrogen_lost_calls + lower_layer_nitrogen_lost_calls
+        LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching.assert_has_calls(all_nitrogen_lost_calls)
+        soil_layers = incorp.data.soil_layers + [incorp.data.vadose_zone_layer]
+        for index in range(len(soil_layers)):
+            if index == 0 or index == 2:
+                assert soil_layers[index].nitrate_content == 30
+                assert soil_layers[index].ammonium_content == 25
+                assert soil_layers[index].active_organic_nitrogen_content == 5
+            elif index == 1:
+                assert soil_layers[index].nitrate_content == 50
+                assert soil_layers[index].ammonium_content == 45
+                assert soil_layers[index].active_organic_nitrogen_content == 25
+            elif index == 3:
+                assert soil_layers[index].nitrate_content == 40
+                assert soil_layers[index].ammonium_content == 35
+                assert soil_layers[index].active_organic_nitrogen_content == 15
+            else:
+                assert soil_layers[index].nitrate_content == 10
+                assert soil_layers[index].ammonium_content == 10
+                assert soil_layers[index].active_organic_nitrogen_content == 10
+
+
+def test_leach_and_erode_nitrogen() -> None:
+    """Tests that the top level routine of this module calls the right helper methods."""
+    field_size = 2.3
+    data = SoilData(field_size=2.3)
+    incorp = LeachingRunoffErosion(data)
+
+    incorp._erode_nitrogen = MagicMock()
+    incorp._leach_nitrogen = MagicMock()
+
+    incorp.leach_runoff_and_erode_nitrogen(field_size)
+
+    incorp._erode_nitrogen.assert_called_once_with(field_size)
+    incorp._leach_nitrogen.assert_called_once()

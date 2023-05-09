@@ -260,7 +260,10 @@ class SoilData:
                                                soil_water_concentration=0,
                                                saturation_point_water_concentration=inf,
                                                initial_labile_inorganic_phosphorus_concentration=0,
+                                               initial_soil_nitrate_concentration=0,
                                                field_size=field_size)
+            self.vadose_zone_layer.active_organic_nitrogen_content = 0
+            self.vadose_zone_layer.stable_organic_nitrogen_content = 0
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content

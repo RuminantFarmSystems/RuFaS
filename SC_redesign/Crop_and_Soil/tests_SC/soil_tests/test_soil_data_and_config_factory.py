@@ -55,9 +55,13 @@ def test_config_factory_defaults():
     assert generic.average_subbasin_slope == 0.05
     assert generic.moisture_condition_parameter is None
     assert generic.accumulated_runoff is None
-    assert generic.vadose_zone_layer == LayerData(top_depth=200, bottom_depth=10000000, soil_water_concentration=0,
-                                                  saturation_point_water_concentration=inf, field_size=1.0,
-                                                  initial_labile_inorganic_phosphorus_concentration=0)
+    expected_vadose_zone_layer = LayerData(top_depth=200, bottom_depth=10000000, soil_water_concentration=0,
+                                           saturation_point_water_concentration=inf, field_size=1.0,
+                                           initial_labile_inorganic_phosphorus_concentration=0,
+                                           initial_soil_nitrate_concentration=0)
+    expected_vadose_zone_layer.active_organic_nitrogen_content = 0
+    expected_vadose_zone_layer.stable_organic_nitrogen_content = 0
+    assert generic.vadose_zone_layer == expected_vadose_zone_layer
     assert generic.time_step == 24
     assert generic.previous_temperature_effect == 0.8
     assert generic.slope_length == 3
@@ -152,10 +156,13 @@ def test_manual_soil_data_configuration() -> None:
                                                  field_size=1.8)
     assert mollisols.soil_layers[3] == LayerData(top_depth=150, bottom_depth=300, initial_soil_nitrate_concentration=5,
                                                  field_size=1.8)
-    assert mollisols.vadose_zone_layer == LayerData(top_depth=300, bottom_depth=10000000,
-                                                    soil_water_concentration=0, field_size=1.8,
-                                                    saturation_point_water_concentration=inf,
-                                                    initial_labile_inorganic_phosphorus_concentration=0)
+    expected_vadose_zone_layer = LayerData(top_depth=300, bottom_depth=10000000, soil_water_concentration=0,
+                                           field_size=1.8, saturation_point_water_concentration=inf,
+                                           initial_labile_inorganic_phosphorus_concentration=0,
+                                           initial_soil_nitrate_concentration=0)
+    expected_vadose_zone_layer.active_organic_nitrogen_content = 0
+    expected_vadose_zone_layer.stable_organic_nitrogen_content = 0
+    assert mollisols.vadose_zone_layer == expected_vadose_zone_layer
 
 
 def test_error_manual_soil_data_configuration() -> None:

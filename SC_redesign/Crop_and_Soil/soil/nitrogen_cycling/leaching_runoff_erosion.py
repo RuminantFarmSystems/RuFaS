@@ -1,5 +1,6 @@
 from typing import Optional
 from math import exp, log
+
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
@@ -52,6 +53,11 @@ class LeachingRunoffErosion:
         field_size : float
             Size of the field (ha)
 
+        References
+        ----------
+        pseudocode_soil [S.4.C.2] (determines what the runoff extraction coefficient will be for nitrates and ammonium)
+        TODO: find literature source for these values, issue #495
+
         Notes
         -----
         This method only removes nitrogen from the top soil layer. Inorganic nitrogen is removed by runoff, while
@@ -93,10 +99,20 @@ class LeachingRunoffErosion:
             self.data.annual_eroded_active_organic_nitrogen_total += active_organic_nitrogen_lost * field_size
 
     def _leach_nitrogen(self) -> None:
-        """Removes leached nitrogen from each soil layer, then adds
+        """Removes leached nitrogen from each soil layer, then adds the leached nitrogen to the next layer.
+
+        References
+        ----------
+        pseudocode_soil [S.4.C.8] (determines what the leaching extraction coefficient will be for each pool/layer)
+        TODO: find literature source for these values, issue #495
 
         Notes
         -----
+        This method determines how much nitrogen will be leached out of each layer without being influenced at all by
+        the amount of nitrogen leaching into that layer. It achieves this by calculating the amounts leached out of each
+        layer, storing those amounts in a dictionary, appending that dictionary to a list (`percolated_nitrogen`), then
+        iterating through the soil profile a second time and adding the leached nitrogen into the appropriate layer. The
+        bottom soil layer leaches into the vadose zone.
 
         """
         percolated_nitrogen = []
@@ -116,9 +132,9 @@ class LeachingRunoffErosion:
                 layer.nitrate_content, layer.field_capacity_content, layer.percolated_water,
                 nitrate_extraction_coefficient, False)
             ammonium_lost = self._calculate_nitrogen_lost_to_leaching(
-                layer.ammonium_content, layer.field_capacity_content, layer.percolated_water, 2.5, False)
+                layer.ammonium_content, layer.field_capacity_content, layer.percolated_water, 1.0, False)
             active_organic_nitrogen_lost = self._calculate_nitrogen_lost_to_leaching(
-                layer.active_organic_nitrogen_content, layer.field_capacity_content, layer.percolated_water, 2.5, True)
+                layer.active_organic_nitrogen_content, layer.field_capacity_content, layer.percolated_water, 1.0, True)
 
             layer.nitrate_content -= nitrates_lost
             layer.ammonium_content -= ammonium_lost
