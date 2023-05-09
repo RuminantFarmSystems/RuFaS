@@ -102,10 +102,10 @@ class SolublePhosphorus:
         runoff_in_liters = (runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
         runoff_in_liters_per_hectare = runoff_in_liters / field_size
 
-        top_layer_soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,
-                                                                                                    bulk_density,
-                                                                                                    layer_thickness,
-                                                                                                    field_size)
+        top_layer_soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(labile_phosphorus,
+                                                                                                  bulk_density,
+                                                                                                  layer_thickness,
+                                                                                                  field_size)
         extraction_coefficient = 0.005
         top_layer_dissolved_reactive_phosphorus_runoff = top_layer_soil_phosphorus_concentration * \
             extraction_coefficient * runoff_in_liters_per_hectare * (10 ** (-6))
@@ -237,10 +237,8 @@ class SolublePhosphorus:
             The amount of phosphorus that leaves this layer of soil on the current day (kg / ha)
 
         """
-        soil_phosphorus_concentration = LayerData.determine_soil_phosphorus_concentration(labile_phosphorus,
-                                                                                          bulk_density,
-                                                                                          layer_thickness,
-                                                                                          field_size)
+        soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(labile_phosphorus, bulk_density,
+                                                                                        layer_thickness, field_size)
 
         isotherm_slope = SolublePhosphorus._determine_isotherm_slope(percent_clay_content)
         isotherm_intercept = SolublePhosphorus._determine_isotherm_intercept(isotherm_slope)

@@ -570,17 +570,17 @@ def test_calculate_phosphorus_sorption_parameter(clay: float, phosphorus: float,
     assert observed == expected
 
 
-@pytest.mark.parametrize("phosphorus,density,depth,area", [
+@pytest.mark.parametrize("nutrient,density,depth,area", [
     (25, 22.13, 20, 1.88),
     (13, 34.556, 9.12, 3.45),
     (1.2344, 19.84, 15, 2.3341),
 ])
-def test_determine_soil_phosphorus_concentration(phosphorus: float, density: float, depth: float, area: float) -> None:
-    """Tests that the soil phosphorus concentration is calculated correctly."""
-    observed = LayerData.determine_soil_phosphorus_concentration(phosphorus, density, depth, area)
+def test_determine_soil_nutrient_concentration(nutrient: float, density: float, depth: float, area: float) -> None:
+    """Tests that the soil nutrient concentration is calculated correctly."""
+    observed = LayerData.determine_soil_nutrient_concentration(nutrient, density, depth, area)
     total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
     total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
-    total_phosphorus_mass = phosphorus * area
+    total_phosphorus_mass = nutrient * area
     expected_concentration = (total_phosphorus_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
     assert pytest.approx(observed) == expected_concentration
 

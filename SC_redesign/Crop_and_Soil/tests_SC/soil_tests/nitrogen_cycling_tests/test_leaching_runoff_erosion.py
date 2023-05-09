@@ -3,6 +3,7 @@ from math import exp, log
 from unittest.mock import MagicMock
 
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 
 @pytest.mark.parametrize("soluble_nitrogen_amount, soil_water_runoff_sum,saturation_content", [
@@ -59,22 +60,6 @@ def test_calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_conten
     assert observed == 25
 
 
-@pytest.mark.parametrize("nitrogen_amount,layer_thickness,bulk_density", [
-    (102, 100, 99),
-    (0.5, 1.8, 2.3),
-    (2, 3, 4),
-    (0, 3, 4)
-])
-def test_determine_nitrogen_erosion_concentration(nitrogen_amount: float,
-                                                  layer_thickness: float,
-                                                  bulk_density: float) -> None:
-    """Tests that the soil nitrogen concentrations for the Fresh, Active, and Stable pools are calculated correctly"""
-    expected = (100 * nitrogen_amount) / (bulk_density * layer_thickness)
-    assert expected == LeachingRunoffErosion._determine_nitrogen_erosion_concentration(nitrogen_amount,
-                                                                                       layer_thickness,
-                                                                                       bulk_density)
-
-
 @pytest.mark.parametrize("daily_soil_lost", [
     5,  # lower values
     100,  # higher values
@@ -84,6 +69,29 @@ def test_determine_enrichment_ratio(daily_soil_lost: float) -> None:
     """Tests that the enrichment ratio was calculated correctly"""
     expected = exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
     assert expected == LeachingRunoffErosion._determine_enrichment_ratio(daily_soil_lost)
+
+
+@pytest.mark.parametrize("nitrogen,density,depth,area,sediment", [
+    (13.44, 1.82, 20, 2.11, 0.8),
+    (44.996, 0.98, 25, 1.234, 0.44),
+    (66.101, 1.334, 17, 0.85, 0.55),
+    (5.223, 1.4, 31, 2.5, 0.76)
+])
+def test_calculate_eroded_organic_nitrogen(nitrogen: float, density: float, depth: float, area: float,
+                                           sediment: float) -> float:
+    """Tests that the amount of organic nitrogen lost to eroded sediment is calculated correctly."""
+    LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=26)
+    LeachingRunoffErosion._determine_enrichment_ratio = MagicMock(return_value=2.5)
+    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content = MagicMock(return_value=33)
+
+    observed = LeachingRunoffErosion._calculate_eroded_organic_nitrogen(nitrogen, density, depth, area, sediment)
+    expected_sediment_per_ha = sediment / area
+    expected_lost_nitrogen = min(nitrogen, 33)
+
+    LayerData.determine_soil_nutrient_concentration.assert_called_once_with(nitrogen, density, depth, area)
+    LeachingRunoffErosion._determine_enrichment_ratio.assert_called_once_with(expected_sediment_per_ha)
+    LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(26, expected_sediment_per_ha, 2.5)
+    assert observed == expected_lost_nitrogen
 
 
 @pytest.mark.parametrize("nitrogen,field_capacity,percolation", [

@@ -1,8 +1,7 @@
 from typing import Optional
 from math import exp, log
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import METRIC_TONS_TO_KILOGRAMS
-
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 """
 This module handles the movement and loss of nitrogen due to erosion and leaching within the soil profile, and is based
@@ -70,12 +69,15 @@ class LeachingRunoffErosion:
             self.data.soil_layers[0].ammonium_content -= ammonium_lost_to_runoff
             self.data.annual_runoff_ammonium_total += ammonium_lost_to_runoff * field_size
 
+        if self.data.eroded_sediment > 0.0:
+            pass
+
     # --- Static methods ---
     @staticmethod
     def _determine_nitrogen_concentration(soluble_nitrogen_amount: float,
                                           soil_water_runoff_sum: float,
                                           saturation_content: float) -> float:
-        """This method determines the concentration of the inorganic pools NO3/NH4 in the top soil layer
+        """This method determines the concentration of the inorganic pools NO3/NH4 in the top soil layer.
 
         Parameters
         ----------
@@ -173,31 +175,6 @@ class LeachingRunoffErosion:
         return nitrogen_lost_to_runoff
 
     @staticmethod
-    def _determine_nitrogen_erosion_concentration(nitrogen_amount: float,
-                                                  layer_thickness: float,
-                                                  bulk_density: float) -> float:
-        """This method calculates the soil nitrogen concentrations for the Fresh, Active, and Stable pools
-
-        Parameters
-        ----------
-        nitrogen_amount: float
-            amount of Fresh, Active, and Stable nitrogen (kg/ha)
-        bulk_density: float
-    `       bulk density of the soil layer (Mg per cubic meter)
-
-        Returns
-        -------
-        float
-            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 4:2.2.2
-
-        """
-        return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
-
-    @staticmethod
     def _determine_erosion_nitrogen_loss_content(nitrogen_erosion_concentration: float,
                                                  daily_soil_lost: float,
                                                  enrichment_ratio: float) -> float:
@@ -248,7 +225,45 @@ class LeachingRunoffErosion:
         issue #486
 
         """
-        return exp(1.21 - 0.16 * log(daily_soil_lost * METRIC_TONS_TO_KILOGRAMS))
+        return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
+
+    @staticmethod
+    def _calculate_eroded_organic_nitrogen(nitrogen_content: float, bulk_density: float, layer_thickness: float,
+                                           field_size: float, eroded_sediment: float) -> float:
+        """This method calculates how much organic nitrogen is lost from the field via eroded sediment.
+
+        Parameters
+        ----------
+        nitrogen_content : float
+            Nitrogen content of the given pool of the top soil layer (kg / ha)
+        bulk_density : float
+            The density of the top soil layer (Megagrams / cubic meter)
+        layer_thickness : float
+            The thickness of the top layer of soil (mm)
+        field_size : float
+            Size of the field (ha)
+        eroded_sediment : float
+            Amount of sediment that was eroded from the field on the current day (metric tons)
+
+        Returns
+        -------
+        float
+            Amount of nitrogen lost to erosion from the given organic pool in the top soil layer (kg / ha)
+
+        Notes
+        -----
+        Nitrogen can only be removed from the field by erosion from the top layer of soil, so this method should not be
+        used on any other layers of soil.
+
+        """
+        nitrogen_concentration = LayerData.determine_soil_nutrient_concentration(nitrogen_content, bulk_density,
+                                                                                 layer_thickness, field_size)
+        sediment_content_loss = eroded_sediment / field_size
+        enrichment_ratio = LeachingRunoffErosion._determine_enrichment_ratio(sediment_content_loss)
+        nitrogen_lost = LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(nitrogen_concentration,
+                                                                                       sediment_content_loss,
+                                                                                       enrichment_ratio)
+        return min(nitrogen_content, nitrogen_lost)
 
     @staticmethod
     def _determine_nitrogen_percolation_water_concentration(nitrogen_content: float,
