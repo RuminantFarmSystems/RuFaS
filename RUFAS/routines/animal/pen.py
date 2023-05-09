@@ -502,8 +502,6 @@ class Pen:
             feed: instance of the Feed class
             methane_model: methane model used for methane emission calculations
         """
-        if len(self.animals_in_pen) == 0:
-            return
 
         for animal in self.animals_in_pen:
             if type(animal).__name__ == 'Cow':
