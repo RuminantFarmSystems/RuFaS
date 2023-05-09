@@ -11,9 +11,8 @@ from RUFAS.routines.animal.pen import Pen
 
 class AnimalGroupingScenario(Enum):
     """  
-    The different scenarios for animal grouping.  
-    Each scenario is a dictionary of the form: { Pen.AnimalCombination: [List of animal type names] }
-    The animal type names are the names of the animal classes as strings.
+    The different scenarios for grouping animals on a farm.
+    Each scenario is a dictionary of the form: { Pen.AnimalCombination: [List of animal type/subtype names] }
 
     Notes:
         Each scenario must be both exhaustive and non-overlapping.
@@ -22,7 +21,7 @@ class AnimalGroupingScenario(Enum):
         - Non-overlapping: Each animal type or subtype must be associated with one and only one animal combination.
 
     """
-    # TODO: Probably change the names of these scenarios to be more descriptive. Add other scenarios as needed.
+    # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
         Pen.AnimalCombination.CALF: ['Calf'],
@@ -51,9 +50,9 @@ class AnimalGroupingScenario(Enum):
         self._value_ = value
 
         self._animal_combination_by_animal_name = {}  # key: animal type name, value: animal combination
-        for animal_combination, animal_type_names in self.value.items():
-            for animal_type_name in animal_type_names:
-                self._animal_combination_by_animal_name[animal_type_name] = animal_combination
+        for animal_combination, animal_names in self.value.items():
+            for animal_name in animal_names:
+                self._animal_combination_by_animal_name[animal_name] = animal_combination
 
     # Currently, we don't have subtypes for calves, heiferIs, heiferIIs, and heiferIIIs.
     # Therefore, their names are the same as their class names.
@@ -88,6 +87,7 @@ class AnimalGroupingScenario(Enum):
             The name of the subtype that the given cow belongs to.
 
         """
+
         cow_name_by_scenario = {
             AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: 'LacCow' if cow.is_lactating else 'DryCow',
             AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: 'LacCow' if cow.is_lactating else 'DryCow'

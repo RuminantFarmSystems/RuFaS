@@ -612,11 +612,12 @@ class Pen:
         """
         Calls each animal's method to calculate daily phosphorus update.
         """
-        if not len(self.animals_in_pen) == 0:
+        if len(self.animals_in_pen) > 0:
             total_p_animal = 0
             for animal in self.animals_in_pen:
                 animal.daily_p_update()
                 total_p_animal += animal.p_animal
+            total_p_animal = max(total_p_animal, 0)  # TODO: Add warning if total_p_animal < 0
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
     def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
@@ -760,7 +761,21 @@ class Pen:
     # =========================================================================
     # Manure-related methods
     # ----------------------
-    def calc_total_manure(self, feed, methane_model: str):
+    def calc_total_manure(self, feed, methane_model: str) -> None:
+        """
+        Calculate the total manure excreted by all animals in the pen.
+
+        Parameters
+        ----------
+        feed
+        methane_model
+
+        Returns
+        -------
+        None
+
+        """
+
         self.manure = get_default_animal_manure_excretions()
 
         if not self.is_populated:
@@ -777,7 +792,25 @@ class Pen:
 
     # Ration-related methods
     # ----------------------
-    def _set_animal_nutrient_values(self, animal, feed, temp, phosphorus_concentration):
+    # TODO: Review
+    def _set_animal_nutrient_values(self, animal, feed, temp, phosphorus_concentration) -> None:
+        """
+        Set the nutrient values for the animal.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            The animal to set the nutrient values for.
+        feed
+        temp
+        phosphorus_concentration : float
+
+        Returns
+        -------
+        None
+
+        """
+
         if type(animal) == Cow:
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
                                           day_of_pregnancy=animal.days_in_preg, animal_type='cow',
@@ -826,6 +859,21 @@ class Pen:
         animal.set_p_intake(self.ration_nutrient_amount['phosphorus'], self.ration_nutrient_conc['phosphorus'])
 
     def _calc_new_ration(self, num_animals: int):
+        """
+        Calculate the new ration for the pen based on the number of animals in the pen.
+
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
+
+        Returns
+        -------
+        ration : Dict[str, Union[float, str]]
+            The new ration for the pen.
+
+        """
+
         ration = {}
         for key in self.ration_per_animal:
             if key == 'status':
@@ -837,7 +885,19 @@ class Pen:
     # Population-related methods
     def add_animal(self, animal, feed, temp, phosphorus_concentration: float) -> None:
         """
-        Add an animal to the pen.
+        Add an animal to the pen and adjust the ration accordingly.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            The animal to be added to the pen.
+        feed
+        temp
+        phosphorus_concentration : float
+
+        Returns
+        -------
+        None
 
         """
 
@@ -847,7 +907,7 @@ class Pen:
 
     def remove_animal(self, animal_id: int) -> None:
         """
-        Remove an animal from the pen by its id.
+        Remove an animal from the pen by its id and adjust the ration accordingly.
 
         Parameters
         ----------
