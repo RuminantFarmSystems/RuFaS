@@ -3,6 +3,8 @@ from math import exp, log
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
+import pdb
+
 """
 This module handles the movement and loss of nitrogen due to erosion and leaching within the soil profile, and is based
 on SWAT sections 4:2.1, 2
@@ -40,7 +42,7 @@ class LeachingRunoffErosion:
         executes leaching operations.
 
         """
-        pass
+        self._erode_nitrogen(field_size)
 
     def _erode_nitrogen(self, field_size: float) -> None:
         """This method handles the erosion of nitrogen and updating the soil profile accordingly.
@@ -56,6 +58,7 @@ class LeachingRunoffErosion:
         organic nitrogen is removed by sediment erosion.
 
         """
+        # pdb.set_trace()
         if self.data.accumulated_runoff > 0.0:
             nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
                 self.data.soil_layers[0].nitrate_content, self.data.soil_layers[0].water_content,
@@ -66,11 +69,29 @@ class LeachingRunoffErosion:
 
             self.data.soil_layers[0].nitrate_content -= nitrates_lost_to_runoff
             self.data.annual_runoff_nitrates_total += nitrates_lost_to_runoff * field_size
+
             self.data.soil_layers[0].ammonium_content -= ammonium_lost_to_runoff
             self.data.annual_runoff_ammonium_total += ammonium_lost_to_runoff * field_size
 
         if self.data.eroded_sediment > 0.0:
-            pass
+            fresh_organic_nitrogen_lost = self._calculate_eroded_organic_nitrogen(
+                self.data.soil_layers[0].fresh_organic_nitrogen_content, self.data.soil_layers[0].bulk_density,
+                self.data.soil_layers[0].layer_thickness, field_size, self.data.eroded_sediment)
+            stable_organic_nitrogen_lost = self._calculate_eroded_organic_nitrogen(
+                self.data.soil_layers[0].stable_organic_nitrogen_content, self.data.soil_layers[0].bulk_density,
+                self.data.soil_layers[0].layer_thickness, field_size, self.data.eroded_sediment)
+            active_organic_nitrogen_lost = self._calculate_eroded_organic_nitrogen(
+                self.data.soil_layers[0].active_organic_nitrogen_content, self.data.soil_layers[0].bulk_density,
+                self.data.soil_layers[0].layer_thickness, field_size, self.data.eroded_sediment)
+
+            self.data.soil_layers[0].fresh_organic_nitrogen_content -= fresh_organic_nitrogen_lost
+            self.data.annual_eroded_fresh_organic_nitrogen_total += fresh_organic_nitrogen_lost * field_size
+
+            self.data.soil_layers[0].stable_organic_nitrogen_content -= stable_organic_nitrogen_lost
+            self.data.annual_eroded_stable_organic_nitrogen_total += stable_organic_nitrogen_lost * field_size
+
+            self.data.soil_layers[0].active_organic_nitrogen_content -= active_organic_nitrogen_lost
+            self.data.annual_eroded_active_organic_nitrogen_total += active_organic_nitrogen_lost * field_size
 
     # --- Static methods ---
     @staticmethod
@@ -172,7 +193,7 @@ class LeachingRunoffErosion:
         nitrogen_lost_to_runoff = LeachingRunoffErosion._determine_nitrogen_runoff_amount(nitrogen_concentration,
                                                                                           runoff,
                                                                                           runoff_extraction_coefficient)
-        return nitrogen_lost_to_runoff
+        return min(nitrogen_content, nitrogen_lost_to_runoff)
 
     @staticmethod
     def _determine_erosion_nitrogen_loss_content(nitrogen_erosion_concentration: float,

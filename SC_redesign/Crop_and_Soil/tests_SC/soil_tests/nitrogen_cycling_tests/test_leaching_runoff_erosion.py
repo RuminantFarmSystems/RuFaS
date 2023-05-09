@@ -1,11 +1,13 @@
 import pytest
 from math import exp, log
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call, PropertyMock, patch
 
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 
+# --- Static method tests ---
 @pytest.mark.parametrize("soluble_nitrogen_amount, soil_water_runoff_sum,saturation_content", [
     (102, 100, 99),
     (0.5, 1.8, 2.3),
@@ -40,7 +42,8 @@ def test_determine_nitrogen_runoff_amount(nitrogen_concentration: float, runoff:
 @pytest.mark.parametrize("nitrogen_content,water_content,saturation_content,runoff,extraction_coefficient", [
     (67.8, 5.66, 8.99, 3.22, 0.1),
     (35.445, 7.81, 6.54, 2.331, 1.0),
-    (45.1948, 4.51, 9.44, 1.334, 0.1)
+    (45.1948, 4.51, 9.44, 1.334, 0.1),
+    (13.495, 5.03, 6.7, 1.4, 1.0)
 ])
 def test_calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_content: float, saturation_content: float,
                                            runoff: float, extraction_coefficient: float) -> None:
@@ -52,12 +55,13 @@ def test_calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_conten
                                                                         saturation_content, runoff,
                                                                         extraction_coefficient)
     expected_water_sum = water_content + runoff
+    expected_nitrogen_lost = min(nitrogen_content, 25)
 
     LeachingRunoffErosion._determine_nitrogen_concentration.assert_called_once_with(nitrogen_content,
                                                                                     expected_water_sum,
                                                                                     saturation_content)
     LeachingRunoffErosion._determine_nitrogen_runoff_amount.assert_called_once_with(30, runoff, extraction_coefficient)
-    assert observed == 25
+    assert observed == expected_nitrogen_lost
 
 
 @pytest.mark.parametrize("daily_soil_lost", [
@@ -132,3 +136,47 @@ def test_determine_leached_nitrogen(nitrogen: float, percolation: float, leachin
     observed = LeachingRunoffErosion._determine_leached_nitrogen(nitrogen, percolation, leaching_coefficient)
     expected = (nitrogen / leaching_coefficient) * percolation
     assert observed == expected
+
+
+# --- Integration tests ---
+@pytest.mark.parametrize("nitrates,ammonium,fresh,active,stable,field_size", [
+    (78.1994, 66.391, 12.31, 16.594, 18.192, 1.8),
+    (75.6, 70.8, 3.22, 10.33, 14.5, 2.3)
+])
+def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: float, stable: float,
+                        field_size: float) -> None:
+    """Tests that nitrogen is properly eroded from the surface of the field."""
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.saturation_content", new_callable=PropertyMock,
+               return_value=8.8):
+        layer = LayerData(top_depth=0, bottom_depth=20, field_size=field_size, ammonium_content=ammonium,
+                          bulk_density=1.6)
+        layer.nitrate_content = nitrates
+        layer.active_organic_nitrogen_content = active
+        layer.stable_organic_nitrogen_content = stable
+        layer.fresh_organic_nitrogen_content = fresh
+        layer.water_content = 5.6
+        data = SoilData(field_size=field_size, soil_layers=[layer], accumulated_runoff=2.1, eroded_sediment=0.92)
+        incorp = LeachingRunoffErosion(data)
+
+        incorp._calculate_inorganic_nitrogen_loss = MagicMock(return_value=45)
+        incorp._calculate_eroded_organic_nitrogen = MagicMock(return_value=3)
+
+        inorganic_loss_calls = [call(nitrates, 5.6, 8.8, 2.1, 0.1), call(ammonium, 5.6, 8.8, 2.1, 1.0)]
+        eroded_organic_nitrogen_calls = [call(fresh, 1.6, 20, field_size, 0.92),
+                                         call(stable, 1.6, 20, field_size, 0.92),
+                                         call(active, 1.6, 20, field_size, 0.92)]
+
+        incorp._erode_nitrogen(field_size)
+
+        incorp._calculate_inorganic_nitrogen_loss.assert_has_calls(inorganic_loss_calls)
+        incorp._calculate_eroded_organic_nitrogen.assert_has_calls(eroded_organic_nitrogen_calls)
+        assert incorp.data.soil_layers[0].nitrate_content == nitrates - 45
+        assert incorp.data.annual_runoff_nitrates_total == 45 * field_size
+        assert incorp.data.soil_layers[0].ammonium_content == ammonium - 45
+        assert incorp.data.annual_runoff_ammonium_total == 45 * field_size
+        assert incorp.data.soil_layers[0].fresh_organic_nitrogen_content == fresh - 3
+        assert incorp.data.annual_eroded_fresh_organic_nitrogen_total == 3 * field_size
+        assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == stable - 3
+        assert incorp.data.annual_eroded_stable_organic_nitrogen_total == 3 * field_size
+        assert incorp.data.soil_layers[0].active_organic_nitrogen_content == active - 3
+        assert incorp.data.annual_eroded_active_organic_nitrogen_total == 3 * field_size

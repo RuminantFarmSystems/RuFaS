@@ -70,6 +70,12 @@ class SoilData:
     """Cumulative total of nitrates that were removed from the top soil layer by runoff (kg)"""
     annual_runoff_ammonium_total: float = 0
     """Cumulative total of ammonium that was removed from the top soil layer by runoff (kg)"""
+    annual_eroded_fresh_organic_nitrogen_total: float = 0
+    """Cumulative total of fresh organic nitrogen that was removed from the top soil layer by erosion (kg)"""
+    annual_eroded_stable_organic_nitrogen_total: float = 0
+    """Cumulative total of stable organic nitrogen that was removed from the top soil layer by erosion (kg)"""
+    annual_eroded_active_organic_nitrogen_total: float = 0
+    """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
     # ---- evapotranspiration
     potential_evapotranspiration: Optional[float] = None
