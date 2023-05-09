@@ -138,6 +138,35 @@ def test_determine_leached_nitrogen(nitrogen: float, percolation: float, leachin
     assert observed == expected
 
 
+@pytest.mark.parametrize("nitrogen_content,field_capacity,percolation,extraction_coefficient,is_active", [
+    (35, 10.33, 3.11, 1.0, False),
+    (14.5, 6.75, 1.22, 2.5, True),
+    (22.45, 8.332, 2.45, 2.5, False)
+])
+def test_calculate_nitrogen_lost_to_leaching(nitrogen_content: float, field_capacity: float, percolation: float,
+                                             extraction_coefficient: float, is_active: bool) -> None:
+    """Tests that the correct amount of nitrogen is determined to be leached out of a soil layer."""
+    LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration = MagicMock(return_value=46)
+    LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration = MagicMock(return_value=30)
+    LeachingRunoffErosion._determine_leached_nitrogen = MagicMock(return_value=18)
+
+    observed = LeachingRunoffErosion._calculate_nitrogen_lost_to_leaching(nitrogen_content, field_capacity, percolation,
+                                                                          extraction_coefficient, is_active)
+
+    LeachingRunoffErosion._determine_nitrogen_percolation_water_concentration.assert_called_once_with(nitrogen_content,
+                                                                                                      field_capacity,
+                                                                                                      percolation)
+    if is_active:
+        LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration.assert_called_once_with(46)
+        LeachingRunoffErosion._determine_leached_nitrogen.assert_called_once_with(30, percolation,
+                                                                                  extraction_coefficient)
+    else:
+        LeachingRunoffErosion._adjust_active_organic_nitrogen_concentration.assert_not_called()
+        LeachingRunoffErosion._determine_leached_nitrogen.assert_called_once_with(46, percolation,
+                                                                                  extraction_coefficient)
+    assert observed == min(nitrogen_content, 18)
+
+
 # --- Integration tests ---
 @pytest.mark.parametrize("nitrates,ammonium,fresh,active,stable,field_size", [
     (78.1994, 66.391, 12.31, 16.594, 18.192, 1.8),
@@ -180,3 +209,10 @@ def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: 
         assert incorp.data.annual_eroded_stable_organic_nitrogen_total == 3 * field_size
         assert incorp.data.soil_layers[0].active_organic_nitrogen_content == active - 3
         assert incorp.data.annual_eroded_active_organic_nitrogen_total == 3 * field_size
+
+
+# def test_leach_nitrogen() -> None:
+#     """Tests that nitrogen is properly removed from a layer and percolated to the next during the leaching process."""
+#    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
+#                return_value=6.8):
+#         data = SoilData(field_size=2.0)
