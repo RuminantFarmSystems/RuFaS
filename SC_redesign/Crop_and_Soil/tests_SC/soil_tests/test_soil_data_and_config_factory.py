@@ -587,8 +587,8 @@ def test_determine_soil_nutrient_concentration(nutrient: float, density: float, 
     observed = LayerData.determine_soil_nutrient_concentration(nutrient, density, depth, area)
     total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
     total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
-    total_phosphorus_mass = nutrient * area
-    expected_concentration = (total_phosphorus_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
+    total_nutrient_mass = nutrient * area
+    expected_concentration = (total_nutrient_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
     assert pytest.approx(observed) == expected_concentration
 
 
