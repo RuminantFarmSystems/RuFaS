@@ -509,6 +509,23 @@ def get_ration_vals(x):
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
+# establishing the constraints of the NLP
+con1 = {'type': 'ineq', 'fun': NEmact_constraint}
+con2 = {'type': 'ineq', 'fun': NEl_constraint}
+con3 = {'type': 'ineq', 'fun': NEgact_constraint}
+con4 = {'type': 'ineq', 'fun': calcium_constraint}
+con5 = {'type': 'ineq', 'fun': phosphorus_constraint}
+con6 = {'type': 'ineq', 'fun': protien_constraint}
+con7 = {'type': 'ineq', 'fun': NDF_constraint_1}
+con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
+con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
+con10 = {'type': 'ineq', 'fun': fat_constraint}
+con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
+con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
+cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+
+
 def optimize():
     """
     Calls the objective function and constraint functions and formulates
@@ -532,23 +549,7 @@ def optimize():
     for i in range(len(limit)):
         bnds.append((0, (limit[i] / 3) + 0.0001))
     bnds = tuple(bnds)
-
-    # establishing the constraints of the NLP
-    con1 = {'type': 'ineq', 'fun': NEmact_constraint}
-    con2 = {'type': 'ineq', 'fun': NEl_constraint}
-    con3 = {'type': 'ineq', 'fun': NEgact_constraint}
-    con4 = {'type': 'ineq', 'fun': calcium_constraint}
-    con5 = {'type': 'ineq', 'fun': phosphorus_constraint}
-    con6 = {'type': 'ineq', 'fun': protien_constraint}
-    con7 = {'type': 'ineq', 'fun': NDF_constraint_1}
-    con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
-    con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
-    con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
-    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
-
+   
     if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':

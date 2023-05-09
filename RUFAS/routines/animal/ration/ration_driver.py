@@ -15,6 +15,10 @@ import collections
 import math
 import statistics as stat
 import numpy as np
+from RUFAS.output_manager import OutputManager
+
+
+om = OutputManager()
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type):
@@ -79,6 +83,20 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     return solution, ration_vals
 
 
+def is_constraint_violated(solution, constraint) -> bool:
+        result = constraint['fun'](solution)
+        if constraint['type'] == 'ineq' and result < 0:
+            return True
+        elif constraint['type'] == 'eq' and not np.isclose(result, 0):
+            return True
+        else:
+            return False
+
+
+def find_failed_constraints(solution, constraints):
+        return list(filter(lambda c: is_constraint_violated(solution, c), constraints))
+
+
 def ration_formulation(pen, available_feeds, animal_type, cow_type):
     """
     Function that links the ration_driver file with the calc_ration function in
@@ -99,8 +117,16 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
 
     solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
+    num_reattempts = 0
+    failed_list = []
     if animal_type == 'cow':
         while not solution.success:
+            num_reattempts += 1
+            # add step to check constraints
+            failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+            if failed_constraints:
+                for constr in failed_constraints:
+                    failed_list.append(constr["fun"].__name__)
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
@@ -116,8 +142,13 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
-
+    info_map = {"class": pen.__class__.__name__,
+                "function": pen.__init__.__name__,
+                }
     if solution != None:
+        if failed_list != []:
+            fail_summary = [num_reattempts, failed_list]
+            om.add_variable(f'failed_constraints for pen {pen.id} ', fail_summary, info_map)
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
@@ -334,7 +365,7 @@ class Requirements:
                 BW.append(animal.body_weight)
                 # milk.append(milk)
                 # CP_milk.append(CP_milk)
-        usethemean = False
+        usethemean = True
         if usethemean == True:
             # populating the class variables as an average across cows for each requirement
             self.NEmaint = stat.mean(NEmaint)
@@ -365,12 +396,17 @@ class Requirements:
             self.avg_milk = np.percentile(milk, requirement_percentile)
             self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
             self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
-            print('worked')
+            #print('worked')
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.__init__.__name__,
+                    }
         # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
                               'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
                               'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
                               'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
+        print(avg_nutrient_rqmts)
+        om.add_variable(f'avg_rqmts_for pen {pen.id} ', avg_nutrient_rqmts, info_map)
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
