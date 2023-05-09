@@ -3,7 +3,6 @@ from math import exp, log
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
-import pdb
 
 """
 This module handles the movement and loss of nitrogen due to erosion and leaching within the soil profile, and is based
@@ -58,7 +57,6 @@ class LeachingRunoffErosion:
         organic nitrogen is removed by sediment erosion.
 
         """
-        # pdb.set_trace()
         if self.data.accumulated_runoff > 0.0:
             nitrates_lost_to_runoff = self._calculate_inorganic_nitrogen_loss(
                 self.data.soil_layers[0].nitrate_content, self.data.soil_layers[0].water_content,
