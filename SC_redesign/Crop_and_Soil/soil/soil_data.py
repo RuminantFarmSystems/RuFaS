@@ -346,6 +346,12 @@ class SoilData:
 
         self.annual_soil_phosphorus_runoff = 0
 
+        self.annual_runoff_nitrates_total = 0
+        self.annual_runoff_ammonium_total = 0
+        self.annual_eroded_fresh_organic_nitrogen_total = 0
+        self.annual_eroded_stable_organic_nitrogen_total = 0
+        self.annual_eroded_active_organic_nitrogen_total = 0
+
         # Reset carbon cycle
         for layer in self.soil_layers:
             layer.do_annual_reset()
