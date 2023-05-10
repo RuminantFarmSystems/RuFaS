@@ -29,31 +29,38 @@ class Denitrification:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def do_denitrification(self) -> None:
+    def denitrify(self) -> None:
         """Conducts the daily denitrification operations.
 
         References
         ----------
         SWAT Theoretical documentation section 3:1.4, eqn. 3:1.4.1, 2
 
+        Notes
+        -----
+        The SWAT Theoretical documentation defines denitrification as "the bacterial reduction of nitrate, NO3-, to N2
+        or N2O gases" (page 194). This method conducts denitrification by calculating the amount of nitrate that is
+        denitrified, then removing that amount from the nitrate pool and adding it to denitrification emissions tracker.
+
         """
         for layer in self.data.soil_layers:
-            if layer.nutrient_cycling_water_factor < layer.denitrification_threshold_water_content:
+            nutrient_is_below_threshold = layer.nutrient_cycling_water_factor < \
+                                          layer.denitrification_threshold_water_content
+            if nutrient_is_below_threshold:
                 continue
 
             # TODO: check that soil_overall_carbon_fraction is being used correctly in this context - issue #475
-            nitrified_nitrates = self._calculate_nitrification_amount(layer.nitrate_content,
-                                                                      layer.denitrification_rate_coefficient,
-                                                                      layer.nutrient_cycling_temp_factor,
-                                                                      layer.soil_overall_carbon_fraction * 100)
+            nitrified_nitrates = self._calculate_denitrification_amount(layer.nitrate_content,
+                                                                        layer.denitrification_rate_coefficient,
+                                                                        layer.nutrient_cycling_temp_factor,
+                                                                        layer.soil_overall_carbon_fraction * 100)
             layer.nitrate_content -= nitrified_nitrates
             layer.annual_denitrified_nitrogen_total += nitrified_nitrates
 
-    # --- Static methods ---
     @staticmethod
-    def _calculate_nitrification_amount(nitrate_content: float, denitrification_rate_coefficient: float,
-                                        temp_factor: float, percent_organic_carbon_content: float) -> float:
-        """This method calculates the amount of nitrate lost to denitrification.
+    def _calculate_denitrification_amount(nitrate_content: float, denitrification_rate_coefficient: float,
+                                          temp_factor: float, percent_organic_carbon_content: float) -> float:
+        """Calculates the amount of nitrate lost to denitrification.
 
         Parameters
         ----------
@@ -78,9 +85,12 @@ class Denitrification:
         Notes
         -----
         This calculates the fraction of nitrates lost to nitrification as nitrification factor, and bounds it to be in
-        the range [0.0, 1.0].
+        the range [0.0, 1.0]. 0 is the minimum because a negative denitrification factor would indicate nitrous gases
+        turning back into nitrate, which is not an operation that is handled by this module. 1 is the maximum because it
+        is physically impossible to remove more nitrate than there is in the soil.
 
         """
         exponential_term = exp(-1 * denitrification_rate_coefficient * temp_factor * percent_organic_carbon_content)
-        nitrification_factor = max(min(1.0, (1 - exponential_term)), 0.0)
-        return nitrate_content * nitrification_factor
+        denitrification_factor = 1 - exponential_term
+        bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
+        return nitrate_content * bounded_denitrification_factor
