@@ -107,6 +107,10 @@ class LeachingRunoffErosion:
         ----------
         SWAT Theoretical documentation eqn. 4:2.2.2
 
+        Notes
+        -----
+        This unit conversion is already implemented in LayerData, this method will be eliminated in the next PR.
+
         """
         return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
 
