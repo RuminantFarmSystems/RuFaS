@@ -45,13 +45,16 @@ Because of these challenges, a redesign and refactor of the input manager is war
 ## Requirements
 
 RuFaS should handle input such that:
-* JSON files containing user-specified input can be used to setup the simulation (current functionality)
+* files (e.g., JSONs) containing user-specified input can be used to setup the simulation (current functionality)
 * alternative input methods can also be handled (e.g., dictionaries or other user-initialized data objects)
 * external methods (e.g., sensitivity analysis, validation, and mathematical optimization) can execute RuFaS by altering
 the input values automatically
 * parallel or distributed evaluation of multiple RuFaS instances can be done in a thread safe way, with many alternative
 starting conditions.
 * the actual model and submodules are agnostic to the structure of the input that the user specified.
+* The input manager should conduct input validation, ensuring that the structure of the data is usable. If the checks
+are not passed, the model/simulation will not be run. This will need to account for necessary inputs and advanced 
+inputs. For the latter case, default values can be supplied when advanced options aren't given.
 
 ---
 
@@ -155,6 +158,10 @@ tracked throughout the simulation for each module of RuFaS.*
 
 Then, another set of methods would be needed to parse the current input JSON files (those that contain path references
 and not actual data) and create the dictionaries or input formats needed to create `InputData`.
+
+Note: the conceptual model (*Fig. 1*) only demonstrates a finite number of component classes for which we currently
+know input data will be needed. However, this input class may have many yet-unknown components. So, it may be useful
+to have a template for adding new component input objects.
 
 With this design, the current method of running RuFaS would remain intact and additional paths would also open up, by
 allowing users to create the `InputData` class by whatever means suit their needs. With this single input object, a full
