@@ -37,15 +37,16 @@ def test_convert_to_tuple(x: Any, expect: Tuple):
 
 def test_crop_schedule_spec() -> None:
     """test that the crop schedule specification creates the expected structure for a number of different use cases"""
-    case_1 = CropScheduleSpec(planting_years=1, planting_days=120, harvest_years=1, harvest_days=220,
-                              harvest_operations="default")
+    case_1 = CropScheduleSpec(crop_reference="corn", planting_years=1, planting_days=120, harvest_years=1,
+                              harvest_days=220, harvest_operations="default")
     assert case_1.planting_years == (1,)
     assert case_1.planting_days == (120,)
     assert case_1.harvest_years == (1,)
     assert case_1.harvest_days == (220,)
     assert case_1.harvest_operations == (HarvestOperation.HARVEST,)
+    assert case_1.uses_custom_crop is False
 
-    case_2 = CropScheduleSpec(planting_years=(1, 2, 3), planting_days=(120, 115, 123),
+    case_2 = CropScheduleSpec(crop_reference="field_corn", planting_years=(1, 2, 3), planting_days=(120, 115, 123),
                               harvest_years=(1, 2, 3), harvest_days=(220, 220, 238),
                               harvest_operations=("no_kill", "no_kill", "default"))
     assert case_2.planting_years == (1, 2, 3)
@@ -54,6 +55,7 @@ def test_crop_schedule_spec() -> None:
     assert case_2.harvest_days == (220, 220, 238)
     assert case_2.harvest_operations == (HarvestOperation.HARVEST_NOKILL, HarvestOperation.HARVEST_NOKILL,
                                          HarvestOperation.HARVEST)
+    assert case_2.uses_custom_crop is True
 
     case_3 = CropScheduleSpec(planting_years=(1, 2, 3), planting_days=120,
                               harvest_years=(1, 2, 3), harvest_days=220,
