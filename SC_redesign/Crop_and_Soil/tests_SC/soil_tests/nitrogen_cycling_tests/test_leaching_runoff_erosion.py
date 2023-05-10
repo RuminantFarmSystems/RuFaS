@@ -62,22 +62,6 @@ def test_calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_conten
     assert observed == expected_nitrogen_lost
 
 
-@pytest.mark.parametrize("nitrogen_amount, layer_thickness,bulk_density", [
-    (102, 100, 99),
-    (0.5, 1.8, 2.3),
-    (2, 3, 4),
-    (0, 3, 4)
-])
-def test_determine_nitrogen_erosion_concentration(nitrogen_amount: float,
-                                                  layer_thickness: float,
-                                                  bulk_density: float) -> None:
-    """Tests that the soil nitrogen concentrations for the Fresh, Active, and Stable pools are calculated correctly"""
-    expected = (100 * nitrogen_amount) / (bulk_density * layer_thickness)
-    assert expected == LeachingRunoffErosion._determine_nitrogen_erosion_concentration(nitrogen_amount,
-                                                                                       layer_thickness,
-                                                                                       bulk_density)
-
-
 @pytest.mark.parametrize("daily_soil_lost", [
     5,  # lower values
     100,  # higher values

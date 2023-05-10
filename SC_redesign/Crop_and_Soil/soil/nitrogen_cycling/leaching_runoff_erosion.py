@@ -123,35 +123,6 @@ class LeachingRunoffErosion:
         return min(nitrogen_content, nitrogen_lost_to_runoff)
 
     @staticmethod
-    def _determine_nitrogen_erosion_concentration(nitrogen_amount: float,
-                                                  layer_thickness: float,
-                                                  bulk_density: float) -> float:
-        """This method calculates the soil nitrogen concentrations for the Fresh, Active, and Stable pools
-
-        Parameters
-        ----------
-        nitrogen_amount: float
-            amount of Fresh, Active, and Stable nitrogen (kg/ha)
-        bulk_density: float
-    `       bulk density of the soil layer (Mg per cubic meter)
-
-        Returns
-        -------
-        float
-            the soil nitrogen concentrations for the Fresh, Active, and Stable pools in soil(mg/kg)
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 4:2.2.2
-
-        Notes
-        -----
-        This unit conversion is already implemented in LayerData, this method will be eliminated in the next PR.
-
-        """
-        return (100 * nitrogen_amount) / (bulk_density * layer_thickness)
-
-    @staticmethod
     def _determine_erosion_nitrogen_loss_content(nitrogen_erosion_concentration: float,
                                                  daily_soil_lost: float,
                                                  enrichment_ratio: float) -> float:
