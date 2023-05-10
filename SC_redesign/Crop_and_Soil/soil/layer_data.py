@@ -250,9 +250,19 @@ class LayerData:
     """Fresh organic nitrogen content of this soil layer (kg / ha)
         Note: all layers except the top layer are initialized with 0 fresh organic nitrogen."""
 
+    annual_denitrified_nitrogen_total: float = 0
+    """Cumulative total amount of nitrates that have denitrified in a year (kg / ha)"""
+
     humus_mineralization_rate_factor: float = 0.0003
     """Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless)
         Reference: SWAT Input .BSN file, see "CMN" on page 101."""
+    denitrification_rate_coefficient: float = 1.4
+    """Controls the rate of denitrification in this layer of soil (unitless)
+        Note: acceptable values for this attribute are in the range [0.0, 3.0].
+        Reference: SWAT Input .BSN file, see "CDN" on page 101."""
+    denitrification_threshold_water_content: float = 1.10
+    """Fraction of field capacity water content above which denitrification takes place (unitless)
+        Reference: SWAT Input .BSN file, see "SDNCO" on page 102."""
     residue_fresh_organic_mineralization_rate: float = 0.05
     """Rate coefficient for mineralization of residue fresh organic nutrients (nitrogen and phosphorus) (unitless)
         Reference: SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page
@@ -636,4 +646,5 @@ class LayerData:
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
         self.annual_decomposition_carbon_CO2_lost = 0
+        self.annual_denitrified_nitrogen_total = 0
         self.annual_volatilized_ammonium_total = 0
