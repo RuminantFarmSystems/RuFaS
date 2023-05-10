@@ -10,6 +10,7 @@ from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application import ManureApplication
+from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
 
 
 class Soil:
@@ -44,6 +45,8 @@ class Soil:
         """Process component that handles carbon cycling (through decomposition) in the soil."""
         # TODO: need to add phosphorus, manure, and carbon cycling main methods methods to the soil methods.
         #   It is unclear to me how best to do that.
+        self.nitrogen_cycling = NitrogenCycling(self.data)
+        """Process component for managing nitrogen within the soil profile."""
 
         # Water components
         self.evapotranspiration = Evapotranspiration(self.data)
@@ -117,3 +120,4 @@ class Soil:
                                                  initial_canopy_free_water)
         self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue)
         self.phosphorus_cycling.cycle_phosphorus(rainfall, self.data.accumulated_runoff, field_size, avg_air_temp)
+        self.nitrogen_cycling.cycle_nitrogen(field_size)
