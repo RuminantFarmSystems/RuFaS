@@ -61,7 +61,8 @@ class LeachingRunoffErosion:
         Notes
         -----
         This method only removes nitrogen from the top soil layer. Inorganic nitrogen is removed by runoff, while
-        organic nitrogen is removed by sediment erosion.
+        organic nitrogen is removed by sediment erosion. When determining the amounts of nitrates and ammonium lost to
+        runoff, 0.1 is used as the runoff extraction coefficient for nitrates and 1.0 for ammonium.
 
         """
         if self.data.accumulated_runoff > 0.0:
@@ -114,6 +115,9 @@ class LeachingRunoffErosion:
         iterating through the soil profile a second time and adding the leached nitrogen into the appropriate layer. The
         bottom soil layer leaches into the vadose zone.
 
+        The leaching extraction coefficient is 1.0 except when leaching from the nitrate pool in all non-top soil
+        layers, in which case it is 2.5.
+
         """
         percolated_nitrogen = []
         for layer in self.data.soil_layers:
@@ -156,7 +160,6 @@ class LeachingRunoffErosion:
             current_layer.ammonium_content += amounts_leached_into_layer.get("ammonium")
             current_layer.active_organic_nitrogen_content += amounts_leached_into_layer.get("active_organic")
 
-    # --- Static methods ---
     @staticmethod
     def _determine_nitrogen_concentration(soluble_nitrogen_amount: float,
                                           soil_water_runoff_sum: float,

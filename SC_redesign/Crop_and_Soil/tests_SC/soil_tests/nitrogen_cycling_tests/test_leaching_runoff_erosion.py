@@ -7,7 +7,6 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 
 
-# --- Static method tests ---
 @pytest.mark.parametrize("soluble_nitrogen_amount, soil_water_runoff_sum,saturation_content", [
     (102, 100, 99),
     (0.5, 1.8, 2.3),
@@ -167,7 +166,6 @@ def test_calculate_nitrogen_lost_to_leaching(nitrogen_content: float, field_capa
     assert observed == min(nitrogen_content, 18)
 
 
-# --- Integration tests ---
 @pytest.mark.parametrize("nitrates,ammonium,fresh,active,stable,field_size", [
     (78.1994, 66.391, 12.31, 16.594, 18.192, 1.8),
     (75.6, 70.8, 3.22, 10.33, 14.5, 2.3)
