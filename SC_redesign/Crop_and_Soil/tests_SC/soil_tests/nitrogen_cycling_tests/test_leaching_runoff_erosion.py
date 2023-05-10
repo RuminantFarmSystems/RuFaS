@@ -50,6 +50,18 @@ def test_determine_nitrogen_erosion_concentration(nitrogen_amount: float,
                                                                                        bulk_density)
 
 
+@pytest.mark.parametrize("nitrogen,soil_lost,enrichment_ratio", [
+    (56, 1.2, 0.98),
+    (34.556, 0.556, 1.022),
+    (90.0294, 2.334, 1.035)
+])
+def test_determine_erosion_nitrogen_loss_content(nitrogen: float, soil_lost: float, enrichment_ratio: float) -> None:
+    """Tests that the mass of nitrogen lost to erosion is calculated correctly."""
+    observed = LeachingRunoffErosion._determine_erosion_nitrogen_loss_content(nitrogen, soil_lost, enrichment_ratio)
+    expected = nitrogen * soil_lost * enrichment_ratio * 0.001
+    assert pytest.approx(observed) == expected
+
+
 @pytest.mark.parametrize("daily_soil_lost", [
     5,  # lower values
     100,  # higher values
