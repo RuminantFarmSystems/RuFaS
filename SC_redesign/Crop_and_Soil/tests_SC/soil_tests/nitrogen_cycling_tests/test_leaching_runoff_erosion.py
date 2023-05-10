@@ -1,8 +1,11 @@
 import pytest
 from math import exp, log
+from unittest.mock import MagicMock
+
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
 
 
+# --- Static method tests ---
 @pytest.mark.parametrize("soluble_nitrogen_amount, soil_water_runoff_sum,saturation_content", [
     (102, 100, 99),
     (0.5, 1.8, 2.3),
@@ -25,13 +28,38 @@ def test_determine_nitrogen_concentration(soluble_nitrogen_amount: float,
     (54.3, 92.4, 0),
     (1, 5, 0.6)
 ])
-def test_determine_nitrate_runoff_amount(nitrogen_concentration: float, runoff: float,
-                                         runoff_extraction_coef: float) -> None:
-    """Tests that the amount of nitrate runoff for the first layer was calculated correctly"""
+def test_determine_nitrogen_runoff_amount(nitrogen_concentration: float, runoff: float,
+                                          runoff_extraction_coef: float) -> None:
+    """Tests that the amount of nitrogen runoff for the first layer was calculated correctly"""
     expected = nitrogen_concentration * runoff * runoff_extraction_coef
-    assert expected == LeachingRunoffErosion._determine_nitrate_runoff_amount(nitrogen_concentration,
-                                                                              runoff,
-                                                                              runoff_extraction_coef)
+    assert expected == LeachingRunoffErosion._determine_nitrogen_runoff_amount(nitrogen_concentration,
+                                                                               runoff,
+                                                                               runoff_extraction_coef)
+
+
+@pytest.mark.parametrize("nitrogen_content,water_content,saturation_content,runoff,extraction_coefficient", [
+    (67.8, 5.66, 8.99, 3.22, 0.1),
+    (35.445, 7.81, 6.54, 2.331, 1.0),
+    (45.1948, 4.51, 9.44, 1.334, 0.1),
+    (13.495, 5.03, 6.7, 1.4, 1.0)
+])
+def test_calculate_inorganic_nitrogen_loss(nitrogen_content: float, water_content: float, saturation_content: float,
+                                           runoff: float, extraction_coefficient: float) -> None:
+    """Tests that the correct amount of inorganic nitrogen is lost to runoff."""
+    LeachingRunoffErosion._determine_nitrogen_concentration = MagicMock(return_value=30)
+    LeachingRunoffErosion._determine_nitrogen_runoff_amount = MagicMock(return_value=25)
+
+    observed = LeachingRunoffErosion._calculate_inorganic_nitrogen_loss(nitrogen_content, water_content,
+                                                                        saturation_content, runoff,
+                                                                        extraction_coefficient)
+    expected_water_sum = water_content + runoff
+    expected_nitrogen_lost = min(nitrogen_content, 25)
+
+    LeachingRunoffErosion._determine_nitrogen_concentration.assert_called_once_with(nitrogen_content,
+                                                                                    expected_water_sum,
+                                                                                    saturation_content)
+    LeachingRunoffErosion._determine_nitrogen_runoff_amount.assert_called_once_with(30, runoff, extraction_coefficient)
+    assert observed == expected_nitrogen_lost
 
 
 @pytest.mark.parametrize("nitrogen_amount, layer_thickness,bulk_density", [
