@@ -1,7 +1,6 @@
 from typing import Optional
 from math import exp, log
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import METRIC_TONS_TO_KILOGRAMS
 
 
 class LeachingRunoffErosion:
@@ -161,7 +160,7 @@ class LeachingRunoffErosion:
         issue #486
 
         """
-        return exp(1.21 - 0.16 * log(daily_soil_lost * METRIC_TONS_TO_KILOGRAMS))
+        return exp(1.21 - 0.16 * log(daily_soil_lost * 1000))
 
     @staticmethod
     def _determine_nitrogen_percolation_water_concentration(nitrogen_content: float,
