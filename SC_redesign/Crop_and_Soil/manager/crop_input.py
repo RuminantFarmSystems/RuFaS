@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 
+# TODO: This is not working as expected - see example_rotation.md
 
 @dataclass(kw_only=True)
 class CropScheduleSpec:
@@ -43,10 +44,7 @@ class CropScheduleSpec:
     pattern_skip : int, optional
         the number of years to wait before repeating the pattern
     pattern_repeat : int, optional
-        the number of times the specified crop management pattern should be repeated
-    use_custom_crop : bool
-        status variable that indicates whether the `crop_references` refers to a custom (user-defined) crop instead of
-        on of the supported crop species.
+        the number of times the specified crop management pattern should be repeated (after the first cycle completes)
 
     Attributes
     ----------
@@ -71,7 +69,6 @@ class CropScheduleSpec:
     harvest_operations: str | Sequence[str] = "default"
     pattern_skip: Optional[int] = None
     pattern_repeat: Optional[int] = None
-    uses_custom_crop: bool = False
 
     @staticmethod
     def _convert_to_tuple(x: Any):
@@ -98,7 +95,7 @@ class CropScheduleSpec:
         """This method expands the user-specified input into a full-blown schedule for a crop. Users are able
         to initialize the class with simplified inputs and a pattern. That pattern is projected into the future by
         this method"""
-        if self.crop_reference in CropSpecies.__members__:
+        if self.crop_reference.upper() in CropSpecies.__members__:
             self.uses_custom_crop = False
         else:
             self.uses_custom_crop = True
