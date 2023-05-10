@@ -11,7 +11,7 @@ This module handles the denitrification of nitrogen in the nitrates pool, based 
 class Denitrification:
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
-        """This method initializes the SoilData object that this module will work with, or create one if none provided.
+        """Initializes the SoilData object that this module will work with, or creates one if none is provided.
 
         Parameters
         ----------
