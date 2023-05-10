@@ -7,7 +7,8 @@ from collections.abc import Sequence
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 
-# TODO: This is not working as expected - see example_rotation.md
+# TODO: This is not working as expected - see example_rotation.md for desired behavior.
+
 
 @dataclass(kw_only=True)
 class CropScheduleSpec:
