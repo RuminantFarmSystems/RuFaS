@@ -11,6 +11,7 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
@@ -457,16 +458,26 @@ def fat_constraint(x):
         return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-def DMI_constraint(x):
+def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    less than the DMI_est calculated in the requirements.
+    greater than the DMI_est + 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
     """
-    return -(sum(x)) + DMIest
+    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
+
+def DMI_constraint_upper(x):
+    """
+    Constraint in place to make sure the sum of all the feeds in the ration is
+    less than the DMI_est + 20% calculated in the requirements.
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 def energy_req_limit_constraint(x):
     """
@@ -549,9 +560,10 @@ def optimize():
     con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
     con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
     con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
+    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
+    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
+    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
 
     if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
