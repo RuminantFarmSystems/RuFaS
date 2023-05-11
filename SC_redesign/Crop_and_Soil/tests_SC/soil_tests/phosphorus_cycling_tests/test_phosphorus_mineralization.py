@@ -158,7 +158,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
     with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
                new_callable=MagicMock, return_value=20):
         # Case 1: tests that desorption occurs correctly
-        LayerData.determine_soil_phosphorus_concentration = MagicMock()
+        LayerData.determine_soil_nutrient_concentration = MagicMock()
         LayerData.calculate_phosphorus_sorption_parameter = MagicMock()
         layers1 = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size),
                    LayerData(top_depth=20, bottom_depth=65, field_size=field_size),
@@ -174,7 +174,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
 
         incorp1.mineralize_phosphorus(field_size)
 
-        assert LayerData.determine_soil_phosphorus_concentration.call_count == 3
+        assert LayerData.determine_soil_nutrient_concentration.call_count == 3
         assert LayerData.calculate_phosphorus_sorption_parameter.call_count == 7
         assert incorp1._recompute_mean_phosphorus_sorption_parameter.call_count == 3
         assert incorp1._determine_phosphorus_imbalance.call_count == 3
@@ -190,7 +190,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
             assert layer.stable_inorganic_phosphorus_content == 14
 
         # Case 2: tests that sorption occurs correctly
-        LayerData.determine_soil_phosphorus_concentration = MagicMock()
+        LayerData.determine_soil_nutrient_concentration = MagicMock()
         LayerData.calculate_phosphorus_sorption_parameter = MagicMock()
         layers2 = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size),
                    LayerData(top_depth=20, bottom_depth=78, field_size=field_size),
@@ -206,7 +206,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
 
         incorp2.mineralize_phosphorus(field_size)
 
-        assert LayerData.determine_soil_phosphorus_concentration.call_count == 3
+        assert LayerData.determine_soil_nutrient_concentration.call_count == 3
         assert LayerData.calculate_phosphorus_sorption_parameter.call_count == 7
         assert incorp2._recompute_mean_phosphorus_sorption_parameter.call_count == 3
         assert incorp2._determine_phosphorus_imbalance.call_count == 3
@@ -222,7 +222,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
             assert layer.stable_inorganic_phosphorus_content == 18
 
         # Case 3: tests that when there is no imbalance, no phosphorus is transferred between active and labile pools
-        LayerData.determine_soil_phosphorus_concentration = MagicMock()
+        LayerData.determine_soil_nutrient_concentration = MagicMock()
         LayerData.calculate_phosphorus_sorption_parameter = MagicMock()
         layers3 = [LayerData(top_depth=0, bottom_depth=20, field_size=field_size),
                    LayerData(top_depth=20, bottom_depth=56, field_size=field_size),
@@ -238,7 +238,7 @@ def test_mineralize_phosphorus(field_size: float) -> None:
 
         incorp3.mineralize_phosphorus(field_size)
 
-        assert LayerData.determine_soil_phosphorus_concentration.call_count == 3
+        assert LayerData.determine_soil_nutrient_concentration.call_count == 3
         assert LayerData.calculate_phosphorus_sorption_parameter.call_count == 7
         assert incorp3._recompute_mean_phosphorus_sorption_parameter.call_count == 3
         assert incorp3._determine_phosphorus_imbalance.call_count == 3
