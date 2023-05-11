@@ -588,7 +588,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: str, milk_fat: fl
 def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: float, day_of_pregnancy: Optional[int],
                                        animal_type: str, milk_production: float, milk_true_protein: float,
                                        calf_birth_weight: float, net_energy_growth: float, average_daily_gain: float,
-                                       equivalent_shrunk_body_weight: float) -> float:
+                                       equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float) -> float:
     """ Protein requirement for maintenance according to NRC (2001).
 
     Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -639,8 +639,13 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     # Metabolizable protein requirement for maintenance (g)
     # (note this is not the full calculation, which will be completed within the
     # non-linear program)
+    TDN_estimate = 0.7 #communication with Dr. Edward Garcia
+    MP_bactria_estimate = dry_matter_intake_estimate * 1000 * TDN_estimate * 0.13 #communication with Dr. Edward Garcia
+
     MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
-        4.1 * (body_weight - conceptus_weight) ** 0.5
+        4.1 * (body_weight - conceptus_weight) ** 0.5 + \
+        (dry_matter_intake_estimate * 1000 * 0.03 - 0.5 * (MP_bactria_estimate / 0.68 - MP_bactria_estimate)) + \
+        0.4 * 11.8 * dry_matter_intake_estimate / 0.67
     # Growth Requirement
     # ---------------------
     # [A.Cow.B.2]-[A.Heifer.B.2]
@@ -743,11 +748,11 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     NPMFP = CPMFP*0.73
     NPGrowth = frame_weight_gain*0.11*0.86
     NPGest = gravid_uterine_weight_gain * 125
-    NPMilk = milk_true_protein*milk_production*1000
+    NPMilk = (milk_true_protein / 100) * milk_production * 1000
     TargetEffMP = 0.69
     if lactating:
-        metabolizable_protein_requirement = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
-                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100  # final div/100 is correcting the units g/kg
+        metabolizable_protein_requirement = ((NPscurf + NPMFP + NPMilk + NPGrowth) /
+                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin
     else:
         metabolizable_protein_requirement = (NPscurf + NPMFP) / TargetEffMP + \
             (NPGest/0.33) + (NPGrowth/0.40) + NPEndUrin
