@@ -397,6 +397,7 @@ class Requirements:
             self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
             self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
             #print('worked')
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.__init__.__name__,
                     }
@@ -404,8 +405,11 @@ class Requirements:
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
                               'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
                               'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
-                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
-        print(avg_nutrient_rqmts)
+                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW, 'avg_milk': self.avg_milk,
+                              'avg_milk_production_reduction': self.avg_milk_production_reduction,
+                              'cumulated_milk':sum(milk),
+                              'num_animals':len(pen.animals_in_pen)}
+        #print(avg_nutrient_rqmts)
         om.add_variable(f'avg_rqmts_for pen {pen.id} ', avg_nutrient_rqmts, info_map)
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
