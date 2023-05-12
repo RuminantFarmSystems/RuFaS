@@ -55,22 +55,41 @@ class FieldData:
     """if the HRU has a seasonal high water table (true/false)"""
     field_size: float = 1
     """size of the field (ha)"""
-    user_input_watering_amount: InitVar[float] = None
-    """User-supplied amount of water to be applied to the field when irrigation occurs (liters)
-        Note: this attribute is only used for initialization. After that it cannot be used."""
-    watering_amount: Optional[float] = None
-    """Amount of water to be applied to the field when irrigation occurs (mm)"""
 
-    def __post_init__(self, user_input_watering_amount: float):
+    # --- Irrigation variables ---
+    watering_amount_in_liters: Optional[float] = None
+    """User-supplied amount of water to be applied to the field when irrigation occurs (liters)"""
+    watering_amount_in_mm: float = 0
+    """Amount of water to be applied to the field when irrigation occurs (mm)"""
+    watering_interval: Optional[int] = None
+    """Number of days to wait before watering the field again."""
+    days_since_watering: int = 0
+    """Number of days since the field has been watered."""
+    watering_occurs: bool = True
+    """Status indicating if this field is watered at all."""
+    rainfall_watering_threshold: float = 0
+    """Non-inclusive mininum amount of rainfall that must occur on a single day in order to substitute a watering (mm)"""
+
+    # --- Annual totals ---
+    annual_irrigation_water_use_total: float = 0
+    """Cumulative total of water used for irrigation in a year (liters)"""
+
+    def __post_init__(self):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""
         self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
         self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
                                                                               self.dormancy_threshold)
 
-        if user_input_watering_amount is not None:
-            self.watering_amount = self.convert_liters_to_millimeters(user_input_watering_amount, self.field_size)
+        if self.watering_amount_in_liters < 0.0:
+            raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
+        elif self.watering_interval < 0:
+            raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
+
+        if self.watering_amount_in_liters is not None and self.watering_interval is not None:
+            self.watering_amount_in_mm = self.convert_liters_to_millimeters(self.watering_amount_in_liters,
+                                                                            self.field_size)
         else:
-            self.watering_amount = 0
+            self.watering_occurs = False
 
     @staticmethod
     def convert_liters_to_millimeters(liter_amount: float, field_size: float) -> float:
