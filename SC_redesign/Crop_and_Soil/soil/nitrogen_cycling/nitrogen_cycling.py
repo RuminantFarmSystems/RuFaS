@@ -28,7 +28,7 @@ class NitrogenCycling:
         Notes
         -----
         Field size is used to initialize a SoilData object for this module to work with, if a pre-configured SoilData
-        object is not provided (ha)
+        object is not provided
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
