@@ -2,11 +2,15 @@
 
 This document is meant to outline how the `CropInput` system should work. 
 
+The input data is parsed and used to create a `CropScheduleSpec`, which determines how a crop should be scheduled
+in a field, and `CropRotation` which is a container for multiple `CropScheduleSpec`s. The `CropRotation` class should
+be created when `Field`s are initialized and each field should have their own component `CropRotation`. 
+
 ## Scheduling an individual crop practice
 
 The `CropScheduleSpec` class is a dataclass that contains the specifications of the timings of management practices
-concerning the planting and harvesting of individual crops. The specification of this class should be flexible and allow
-for different types of patterns. 
+concerning the planting and harvesting of individual crops. The specification of this class should be flexible and 
+allow for different types of patterns. 
 
 Below are examples for how crop management might be specified.
 
@@ -55,7 +59,8 @@ print(odd_pattern.harvest_days)  # (220, 222, 220, 230, 220, 220, 222, 220, 230,
 
 #### Example 4: 
 Some crops may be harvested and allowed to regrow multiple times after a single planting. In this example, 
-alfalfa is harvested for 3 years after it is planted and then a rest year is given. On the final harvest, the crop is killed.
+alfalfa is harvested for 3 years after it is planted and then a rest year is given. On the final harvest, the crop is 
+killed.
 
 ```python
 from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
@@ -187,8 +192,8 @@ print(rotation.harvest_years)  # {"field_corn": (1990), "corn": (1994, 1998), "a
 ```
 
 #### Common rotations
-Some common rotations (`CommonRotations`), like the ones mentioned above could be further simplified by giving the name and some basic
-parameters of the common rotation.
+Some common rotations (`CommonRotations`), like the ones mentioned above could be further simplified by giving the 
+name and some basic parameters of the common rotation.
 
 For example, the following code could produce the rotation from example 2 above:
 
@@ -234,15 +239,15 @@ input_one = {
 }
 ```
 
-This particular input indicates that there are 3 fields in this farm (named "A", "B", and "field_3") and the fields will
-use the user-defined crop rotations "rot_a", "rot_b", and "rot_a" respectively (note that "rot_a" is used for two of the
-fields). 
+This particular input indicates that there are 3 fields in this farm (named "A", "B", and "field_3") and the fields 
+will use the user-defined crop rotations "rot_a", "rot_b", and "rot_a" respectively (note that "rot_a" is used for two 
+of the fields). 
 
 The first rotation (named "rot_a") starts in 1990 and begins with corn, which is planted on the 118th day of
-the year and harvested later that year on day 240. The year after the corn is harvested, alfalfa is planted on the 118th
-day. That alfalfa is harvested for three years on day 220. This cycle is then repeated two more times 
-(i.e., corn, alfalfa, alfalfa, alfalfa, corn, alfalfa, alfalfa, alfalfa, corn, alfalfa, alfalfa, alfalfa). This rotation
-is used by field `"A"` and `"field_3"`, according to the `"field_specifications"` entry.
+the year and harvested later that year on day 240. The year after the corn is harvested, alfalfa is planted on the 
+118th day. That alfalfa is harvested for three years on day 220. This cycle is then repeated two more times 
+(i.e., corn, alfalfa, alfalfa, alfalfa, corn, alfalfa, alfalfa, alfalfa, corn, alfalfa, alfalfa, alfalfa). This 
+rotation is used by field `"A"` and `"field_3"`, according to the `"field_specifications"` entry.
 
 Field `"B"` uses the second rotation (named "rot_b") which is slightly different. Here, we have a custom crop called
 `"field_corn"` planted in 1990, followed by the same 3 years of alfalfa as in "rot_a". Then, after the last year of
@@ -250,5 +255,3 @@ alfalfa is harvested, default corn is again planted and the cycle between defaul
 (i.e., field_corn, alfalfa, alfalfa, alfalfa, corn, alfalfa, alfalfa, alfalfa, corn, alfalfa, alfalfa, alfalfa).
 Note that since `"field_corn"` is not one of the supported crops, the user configures it in the `"crop_customization"`
 input section. The format of this input mirrors a call to `CropSpeciesDataFactory.create_species_data()`.
-
-#### Alternative Approach
