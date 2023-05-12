@@ -131,12 +131,12 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
-            NEl_con = NLP.NEl_constraint(solution.x)
-            if NEl_con < -0.5:
-                reduction = 3 * (-NEl_con)
-            else:
-                reduction = 1.5
-
+            # NEl_con = NLP.NEl_constraint(solution.x)
+            # if NEl_con < -0.5:
+            #     reduction = 3 * (-NEl_con)
+            # else:
+            #     reduction = 1.5
+            reduction = 1
             for animal in pen.animals_in_pen:
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction
@@ -163,6 +163,8 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     # safeguard if scipy SLSQP bounds error still occurs after many iterations
     # using previous cycles ration for this pen
     else:
+        print('rationreturned')
+        print(np.mean([animal.milk_production_reduction for animal in pen.animals_in_pen]))
         return pen.ration, ration_vals
 
 
@@ -397,30 +399,30 @@ class Requirements:
             self.avg_milk = np.percentile(milk, requirement_percentile)
             self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
             self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
-            #print('worked')
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.__init__.__name__,
+          
+        info_map = {"class": "no_caller_class",
+                    "function": ration_formulation.__name__,
+                    "pen_id": pen.id,
+                    "pen_animal_combination": pen.animal_combination._name_,
                     }
         # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
                               'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
                               'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
-                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW, 'avg_milk': self.avg_milk,
-                              'avg_milk_production_reduction': self.avg_milk_production_reduction,
-                              'cumulated_milk':sum(milk),
-                              'num_animals':len(pen.animals_in_pen)}
-        #print(avg_nutrient_rqmts)
+                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
         om.add_variable(f'avg_rqmts_for pen {pen.id} ', avg_nutrient_rqmts, info_map)
+        
+        if pen.animal_combination.name == 'LAC_COW':
+            cow_summary = {'avg_BW_pen': self.avg_BW, 'avg_milk_pen': self.avg_milk,
+                                'avg_milk_production_reduction_pen': self.avg_milk_production_reduction,
+                                'cumulated_milk':sum(milk), 'num_animals':len(pen.animals_in_pen),}
+            for key in ['DMIest', 'mPrt', 'estimated_daily_milk_produced', 'days_in_milk', 'days_in_preg', 'calves']:
+                cow_summary[key]=[getattr(animal, key) for animal in pen.animals_in_pen]
+            om.add_variable(f'cow info for pen {pen.id} ', cow_summary, info_map)
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.set_requirements.__name__,
-                    "pen_id": pen.id,
-                    "pen_animal_combination": pen.animal_combination._name_,
-                    }
 
         om.add_variable("avg_nutrient_rqmts", avg_nutrient_rqmts, info_map)
 
