@@ -414,7 +414,8 @@ class ManureManagementOutputHandler:
             The path of the main output directory for the manure module.
 
         """
-        main_output_dir_path = Utility.get_base_dir() / 'RUFAS' / 'routines' / 'manure' / 'output'
+        # main_output_dir_path = Utility.get_base_dir() / 'RUFAS' / 'routines' / 'manure' / 'output'
+        main_output_dir_path = Utility.get_base_dir() / 'output'
         main_output_dir_path.mkdir(parents=True, exist_ok=True)
         return main_output_dir_path
 
@@ -427,7 +428,7 @@ class ManureManagementOutputHandler:
             The path of the csv output directory.
 
         """
-        csv_dir_path = self.get_main_output_directory_path() / 'csv'
+        csv_dir_path = self.get_main_output_directory_path() / 'CSVs' / 'manure_module_reports'
         csv_dir_path.mkdir(parents=True, exist_ok=True)
         return csv_dir_path
 
@@ -446,13 +447,17 @@ class ManureManagementOutputHandler:
 
     def empty_main_output_directory(self) -> None:
         """Empties the main output directory."""
-        self._delete_files_and_subdirectories(self.get_main_output_directory_path())
+        self._delete_files_and_subdirectories(self.get_csv_output_directory_path())
+        self._delete_files_and_subdirectories(self._get_graphics_dir())
+
 
     @classmethod
     def _delete_files_and_subdirectories(cls, path: Path) -> None:
         """Deletes all files and subdirectories in the specified path."""
         if path.exists():
             for file in path.iterdir():
+                if file.name.startswith('.'):  # Ignore hidden files
+                    continue
                 if file.is_file():
                     file.unlink()
                 elif file.is_dir():
@@ -702,6 +707,6 @@ class ManureManagementOutputHandler:
 
     def _get_graphics_dir(self) -> Path:
         """Returns the graphics output directory."""
-        graphics_dir = self.get_main_output_directory_path() / 'graphics'
+        graphics_dir = self.get_main_output_directory_path() / 'graphics' / 'manure_module_reports'
         graphics_dir.mkdir(parents=True, exist_ok=True)
         return graphics_dir
