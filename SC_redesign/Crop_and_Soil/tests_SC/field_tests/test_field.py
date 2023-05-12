@@ -5,6 +5,9 @@ from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
+from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
+    HECTARES_TO_SQUARE_MILLIMETERS
 
 
 @pytest.mark.parametrize("daylength,threshold_daylength", [
@@ -176,3 +179,16 @@ def test_annual_reset() -> None:
     field.soil.data.do_annual_reset.assert_called_once()
 
 # TODO: All field methods need to be tested in future PRs.
+
+
+# --- Test FieldData methods ---
+@pytest.mark.parametrize("liters,area", [
+    (100, 2.3),
+    (356, 4.556),
+    (60, 1.8)
+])
+def test_liters_to_millimeters(liters: float, area: float) -> None:
+    """Tests that the conversion from liters for evenly distributed millimeters is performed correctly."""
+    actual = FieldData.convert_liters_to_millimeters(liters, area)
+    expected = (liters * LITERS_TO_CUBIC_MILLIMETERS) / (area * HECTARES_TO_SQUARE_MILLIMETERS)
+    assert actual == expected
