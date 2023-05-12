@@ -19,8 +19,9 @@ A user wants to plant an instance of "corn" every year for 4 years starting in 1
 events should always take place on the same of the year. The following call to `CropScheduleSpec` should work:
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-all_corn = CropScheduleSpec(crop_reference="corn", planting_years=1990, planting_days=120, 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+all_corn = CropScheduleSpec(crop_reference="corn", planting_years=1990, planting_days=120,
                             harvest_years=1990, harvest_days=220, pattern_repeat=3)
 print(all_corn.planting_years)  # (1990, 1991, 1992, 1993)
 print(all_corn.harvest_years)  # (1990, 1991, 1992, 1993)
@@ -30,8 +31,9 @@ print(all_corn.harvest_years)  # (1990, 1991, 1992, 1993)
 This time, the user wants to plant an instance of "corn" every other year, for 6 years, starting in 1990
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-skipped_corn = CropScheduleSpec(crop_reference="corn", planting_years=1990, planting_days=120, 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+skipped_corn = CropScheduleSpec(crop_reference="corn", planting_years=1990, planting_days=120,
                                 harvest_years=1990, harvest_days=220, pattern_repeat=3,
                                 pattern_skip=1)
 print(skipped_corn.planting_years)  # (1990, 1992, 1994, 1996)
@@ -44,12 +46,13 @@ plant 3 years in a row, and then skip 2 years before starting over. The calendar
 different for each step. This will repeat one time after the first cycle:
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-odd_pattern = CropScheduleSpec(crop_reference="corn", 
-                               planting_years=(1990, 1991, 1993, 1994, 1995), 
-                               planting_days=(115, 120, 120, 108, 130), 
-                               harvest_years=(1990, 1991, 1993, 1994, 1995), 
-                               harvest_days=(220, 222, 220, 230, 220), 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+odd_pattern = CropScheduleSpec(crop_reference="corn",
+                               planting_years=(1990, 1991, 1993, 1994, 1995),
+                               planting_days=(115, 120, 120, 108, 130),
+                               harvest_years=(1990, 1991, 1993, 1994, 1995),
+                               harvest_days=(220, 222, 220, 230, 220),
                                pattern_repeat=1, pattern_skip=2)
 print(odd_pattern.planting_years)  # (1990, 1991, 1993, 1994, 1995, 1998, 1999, 2001, 2002, 2003)
 print(odd_pattern.planting_days)  # (115, 120, 120, 108, 130, 115, 120, 120, 108, 130)
@@ -63,8 +66,9 @@ alfalfa is harvested for 3 years after it is planted and then a rest year is giv
 killed.
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-alf_spec = CropScheduleSpec(crop_reference="alfalfa", 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+alf_spec = CropScheduleSpec(crop_reference="alfalfa",
                             planting_years=1990,
                             planting_days=120,
                             harvest_years=([1990, 1991, 1992]),
@@ -86,12 +90,13 @@ alfalfa specification, except harvest days are not given. Instead, we tell the i
 scheduling to determine the optimal harvest date(s) for any given event:
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-optimal_alf = CropScheduleSpec(crop_reference="alfalfa", 
-                               planting_years=1990, 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+optimal_alf = CropScheduleSpec(crop_reference="alfalfa",
+                               planting_years=1990,
                                planting_days=120,
-                               harvest_years=([1990, 1991, 1992]),                            
-                               use_optimal_harvest = True, 
+                               harvest_years=([1990, 1991, 1992]),
+                               use_optimal_harvest=True,
                                harvest_operations=(["no_kill", "no_kill", "default"]),
                                pattern_skip=1, pattern_repeat=2)
 ```
@@ -104,19 +109,20 @@ It seems that numpy arrays will be the best to use here. In this way, we can alw
 For example, if we plant alfalfa once and harvest it 3 times, we only need 1 instance of `Alfalfa`. This means 
 that our arrays should be length 1. However, our harvest arrays need to have 3 sub-elements. 
 
-The example below shows a situation that uses variable harvest. Here we have two alfalfa instances. The first is planted
-in 1990 and is harvested 3 times (on the same day each harvest). The second alfalfa is planted in 1994 and is 
+The example below shows a situation that uses variable harvest. Here we have two alfalfa instances. The first is 
+planted in 1990 and is harvested 3 times (on the same day each harvest). The second alfalfa is planted in 1994 and is 
 harvested only once (on a different day from the previous year). Note that the arrays should all be length 2, but 
 the harvest sub-arrays for the first alfalfa instance are length 3 while the second sub-array is length 1.
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-new_alf = CropScheduleSpec(crop_reference="alfalfa", 
-                               planting_years=(1990, 1994),
-                               planting_days=120,
-                               harvest_years=([1990, 1991, 1992], 1994),                            
-                               harvest_days = (220, 199),
-                               harvest_operations=(["no_kill", "no_kill", "default"], "default"))
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+new_alf = CropScheduleSpec(crop_reference="alfalfa",
+                           planting_years=(1990, 1994),
+                           planting_days=120,
+                           harvest_years=([1990, 1991, 1992], 1994),
+                           harvest_days=(220, 199),
+                           harvest_operations=(["no_kill", "no_kill", "default"], "default"))
 # TODO: Note that this does not yet work with the current CropScheduleSpec. Below is the *desired* output
 print(new_alf.planting_years)  # (1990, 1994)
 print(new_alf.planting_days)  # (120, 120)
@@ -129,9 +135,10 @@ Note that users can also just explicitly specify their dates without using any p
 produce identical results to Example 3 above.
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec
-odd_pattern = CropScheduleSpec(crop_reference="corn", 
-                               planting_years=(1990, 1991, 1993, 1994, 1995, 1998, 1999, 2001, 2002, 2003), 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec
+
+odd_pattern = CropScheduleSpec(crop_reference="corn",
+                               planting_years=(1990, 1991, 1993, 1994, 1995, 1998, 1999, 2001, 2002, 2003),
                                planting_days=(115, 120, 120, 108, 130, 115, 120, 120, 108, 130),
                                harvest_years=(1990, 1991, 1993, 1994, 1995, 1998, 1999, 2001, 2002, 2003),
                                harvest_days=(220, 222, 220, 230, 220, 220, 222, 220, 230, 220))
@@ -153,8 +160,9 @@ A common rotation is one year of corn, followed by 3 years of alfalfa. Only one 
 perennial alfalfa. An example of this rotation might be:
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec, CropRotation
-corn_spec = CropScheduleSpec(crop_reference="corn", planting_years = 1990, planting_days=120, harvest_years=1990, 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec, CropRotation
+
+corn_spec = CropScheduleSpec(crop_reference="corn", planting_years=1990, planting_days=120, harvest_years=1990,
                              harvest_days=240, harvest_operations="default",
                              pattern_skip=3, pattern_repeat=2)
 alf_spec = CropScheduleSpec(crop_reference="alfalfa", planting_years=1991, planting_days=120,
@@ -164,7 +172,8 @@ alf_spec = CropScheduleSpec(crop_reference="alfalfa", planting_years=1991, plant
 rotation = CropRotation([corn_spec, alf_spec])
 # TODO: Note that this is not yet implemented. Below is the *desired* output
 print(rotation.planting_years)  # {"corn": (1990, 1994, 1998), "alfalfa: (1991, 1995, 1999)}
-print(rotation.harvest_years)  # {"corn": (1990, 1994, 1998), "alfalfa": ([1991, 1992, 1993], [1995, 1996, 1997], [1999, 2000, 2001])}
+print(
+    rotation.harvest_years)  # {"corn": (1990, 1994, 1998), "alfalfa": ([1991, 1992, 1993], [1995, 1996, 1997], [1999, 2000, 2001])}
 ```
 
 #### Example 2
@@ -174,11 +183,12 @@ this example, we use the same rotation as above, except the first year uses a us
 The details of how to create the user-defined crop should occur in a separate input field, but can be referenced here:
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec, CropRotation
-fc_spec = CropScheduleSpec(crop_reference="field_corn", planting_years = 1990, planting_days=120, harvest_years=1990, 
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec, CropRotation
+
+fc_spec = CropScheduleSpec(crop_reference="field_corn", planting_years=1990, planting_days=120, harvest_years=1990,
                            harvest_days=240, harvest_operations="default",
                            pattern_repeat=0)
-corn_spec = CropScheduleSpec(crop_reference="corn", planting_years = 1994, planting_days=120, harvest_years=1990, 
+corn_spec = CropScheduleSpec(crop_reference="corn", planting_years=1994, planting_days=120, harvest_years=1990,
                              harvest_days=240, harvest_operations="default",
                              pattern_skip=3, pattern_repeat=1)
 alf_spec = CropScheduleSpec(crop_reference="alfalfa", planting_years=1991, planting_days=120,
@@ -188,7 +198,8 @@ alf_spec = CropScheduleSpec(crop_reference="alfalfa", planting_years=1991, plant
 rotation = CropRotation([corn_spec, alf_spec])
 # TODO: Note that this is not yet implemented. Below is the *desired* output
 print(rotation.planting_years)  # {"field_corn": (1990), "corn": (1994, 1998), "alfalfa: (1991, 1995, 1999)}
-print(rotation.harvest_years)  # {"field_corn": (1990), "corn": (1994, 1998), "alfalfa": ([1991, 1992, 1993], [1995, 1996, 1997], [1999, 2000, 2001])}
+print(
+    rotation.harvest_years)  # {"field_corn": (1990), "corn": (1994, 1998), "alfalfa": ([1991, 1992, 1993], [1995, 1996, 1997], [1999, 2000, 2001])}
 ```
 
 #### Common rotations
@@ -198,7 +209,8 @@ name and some basic parameters of the common rotation.
 For example, the following code could produce the rotation from example 2 above:
 
 ```python
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropRotation
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropRotation
+
 CropRotation.make_common_rotation(rotation_name="corn_alfala_a", start_date=1990, repeat=2)
 ```
 

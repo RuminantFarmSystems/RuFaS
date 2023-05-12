@@ -157,7 +157,7 @@ class CropRotation:
     crop_schedules: List[CropScheduleSpec]
 
 
-class CommonRotations(Enum):
+class CommonRotations(Enum):  # TODO: this is a post-v1 feature. Ask Eric Young about common rotations.
     """Enum containing all the default supported crop rotation patterns"""
     CORN_ALFALFA_A = "corn_alfalfa_a"  # corn-alf-alf-alf
     CORN_ALFALFA_B = "corn_alfalfa_b"  # corn-corn-alf-alf-alf

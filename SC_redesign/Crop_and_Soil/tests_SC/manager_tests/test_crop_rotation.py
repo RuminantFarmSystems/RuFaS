@@ -3,7 +3,7 @@ from typing import Any, Tuple
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
-from SC_redesign.Crop_and_Soil.manager.crop_input import CropScheduleSpec, repeat_pattern
+from SC_redesign.Crop_and_Soil.manager.crop_rotation import CropScheduleSpec, repeat_pattern
 
 
 def test_repeat_pattern():
