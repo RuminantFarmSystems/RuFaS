@@ -67,25 +67,40 @@ class FieldData:
     """Number of days since the field has been watered."""
     watering_occurs: bool = True
     """Status indicating if this field is watered at all."""
-    rainfall_watering_threshold: float = 0
-    """Non-inclusive mininum amount of rainfall that must occur on a single day in order to substitute a watering (mm)"""
+    rainfall_watering_threshold: float = 0.3
+    """Non-inclusive minimum amount of rainfall that must occur on a single day in order to substitute a watering 
+        (mm)"""
 
     # --- Annual totals ---
     annual_irrigation_water_use_total: float = 0
     """Cumulative total of water used for irrigation in a year (liters)"""
 
     def __post_init__(self):
-        """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""
+        """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes.
+
+        Raises
+        ------
+        ValueError
+            If the watering amount is < 0.
+        ValueError
+            If the watering interval is < 0.
+        ValueError
+            If the rainfall watering threshold is < 0.
+
+        """
         self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
         self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
                                                                               self.dormancy_threshold)
 
-        if self.watering_amount_in_liters < 0.0:
-            raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
-        elif self.watering_interval < 0:
-            raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
-
         if self.watering_amount_in_liters is not None and self.watering_interval is not None:
+            if self.watering_amount_in_liters < 0.0:
+                raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
+            elif self.watering_interval < 0:
+                raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
+            elif self.rainfall_watering_threshold < 0:
+                raise ValueError(f"Expected rainfall watering threshold to be >= 0, received "
+                                 f"'{self.rainfall_watering_threshold}'.")
+
             self.watering_amount_in_mm = self.convert_liters_to_millimeters(self.watering_amount_in_liters,
                                                                             self.field_size)
         else:

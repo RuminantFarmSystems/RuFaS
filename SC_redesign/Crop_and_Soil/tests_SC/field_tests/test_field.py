@@ -171,6 +171,41 @@ def test_amend_soil() -> None:
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
 
 
+@pytest.mark.parametrize("rainfall,days_since_watering,watering_occurs", [
+    (3.4, 3, False),    # No watering because water_occurs is False
+    (3.1, 4, True),     # No watering because rainfall takes care of watering
+    (0.2, 5, True),     # Watering occurs because has been sufficient number of days to water again
+    (0.19, 4, True)     # No watering occurs because interval has not been met
+])
+def test_determine_watering_amount(rainfall: float, days_since_watering: float, watering_occurs: float) -> None:
+    """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
+        totals are updated correctly."""
+    data = FieldData(watering_amount_in_liters=5000, watering_interval=5, rainfall_watering_threshold=0.3,
+                     days_since_watering=days_since_watering)
+    data.watering_amount_in_mm = 0.5
+    data.watering_occurs = watering_occurs
+    incorp = Field(field_data=data)
+
+    actual = incorp._determine_watering_amount(rainfall)
+
+    if not watering_occurs:
+        assert actual == 0.0
+        assert incorp.field_data.days_since_watering == days_since_watering
+        assert incorp.field_data.annual_irrigation_water_use_total == 0
+    elif rainfall > 0.3:
+        assert actual == 0.0
+        assert incorp.field_data.days_since_watering == 0
+        assert incorp.field_data.annual_irrigation_water_use_total == 0
+    elif days_since_watering == 5:
+        assert actual == 0.5
+        assert incorp.field_data.days_since_watering == 0
+        assert incorp.field_data.annual_irrigation_water_use_total == 5000
+    else:
+        assert actual == 0.0
+        assert incorp.field_data.days_since_watering == days_since_watering + 1
+        assert incorp.field_data.annual_irrigation_water_use_total == 0
+
+
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
     field = Field()

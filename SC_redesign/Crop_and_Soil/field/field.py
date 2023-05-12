@@ -402,10 +402,19 @@ class Field:
 
         """
         if not self.field_data.watering_occurs:
-            return 0
+            return 0.0
 
         if rainfall > self.field_data.rainfall_watering_threshold:
+            self.field_data.days_since_watering = 0
+            return 0.0
 
+        if self.field_data.days_since_watering == self.field_data.watering_interval:
+            self.field_data.days_since_watering = 0
+            self.field_data.annual_irrigation_water_use_total += self.field_data.watering_amount_in_liters
+            return self.field_data.watering_amount_in_mm
+
+        self.field_data.days_since_watering += 1
+        return 0.0
 
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
