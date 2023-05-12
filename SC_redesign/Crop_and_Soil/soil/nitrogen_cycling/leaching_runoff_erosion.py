@@ -465,9 +465,8 @@ class LeachingRunoffErosion:
             Amount of water that percolated out of the current soil layer on this day (mm)
         leaching_extraction_coefficient : float
             Coefficient for adjusting the amount leached based on depth (unitless)
-        is_active_organic_nitrogen
+        is_active_organic_nitrogen  : bool
             Status indicating whether the pool being leached from is the active organic nitrogen pool or not
-            (True / False)
 
         Returns
         -------
