@@ -382,6 +382,31 @@ class Field:
                                            minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
 
+    def _determine_watering_amount(self, rainfall: float) -> float:
+        """Manages watering of the field.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall that occurs on this day (mm)
+
+        Returns
+        -------
+        float
+            Amount of water used to irrigate the field on this day (mm)
+
+        Notes
+        -----
+        This method determines whether the field should be watered on this day, and updates all irrigation related
+        attributes depending on whether the field is watered.
+
+        """
+        if not self.field_data.watering_occurs:
+            return 0
+
+        if rainfall > self.field_data.rainfall_watering_threshold:
+
+
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
