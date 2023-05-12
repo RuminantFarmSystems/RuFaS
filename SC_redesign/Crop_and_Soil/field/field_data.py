@@ -1,11 +1,17 @@
 from typing import Optional, List, Dict
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
+    HECTARES_TO_SQUARE_MILLIMETERS
 
 
 @dataclass(kw_only=True)
 class FieldData:
     """data object to track the field-specific variables"""
+    #
+    # user_input_watering_amount: Optional[InitVar[float]] = None
+    # """User-supplied amount of water to be applied to the field when irrigation occurs (liters)
+    #     Note: this attribute is only used for initialization. After that it cannot be used."""
 
     # --- Soil Management Variables ---
     is_amendment_day: bool = False
@@ -49,9 +55,40 @@ class FieldData:
     """if the HRU has a seasonal high water table (true/false)"""
     field_size: float = 1
     """size of the field (ha)"""
+    user_input_watering_amount: InitVar[float] = None
+    """User-supplied amount of water to be applied to the field when irrigation occurs (liters)
+        Note: this attribute is only used for initialization. After that it cannot be used."""
+    watering_amount: Optional[float] = None
+    """Amount of water to be applied to the field when irrigation occurs (mm)"""
 
-    def __post_init__(self):
+    def __post_init__(self, user_input_watering_amount: float):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes"""
         self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
         self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
                                                                               self.dormancy_threshold)
+
+        if user_input_watering_amount is not None:
+            self.watering_amount = self.convert_liters_to_millimeters(user_input_watering_amount, self.field_size)
+        else:
+            self.watering_amount = 0
+
+    @staticmethod
+    def convert_liters_to_millimeters(liter_amount: float, field_size: float) -> float:
+        """Converts an amount in liters to an amount in mm based on the area the liters are distributed over.
+
+        Parameters
+        ----------
+        liter_amount : float
+            Volume to be converted (liters)
+        field_size : float
+            Size of the field (ha)
+
+        Returns
+        -------
+        float
+            Millimeter amount that is distributed evenly across the specified field area (mm)
+
+        """
+        amount_in_cubic_millimeters = liter_amount * LITERS_TO_CUBIC_MILLIMETERS
+        field_size_in_square_millimeters = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        return amount_in_cubic_millimeters / field_size_in_square_millimeters
