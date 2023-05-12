@@ -1,5 +1,5 @@
 from typing import Optional, List, Dict
-from dataclasses import dataclass, InitVar
+from dataclasses import dataclass
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
@@ -58,22 +58,21 @@ class FieldData:
 
     # --- Irrigation variables ---
     watering_amount_in_liters: Optional[float] = None
-    """User-supplied amount of water to be applied to the field when irrigation occurs (liters)"""
+    """User-supplied amount of water to be applied to the field over a specified interval of days (liters)"""
     watering_amount_in_mm: float = 0
-    """Amount of water to be applied to the field when irrigation occurs (mm)"""
+    """Amount of water to be applied to the field over a specified interval of days (mm)"""
     watering_interval: Optional[int] = None
-    """Number of days to wait before watering the field again."""
-    days_since_watering: int = 0
-    """Number of days since the field has been watered."""
+    """Number of days over which the specified amount of water needs to be applied."""
+    days_into_watering_interval: int = 0
+    """Number of days since the start of the current watering interval."""
+    current_water_deficit: float = 0
+    """Amount of water that still needs to be applied to the field in the current interval (mm)"""
     watering_occurs: bool = True
     """Status indicating if this field is watered at all."""
-    rainfall_watering_threshold: float = 0.3
-    """Non-inclusive minimum amount of rainfall that must occur on a single day in order to substitute a watering 
-        (mm)"""
 
     # --- Annual totals ---
     annual_irrigation_water_use_total: float = 0
-    """Cumulative total of water used for irrigation in a year (liters)"""
+    """Cumulative total of water used for irrigation in a year (mm)"""
 
     def __post_init__(self):
         """Initialize all attributes in FieldData object that need to be set based on other FieldData attributes.
@@ -84,8 +83,6 @@ class FieldData:
             If the watering amount is < 0.
         ValueError
             If the watering interval is < 0.
-        ValueError
-            If the rainfall watering threshold is < 0.
 
         """
         self.dormancy_threshold = Dormancy.find_dormancy_threshold(self.absolute_latitude)
@@ -97,12 +94,10 @@ class FieldData:
                 raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
             elif self.watering_interval < 0:
                 raise ValueError(f"Expected watering interval to be >= 0, received '{self.watering_interval}'.")
-            elif self.rainfall_watering_threshold < 0:
-                raise ValueError(f"Expected rainfall watering threshold to be >= 0, received "
-                                 f"'{self.rainfall_watering_threshold}'.")
 
             self.watering_amount_in_mm = self.convert_liters_to_millimeters(self.watering_amount_in_liters,
                                                                             self.field_size)
+            self.current_water_deficit = self.watering_amount_in_mm
         else:
             self.watering_occurs = False
 
