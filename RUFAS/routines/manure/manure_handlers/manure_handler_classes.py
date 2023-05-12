@@ -25,7 +25,6 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import Ma
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 
-
 om = OutputManager()
 
 
@@ -34,6 +33,7 @@ class ManureHandlerType(DefaultEnum):
     FLUSH_SYSTEM = 'flush system'
     MANUAL_SCRAPING = 'manual scraping'
     ALLEY_SCRAPER = 'alley scraper'
+    COMPOST_BEDDED_PACK_BARN = 'compost bedded pack barn'
     DEFAULT = FLUSH_SYSTEM
 
 
@@ -216,6 +216,16 @@ class AlleyScraper(BaseManureHandler):
     pass
 
 
+class CompostBeddedPackBarn(BaseManureHandler):
+    """A class that handles calculations related to a compost bedded pack barn.
+
+    Attributes:
+        All inherited from BaseManureHandler.
+
+    """
+    pass
+
+
 @dataclass
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
@@ -243,6 +253,11 @@ class DefaultManureHandlerConfigFactory:
     ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=10.0,
     )
+    COMPOST_BEDDED_PACK_BARN_CONFIG = ManureHandlerConfig(
+        cleaning_water_use_rate=0.0,
+        minutes_per_cleaning=0,
+        cleanings_per_day=0,
+    )
 
     @classmethod
     def get_instance(cls, manure_handler_type: ManureHandlerType) -> ManureHandlerConfig:
@@ -262,7 +277,8 @@ class DefaultManureHandlerConfigFactory:
         manure_handler_config_by_type = {
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
-            ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG
+            ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG,
+            ManureHandlerType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
         }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
@@ -299,6 +315,7 @@ class ManureHandlerFactory:
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
+            ManureHandlerType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
         }
 
         manure_handler_type = ManureHandlerType.get_type(

@@ -109,7 +109,8 @@ class ManureManagement:
         return self._all_data
 
     def _configure_manure_management_components(self, animal_management: AnimalManagement) -> None:
-        """Configures the manure management components for each animal pen.
+        """
+        Configure the manure management components for each animal pen.
 
         Each pen is associated with the following components - bedding, manure handler,
         reception pit, manure separator, and manure treatment.

@@ -1,0 +1,29 @@
+---
+title: "How to Configure Manure Management Components"
+---
+flowchart TD
+    start[Start] --> checkPen{"Is there any unprocessed Pen \nin animal management?"}
+    checkPen --> yesPen{Yes}
+    checkPen -- No --> Done[End]
+    yesPen --> createManureManagementPen[Create ManureManagementPen instance from the Pen]
+    createManureManagementPen --> checkCustomBeddingConfig{"Is there any \n custom bedding config \n from user input?"}
+    checkCustomBeddingConfig -- Yes --> getSetBeddingConfig[Get and set bedding config for the Pen]
+    checkCustomBeddingConfig -- No --> getDefaultBeddingConfig[Get default bedding config for the Pen]
+    getDefaultBeddingConfig --> getSetBeddingConfig
+    getSetBeddingConfig --> checkCustomHandlerConfig{"Is there any \n custom manure handler config \n from user input?"}
+    checkCustomHandlerConfig -- Yes --> getSetHandlerConfig[Get and set manure handler config for the Pen]
+    checkCustomHandlerConfig -- No --> getDefaultHandlerConfig[Get default manure handler config for the Pen]
+    getDefaultHandlerConfig --> getSetHandlerConfig
+    getSetHandlerConfig --> createSetReceptionPit[Create and set ReceptionPit for the Pen]
+    createSetReceptionPit --> checkSeparator{"Is Manure Separator Required?"}
+    checkSeparator -- Yes --> checkCustomSeparatorConfig{"Is there any \n custom separator config \n from user input?"}
+    checkSeparator -- No --> setSeparatorNone[Set manure separator to None for the Pen]
+    checkCustomSeparatorConfig -- Yes --> getSetSeparatorConfig[Get and set manure separator config for the Pen]
+    checkCustomSeparatorConfig -- No --> getDefaultSeparatorConfig[Get default separator config for the Pen]
+    getDefaultSeparatorConfig --> getSetSeparatorConfig
+    getSetSeparatorConfig --> checkCustomTreatmentConfig{"Is there any \n custom treatment config \n from user input?"}
+    setSeparatorNone --> checkCustomTreatmentConfig
+    checkCustomTreatmentConfig -- Yes --> getSetTreatmentConfig[Get and set manure treatment config for the Pen]
+    checkCustomTreatmentConfig -- No --> getDefaultTreatmentConfig[Get default treatment config for the Pen]
+    getDefaultTreatmentConfig --> getSetTreatmentConfig
+    getSetTreatmentConfig --> checkPen

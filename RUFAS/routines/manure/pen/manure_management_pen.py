@@ -72,6 +72,7 @@ class ManureManagementPen:
             The number of lactating cows in the pen.
 
         """
+
         num_lac_cows = 0
         if animal_combination is Pen.AnimalCombination.LAC_COW:
             for animal in animals_in_pen:
