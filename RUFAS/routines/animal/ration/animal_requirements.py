@@ -82,7 +82,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
             day_of_pregnancy, calf_birth_weight)
         net_energy_lactation = calculate_NRC_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
-        metabolizable_protein_requirement = calculate_NRC_protein_requirements(
+        metabolizable_protein_requirement, MPm, MPg, MPpreg, MPlact = calculate_NRC_protein_requirements(
             body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
             calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight)
         calcium_requirement = calculate_NRC_calcium_requirements(
@@ -106,7 +106,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval)
         net_energy_pregnancy, gravid_uterine_weight_gain = calculate_NASEM_energy_pregnancy_requirements(
             lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight)
-        metabolizable_protein_requirement = calculate_NASEM_protein_requirements(
+        metabolizable_protein_requirement, NPscurf, NPMFP, NPMilk, NPGrowth, NPGest, NPEndUrin = calculate_NASEM_protein_requirements(
             lactating, body_weight, frame_weight_gain, gravid_uterine_weight_gain, dry_matter_intake_estimate,
             milk_true_protein, milk_production)
         calcium_requirement = calculate_NASEM_calcium_requirements(
@@ -123,8 +123,11 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
         om.add_error("energy_and_nutrient_calculation_method_error",
                      energy_and_nutrient_calculation_method_error, info_map)
     # Requirements summary dictionary
+    #return {'NEmaint': net_energy_maintenance, 'NEg': net_energy_growth, 'NEpreg': net_energy_pregnancy,
+    #        'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'NPscurf': NPscurf, 'NPMFP': NPMFP, 'NPMilk': NPMilk, 'NPGrowth': NPGrowth, 'NPGest': NPGest, 'NPEndUrin': NPEndUrin, 'Ca_req': calcium_requirement,
+    #        'P_req': phosphorus_requirement,'DMIest': dry_matter_intake_estimate}
     return {'NEmaint': net_energy_maintenance, 'NEg': net_energy_growth, 'NEpreg': net_energy_pregnancy,
-            'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'Ca_req': calcium_requirement,
+            'NEl': net_energy_lactation, 'MP_req': metabolizable_protein_requirement, 'MPm': MPm, 'MPg': MPg, 'MPpreg': MPpreg, 'MPlact': MPlact, 'Ca_req': calcium_requirement,
             'P_req': phosphorus_requirement,'DMIest': dry_matter_intake_estimate}
 
 
@@ -588,7 +591,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: str, milk_fat: fl
 def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: float, day_of_pregnancy: Optional[int],
                                        animal_type: str, milk_production: float, milk_true_protein: float,
                                        calf_birth_weight: float, net_energy_growth: float, average_daily_gain: float,
-                                       equivalent_shrunk_body_weight: float) -> float:
+                                       equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float) -> float:
     """ Protein requirement for maintenance according to NRC (2001).
 
     Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -639,8 +642,10 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     # Metabolizable protein requirement for maintenance (g)
     # (note this is not the full calculation, which will be completed within the
     # non-linear program)
-    MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
-        4.1 * (body_weight - conceptus_weight) ** 0.5
+    # MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
+    #     4.1 * (body_weight - conceptus_weight) ** 0.5
+     MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
+        4.1 * (body_weight - conceptus_weight) ** 0.5 + (dry_matter_intake_estimate * 1000 * 0.03 - 0.5 * ()) + 0.4 * 11.8 * dry_matter_intake_estimate/0.67
     # Growth Requirement
     # ---------------------
     # [A.Cow.B.2]-[A.Heifer.B.2]
@@ -675,6 +680,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     if animal_type == 'cow':
         # [A.Cow.B.6]
         MPlact = milk_production * (milk_true_protein / 100) * (1000 / 0.67)
+    else:
+        MPlact = 0.0 
     # Total Protein Requirement  (g)
     # ---------------------
     if animal_type == 'cow':
@@ -683,7 +690,7 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     elif animal_type == 'heifer':
         # [A.Heifer.B.6]
         metabolizable_protein_requirement = MPm + MPg + MPpreg
-    return metabolizable_protein_requirement
+    return metabolizable_protein_requirement, MPm, MPg, MPpreg, MPlact
 
 
 def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, frame_weight_gain: float, 
@@ -743,15 +750,18 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     NPMFP = CPMFP*0.73
     NPGrowth = frame_weight_gain*0.11*0.86
     NPGest = gravid_uterine_weight_gain * 125
-    NPMilk = milk_true_protein*milk_production*1000
+    #NPMilk = milk_true_protein*milk_production*1000
+    NPMilk = milk_true_protein*milk_production*1000/100 #convert milk true protein from percentage to decimal 
     TargetEffMP = 0.69
     if lactating:
-        metabolizable_protein_requirement = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
-                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100  # final div/100 is correcting the units g/kg
+        #metabolizable_protein_requirement = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
+        #                                      TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100  # final div/100 is correcting the units g/kg
+        metabolizable_protein_requirement = ((NPscurf + NPMFP + NPMilk + NPGrowth) /
+                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin
     else:
         metabolizable_protein_requirement = (NPscurf + NPMFP) / TargetEffMP + \
             (NPGest/0.33) + (NPGrowth/0.40) + NPEndUrin
-    return metabolizable_protein_requirement
+    return metabolizable_protein_requirement, NPscurf, NPMFP, NPMilk, NPGrowth, NPGest, NPEndUrin  
 
 
 def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: float, day_of_pregnancy: Optional[int],

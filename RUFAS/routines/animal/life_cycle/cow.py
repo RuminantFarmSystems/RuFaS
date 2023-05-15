@@ -387,6 +387,16 @@ class Cow(HeiferIII):
         self.NEpreg = req['NEpreg']
         self.NEl = req['NEl']
         self.MP_req = req['MP_req']
+        # self.NPscurf = req['NPscurf'] 
+        # self.NPMFP = req['NPMFP'] 
+        # self.NPMilk = req['NPMilk'] 
+        # self.NPGrowth = req['NPGrowth'] 
+        # self.NPGest = req['NPGest'] 
+        # self.NPEndUrin = req['NPEndUrin']
+        self.MPm = req['MPm'] 
+        self.MPg = req['MPg'] 
+        self.MPpreg = req['MPpreg'] 
+        self.MPlact = req['MPlact']
         self.Ca_req = req['Ca_req']
         self.P_req = req['P_req']
         self.DMIest = req['DMIest']
@@ -409,6 +419,10 @@ class Cow(HeiferIII):
                    self.NEpreg,
                    self.NEl,
                    self.MP_req,
+                   self.MPm, 
+                   self.MPg, 
+                   self.MPpreg, 
+                   self.MPlact,
                    self.Ca_req,
                    self.P_req,
                    self.DMIest,
@@ -419,6 +433,12 @@ class Cow(HeiferIII):
             csvout = csv.writer(file)
             csvout.writerow(csvline)
 
+                #    self.NPscurf,
+                #    self.NPMFP, 
+                #    self.NPMilk,
+                #    self.NPGrowth, 
+                #    self.NPGest, 
+                #    self.NPEndUrin, 
     def phosphorus_rqmts(self, DMI):
         """
         Calculates and sets the animal's phosphorus requirement.
