@@ -272,10 +272,10 @@ def test_field_data_initialization(latitude: float, min_daylength: float, wateri
     (-1300, 13),
     (2000, -3)
 ])
-def test_error_field_data_initialization(watering_amount: float, interval: float) -> None:
+def test_error_field_data_initialization(watering_amount: float, interval: int) -> None:
     """Tests that errors are correctly raised when FieldData is initialized with invalid values."""
     with pytest.raises(Exception) as e:
-        data = FieldData(watering_amount_in_liters=watering_amount, watering_interval=interval)
+        FieldData(watering_amount_in_liters=watering_amount, watering_interval=interval)
     if watering_amount < 0:
         assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
     elif interval < 0:
