@@ -210,8 +210,12 @@ def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
     field = Field()
     field.soil.data.do_annual_reset = MagicMock()
+    field.field_data.perform_annual_field_reset = MagicMock()
+
     field.perform_annual_reset()
+
     field.soil.data.do_annual_reset.assert_called_once()
+    field.field_data.perform_annual_field_reset.assert_called_once()
 
 # TODO: All field methods need to be tested in future PRs.
 

@@ -101,6 +101,10 @@ class FieldData:
         else:
             self.watering_occurs = False
 
+    def perform_annual_field_reset(self) -> None:
+        """Resets all cumulative totals that are calculated annually for the field."""
+        self.annual_irrigation_water_use_total = 0
+
     @staticmethod
     def convert_liters_to_millimeters(liter_amount: float, field_size: float) -> float:
         """Converts an amount in liters to an amount in mm based on the area the liters are distributed over.

@@ -446,4 +446,5 @@ class Field:
         """Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
             file, and then reset all annual totals"""
         self.soil.data.do_annual_reset()
+        self.field_data.perform_annual_field_reset()
         return
