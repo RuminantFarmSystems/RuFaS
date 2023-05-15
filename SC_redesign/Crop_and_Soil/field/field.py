@@ -382,6 +382,45 @@ class Field:
                                            minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
 
+    def _handle_water_in_crop_canopy(self, precipitation_total: float) -> float:
+        """Adds water to canopies of all the crops in the field and removes any excess water from them.
+
+        Parameters
+        ----------
+        precipitation_total : float
+            Total amount of precipitation that fell on the field today (mm)
+
+        Returns
+        -------
+        float
+            Amount of water that reaches the soil surface (mm)
+
+        Notes
+        -----
+        This method accounts for the edge case that no water was lost from the crop canopy yesterday and the capacity in
+        the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
+        happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
+        canopy of another.
+
+        """
+        precipitation_reaching_soil = precipitation_total
+        excess_canopy_water = 0
+        for crop in self.crops:
+            canopy_water_excess_capacity = crop.data.water_canopy_storage_capacity - crop.data.canopy_water
+
+            excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
+            excess_canopy_water += -1 * excess_water_in_canopy
+            if excess_water_in_canopy != 0.0:
+                crop.data.canopy_water = crop.data.water_canopy_storage_capacity
+
+            water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
+            water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
+            crop.data.canopy_water += water_taken_to_be_stored
+            precipitation_reaching_soil -= water_taken_to_be_stored
+
+        return precipitation_reaching_soil + excess_canopy_water
+
+
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0

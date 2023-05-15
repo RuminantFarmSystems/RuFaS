@@ -1,5 +1,5 @@
 from typing import Optional, List, Dict
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
@@ -77,7 +77,7 @@ def test_add_crop():
         field.add_crop(crop)
         assert type(field.crops[i]) is Crop
     for crop in field.crops:
-        assert crop.data.field_proportion == 1/5
+        assert crop.data.field_proportion == 1 / 5
     assert len(field.crops) == 5
 
     # ---- second case: specific covers
@@ -123,7 +123,7 @@ def test_make_crop_from_config_dict(config: dict):
     ([{"species": "corn"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
-    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1/3, 1/3, 1/3])
+    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1 / 3, 1 / 3, 1 / 3])
 ])
 def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     field = Field()
@@ -167,6 +167,34 @@ def test_amend_soil() -> None:
     field.amend_soil()
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
 
+
+@pytest.mark.parametrize("precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
+                         "expected_first,expected_second", [
+                             (13, 8, 2, 4, 3, 8, 8),    # Fills both pools with some leftover
+                             (6, 7, 3, 2, 0, 7, 4),     # Fills one pool, puts some in second, none leftover
+                             (14, 5, 7, 1, 12, 5, 5),   # Removes from one pool, fills other, some leftover
+                             (3, 6, 8, 9, 8, 6, 6),     # Removes from both pools, lots left over
+                             (5, 10, 3, 12, 2, 8, 10)   # Fills one pool as much as possible, removes excess from
+                                                        # another
+                         ]
+)
+def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
+                                     second_canopy_amount: float, expected_return: float, expected_first: float,
+                                     expected_second: float) -> None:
+    """Tests that water is properly added and removed from the crop canopies of field objects."""
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.water_canopy_storage_capacity",
+               new_callable=PropertyMock, return_value=canopy_capacity):
+        crop_data1 = CropData(canopy_water=first_canopy_amount)
+        crop1 = Crop(crop_data1)
+        crop_data2 = CropData(canopy_water=second_canopy_amount)
+        crop2 = Crop(crop_data2)
+        field = Field()
+        field.crops = [crop1, crop2]
+
+        actual = field._handle_water_in_crop_canopy(precipitation)
+        assert actual == expected_return
+        assert field.crops[0].data.canopy_water == expected_first
+        assert field.crops[1].data.canopy_water == expected_second
 
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""

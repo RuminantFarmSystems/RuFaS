@@ -8,8 +8,6 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 This module is based upon the "Water Uptake By Plants" section of SWAT (5:2.2.1)
 """
 
-# TODO These functions belong in either water_dynamics.py or as soil process methods - GitHub Issue #450
-
 # TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
 #   I'm not entirely sure if that should happen for this module, since the methods allow a crop to pull water up
 #   from deeper in the soil if the given layer does not have enough to meet the demands of that depth.

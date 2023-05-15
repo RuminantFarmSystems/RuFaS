@@ -305,8 +305,19 @@ class CropData:
     evapotranspiration_weighting_coefficient: float = 1
     """plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive(?).
         Used in SWAT equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)"""
-    initial_canopy_free_water: float = 0    # TODO: track this - Issue #316
-    """initial amount of free water held in the canopy on a given day (mm)"""
+    canopy_water: float = 0
+    """Amount of water currently held in the canopy (mm)"""
+    max_canopy_water_capacity: float = 0.8
+    """Maximum amount of water that can be trapped in canopy on a given day when fully developed (mm).
+        References: SWAT Theoretical documentation eqn. 2:2.1.1 (see also SWAT Input file .HRU ("CANMX" page 233).
+        Note: this default is super arbitrary. It comes from the paper:
+            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated 
+            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western 
+            UK. GCB Bioenergy. 2019;11:1298–1317.  https ://doi.org/10.1111/gcbb.12628'
+        which cites the following paper that I could not find:
+           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation. 
+            Scientia Agricultura Sinica, 39(9), 1859–1864.'
+    """
 
     # ---- transpiration
     water_distro_parameter: float = 10
@@ -399,6 +410,17 @@ class CropData:
     def is_in_senescence(self) -> bool:
         """check if the plant is in senescence"""
         return self.heat_fraction > self.senescent_heat_fraction
+
+    @property
+    def water_canopy_storage_capacity(self) -> float:
+        """Maximum amount of water that can be held in the canopy (mm).
+
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:2.1.1
+
+        """
+        return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
 
 
 """

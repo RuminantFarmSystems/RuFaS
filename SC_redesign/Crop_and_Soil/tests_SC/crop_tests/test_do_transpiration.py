@@ -3,7 +3,7 @@ from math import exp
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.crop.transpiration import WaterUptake
+from SC_redesign.Crop_and_Soil.crop.water_uptake import WaterUptake
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
