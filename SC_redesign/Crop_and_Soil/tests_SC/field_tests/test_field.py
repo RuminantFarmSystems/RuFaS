@@ -6,6 +6,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
 
@@ -80,7 +81,7 @@ def test_add_crop():
         field.add_crop(crop)
         assert type(field.crops[i]) is Crop
     for crop in field.crops:
-        assert crop.data.field_proportion == 1/5
+        assert crop.data.field_proportion == 1 / 5
     assert len(field.crops) == 5
 
     # ---- second case: specific covers
@@ -126,7 +127,7 @@ def test_make_crop_from_config_dict(config: dict):
     ([{"species": "corn"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
-    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1/3, 1/3, 1/3])
+    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1 / 3, 1 / 3, 1 / 3])
 ])
 def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     field = Field()
@@ -172,10 +173,10 @@ def test_amend_soil() -> None:
 
 
 @pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs", [
-    (3.4, 3, 1.5, False),       # No watering because water_occurs is False
-    (3.1, 5, 2.3, True),        # No watering because rainfall takes care of watering
-    (0.2, 5, 3.6, True),        # Watering occurs because water deficit has not been met
-    (0.19, 4, 2.8, True)        # No watering occurs because interval has not been met
+    (3.4, 3, 1.5, False),  # No watering because water_occurs is False
+    (3.1, 5, 2.3, True),  # No watering because rainfall takes care of watering
+    (0.2, 5, 3.6, True),  # Watering occurs because water deficit has not been met
+    (0.19, 4, 2.8, True)  # No watering occurs because interval has not been met
 ])
 def test_determine_watering_amount(rainfall: float, days_into_interval: int, water_deficit: float,
                                    watering_occurs: float) -> None:
@@ -217,6 +218,7 @@ def test_annual_reset() -> None:
     field.soil.data.do_annual_reset.assert_called_once()
     field.field_data.perform_annual_field_reset.assert_called_once()
 
+
 # TODO: All field methods need to be tested in future PRs.
 
 
@@ -231,3 +233,50 @@ def test_liters_to_millimeters(liters: float, area: float) -> None:
     actual = FieldData.convert_liters_to_millimeters(liters, area)
     expected = (liters * LITERS_TO_CUBIC_MILLIMETERS) / (area * HECTARES_TO_SQUARE_MILLIMETERS)
     assert actual == expected
+
+
+@pytest.mark.parametrize("latitude,min_daylength,watering_amount,watering_interval", [
+    (45.66, 12.5, 2000, 3),
+    (37.445, 9.88, 7500, 7),
+    (50.667, 10.334, 0, 5),
+    (49.551, 12.65, 3500, 0)
+])
+def test_field_data_initialization(latitude: float, min_daylength: float, watering_amount: float,
+                                   watering_interval: int) -> None:
+    """Tests that FieldData objects are initialized correctly."""
+    Dormancy.find_dormancy_threshold = MagicMock(return_value=14.5)
+    Dormancy.find_threshold_daylength = MagicMock(return_value=10.22)
+    FieldData.convert_liters_to_millimeters = MagicMock(return_value=0.8)
+
+    data = FieldData(field_size=3, absolute_latitude=latitude, minimum_daylength=min_daylength,
+                     watering_amount_in_liters=watering_amount, watering_interval=watering_interval)
+
+    Dormancy.find_dormancy_threshold.assert_called_once_with(latitude)
+    Dormancy.find_threshold_daylength.assert_called_once_with(min_daylength, 14.5)
+    assert data.dormancy_threshold == 14.5
+    assert data.dormancy_threshold_daylength == 10.22
+    if watering_amount is not None and watering_amount != 0.0 and watering_interval is not None and \
+            watering_interval != 0:
+        FieldData.convert_liters_to_millimeters.assert_called_once_with(watering_amount, 3)
+        assert data.watering_amount_in_mm == 0.8
+        assert data.current_water_deficit == 0.8
+        assert data.watering_occurs
+    else:
+        FieldData.convert_liters_to_millimeters.assert_not_called()
+        assert data.watering_amount_in_mm == 0
+        assert data.current_water_deficit == 0
+        assert not data.watering_occurs
+
+
+@pytest.mark.parametrize("watering_amount,interval", [
+    (-1300, 13),
+    (2000, -3)
+])
+def test_error_field_data_initialization(watering_amount: float, interval: float) -> None:
+    """Tests that errors are correctly raised when FieldData is initialized with invalid values."""
+    with pytest.raises(Exception) as e:
+        data = FieldData(watering_amount_in_liters=watering_amount, watering_interval=interval)
+    if watering_amount < 0:
+        assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
+    elif interval < 0:
+        assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)

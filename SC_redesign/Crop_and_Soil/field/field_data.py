@@ -8,10 +8,6 @@ from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MI
 @dataclass(kw_only=True)
 class FieldData:
     """data object to track the field-specific variables"""
-    #
-    # user_input_watering_amount: Optional[InitVar[float]] = None
-    # """User-supplied amount of water to be applied to the field when irrigation occurs (liters)
-    #     Note: this attribute is only used for initialization. After that it cannot be used."""
 
     # --- Soil Management Variables ---
     is_amendment_day: bool = False
@@ -25,9 +21,9 @@ class FieldData:
     scheduling, whereby harvest operations are conducted to maximize yield (based on heat unit accumulation)."""
     is_planting_day: bool = False
     """is today the day to plant new crops?"""
-    absolute_latitude: float = 43.5     # TODO: set default to somewhere other than Wisconsin, or no default?
+    absolute_latitude: float = 43.5  # TODO: set default to somewhere other than Wisconsin, or no default?
     """The absolute latitude value (degrees above or below equator) where field is located (degrees)"""
-    minimum_daylength: float = 6.33     # TODO: set default to somewhere other than Wisconsin, or no default?
+    minimum_daylength: float = 6.33  # TODO: set default to somewhere other than Wisconsin, or no default?
     """Shortest day of the year for this watershed (hours)"""
     dormancy_threshold_daylength: Optional[float] = None
     """Threshold daylength to initiate dormancy in a plant (hours)"""
@@ -89,7 +85,9 @@ class FieldData:
         self.dormancy_threshold_daylength = Dormancy.find_threshold_daylength(self.minimum_daylength,
                                                                               self.dormancy_threshold)
 
-        if self.watering_amount_in_liters is not None and self.watering_interval is not None:
+        should_water = self.watering_amount_in_liters is not None and self.watering_interval is not None and \
+            self.watering_amount_in_liters != 0.0 and self.watering_interval != 0
+        if should_water:
             if self.watering_amount_in_liters < 0.0:
                 raise ValueError(f"Expected watering amount to be >= 0, received '{self.watering_amount_in_liters}'.")
             elif self.watering_interval < 0:
