@@ -1154,9 +1154,12 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
         National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
     """
     if lactating:
-        dry_matter_intake_estimate = ((3.7 + parity*5.7)+0.305*net_energy_lactation
-                                      + 0.022*body_weight+(-0.689-1.87*parity)*body_condition_score_5) \
-            * (1-(0.212+parity*0.136)*math.exp(-0.053*days_in_milk))
+        parity_adjustment_factor = 0
+        if parity > 1:
+            parity_adjustment_factor = 1 
+        dry_matter_intake_estimate = ((3.7 + parity_adjustment_factor*5.7)+0.305*net_energy_lactation
+                                      + 0.022*body_weight+(-0.689-1.87*parity_adjustment_factor)*body_condition_score_5) \
+            * (1-(0.212+parity_adjustment_factor*0.136)*math.exp(-0.053*days_in_milk))
     else:
         dry_matter_intake_estimate = 0.022*mature_body_weight * \
             (1-math.exp(-1.54*(body_weight/mature_body_weight)))
