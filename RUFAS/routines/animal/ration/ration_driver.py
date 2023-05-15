@@ -17,7 +17,9 @@ import math
 import statistics as stat
 import numpy as np
 from RUFAS.output_manager import OutputManager
-
+from typing import Callable
+import numpy as np
+import numpy.typing as npt
 
 om = OutputManager()
 
@@ -84,8 +86,20 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     return solution, ration_vals
 
 
-def is_constraint_violated(solution, constraint) -> bool:
-        result = constraint['fun'](solution)
+def is_constraint_violated(solution_x: npt.NDArray, constraint: List[dict[str, Callable]]) -> bool:
+        """
+        Helper function to check a solution dictionary to see if a given constraint 
+            in a list of constraints was met.
+        
+        Parameters
+        ----------
+        solution_x: numpy nd array, e.g. npt.NDArray
+            solution.x array from minimize function used in ration_NLP.py
+        constraints: List[dict[str, Any]]
+            list of constraint functions as defined in ration_NLP.py
+
+        """
+        result = constraint['fun'](solution_x)
         if constraint['type'] == 'ineq' and result < 0:
             return True
         elif constraint['type'] == 'eq' and not np.isclose(result, 0):
@@ -94,8 +108,26 @@ def is_constraint_violated(solution, constraint) -> bool:
             return False
 
 
-def find_failed_constraints(solution, constraints):
-        return list(filter(lambda c: is_constraint_violated(solution, c), constraints))
+def find_failed_constraints(solution_x: npt.NDArray, constraints: List[dict[str,Callable]]) -> List[dict[str,Callable]]:
+        """
+        Returns list of constraints that were not met during optmization step.
+        
+        Parameters
+        ----------
+        solution_x: numpy nd array, e.g. npt.NDArray
+            solution.x is from minimize function used in ration_NLP.py, 
+                solution obj itself is returned as  <dict class 'scipy.optimize._optimize.OptimizeResult'>
+
+        constraints: List[dict[str, Callable]]
+            list of constraint functions as defined in ration_NLP.py
+
+        Returns
+        -------
+        List[dict[str,Callable]]
+            the same type of list as the constraints themselves
+                just filtered such that the ones that failed are returned
+        """
+        return list(filter(lambda c: is_constraint_violated(solution_x, c), constraints))
 
 
 def ration_formulation(pen, available_feeds, animal_type, cow_type):
@@ -123,7 +155,6 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     if animal_type == 'cow':
         while not solution.success:
             num_reattempts += 1
-            # add step to check constraints
             failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
             if failed_constraints:
                 for constr in failed_constraints:
@@ -136,20 +167,20 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
             #     reduction = 3 * (-NEl_con)
             # else:
             #     reduction = 1.5
-            reduction = 1
+            reduction = 0.25
             for animal in pen.animals_in_pen:
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
-    info_map = {"class": pen.__class__.__name__,
+    info_map = {"class": "no_caller_class",
                 "function": pen.__init__.__name__,
                 }
     if solution != None:
         if failed_list != []:
             fail_summary = [num_reattempts, failed_list]
-            om.add_variable(f'failed_constraints for pen {pen.id} ', fail_summary, info_map)
+            om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
@@ -253,7 +284,78 @@ class Requirements:
         # TODO: add documentation for avg_milk and avg_CP_milk
         self.avg_milk = 0
         self.avg_CP_milk = 0
-
+    
+    def set_pen_requirements(self, NEmaint: List[float], NEa: List[float], NEg: List[float], NEpreg: List[float],
+                               NEl: List[float], MP_req: List[float], Ca_req: List[float], P_req: List[float], 
+                               DMIest: List[float], BW: List[float], milk: List[float], CP_milk: List[float],
+                               milk_production_reduction: List[float], use_the_mean: bool) -> None:
+        """
+        This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats generated in ration_driver.set_requirements
+        
+        Parameters
+        ----------
+        NEmaint: List[float]
+            List of net energy for maintenance requirement (Mcal) for all animals in pen
+        NEa: List[float]
+            List of Net energy for activity requirement (Mcal) for all animals in pen
+        NEg: List[float]
+            List of Net energy for growth requirement (Mcal) for all animals in pen
+        NEpreg: List[float]
+            List of Net energy requirement for pregnancy (Mcal) for all animals in pen
+        NEl: List[float]
+            List of Net energy requirement for lactation (Mcal) for all animals in pen
+        MP_req: List[float]
+            List of Metabolizable protein requirement for growth (g) for all animals in pen
+        Ca_req: List[float]
+            List of Calcium requirement (g) for all animals in pen
+        P_req: List[float]
+            List of Phosphorus requirement (g) for all animals in pen
+        DMIest: List[float] 
+            List of dry matter intake estimation (kg) for all animals in pen
+        BW: List[float]
+            List of body weight (kg) for all animals in the pen for all animals in pen
+        milk: List[float]
+            List of milk production of the animals in the pen (kg)
+        CP_milk: List[float] 
+            List of milk crude protein content of the animals in the pen.
+        milk_production_reduction: List[float]
+            list of milk_production_reduction values for all animals in the pen
+        use_the_mean: bool
+            True is mean should be used, False if percentile should be used.
+            TODO: implement this function in an elegant manner: 
+                e.g. should we move both the percentile value and decision to the constants file?
+        """
+        if use_the_mean == True:
+            # populating the class variables as an average across cows for each requirement
+            self.NEmaint = stat.mean(NEmaint)
+            self.NEa = stat.mean(NEa)
+            self.NEg = stat.mean(NEg)
+            self.NEpreg = stat.mean(NEpreg)
+            self.NEl = stat.mean(NEl)
+            self.MP_req = stat.mean(MP_req)
+            self.Ca_req = stat.mean(Ca_req)
+            self.P_req = stat.mean(P_req)
+            self.DMIest = stat.mean(DMIest)
+            self.avg_BW = stat.mean(BW)
+            self.avg_milk = stat.mean(milk)
+            self.avg_CP_milk = stat.mean(CP_milk)
+            self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
+        else:
+            requirement_percentile = 80
+            self.NEmaint = np.percentile(NEmaint, requirement_percentile)
+            self.NEa = np.percentile(NEa, requirement_percentile)
+            self.NEg = np.percentile(NEg, requirement_percentile)
+            self.NEpreg = np.percentile(NEpreg, requirement_percentile)
+            self.NEl = np.percentile(NEl, requirement_percentile)
+            self.MP_req = np.percentile(MP_req, requirement_percentile)
+            self.Ca_req = np.percentile(Ca_req, requirement_percentile)
+            self.P_req = np.percentile(P_req, requirement_percentile)
+            self.DMIest = np.percentile(DMIest, requirement_percentile)
+            self.avg_BW = np.percentile(BW, requirement_percentile)
+            self.avg_milk = np.percentile(milk, requirement_percentile)
+            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
+            self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
+        
     def set_requirements(self, pen, animal_type, recalc):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
@@ -368,63 +470,23 @@ class Requirements:
                 BW.append(animal.body_weight)
                 # milk.append(milk)
                 # CP_milk.append(CP_milk)
-        usethemean = True
-        if usethemean == True:
-            # populating the class variables as an average across cows for each requirement
-            self.NEmaint = stat.mean(NEmaint)
-            self.NEa = stat.mean(NEa)
-            self.NEg = stat.mean(NEg)
-            self.NEpreg = stat.mean(NEpreg)
-            self.NEl = stat.mean(NEl)
-            self.MP_req = stat.mean(MP_req)
-            self.Ca_req = stat.mean(Ca_req)
-            self.P_req = stat.mean(P_req)
-            self.DMIest = stat.mean(DMIest)
-            self.avg_BW = stat.mean(BW)
-            self.avg_milk = stat.mean(milk)
-            self.avg_CP_milk = stat.mean(CP_milk)
-            self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
-        else:
-            requirement_percentile = 80
-            self.NEmaint = np.percentile(NEmaint, requirement_percentile)
-            self.NEa = np.percentile(NEa, requirement_percentile)
-            self.NEg = np.percentile(NEg, requirement_percentile)
-            self.NEpreg = np.percentile(NEpreg, requirement_percentile)
-            self.NEl = np.percentile(NEl, requirement_percentile)
-            self.MP_req = np.percentile(MP_req, requirement_percentile)
-            self.Ca_req = np.percentile(Ca_req, requirement_percentile)
-            self.P_req = np.percentile(P_req, requirement_percentile)
-            self.DMIest = np.percentile(DMIest, requirement_percentile)
-            self.avg_BW = np.percentile(BW, requirement_percentile)
-            self.avg_milk = np.percentile(milk, requirement_percentile)
-            self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
-            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
-          
-        info_map = {"class": "no_caller_class",
-                    "function": ration_formulation.__name__,
-                    "pen_id": pen.id,
-                    "pen_animal_combination": pen.animal_combination._name_,
-                    }
+        
+        Requirements.set_pen_requirements(self, NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
+                               milk_production_reduction, use_the_mean = True)
+        
         # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
                               'NEg': self.NEg, 'NEpreg': self.NEpreg, 'NEl': self.NEl,
                               'MP_req': self.MP_req, 'Ca_req': self.Ca_req, 'P_req': self.P_req,
-                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW}
-        om.add_variable(f'avg_rqmts_for pen {pen.id} ', avg_nutrient_rqmts, info_map)
+                              'DMIest': self.DMIest, 'avg_BW': self.avg_BW,
+                              'avg_milk_production_reduction_pen': self.avg_milk_production_reduction,}
         
-        if pen.animal_combination.name == 'LAC_COW':
-            cow_summary = {'avg_BW_pen': self.avg_BW, 'avg_milk_pen': self.avg_milk,
-                                'avg_milk_production_reduction_pen': self.avg_milk_production_reduction,
-                                'cumulated_milk':sum(milk), 'num_animals':len(pen.animals_in_pen),}
-            for key in ['DMIest', 'mPrt', 'estimated_daily_milk_produced', 'days_in_milk', 'days_in_preg', 'calves']:
-                cow_summary[key]=[getattr(animal, key) for animal in pen.animals_in_pen]
-            om.add_variable(f'cow info for pen {pen.id} ', cow_summary, info_map)
-
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
-        om.add_variable("avg_nutrient_rqmts", avg_nutrient_rqmts, info_map)
+
+    
 
 
 class AvailableFeeds:

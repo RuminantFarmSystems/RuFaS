@@ -1112,9 +1112,7 @@ class AnimalManagement:
                 pen.populated = len(pen.animals_in_pen) > 0
 
             if self.end_ration_interval():
-                for pen in self.all_pens:
-                    if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name == 'CLOSE_UP' :
-                        self.reset_milk_production_reduction()
+                self.reset_milk_production_reduction()
 
             animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
                 self.heiferIIs, self.heiferIIIs, self.cows = \

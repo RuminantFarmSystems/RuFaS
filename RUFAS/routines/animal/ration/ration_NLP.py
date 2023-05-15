@@ -525,7 +525,6 @@ con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
 cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
 heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
 
-
 def optimize():
     """
     Calls the objective function and constraint functions and formulates
