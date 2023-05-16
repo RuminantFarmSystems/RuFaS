@@ -117,6 +117,7 @@ class Evapotranspiration:
             layer.water_content -= amount_water_removed
 
     # --- static methods ---
+    # TODO: remove me
     @staticmethod
     def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
                                                 min_air_temp: float,
@@ -145,6 +146,7 @@ class Evapotranspiration:
             return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
                     * (avg_air_temp + 17.8)) / latent_heat_vaporization
 
+    # TODO: remove me
     @staticmethod
     def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
         """determine latent heat of vaporization for a given day

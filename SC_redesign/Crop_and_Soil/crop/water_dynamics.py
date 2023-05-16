@@ -8,16 +8,13 @@ class WaterDynamics:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    def cycle_water(self, evaporation: float, transpiration: float, potential_evapotranspiration: float,
-                    potential_evapotranspiration_adjusted: float) -> None:
+    def cycle_water(self, evaporation: float, transpiration: float, potential_evapotranspiration: float) -> None:
         """executes the daily cycling of water between the plants, soil, and environment
 
         Args:
             evaporation: evaporation on a given day in mm
             transpiration: transpiration on a given day in mm
             potential_evapotranspiration: potential evapotranspiration on a given day in mm
-            potential_evapotranspiration_adjusted: potential evapotranspiration adjusted for evaporation of free water
-                the canopy in mm
 
         """
         self.data.cumulative_evaporation += evaporation
@@ -31,6 +28,53 @@ class WaterDynamics:
         # TODO: cumulative evaporation, transpiration, evapotranspiration, and maximum cumulative
         # evapotranspiration are all listed as yearly totals, but maximum transpiration is a daily value.
         # Do they need to calculated in separate methods?
+
+    def evaporate_from_canopy(self, potential_evapotranspiration: float) -> float:
+        """Evaporates water from the canopy.
+
+        Parameters
+        ----------
+        potential_evapotranspiration : float
+            Evapotranspirative demand on the field on the current day (mm)
+
+        Returns
+        -------
+        float
+            Amount evaporated from canopy (mm)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.1
+
+        Notes
+        -----
+        This method evaporates water from the crop's canopy until either 1) there is no more water in the canopy or 2)
+        there is no more evapotranspirative demand. It then returns the amount of water that was evaporated from the
+        canopy.
+
+        """
+        more_canopy_water_than_demand = self.data.canopy_water >= potential_evapotranspiration
+        if more_canopy_water_than_demand:
+            self.data.canopy_water -= potential_evapotranspiration
+            return potential_evapotranspiration
+        else:
+            amount_evaporated = self.data.canopy_water
+            self.data.canopy_water = 0
+            return amount_evaporated
+
+    def set_maximum_transpiration(self, potential_evapotranspiration_adjusted: float) -> None:
+        """Sets the maximum transpiration based on the adjusted potential evapotranspiration of this day.
+
+        Parameters
+        ----------
+        potential_evapotranspiration_adjusted : float
+            Evapotranspirative demand remaining after evaporating water in the canopy (mm)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.2
+
+        """
         self.data.max_transpiration = self._determine_maximum_transpiration(self.data.leaf_area_index,
                                                                             potential_evapotranspiration_adjusted)
 

@@ -1,6 +1,7 @@
 from math import exp
 
 import pytest
+from unittest.mock import MagicMock, patch
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.water_uptake import WaterUptake
@@ -42,8 +43,11 @@ def test_determine_max_water_uptake_to_depth():
 ])
 def test_uptake_water(max_trans):
     """ensure that uptake_water can run without error"""
-    crop_data = CropData()
-    crop_data.max_transpiration = max_trans
-    soil_data = SoilData(field_size=1.5)
-    wu = WaterUptake(crop_data)
-    wu.uptake_water(soil_data)  # The mocked NitrogenIncorporation.determine_layer_nutrient_demand breaks this...
+    # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
+    with patch("SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation."
+               "determine_layer_nutrient_demands", new_callable=MagicMock, return_value=[1, 2, 3, 4]):
+        crop_data = CropData()
+        crop_data.max_transpiration = max_trans
+        soil_data = SoilData(field_size=1.5)
+        wu = WaterUptake(crop_data)
+        wu.uptake_water(soil_data)
