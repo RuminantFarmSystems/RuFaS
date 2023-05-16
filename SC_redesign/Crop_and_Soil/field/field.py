@@ -357,8 +357,16 @@ class Field:
 
         Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
             whole-field. Therefore, it makes most sense for this process to take place within the field class rather
-            than in both the crop and soil classes. Water uptake by the crop will likely be an exception that should
-            take place during a crop's grow() method. Other exceptions may come up as these modules develop.
+            than in both the crop and soil classes. This method coordinates the evapotranspiration from the field on any
+            given day, by first calculating the evapotranspirative demand, the removing water from the elements in the
+            field in the order listed below. The removal of water does not stop until either all elements have had water
+            removed from them or the evapotranspirative demand has been satisfied. Order of elements evapotranspirated
+            from:
+                - Evaporation of water in canopies of crops.
+                - Sublimation of water in snow pack (not implemented in V1)
+                - Evaporation from the soil profile.
+                - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
+                    and this amount depends on the evapotranspirative demand after water has been removed from canopies)
         """
         total_precipitation = current_weather.rainfall
         precipitation_reaching_soil = self._handle_water_in_crop_canopy(total_precipitation)
