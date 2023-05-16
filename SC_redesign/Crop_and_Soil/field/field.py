@@ -377,7 +377,7 @@ class Field:
                                            avg_air_temp=current_weather.mean_air_temperature,
                                            above_ground_biomass=self._determine_total_above_ground_biomass(),
                                            residue=self.field_data.current_residue,
-                                           snow_water_content=current_weather.snow_fall,
+                                           snow_water_content=0,
                                            initial_canopy_free_water=total_initial_canopy_free_water,
                                            minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
@@ -426,6 +426,69 @@ class Field:
         for crop in self.crops:
             total_above_ground_biomass += crop.data.above_ground_biomass
         return total_above_ground_biomass
+
+    @staticmethod
+    def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
+                                                min_air_temp: float,
+                                                avg_air_temp: float) -> float:
+        """Calculates the potential evapotranspiration for a given day.
+
+        Parameters
+        ----------
+        extra_terrestrial_radiation : float
+            Radiation from the aliens (MJ per square meter per day)
+        max_air_temp : float
+            Maximum air temperature (degrees C)
+        min_air_temp : float
+            Minimum air temperature (degrees C)
+        avg_air_temp : float
+            Average air temperature (degrees C)
+
+        Returns
+        -------
+        float
+            potential evapotranspiration (mm per day)
+
+        References
+        ----------
+        SWAT Reference: 2:2.2.24
+
+        Notes
+        -----
+        This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
+        method.
+
+        """
+        if avg_air_temp is None:
+            calculated_avg_air_temp = (max_air_temp + min_air_temp) / 2
+            latent_heat_vaporization = Field._determine_latent_heat_vaporization(calculated_avg_air_temp)
+            return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
+                    * (calculated_avg_air_temp + 17.8)) / latent_heat_vaporization
+        else:
+            latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
+            return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
+                    * (avg_air_temp + 17.8)) / latent_heat_vaporization
+
+    @staticmethod
+    def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
+        """Determine latent heat of vaporization for a given day.
+
+        Parameters
+        ----------
+        avg_air_temp : float
+            Average air temperature (degrees C)
+
+        Returns
+        -------
+        float
+            latent heat of vaporization (MJ per kg)
+
+        References
+        ----------
+        SWAT Reference: 1:2.3.6
+
+        """
+        return 2.501 - ((2.361 * (10 ** (-3))) * avg_air_temp)
 
     # </editor-fold>
 
