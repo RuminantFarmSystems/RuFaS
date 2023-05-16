@@ -197,6 +197,43 @@ def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: floa
         assert field.crops[1].data.canopy_water == expected_second
 
 
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
+    (100, 28, 10, 14),
+    (568, 20, 14, 18),
+    (568, 20, 14, None),
+    (80, 14, 0, 8),
+    (678.0098, 26.8896, 10.3339, 18.3345),
+])
+def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
+    with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_latent_heat_vaporization",
+               new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
+        actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
+        if avg_temp is not None:
+            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                      (avg_temp + 17.8)) / 1.3
+        else:
+            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                      (((max_temp + min_temp) / 2) + 17.8)) / 1.3
+
+        if avg_temp is not None:
+            mocked_latent_heat.assert_called_once_with(avg_temp)
+        else:
+            mocked_latent_heat.assert_called_once_with((max_temp + min_temp) / 2)
+        assert actual == expect
+
+
+@pytest.mark.parametrize("avg_temp", [
+    12.86878,
+    0,
+    (-2.586948),
+    20.4486,
+])
+def test_determine_latent_heat_vaporization(avg_temp):
+    observe = Field._determine_latent_heat_vaporization(avg_temp)
+    expect = 2.501 - (0.002361 * avg_temp)
+    assert expect == observe
+
+
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
     field = Field()
