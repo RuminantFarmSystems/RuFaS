@@ -420,7 +420,6 @@ class Field:
 
         return precipitation_reaching_soil + excess_canopy_water
 
-
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0

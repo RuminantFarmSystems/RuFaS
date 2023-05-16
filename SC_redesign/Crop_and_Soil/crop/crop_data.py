@@ -311,11 +311,11 @@ class CropData:
     """Maximum amount of water that can be trapped in canopy on a given day when fully developed (mm).
         References: SWAT Theoretical documentation eqn. 2:2.1.1 (see also SWAT Input file .HRU ("CANMX" page 233).
         Note: this default is super arbitrary. It comes from the paper:
-            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated 
-            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western 
+            'Holder AJ, Rowe R, McNamara NP, Donnison IS, McCalmont JP. Soil & Water Assessment Tool (SWAT) simulated
+            hydrological impacts of land use change from temperate grassland to energy crops: A case study in western
             UK. GCB Bioenergy. 2019;11:1298–1317.  https ://doi.org/10.1111/gcbb.12628'
         which cites the following paper that I could not find:
-           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation. 
+           'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation.
             Scientia Agricultura Sinica, 39(9), 1859–1864.'
     """
 
