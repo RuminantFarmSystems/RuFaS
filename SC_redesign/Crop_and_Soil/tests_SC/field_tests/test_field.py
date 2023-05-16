@@ -177,7 +177,7 @@ def test_amend_soil() -> None:
                              (5, 10, 3, 12, 2, 8, 10)   # Fills one pool as much as possible, removes excess from
                                                         # another
                          ]
-)
+                         )
 def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
                                      second_canopy_amount: float, expected_return: float, expected_first: float,
                                      expected_second: float) -> None:
@@ -195,6 +195,7 @@ def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: floa
         assert actual == expected_return
         assert field.crops[0].data.canopy_water == expected_first
         assert field.crops[1].data.canopy_water == expected_second
+
 
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
