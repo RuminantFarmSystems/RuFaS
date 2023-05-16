@@ -351,15 +351,29 @@ class Field:
     def cycle_water(self, current_weather: CurrentWeather):
         """allow the water to cycle through the field.
 
-         Args:
-             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
+        Args:
+            current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
-         Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
-         whole-field. Therefore, it makes most sense for this process to take place within the field class rather
-         than in both the crop and soil classes. Water uptake by the crop will likely be an exception that should
-         take place during a crop's grow() method. Other exceptions may come up as these modules develop.
-         """
+        Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
+            whole-field. Therefore, it makes most sense for this process to take place within the field class rather
+            than in both the crop and soil classes. Water uptake by the crop will likely be an exception that should
+            take place during a crop's grow() method. Other exceptions may come up as these modules develop.
+        """
+        total_precipitation = current_weather.rainfall
+        precipitation_reaching_soil = self._handle_water_in_crop_canopy(total_precipitation)
+        self.soil.infiltration(precipitation_reaching_soil, 1)
+        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+
+        full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
+            current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
+            current_weather.mean_air_temperature)
+
+        remaining_evapotranspirative_demand = self._evaporate_from_crops_canopy(full_evapotranspirative_demand)
+
+        for crop in self.crops:
+            crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
+
         total_initial_canopy_free_water = 0
         for crop in self.crops:
             crop.water_dynamics.cycle_water()  # TODO: tweak this once water method sare more solidified.
@@ -420,6 +434,38 @@ class Field:
 
         return precipitation_reaching_soil + excess_canopy_water
 
+    def _evaporate_from_crops_canopy(self, evapotranspirative_demand: float) -> float:
+        """Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
+
+        Parameters
+        ----------
+        evapotranspirative_demand : float
+            Evapotranspirative demand on the field on the current day (mm)
+
+        Returns
+        -------
+        float
+            Evapotranspirative demand after evaporating water from crops' canopies (mm)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.1
+
+        Notes
+        -----
+        This method iterates through the crops in the field, for each determines how much water was evaporated from its
+        canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
+        reaches 0, then no more water should be evaporated so the method stops running.
+
+        """
+        remaining_evapotranspirative_demand = evapotranspirative_demand
+        for crop in self.crops:
+            amount_evaporated = crop.water_dynamics.evaporate_from_canopy(remaining_evapotranspirative_demand)
+            remaining_evapotranspirative_demand -= amount_evaporated
+            if remaining_evapotranspirative_demand == 0.0:
+                break
+        return remaining_evapotranspirative_demand
+
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
@@ -447,7 +493,7 @@ class Field:
         Returns
         -------
         float
-            potential evapotranspiration (mm per day)
+            potential evapotranspiration (mm)
 
         References
         ----------

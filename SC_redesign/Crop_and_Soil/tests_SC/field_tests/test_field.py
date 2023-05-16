@@ -170,12 +170,12 @@ def test_amend_soil() -> None:
 
 @pytest.mark.parametrize("precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
                          "expected_first,expected_second", [
-                             (13, 8, 2, 4, 3, 8, 8),    # Fills both pools with some leftover
-                             (6, 7, 3, 2, 0, 7, 4),     # Fills one pool, puts some in second, none leftover
-                             (14, 5, 7, 1, 12, 5, 5),   # Removes from one pool, fills other, some leftover
-                             (3, 6, 8, 9, 8, 6, 6),     # Removes from both pools, lots left over
-                             (5, 10, 3, 12, 2, 8, 10)   # Fills one pool as much as possible, removes excess from
-                                                        # another
+                             (13, 8, 2, 4, 3, 8, 8),  # Fills both pools with some leftover
+                             (6, 7, 3, 2, 0, 7, 4),  # Fills one pool, puts some in second, none leftover
+                             (14, 5, 7, 1, 12, 5, 5),  # Removes from one pool, fills other, some leftover
+                             (3, 6, 8, 9, 8, 6, 6),  # Removes from both pools, lots left over
+                             (5, 10, 3, 12, 2, 8, 10)  # Fills one pool as much as possible, removes excess from
+                             # another
                          ]
                          )
 def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
@@ -195,6 +195,29 @@ def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: floa
         assert actual == expected_return
         assert field.crops[0].data.canopy_water == expected_first
         assert field.crops[1].data.canopy_water == expected_second
+
+
+@pytest.mark.parametrize("demand,canopy_water_1,canopy_water_2,expected_demand,expected_canopy_water1,"
+                         "expected_canopy_water2", [
+                             (14.5, 1.8, 2.3, 10.4, 0.0, 0.0),
+                             (8.6, 4.7, 4.1, 0.0, 0.0, 0.2),
+                             (9.5, 10.8, 5.7, 0.0, 1.3, 5.7)
+                         ])
+def test_evaporate_from_crops_canopy(demand: float, canopy_water_1: float, canopy_water_2: float,
+                                     expected_demand: float, expected_canopy_water1: float,
+                                     expected_canopy_water2: float) -> None:
+    """Tests that the evapotranspirative demand is correctly reduced by the amounts of water evaporated."""
+    data1 = CropData(canopy_water=canopy_water_1)
+    crop1 = Crop(data1)
+    data2 = CropData(canopy_water=canopy_water_2)
+    crop2 = Crop(data2)
+    field = Field()
+    field.crops = [crop1, crop2]
+
+    actual_demand = field._evaporate_from_crops_canopy(demand)
+    assert pytest.approx(actual_demand) == expected_demand
+    assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
+    assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
 
 
 @pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
