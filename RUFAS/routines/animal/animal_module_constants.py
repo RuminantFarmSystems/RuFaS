@@ -22,5 +22,5 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_SEPARATOR = 'screw press'
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
 
-    DMI_CONSTRAINT_PERCENT = 0.1
+    DMI_CONSTRAINT_PERCENT = 0.125
     
