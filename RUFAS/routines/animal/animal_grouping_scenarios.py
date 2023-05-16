@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Union
 
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -12,28 +13,24 @@ from RUFAS.routines.animal.pen import Pen
 class AnimalGroupingScenario(Enum):
     """  
     The different scenarios for grouping animals on a farm.
-    Each scenario is a dictionary of the form: { Pen.AnimalCombination: [List of animal type/subtype names] }
+    Each scenario is a dictionary of the form: { Pen.AnimalCombination: [List of animal types/subtypes] }
 
-    Notes:
-        Each scenario must be both exhaustive and non-overlapping.
-
-        - Exhaustive: Each scenario must account for all animal types and subtypes present in that scenario.
-        - Non-overlapping: Each animal type or subtype must be associated with one and only one animal combination.
 
     """
     # TODO: Probably change the names of these scenarios to be more concise/descriptive. Add other scenarios as needed.
 
     CALF__GROWING__CLOSE_UP__LACCOW = {
-        Pen.AnimalCombination.CALF: ['Calf'],
-        Pen.AnimalCombination.GROWING: ['HeiferI', 'HeiferII'],
-        Pen.AnimalCombination.CLOSE_UP: ['HeiferIII', 'DryCow'],
-        Pen.AnimalCombination.LAC_COW: ['LacCow']
+        Pen.AnimalCombination.CALF: [AnimalType.CALF],
+        Pen.AnimalCombination.GROWING: [AnimalType.HEIFER_I, AnimalType.HEIFER_II],
+        Pen.AnimalCombination.CLOSE_UP: [AnimalType.HEIFER_III, AnimalType.DRY_COW],
+        Pen.AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
     }
 
     CALF__GROWING_AND_CLOSE_UP__LACCOW = {
-        Pen.AnimalCombination.CALF: ['Calf'],
-        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: ['HeiferI', 'HeiferII', 'HeiferIII', 'DryCow'],
-        Pen.AnimalCombination.LAC_COW: ['LacCow']
+        Pen.AnimalCombination.CALF: [AnimalType.CALF],
+        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: [AnimalType.HEIFER_I, AnimalType.HEIFER_II,
+                                                     AnimalType.HEIFER_III, AnimalType.DRY_COW],
+        Pen.AnimalCombination.LAC_COW: [AnimalType.LAC_COW]
     }
 
     def __init__(self, value):
@@ -49,86 +46,131 @@ class AnimalGroupingScenario(Enum):
 
         self._value_ = value
 
-        self._animal_combination_by_animal_name = {}  # key: animal type name, value: animal combination
-        for animal_combination, animal_names in self.value.items():
-            for animal_name in animal_names:
-                self._animal_combination_by_animal_name[animal_name] = animal_combination
+        self._animal_combination_by_animal_type = {}  # key: animal type, value: animal combination
+        for animal_combination, animal_types in self.value.items():
+            for animal_type in animal_types:
+                self._animal_combination_by_animal_type[animal_type] = animal_combination
 
     # Currently, we don't have subtypes for calves, heiferIs, heiferIIs, and heiferIIIs.
-    # Therefore, their names are the same as their class names.
-    def _get_calf_name(self, calf: Calf) -> str:
-        return 'Calf'
-
-    def _get_heiferI_name(self, heiferI: HeiferI) -> str:
-        return 'HeiferI'
-
-    def _get_heiferII_name(self, heiferII: HeiferII) -> str:
-        return 'HeiferII'
-
-    def _get_heiferIII_name(self, heiferIII: HeiferIII) -> str:
-        return 'HeiferIII'
-
-    def _get_cow_name(self, cow: Cow) -> str:
+    def _get_calf_type(self, calf: Calf) -> AnimalType:
         """
-        Get the name of the subtype that the given cow belongs to.
+        Get the animal subtype of the given calf.
 
-        Here, we create subtypes of cow based on certain characteristics depending on the current grouping scenario.
+        Parameters
+        ----------
+        calf : Calf
+            The calf to get the animal subtype of.
 
-        Make sure the subtype names must match those listed in the scenario dictionary above.
+        Returns
+        -------
+        AnimalType
+            The animal subtype of the given calf.
+
+        """
+
+        return AnimalType.CALF
+
+    def _get_heiferI_type(self, heiferI: HeiferI) -> AnimalType:
+        """
+        Get the animal subtype of the given heiferI.
+
+        Parameters
+        ----------
+        heiferI : HeiferI
+            The heiferI to get the animal subtype of.
+
+        Returns
+        -------
+        AnimalType
+            The animal subtype of the given heiferI.
+
+        """
+
+        return AnimalType.HEIFER_I
+
+    def _get_heiferII_type(self, heiferII: HeiferII) -> AnimalType:
+        """
+        Get the animal subtype of the given heiferII.
+
+        Parameters
+        ----------
+        heiferII : HeiferII
+            The heiferII to get the animal subtype of.
+
+        Returns
+        -------
+        AnimalType
+            The animal subtype of the given heiferII.
+
+        """
+
+        return AnimalType.HEIFER_II
+
+    def _get_heiferIII_type(self, heiferIII: HeiferIII) -> AnimalType:
+        """
+        Get the animal subtype of the given heiferIII.
+
+        Parameters
+        ----------
+        heiferIII : HeiferIII
+            The heiferIII to get the animal subtype of.
+
+        Returns
+        -------
+        AnimalType
+            The animal subtype of the given heiferIII.
+
+        """
+
+        return AnimalType.HEIFER_III
+
+    def _get_cow_type(self, cow: Cow) -> AnimalType:
+        """
+        Get the animal subtype of the given cow.
 
         Parameters
         ----------
         cow : Cow
-            The cow to get the subtype name for.
+            The cow to get the animal subtype of.
 
         Returns
         -------
-        str
-            The name of the subtype that the given cow belongs to.
+        AnimalType
+            The animal subtype of the given cow.
 
         """
 
-        cow_name_by_scenario = {
-            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: 'LacCow' if cow.is_lactating else 'DryCow',
-            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: 'LacCow' if cow.is_lactating else 'DryCow'
+        cow_subtype_by_scenario = {
+            AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW: AnimalType.LAC_COW if cow.is_lactating
+            else AnimalType.DRY_COW,
+
+            AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW: AnimalType.LAC_COW if cow.is_lactating
+            else AnimalType.DRY_COW,
         }
-        return cow_name_by_scenario[self]
+        return cow_subtype_by_scenario[self]
 
-    def get_all_animal_names(self) -> list[str]:
+    def get_animal_type(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> AnimalType:
         """
-        Get a list of all animal names in the scenario.
-
-        Returns
-        -------
-        list[str]
-            A list of all animal names in the scenario.
-
-        """
-
-        return list(self._animal_combination_by_animal_name.keys())
-
-    def get_animal_name(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]):
-        """
-        Get the name of the given animal.
+        Get the animal type of the given animal.
 
         Parameters
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-            The animal to get the animal name for.
+            The animal to get the animal type of.
 
         Returns
         -------
-        str
-            The name of the given animal.
+        AnimalType
+            The animal type of the given animal.
 
         """
 
         return {
-            Calf: self._get_calf_name,
-            HeiferI: self._get_heiferI_name,
-            HeiferII: self._get_heiferII_name,
-            HeiferIII: self._get_heiferIII_name,
-            Cow: self._get_cow_name
+            Calf: self._get_calf_type,
+            HeiferI: self._get_heiferI_type,
+            HeiferII: self._get_heiferII_type,
+            HeiferIII: self._get_heiferIII_type,
+            Cow: self._get_cow_type
         }[type(animal)](animal)  # type: ignore
 
     def find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) -> Pen.AnimalCombination:
@@ -147,5 +189,5 @@ class AnimalGroupingScenario(Enum):
 
         """
 
-        animal_name = self.get_animal_name(animal)
-        return self._animal_combination_by_animal_name[animal_name]
+        animal_type = self.get_animal_type(animal)
+        return self._animal_combination_by_animal_type[animal_type]

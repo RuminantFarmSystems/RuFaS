@@ -14,7 +14,7 @@ classDiagram
         CALF__GROWING__CLOSE_UP__LACCOW : Dict[AnimalCombination, List[str]]
         CALF__GROWING_AND_CLOSE_UP__LACCOW : Dict[AnimalCombination, List[str]]
         -type_name_by_scenario : Dict[AnimalGroupingScenario, str]
-        +get_animal_name(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) str
+        +get_animal_type(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) str
         +find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) AnimalCombination
     }
 
