@@ -18,11 +18,12 @@ import collections
 import math
 import random
 from statistics import mean
-from typing import Any, Dict, Tuple, List
+from typing import Any, Dict, Tuple, List, Set
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.clustering_pen_grouping import grouping
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -76,18 +77,29 @@ class AnimalManagement:
         Pen.AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
         Pen.AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
         Pen.AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
-        Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN
+        Pen.AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
+        Pen.AnimalCombination.GROWING_AND_CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
 
     ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
+    # ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
 
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
         """
         Sets the animal grouping scenario to the given scenario.
-        Parameters    ----------    scenario : AnimalGroupingScenario        The scenario to set the animal grouping scenario to.
-        Returns    -------    None
+
+        Parameters
+        ----------
+        scenario : AnimalGroupingScenario
+                The scenario to set the animal grouping scenario to.
+
+        Returns
+        -------
+        None
+
         """
+
         cls.ANIMAL_GROUPING_SCENARIO = scenario
 
     @staticmethod
@@ -1430,35 +1442,23 @@ class AnimalManagement:
             if pen.is_populated:
                 pen.subset_class_feeds(feed)
                 pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
-                classes_in_pen = self._get_classes_in_pen(pen)
 
                 ration_per_animal = {}
                 ration_vals = {}
-                while True:  # TODO: Change the condition to check for non-optimal status
-                    # TODO: Should probably use pen animal combinations instead
-                    # TODO: We want to avoid hard-coding the classes in the pen
-                    if 'Calf' in classes_in_pen:
+
+                counter = 1
+                while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
+                    if pen.animal_combination == Pen.AnimalCombination.CALF:
                         ration_per_animal = calf_optimize()
                         ration_vals = {'ME_tot': 0}
-
-                    elif classes_in_pen.intersection({'HeiferI', 'HeiferII', 'HeiferIII'}):
+                    else:
                         ration_per_animal, ration_vals = \
-                            ration_driver.ration_formulation(pen, pen_specific_feed_data, 'heifer', False)
+                            ration_driver.ration_formulation(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
 
-                    elif 'LacCow' in classes_in_pen:
-                        ration_per_animal, ration_vals = \
-                            ration_driver.ration_formulation(pen, pen_specific_feed_data, 'cow', True)
-
-                    elif 'DryCow' in classes_in_pen:
-                        ration_per_animal, ration_vals = \
-                            ration_driver.ration_formulation(pen, pen_specific_feed_data, 'cow', False)
-
-                    else:  # this should never occur
-                        print('error in pen ration calculation')
-                        ration_per_animal = {'status': 'Infeasible'}
-
-                    if ration_per_animal['status'] == 'Optimal':
-                        break
+                    # TODO: Remove this check before merging to master
+                    counter += 1
+                    if counter > 50:
+                        raise Exception('Too many attempts at optimizing ration.')
 
                 # recording ration nutrition information in pen
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
@@ -1471,29 +1471,55 @@ class AnimalManagement:
                     animal.set_ration(ration_per_animal, nutrient_amount['dm'])
                     animal.set_p_intake(nutrient_amount['phosphorus'], nutrient_conc['phosphorus'])
 
-                ration = {}
+                ration_per_pen = {}
                 num_animals = len(pen.animals_in_pen)
                 for key in ration_per_animal:
                     if key == 'status':
-                        ration[key] = ration_per_animal[key]
+                        ration_per_pen[key] = ration_per_animal[key]
                     else:  # feeds and price
-                        ration[key] = ration_per_animal[key] * num_animals
+                        ration_per_pen[key] = ration_per_animal[key] * num_animals
 
-                pen.ration = ration
+                pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
 
     @classmethod
-    def _get_classes_in_pen(cls, pen: Pen):
+    def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
         """
-        Get the classes of animals in the pen.
+        Get the animal types in the pen.
 
         Notes
         -----
-        This method returns a set of animal names. By definition of a set, there will be no repeats.
+        This method returns a set of animal types. By definition of a set, there will be no repeats.
         Note that removing an animal from a pen doesn't necessarily mean that we can remove the animal's
-        name from the set, because there may still be other animals with the same name in the pen.
+        type from the set, because there may still be other animals with the same type in the pen.
         Therefore, to improve efficiency, if there is a need to remove multiple animals at the same time,
         this method should be called after all the animals have been removed.
+
+        Parameters
+        ----------
+        pen : Pen
+            The pen to get the animal types from.
+
+        Returns
+        -------
+        Set
+            The set of animal types in the pen.
+
+        """
+
+        animal_types_in_pen = set()
+        for animal in pen.animals_in_pen:
+            animal_type = cls.ANIMAL_GROUPING_SCENARIO.get_animal_type(animal)
+            animal_types_in_pen.add(animal_type)
+
+        return animal_types_in_pen
+
+    @classmethod
+    def _get_classes_in_pen(cls, pen: Pen) -> Set[str]:
+        """
+        Get the classes of animals in the pen.
+
+        Eventually, we want to get rid of this method and use _get_animal_types_in_pen() instead.
 
         Parameters
         ----------
@@ -1507,11 +1533,8 @@ class AnimalManagement:
 
         """
 
-        classes_in_pen = set()
-        for animal in pen.animals_in_pen:
-            animal_name = cls.ANIMAL_GROUPING_SCENARIO.get_animal_name(animal)
-            classes_in_pen.add(animal_name)
-        return classes_in_pen
+        animal_types_in_pen = cls._get_animal_types_in_pen(pen)
+        return {animal_type.value for animal_type in animal_types_in_pen}
 
     # New version of daily_updates
     def daily_updates2(self, feed, weather, time):
@@ -1559,19 +1582,19 @@ class AnimalManagement:
 
             # Find those animals that were present before but not now
             # Reasons for removal: graduated, sold, culled
-            calves_removed_after_update = calves_before_update.difference(set(self.calves))
-            heiferIs_removed_after_update = heiferIs_before_update.difference(set(self.heiferIs))
-            heiferIIs_removed_after_update = heiferIIs_before_update.difference(set(self.heiferIIs))
-            heiferIIIs_removed_after_update = heiferIIIs_before_update.difference(set(self.heiferIIIs))
-            cows_removed_after_update = cows_before_update.difference(set(self.cows))
+            calves_removed_after_update = calves_before_update - set(self.calves)
+            heiferIs_removed_after_update = heiferIs_before_update - set(self.heiferIs)
+            heiferIIs_removed_after_update = heiferIIs_before_update - set(self.heiferIIs)
+            heiferIIIs_removed_after_update = heiferIIIs_before_update - set(self.heiferIIIs)
+            cows_removed_after_update = cows_before_update - set(self.cows)
 
             # Find and combine all the animals that haven't changed their classes
             # '|' is the union operator for sets
-            animals_with_unchanged_class = calves_before_update.intersection(set(self.calves)) \
-                                          | heiferIs_before_update.intersection(set(self.heiferIs)) \
-                                          | heiferIIs_before_update.intersection(set(self.heiferIIs)) \
-                                          | heiferIIIs_before_update.intersection(set(self.heiferIIIs)) \
-                                          | cows_before_update.intersection(set(self.cows))
+            animals_with_unchanged_class = (calves_before_update & set(self.calves)) \
+                                             | (heiferIs_before_update & set(self.heiferIs)) \
+                                             | (heiferIIs_before_update & set(self.heiferIIs)) \
+                                             | (heiferIIIs_before_update & set(self.heiferIIIs)) \
+                                             | (cows_before_update & set(self.cows))
             # Now, out of those animals, find the ones that have changed their animal combination
             # Then, we remove them from their old pens and add them to their new pens
             animals_with_unchanged_class_and_changed_combination = []
@@ -1588,10 +1611,10 @@ class AnimalManagement:
                 del self.animal_to_pen_id_map[animal.id]
 
             # Find the graduated animals
-            heiferIs_from_graduated_calves = list(set(self.heiferIs).difference(heiferIs_before_update))
-            heiferIIs_from_graduated_heiferIs = list(set(self.heiferIIs).difference(heiferIIs_before_update))
-            heiferIIIs_from_graduated_heiferIIs = list(set(self.heiferIIIs).difference(heiferIIIs_before_update))
-            cows_from_graduated_heiferIIIs = list(set(self.cows).difference(cows_before_update))
+            heiferIs_from_graduated_calves = list(set(self.heiferIs) - heiferIs_before_update)
+            heiferIIs_from_graduated_heiferIs = list(set(self.heiferIIs) - heiferIIs_before_update)
+            heiferIIIs_from_graduated_heiferIIs = list(set(self.heiferIIIs) - heiferIIIs_before_update)
+            cows_from_graduated_heiferIIIs = list(set(self.cows) - cows_before_update)
 
             for animal in [*heiferIs_from_graduated_calves, *heiferIIs_from_graduated_heiferIs,
                            *heiferIIIs_from_graduated_heiferIIs, *cows_from_graduated_heiferIIIs,
