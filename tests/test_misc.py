@@ -537,7 +537,7 @@ def output_manager_original_method_states(
         "save_logs": mock_output_manager.save_logs,
         "save_warnings": mock_output_manager.save_warnings,
         "save_errors": mock_output_manager.save_errors,
-        "save_variable_names": mock_output_manager.save_variable_names,
+        "collect_variable_names_and_contexts": mock_output_manager.collect_variable_names_and_contexts,
     }
 
 
@@ -551,7 +551,7 @@ def test_save_all_pools(
     mock_output_manager.save_warnings = MagicMock()
     mock_output_manager.save_logs = MagicMock()
     mock_output_manager.save_variables = MagicMock()
-    mock_output_manager.save_variable_names = MagicMock()
+    mock_output_manager.collect_variable_names_and_contexts = MagicMock()
 
     mock_output_manager.save_all_pools(path, exclude_info_maps=False)
 
@@ -561,7 +561,7 @@ def test_save_all_pools(
     mock_output_manager.save_variables.assert_called_once_with(
         path, exclude_info_maps=False
     )
-    mock_output_manager.save_variable_names.assert_called_once_with(path)
+    mock_output_manager.collect_variable_names_and_contexts.assert_called_once_with(path, exclude_info_maps=False)
 
     mock_output_manager.save_all_pools(path, exclude_info_maps=True)
     mock_output_manager.save_variables.assert_called_with(path, exclude_info_maps=True)
@@ -580,8 +580,8 @@ def test_save_all_pools(
     mock_output_manager.save_errors = output_manager_original_method_states[
         "save_errors"
     ]
-    mock_output_manager.save_variable_names = output_manager_original_method_states[
-        "save_variable_names"
+    mock_output_manager.collect_variable_names_and_contexts = output_manager_original_method_states[
+        "collect_variable_names_and_contexts"
     ]
 
 
@@ -694,20 +694,20 @@ def test_save_errors(
     ]
 
 
-def test_save_variable_names(
+def test_collect_variable_names_and_contexts(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_variable_names in output_manager.py"""
+    """Test case for function collect_variable_names_and_contexts in output_manager.py"""
     dummy_list = []
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.save_variable_names("dummy_path")
+    mock_output_manager.collect_variable_names_and_contexts("dummy_path", exclude_info_maps=False)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
-        dummy_list, os.path.join("dummy_path", "dummy_name")
+        dummy_list, os.path.join("dummy_path", "dummy_name",), exclude_info_maps=False
     )
 
     # Restore original methods
@@ -730,8 +730,9 @@ def test_list_to_file_txt(
 
     mock_output_manager._list_to_file_txt(dummy_list, dummy_file_path)
     with open(dummy_file_path) as read_dummy_file:
-        dummy_file_content = read_dummy_file.read().strip().split('\n')
-    assert dummy_file_content == dummy_list
+        dummy_file_content = read_dummy_file.read().strip()
+    assert "This simulation ran including info maps" in dummy_file_content
+    assert "apple\nbanana\ncherry" in dummy_file_content
 
     with pytest.raises(TypeError) as e:
         mock_output_manager._list_to_file_txt(1234, dummy_file_path)
