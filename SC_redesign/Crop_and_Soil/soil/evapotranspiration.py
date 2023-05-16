@@ -50,7 +50,6 @@ class Evapotranspiration:
             avg_air_temp)
         self.data.potential_evapotranspiration_adjusted = self._determine_potential_evapotranspiration_adjusted(
             initial_canopy_free_water)
-        # TODO: add attribute (in CropData?) to track amount of free water in canopy as it gets adjusted - issue #316
         self.data.soil_evaporation_adjusted = self._determine_soil_evaporation_adjusted(
             above_ground_biomass,
             residue,
@@ -117,7 +116,6 @@ class Evapotranspiration:
             layer.water_content -= amount_water_removed
 
     # --- static methods ---
-    # TODO: remove me
     @staticmethod
     def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
                                                 min_air_temp: float,
@@ -146,7 +144,6 @@ class Evapotranspiration:
             return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
                     * (avg_air_temp + 17.8)) / latent_heat_vaporization
 
-    # TODO: remove me
     @staticmethod
     def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
         """determine latent heat of vaporization for a given day

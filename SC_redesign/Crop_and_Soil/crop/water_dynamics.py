@@ -25,9 +25,6 @@ class WaterDynamics:
                                                self.data.cumulative_transpiration)
         self.data.water_deficiency = self._determine_water_deficiency(self.data.cumulative_evapotranspiration,
                                                                       self.data.cumulative_potential_evapotranspiration)
-        # TODO: cumulative evaporation, transpiration, evapotranspiration, and maximum cumulative
-        # evapotranspiration are all listed as yearly totals, but maximum transpiration is a daily value.
-        # Do they need to calculated in separate methods?
 
     def evaporate_from_canopy(self, potential_evapotranspiration: float) -> float:
         """Evaporates water from the canopy.

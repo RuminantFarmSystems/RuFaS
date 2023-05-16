@@ -39,7 +39,7 @@ def test_determine_max_water_uptake_to_depth():
 
 
 @pytest.mark.parametrize("max_trans", [
-    (5)
+    5
 ])
 def test_uptake_water(max_trans):
     """ensure that uptake_water can run without error"""
