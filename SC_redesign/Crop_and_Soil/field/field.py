@@ -369,7 +369,7 @@ class Field:
                     and this amount depends on the evapotranspirative demand after water has been removed from canopies)
         """
         total_precipitation = current_weather.rainfall
-        precipitation_reaching_soil = self._handle_water_in_crop_canopy(total_precipitation)
+        precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
         self.soil.infiltration(precipitation_reaching_soil, 1)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
 
@@ -377,7 +377,7 @@ class Field:
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
             current_weather.mean_air_temperature)
 
-        remaining_evapotranspirative_demand = self._evaporate_from_crops_canopy(full_evapotranspirative_demand)
+        remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
         for crop in self.crops:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
@@ -404,7 +404,7 @@ class Field:
                                            minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
 
-    def _handle_water_in_crop_canopy(self, precipitation_total: float) -> float:
+    def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.
 
         Parameters
@@ -442,7 +442,7 @@ class Field:
 
         return precipitation_reaching_soil + excess_canopy_water
 
-    def _evaporate_from_crops_canopy(self, evapotranspirative_demand: float) -> float:
+    def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
         """Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
 
         Parameters

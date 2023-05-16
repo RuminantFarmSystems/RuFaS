@@ -178,9 +178,9 @@ def test_amend_soil() -> None:
                              # another
                          ]
                          )
-def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
-                                     second_canopy_amount: float, expected_return: float, expected_first: float,
-                                     expected_second: float) -> None:
+def test_handle_water_in_crop_canopies(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
+                                       second_canopy_amount: float, expected_return: float, expected_first: float,
+                                       expected_second: float) -> None:
     """Tests that water is properly added and removed from the crop canopies of field objects."""
     with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.water_canopy_storage_capacity",
                new_callable=PropertyMock, return_value=canopy_capacity):
@@ -191,7 +191,7 @@ def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: floa
         field = Field()
         field.crops = [crop1, crop2]
 
-        actual = field._handle_water_in_crop_canopy(precipitation)
+        actual = field._handle_water_in_crop_canopies(precipitation)
         assert actual == expected_return
         assert field.crops[0].data.canopy_water == expected_first
         assert field.crops[1].data.canopy_water == expected_second
@@ -203,9 +203,9 @@ def test_handle_water_in_crop_canopy(precipitation: float, canopy_capacity: floa
                              (8.6, 4.7, 4.1, 0.0, 0.0, 0.2),
                              (9.5, 10.8, 5.7, 0.0, 1.3, 5.7)
                          ])
-def test_evaporate_from_crops_canopy(demand: float, canopy_water_1: float, canopy_water_2: float,
-                                     expected_demand: float, expected_canopy_water1: float,
-                                     expected_canopy_water2: float) -> None:
+def test_evaporate_from_crop_canopies(demand: float, canopy_water_1: float, canopy_water_2: float,
+                                      expected_demand: float, expected_canopy_water1: float,
+                                      expected_canopy_water2: float) -> None:
     """Tests that the evapotranspirative demand is correctly reduced by the amounts of water evaporated."""
     data1 = CropData(canopy_water=canopy_water_1)
     crop1 = Crop(data1)
@@ -214,7 +214,7 @@ def test_evaporate_from_crops_canopy(demand: float, canopy_water_1: float, canop
     field = Field()
     field.crops = [crop1, crop2]
 
-    actual_demand = field._evaporate_from_crops_canopy(demand)
+    actual_demand = field._evaporate_from_crop_canopies(demand)
     assert pytest.approx(actual_demand) == expected_demand
     assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
     assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
