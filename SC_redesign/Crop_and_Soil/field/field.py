@@ -1,12 +1,10 @@
-from typing import Optional, List, Dict
-from math import exp
-
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from typing import Optional, List, Dict
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
 # TODO: delete/replace the note block below once satisfied with the design
@@ -156,7 +154,6 @@ class Field:
             For example, if we need to plant a crop today, this method will set `self.field_data.is_planting_day=True`.
          """
         pass
-
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
@@ -348,7 +345,6 @@ class Field:
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False
-
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
@@ -383,26 +379,8 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        weighted_transpiration_total = 0.0
-        weights_sum = 0.0
         for crop in self.crops:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
-            weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
-            weights_sum += crop.data.field_proportion
-        weighted_average_transpiration = weighted_transpiration_total / weights_sum
-
-        # TODO: Implement snow (melting and sublimation) - issue #317
-        snow_water_content = 0
-        above_ground_biomass = self._determine_total_above_ground_biomass()
-
-        soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
-            above_ground_biomass, self.soil.data.plant_surface_residue, snow_water_content,
-            remaining_evapotranspirative_demand, weighted_average_transpiration)
-
-        # TODO: sublimate and adjust soil_evaporation_and_sublimation_amount here - issue #317
-
-        amount_evaporated_from_soil = self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
-        remaining_evapotranspirative_demand -= amount_evaporated_from_soil
 
         total_initial_canopy_free_water = 0
         for crop in self.crops:
@@ -565,73 +543,6 @@ class Field:
 
         """
         return 2.501 - ((2.361 * (10 ** (-3))) * avg_air_temp)
-
-    @staticmethod
-    def _determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass: float, residue: float,
-                                                             snow_water_content: float,
-                                                             potential_evapotranspiration_adjusted: float,
-                                                             transpiration: float) -> float:
-        """Calculate the amount of sublimation and soil evaporation for this day, adjusted for plant use.
-
-        Parameters
-        ----------
-        above_ground_biomass : float
-            Mass of plant above ground (kg per hectare)
-        residue : float
-            Biomass separated from plant on the ground (kg per hectare)
-        snow_water_content : float
-            Amount of water in the snow pack (mm)
-        potential_evapotranspiration_adjusted : float
-            Potential evapotranspiration adjusted for evaporation of free water in canopy (mm)
-        transpiration : float
-            Maximum transpiration for a given day (mm)
-
-        Returns
-        -------
-        float
-            Soil evaporation and sublimation, adjusted for plant water use (mm)
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 2:2.3.7, 9
-
-        """
-        soil_cover_index = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water_content)
-        max_soil_evaporation_sublimation = potential_evapotranspiration_adjusted * soil_cover_index
-        adjusted_soil_evaporation_sublimation = \
-            (max_soil_evaporation_sublimation * potential_evapotranspiration_adjusted) / \
-            (max_soil_evaporation_sublimation + transpiration)
-        actual_soil_evaporation_sublimation = min(max_soil_evaporation_sublimation,
-                                                  adjusted_soil_evaporation_sublimation)
-        return actual_soil_evaporation_sublimation
-
-    @staticmethod
-    def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
-        """Calculate the soil cover index.
-
-        Parameters
-        ----------
-        above_ground_biomass : float
-            Mass of plant above ground (kg per hectare)
-        residue : float
-            Biomass separated from plant on the ground (kg per hectare)
-        snow_water_content : float
-            Amount of water from snow (mm)
-
-        Returns
-        -------
-        Float
-            Soil cover index (unitless)
-
-        References
-        ----------
-        SWAT Theoretical documentation eqn. 2:2.3.8
-
-        """
-        if snow_water_content > 0.5:
-            return 0.5
-        else:
-            return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
 
     # </editor-fold>
 
