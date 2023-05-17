@@ -308,10 +308,7 @@ class SoilData:
         self.initial_nitrates_total = self.profile_nitrates_total
 
         # Reset hydrological activity totals
-        self.annual_potential_evapotranspiration_total = 0
-        self.annual_adjusted_potential_evapotranspiration_total = 0
-        self.annual_maximum_soil_evaporation_total = 0
-        self.annual_adjusted_soil_evaporation_total = 0
+        self.annual_soil_evaporation_total = 0
         self.annual_runoff_total = 0
 
         # Reset erosion activity totals

@@ -37,6 +37,13 @@ class Evaporation:
         float
             Actual amount of water evaporated from the soil on a given day (mm)
 
+        Notes
+        -----
+        This method takes in a maximum amount of water that may be evaporated from the soil profile, then iterates over
+        the layers in the soil profile and determines how much to evaporate from that layer. If the amount determined to
+        be evaporated would put the total amount of evaporation over the limit, the amount is reduced to meet the limit
+        exactly and the loop is exited after evaporating the reduced amount from the current layer.
+
         """
         amount_available_for_evaporation = maximum_soil_water_evaporation
         for layer in self.data.soil_layers:
