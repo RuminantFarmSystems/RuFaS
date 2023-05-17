@@ -383,10 +383,13 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
-        total_transpiration = 0.0
+        weighted_transpiration_total = 0.0
+        weights_sum = 0.0
         for crop in self.crops:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
-            total_transpiration += crop.data.max_transpiration
+            weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
+            weights_sum += crop.data.field_proportion
+        weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
         # TODO: Implement snow (melting and sublimation) - issue #317
         snow_water_content = 0
@@ -394,7 +397,12 @@ class Field:
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
             above_ground_biomass, self.soil.data.plant_surface_residue, snow_water_content,
-            remaining_evapotranspirative_demand, total_transpiration)
+            remaining_evapotranspirative_demand, weighted_average_transpiration)
+
+        # TODO: sublimate and adjust soil_evaporation_and_sublimation_amount here - issue #317
+
+        amount_evaporated_from_soil = self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
+        remaining_evapotranspirative_demand -= amount_evaporated_from_soil
 
         total_initial_canopy_free_water = 0
         for crop in self.crops:
@@ -624,6 +632,36 @@ class Field:
             return 0.5
         else:
             return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
+
+    # TODO: this method will not be used until sublimation is implemented - issue #317
+    @staticmethod
+    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
+        """Calculates the maximum amount of evaporation from soil in a given day
+
+        Parameters
+        ----------
+        soil_evaporation_adj : float
+            Maximum soil evaporation adjusted for plant water use on a given day (mm)
+        snow_water_content : float
+            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
+
+        TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
+            (2:2.3.3) mean the same thing
+
+        Returns
+        -------
+        float
+            Maximum soil water evaporation on a given day (mm)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.3.1
+
+        """
+        if soil_evaporation_adj < snow_water_content:
+            return 0
+        else:
+            return soil_evaporation_adj - snow_water_content
 
     # </editor-fold>
 
