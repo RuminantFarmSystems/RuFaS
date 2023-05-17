@@ -383,8 +383,18 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
+        total_transpiration = 0.0
         for crop in self.crops:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
+            total_transpiration += crop.data.max_transpiration
+
+        # TODO: Implement snow (melting and sublimation) - issue #317
+        snow_water_content = 0
+        above_ground_biomass = self._determine_total_above_ground_biomass()
+
+        soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
+            above_ground_biomass, self.soil.data.plant_surface_residue, snow_water_content,
+            remaining_evapotranspirative_demand, total_transpiration)
 
         total_initial_canopy_free_water = 0
         for crop in self.crops:

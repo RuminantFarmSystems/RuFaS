@@ -24,44 +24,23 @@ class Evapotranspiration:
         self.data = soil_data or SoilData(field_size=field_size)
 
     # --- main routine ---
-    def evapotranspirate(self, extraterrestrial_radiation: float, max_air_temp: float, min_air_temp: float,
-                         avg_air_temp: float, above_ground_biomass: float, residue: float, snow_water_content: float,
-                         initial_canopy_free_water: float) -> None:
-        """executes evapotranspiration processes on nh the soil on a given day
+    def evapotranspirate(self, soil_evaporation_demand: float) -> None:
+        """executes evapotranspiration processes on the soil on a given day
 
         Details: calculates and stores the potential evapotranspiration, soil evaporation in the SoilData object
 
-        Args:
-            extraterrestrial_radiation: radiation from the aliens, in MJ per square meter per day
-                TODO: better description
-            max_air_temp: maximum air temperature (degrees C)
-            min_air_temp: minimum air temperature (degrees C)
-            avg_air_temp: average air temperature (degrees C)
-            above_ground_biomass: mass of plant above ground (kg per hectare)
-            residue: biomass separated from plant on the ground (kg per hectare)
-            snow_water_content: amount of water from snow (mm)
-            initial_canopy_free_water: initial amount of free water held in canopy on a given day (mm)
-
         """
-        self.data.potential_evapotranspiration = self._determine_potential_evapotranspiration(
-            extraterrestrial_radiation,
-            max_air_temp,
-            min_air_temp,
-            avg_air_temp)
-        self.data.potential_evapotranspiration_adjusted = self._determine_potential_evapotranspiration_adjusted(
-            initial_canopy_free_water)
-        self.data.soil_evaporation_adjusted = self._determine_soil_evaporation_adjusted(
-            above_ground_biomass,
-            residue,
-            snow_water_content,
-            self.data.potential_evapotranspiration_adjusted,
-            self.data.transpiration)
-        self.data.maximum_soil_evaporation = self._determine_maximum_soil_evaporation(
-            self.data.soil_evaporation_adjusted,
-            snow_water_content)
-        # TODO: snow water content needs to be tracked and adjusted as time goes by (in SoilData or by a weather
-        #  monitor?) - issue #317
-        self._evaporate_from_soil()
+        for layer in self.data.soil_layers:
+            evaporative_demand = self._determine_layer_evaporative_demand(
+                self.data.maximum_soil_evaporation, layer.top_depth, layer.bottom_depth,
+                layer.soil_evaporation_compensation_coefficient)
+            evaporative_demand_reduced = self._determine_evaporative_demand_reduced(
+                evaporative_demand, layer.water_content, layer.field_capacity_content, layer.wilting_point_content)
+            amount_water_removed = self._determine_amount_water_removed(
+                evaporative_demand_reduced, layer.water_content, layer.wilting_point_content)
+
+            # remove water from soil water content
+            layer.water_content -= amount_water_removed
 
         # Update accumulated (annual) totals
         self.data.annual_potential_evapotranspiration_total += self.data.potential_evapotranspiration
