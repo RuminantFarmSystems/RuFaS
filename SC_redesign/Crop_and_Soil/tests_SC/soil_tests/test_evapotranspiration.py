@@ -39,45 +39,6 @@ import pytest
 #         Evapotranspiration._determine_latent_heat_vaporization.assert_called_once()
 
 
-# @pytest.mark.parametrize("avg_temp", [
-#     12.86878,
-#     0,
-#     (-2.586948),
-#     20.4486,
-# ])
-# def test_determine_latent_heat_vaporization(avg_temp):
-#     observe = Evapotranspiration._determine_latent_heat_vaporization(avg_temp)
-#     expect = 2.501 - (0.002361 * avg_temp)
-#     assert expect == observe
-
-
-# @pytest.mark.parametrize("above_ground_biomass,residue,snow_water,potential_evapotrans_adj, transpiration", [
-#     (800, 40, 0.3, 1.6, 0.9),  # arbitrary
-#     (1200, 300, 0.433, 2.4, 1.8),  # arbitrary
-#     (0, 800, 0.03, 0, 3.6),  # after harvest
-#     (800, 56, 0.84, 0.44, 0.23),  # snowy
-#     (0, 0, 0.22, 0.69, 0.45),  # empty field
-#     (400, 150, 0, 0.01, 0),  # dry conditions
-#     (500, 200, 0, 6.3, 4.5),  # wet conditions
-# ])
-# def test_determine_soil_evaporation(above_ground_biomass, residue, snow_water, potential_evapotrans_adj,
-# transpiration):
-#     soil_cover_index = Evapotranspiration._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
-#     soil_evaporation = potential_evapotrans_adj * soil_cover_index
-#     reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / (soil_evaporation + transpiration)
-#     actual_soil_evaporation = min(soil_evaporation, reduced_soil_evaporation)
-#     observe = Evapotranspiration._determine_soil_evaporation_adjusted(above_ground_biomass, residue, snow_water,
-#                                                                       potential_evapotrans_adj, transpiration)
-#     assert actual_soil_evaporation == observe
-#
-#     # Check that _determine_soil_cover_index() is being called once
-#     with patch("SC_redesign.Crop_and_Soil.soil.evapotranspiration.Evapotranspiration._determine_soil_cover_index",
-#                new=MagicMock(return_value=2.1)):
-#         Evapotranspiration._determine_soil_evaporation_adjusted(above_ground_biomass, residue, snow_water,
-#                                                                 potential_evapotrans_adj, transpiration)
-#         Evapotranspiration._determine_soil_cover_index.assert_called_once()
-
-
 @pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
     (1.3, 3.2),
     (0, 0),
@@ -160,31 +121,6 @@ def test_determine_amount_water_removed(reduced_evap_demand, soil_water, wilting
     observe = Evaporation._determine_amount_water_removed(reduced_evap_demand, soil_water, wilting_water)
     expect = min(reduced_evap_demand, 0.8 * (soil_water - wilting_water))
     assert expect == observe
-
-
-# --- helper function tests ---
-# @pytest.mark.parametrize("initial_canopy_water", [
-#     0.91,
-#     0,  # zero
-#     1.35,
-#     3.99,  # greater than potential evapotranspiration
-# ])
-# def test_determine_potential_evapotranspiration_adjusted(initial_canopy_water):
-#     # initialize object
-#     data = SoilData(transpiration=0.356, field_size=1.05)
-#     assert data.transpiration == 0.356
-#     incorp = Evaporation(data)
-#
-#     # set needed data field inside object
-#     incorp.data.potential_evapotranspiration = 1.4
-#
-#     # run method
-#     observe = incorp._determine_potential_evapotranspiration_adjusted(initial_canopy_water)
-#     if initial_canopy_water > 1.4:
-#         assert observe == 0
-#     else:
-#         assert observe == (1.4 - initial_canopy_water)
-
 
 # --- integration tests ---
 @pytest.mark.parametrize(
