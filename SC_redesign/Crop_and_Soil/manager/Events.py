@@ -1,5 +1,7 @@
 from typing import List
 
+from RUFAS.classes import Time
+
 """This module defines the various Event classes and helper functions
 
 Events are simple classes that will facilitate scheduling of different management operations. At their core, they
@@ -31,6 +33,11 @@ class Event:
         """
         self.year = year
         self.day = day
+
+    def occurs_today(self, time: Time) -> bool:
+        """returns true if the event should take place today, false otherwise"""
+        years_since_start = (time.year - 1)
+        return self.year == years_since_start and self.day == time.day
 
     def project_next(self, years: int = 1, days: int = 0):  # Pycharm dislikes the return type hint
         """creates the next Event in the sequence, projected forward by `years` and `days`
@@ -76,7 +83,7 @@ class HarvestEvent(Event):
         super().__init__(year=year, day=day)
         self.operation = operation
 
-def create_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0, cycles: int = 1) -> List[int]:
+def project_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0, cycles: int = 1) -> List[int]:
     """Generates a sequence of integers from a starting point, based on pattern rules. This method was created with
     temporal sequences specifically in mind.
 
@@ -107,34 +114,34 @@ def create_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0, 
 
     Examples
     --------
-    >>> create_sequence(start=0, repeat=1, skip=1, cycles=3)
+    >>> project_sequence(start=0, repeat=1, skip=1, cycles=3)
     [0, 1, 3, 4, 6, 7]
 
-    >>> create_sequence(start=[1, 2, 4], skip=1, cycles=3)
+    >>> project_sequence(start=[1, 2, 4], skip=1, cycles=3)
     [1, 2, 4, 6, 7, 9, 11, 12, 14]
 
-    >>> create_sequence(start=[1, 2, 4], repeat=1, skip=2, cycles=3)
+    >>> project_sequence(start=[1, 2, 4], repeat=1, skip=2, cycles=3)
     [1, 2, 4, 5, 6, 8, 11, 12, 14, 15, 16, 18]
 
-    >>> create_sequence(start=1, cycles=10)
+    >>> project_sequence(start=1, cycles=10)
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     Equivalently:
 
-    >>> create_sequence(start=[1, 2, 3, 4, 5], repeat=1)
+    >>> project_sequence(start=[1, 2, 3, 4, 5], repeat=1)
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     Equivalently:
 
-    >>> create_sequence(start=[1, 2, 3, 4, 5], cycles=2)
+    >>> project_sequence(start=[1, 2, 3, 4, 5], cycles=2)
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    >>> create_sequence(start=1, repeat=3, skip=3, cycles=4)
+    >>> project_sequence(start=1, repeat=3, skip=3, cycles=4)
     [1, 2, 3, 7, 8, 9, 13, 14, 15, 19, 20, 21]
 
     Equivalently:
 
-    >>> create_sequence(start=[1, 2, 3], skip=3, cycles=4)
+    >>> project_sequence(start=[1, 2, 3], skip=3, cycles=4)
     [1, 2, 3, 7, 8, 9, 13, 14, 15, 19, 20, 21]
     """
     if repeat < 0:

@@ -7,7 +7,8 @@ from SC_redesign.Crop_and_Soil.manager.Events import Event, HarvestEvent
 class CropSchedule:
     """Specifies the timing of events for a single crop instance"""
     def __init__(self, crop_reference: str, planting_event: Event,
-                 harvest_events: HarvestEvent | List[HarvestEvent] | None, use_heat_scheduling: bool = False):
+                 harvest_events: HarvestEvent | List[HarvestEvent] | None,
+                 use_heat_scheduling: bool = False):
         """Creates a CropSchedule instance
 
         Parameters
