@@ -1,8 +1,8 @@
 # RuFaS Input Redesign
-Authors: Clay J. Morrow
-Created: 11, April 2023
-Last Edited: 11, April 2023
-Reviewed by: [TBA]
+Authors: Clay J. Morrow  
+Created: 11, April 2023  
+Last Edited: 17, May 2023  
+Reviewed by: Pooya, [TBA]  
 Status: Draft
 
 ## Contents
