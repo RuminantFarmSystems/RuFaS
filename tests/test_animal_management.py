@@ -1064,3 +1064,17 @@ def test_get_life_cycle_output():
 def test_get_initialize_db_summary():
     """Unit test for function get_initialize_db_summary in file routines/animal/animal_management.py"""
     pass
+
+@pytest.fixture
+def cowlist():
+    cowlist = [MagicMock(),
+        MagicMock(),
+        MagicMock()]
+    return cowlist
+
+def test_sum_daily_milk(animal_management, cowlist):
+    """Unit test for function sum_daily_milk in file routines/animal/animal_management.py"""
+    for cow in cowlist:
+        cow.estimated_daily_milk_produced = 50.0
+    result = AnimalManagement.sum_daily_milk(animal_management, cowlist)
+    assert result == 150

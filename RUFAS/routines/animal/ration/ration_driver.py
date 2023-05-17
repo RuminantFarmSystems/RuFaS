@@ -86,7 +86,7 @@ def optimization(requirements, available_feeds, animal_type, cow_type):
     return solution, ration_vals
 
 
-def is_constraint_violated(solution_x: npt.NDArray, constraint: List[dict[str, Callable]]) -> bool:
+def is_constraint_violated(solution_x: npt.NDArray, constraint: dict[str, Callable]) -> bool:
         """
         Helper function to check a solution dictionary to see if a given constraint 
             in a list of constraints was met.
@@ -95,8 +95,8 @@ def is_constraint_violated(solution_x: npt.NDArray, constraint: List[dict[str, C
         ----------
         solution_x: numpy nd array, e.g. npt.NDArray
             solution.x array from minimize function used in ration_NLP.py
-        constraints: List[dict[str, Any]]
-            list of constraint functions as defined in ration_NLP.py
+        constraint: dict[str, Any]
+            constraint function as defined in ration_NLP.py
 
         """
         result = constraint['fun'](solution_x)
@@ -194,8 +194,6 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     # safeguard if scipy SLSQP bounds error still occurs after many iterations
     # using previous cycles ration for this pen
     else:
-        print('rationreturned')
-        print(np.mean([animal.milk_production_reduction for animal in pen.animals_in_pen]))
         return pen.ration, ration_vals
 
 
@@ -285,7 +283,7 @@ class Requirements:
         self.avg_milk = 0
         self.avg_CP_milk = 0
     
-    def set_pen_requirements(self, NEmaint: List[float], NEa: List[float], NEg: List[float], NEpreg: List[float],
+    def calc_pen_requirements(self, NEmaint: List[float], NEa: List[float], NEg: List[float], NEpreg: List[float],
                                NEl: List[float], MP_req: List[float], Ca_req: List[float], P_req: List[float], 
                                DMIest: List[float], BW: List[float], milk: List[float], CP_milk: List[float],
                                milk_production_reduction: List[float], use_the_mean: bool) -> None:
@@ -341,7 +339,7 @@ class Requirements:
             self.avg_CP_milk = stat.mean(CP_milk)
             self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
         else:
-            requirement_percentile = 80
+            requirement_percentile = 90
             self.NEmaint = np.percentile(NEmaint, requirement_percentile)
             self.NEa = np.percentile(NEa, requirement_percentile)
             self.NEg = np.percentile(NEg, requirement_percentile)
@@ -354,7 +352,7 @@ class Requirements:
             self.avg_BW = np.percentile(BW, requirement_percentile)
             self.avg_milk = np.percentile(milk, requirement_percentile)
             self.avg_CP_milk = np.percentile(CP_milk, requirement_percentile)
-            self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
+            self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
         
     def set_requirements(self, pen, animal_type, recalc):
         """
@@ -471,7 +469,7 @@ class Requirements:
                 # milk.append(milk)
                 # CP_milk.append(CP_milk)
         
-        Requirements.set_pen_requirements(self, NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
+        self.calc_pen_requirements(NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
                                milk_production_reduction, use_the_mean = True)
         
         # setting average nutrient requirements pen class variable

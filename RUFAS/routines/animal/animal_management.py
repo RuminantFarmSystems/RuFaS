@@ -1010,9 +1010,14 @@ class AnimalManagement:
         """
         sums the daily milk production across all cows
 
-        Args: the list of cows in the animal management class
+        Parameters
+        ----------
+        cows: List
+            the list of cows in the animal management class
 
-        Returns: the total milk produced in the herd (kg milk/day)
+        Returns
+        -------
+        float: The total milk produced in the herd (kg milk/day)
         """
         total_milk = 0.0
         for cow in cows:

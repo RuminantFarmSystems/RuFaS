@@ -12,7 +12,7 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
-
+import RUFAS.routines.animal.ration.ration_driver
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -1384,9 +1384,98 @@ def test_ration_report():
     pass
 
 
+
+
+
+
 def test_set_requirements():
     """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
-    pass
+
+
+def	test_is_constraint_violated():
+    """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
+    def dummy_solution():
+        return [1,2,3,4]
+    def dummy_constraint_1(dummy_solution):
+        return sum(dummy_solution)
+    def dummy_constraint_2(dummy_solution):
+        return -sum(dummy_solution)
+    def dummy_constraint_3(dummy_solution):
+        return sum(dummy_solution)-10
+    test_constraints = [{'type': 'ineq', 'fun': dummy_constraint_1},
+                        {'type': 'ineq', 'fun': dummy_constraint_2},
+                        {'type': 'eq', 'fun': dummy_constraint_3},
+                        {'type': 'eq', 'fun': dummy_constraint_1},]
+    for i, constraint in enumerate(test_constraints):
+        result = RUFAS.routines.animal.ration.ration_driver.is_constraint_violated(dummy_solution(), constraint)
+        assert result == [False, True, False, True][i]
+    
+
+def	test_find_failed_constraints():
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
+    def dummy_solution():
+        return [1,2,3,4]
+    def dummy_constraint_1(dummy_solution):
+        return sum(dummy_solution)
+    def dummy_constraint_2(dummy_solution):
+        return -sum(dummy_solution)
+    def dummy_constraint_3(dummy_solution):
+        return sum(dummy_solution)-10
+
+    test_constraints = [{'type': 'ineq', 'fun': dummy_constraint_1},
+                        {'type': 'ineq', 'fun': dummy_constraint_2},
+                        {'type': 'eq', 'fun': dummy_constraint_3},
+                        {'type': 'eq', 'fun': dummy_constraint_1},]
+    result = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(dummy_solution(), test_constraints)
+    assert len(result)==2
+    assert result[0]['fun'].__name__ == 'dummy_constraint_2'
+    assert result[1]['fun'].__name__ == 'dummy_constraint_1'
+
+
+# @pytest.fixture
+# def dummy_solution():
+#     return [1,2,3,4]
+
+# @pytest.fixture
+# def dummy_constraint_1(dummy_solution):
+#     return sum(dummy_solution)
+
+# @pytest.fixture
+# def dummy_constraint_2(dummy_solution):
+#     return -sum(dummy_solution)
+
+# @pytest.fixture
+# def dummy_constraint_3(dummy_solution):
+#     return sum(dummy_solution)-10
+
+# def	test_find_failed_constraints():
+#     """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
+#     test_constraints = [{'type': 'ineq', 'fun': dummy_constraint_1},
+#                         {'type': 'ineq', 'fun': dummy_constraint_2},
+#                         {'type': 'eq', 'fun': dummy_constraint_3},
+#                         {'type': 'eq', 'fun': dummy_constraint_1},]
+#     result = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(dummy_solution(), test_constraints)
+#     assert len(result)==2
+#     assert result[0]['fun'].__name__ == 'dummy_constraint_2'
+#     assert result[1]['fun'].__name__ == 'dummy_constraint_1'
+
+
+def	test_calc_pen_requirements():
+    """Unit test for function set_pen_requirements in file routines/animal/ration/ration_driver.py"""
+    req = RUFAS.routines.animal.ration.ration_driver.Requirements()
+    req.calc_pen_requirements(
+        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3], 
+        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], True)
+    attributelist = ['NEmaint','NEa','NEg','NEpreg', 'NEl', 'MP_req', 'Ca_req', 'P_req', 
+        'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
+    for attribute in attributelist:
+        assert getattr(req, attribute) == 2
+    
+    req.calc_pen_requirements(
+        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3], 
+        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], False)
+    for attribute in attributelist:
+        assert getattr(req, attribute) == 2.8
 
 
 def test_feed_nutrients():
