@@ -272,7 +272,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _list_to_file_txt(self, data_list: List[str], path: str, exclude_info_maps: bool = False) -> None:
+    def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
         """Saves a list into a text file
 
         Parameters
@@ -290,18 +290,7 @@ class OutputManager(object):
         """
         try:
             with open(path, "w") as var_names_file:
-                if exclude_info_maps:
-                    info_maps_absent_notice = "This simulation ran excluding info maps from the variables pool so no"\
-                     " data from info maps are included.\nIf you would like to see that data, run the simulation with"\
-                     " info maps included."
-                    var_names_file.write(info_maps_absent_notice + "\n\n")
-                else:
-                    info_maps_present_notice = "This simulation ran including info maps in the variables pool so"\
-                     " data from info maps are included.\nIf you would not like to see that data, run the simulation"\
-                     " with info maps excluded."
-                    var_names_file.write(info_maps_present_notice + "\n\n")
-                for variable_name in data_list:
-                    var_names_file.write(variable_name + "\n")
+                var_names_file.writelines(data_list)
         except Exception as e:
             raise e
 
@@ -346,34 +335,54 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def collect_variable_names_and_contexts(self, path: str, exclude_info_maps: bool = False) -> None:
+    def save_variable_names_and_contexts(
+        self, path: str, exclude_info_maps: bool, format_option: str = "block"
+    ) -> None:
         """
-        Collects names of all variables added to variables_pool along with the caller class and function contextual
-        information to eventually be saved into a txt file in the given path to a directory.
+        saves names of all variables added to variables_pool along with the caller class
+        and function contextual information into a txt file in the given path to a directory.
+        TODO: expand the docstring and explain format_options: "block", "inline", and "verbose"
         """
 
-        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
-        var_set = set()
-        for class_and_function, variables_data in self.variables_pool.items():
-            for variable_data_value in variables_data.values():
-                for variable_data_item in variable_data_value:
-                    if isinstance(variable_data_item, dict):
-                        for variable_data_item_key, variable_data_item_value in variable_data_item.items():
-                            if isinstance(variable_data_item_value, dict):
-                                for variable_data_item_value_key in variable_data_item_value.keys():
-                                    var_set.add(f"{class_and_function}: {variable_data_item_value_key}")
-                            else:
-                                var_set.add(f"{class_and_function}: {variable_data_item_key}")
-        var_list = sorted(var_set)  # sorted(set) sorts and then converts set into a list
+        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
+        for name, variable_data in self.variables_pool.items():
+            if not variable_data["values"]:
+                var_list.append(f"{name}: **NO VARIABLES**\n")
+                continue
 
-        self._list_to_file_txt(var_list, file_path, exclude_info_maps=exclude_info_maps)
+            is_varible_nested = isinstance(variable_data["values"][0], Dict)
+            if is_varible_nested:
+                parsable_dicts = ["values", "info_maps"]
+            else:
+                var_list.append(f"{name}\n")
+                parsable_dicts = ["info_maps"]
+
+            if format_option == "block":
+                var_list.append(f"{name}\n")
+
+            prefix = name
+            if format_option == "block":
+                prefix = " " * len(name)
+
+            for parsable_dict in parsable_dicts:
+                keys = variable_data[parsable_dict][0].keys()
+                if format_option == "inline":
+                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}\n")
+                else:
+                    for key in keys:
+                        var_list.append(f"{prefix}.{parsable_dict}: {key}\n")
+
+        file_path = os.path.join(
+            path, self._generate_file_name("variable_names", "txt")
+        )
+        self._list_to_file_txt(var_list, file_path)
 
     def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves all pool into the given path to a directory.
         """
-        self.save_variables(path, exclude_info_maps=exclude_info_maps)
-        self.collect_variable_names_and_contexts(path, exclude_info_maps=exclude_info_maps)
+        self.save_variables(path, exclude_info_maps)
+        self.save_variable_names_and_contexts(path, exclude_info_maps)
         self.save_errors(path)
         self.save_logs(path)
         self.save_warnings(path)
