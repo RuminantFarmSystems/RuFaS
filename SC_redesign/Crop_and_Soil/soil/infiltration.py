@@ -23,12 +23,14 @@ class Infiltration:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def infiltrate(self, rainfall: float, weighting_coefficient: float) -> None:
+    def infiltrate(self, rainfall: float, weighting_coefficient: float, potential_evapotranspiration: float) -> None:
         """main routine for determining runoff and infiltration of soil for a given day
 
         rainfall: rainfall depth of current day (mm)
         weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
             calculations dependent on plant evapotranspiration (unitless)
+        potential_evapotranspiration: total potential evaporation and transpiration that could occur on the current day
+            (mm)
 
         Notes
         -----
@@ -95,7 +97,7 @@ class Infiltration:
         else:
             self.data.previous_retention_parameter = self._determine_updated_retention_parameter(
                                                                         self.data.previous_retention_parameter,
-                                                                        self.data.potential_evapotranspiration,
+                                                                        potential_evapotranspiration,
                                                                         first_moisture_condition_retention_parameter,
                                                                         rainfall,
                                                                         self.data.accumulated_runoff,

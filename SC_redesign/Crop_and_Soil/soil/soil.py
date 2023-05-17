@@ -83,15 +83,17 @@ class Soil:
                                                      snow_cover, avg_annual_air_temp)
 
     def daily_soil_water_routine(self, rainfall: float, weighting_coefficient: float,
-                                 has_seasonal_high_water_table: bool, maximum_soil_evaporation: float,
-                                 avg_air_temp: float, residue: float, minimum_cover_management_factor: float,
-                                 field_size: float) -> None:
+                                 potential_evapotranspiration: float, has_seasonal_high_water_table: bool,
+                                 maximum_soil_evaporation: float, avg_air_temp: float, residue: float,
+                                 minimum_cover_management_factor: float, field_size: float) -> None:
         """this method calls all water related daily update routines
 
         Args:
             rainfall: rainfall depth of current day (mm)
             weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
                 calculations dependent on plant evapotranspiration (unitless)
+            potential_evapotranspiration: total potential evaporation and transpiration that could occur on the current
+                day (mm)
             has_seasonal_high_water_table: if the HRU has a seasonal high water table (true/false)
             maximum_soil_evaporation: maximum amount of water that can be evaporated from the soil profile on the
                 current day (mm)
@@ -107,7 +109,7 @@ class Soil:
         profile depend on how much water enters and move through the soil profile.
 
         """
-        self.infiltration.infiltrate(rainfall, weighting_coefficient)
+        self.infiltration.infiltrate(rainfall, weighting_coefficient, potential_evapotranspiration)
         self.percolation.percolate(has_seasonal_high_water_table)
         self.evaporation.evaporate(maximum_soil_evaporation)
         self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue)
