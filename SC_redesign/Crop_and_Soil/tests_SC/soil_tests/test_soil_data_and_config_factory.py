@@ -7,10 +7,6 @@ from unittest.mock import patch, PropertyMock, MagicMock
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.evaporation import Evaporation
-from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
-from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
 
