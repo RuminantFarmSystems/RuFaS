@@ -78,35 +78,18 @@ import pytest
 #         Evapotranspiration._determine_soil_cover_index.assert_called_once()
 
 
-# @pytest.mark.parametrize("above_ground_biomass,residue,snow_water", [
-#     (400, 65, 0.3),
-#     (800, 120, 0),
-#     (0, 0, 0),
-#     (1250, 800, 0.4999),
-#     (990, 200, 0.338),
-#     (400, 30, 0.51),
-# ])
-# def test_determine_soil_cover_index(above_ground_biomass, residue, snow_water):
-#     if snow_water > 0.5:
-#         expect = 0.5
-#     else:
-#         expect = exp((-0.00005) * (above_ground_biomass + residue))
-#     observe = Evapotranspiration._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
-#     assert expect == observe
-
-
-# @pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
-#     (1.3, 3.2),
-#     (0, 0),
-#     (1.3, 0.4),
-#     (1.8954, 0)
-# ])
-# def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-#     observe = Evapotranspiration._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-#     if snow_water_content > soil_evaporation_adj:
-#         assert 0 == observe
-#     else:
-#         assert (soil_evaporation_adj - snow_water_content) == observe
+@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
+    (1.3, 3.2),
+    (0, 0),
+    (1.3, 0.4),
+    (1.8954, 0)
+])
+def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
+    observe = Evaporation._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
+    if snow_water_content > soil_evaporation_adj:
+        assert 0 == observe
+    else:
+        assert (soil_evaporation_adj - snow_water_content) == observe
 
 
 @pytest.mark.parametrize("max_soil_water_evap,depth", [

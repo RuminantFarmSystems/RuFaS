@@ -633,36 +633,6 @@ class Field:
         else:
             return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
 
-    # TODO: this method will not be used until sublimation is implemented - issue #317
-    @staticmethod
-    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
-        """Calculates the maximum amount of evaporation from soil in a given day
-
-        Parameters
-        ----------
-        soil_evaporation_adj : float
-            Maximum soil evaporation adjusted for plant water use on a given day (mm)
-        snow_water_content : float
-            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
-
-        TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-            (2:2.3.3) mean the same thing
-
-        Returns
-        -------
-        float
-            Maximum soil water evaporation on a given day (mm)
-
-        References
-        ----------
-        SWAT Theoretical documentation section 2:2.3.3.1
-
-        """
-        if soil_evaporation_adj < snow_water_content:
-            return 0
-        else:
-            return soil_evaporation_adj - snow_water_content
-
     # </editor-fold>
 
     # <editor-fold desc="--- Annual Reset Methods ---">

@@ -182,46 +182,27 @@ class Evaporation:
     #                                       )
     #     return actual_max_soil_evaporation
 
-    # @staticmethod
-    # def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
-    #     """
-    #     Calculate soil cover index
-    #
-    #     Args:
-    #         above_ground_biomass: mass of plant above ground (kg per hectare)
-    #         residue: biomass separated from plant on the ground (kg per hectare)
-    #         snow_water_content: amount of water from snow (mm)
-    #
-    #     Returns:
-    #         soil cover index (unitless)
-    #
-    #     SWAT Reference: 2:2.3.8
-    #     """
-    #     if snow_water_content > 0.5:
-    #         return 0.5
-    #     else:
-    #         return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
+    # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
+    @staticmethod
+    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
+        """Calculates the maximum amount of evaporation from soil in a given day
 
-    # @staticmethod
-    # def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
-    #     """Calculates the maximum amount of evaporation from soil in a given day
-    #
-    #     Args:
-    #         soil_evaporation_adj: maximum soil evaporation adjusted for plant water use on a given day (mm)
-    #         snow_water_content: amount of water in the snow pack on a given day prior to accounting for sublimation
-    #         (mm)
-    #          TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-    #           (2:2.3.3) mean the same thing
-    #
-    #     Returns:
-    #         maximum soil water evaporation on a given day (mm)
-    #
-    #     SWAT Reference: 2:2.3.3.1
-    #     """
-    #     if soil_evaporation_adj < snow_water_content:
-    #         return 0  # 2:2.3.10
-    #     else:
-    #         return soil_evaporation_adj - snow_water_content  # 2:2.3.15
+        Args:
+            soil_evaporation_adj: maximum soil evaporation adjusted for plant water use on a given day (mm)
+            snow_water_content: amount of water in the snow pack on a given day prior to accounting for sublimation
+            (mm)
+             TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
+              (2:2.3.3) mean the same thing
+
+        Returns:
+            maximum soil water evaporation on a given day (mm)
+
+        SWAT Reference: 2:2.3.3.1
+        """
+        if soil_evaporation_adj < snow_water_content:
+            return 0  # 2:2.3.10
+        else:
+            return soil_evaporation_adj - snow_water_content  # 2:2.3.15
 
     @staticmethod
     def _determine_depth_evaporative_demand(max_soil_water_evaporation: float, depth: float) -> float:
