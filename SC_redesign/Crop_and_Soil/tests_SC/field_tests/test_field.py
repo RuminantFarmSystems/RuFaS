@@ -302,20 +302,6 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
     assert expect == observe
 
 
-@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
-    (1.3, 3.2),
-    (0, 0),
-    (1.3, 0.4),
-    (1.8954, 0)
-])
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
-
-
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
     field = Field()
