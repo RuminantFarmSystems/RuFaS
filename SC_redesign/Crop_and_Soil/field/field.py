@@ -423,7 +423,7 @@ class Field:
         the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
         happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
         canopy of another.
-
+        TODO: distribute water evenly/proportionally/fairly between crop canopies - issue #513
         """
         precipitation_reaching_soil = precipitation_total
         excess_canopy_water = 0
@@ -464,7 +464,7 @@ class Field:
         This method iterates through the crops in the field, for each determines how much water was evaporated from its
         canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
         reaches 0, then no more water should be evaporated so the method stops running.
-
+        TODO: evaporate water evenly/proportionally/fairly from crop canopies - issue #513
         """
         remaining_evapotranspirative_demand = evapotranspirative_demand
         for crop in self.crops:
