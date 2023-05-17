@@ -3,7 +3,7 @@ from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evaporation
+from SC_redesign.Crop_and_Soil.soil.evaporation import Evaporation
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp

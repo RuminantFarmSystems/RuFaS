@@ -56,34 +56,10 @@ class Evaporation:
             if no_more_soil_water_evaporated:
                 break
 
-        return maximum_soil_water_evaporation - amount_available_for_evaporation
+        total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
+        self.data.annual_soil_evaporation_total += total_evaporation_from_soil
+        return total_evaporation_from_soil
 
-        # # Update accumulated (annual) totals
-        # self.data.annual_potential_evapotranspiration_total += self.data.potential_evapotranspiration
-        # self.data.annual_adjusted_potential_evapotranspiration_total += \
-        #     self.data.potential_evapotranspiration_adjusted
-        # self.data.annual_adjusted_soil_evaporation_total += self.data.soil_evaporation_adjusted
-        # self.data.annual_maximum_soil_evaporation_total += self.data.maximum_soil_evaporation
-
-    # def _evaporate_from_soil(self) -> None:
-    #     """
-    #     Evaporates water from each layer of soil
-    #
-    #     SWAT Reference: 2:2.3.3.2
-    #     """
-    #     for layer in self.data.soil_layers:
-    #         evaporative_demand = self._determine_layer_evaporative_demand(
-    #             self.data.maximum_soil_evaporation, layer.top_depth, layer.bottom_depth,
-    #             layer.soil_evaporation_compensation_coefficient)
-    #         evaporative_demand_reduced = self._determine_evaporative_demand_reduced(
-    #             evaporative_demand, layer.water_content, layer.field_capacity_content, layer.wilting_point_content)
-    #         amount_water_removed = self._determine_amount_water_removed(
-    #             evaporative_demand_reduced, layer.water_content, layer.wilting_point_content)
-    #
-    #         # remove water from soil water content
-    #         layer.water_content -= amount_water_removed
-
-    # --- static methods ---
     # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
     @staticmethod
     def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
