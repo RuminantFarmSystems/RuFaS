@@ -23,7 +23,6 @@ class Evaporation:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    # --- main routine ---
     def evaporate(self, maximum_soil_water_evaporation: float) -> float:
         """Evaporates water from the soil profile.
 
@@ -64,6 +63,7 @@ class Evaporation:
                 break
 
         total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
+        self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
         return total_evaporation_from_soil
 

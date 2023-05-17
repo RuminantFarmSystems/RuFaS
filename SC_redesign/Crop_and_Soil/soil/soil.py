@@ -50,7 +50,7 @@ class Soil:
 
         # Water components
         self.evaporation = Evaporation(self.data)
-        """Process component that controls evapotranspiration from the soil"""
+        """Process component that controls evaporation from the soil"""
         self.infiltration = Infiltration(self.data)
         """Process component that controls water infiltration from the soil surface into the profile"""
         self.percolation = Percolation(self.data)
@@ -92,7 +92,7 @@ class Soil:
             rainfall: rainfall depth of current day (mm)
             weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
                 calculations dependent on plant evapotranspiration (unitless)
-            potential_evapotranspiration: total potential evaporation and transpiration that could occur on the current
+            potential_evapotranspiration: total potential evaporation and transpiration that can occur on the current
                 day (mm)
             has_seasonal_high_water_table: if the HRU has a seasonal high water table (true/false)
             maximum_soil_evaporation: maximum amount of water that can be evaporated from the soil profile on the

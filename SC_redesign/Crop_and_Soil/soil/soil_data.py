@@ -71,6 +71,10 @@ class SoilData:
     annual_eroded_active_organic_nitrogen_total: float = 0
     """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
+    # ---- evaporation
+    water_evaporated: float = 0
+    """Amount of water evaporated from the soil profile on the current day (mm)"""
+
     # ---- infiltration
     second_moisture_condition_parameter: float = 85
     """'curve number' parameter for average moisture conditions equation (unitless)"""

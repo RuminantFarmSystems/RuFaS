@@ -29,7 +29,7 @@ class Infiltration:
         rainfall: rainfall depth of current day (mm)
         weighting_coefficient: weighting coefficient used to calculate retention coefficient for daily curve number
             calculations dependent on plant evapotranspiration (unitless)
-        potential_evapotranspiration: total potential evaporation and transpiration that could occur on the current day
+        potential_evapotranspiration: total potential evaporation and transpiration that can occur on the current day
             (mm)
 
         Notes

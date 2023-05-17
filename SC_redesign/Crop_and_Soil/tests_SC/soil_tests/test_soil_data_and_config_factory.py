@@ -41,6 +41,7 @@ def test_config_factory_defaults():
                                    LayerData(top_depth=20, bottom_depth=50, field_size=1),
                                    LayerData(top_depth=50, bottom_depth=80, field_size=1),
                                    LayerData(top_depth=80, bottom_depth=200, field_size=1)]
+    assert generic.water_evaporated == 0
     assert generic.second_moisture_condition_parameter == 85
     assert generic.previous_retention_parameter is None
     assert generic.average_subbasin_slope == 0.05

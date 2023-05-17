@@ -122,4 +122,5 @@ def test_evaporate(max_evaporation: float, expected_evaporation: float, expected
     assert incorp._determine_amount_water_removed.call_count == expected_loop_iterations
     assert pytest.approx(actual_remaining_demand) == expected_evaporation
     assert pytest.approx(actual_water_contents) == expected_water_contents
+    assert pytest.approx(incorp.data.water_evaporated) == expected_evaporation
     assert pytest.approx(incorp.data.annual_soil_evaporation_total) == expected_evaporation
