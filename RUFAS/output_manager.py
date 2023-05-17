@@ -351,16 +351,19 @@ class OutputManager(object):
         Collects names of all variables added to variables_pool along with the caller class and function contextual
         information to eventually be saved into a txt file in the given path to a directory.
         """
-        # vars_pool = self.variables_pool.copy()
-        # for key, value in vars_pool.items():
-        #     if isinstance(value, dict) and "info_maps" in value:
-        #         value.pop("info_maps")
+
         file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
         var_set = set()
-        for key, value in self.variables_pool.items():
-            var_set.add(key)
-            var_set.update(f"{key}: {variable_name}" for values_list in value.values() for variable_dict in values_list
-                           if isinstance(variable_dict, dict) for variable_name in variable_dict.keys())
+        for class_and_function, variables_data in self.variables_pool.items():
+            for variable_data_value in variables_data.values():
+                for variable_data_item in variable_data_value:
+                    if isinstance(variable_data_item, dict):
+                        for variable_data_item_key, variable_data_item_value in variable_data_item.items():
+                            if isinstance(variable_data_item_value, dict):
+                                for variable_data_item_value_key in variable_data_item_value.keys():
+                                    var_set.add(f"{class_and_function}: {variable_data_item_value_key}")
+                            else:
+                                var_set.add(f"{class_and_function}: {variable_data_item_key}")
         var_list = sorted(var_set)  # sorted(set) sorts and then converts set into a list
 
         self._list_to_file_txt(var_list, file_path, exclude_info_maps=exclude_info_maps)
