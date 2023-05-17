@@ -16,6 +16,7 @@ Description: This file updates the cow form first calving to leaving the herd.
                 Disease, Udder, and Unknown
 """
 
+# import csv
 import math
 import numpy as np
 from scipy.stats import truncnorm
@@ -389,6 +390,20 @@ class Cow(HeiferIII):
         self.DMIest = req['DMIest']
         self.DNED_req = (req['NEmaint'] + req['NEl']) / self.DMIest
         self.DMDP_req = (req['MP_req']) / self.DMIest
+
+        # csvline = [self.id,
+        #            'cow',
+        #            self.body_weight,
+        #            self.mPrt,
+        #            self.fat_percent,
+        #            self.lactose_milk,
+        #            self.estimated_daily_milk_produced,
+        #            self.days_in_milk,
+        #            ]
+
+        # with open('/Users/haowenhu/Library/Mobile Documents/com~apple~CloudDocs/Reed Lab/Conferences/CJAS/CJAS 2023/milkcomponents_NRC.csv', 'a', newline='') as file:
+        #     csvout = csv.writer(file)
+        #     csvout.writerow(csvline)
 
     def phosphorus_rqmts(self, DMI):
         """
