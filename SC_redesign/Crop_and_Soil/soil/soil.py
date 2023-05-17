@@ -3,7 +3,7 @@ from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
+from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evaporation
 from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
@@ -49,7 +49,7 @@ class Soil:
         """Process component for managing nitrogen within the soil profile."""
 
         # Water components
-        self.evapotranspiration = Evapotranspiration(self.data)
+        self.evaporation = Evaporation(self.data)
         """Process component that controls evapotranspiration from the soil"""
         self.infiltration = Infiltration(self.data)
         """Process component that controls water infiltration from the soil surface into the profile"""
@@ -115,9 +115,7 @@ class Soil:
         """
         self.infiltration.infiltrate(rainfall, weighting_coefficient)
         self.percolation.percolate(has_seasonal_high_water_table)
-        self.evapotranspiration.evapotranspirate(solar_radiation, max_air_temp, min_air_temp, avg_air_temp,
-                                                 above_ground_biomass, residue, snow_water_content,
-                                                 initial_canopy_free_water)
+        self.evaporation.evaporate(solar_radiation)
         self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue)
         self.phosphorus_cycling.cycle_phosphorus(rainfall, self.data.accumulated_runoff, field_size, avg_air_temp)
         self.nitrogen_cycling.cycle_nitrogen(field_size)

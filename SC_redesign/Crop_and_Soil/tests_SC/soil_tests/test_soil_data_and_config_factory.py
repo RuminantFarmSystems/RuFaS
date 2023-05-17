@@ -201,7 +201,7 @@ def test_annual_reset() -> None:
     fertilizer_phosphorus = Fertilizer(soil_data)
 
     # Run methods that add to annual totals
-    evapotranspirator.evapotranspirate(500, 24, 18, 20, 1000, 200, 0.12, 1.01)
+    evapotranspirator.evaporate(500)
     infiltrator.infiltrate(20, 0.58392)
     eroder.erode(1, 0.2, 800)
     fertilizer_phosphorus.add_fertilizer_phosphorus(90)
