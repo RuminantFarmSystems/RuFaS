@@ -158,12 +158,12 @@ The following soil tillage practice options should be implemented:
 
 All methods should appropriately account for and/or alter:
 
-* [x] soil erosion
-* [x] water infiltration
-* [x] nutrient and water cycling/composition
-* [x] leeching
+* [ ] soil erosion
+* [ ] water infiltration
+* [ ] nutrient and water cycling/composition
+* [ ] leeching
 * [ ] soil compaction
-* [x] mixing (e.g., mixing fertilizer/manure into soil profile)
+* [ ] mixing (e.g., mixing fertilizer/manure into soil profile)
 
 ### Outputs
 
