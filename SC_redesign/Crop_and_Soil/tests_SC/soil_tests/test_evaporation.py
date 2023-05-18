@@ -114,13 +114,12 @@ def test_evaporate(max_evaporation: float, expected_evaporation: float, expected
     incorp._determine_evaporative_demand_reduced = MagicMock(return_value=0.6)
     incorp._determine_amount_water_removed = MagicMock(return_value=0.7)
 
-    actual_remaining_demand = incorp.evaporate(max_evaporation)
+    incorp.evaporate(max_evaporation)
     actual_water_contents = incorp.data.get_vectorized_layer_attribute("water_content")
 
     assert incorp._determine_layer_evaporative_demand.call_count == expected_loop_iterations
     assert incorp._determine_evaporative_demand_reduced.call_count == expected_loop_iterations
     assert incorp._determine_amount_water_removed.call_count == expected_loop_iterations
-    assert pytest.approx(actual_remaining_demand) == expected_evaporation
     assert pytest.approx(actual_water_contents) == expected_water_contents
     assert pytest.approx(incorp.data.water_evaporated) == expected_evaporation
     assert pytest.approx(incorp.data.annual_soil_evaporation_total) == expected_evaporation

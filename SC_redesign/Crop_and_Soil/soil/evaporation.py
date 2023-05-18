@@ -23,18 +23,13 @@ class Evaporation:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def evaporate(self, maximum_soil_water_evaporation: float) -> float:
+    def evaporate(self, maximum_soil_water_evaporation: float) -> None:
         """Evaporates water from the soil profile.
 
         Parameters
         ----------
         maximum_soil_water_evaporation : float
             Maximum amount of water allowed to be evaporated from the soil profile on the current day (mm)
-
-        Returns
-        -------
-        float
-            Actual amount of water evaporated from the soil on a given day (mm)
 
         Notes
         -----
@@ -54,18 +49,18 @@ class Evaporation:
             amount_water_removed = self._determine_amount_water_removed(
                 evaporative_demand_reduced, layer.water_content, layer.wilting_point_content)
 
-            no_more_soil_water_evaporated = amount_available_for_evaporation <= amount_water_removed
-            if no_more_soil_water_evaporated:
+            maximum_amount_evaporated = amount_available_for_evaporation <= amount_water_removed
+            if maximum_amount_evaporated:
                 amount_water_removed = amount_available_for_evaporation
             layer.water_content -= amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
-            if no_more_soil_water_evaporated:
+            if maximum_amount_evaporated:
                 break
 
         total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
         self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
-        return total_evaporation_from_soil
+        return
 
     # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
     @staticmethod
