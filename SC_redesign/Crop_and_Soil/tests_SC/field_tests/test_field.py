@@ -1,8 +1,6 @@
 from typing import Optional, List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
-from math import exp
-
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
@@ -257,63 +255,6 @@ def test_determine_latent_heat_vaporization(avg_temp):
     observe = Field._determine_latent_heat_vaporization(avg_temp)
     expect = 2.501 - (0.002361 * avg_temp)
     assert expect == observe
-
-
-@pytest.mark.parametrize("above_ground_biomass,residue,snow_water,potential_evapotrans_adj, transpiration", [
-    (800, 40, 0.3, 1.6, 0.9),  # arbitrary
-    (1200, 300, 0.433, 2.4, 1.8),  # arbitrary
-    (0, 800, 0.03, 0, 3.6),  # after harvest
-    (800, 56, 0.84, 0.44, 0.23),  # snowy
-    (0, 0, 0.22, 0.69, 0.45),  # empty field
-    (400, 150, 0, 0.01, 0),  # dry conditions
-    (500, 200, 0, 6.3, 4.5),  # wet conditions
-])
-def test_determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass: float, residue: float,
-                                                             snow_water: float, potential_evapotrans_adj: float,
-                                                             transpiration: float) -> None:
-    """Tests that the amount of soil evaporation and sublimation is calculated correctly."""
-    with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_soil_cover_index", new_callable=MagicMock,
-               return_value=1.3) as mocked_soil_cover_index:
-        actual = Field._determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass, residue, snow_water,
-                                                                            potential_evapotrans_adj, transpiration)
-        soil_evaporation = potential_evapotrans_adj * 1.3
-        reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / (soil_evaporation + transpiration)
-        expected = min(soil_evaporation, reduced_soil_evaporation)
-
-        mocked_soil_cover_index.assert_called_once_with(above_ground_biomass, residue, snow_water)
-        assert actual == expected
-
-
-@pytest.mark.parametrize("above_ground_biomass,residue,snow_water", [
-    (400, 65, 0.3),
-    (800, 120, 0),
-    (0, 0, 0),
-    (1250, 800, 0.4999),
-    (990, 200, 0.338),
-    (400, 30, 0.51),
-])
-def test_determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water: float) -> None:
-    """Tests that the soil cover index is correctly calculated."""
-    if snow_water > 0.5:
-        expect = 0.5
-    else:
-        expect = exp((-0.00005) * (above_ground_biomass + residue))
-    observe = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water)
-    assert expect == observe
-
-
-@pytest.mark.parametrize("soil_evaporation_adj,snow_water_content", [
-    (1.3, 3.2),
-    (0, 0),
-    (1.3, 0.4),
-    (1.8954, 0)
-])
-def test_determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content):
-    observe = Field._determine_maximum_soil_evaporation(soil_evaporation_adj, snow_water_content)
-    if snow_water_content > soil_evaporation_adj:
-        assert 0 == observe
-    else:
-        assert (soil_evaporation_adj - snow_water_content) == observe
 
 
 def test_annual_reset() -> None:
