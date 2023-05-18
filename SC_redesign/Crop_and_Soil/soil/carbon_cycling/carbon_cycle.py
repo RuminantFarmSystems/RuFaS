@@ -28,11 +28,22 @@ class CarbonCycling:
         self.pool_gas_partition = PoolGasPartition(self.data)
         self.residue_partition = ResiduePartition(self.data)
 
-    def cycle_carbon(self, rainfall: float, crop: CropData, temp_average: float, field_size):
-        """main routine for carbon cycle"""
-        self.decomposition.decompose(self.data, temp_average)
-        self.residue_partition.partition_residue(self.data, rainfall, crop)
-        self.pool_gas_partition.partition_pool_gas(self.data)
+    def cycle_carbon(self, rainfall: float, temp_average: float, field_size: float) -> None:
+        """Main routine for carbon cycle.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm)
+        temp_average : float
+            Average temperature on the current day (degrees C)
+        field_size : float
+            Size of the field (ha)
+
+        """
+        self.decomposition.decompose(temp_average)
+        self.residue_partition.partition_residue(rainfall)
+        self.pool_gas_partition.partition_pool_gas()
         self._soil_carbon_aggregation(field_size)
 
     def _soil_carbon_aggregation(self, field_size: float) -> None:
