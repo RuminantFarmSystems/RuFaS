@@ -168,15 +168,26 @@ class CropSequence:
         schedules = [CropSchedule(crop_reference, p, h, False) for p, h in zip(planting_events, harvest_events)]
         return CropSequence(schedules)
 
-
-
-
-
     @staticmethod
     def create_from_pattern():
         """creates a CropSequence object from a pattern. This more closely matches the structure that users will
         be inputting data to create the crop rotation schedule for a field or management unit."""
         pass
+
+class CropRotationSchedule:
+    """Specifies the full crop-rotation schedule for a field over the course of the simulation.
+
+    Attributes
+    ----------
+    crop_sequences : list[CropSequence]
+        all the CropSequence objects, which specify when crops will be planted and harvest. Typically, there will be
+        one element per species.
+    """
+    def __init__(self, crop_sequences: CropSequence | List[CropSequence]):
+        if type(crop_sequences) is CropSequence:
+            self.crop_sequences = [crop_sequences]
+        else:
+            self.crop_sequences = crop_sequences
 
 
 # @dataclass
