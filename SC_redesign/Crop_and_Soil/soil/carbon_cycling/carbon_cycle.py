@@ -1,7 +1,6 @@
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.decomposition import Decomposition
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS
 
@@ -28,11 +27,22 @@ class CarbonCycling:
         self.pool_gas_partition = PoolGasPartition(self.data)
         self.residue_partition = ResiduePartition(self.data)
 
-    def cycle_carbon(self, rainfall: float, crop: CropData, temp_average: float, field_size):
-        """main routine for carbon cycle"""
-        self.decomposition.decompose(self.data, temp_average)
-        self.residue_partition.partition_residue(self.data, rainfall, crop)
-        self.pool_gas_partition.partition_pool_gas(self.data)
+    def cycle_carbon(self, rainfall: float, temp_average: float, field_size: float) -> None:
+        """Main routine for carbon cycle.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm)
+        temp_average : float
+            Average temperature on the current day (mm)
+        field_size : float
+            Size of the field (ha)
+
+        """
+        self.decomposition.decompose(temp_average)
+        self.residue_partition.partition_residue(rainfall)
+        self.pool_gas_partition.partition_pool_gas()
         self._soil_carbon_aggregation(field_size)
 
     def _soil_carbon_aggregation(self, field_size: float) -> None:

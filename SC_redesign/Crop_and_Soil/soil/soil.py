@@ -121,3 +121,4 @@ class Soil:
         self.soil_erosion.erode(field_size, minimum_cover_management_factor, residue)
         self.phosphorus_cycling.cycle_phosphorus(rainfall, self.data.accumulated_runoff, field_size, avg_air_temp)
         self.nitrogen_cycling.cycle_nitrogen(field_size)
+        self.carbon_cycling.cycle_carbon(rainfall, avg_air_temp, field_size)
