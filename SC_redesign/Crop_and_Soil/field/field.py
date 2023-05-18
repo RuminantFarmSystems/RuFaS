@@ -369,18 +369,8 @@ class Field:
                 - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
                     and this amount depends on the evapotranspirative demand after water has been removed from canopies)
         """
-        # TODO: Track snow cover on the field - issue #317
-        plant_cover = self._determine_total_above_ground_biomass() + self.field_data.current_residue
-        self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
-                                                          current_weather.mean_air_temperature,
-                                                          current_weather.min_air_temperature,
-                                                          current_weather.max_air_temperature, plant_cover,
-                                                          0, current_weather.annual_mean_air_temperature)
-
         total_precipitation = current_weather.rainfall
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
-
-        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
         self.soil.infiltration(precipitation_reaching_soil, 1)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
 
@@ -408,17 +398,30 @@ class Field:
 
         # TODO: sublimate and adjust soil_evaporation_and_sublimation_amount here - issue #317
 
-        self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
-        remaining_evapotranspirative_demand -= self.soil.data.water_evaporated
+        amount_evaporated_from_soil = self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
+        remaining_evapotranspirative_demand -= amount_evaporated_from_soil
 
+        total_initial_canopy_free_water = 0
+        for crop in self.crops:
+            crop.water_dynamics.cycle_water()  # TODO: tweak this once water method sare more solidified.
+            total_initial_canopy_free_water += crop.data.initial_canopy_free_water
+            crop.water_uptake.uptake_water()
+
+        # TODO: track snow cover on soil surface somewhere - Issue #317
+        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
         # TODO: figure out how to determine minimum cover management factor when there are multiple crops in the field
-        self.soil.soil_erosion.erode(self.field_data.field_size, 0.2, self.field_data.current_residue)
-        self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil,
-                                                      self.soil.data.accumulated_runoff, self.field_data.field_size,
-                                                      current_weather.mean_air_temperature)
-        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
-        self.soil.carbon_cycling.cycle_carbon(precipitation_reaching_soil, current_weather.mean_air_temperature,
-                                              self.field_data.field_size)
+        self.soil.daily_soil_water_routine(rainfall=current_weather.rainfall, weighting_coefficient=1,
+                                           has_seasonal_high_water_table=self.field_data.seasonal_high_water_table,
+                                           solar_radiation=current_weather.incoming_light,
+                                           max_air_temp=current_weather.max_air_temperature,
+                                           min_air_temp=current_weather.min_air_temperature,
+                                           avg_air_temp=current_weather.mean_air_temperature,
+                                           above_ground_biomass=self._determine_total_above_ground_biomass(),
+                                           residue=self.field_data.current_residue,
+                                           snow_water_content=0,
+                                           initial_canopy_free_water=total_initial_canopy_free_water,
+                                           minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
+        pass
 
     def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.

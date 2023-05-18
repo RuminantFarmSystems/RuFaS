@@ -73,8 +73,6 @@ class Crop:
             process sub-routines. It should be called every day that the crop
             is alive and growing in the simulation
         """
-        max_transpiration = soil_data.potential_evapotranspiration_adjusted
-
         # don't perform growth if the plant can't grow
         cannot_grow = not self.data.is_alive or not self.data.is_growing or self.data.is_dormant
         if cannot_grow:
@@ -85,6 +83,6 @@ class Crop:
         self.root_development.develop_roots()
         self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
         self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
-        self.growth_constraints.constrain_growth(max_transpiration, mean_air_temperature)
+        self.growth_constraints.constrain_growth(self.data.max_transpiration, mean_air_temperature)
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(incoming_light)
