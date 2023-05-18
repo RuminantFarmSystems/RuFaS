@@ -5,7 +5,6 @@ from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS,\
     CUBIC_MILLIMETERS_TO_CUBIC_METERS
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 
 @pytest.mark.parametrize("layer_thickness, field_size", [
@@ -221,10 +220,10 @@ def test_soil_carbon_aggregation(layers) -> None:
         assert layer.annual_carbon_CO2_lost == 11
 
 
-@pytest.mark.parametrize("rainfall, crop, temp_average, field_size", [
-    (1, CropData(yield_residue=300), 3, 4)
+@pytest.mark.parametrize("rainfall, temp_average, field_size", [
+    (1, 3, 4)
 ])
-def test_carbon_cycle(rainfall: float, crop: CropData, temp_average: float, field_size: float) -> None:
+def test_carbon_cycle(rainfall: float, temp_average: float, field_size: float) -> None:
     """tests that routines are called"""
     data = SoilData(field_size=5)
     cycle = CarbonCycling(data)
@@ -232,7 +231,7 @@ def test_carbon_cycle(rainfall: float, crop: CropData, temp_average: float, fiel
     cycle.pool_gas_partition.partition_pool_gas = MagicMock()
     cycle.residue_partition.partition_residue = MagicMock()
     cycle._soil_carbon_aggregation = MagicMock()
-    cycle.cycle_carbon(rainfall, crop, temp_average, field_size)
+    cycle.cycle_carbon(rainfall, temp_average, field_size)
 
     assert cycle.decomposition.decompose.call_count == 1
     assert cycle.pool_gas_partition.partition_pool_gas.call_count == 1
