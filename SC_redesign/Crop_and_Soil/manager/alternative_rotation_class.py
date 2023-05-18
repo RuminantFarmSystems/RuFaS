@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation, FINAL_HARVEST_OPERATIONS
-from SC_redesign.Crop_and_Soil.manager.Events import Event, HarvestEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, HarvestEvent
 
 
 class CropSchedule:
@@ -82,6 +82,95 @@ class CropSequence:
             raise Exception("all elements in crop_schedules should have the same crop_reference. For scheduling "
                             "sequences of multiple crops, see CropRotation.")
         self.crop_reference = self.crop_schedules[0].crop_reference
+
+    @staticmethod
+    def create_from_sequences(crop_reference: str,
+                              planting_years: List[int], planting_days: List[int], harvest_years: List[int | List[int]],
+                              harvest_days: List[int | List[int | List[int]]],
+                              harvest_ops: List[str | List[str | List[str]]]):
+        # TODO: This method isn't working yet.
+        """Creates a CropSequence object from sequences of event specifications
+
+        Parameters
+        ----------
+        crop_reference : str
+            the crop reference identifier for this sequence
+        planting_years : list[int]
+            the years, after simulation start, on which a new crop instances should be created
+        planting_days : list[int]
+            the day of the year on which new crops should be planted, one for each instance
+        harvest_years : list[int | list[int]]
+            the years on which the crop instances should be harvested, one element for each crop instance. If a single
+            crop should be harvested over multiple years, the element can itself be a list with one value for each
+            harvest event.
+        harvest_days : list[int | list[int | list[int]]]
+            the days on which the crop instances should be harvested, one element for each crop instance. If a single
+            crop should be harvested multiple times within a year, the element corresponding to that `harvest_years`
+            element can itself be a list with one value per day for each year.
+        harvest_ops : list[str | list[str | list[str]]]
+            the harvest operation that should occur at the time of harvest. This should have identical dimensions to
+            harvest_days.
+
+        Returns
+        -------
+        seq : CropSequence
+            the resulting CropSequence object
+
+        Examples
+        --------
+        Simple consecutive corn sequence
+
+        >>> CropSequence.create_from_sequences("corn", [0, 1, 2], [120, 120, 120], [0, 1, 2], [240, 240, 240]
+        ...                                    ["default", "default", "default"])
+
+        """
+        if not len(planting_years) == len(planting_days) == len(harvest_days) == len(harvest_years) == len(harvest_ops):
+            raise Exception("all input parameters must be lists of equal lengths")
+        n_instances = len(planting_years)
+
+        planting_events = []
+        harvest_events = []
+        for i in range(n_instances):
+            py = planting_years[i]
+            pd = planting_days[i]
+            planting_events[i] = Event(py, pd)
+
+            hy = harvest_years[i]
+            if type(hy) is int:
+                hy = [hy]
+            hd = harvest_days[i]
+            if type(hd) is int:
+                hd = [hd]
+            ho = harvest_ops[i]
+            if type(ho) is str:
+                ho = [ho]
+
+            if not len(hd) == len(hy) == len(ho):
+                raise Exception("sub-lists of harvest_years, harvest_days, and harvest_operations must have equal"
+                                "lengths")
+            n_years_harvested = len(hy)
+
+            harvest_events[i] = []
+            for j in range(n_years_harvested):
+                y = hy[j]
+                d = hd[j]
+                if type(d) is int:
+                    d = [d]
+                o = ho[j]
+                if type(o) is str:
+                    o = [o]
+
+                if len(d) != len(o):
+                    raise Exception("harvest_days and harvest_operations must have equal dimensions")
+
+                harvest_events[i][j] = [HarvestEvent(y, d, o)]
+
+        schedules = [CropSchedule(crop_reference, p, h, False) for p, h in zip(planting_events, harvest_events)]
+        return CropSequence(schedules)
+
+
+
+
 
     @staticmethod
     def create_from_pattern():

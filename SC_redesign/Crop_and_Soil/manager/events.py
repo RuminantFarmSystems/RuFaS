@@ -121,7 +121,7 @@ def project_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0,
     [1, 2, 4, 6, 7, 9, 11, 12, 14]
 
     >>> project_sequence(start=[1, 2, 4], repeat=1, skip=2, cycles=3)
-    [1, 2, 4, 5, 6, 8, 11, 12, 14, 15, 16, 18]
+    [1, 2, 4, 5, 6, 8, 11, 12, 14, 15, 16, 18, 21, 22, 24, 25, 26, 28]
 
     >>> project_sequence(start=1, cycles=10)
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -137,18 +137,21 @@ def project_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0,
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     >>> project_sequence(start=1, repeat=3, skip=3, cycles=4)
-    [1, 2, 3, 7, 8, 9, 13, 14, 15, 19, 20, 21]
+    [1, 2, 3, 4, 8, 9, 10, 11, 15, 16, 17, 18, 22, 23, 24, 25]
 
     Equivalently:
 
-    >>> project_sequence(start=[1, 2, 3], skip=3, cycles=4)
-    [1, 2, 3, 7, 8, 9, 13, 14, 15, 19, 20, 21]
+    >>> project_sequence(start=[1, 2, 3, 4], skip=3, cycles=4)
+    [1, 2, 3, 4, 8, 9, 10, 11, 15, 16, 17, 18, 22, 23, 24, 25]
+
+    Notes
+    -----
+    Unlike `repeat` and `cycles`, `skip` can be negative, but the behaviour may not be as expected.
     """
     if repeat < 0:
         raise Exception("repeat must not be negative")
     if cycles < 0:
         raise Exception("cycles must not be negative")
-    # Note: skip can be negative, but the behaviour may not be as expected.
 
     if type(start) is int:
         start = [start]
@@ -158,12 +161,14 @@ def project_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0,
 
     increment = span + 1
     pattern_base = start.copy()
-    for i in range(repeat):
-        replicate = i + 1
-        pattern_base += [val + (increment * replicate) for val in start]
+    if repeat > 0:
+        for i in range(repeat):
+            replicate = i + 1
+            pattern_base += [val + (increment * replicate) for val in start]
+        span = max(pattern_base) - min(pattern_base)
 
     out_list = pattern_base.copy()
-    for j in range(cycles):
+    for j in range(cycles - 1):
         cycle = j + 1
         out_list += [val + (cycle * span) + (cycle * (skip + 1)) for val in pattern_base]
 
