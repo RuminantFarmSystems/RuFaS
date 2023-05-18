@@ -1392,7 +1392,7 @@ def test_set_requirements():
     """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
 
 
-def	test_is_constraint_violated():
+def test_is_constraint_violated():
     """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
     def dummy_solution():
         return [1,2,3,4]
@@ -1411,7 +1411,7 @@ def	test_is_constraint_violated():
         assert result == [False, True, False, True][i]
     
 
-def	test_find_failed_constraints():
+def test_find_failed_constraints():
     """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
     def dummy_solution():
         return [1,2,3,4]
@@ -1460,20 +1460,20 @@ def	test_find_failed_constraints():
 #     assert result[1]['fun'].__name__ == 'dummy_constraint_1'
 
 
-def	test_calc_pen_requirements():
+def test_calc_pen_requirements():
     """Unit test for function set_pen_requirements in file routines/animal/ration/ration_driver.py"""
     req = RUFAS.routines.animal.ration.ration_driver.Requirements()
     req.calc_pen_requirements(
-        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3], 
-        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], True)
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], True)
     attributelist = ['NEmaint','NEa','NEg','NEpreg', 'NEl', 'MP_req', 'Ca_req', 'P_req', 
         'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
     
     req.calc_pen_requirements(
-        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3], 
-        [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], [1,2,3],  [1,2,3], False)
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], False)
     for attribute in attributelist:
         assert getattr(req, attribute) == 2.8
 
