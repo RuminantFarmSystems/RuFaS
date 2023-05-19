@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from typing import List
-from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation, FINAL_HARVEST_OPERATIONS
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from SC_redesign.Crop_and_Soil.manager.events import Event, HarvestEvent
 
 
@@ -52,6 +51,7 @@ class CropSchedule:
             raise Exception("The final element of harvest_events must specify an operation that will terminate "
                             "the crop and the non-final harvest_events must not terminate the crop.")
 
+
 class CropSequence:
     """Specifies a sequence of planting and harvesting events for a single crop species.
 
@@ -85,9 +85,11 @@ class CropSequence:
 
     @staticmethod
     def create_from_sequences(crop_reference: str,
-                              planting_years: List[int], planting_days: List[int], harvest_years: List[int | List[int]],
-                              harvest_days: List[int | List[int | List[int]]],
-                              harvest_ops: List[str | List[str | List[str]]]):
+                              planting_years: List[int],
+                              planting_days: List[int],
+                              harvest_years: List[int | List[int]],
+                              harvest_days: List[int | List[int]],
+                              harvest_ops: List[str | List[str]]):
         # TODO: This method isn't working yet.
         """Creates a CropSequence object from sequences of event specifications
 
@@ -103,11 +105,11 @@ class CropSequence:
             the years on which the crop instances should be harvested, one element for each crop instance. If a single
             crop should be harvested over multiple years, the element can itself be a list with one value for each
             harvest event.
-        harvest_days : list[int | list[int | list[int]]]
+        harvest_days : list[int | list[int]]
             the days on which the crop instances should be harvested, one element for each crop instance. If a single
             crop should be harvested multiple times within a year, the element corresponding to that `harvest_years`
             element can itself be a list with one value per day for each year.
-        harvest_ops : list[str | list[str | list[str]]]
+        harvest_ops : list[str | list[str]]
             the harvest operation that should occur at the time of harvest. This should have identical dimensions to
             harvest_days.
 
@@ -116,7 +118,7 @@ class CropSequence:
         seq : CropSequence
             the resulting CropSequence object
 
-        # TODO: See the below examples for how the code *should* work (as I see it, there is likely a better way: tuples?)
+        # TODO: See the below examples for how the code *should* work (as I see it, there's likely better way: tuples?)
         Examples
         --------
         Simple consecutive corn sequence:
@@ -136,11 +138,13 @@ class CropSequence:
 
         This alfalfa is planted twice, it is harvested twice per year, for three years:
 
-        >>> CropSequence.create_from_sequences(crop_reference="grass", planting_years=[0, 3], planting_days=[120, 120],
-        ...                                    harvest_years = [[0, 0, 1, 1, 2, 2], [3, 3, 4, 4, 5, 5]],
-        ...                                    harvest_days = [[220, 240, 220, 240, 220, 240], [220, 240, 220, 240, 220, 240]],
-        ...                                    harvest_ops = [["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "default"],
-        ...                                                   ["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "default"]])
+        >>> CropSequence.create_from_sequences(
+        ...     crop_reference="grass", planting_years=[0, 3], planting_days=[120, 120],
+        ...     harvest_years = [[0, 0, 1, 1, 2, 2], [3, 3, 4, 4, 5, 5]],
+        ...     harvest_days = [[220, 240, 220, 240, 220, 240], [220, 240, 220, 240, 220, 240]],
+        ...     harvest_ops = [["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "default"],
+        ...                    ["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "default"]]
+        ... )
 
         """
         if not len(planting_years) == len(planting_days) == len(harvest_days) == len(harvest_years) == len(harvest_ops):
@@ -192,6 +196,7 @@ class CropSequence:
         """creates a CropSequence object from a pattern. This more closely matches the structure that users will
         be inputting data to create the crop rotation schedule for a field or management unit."""
         pass
+
 
 class CropRotationSchedule:
     """Specifies the full crop-rotation schedule for a field over the course of the simulation.

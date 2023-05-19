@@ -12,6 +12,7 @@ method will be used when harvesting a crop. By contrast no `PlantingEvent` class
 additional specifications required to plant a crop beyond `year` and `day`
 """
 
+
 class Event:
     def __init__(self, year=0, day=120):
         """Creates a new Event instance
@@ -83,6 +84,7 @@ class HarvestEvent(Event):
         super().__init__(year=year, day=day)
         self.operation = operation
 
+
 def project_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0, cycles: int = 1) -> List[int]:
     """Generates a sequence of integers from a starting point, based on pattern rules. This method was created with
     temporal sequences specifically in mind.
@@ -104,7 +106,7 @@ def project_sequence(start: int | List[int] = 0, repeat: int = 0, skip: int = 0,
     -------
     seq : list[int]
         the resulting sequence.
-        
+
     Raises
     ------
     Exception
