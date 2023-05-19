@@ -336,12 +336,39 @@ class OutputManager(object):
         self._dict_to_file_json(self.errors_pool, file_path)
 
     def save_variable_names_and_contexts(
-        self, path: str, exclude_info_maps: bool, format_option: str = "block"
+        self, path: str, exclude_info_maps: bool, format_option: str = "verbose"
     ) -> None:
         """
-        saves names of all variables added to variables_pool along with the caller class
+        Saves names of all variables added to variables_pool along with the caller class
         and function contextual information into a txt file in the given path to a directory.
-        TODO: expand the docstring and explain format_options: "block", "inline", and "verbose"
+
+        Parameters
+        ----------
+        path : str
+            The path to the file to be saved
+        exclude_info_maps : bool
+            Flag to denote whether info_map data should be saved with variable names
+        format_options : {"block", "inline", "verbose"}
+            The selection for the formatting option of the text written to the variables names text file
+
+        Examples
+        --------
+        format_option: str = "block"
+        class_name.function_name.variable_name
+                                              .values: variable1_name
+                                              .values: variable2_name
+                                              .info_maps: variable3_name
+                                              .info_maps: variable4_name
+
+        format_option: str = "inline"
+        class_name.function_name.variable_name.values: [variable1_name, variable2_name]
+        class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
+
+        format_option: str = "verbose"
+        class_name.function_name.variable_name.values: variable1_name
+        class_name.function_name.variable_name.values: variable2_name
+        class_name.function_name.variable_name.info_maps: variable3_name
+        class_name.function_name.variable_name.info_maps: variable4_name
         """
 
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
