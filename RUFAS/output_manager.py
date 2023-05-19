@@ -350,8 +350,8 @@ class OutputManager(object):
                 var_list.append(f"{name}: **NO VARIABLES**\n")
                 continue
 
-            is_varible_nested = isinstance(variable_data["values"][0], Dict)
-            if is_varible_nested:
+            is_variable_nested = isinstance(variable_data["values"][0], Dict)
+            if is_variable_nested:
                 parsable_dicts = ["values", "info_maps"]
             else:
                 var_list.append(f"{name}\n")
