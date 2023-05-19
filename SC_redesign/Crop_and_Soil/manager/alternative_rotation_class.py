@@ -116,12 +116,31 @@ class CropSequence:
         seq : CropSequence
             the resulting CropSequence object
 
+        # TODO: See the below examples for how the code *should* work (as I see it, there is likely a better way: tuples?)
         Examples
         --------
-        Simple consecutive corn sequence
+        Simple consecutive corn sequence:
 
         >>> CropSequence.create_from_sequences("corn", [0, 1, 2], [120, 120, 120], [0, 1, 2], [240, 240, 240]
         ...                                    ["default", "default", "default"])
+
+        Alfalfa is planted once, and harvested multiple years:
+
+        >>> CropSequence.create_from_sequences("alfalfa", [0], [120], [[0, 1, 2]], [[240, 240, 240]],
+        ...                                    [["no_kill", "no_kill", "default"]])
+
+        A crop may also need to be harvested twice per year, this is done by specifying the year multiple times:
+
+        >>> CropSequence.create_from_sequences("imaginary crop", [0], [120], [[0, 0]], [[220, 240]],
+        ...                                    [["no_kill", "default"]])
+
+        This alfalfa is planted twice, it is harvested twice per year, for three years:
+
+        >>> CropSequence.create_from_sequences(crop_reference="grass", planting_years=[0, 3], planting_days=[120, 120],
+        ...                                    harvest_years = [[0, 0, 1, 1, 2, 2], [3, 3, 4, 4, 5, 5]],
+        ...                                    harvest_days = [[220, 240, 220, 240, 220, 240], [220, 240, 220, 240, 220, 240]],
+        ...                                    harvest_ops = [["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "default"],
+        ...                                                   ["no_kill", "no_kill", "no_kill", "no_kill", "no_kill", "default"]])
 
         """
         if not len(planting_years) == len(planting_days) == len(harvest_days) == len(harvest_years) == len(harvest_ops):
