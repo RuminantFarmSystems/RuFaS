@@ -383,15 +383,26 @@ class Field:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
 
         total_initial_canopy_free_water = 0
+        should_water_field = False
         for crop in self.crops:
             crop.water_dynamics.cycle_water()  # TODO: tweak this once water method sare more solidified.
             total_initial_canopy_free_water += crop.data.initial_canopy_free_water
             crop.water_uptake.uptake_water()
 
+            if not crop.data.is_dormant:
+                should_water_field = True
+
+        total_water_added_to_field = CurrentWeather.rainfall
+        if should_water_field:
+            total_water_added_to_field += self._determine_watering_amount(CurrentWeather.rainfall)
+        else:
+            self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
+            self.field_data.days_into_watering_interval = self.field_data.watering_interval
+
         # TODO: track snow cover on soil surface somewhere - Issue #317
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
         # TODO: figure out how to determine minimum cover management factor when there are multiple crops in the field
-        self.soil.daily_soil_water_routine(rainfall=current_weather.rainfall, weighting_coefficient=1,
+        self.soil.daily_soil_water_routine(rainfall=total_water_added_to_field, weighting_coefficient=1,
                                            has_seasonal_high_water_table=self.field_data.seasonal_high_water_table,
                                            solar_radiation=current_weather.incoming_light,
                                            max_air_temp=current_weather.max_air_temperature,
@@ -403,6 +414,45 @@ class Field:
                                            initial_canopy_free_water=total_initial_canopy_free_water,
                                            minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
+
+    def _determine_watering_amount(self, rainfall: float) -> float:
+        """Manages watering of the field.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall that occurs on this day (mm)
+
+        Returns
+        -------
+        float
+            Amount of water used to irrigate the field on this day (mm)
+
+        Notes
+        -----
+        This method drives the engine of irrigation for RuFaS. It tracks how much water has been added to the field by
+        rainfall over a user-defined interval, and when at the end of the interval it determines how much water still
+        needs to be added to the field based on how much watering has to occur over said interval (also defined by the
+        user). The counter that tracks how where in the interval the simulation is and the amount of water that still
+        needs to be applied are reset at the end of every interval. The water that is added to the field from the farm's
+        resources is tracked on an annual basis, so that water budgeting may be accurately predicted.
+
+        """
+        if not self.field_data.watering_occurs:
+            return 0.0
+
+        self.field_data.current_water_deficit -= rainfall
+        self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
+
+        if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
+            self.field_data.days_into_watering_interval = 0
+            water_applied_this_interval = self.field_data.current_water_deficit
+            self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
+            self.field_data.annual_irrigation_water_use_total += water_applied_this_interval
+            return water_applied_this_interval
+
+        self.field_data.days_into_watering_interval += 1
+        return 0.0
 
     def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.
@@ -551,4 +601,5 @@ class Field:
         """Collect all annual accumulated totals from Field, Crop, and Soil modules, write them to some sort of output
             file, and then reset all annual totals"""
         self.soil.data.do_annual_reset()
+        self.field_data.perform_annual_field_reset()
         return
