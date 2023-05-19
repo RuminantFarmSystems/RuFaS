@@ -1,5 +1,5 @@
 from typing import Optional, List, Dict
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
@@ -77,7 +77,7 @@ def test_add_crop():
         field.add_crop(crop)
         assert type(field.crops[i]) is Crop
     for crop in field.crops:
-        assert crop.data.field_proportion == 1/5
+        assert crop.data.field_proportion == 1 / 5
     assert len(field.crops) == 5
 
     # ---- second case: specific covers
@@ -123,7 +123,7 @@ def test_make_crop_from_config_dict(config: dict):
     ([{"species": "corn"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
-    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1/3, 1/3, 1/3])
+    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1 / 3, 1 / 3, 1 / 3])
 ])
 def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     field = Field()
@@ -166,6 +166,95 @@ def test_amend_soil() -> None:
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
     field.amend_soil()
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
+
+
+@pytest.mark.parametrize("precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
+                         "expected_first,expected_second", [
+                             (13, 8, 2, 4, 3, 8, 8),  # Fills both pools with some leftover
+                             (6, 7, 3, 2, 0, 7, 4),  # Fills one pool, puts some in second, none leftover
+                             (14, 5, 7, 1, 12, 5, 5),  # Removes from one pool, fills other, some leftover
+                             (3, 6, 8, 9, 8, 6, 6),  # Removes from both pools, lots left over
+                             (5, 10, 3, 12, 2, 8, 10)  # Fills one pool as much as possible, removes excess from
+                             # another
+                         ]
+                         )
+def test_handle_water_in_crop_canopies(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
+                                       second_canopy_amount: float, expected_return: float, expected_first: float,
+                                       expected_second: float) -> None:
+    """Tests that water is properly added and removed from the crop canopies of field objects."""
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.water_canopy_storage_capacity",
+               new_callable=PropertyMock, return_value=canopy_capacity):
+        crop_data1 = CropData(canopy_water=first_canopy_amount)
+        crop1 = Crop(crop_data1)
+        crop_data2 = CropData(canopy_water=second_canopy_amount)
+        crop2 = Crop(crop_data2)
+        field = Field()
+        field.crops = [crop1, crop2]
+
+        actual = field._handle_water_in_crop_canopies(precipitation)
+        assert actual == expected_return
+        assert field.crops[0].data.canopy_water == expected_first
+        assert field.crops[1].data.canopy_water == expected_second
+
+
+@pytest.mark.parametrize("demand,canopy_water_1,canopy_water_2,expected_demand,expected_canopy_water1,"
+                         "expected_canopy_water2", [
+                             (14.5, 1.8, 2.3, 10.4, 0.0, 0.0),
+                             (8.6, 4.7, 4.1, 0.0, 0.0, 0.2),
+                             (9.5, 10.8, 5.7, 0.0, 1.3, 5.7)
+                         ])
+def test_evaporate_from_crop_canopies(demand: float, canopy_water_1: float, canopy_water_2: float,
+                                      expected_demand: float, expected_canopy_water1: float,
+                                      expected_canopy_water2: float) -> None:
+    """Tests that the evapotranspirative demand is correctly reduced by the amounts of water evaporated."""
+    data1 = CropData(canopy_water=canopy_water_1)
+    crop1 = Crop(data1)
+    data2 = CropData(canopy_water=canopy_water_2)
+    crop2 = Crop(data2)
+    field = Field()
+    field.crops = [crop1, crop2]
+
+    actual_demand = field._evaporate_from_crop_canopies(demand)
+    assert pytest.approx(actual_demand) == expected_demand
+    assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
+    assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
+
+
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
+    (100, 28, 10, 14),
+    (568, 20, 14, 18),
+    (568, 20, 14, None),
+    (80, 14, 0, 8),
+    (678.0098, 26.8896, 10.3339, 18.3345),
+])
+def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
+    with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_latent_heat_vaporization",
+               new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
+        actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
+        if avg_temp is not None:
+            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                      (avg_temp + 17.8)) / 1.3
+        else:
+            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                      (((max_temp + min_temp) / 2) + 17.8)) / 1.3
+
+        if avg_temp is not None:
+            mocked_latent_heat.assert_called_once_with(avg_temp)
+        else:
+            mocked_latent_heat.assert_called_once_with((max_temp + min_temp) / 2)
+        assert actual == expect
+
+
+@pytest.mark.parametrize("avg_temp", [
+    12.86878,
+    0,
+    (-2.586948),
+    20.4486,
+])
+def test_determine_latent_heat_vaporization(avg_temp):
+    observe = Field._determine_latent_heat_vaporization(avg_temp)
+    expect = 2.501 - (0.002361 * avg_temp)
+    assert expect == observe
 
 
 def test_annual_reset() -> None:
