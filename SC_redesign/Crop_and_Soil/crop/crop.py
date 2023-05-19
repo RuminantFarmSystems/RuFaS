@@ -74,8 +74,7 @@ class Crop:
             is alive and growing in the simulation
         """
         # don't perform growth if the plant can't grow
-        cannot_grow = not self.data.is_alive or not self.data.is_growing or self.data.is_dormant
-        if cannot_grow:
+        if not self.data.is_growing:
             return
 
         # grow otherwise

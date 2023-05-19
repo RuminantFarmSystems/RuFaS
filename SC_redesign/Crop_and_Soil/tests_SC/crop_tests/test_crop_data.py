@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch, PropertyMock
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 
 
@@ -12,6 +13,22 @@ def test_is_mature_property(frac, expect):
     """check that the is_mature property is properly assigning maturity by heat fraction"""
     data = CropData(heat_fraction=frac)
     assert data.is_mature == expect
+
+
+@pytest.mark.parametrize("mature,dormant,alive,expected", [
+    (False, False, False, False),
+    (True, False, False, False),
+    (True, True, False, False),
+    (True, True, True, False),
+    (True, False, True, False),
+    (False, False, True, True)
+])
+def test_is_growing_property(mature: bool, dormant: bool, alive: bool, expected: bool) -> None:
+    """Tests that crop's growth status is correctly determined."""
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_mature", new_callable=PropertyMock,
+               return_value=mature):
+        data = CropData(is_dormant=dormant, is_alive=alive)
+        assert data.is_growing == expected
 
 
 @pytest.mark.parametrize("usr_index, expect", [

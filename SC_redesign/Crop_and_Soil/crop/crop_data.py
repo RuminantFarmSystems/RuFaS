@@ -186,9 +186,6 @@ class CropData:
     """total heat units required for the plant to reach maturity (unitless)"""
     accumulated_heat_units: float = 0  # accumulator
     """total heat units accumulated to date (unitless)"""
-    is_growing: bool = True
-    # TODO: not currently used; SWAT 5:2.1.4 (pretty sure this is a section, not equation, reference)
-    """is the crop currently growing?"""
     is_dormant: bool = False
     """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
@@ -398,8 +395,19 @@ class CropData:
 
     @property
     def is_mature(self) -> bool:
-        """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
+        """checks if maturity has been reached based on the fraction of potential heat units accumulated
+
+        References
+        ----------
+        SWAT Theoretical documentation section 5:2.1.4
+        """
         return self.heat_fraction >= 1.0
+
+    @property
+    def is_growing(self) -> bool:
+        """Indicates if the plant is in its growing season.
+        """
+        return not self.is_mature and not self.is_dormant and self.is_alive
 
     @property
     def do_harvest_index_override(self) -> bool:
@@ -421,7 +429,6 @@ class CropData:
 
         """
         return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
-
 
 """
 The species child classes provide default configuration for the supported CropSpecies.
