@@ -351,15 +351,37 @@ class Field:
     def cycle_water(self, current_weather: CurrentWeather):
         """allow the water to cycle through the field.
 
-         Args:
-             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
+        Args:
+            current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
-         Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
-         whole-field. Therefore, it makes most sense for this process to take place within the field class rather
-         than in both the crop and soil classes. Water uptake by the crop will likely be an exception that should
-         take place during a crop's grow() method. Other exceptions may come up as these modules develop.
-         """
+        Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
+            whole-field. Therefore, it makes most sense for this process to take place within the field class rather
+            than in both the crop and soil classes. This method coordinates the evapotranspiration from the field on any
+            given day, by first calculating the evapotranspirative demand, the removing water from the elements in the
+            field in the order listed below. The removal of water does not stop until either all elements have had water
+            removed from them or the evapotranspirative demand has been satisfied. Order of elements evapotranspirated
+            from:
+                - Evaporation of water in canopies of crops.
+                - Sublimation of water in snow pack (not implemented in V1)
+                - Evaporation from the soil profile.
+                - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
+                    and this amount depends on the evapotranspirative demand after water has been removed from canopies)
+        """
+        total_precipitation = current_weather.rainfall
+        precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
+        self.soil.infiltration(precipitation_reaching_soil, 1)
+        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+
+        full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
+            current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
+            current_weather.mean_air_temperature)
+
+        remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
+
+        for crop in self.crops:
+            crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
+
         total_initial_canopy_free_water = 0
         should_water_field = False
         for crop in self.crops:
@@ -388,7 +410,7 @@ class Field:
                                            avg_air_temp=current_weather.mean_air_temperature,
                                            above_ground_biomass=self._determine_total_above_ground_biomass(),
                                            residue=self.field_data.current_residue,
-                                           snow_water_content=current_weather.snow_fall,
+                                           snow_water_content=0,
                                            initial_canopy_free_water=total_initial_canopy_free_water,
                                            minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
         pass
@@ -432,12 +454,145 @@ class Field:
         self.field_data.days_into_watering_interval += 1
         return 0.0
 
+    def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
+        """Adds water to canopies of all the crops in the field and removes any excess water from them.
+
+        Parameters
+        ----------
+        precipitation_total : float
+            Total amount of precipitation that fell on the field today (mm)
+
+        Returns
+        -------
+        float
+            Amount of water that reaches the soil surface (mm)
+
+        Notes
+        -----
+        This method accounts for the edge case that no water was lost from the crop canopy yesterday and the capacity in
+        the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
+        happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
+        canopy of another.
+        TODO: distribute water evenly/proportionally/fairly between crop canopies - issue #513
+        """
+        precipitation_reaching_soil = precipitation_total
+        excess_canopy_water = 0
+        for crop in self.crops:
+            canopy_water_excess_capacity = crop.data.water_canopy_storage_capacity - crop.data.canopy_water
+
+            excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
+            excess_canopy_water += -1 * excess_water_in_canopy
+            if excess_water_in_canopy != 0.0:
+                crop.data.canopy_water = crop.data.water_canopy_storage_capacity
+
+            water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
+            water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
+            crop.data.canopy_water += water_taken_to_be_stored
+            precipitation_reaching_soil -= water_taken_to_be_stored
+
+        return precipitation_reaching_soil + excess_canopy_water
+
+    def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
+        """Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
+
+        Parameters
+        ----------
+        evapotranspirative_demand : float
+            Evapotranspirative demand on the field on the current day (mm)
+
+        Returns
+        -------
+        float
+            Evapotranspirative demand after evaporating water from crops' canopies (mm)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.1
+
+        Notes
+        -----
+        This method iterates through the crops in the field, for each determines how much water was evaporated from its
+        canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
+        reaches 0, then no more water should be evaporated so the method stops running.
+        TODO: evaporate water evenly/proportionally/fairly from crop canopies - issue #513
+        """
+        remaining_evapotranspirative_demand = evapotranspirative_demand
+        for crop in self.crops:
+            amount_evaporated = crop.water_dynamics.evaporate_from_canopy(remaining_evapotranspirative_demand)
+            remaining_evapotranspirative_demand -= amount_evaporated
+            if remaining_evapotranspirative_demand == 0.0:
+                break
+        return remaining_evapotranspirative_demand
+
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
         for crop in self.crops:
             total_above_ground_biomass += crop.data.above_ground_biomass
         return total_above_ground_biomass
+
+    @staticmethod
+    def _determine_potential_evapotranspiration(extra_terrestrial_radiation: float, max_air_temp: float,
+                                                min_air_temp: float,
+                                                avg_air_temp: float) -> float:
+        """Calculates the potential evapotranspiration for a given day.
+
+        Parameters
+        ----------
+        extra_terrestrial_radiation : float
+            Radiation from the aliens (MJ per square meter per day)
+        max_air_temp : float
+            Maximum air temperature (degrees C)
+        min_air_temp : float
+            Minimum air temperature (degrees C)
+        avg_air_temp : float
+            Average air temperature (degrees C)
+
+        Returns
+        -------
+        float
+            potential evapotranspiration (mm)
+
+        References
+        ----------
+        SWAT Reference: 2:2.2.24
+
+        Notes
+        -----
+        This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
+        method.
+
+        """
+        if avg_air_temp is None:
+            calculated_avg_air_temp = (max_air_temp + min_air_temp) / 2
+            latent_heat_vaporization = Field._determine_latent_heat_vaporization(calculated_avg_air_temp)
+            return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
+                    * (calculated_avg_air_temp + 17.8)) / latent_heat_vaporization
+        else:
+            latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
+            return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
+                    * (avg_air_temp + 17.8)) / latent_heat_vaporization
+
+    @staticmethod
+    def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
+        """Determine latent heat of vaporization for a given day.
+
+        Parameters
+        ----------
+        avg_air_temp : float
+            Average air temperature (degrees C)
+
+        Returns
+        -------
+        float
+            latent heat of vaporization (MJ per kg)
+
+        References
+        ----------
+        SWAT Reference: 1:2.3.6
+
+        """
+        return 2.501 - ((2.361 * (10 ** (-3))) * avg_air_temp)
 
     # </editor-fold>
 
