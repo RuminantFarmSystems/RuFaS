@@ -357,19 +357,19 @@ class AnimalManagement:
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(temp)
+            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
             heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(temp)
+            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
             heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(temp)
+            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
             heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
 
         for cow in self.cows:
-            cow.set_nutrient_rqmts()
+            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO)
             cow.p_animal = 0.0072 * cow.body_weight * 1000
 
     def avg_pen_dist(self) -> Tuple[float, float]:
@@ -394,16 +394,16 @@ class AnimalManagement:
             calf.calc_nutrient_rqmts(feed, temp)
 
         for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(temp)
+            heiferI.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
 
         for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(temp)
+            heiferII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
 
         for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(temp)
+            heiferIII.set_nutrient_rqmts(temp, self.ANIMAL_GROUPING_SCENARIO)
 
         for cow in self.cows:
-            cow.set_nutrient_rqmts()
+            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO)
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -1622,7 +1622,7 @@ class AnimalManagement:
                 animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
                 pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
                                                     key=lambda p: p.current_stocking_density)
-                pen_with_min_stocking_density.add_animal(animal, feed, temp,
+                pen_with_min_stocking_density.add_animal(animal, self.ANIMAL_GROUPING_SCENARIO, feed, temp,
                                                          self.phosphorus_concentration_by_animal_type[type(animal)])
                 self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 

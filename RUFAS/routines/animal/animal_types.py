@@ -10,9 +10,3 @@ class AnimalType(Enum):
     HEIFER_III = 'HeiferIII'
     DRY_COW = 'DryCow'
     LAC_COW = 'LacCow'
-
-
-if __name__ == '__main__':
-    # print all member names
-    t = AnimalType.CALF
-    print(f'AnimalType.CALF: {t}')

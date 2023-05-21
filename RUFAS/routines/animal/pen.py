@@ -15,6 +15,7 @@ from enum import Enum
 from typing import List, Dict, Union, DefaultDict, Any
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
@@ -792,7 +793,8 @@ class Pen:
     # Ration-related methods
     # ----------------------
     # TODO: Review
-    def _set_animal_nutrient_values(self, animal, feed, temp, phosphorus_concentration) -> None:
+    def _set_animal_nutrient_values(self, animal, animal_grouping_scenario,
+                                    feed, temp, phosphorus_concentration) -> None:
         """
         Set the nutrient values for the animal.
 
@@ -800,6 +802,7 @@ class Pen:
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
             The animal to set the nutrient values for.
+        animal_grouping_scenario
         feed
         temp
         phosphorus_concentration : float
@@ -809,15 +812,16 @@ class Pen:
         None
 
         """
-
-        if type(animal) == Cow:
+        animal_type = animal_grouping_scenario.get_animal_type(animal)
+        if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
             requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
-                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow',
+                                          day_of_pregnancy=animal.days_in_preg, animal_type=animal_type,
                                           parity=animal.calves, calving_interval=animal.CI,
                                           milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
                                           milk_lactose=animal.lactose_milk,
                                           milk_production=animal.estimated_daily_milk_produced,
-                                          days_in_milk=animal.days_in_milk, lactating=animal.milking)
+                                          days_in_milk=animal.days_in_milk, lactating=animal.milking,
+                                          previous_temperature=temp)
             animal.NEmaint = requirements['NEmaint']
             animal.NEg = requirements['NEg']
             animal.NEpreg = requirements['NEpreg']
@@ -832,21 +836,21 @@ class Pen:
 
             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
-        if type(animal) == Calf:
+        if animal_type in [AnimalType.CALF]:
             if self.avg_calf_nutrient_rqmts:
                 animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
             else:
                 animal.calc_nutrient_rqmts(feed, temp)
-        elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
             if self.avg_nutrient_rqmts:
                 animal.nutrient_rqmts = self.avg_nutrient_rqmts
             else:
-                animal.set_nutrient_rqmts(temp)
+                animal.set_nutrient_rqmts(temp, animal_grouping_scenario)
         else:
             if self.avg_nutrient_rqmts:
                 animal.nutrient_rqmts = self.avg_nutrient_rqmts
             else:
-                animal.set_nutrient_rqmts()
+                animal.set_nutrient_rqmts(animal_grouping_scenario)
 
         if phosphorus_concentration != -1:
             animal.p_animal = animal.body_weight * phosphorus_concentration
@@ -882,7 +886,8 @@ class Pen:
         return ration
 
     # Population-related methods
-    def add_animal(self, animal, feed, temp, phosphorus_concentration: float) -> None:
+    def add_animal(self, animal, animal_grouping_scenario,
+                   feed, temp, phosphorus_concentration: float) -> None:
         """
         Add an animal to the pen and adjust the ration accordingly.
 
@@ -890,6 +895,7 @@ class Pen:
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
             The animal to be added to the pen.
+        animal_grouping_scenario
         feed
         temp
         phosphorus_concentration : float
@@ -900,7 +906,7 @@ class Pen:
 
         """
 
-        self._set_animal_nutrient_values(animal, feed, temp, phosphorus_concentration)
+        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
         self.animals_in_pen.append(animal)
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
 

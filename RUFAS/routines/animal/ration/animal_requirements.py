@@ -179,10 +179,10 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     if day_of_pregnancy and day_of_pregnancy > 190:
         conceptus_weight = (18 + (day_of_pregnancy - 190)
                             * 0.665) * (calf_birth_weight / 45)
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
         net_energy_maintenance = (
             0.08 * (body_weight - conceptus_weight) ** 0.75)
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
         body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
         net_energy_maintenance = (body_weight-conceptus_weight)**(0.75) * \
             (0.086*(0.8 + (body_condition_score_9 - 1) * 0.5)) + \
@@ -310,7 +310,7 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
     equivalent_shrunk_body_weight = (SBW - conceptus_weight) * (478 / MSBW)
     # [A.Cow.A.11]
     # Average Daily Gain (kg)
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
         if parity == 1 and calving_interval != 0:
             average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
         elif parity == 2 and calving_interval != 0:
@@ -319,7 +319,7 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
             average_daily_gain = 0.0
     # [A.Heifer.A.12]
     # Average Daily Gain (kg)
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
         average_daily_gain = max(average_daily_gain_heifer, 0.0)
     # [A.Cow.A.12]-[A.Heifer.A.13]
     # Equivalent empty weight gain (kg)
@@ -378,14 +378,14 @@ def calculate_NASEM_energy_growth_requirements(
 
     """
     MSBW = 0.96 * mature_body_weight
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
         if parity == 1 and calving_interval != 0:
             average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
         elif parity == 2 and calving_interval != 0:
             average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval
         else:
             average_daily_gain = 0.0
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
         average_daily_gain = max(average_daily_gain_heifer, 0.0)
     else:
         average_daily_gain = 0.0
@@ -406,7 +406,7 @@ def calculate_NASEM_energy_growth_requirements(
 def calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy: Optional[int], calf_birth_weight: float) -> float:
     """ Calculates energy requirement for pregnancy according to NRC (2001).
 
-    Calculates the estimated energy requirements requirements for pregnancy in megacalories per day
+    Calculates the estimated energy requirements for pregnancy in megacalories per day
 
     Parameters
     ----------
@@ -943,7 +943,7 @@ def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight
         P_lact = 0.9 * milk_production
     if animal_type in [AnimalType.LAC_COW]:
         phosphorus_requirement = P_growth + P_preg + P_lact
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
         phosphorus_requirement = P_growth + P_preg
     return phosphorus_requirement
 
@@ -1092,8 +1092,6 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
 
     Parameters
     ----------
-    animal_type : str
-        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     body_weight : float
         Body weight (kilograms)
     mature_body_weight : float

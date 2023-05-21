@@ -196,7 +196,7 @@ def ration_report(ration, available_feeds):
 class Requirements:
     """
     Stores the information for the calculated requirements of animals to
-    be used in the the ration formulation.
+    be used in the ration formulation.
     """
 
     def __init__(self):
