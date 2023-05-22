@@ -15,20 +15,20 @@ def test_is_mature_property(frac, expect):
     assert data.is_mature == expect
 
 
-@pytest.mark.parametrize("mature,dormant,alive,expected", [
-    (False, False, False, False),
-    (True, False, False, False),
-    (True, True, False, False),
-    (True, True, True, False),
-    (True, False, True, False),
-    (False, False, True, True)
+@pytest.mark.parametrize("mature,dormant,alive,growing,expected", [
+    (False, False, False, False, False),
+    (True, False, False, True, False),
+    (True, True, False, False, False),
+    (True, True, True, True, False),
+    (True, False, True, False, False),
+    (False, False, True, True, True)
 ])
-def test_is_growing_property(mature: bool, dormant: bool, alive: bool, expected: bool) -> None:
+def test_in_growing_season_property(mature: bool, dormant: bool, alive: bool, growing: bool, expected: bool) -> None:
     """Tests that crop's growth status is correctly determined."""
     with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_mature", new_callable=PropertyMock,
                return_value=mature):
         data = CropData(is_dormant=dormant, is_alive=alive)
-        assert data.is_growing == expected
+        assert data.in_growing_season == expected
 
 
 @pytest.mark.parametrize("usr_index, expect", [

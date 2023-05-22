@@ -185,7 +185,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                      light: float, min_temp: float, max_temp: float, mean_temp: float, surface_residue: float,
                      crop_1_proportion: float, crop_2_proportion: float, crops_growing: bool) -> None:
     """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
-    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_growing", new_callable=PropertyMock,
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
                return_value=crops_growing):
         soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5)
         soil_data.plant_surface_residue = surface_residue
