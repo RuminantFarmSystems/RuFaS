@@ -12,6 +12,7 @@ import numpy as np
 import random
 from scipy.optimize import minimize
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration_values as user_defined_ration_values
@@ -464,16 +465,28 @@ def fat_constraint(x):
         return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-def DMI_constraint_lower(x):
+def DMI_constraint_lower_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
+    greater than the DMI_est + 20% calculated in the requirements
     greater than the DMI_est + 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
     """
     return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
+
+def DMI_constraint_upper(x):
+    """
+    Constraint in place to make sure the sum of all the feeds in the ration is
+    less than the DMI_est + 20% calculated in the requirements.
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 def DMI_constraint_upper(x):
     """
@@ -602,13 +615,11 @@ def optimize(user_defined_ration_select, ration_percents):
     con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
     con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
     con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
-    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
-
-    user_cons_cow = [con1, con2, con3, con4, con5, con6, con7, con9, con10, con11, con12]
-    user_cons_heif = [con1, con3, con4, con5, con6, con7, con9, con10, con11, con12]
+    con11 = {'type': 'ineq', 'fun': DMI_constraint}
+    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
+    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
+    user_cons_cow = [con1, con2, con3, con4, con5, con6, con7, con9, con10, con11]
+    user_cons_heif = [con1, con3, con4, con5, con6, con7, con9, con10, con11]
 
     def is_constraint_violated(solution, constraint) -> bool:
         result = constraint['fun'](solution)
@@ -618,7 +629,7 @@ def optimize(user_defined_ration_select, ration_percents):
             return True
         else:
             return False
-
+          
     def find_failed_constraints(solution, constraints):
         return list(filter(lambda c: is_constraint_violated(solution, c), constraints))
 

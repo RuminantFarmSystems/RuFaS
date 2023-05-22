@@ -23,6 +23,7 @@ from scipy.stats import truncnorm
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
@@ -31,8 +32,9 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
-from RUFAS.output_manager import OutputManager
+
 om = OutputManager()
+
 
 class MilkProductionHistory:
     def __init__(self, sim_day, days_in_milk, milk_prod, days_born):
@@ -326,11 +328,29 @@ class Cow(HeiferIII):
 
         self.body_weight += self.daily_growth
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.milking_update.__name__,
+                    "simulation_day": sim_day
+                    }
+
+        milk_data_update = {}
+        milk_data_update["days_in_milk"] = self.days_in_milk
+        milk_data_update["estimated_daily_milk_produced"] = self.estimated_daily_milk_produced
+        milk_data_update["milk_protein"] = self.mPrt
+        milk_data_update["milk_fat"] = self.fat_percent
+        milk_data_update["milk_lactose"] = self.lactose_milk
+        milk_data_update["lactating"] = self.milking
+        milk_data_update["parity"] = self.calves
+        milk_data_update["cow_id"] = self.id
+
+        om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
+
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
         return self.estimated_daily_milk_produced, fat_percent, \
                daily_fat_correct_milk_production
+
 
     def calc_manure_excretion(self, feed, methane_model, ME_intake):
         """
@@ -356,6 +376,7 @@ class Cow(HeiferIII):
         """
         Calculates this Cow's nutrient requirements.
         """
+
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
