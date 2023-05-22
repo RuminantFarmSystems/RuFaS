@@ -1154,7 +1154,7 @@ class AnimalManagement:
         Returns: True if today is the day a new ration has to be formulated,
                 false otherwise.
         """
-        return self.simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1
+        return self.simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or self.simulation_day == 0
 
     def annual_reset(self):
         pass
