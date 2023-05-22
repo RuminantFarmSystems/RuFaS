@@ -157,7 +157,7 @@ def test_absorb_heat_units(mean, mint, maxt, use_heat_unit_temp):
         expect_is_growing = True
     else:
         expect_is_growing = False
-    assert expect_is_growing == data.in_growing_season
+    assert expect_is_growing == data.is_growing
 
     if use_heat_unit_temp or (mean is None):
         expect_new_heat_units = HeatUnits._determine_new_heat_units(expect_heat_unit_temp, 20)
