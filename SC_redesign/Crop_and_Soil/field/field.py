@@ -673,7 +673,7 @@ class Field:
         snow_water_content : float
             Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
         TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-            (2:2.3.3) mean the same thing
+            (2:2.3.3) mean the same thing - address this with #317
         Returns
         -------
         float
