@@ -432,6 +432,7 @@ class CropData:
         """
         return self.max_canopy_water_capacity * (self.leaf_area_index / self.max_leaf_area_index)
 
+
 """
 The species child classes provide default configuration for the supported CropSpecies.
 Only values that differ from the default CropData need to be declared by default in these species classes.

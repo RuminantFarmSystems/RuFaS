@@ -5,6 +5,9 @@ import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
+from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
+from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.field import Field
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
@@ -171,6 +174,89 @@ def test_amend_soil() -> None:
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
     field.amend_soil()
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
+
+
+@pytest.mark.parametrize("field_size,rainfall,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
+                         "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing", [
+                             (1.9, 4.66, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
+                             (2.3, 5.6, 2.1, True, 44.5, 250, 22.33, 25.36, 24.6, 80.4, 0.77, 0.23, False)
+                         ])
+def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_water_table: bool, residue: float,
+                     light: float, min_temp: float, max_temp: float, mean_temp: float, surface_residue: float,
+                     crop_1_proportion: float, crop_2_proportion: float, crops_growing: bool) -> None:
+    """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_growing", new_callable=PropertyMock,
+               return_value=crops_growing):
+        soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5)
+        soil_data.plant_surface_residue = surface_residue
+        soil = Soil(soil_data)
+        crop_data_1 = CropData(field_proportion=crop_1_proportion, max_transpiration=44.1, cumulative_evaporation=105.5,
+                               cumulative_transpiration=205.1, cumulative_potential_evapotranspiration=400.19,
+                               total_water_uptake=3.5)
+        crop_1 = Crop(crop_data_1)
+        crop_data_2 = CropData(field_proportion=crop_2_proportion, max_transpiration=39.5, cumulative_evaporation=112.4,
+                               cumulative_transpiration=219.2, cumulative_potential_evapotranspiration=480.1,
+                               total_water_uptake=3.25)
+        crop_2 = Crop(crop_data_2)
+        current_weather = CurrentWeather(incoming_light=light, min_air_temperature=min_temp, rainfall=rainfall,
+                                         max_air_temperature=max_temp, mean_air_temperature=mean_temp)
+        field_data = FieldData(field_size=field_size, current_residue=residue,
+                               seasonal_high_water_table=high_water_table)
+        incorp = Field(field_data, soil)
+        incorp.crops = [crop_1, crop_2]
+
+        incorp.soil.infiltration.infiltrate = MagicMock()
+        incorp.soil.percolation.percolate = MagicMock()
+        incorp.soil.soil_erosion.erode = MagicMock()
+        incorp.soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
+        incorp.soil.nitrogen_cycling.cycle_nitrogen = MagicMock()
+        incorp.soil.evaporation.evaporate = MagicMock()
+
+        incorp._determine_watering_amount = MagicMock(return_value=0)
+        incorp._handle_water_in_crop_canopies = MagicMock(return_value=2.0)
+        incorp._determine_potential_evapotranspiration = MagicMock(return_value=33.5)
+        incorp._evaporate_from_crop_canopies = MagicMock(return_value=30.5)
+        incorp._determine_total_above_ground_biomass = MagicMock(return_value=40.0)
+        incorp._determine_soil_evaporation_and_sublimation_adjusted = MagicMock(return_value=10.5)
+
+        crop_1.water_dynamics.set_maximum_transpiration = MagicMock()
+        crop_1.water_dynamics.cycle_water = MagicMock()
+        crop_1.water_uptake.uptake_water = MagicMock()
+        crop_2.water_dynamics.set_maximum_transpiration = MagicMock()
+        crop_2.water_dynamics.cycle_water = MagicMock()
+        crop_2.water_uptake.uptake_water = MagicMock()
+
+        incorp.cycle_water(current_weather)
+
+        incorp._determine_watering_amount.assert_called_once_with(rainfall)
+        incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
+        incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp, mean_temp)
+        incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
+        incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
+        incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
+        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue)
+        incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
+        incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
+        expected_remaining_demand = 30.5
+        crop_1.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
+        crop_2.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
+        expected_average_transpiration = 44.1 * crop_1_proportion + 39.5 * crop_2_proportion
+        incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
+            40.0, surface_residue, 0, expected_remaining_demand, expected_average_transpiration)
+        incorp.soil.evaporation.evaporate.assert_called_once_with(10.5)
+        expected_actual_evaporation = 33.5 - (expected_remaining_demand - 3.5)
+        if crops_growing:
+            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil)
+            crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
+            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil)
+            crop_2.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
+        else:
+            assert crop_1.data.cumulative_evaporation == 0
+            assert crop_1.data.cumulative_transpiration == 0
+            assert crop_1.data.cumulative_potential_evapotranspiration == 0
+            assert crop_2.data.cumulative_evaporation == 0
+            assert crop_2.data.cumulative_transpiration == 0
+            assert crop_2.data.cumulative_potential_evapotranspiration == 0
 
 
 @pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs", [

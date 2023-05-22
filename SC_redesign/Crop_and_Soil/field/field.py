@@ -356,37 +356,40 @@ class Field:
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
-        Details: Water processes are linked to both  Therefore, it makes most sense for this process to take place within the field class rather
-            than in both the crop and soil classes. This method coordinates the evapotranspiration from the field on any
-            given day, by first calculating the evapotranspirative demand, the removing water from the elements in the
-            field in the order listed below. The removal of water does not stop until either all elements have had water
-            removed from them or the evapotranspirative demand has been satisfied. Order of elements evapotranspirated
-            from:
+        Details: This method executes all water-related processes that occur within Crop and Soil objects. Having a
+            separate method to handle water processes altogether is necessary because processes that effect water in the
+            soil are dependent on processes that effect water in crops and vice versa. The most complex process that is
+            executed in this method is evapotranspiration, which is executed in the following order
                 - Evaporation of water in canopies of crops.
                 - Sublimation of water in snow pack (not implemented in V1)
                 - Evaporation from the soil profile.
                 - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
                     and this amount depends on the evapotranspirative demand after water has been removed from canopies)
+
+            It should also be noted that while this method is more messy and complex than it should be, this is a
+            conscious design choice that will allow for SME's to more easily and freely experiment with different orders
+            of processes. This is necessary because there is not necessarily one correct order for processes to run in.
+
         """
         watering_amount = self._determine_watering_amount(current_weather.rainfall)
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
-
-        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
-        #  #519
-        self.soil.infiltration(precipitation_reaching_soil, 1)
-        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
-        # TODO: find reasonable values/way to set minimum cover management factor - issue #520
-        self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue)
-        self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
-                                                      self.field_data.field_size, current_weather.mean_air_temperature)
-        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
             current_weather.mean_air_temperature)
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
+
+        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
+        #  #519
+        self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1, full_evapotranspirative_demand)
+        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+        # TODO: find reasonable values/way to set minimum cover management factor - issue #520
+        self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue)
+        self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
+                                                      self.field_data.field_size, current_weather.mean_air_temperature)
+        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
 
         weighted_transpiration_total = 0.0
         weights_sum = 0.0
@@ -414,7 +417,7 @@ class Field:
         for crop in self.crops:
             if crop.data.is_growing:
                 crop.water_uptake.uptake_water(self.soil)
-                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.actual_water_uptakes,
+                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
                                                 full_evapotranspirative_demand)
             else:
                 crop.data.cumulative_evaporation = 0
