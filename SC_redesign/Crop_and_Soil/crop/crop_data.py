@@ -186,6 +186,8 @@ class CropData:
     """total heat units required for the plant to reach maturity (unitless)"""
     accumulated_heat_units: float = 0  # accumulator
     """total heat units accumulated to date (unitless)"""
+    is_growing: bool = True
+    """is the crop currently growing?"""
     is_dormant: bool = False
     """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
@@ -406,10 +408,10 @@ class CropData:
         return self.heat_fraction >= 1.0
 
     @property
-    def is_growing(self) -> bool:
+    def in_growing_season(self) -> bool:
         """Indicates if the plant is in its growing season.
         """
-        return not self.is_mature and not self.is_dormant and self.is_alive
+        return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
 
     @property
     def do_harvest_index_override(self) -> bool:

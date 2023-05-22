@@ -415,7 +415,7 @@ class Field:
         actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
 
         for crop in self.crops:
-            if crop.data.is_growing:
+            if crop.data.in_growing_season:
                 crop.water_uptake.uptake_water(self.soil)
                 crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
                                                 full_evapotranspirative_demand)
