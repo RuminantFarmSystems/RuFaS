@@ -127,9 +127,6 @@ def objective(x):
     Args:
         x: The decision vector of the NLP
     """
-    chanchodebug = False
-    if chanchodebug:
-        print(np.multiply(x, price))
     return sum(np.multiply(x, price))
 
 
@@ -465,7 +462,7 @@ def fat_constraint(x):
         return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-def DMI_constraint_lower_lower(x):
+def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
     greater than the DMI_est + 20% calculated in the requirements
@@ -474,7 +471,6 @@ def DMI_constraint_lower_lower(x):
     Args:
         x: The decision vector of the NLP
     """
-    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
     return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 
@@ -488,15 +484,6 @@ def DMI_constraint_upper(x):
     """
     return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
-def DMI_constraint_upper(x):
-    """
-    Constraint in place to make sure the sum of all the feeds in the ration is
-    less than the DMI_est + 20% calculated in the requirements.
-
-    Args:
-        x: The decision vector of the NLP
-    """
-    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 def energy_req_limit_constraint(x):
     """
@@ -547,22 +534,6 @@ def get_ration_vals(x):
 
 
 def userbounds(ration_percents):
-    # ration_percents
-    # ration_calf = udrv.calf_ration
-    # ration_all_heifers = udrv.heifer_ration
-    # ration_cow_lactating = udrv.lactating_cow_ration
-    # ration_cow_dry = udrv.lactating_cow_ration
-    # if animal_type == 'cow':
-    #     if cow_type == True:
-    #         ration_percents = ration_cow_lactating
-    #         # print('çów')
-    #     else:
-    #         ration_percents = ration_cow_dry
-    # elif animal_type == 'heifer':
-    #     ration_percents = ration_all_heifers
-    # else: 
-    #     ration_percents = ration_calf
-
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
@@ -602,7 +573,6 @@ def optimize(user_defined_ration_select, ration_percents):
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
         bnds = tuple(bnds)
-        #print(bnds)
 
     # establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
@@ -615,11 +585,13 @@ def optimize(user_defined_ration_select, ration_percents):
     con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
     con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
     con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
-    user_cons_cow = [con1, con2, con3, con4, con5, con6, con7, con9, con10, con11]
-    user_cons_heif = [con1, con3, con4, con5, con6, con7, con9, con10, con11]
+    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
+    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
+    
+    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+    user_cons_cow = [con1, con2, con3, con4, con5, con6, con7, con9, con10, con11, con12]
+    user_cons_heif = [con1, con3, con4, con5, con6, con7, con9, con10, con11, con12]
 
     def is_constraint_violated(solution, constraint) -> bool:
         result = constraint['fun'](solution)
@@ -651,10 +623,11 @@ def optimize(user_defined_ration_select, ration_percents):
             for constr in failed_constraints:
                 # add warnings to output manager
                 # or print out to console or both
-                #print(f'Constraint {constr} violated')
-                #print(f'Constraint value: {constr["fun"](usermod.x)}')
-                #print(f'Constraint type: {constr["type"]}')
-                print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
+                # print(f'Constraint {constr} violated')
+                # print(f'Constraint value: {constr["fun"](usermod.x)}')
+                # print(f'Constraint type: {constr["type"]}')
+                # print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
+                pass
         return usermod
     elif animal_type == 'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)

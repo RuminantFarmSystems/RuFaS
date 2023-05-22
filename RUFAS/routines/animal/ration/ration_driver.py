@@ -62,7 +62,6 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
     # try block for catching scipy SLSQP error
     i = 0
     count = 0
-    #print('optimization_attempt')
     while i < 1:
         try:
             solution = NLP.optimize(user_defined_ration_select, ration_percents)
@@ -75,12 +74,10 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
             count += 1
         # this case should not be called, but is in place to not crash the
         # simulation if bounds error is not resolved
-        #print(count)
         if count > 30:
             solution = None
             mock_solution = user_defined_solution(pen, requirements.DMIest)
             ration_vals = NLP.get_ration_vals_null(mock_solution)
-            #print('nullvals')
             return solution, ration_vals
 
     # retrieving MEact from diet
@@ -144,7 +141,6 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
             total_milk_in_pen += animal.estimated_daily_milk_produced
             num_animals += 1
         average_total_milk = total_milk_in_pen/num_animals
-        # print('average_total_milk = '+ str(average_total_milk))
     fixed_ration = False
     if animal_type == 'cow' and solution is not None:
         while not solution.success:
@@ -165,26 +161,15 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
                     animal.milk_production_reduction -= reduction
                 running_total_milk += animal.estimated_daily_milk_produced
             average_running_total_milk = running_total_milk / num_animals
-            chanchodebug = False
-            if chanchodebug:
-                print('dropping milk!')
-                print('reduction = '+ str(reduction))
-                print('average_running_total_milk = '+ str(average_running_total_milk))
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_type, True)
             solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select, ration_percents)
             if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
-                if chanchodebug:
-                    print('dropped too much!')
-                    print(solution)
                 break
 
     if solution is not None and not fixed_ration:
-        #print(solution)
-        #print('solution is not None and not fixed_ration')
-        # if not fixed_ration:
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
@@ -195,20 +180,12 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
         ration['status'] = 'Optimal'
         ration['objective'] = NLP.objective(solution.x)
     else:
-        #print('fixed ration')
         ration = {}
-        chanchodebug = False
-        if chanchodebug:
-            print(available_feeds['feed_id'])
-            print(ration_percents)
         for feed_id in range(len(available_feeds['feed_id'])):
             if available_feeds['feed_key'][feed_id] in ration_percents:
                 ingredient_percentage = ration_percents[available_feeds['feed_key'][feed_id]]
                 ingredient_as_proportion = ingredient_percentage/100*req.DMIest
                 ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
-                if chanchodebug:
-                    print('ingredient_as_proportion = ' + str(ingredient_as_proportion))
-                    print('ingredient_as_proportion = ' + str(round(ingredient_as_proportion,6)))
             else:
                 ration[available_feeds['feed_key'][feed_id]] = 0.0
         ration['status'] = 'Optimal'
@@ -232,11 +209,9 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
-    # print('udrv.udr_or_not' + str(udrv.udr_or_not))
     user_defined_ration_select = udrv.udr_or_not
     if user_defined_ration_select:
         ration, ration_vals = user_defined_ration(req, pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
-        #print('\n \n \n returning UDR \n \n \n ')
         return ration, ration_vals
 
     solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type,)
