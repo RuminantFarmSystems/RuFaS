@@ -1,4 +1,4 @@
-# Design Document: Soil and Crop Module Redesign
+# Crop and Soil Finish Line document
 
 Authors: Ed Hansen  
 Date created: 22 May 2023  
@@ -9,13 +9,8 @@ Reviewers:
 1. [Overview](#overview)
 2. [Context](#context)
 3. [Requirements](#requirements)
-4. [Milestones](#milestones) 
-5. [Existing Solution](#existing-solution)
-6. [Alternative Solutions](#alternative-solutions)
-7. [Testability, etc.](#testability-monitoring-and-alerting)
-8. [Cross-Team Impact](#cross-team-impact)
-9. [Open Questions](#open-questions)
-10. [Details](#detailed-scoping-and-timeline)   
+4. [Open Questions](#open-questions)
+5. [Details](#detailed-scoping-and-timeline)   
     a. [Timeline](#timeline)  
 
 ---
@@ -23,20 +18,20 @@ Reviewers:
 ## Overview
 
 This document contains an overview and timeline for the tasks remaining before the Crop and Soil overhaul is complete 
-and can be integrated into the rest of the RuFaS codebase.
+and can be integrated into the rest of RuFaS.
 
 ---
 
 ## Context
 
 As of the writing of this (22 May) we are about two weeks out from an ideal finish date (Friday, 2 June). Before this
-there are a number of functionalities that must be implemented. Due to Clay recently leaving the program, I (Ed) believe
-it is important to reestablish a clear plan/path for what needs to happen to make the Crop and Soil module ready for 
-delivery with the MVP for several reasons,  
+there are a number of functionalities that must be implemented. Due to Clay recently leaving for his new job, I (Ed) 
+believe it is important to reestablish a clear plan/path for what needs to happen to make the Crop and Soil module ready
+for delivery with the MVP for several reasons:   
     1) To help the people working on the Crop and Soil module full-time to keep a clear picture of what needs to be 
 done.   
     2) To help the project manager (Jenn) track progress more accurately.  
-    3) To help any developers/engineers/SMEs who have not been working full-time on the Crop and Soil module but who may
+    3) To help any developers/engineers/SMEs who have not been working on the Crop and Soil module but who may 
 contribute get up to speed on the state of the module quickly.  
 
 ---
@@ -49,7 +44,7 @@ contribute get up to speed on the state of the module quickly.
 #### Water
 Biophysical processes that involve the movement of water are often complex and intertwined with Crop and Soil processes,
 so there is a need to make sure all these processes are coordinated between Crop and Soil objects.
-- [ ] Create a method that can be run on a daily basis which handle all water operations at the field level.
+- [ ] Create a method that can be run on a daily basis which handles all water operations at the field level.
 
 #### Growth/Non-water Component Processes
 - [ ] Create a method that can be run on a daily basis that will run all daily crop growth and soil update operations.
@@ -65,10 +60,9 @@ Fertilizer application and update routines have already been implemented, but ar
 `soil/phosphorus_cycling`.
 - [ ] Write a fertilizer module at the level of `Field`.
     - This module will, for now, be a wrapper for the existing fertilizer routines in `soil/phosphorus_cycling`, with 
-    the understanding that at the functionality will eventually be moved to the level of `Field` after delivery of v1 
-    Crop and Soil module.
-- [ ] Integrate the fertilizer module into `Field` so that it may be called when fertilizer is to be applied to the 
-  field.
+    the understanding that the functionality will eventually be moved to the level of `Field` after delivery of v1 Crop 
+    and Soil module.
+- [ ] Integrate the fertilizer module into `Field` so that it can be called when fertilizer is applied to the field.
 
 #### Manure
 The Manure application and update routines are in same state as their fertilizer counterparts, and the requirements are
