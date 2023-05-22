@@ -83,7 +83,7 @@ def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedratio
         json.dump(fff, file, indent=3)
 
 
-class user_defined_ration_values(object):
+class UserDefinedRationValues(object):
     """
     Reads in the user_defined_ration JSON and collects variables and dicts to use later
     """
@@ -95,12 +95,12 @@ class user_defined_ration_values(object):
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
-            cls.instance = super(user_defined_ration_values, cls).__new__(cls)
+            cls.instance = super(UserDefinedRationValues, cls).__new__(cls)
         return cls.instance
 
     def __init__(self) -> None:
-        if user_defined_ration_values.__instance is None:
-            user_defined_ration_values.__instance = self
+        if UserDefinedRationValues.__instance is None:
+            UserDefinedRationValues.__instance = self
             with open('input/userdefinedration/user_defined_ration_input_percentages.json', 'r') as f:
                 ration_all = json.load(f)
             lactating_cow_ration = ration_all['cow_lactating']
@@ -114,16 +114,14 @@ class user_defined_ration_values(object):
             self.dry_cow_ration: Dict[str, Any] = dry_cow_ration
             self.ration_all: Dict[str, Any] = ration_all
             self.close_up_ration: Dict[str, Any] = close_up_ration
-
             self.tolerance = ration_all['tolerance']
             self.milk_reduction_percent = ration_all['milk_reduction_percent']
- 
-            self.udr_or_not = False
+            self.udr_or_not = None
             
 
 def ration_to_use(pen_animal_combo):
     """
-    Function outputs the correct dictionary from the user_defined_ration_values class
+    Function outputs the correct dictionary from the UserDefinedRationValues class
     
     Parameters
     ----------
@@ -134,8 +132,7 @@ def ration_to_use(pen_animal_combo):
     ration_percents: Dict
         dictionary of feed ids and their associated percentage of DMI 
     """
-    udrv = user_defined_ration_values()
-    # print('udrv.udr_or_not' + str(udrv.udr_or_not))
+    udrv = UserDefinedRationValues()
     group = pen_animal_combo.name 
     if group == 'LAC_COW':
         ration_percents = udrv.lactating_cow_ration

@@ -15,8 +15,8 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration_values as user_defined_ration_values
-udrv = user_defined_ration_values()
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationValues as UserDefinedRationValues
+udrv = UserDefinedRationValues()
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
@@ -619,7 +619,6 @@ def optimize(user_defined_ration_select, ration_percents):
             failed_constraints = find_failed_constraints(usermod.x, user_cons_cow)
             if not failed_constraints:
                 print('No constraints violated')
-            print(animal_type)
             for constr in failed_constraints:
                 # add warnings to output manager
                 # or print out to console or both

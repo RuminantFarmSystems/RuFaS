@@ -15,8 +15,8 @@ from typing import Dict, List, Set, Any, Union
 import collections
 import math
 import statistics as stat
-from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration_values as user_defined_ration_values
-udrv = user_defined_ration_values()
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationValues as UserDefinedRationValues
+udrv = UserDefinedRationValues()
 from RUFAS.routines.animal.ration.user_defined_ration import ration_to_use as ration_to_use
 
 
@@ -144,16 +144,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
     fixed_ration = False
     if animal_type == 'cow' and solution is not None:
         while not solution.success:
-            # TODO: JCW 24 Mar 2023 commented out below is the existing method, here we're simply reducing 1 at a time.
-            # This values for reduction are not from pseudocode, but the vales below
-            # are based on fastest case runtime testing
-            # TODO: continue testing for more efficient reductions
-            # NEl_con = NLP.NEl_constraint(solution.x)
-            # if NEl_con < -0.5:
-            #     reduction = 3 * (-NEl_con)
-            # else:
-            #     reduction = 1.5
-            reduction = 1.0
+            reduction = 0.5
             running_total_milk = 0.0
             for animal in pen.animals_in_pen:
                 if animal.estimated_daily_milk_produced > 1.0:
@@ -301,35 +292,6 @@ def ration_report(ration, available_feeds):
                                   * 100
 
     return nutrient_amount, nutrient_conc
-
-def ration_net_energy_maintenance(ration, available_feeds):
-    """
-    Returns actual net energy for maintenance of feed i, Mcal for given ration total
-
-    first calculates actual metabolizable energy of feed i, Mcal/kg
-
-    Then from the metabolizable energy, calculates the maintenance for each feed
-
-    """  
-    MEact = []
-    for key, val in ration.items():
-        if available_feeds[key]['type'] == 'Mineral':
-            MEact.append(0)
-        elif available_feeds[key]['is_fat'] == 1:
-            MEact.append(val*available_feeds[key]['DE'])
-        elif available_feeds[key]['EE'] >= 3:
-            MEact.append(val*(1.01 * available_feeds[key]['DE'] - 0.45 + 0.0046 * (available_feeds[key]['EE'] - 3)))
-        else:
-            MEact.append(val*(1.01 * available_feeds[key]['DE'] - 0.45))
-    NEm_act = []
-    i = 0
-    for key, val in ration.items():
-        if available_feeds[key]['is_fat'] == 1:
-            NEm_act.append(0.8 * MEact[i])
-        else:
-            NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
-        i+=1
-    return sum(NEm_act)
 
 
 class Requirements:
