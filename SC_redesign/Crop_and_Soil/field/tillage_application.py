@@ -47,9 +47,42 @@ class TillageApplication:
 
         References
         ----------
-        SWAT Theoretical documentation section 6:1.6,
+        SWAT Theoretical documentation section 6:1.6, SurPhos Fortran code plow.f
+
+        Notes
+        -----
+        The tillage process starts by calculating the amount of stuff removed from the
 
         """
         pass
 
-    def 
+    @staticmethod
+    def _remove_amount_incorporated(data_container: object, attribute_name: str,
+                                    incorporation_fraction: float) -> float:
+        """
+        Calculates amount of stuff incorporated from the soil surface into the soil profile.
+
+        Parameters
+        ----------
+        data_container : object
+            Class instance containing the pool to be removed from (unitless)
+        attribute_name : str
+            Name of the pool to be removed from (unitless)
+        incorporation_fraction : float
+            Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
+
+        Returns
+        -------
+        float
+            Amount of stuff removed from soil surface and added to soil profile (units vary)
+
+        Notes
+        -----
+        The units of the value returned are the same as the units of the pool being removed from.
+
+        """
+        amount_in_pool = getattr(data_container, attribute_name)
+        amount_removed = amount_in_pool * incorporation_fraction
+        remaining_amount_in_pool = amount_in_pool - amount_removed
+        setattr(data_container, attribute_name, remaining_amount_in_pool)
+        return amount_removed
