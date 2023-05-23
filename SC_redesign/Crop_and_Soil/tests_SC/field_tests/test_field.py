@@ -226,7 +226,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         crop_2.water_dynamics.cycle_water = MagicMock()
         crop_2.water_uptake.uptake_water = MagicMock()
 
-        incorp.cycle_water(current_weather)
+        incorp._cycle_water(current_weather)
 
         incorp._determine_watering_amount.assert_called_once_with(rainfall)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
