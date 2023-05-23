@@ -11,6 +11,7 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
@@ -457,16 +458,26 @@ def fat_constraint(x):
         return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-def DMI_constraint(x):
+def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    less than the DMI_est calculated in the requirements.
+    greater than the DMI_est + 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
     """
-    return -(sum(x)) + DMIest
+    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
+
+def DMI_constraint_upper(x):
+    """
+    Constraint in place to make sure the sum of all the feeds in the ration is
+    less than the DMI_est + 20% calculated in the requirements.
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 def energy_req_limit_constraint(x):
     """
@@ -521,7 +532,6 @@ def optimize():
     for i in range(len(limit)):
         bnds.append((0, (limit[i] / 3) + 0.0001))
     bnds = tuple(bnds)
-    #print(bnds)
 
     # establishing the constraints of the NLP
     con1 = {'type': 'ineq', 'fun': NEmact_constraint}
@@ -534,26 +544,11 @@ def optimize():
     con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
     con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
     con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
+    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
+    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
+    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
 
-    #t_start_1 = timer.time()
-    #sol1 = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cons,
-    #options = { 'maxiter': 50, 'ftol': 1e-06, 'iprint': 1, 'disp': False,
-    #'eps': 1.4901161193847656e-08, 'finite_diff_rel_step': None})
-    #t_end_1 = timer.time()
-    #print('Sol1: 50 max iterates' , sol1.x)
-    #obj1 = objective(sol1.x)
-    #print("Time Results: ")
-    #print("Total Run Time 50 its seconds", str(t_end_1 - t_start_1))
-
-    #def write_csv(data):
-    #    with open('/Users/cvankerkhove/Desktop/example.csv', 'a') as outfile:
-    #        writer = csv.writer(outfile)
-    #        writer.writerow(data)
-    #t1 = t_end_2 - t_end_1
-    #write_csv([t1, obj1])
     if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
     elif animal_type == 'heifer':

@@ -8,12 +8,15 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
 from typing import Dict, List, Set
 import collections
 import math
 import statistics as stat
+
+om = OutputManager()
 
 
 def optimization(requirements, available_feeds, animal_type, cow_type):
@@ -96,13 +99,6 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
     req = Requirements()
     req.set_requirements(pen, animal_type, False)
 
-    ###
-    # Pyomo Nutrients Stuff
-    # available_feeds.pyomo_nutrients_data(feed, animal_type, cow_type)
-    # req.pyomo_req['BW'] = BW
-    # pslv.create_model(available_feeds.pyomo_data, req.pyomo_req, available_feeds.feeds)
-    ####
-
     solution, ration_vals = optimization(req, available_feeds, animal_type, cow_type)
     # Reduction of milk production estimate process to achieve feasible solution
     if animal_type == 'cow':
@@ -174,8 +170,7 @@ def ration_report(ration, available_feeds):
                 # [A.2.A.1]
                 else:
                     denom = 6.25
-                nutrient_amount[nutr] += (available_feeds[key]['CP'] /
-                                          (denom * 100)) * val
+                nutrient_amount[nutr] += (available_feeds[key]['CP'] / (denom * 100)) * val
             else:
                 nutrient_amount[nutr] += val * (available_feeds[key][nutr] / 100)
 
@@ -183,12 +178,10 @@ def ration_report(ration, available_feeds):
     dm_amount = nutrient_amount['dm']
     for nutr in nutrients:
         if nutr == 'DM':
-            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) \
-                                  * 100
+            nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100
         else:
             # all values on a 100% dry matter basis
-            nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) \
-                                  * 100
+            nutrient_conc[nutr] = (nutrient_amount[nutr] / dm_amount) * 100
     return nutrient_amount, nutrient_conc
 
 
@@ -227,8 +220,6 @@ class Requirements:
         # TODO: add documentation for avg_milk and avg_CP_milk
         self.avg_milk = 0
         self.avg_CP_milk = 0
-        # pyomo requirements dictionary
-        self.pyomo_req = {}
 
     def set_requirements(self, pen, animal_type, recalc):
         """
@@ -261,26 +252,23 @@ class Requirements:
             for animal in pen.animals_in_pen:
                 a_type = type(animal).__name__
                 if a_type == 'HeiferI':
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, None, animal_type='heifer',
-                                                         BCS5=3, PrevTemp=15,
-                                                         ADG_heifer=animal.daily_growth,
-                                                         Age=animal.days_born
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = None, animal_type='heifer',
+                                                         body_condition_score_5=3, previous_temperature=15,
+                                                         average_daily_gain_heifer=animal.daily_growth
                                                          )
                 elif a_type == 'HeiferII' or a_type == 'HeiferIII':
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, animal.days_in_preg,
-                                                         animal_type='heifer', BCS5=3, PrevTemp=15,
-                                                         ADG_heifer=animal.daily_growth,
-                                                         Age=animal.days_born
-                                                         )
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type='heifer', body_condition_score_5=3, previous_temperature=15,
+                                                         average_daily_gain_heifer=animal.daily_growth)
                 else:
-                    req = animal_requirements.calc_rqmts(animal.body_weight,
-                                                         animal.mature_body_weight, animal.days_in_preg,
-                                                         'cow', animal.calves, animal.CI,
-                                                         animal.mPrt, animal.fat_percent, animal.lactose_milk,
-                                                         animal.estimated_daily_milk_produced,
-                                                         animal.days_in_milk, animal.milking
+                    req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
+                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type = 'cow', parity = animal.calves, calving_interval = animal.CI,
+                                                         milk_true_protein= animal.mPrt, milk_fat = animal.fat_percent, milk_lactose = animal.lactose_milk,
+                                                         milk_production = animal.estimated_daily_milk_produced,
+                                                         days_in_milk = animal.days_in_milk, lactating = animal.milking
                                                          )
 
                 animal.NEmaint = req['NEmaint']
@@ -366,18 +354,15 @@ class Requirements:
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
-        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.set_requirements.__name__,
+                    "pen_id": pen.id,
+                    "pen_animal_combination": pen.animal_combination._name_,
+                    }
 
-        # pyomo requirements dictionary
-        self.pyomo_req['NEmaint'] = self.NEmaint
-        self.pyomo_req['NEa'] = self.NEa
-        self.pyomo_req['NEg'] = self.NEg
-        self.pyomo_req['NEpreg'] = self.NEpreg
-        self.pyomo_req['NEl'] = self.NEl
-        self.pyomo_req['MP_req'] = self.MP_req
-        self.pyomo_req['Ca_req'] = self.Ca_req
-        self.pyomo_req['P_req'] = self.P_req
-        self.pyomo_req['DMIest'] = self.DMIest
+        om.add_variable("avg_nutrient_rqmts", avg_nutrient_rqmts, info_map)
+
+        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk)
 
 
 class AvailableFeeds:
