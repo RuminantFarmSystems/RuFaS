@@ -650,6 +650,7 @@ class LifeCycleManager:
         args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
         args.update(tai_method_c=AnimalBase.config['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
+        args.update(lactation_curve=AnimalBase.config['lactation_curve'])
         new_cow = Cow(args)
         cows.append(new_cow)
 
@@ -745,6 +746,7 @@ class LifeCycleManager:
 
             if new_born:
                 self._handle_new_born(sim_day, cow, calves_born)
+                cow.set_lactation_curve_params()
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num

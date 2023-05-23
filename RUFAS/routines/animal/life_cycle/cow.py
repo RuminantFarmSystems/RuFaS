@@ -90,6 +90,7 @@ class Cow(HeiferIII):
             args.days_in_milk: cow's current day in milk
             args.parity: parity of the cow
             args.calving_interval: cow's most recent calving interval
+            args.lactation_curve: lactation curve model choice
         """
         super().__init__(args)
 
@@ -126,6 +127,7 @@ class Cow(HeiferIII):
         self.tai_program_start_day_c = 0
         self.resynch_method = args['resynch_method']
 
+        self.lactation_curve = args['lactation_curve']
         self.milk_production_history = []
 
         # grouping nutrition requirement values
@@ -211,6 +213,39 @@ class Cow(HeiferIII):
 
         return (self.is_pregnant and self.is_dry and
                 self.days_in_preg >= AnimalModuleConstants.DRY_CLOSE_UP_START_DATE)
+    
+    def set_lactation_curve_params(self):
+        """
+        Set cow's lactation curve params based on cow's lactation curve attribute.
+        Currently only set up for wood model.
+        """
+        if self.breed == 'HO':
+            breed_index = 0
+            parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
+        elif self.breed == 'JE':
+            breed_index = 1
+            parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
+        if AnimalBase.config['lactation_curve'] == 'wood':
+            self.wood_l = self.determine_param_value(
+                AnimalBase.config['wood_l'][breed_index][parity_index],
+                AnimalBase.config['wood_l_std'][breed_index][parity_index])
+            self.wood_m = self.determine_param_value(
+                AnimalBase.config['wood_m'][breed_index][parity_index],
+                AnimalBase.config['wood_m_std'][breed_index][parity_index])
+            self.wood_n = self.determine_param_value(
+                AnimalBase.config['wood_n'][breed_index][parity_index],
+                AnimalBase.config['wood_n_std'][breed_index][parity_index])
+
+
+    def calculate_daily_milk_produced(self):
+        if self.lactation_curve == 'wood':
+            return self.wood_l * math.pow(self.days_in_milk, self.wood_m) * \
+            math.exp((0 - self.wood_n) * self.days_in_milk)
+        if self.lactation_curve == 'milkbot':
+            return AnimalBase.config['a'] * (1 - math.exp((AnimalBase.config['c'] - self.days_in_milk) /
+                                                          AnimalBase.config['b']) / 2) * \
+                                            math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
+        return 0
 
     def update_milk_production_history(self, sim_day):
         """
@@ -262,41 +297,42 @@ class Cow(HeiferIII):
 
             return 0, 0, 0
 
-        breed_index = 0
-        parity_index = 0
+        # breed_index = 0
+        # parity_index = 0
         if self.milking:
             self.days_in_milk += 1
         else:
             self.days_in_milk = 0
 
-        if self.breed == 'HO':
-            breed_index = 0
-            parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
-        elif self.breed == 'JE':
-            breed_index = 1
-            parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
+        # if self.breed == 'HO':
+        #     breed_index = 0
+        #     parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
+        # elif self.breed == 'JE':
+        #     breed_index = 1
+        #     parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
 
-        estimated_daily_milk_produced = 0
-        if AnimalBase.config['lactation_curve'] == 'wood':
-            l = self.determine_param_value(
-                AnimalBase.config['wood_l'][breed_index][parity_index],
-                AnimalBase.config['wood_l_std'][breed_index][parity_index])
-            m = self.determine_param_value(
-                AnimalBase.config['wood_m'][breed_index][parity_index],
-                AnimalBase.config['wood_m_std'][breed_index][parity_index])
-            n = self.determine_param_value(
-                AnimalBase.config['wood_n'][breed_index][parity_index],
-                AnimalBase.config['wood_n_std'][breed_index][parity_index])
+        # estimated_daily_milk_produced = 0
+        # self.set_lactation_curve_params()
+        # if AnimalBase.config['lactation_curve'] == 'wood':
+        #     l = self.determine_param_value(
+        #         AnimalBase.config['wood_l'][breed_index][parity_index],
+        #         AnimalBase.config['wood_l_std'][breed_index][parity_index])
+        #     m = self.determine_param_value(
+        #         AnimalBase.config['wood_m'][breed_index][parity_index],
+        #         AnimalBase.config['wood_m_std'][breed_index][parity_index])
+        #     n = self.determine_param_value(
+        #         AnimalBase.config['wood_n'][breed_index][parity_index],
+        #         AnimalBase.config['wood_n_std'][breed_index][parity_index])
             # TODO adding milkbot parameters
-
-            estimated_daily_milk_produced = \
-                l * math.pow(self.days_in_milk, m) * \
-                math.exp((0 - n) * self.days_in_milk)
-        elif AnimalBase.config['lactation_curve'] == 'milkbot':
-            estimated_daily_milk_produced = AnimalBase.config['a'] * \
-                                            (1 - math.exp((AnimalBase.config['c'] - self.days_in_milk) /
-                                                          AnimalBase.config['b']) / 2) * \
-                                            math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
+        estimated_daily_milk_produced = self.calculate_daily_milk_produced()
+        # estimated_daily_milk_produced = \
+        #     l * math.pow(self.days_in_milk, m) * \
+        #     math.exp((0 - n) * self.days_in_milk)
+        # elif AnimalBase.config['lactation_curve'] == 'milkbot':
+        #     estimated_daily_milk_produced = AnimalBase.config['a'] * \
+        #                                     (1 - math.exp((AnimalBase.config['c'] - self.days_in_milk) /
+        #                                                   AnimalBase.config['b']) / 2) * \
+        #                                     math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
         if self.milking:
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
         else:
