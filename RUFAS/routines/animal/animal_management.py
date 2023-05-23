@@ -161,7 +161,7 @@ class AnimalManagement:
 
         self.ration_user_input = data['ration']['user_input']
 
-        # how often a ration is calculated, days
+        # how often a ruser_defined_ration_valuesys
         self.formulation_interval = data['ration']['formulation_interval']
 
         self.methane_model = data['methane_model']
@@ -372,9 +372,11 @@ class AnimalManagement:
 
         """
         for pen in self.all_pens:
-            if pen.animal_combination.name == 'LAC_COW':
+            if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name =='CLOSE_UP':
                 for animal in pen.animals_in_pen:
                     animal.milk_production_reduction = 0.0
+
+                    
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -1138,6 +1140,10 @@ class AnimalManagement:
                 self.allocate_animals_to_pens()
                 self.calc_ration(feed)  # per pen
                 self.calc_avg_growth()  # per pen
+                for pen in self.all_pens:
+                    if pen.animal_combination.name == 'LAC_COW':
+                        for animal in pen.animals_in_pen:
+                            animal.update_milk_production_history(self.simulation_day)
 
             # manure excretion
             self.calc_manure_excretion(feed, self.methane_model)  # per animal
