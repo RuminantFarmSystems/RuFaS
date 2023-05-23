@@ -127,7 +127,11 @@ class Cow(HeiferIII):
         self.tai_program_start_day_c = 0
         self.resynch_method = args['resynch_method']
 
-        self.lactation_curve = args['lactation_curve']
+        self.wood_l = 0
+        self.wood_m = 0
+        self.wood_n = 0
+
+        self.lactation_curve = AnimalBase.config['lactation_curve']
         self.milk_production_history = []
 
         # grouping nutrition requirement values
@@ -325,6 +329,16 @@ class Cow(HeiferIII):
         #         AnimalBase.config['wood_n_std'][breed_index][parity_index])
             # TODO adding milkbot parameters
         estimated_daily_milk_produced = self.calculate_daily_milk_produced()
+        daily_milk_variation = self.determine_param_value(0, 1)
+        # print(f'daily_milk_variation is {daily_milk_variation}')
+        # print(f'cow {self.id} produced {estimated_daily_milk_produced} before daily_variation added on {sim_day}')
+        estimated_daily_milk_produced += daily_milk_variation
+        # if self.milking:
+        #     print(f'milking cow produced {estimated_daily_milk_produced} on {sim_day}')
+        #     print(f'milking cow has {self.calves} calves')
+        # else:
+        #     print(f'non-milking cow produced {estimated_daily_milk_produced} on {sim_day}')
+        #     print(f'non-milking cow has {self.calves} calves')
         # estimated_daily_milk_produced = \
         #     l * math.pow(self.days_in_milk, m) * \
         #     math.exp((0 - n) * self.days_in_milk)
