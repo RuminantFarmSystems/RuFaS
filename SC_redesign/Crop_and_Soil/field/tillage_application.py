@@ -33,7 +33,7 @@ class TillageApplication:
 
         """
         self.field_data = field_data or FieldData(field_size=field_size or 1)
-        self.soil_data = soil_data or SoilData(field_size=field_data.field_size)
+        self.soil_data = soil_data or SoilData(field_size=self.field_data.field_size)
 
     def till_soil(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float) -> None:
         """
@@ -81,8 +81,16 @@ class TillageApplication:
         self._remove_amount_incorporated(self.soil_data, "grazing_manure_dry_mass", incorporation_fraction)
         self._remove_amount_incorporated(self.soil_data, "grazing_manure_field_coverage", incorporation_fraction)
 
-
-        pass
+        pools_to_till_in_soil = ["labile_inorganic_phosphorus_content",
+                                 "active_inorganic_phosphorus_content",
+                                 "stable_inorganic_phosphorus_content",
+                                 "nitrate_content",
+                                 "ammonium_content",
+                                 "active_organic_nitrogen_content",
+                                 "stable_organic_nitrogen_content",
+                                 "fresh_organic_nitrogen_content"]
+        for pool in pools_to_till_in_soil:
+            self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
@@ -160,32 +168,3 @@ class TillageApplication:
         remaining_amount_in_pool = amount_in_pool - amount_removed
         setattr(data_container, attribute_name, remaining_amount_in_pool)
         return amount_removed
-
-    @staticmethod
-    def _determine_fraction_of_layer_mixed(layer_thickness: float, layer_bottom_depth: float,
-                                           tillage_depth: float) -> float:
-        """
-        Calculates how much a soil layer is mixed when it is not tilled entirely.
-
-        Parameters
-        ----------
-        layer_thickness : float
-            Top depth of layer (mm)
-        layer_bottom_depth : float
-            Bottom depth of layer (mm)
-        tillage_depth : float
-            The lowest depth the tilling implement reaches (mm)
-
-        Returns
-        -------
-        float
-            The fraction of the soil layer affected by the tillage operation (unitless)
-
-        Notes
-        -----
-        This method is necessary when determining how a soil layer is effected by a tillage operation that does not till
-        the entire soil layer.
-
-        """
-        untilled_depth = layer_bottom_depth - tillage_depth
-        return 1 - (untilled_depth / layer_thickness)
