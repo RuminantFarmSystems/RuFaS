@@ -47,7 +47,7 @@ so there is a need to make sure all these processes are coordinated between Crop
 - [x] Create a method that can be run on a daily basis which handles all water operations at the field level.
 
 #### Growth/Non-water Component Processes
-- [ ] Create a method that can be run on a daily basis that will run all daily crop growth and soil update operations.
+- [x] Create a method that can be run on a daily basis that will run all daily crop growth and soil update operations.
 
 #### Tillage
 - [ ] Refactor the old `tillage.py`.
