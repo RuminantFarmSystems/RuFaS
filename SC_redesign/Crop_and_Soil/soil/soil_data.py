@@ -30,14 +30,8 @@ class SoilData:
     """Total soil nitrate amounts at the beginning of a year, for use in determining annual change (kg per hectare)"""
 
     # Track annual hydrological activity
-    annual_potential_evapotranspiration_total: float = 0
-    """Cumulative total of potential evapotranspiration that occurred in a year (mm)"""
-    annual_adjusted_potential_evapotranspiration_total: float = 0
-    """Cumulative total of adjusted potential evapotranspiration that occurred in a year (mm)"""
-    annual_maximum_soil_evaporation_total: float = 0
-    """Cumulative total of maximum soil evaporation that occurred in a year (mm)"""
-    annual_adjusted_soil_evaporation_total: float = 0
-    """Cumulative total of adjusted soil evaporation that occurred in a year (mm)"""
+    annual_soil_evaporation_total: float = 0
+    """Cumulative total of water evaporated from the soil this year (mm)"""
     annual_runoff_total: float = 0
     """Cumulative total of runoff that occurred in a year (mm)"""
 
@@ -77,18 +71,9 @@ class SoilData:
     annual_eroded_active_organic_nitrogen_total: float = 0
     """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
 
-    # ---- evapotranspiration
-    potential_evapotranspiration: Optional[float] = None
-    """potential evapotranspiration for a given day (mm per day)"""
-    potential_evapotranspiration_adjusted: Optional[float] = None
-    """amount of evapotranspiration adjusted for water in canopy (mm)
-        SWAT Reference: 2:2.3.1"""
-    transpiration: float = 30  # arbitrary
-    """amount of transpiration on a given day (mm)"""
-    soil_evaporation_adjusted: Optional[float] = None
-    """maximum amount of evaporation from soil on a given day adjusted for plant use (mm)"""
-    maximum_soil_evaporation: Optional[float] = None
-    """maximum amount of evaporation from soil on a given day (mm)"""
+    # ---- evaporation
+    water_evaporated: float = 0
+    """Amount of water evaporated from the soil profile on the current day (mm)"""
 
     # ---- infiltration
     second_moisture_condition_parameter: float = 85
@@ -327,10 +312,7 @@ class SoilData:
         self.initial_nitrates_total = self.profile_nitrates_total
 
         # Reset hydrological activity totals
-        self.annual_potential_evapotranspiration_total = 0
-        self.annual_adjusted_potential_evapotranspiration_total = 0
-        self.annual_maximum_soil_evaporation_total = 0
-        self.annual_adjusted_soil_evaporation_total = 0
+        self.annual_soil_evaporation_total = 0
         self.annual_runoff_total = 0
 
         # Reset erosion activity totals
