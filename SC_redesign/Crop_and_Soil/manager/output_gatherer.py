@@ -11,7 +11,7 @@ class OutputGatherer:
 
     def send_daily_variables(self, filter_specs: Optional[List] = None) -> None:
         """sends daily variables to the output manager"""
-        info_map = {"class": "OutputGatherer", "function": "send_daily_variables"}
+        info_map = {"class": self.__class__.__name__, "function": self.send_daily_variables.__name__}
         for field in self.fields:
             info_map["prefix"] = "field" + field.field_data.name
             self.om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff,
