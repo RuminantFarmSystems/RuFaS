@@ -346,7 +346,8 @@ class Field:
 
         Notes
         -----
-        This method is designed to be called daily to do updates on the crops and soil profile in the field.
+        This method is designed to make it easier to change the order of process execution, which is desirable because
+        it will allow subject-matter experts to more easily experiment with different orders.
 
         """
         # TODO - issue #317
