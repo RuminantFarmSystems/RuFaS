@@ -11,7 +11,8 @@ documentation section 6:1.6 and
 
 class TillageApplication:
 
-    def __init__(self, field_data: Optional[FieldData], soil_data: Optional[SoilData], field_size: Optional[float]):
+    def __init__(self, field_data: Optional[FieldData] = None, soil_data: Optional[SoilData] = None,
+                 field_size: Optional[float] = None):
         """
         Creates a TillageApplication object based on a SoilData object.
 
@@ -98,12 +99,35 @@ class TillageApplication:
         redistribution_fractions = []
         total_to_mix_from_pools = 0
         for layer in self.soil_data.soil_layers:
-            if layer.bottom_depth > tillage_depth:
+            layer_not_tilled = layer.top_depth > tillage_depth
+            layer_partially_tilled = layer.bottom_depth > tillage_depth
+            if layer_not_tilled:
+                break
+            elif layer_partially_tilled:
                 tilled_depth = tillage_depth - layer.top_depth
-                layer_redistribution_fraction = tilled_depth /
+                layer_redistribution_fraction = tilled_depth / tillage_depth
+                fraction_of_layer_mixed = tilled_depth / layer.layer_thickness
             else:
                 layer_redistribution_fraction = layer.layer_thickness / tillage_depth
-            redistribution_fractions.append
+                fraction_of_layer_mixed = 1.0
+            redistribution_fractions.append(layer_redistribution_fraction)
+
+            current_pool_amount = getattr(layer, pool_name)
+            amount_to_remove = current_pool_amount * mixing_fraction * fraction_of_layer_mixed
+            setattr(layer, pool_name, current_pool_amount - amount_to_remove)
+            total_to_mix_from_pools += amount_to_remove
+
+        number_of_tilled_layers = len(redistribution_fractions)
+        for layer_index in range(number_of_tilled_layers):
+            layer = self.soil_data.soil_layers[layer_index]
+            layer_fraction = redistribution_fractions[layer_index]
+
+            amount_to_add = total_to_mix_from_pools * layer_fraction
+            total_to_mix_from_pools -= amount_to_add
+
+            amount_in_pool = getattr(layer, pool_name)
+            new_pool_amount = amount_in_pool + amount_to_add
+            setattr(layer, pool_name, new_pool_amount)
 
     # def _till_surface_pool_into_top_layer(self, data_container: object, surface_attribute_name: str,
     #                                       incorporation_fraction: float, soil_attribute_name: str) -> None:

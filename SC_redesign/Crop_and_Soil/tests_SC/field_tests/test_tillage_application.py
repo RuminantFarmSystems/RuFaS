@@ -1,7 +1,9 @@
 import pytest
 from unittest.mock import MagicMock
+from typing import List
 
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
 
@@ -41,3 +43,22 @@ def test_remove_amount_incorporated(data: object, attr_name: str, attr_value: fl
 #
 #     till_app._remove_amount_incorporate.assert_called_once_with(data, surface_attr_name, incorp_frac)
 #     assert actual_amount_in_soil == expected_amount_in_soil
+
+
+@pytest.mark.parametrize("layers,field_size,pool_values,pool_name,till_depth,mix_frac,expected", [
+    ([LayerData(field_size=1.3, top_depth=0, bottom_depth=20), LayerData(field_size=1.3, top_depth=20, bottom_depth=60),
+      LayerData(field_size=1.3, top_depth=60, bottom_depth=200)], 1.3, [40, 50, 20], "nitrate_content", 120, 0.3,
+     [43, 45, 32])
+])
+def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values: List[float], pool_name: str,
+                         till_depth: float, mix_frac: float, expected: List[float]) -> None:
+    """Tests that stuff is correctly redistributed between different pools in the soil layer."""
+    soil_data = SoilData(field_size=field_size, soil_layers=layers)
+    soil_data.set_vectorized_layer_attribute(pool_name, pool_values)
+    field_data = FieldData(field_size=field_size)
+    tillage_app = TillageApplication(field_data, soil_data)
+
+    tillage_app._mix_soil_layers(pool_name, till_depth, mix_frac)
+
+    actual = tillage_app.soil_data.get_vectorized_layer_attribute(pool_name)
+    assert actual == expected
