@@ -3,6 +3,8 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
+import pdb
+
 """
 This module contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical 
 documentation section 6:1.6 and  
@@ -99,7 +101,7 @@ class TillageApplication:
         redistribution_fractions = []
         total_to_mix_from_pools = 0
         for layer in self.soil_data.soil_layers:
-            layer_not_tilled = layer.top_depth > tillage_depth
+            layer_not_tilled = layer.top_depth >= tillage_depth
             layer_partially_tilled = layer.bottom_depth > tillage_depth
             if layer_not_tilled:
                 break
@@ -123,39 +125,10 @@ class TillageApplication:
             layer_fraction = redistribution_fractions[layer_index]
 
             amount_to_add = total_to_mix_from_pools * layer_fraction
-            total_to_mix_from_pools -= amount_to_add
 
             amount_in_pool = getattr(layer, pool_name)
             new_pool_amount = amount_in_pool + amount_to_add
             setattr(layer, pool_name, new_pool_amount)
-
-    # def _till_surface_pool_into_top_layer(self, data_container: object, surface_attribute_name: str,
-    #                                       incorporation_fraction: float, soil_attribute_name: str) -> None:
-    #     """
-    #     Transfers tilled stuff from soil surface into the top soil layer.
-    #
-    #     Parameters
-    #     ----------
-    #     data_container : object
-    #         Class instance containing the soil surface pool to be removed from (unitless)
-    #     surface_attribute_name : str
-    #         Name of the pool in the soil surface to be removed from (unitless)
-    #     incorporation_fraction : float
-    #         Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
-    #     soil_attribute_name : float
-    #         Name of the pool in the top soil layer to added to (unitless)
-    #
-    #     Notes
-    #     -----
-    #     Some pools on the soil surface are named differently than the pools in the soil profile which contain the same
-    #     substance, which is why this method takes both a surface attribute name and a soil attribute name.
-    #
-    #     """
-    #     amount_removed_from_surface = self._remove_amount_incorporated(data_container, surface_attribute_name,
-    #                                                                    incorporation_fraction)
-    #     amount_in_top_layer = getattr(self.soil_data.soil_layers[0], soil_attribute_name)
-    #     amount_in_top_layer += amount_removed_from_surface
-    #     setattr(self.soil_data.soil_layers[0], soil_attribute_name, amount_in_top_layer)
 
     @staticmethod
     def _remove_amount_incorporated(data_container: object, attribute_name: str,
