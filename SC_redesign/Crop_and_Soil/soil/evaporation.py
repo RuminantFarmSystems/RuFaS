@@ -49,18 +49,15 @@ class Evaporation:
             amount_water_removed = self._determine_amount_water_removed(
                 evaporative_demand_reduced, layer.water_content, layer.wilting_point_content)
 
-            maximum_amount_evaporated = amount_available_for_evaporation <= amount_water_removed
-            if maximum_amount_evaporated:
-                amount_water_removed = amount_available_for_evaporation
+            amount_water_removed = min(amount_water_removed, amount_available_for_evaporation)
             layer.water_content -= amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
-            if maximum_amount_evaporated:
+            if amount_available_for_evaporation == 0:
                 break
 
         total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
         self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
-        return
 
     # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
     @staticmethod
