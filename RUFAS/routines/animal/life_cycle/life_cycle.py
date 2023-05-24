@@ -650,7 +650,6 @@ class LifeCycleManager:
         args.update(presynch_method=AnimalBase.config['cow_presynch_protocol'])
         args.update(tai_method_c=AnimalBase.config['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
-        args.update(lactation_curve=AnimalBase.config['lactation_curve'])
         new_cow = Cow(args)
         cows.append(new_cow)
 
