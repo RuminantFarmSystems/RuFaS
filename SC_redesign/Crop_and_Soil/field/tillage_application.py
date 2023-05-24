@@ -3,11 +3,10 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
-import pdb
 
 """
-This module contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical 
-documentation section 6:1.6 and  
+This module contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical
+documentation section 6:1.6 and
 """
 
 
