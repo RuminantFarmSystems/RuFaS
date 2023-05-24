@@ -377,12 +377,16 @@ class OutputManager(object):
                 var_list.append(f"{name}: **NO VARIABLES**\n")
                 continue
 
+            parsable_dicts = []
+
+            if not exclude_info_maps:
+                parsable_dicts.append("info_maps")
+
             is_variable_nested = isinstance(variable_data["values"][0], Dict)
             if is_variable_nested:
-                parsable_dicts = ["values", "info_maps"]
+                parsable_dicts.append("values")
             else:
                 var_list.append(f"{name}\n")
-                parsable_dicts = ["info_maps"]
 
             if format_option == "block":
                 var_list.append(f"{name}\n")
