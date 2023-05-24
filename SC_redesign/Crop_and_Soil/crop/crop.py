@@ -3,7 +3,7 @@ from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
 from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIncorporation
-from SC_redesign.Crop_and_Soil.crop.transpiration import WaterUptake
+from SC_redesign.Crop_and_Soil.crop.water_uptake import WaterUptake
 from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
 from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
 from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex

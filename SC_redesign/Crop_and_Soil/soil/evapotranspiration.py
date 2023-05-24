@@ -50,7 +50,6 @@ class Evapotranspiration:
             avg_air_temp)
         self.data.potential_evapotranspiration_adjusted = self._determine_potential_evapotranspiration_adjusted(
             initial_canopy_free_water)
-        # TODO: add attribute (in CropData?) to track amount of free water in canopy as it gets adjusted - issue #316
         self.data.soil_evaporation_adjusted = self._determine_soil_evaporation_adjusted(
             above_ground_biomass,
             residue,
