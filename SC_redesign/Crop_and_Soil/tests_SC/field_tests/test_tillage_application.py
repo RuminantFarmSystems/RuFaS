@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 from typing import List
 
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
@@ -53,3 +53,42 @@ def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values
     actual = tillage_app.soil_data.get_vectorized_layer_attribute(pool_name)
     print(actual)
     assert actual == expected
+
+
+@pytest.mark.parametrize("till_depth,incorp_frac,mix_frac", [
+    (30, 0.12, 0.33),
+    (57.8, 0.05, 0.2),
+    (150, 0.23, 0.19)
+])
+def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float) -> None:
+    """Tests that soil is tilled correctly."""
+    till_app = TillageApplication(field_size=1.5)
+
+    till_app._remove_amount_incorporated = MagicMock(return_value=8)
+    till_app.soil_data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
+    till_app._mix_soil_layers = MagicMock()
+
+    till_app.till_soil(till_depth, incorp_frac, mix_frac)
+
+    remove_calls = [call(till_app.soil_data, "available_phosphorus_pool", incorp_frac),
+                    call(till_app.soil_data, "recalcitrant_phosphorus_pool", incorp_frac),
+                    call(till_app.soil_data, "machine_water_extractable_inorganic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "machine_water_extractable_organic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "machine_stable_inorganic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "machine_stable_organic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "grazing_water_extractable_inorganic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "grazing_water_extractable_organic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "grazing_stable_inorganic_phosphorus", incorp_frac),
+                    call(till_app.soil_data, "grazing_stable_organic_phosphorus", incorp_frac)]
+    till_app._remove_amount_incorporated.assert_has_calls(remove_calls)
+    expected_total_phosphorus = len(remove_calls) * 8
+    till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expected_total_phosphorus, 1.5)
+    mix_calls = [call("labile_inorganic_phosphorus_content", till_depth, mix_frac),
+                 call("active_inorganic_phosphorus_content", till_depth, mix_frac),
+                 call("stable_inorganic_phosphorus_content", till_depth, mix_frac),
+                 call("nitrate_content", till_depth, mix_frac),
+                 call("ammonium_content", till_depth, mix_frac),
+                 call("active_organic_nitrogen_content", till_depth, mix_frac),
+                 call("stable_organic_nitrogen_content", till_depth, mix_frac),
+                 call("fresh_organic_nitrogen_content", till_depth, mix_frac)]
+    till_app._mix_soil_layers.assert_has_calls(mix_calls)
