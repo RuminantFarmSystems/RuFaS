@@ -225,10 +225,9 @@ class Cow(HeiferIII):
         """
         if self.breed == 'HO':
             breed_index = 0
-            parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
         elif self.breed == 'JE':
             breed_index = 1
-            parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
+        parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
 
         if AnimalBase.config['lactation_curve'] == 'wood':
             self.wood_l = self.determine_param_value(
