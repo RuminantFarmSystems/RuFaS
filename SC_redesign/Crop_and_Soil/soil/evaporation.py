@@ -49,35 +49,39 @@ class Evaporation:
             amount_water_removed = self._determine_amount_water_removed(
                 evaporative_demand_reduced, layer.water_content, layer.wilting_point_content)
 
-            maximum_amount_evaporated = amount_available_for_evaporation <= amount_water_removed
-            if maximum_amount_evaporated:
-                amount_water_removed = amount_available_for_evaporation
+            amount_water_removed = min(amount_water_removed, amount_available_for_evaporation)
             layer.water_content -= amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
-            if maximum_amount_evaporated:
+            if amount_available_for_evaporation == 0:
                 break
 
         total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
         self.data.water_evaporated = total_evaporation_from_soil
         self.data.annual_soil_evaporation_total += total_evaporation_from_soil
-        return
 
     # TODO - this method should be moved to field.py and used there when sublimation is implemented #317
     @staticmethod
     def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
         """Calculates the maximum amount of evaporation from soil in a given day
 
-        Args:
-            soil_evaporation_adj: maximum soil evaporation adjusted for plant water use on a given day (mm)
-            snow_water_content: amount of water in the snow pack on a given day prior to accounting for sublimation
-            (mm)
-             TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
-              (2:2.3.3) mean the same thing
+        Parameters
+        ----------
+        soil_evaporation_adj : float
+            Maximum soil evaporation adjusted for plant water use on a given day (mm)
+        snow_water_content : float
+            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
+         TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
+          (2:2.3.3) mean the same thing - issue #317
 
-        Returns:
-            maximum soil water evaporation on a given day (mm)
+        Returns
+        -------
+        float
+            Maximum soil water evaporation on a given day (mm)
 
-        SWAT Reference: 2:2.3.3.1
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.3.1
+
         """
         if soil_evaporation_adj < snow_water_content:
             return 0  # 2:2.3.10
@@ -86,35 +90,52 @@ class Evaporation:
 
     @staticmethod
     def _determine_depth_evaporative_demand(max_soil_water_evaporation: float, depth: float) -> float:
-        """calculates evaporative demand
+        """Calculates evaporative demand.
 
-        Args:
-            max_soil_water_evaporation: maximum soil water evaporation on a given day (mm)
-            depth: depth below the surface (mm)
-                TODO: check that it is actually in mm, SWAT page 137 does not explicitly say so
+        Parameters
+        ----------
+        max_soil_water_evaporation : float
+            Maximum soil water evaporation on a given day (mm)
+        depth : float
+            Depth below the surface (mm)
 
-        Returns:
-            evaporative demand at the given depth (mm)
+        Returns
+        -------
+        float
+            Evaporative demand at the given depth (mm)
 
-        SWAT Reference: 2:2.3.16
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.16
+
         """
         return max_soil_water_evaporation * (depth / (depth + exp(2.374 - (0.00713 * depth))))
 
     @staticmethod
     def _determine_layer_evaporative_demand(max_soil_water_evaporation: float, top_depth: float, bottom_depth: float,
                                             compensation: float) -> float:
-        """calculates the evaporative demand for a given layer of soil
+        """Calculates the evaporative demand for a given layer of soil.
 
-        Args:
-            max_soil_water_evaporation: maximum water evaporation from soil on given day (mm)
-            top_depth: depth of top of layer to be analyzed (mm)
-            bottom_depth: depth of bottom of layer to be analyzed (mm)
-            compensation: soil evaporative compensation coefficient (unitless)
+        Parameters
+        ----------
+        max_soil_water_evaporation : float
+            Maximum water evaporation from soil on given day (mm)
+        top_depth : float
+            Depth of top of layer to be analyzed (mm)
+        bottom_depth : float
+            Depth of bottom of layer to be analyzed (mm)
+        compensation : float
+            Soil evaporative compensation coefficient (unitless)
 
-        Returns:
-            evaporative demand for given layer of soil (mm)
+        Returns
+        -------
+        float
+            Evaporative demand for given layer of soil (mm)
 
-        SWAT Reference: 2:2.3.16, 17
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.16, 17
+
         """
         # Check layer integrity
         if top_depth is None or \
@@ -135,18 +156,27 @@ class Evaporation:
     @staticmethod
     def _determine_evaporative_demand_reduced(evaporative_demand: float, soil_water_content: float,
                                               field_water_content: float, wilting_water_content: float) -> float:
-        """calculates evaporative demand reduced for water content and field capacity
+        """Calculates evaporative demand reduced for water content and field capacity.
 
-        Args:
-            evaporative_demand: evaporative demand for current soil layer (mm)
-            soil_water_content: soil water content of given layer (mm)
-            field_water_content: field capacity water content of given layer (mm)
-            wilting_water_content: wilting point water content of given layer (mm)
+        Parameters
+        ----------
+        evaporative_demand : float
+            Evaporative demand for current soil layer (mm)
+        soil_water_content : float
+            Soil water content of given layer (mm)
+        field_water_content : float
+            Field capacity water content of given layer (mm)
+        wilting_water_content : float
+            Wilting point water content of given layer (mm)
 
-        Returns:
+        Returns
+        -------
+        float
             reduced evaporative demand for current layer based on how much water is in layer (mm)
 
-        SWAT Reference: 2:2.3.18, 19
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.18, 19
         """
         # calculate adjusted evaporative demand
         if soil_water_content < field_water_content:
@@ -163,16 +193,25 @@ class Evaporation:
     @staticmethod
     def _determine_amount_water_removed(reduced_evaporative_demand, soil_water_content: float,
                                         wilting_water_content: float) -> float:
-        """calculates amount of water lost from soil layer from evaporation
+        """Calculates amount of water lost from soil layer from evaporation.
 
-        Args:
-            reduced_evaporative_demand: evaporative demand reduced for water content and field capacity (mm)
-            soil_water_content: soil water content of given layer (mm)
-            wilting_water_content: wilting point water content of given layer (mm)
+        Parameters
+        ----------
+        reduced_evaporative_demand : float
+            Evaporative demand reduced for water content and field capacity (mm)
+        soil_water_content : float
+            Soil water content of given layer (mm)
+        wilting_water_content : float
+            Wilting point water content of given layer (mm)
 
-        Returns:
+        Returns
+        -------
+        float
             amount of water removed from soil layer by evaporation (mm)
 
-        SWAT Reference: 2:2.3.20
+        References
+        ----------
+        SWAT Theoretical documentation 2:2.3.20
+
         """
         return min(reduced_evaporative_demand, 0.8 * (soil_water_content - wilting_water_content))
