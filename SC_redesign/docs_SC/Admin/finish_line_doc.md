@@ -50,7 +50,7 @@ so there is a need to make sure all these processes are coordinated between Crop
 - [ ] Create a method that can be run on a daily basis that will run all daily crop growth and soil update operations.
 
 #### Tillage
-- [ ] Refactor the old `tillage.py`.
+- [x] Refactor the old `tillage.py`.
   - The old module is relatively short and simple, so it will be refactored to meet the style standards of the new Crop
     and Soil module but will not be more complex or feature-rich than the old module.
 - [ ] Integrate the refactored module into `Field`.
