@@ -308,7 +308,9 @@ class Cow(HeiferIII):
         estimated_daily_milk_produced = self.calculate_daily_milk_produced()
 
         if estimated_daily_milk_produced > 0.0:
-            daily_milk_variation = self.determine_param_value(0, 1)
+            daily_milk_variation_mean = 0
+            daily_milk_variation_std_dev = 1
+            daily_milk_variation = self.determine_param_value(daily_milk_variation_mean, daily_milk_variation_std_dev)
             estimated_daily_milk_produced += daily_milk_variation
 
         if self.milking:
