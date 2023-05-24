@@ -29,7 +29,8 @@ class TillageApplication:
         If no SoilData object is provided, one is created with the default configuration based on the field size.
 
         """
-        self.soil_data = soil_data or SoilData(field_size=field_size)
+        self.field_data = field_data or FieldData(field_size=field_size or 1)
+        self.soil_data = soil_data or SoilData(field_size=field_data.field_size)
 
     def till_soil(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float) -> None:
         """
@@ -56,6 +57,34 @@ class TillageApplication:
         """
         pass
 
+    def _till_surface_pool_into_top_layer(self, data_container: object, surface_attribute_name: str,
+                                          incorporation_fraction: float, soil_attribute_name: str) -> None:
+        """
+        Transfers tilled stuff from soil surface into the top soil layer.
+
+        Parameters
+        ----------
+        data_container : object
+            Class instance containing the soil surface pool to be removed from (unitless)
+        surface_attribute_name : str
+            Name of the pool in the soil surface to be removed from (unitless)
+        incorporation_fraction : float
+            Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
+        soil_attribute_name : float
+            Name of the pool in the top soil layer to added to (unitless)
+
+        Notes
+        -----
+        Some pools on the soil surface are named differently than the pools in the soil profile which contain the same
+        substance, which is why this method takes both a surface attribute name and a soil attribute name.
+
+        """
+        amount_removed_from_surface = self._remove_amount_incorporated(data_container, surface_attribute_name,
+                                                                       incorporation_fraction)
+        amount_in_top_layer = getattr(self.soil_data.soil_layers[0], soil_attribute_name)
+        amount_in_top_layer += amount_removed_from_surface
+        setattr(self.soil_data.soil_layers[0], soil_attribute_name, amount_in_top_layer)
+
     @staticmethod
     def _remove_amount_incorporated(data_container: object, attribute_name: str,
                                     incorporation_fraction: float) -> float:
@@ -65,7 +94,7 @@ class TillageApplication:
         Parameters
         ----------
         data_container : object
-            Class instance containing the pool to be removed from (unitless)
+            Class instance containing the soil surface pool to be removed from (unitless)
         attribute_name : str
             Name of the pool to be removed from (unitless)
         incorporation_fraction : float
@@ -86,3 +115,32 @@ class TillageApplication:
         remaining_amount_in_pool = amount_in_pool - amount_removed
         setattr(data_container, attribute_name, remaining_amount_in_pool)
         return amount_removed
+
+    @staticmethod
+    def _determine_fraction_of_layer_mixed(layer_thickness: float, layer_bottom_depth: float,
+                                           tillage_depth: float) -> float:
+        """
+        Calculates how much a soil layer is mixed when it is not tilled entirely.
+
+        Parameters
+        ----------
+        layer_thickness : float
+            Top depth of layer (mm)
+        layer_bottom_depth : float
+            Bottom depth of layer (mm)
+        tillage_depth : float
+            The lowest depth the tilling implement reaches (mm)
+
+        Returns
+        -------
+        float
+            The fraction of the soil layer affected by the tillage operation (unitless)
+
+        Notes
+        -----
+        This method is necessary when determining how a soil layer is effected by a tillage operation that does not till
+        the entire soil layer.
+
+        """
+        untilled_depth = layer_bottom_depth - tillage_depth
+        return 1 - (untilled_depth / layer_thickness)
