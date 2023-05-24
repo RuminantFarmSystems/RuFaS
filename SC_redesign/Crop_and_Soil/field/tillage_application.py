@@ -52,38 +52,86 @@ class TillageApplication:
 
         Notes
         -----
-        The tillage process starts by calculating the amount of stuff removed from the
+        The tillage process starts by removing stuff from the soil surface and putting it into the top soil layer, then
+        mixing everything in together from the different soil layers.
 
         """
+        total_phosphorus_incorporated = 0
+        pools_to_draw_from = ["available_phosphorus_pool",
+                              "recalcitrant_phosphorus_pool",
+                              "machine_water_extractable_inorganic_phosphorus",
+                              "machine_water_extractable_organic_phosphorus",
+                              "machine_stable_inorganic_phosphorus",
+                              "machine_stable_organic_phosphorus",
+                              "grazing_water_extractable_inorganic_phosphorus",
+                              "grazing_water_extractable_organic_phosphorus",
+                              "grazing_stable_inorganic_phosphorus",
+                              "grazing_stable_organic_phosphorus"]
+        for pool in pools_to_draw_from:
+            total_phosphorus_incorporated += self._remove_amount_incorporated(self.soil_data, pool,
+                                                                              incorporation_fraction)
+        self.soil_data.soil_layers[0].add_to_labile_phosphorus(total_phosphorus_incorporated,
+                                                               self.field_data.field_size)
+
+        self._remove_amount_incorporated(self.soil_data, "machine_manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data, "machine_manure_field_coverage", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data, "grazing_manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data, "grazing_manure_field_coverage", incorporation_fraction)
+
+
         pass
 
-    def _till_surface_pool_into_top_layer(self, data_container: object, surface_attribute_name: str,
-                                          incorporation_fraction: float, soil_attribute_name: str) -> None:
+    def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
-        Transfers tilled stuff from soil surface into the top soil layer.
+        Redistributes stuff from the specified pool through the soil profile.
 
         Parameters
         ----------
-        data_container : object
-            Class instance containing the soil surface pool to be removed from (unitless)
-        surface_attribute_name : str
-            Name of the pool in the soil surface to be removed from (unitless)
-        incorporation_fraction : float
-            Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
-        soil_attribute_name : float
-            Name of the pool in the top soil layer to added to (unitless)
-
-        Notes
-        -----
-        Some pools on the soil surface are named differently than the pools in the soil profile which contain the same
-        substance, which is why this method takes both a surface attribute name and a soil attribute name.
+        pool_name : str
+            Name of the soil attribute that should be mixed within the soil profile (unitless)
+        tillage_depth : float
+            The lowest depth the tilling implement reaches (mm)
+        mixing_fraction : float
+            Fraction of stuff mixed and redistributed from each layer in the soil profile (unitless)
 
         """
-        amount_removed_from_surface = self._remove_amount_incorporated(data_container, surface_attribute_name,
-                                                                       incorporation_fraction)
-        amount_in_top_layer = getattr(self.soil_data.soil_layers[0], soil_attribute_name)
-        amount_in_top_layer += amount_removed_from_surface
-        setattr(self.soil_data.soil_layers[0], soil_attribute_name, amount_in_top_layer)
+        redistribution_fractions = []
+        total_to_mix_from_pools = 0
+        for layer in self.soil_data.soil_layers:
+            if layer.bottom_depth > tillage_depth:
+                tilled_depth = tillage_depth - layer.top_depth
+                layer_redistribution_fraction = tilled_depth /
+            else:
+                layer_redistribution_fraction = layer.layer_thickness / tillage_depth
+            redistribution_fractions.append
+
+    # def _till_surface_pool_into_top_layer(self, data_container: object, surface_attribute_name: str,
+    #                                       incorporation_fraction: float, soil_attribute_name: str) -> None:
+    #     """
+    #     Transfers tilled stuff from soil surface into the top soil layer.
+    #
+    #     Parameters
+    #     ----------
+    #     data_container : object
+    #         Class instance containing the soil surface pool to be removed from (unitless)
+    #     surface_attribute_name : str
+    #         Name of the pool in the soil surface to be removed from (unitless)
+    #     incorporation_fraction : float
+    #         Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
+    #     soil_attribute_name : float
+    #         Name of the pool in the top soil layer to added to (unitless)
+    #
+    #     Notes
+    #     -----
+    #     Some pools on the soil surface are named differently than the pools in the soil profile which contain the same
+    #     substance, which is why this method takes both a surface attribute name and a soil attribute name.
+    #
+    #     """
+    #     amount_removed_from_surface = self._remove_amount_incorporated(data_container, surface_attribute_name,
+    #                                                                    incorporation_fraction)
+    #     amount_in_top_layer = getattr(self.soil_data.soil_layers[0], soil_attribute_name)
+    #     amount_in_top_layer += amount_removed_from_surface
+    #     setattr(self.soil_data.soil_layers[0], soil_attribute_name, amount_in_top_layer)
 
     @staticmethod
     def _remove_amount_incorporated(data_container: object, attribute_name: str,
