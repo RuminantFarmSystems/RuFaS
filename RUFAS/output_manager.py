@@ -237,26 +237,26 @@ class OutputManager(object):
         return f"{caller_class}.{caller_function}"
 
     def _dict_to_file_json(self, data_dict: Dict[str, Any], path: str) -> None:
-        """Saves a dictionary into a JSON file
+        """Dumps a dictionary into a JSON file
 
         Parameters
         ----------
         data_dict : Dict[str, Any]
-            The dictionary to be saved
+            The dictionary to be dumped
         path : str
-            The path to the file to be saved
+            The path to the file to be dumped to
 
         Raises
         ------
         Exception
-            If an error occurs while saving the file
+            If an error occurs while dumping to the file
 
         Notes
         -----
         The dictionary is first converted to a serializable format using
         `Utility.make_serializable()`.
 
-        The file is saved with no indentation.
+        The file is dumped into with no indentation.
 
         If you want to save time and space, limit the maximum depth of the
         serialized dictionary using the max_depth parameter.
@@ -273,19 +273,19 @@ class OutputManager(object):
             raise e
 
     def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
-        """Saves a list into a text file
+        """Dumps a list into a text file
 
         Parameters
         ----------
         data_list : List[str]
-            The list of variable names to be saved
+            The list of variable names to be dumped
         path : str
-            The path to the file to be saved
+            The path to the file to be dumped to
 
         Raises
         ------
         Exception
-            If an error occurs while saving the file
+            If an error occurs while dumping to the file
 
         """
         try:
@@ -301,9 +301,9 @@ class OutputManager(object):
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
-    def save_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        Saves variables_pool into a json file in the given path to a directory.
+        Dumps variables_pool into a json file in the given path to a directory.
         """
         vars_pool = self.variables_pool.copy()
         if exclude_info_maps:
@@ -314,40 +314,40 @@ class OutputManager(object):
         file_path = os.path.join(path, self._generate_file_name("variables", "json"))
         self._dict_to_file_json(self.variables_pool, file_path)
 
-    def save_logs(self, path: str) -> None:
+    def dump_logs(self, path: str) -> None:
         """
-        Saves logs_pool into a json file in the given path to a directory.
+        Dumps logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
-    def save_warnings(self, path: str) -> None:
+    def dump_warnings(self, path: str) -> None:
         """
-        Saves warnings_pool into a json file in the given path to a directory.
+        Dumps warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
-    def save_errors(self, path: str) -> None:
+    def dump_errors(self, path: str) -> None:
         """
-        Saves errors_pool into a json file in the given path to a directory.
+        Dumps errors_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def save_variable_names_and_contexts(
+    def dump_variable_names_and_contexts(
         self, path: str, exclude_info_maps: bool, format_option: str = "verbose"
     ) -> None:
         """
-        Saves names of all variables added to variables_pool along with the caller class
+        Dumps names of all variables added to variables_pool along with the caller class
         and function contextual information into a txt file in the given path to a directory.
 
         Parameters
         ----------
         path : str
-            The path to the file to be saved
+            The path to the file to be dumped to
         exclude_info_maps : bool
-            Flag to denote whether info_map data should be saved with variable names
+            Flag to denote whether info_map data should be dumped with variable names
         format_options : {"block", "inline", "verbose"}
             The selection for the formatting option of the text written to the variables names text file
 
@@ -404,15 +404,15 @@ class OutputManager(object):
         )
         self._list_to_file_txt(var_list, file_path)
 
-    def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        Saves all pool into the given path to a directory.
+        dumps all pool into the given path to a directory.
         """
-        self.save_variables(path, exclude_info_maps)
-        self.save_variable_names_and_contexts(path, exclude_info_maps)
-        self.save_errors(path)
-        self.save_logs(path)
-        self.save_warnings(path)
+        self.dump_variables(path, exclude_info_maps)
+        self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        self.dump_errors(path)
+        self.dump_logs(path)
+        self.dump_warnings(path)
 
     def flush_pools(self) -> None:
         """
