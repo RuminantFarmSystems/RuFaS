@@ -237,26 +237,26 @@ class OutputManager(object):
         return f"{caller_class}.{caller_function}"
 
     def _dict_to_file_json(self, data_dict: Dict[str, Any], path: str) -> None:
-        """Dumps a dictionary into a JSON file
+        """Saves a dictionary into a JSON file
 
         Parameters
         ----------
         data_dict : Dict[str, Any]
-            The dictionary to be dumped
+            The dictionary to be saved
         path : str
-            The path to the file to be dumped to
+            The path to the file to be saved
 
         Raises
         ------
         Exception
-            If an error occurs while dumping to the file
+            If an error occurs while saving to the file
 
         Notes
         -----
         The dictionary is first converted to a serializable format using
         `Utility.make_serializable()`.
 
-        The file is dumped into with no indentation.
+        The file is saved with no indentation.
 
         If you want to save time and space, limit the maximum depth of the
         serialized dictionary using the max_depth parameter.
@@ -273,19 +273,19 @@ class OutputManager(object):
             raise e
 
     def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
-        """Dumps a list into a text file
+        """Saves a list into a text file
 
         Parameters
         ----------
         data_list : List[str]
-            The list of variable names to be dumped
+            The list of variable names to be saved
         path : str
-            The path to the file to be dumped to
+            The path to the file to be saved
 
         Raises
         ------
         Exception
-            If an error occurs while dumping to the file
+            If an error occurs while saving to the file
 
         """
         try:
