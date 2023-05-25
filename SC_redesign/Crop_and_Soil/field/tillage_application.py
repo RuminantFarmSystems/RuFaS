@@ -64,6 +64,7 @@ class TillageApplication:
         deeper than the bottom of the soil profile.
 
         """
+        # TODO : increase functionality and features - issue #538
         vadose_zone_tilled = tillage_depth > self.soil_data.soil_layers[-1].bottom_depth
         if vadose_zone_tilled:
             tillage_depth = self.soil_data.soil_layers[-1].bottom_depth
