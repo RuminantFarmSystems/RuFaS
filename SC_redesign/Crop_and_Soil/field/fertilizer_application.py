@@ -51,10 +51,9 @@ class FertilizerApplication:
 
         nitrates_applied = (fertilizer_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
         ammonium_applied = (fertilizer_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
-        fresh_organic_nitrogen_applied, fresh_active_organic_nitrogen_applied = \
-            (fertilizer_mass * organic_nitrogen_fraction * 0.5) / field_size
+        organic_nitrogen_applied = (fertilizer_mass * organic_nitrogen_fraction * 0.5) / field_size
 
         self.soil.data.soil_layers[0].nitrate_content += nitrates_applied
         self.soil.data.soil_layers[0].ammonium_content += ammonium_applied
-        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += fresh_organic_nitrogen_applied
-        self.soil.data.soil_layers[0].active_organic_nitrogen_content += fresh_active_organic_nitrogen_applied
+        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += organic_nitrogen_applied
+        self.soil.data.soil_layers[0].active_organic_nitrogen_content += organic_nitrogen_applied
