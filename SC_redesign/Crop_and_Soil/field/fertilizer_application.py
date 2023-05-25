@@ -2,6 +2,10 @@ from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 
+"""
+This module provides a way for Field to apply fertilizer, based on SWAT Theoretical documentation section 6:1.7.
+"""
+
 
 class FertilizerApplication:
 
