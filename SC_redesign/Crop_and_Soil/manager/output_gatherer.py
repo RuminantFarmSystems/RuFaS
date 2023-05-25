@@ -44,12 +44,16 @@ class OutputGatherer:
                                  field.soil.data.rain_events_after_fertilizer_application,
                                  info_map)
 
-
-
+            for layer in field.soil.data.soil_layers:
+                info_map["prefix"] = "field" + field.field_data.name + " layer top depth" + layer.top_depth + \
+                                     " layer bottom depth" + layer.bottom_depth
+                # not sure
+                self.om.add_variable("temperature", layer.temperature, info_map)
+                self.om.add_variable("percolated_water", layer.percolated_water, info_map)
 
 
             for crop in field.crops:
-                info_map["prefix"] = "field" + field.field_data.name + "crop" + crop.data.name
+                info_map["prefix"] = "field" + field.field_data.name + " crop" + crop.data.name
                 self.om.add_variable("root_depth", crop.data.root_depth, info_map)
 
 
