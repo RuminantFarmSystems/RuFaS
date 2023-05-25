@@ -3,10 +3,15 @@ from typing import Optional
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
-
 """
 This module contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical
-documentation section 6:1.6 and
+documentation section 6:1.6 and the SurPhos plow.f file.
+
+Notes
+-----
+This module was written to be as flexible as possible, because every attribute on the soil surface and in the soil
+profile gets incorporated and/or mixed with the same logic. That is why the term "stuff" is used in the docstrings to
+describe the pools/attributes that are effected by tillage.
 """
 
 
@@ -55,21 +60,26 @@ class TillageApplication:
         Notes
         -----
         The tillage process starts by removing stuff from the soil surface and putting it into the top soil layer, then
-        mixing everything in together from the different soil layers.
+        mixing everything in together from the different soil layers. The method also checks that tillage does not go
+        deeper than the bottom of the soil profile.
 
         """
+        vadose_zone_tilled = tillage_depth > self.soil_data.soil_layers[-1].bottom_depth
+        if vadose_zone_tilled:
+            tillage_depth = self.soil_data.soil_layers[-1].bottom_depth
+
         total_phosphorus_incorporated = 0
-        pools_to_draw_from = ["available_phosphorus_pool",
-                              "recalcitrant_phosphorus_pool",
-                              "machine_water_extractable_inorganic_phosphorus",
-                              "machine_water_extractable_organic_phosphorus",
-                              "machine_stable_inorganic_phosphorus",
-                              "machine_stable_organic_phosphorus",
-                              "grazing_water_extractable_inorganic_phosphorus",
-                              "grazing_water_extractable_organic_phosphorus",
-                              "grazing_stable_inorganic_phosphorus",
-                              "grazing_stable_organic_phosphorus"]
-        for pool in pools_to_draw_from:
+        phosphorus_pools_to_draw_from = ["available_phosphorus_pool",
+                                         "recalcitrant_phosphorus_pool",
+                                         "machine_water_extractable_inorganic_phosphorus",
+                                         "machine_water_extractable_organic_phosphorus",
+                                         "machine_stable_inorganic_phosphorus",
+                                         "machine_stable_organic_phosphorus",
+                                         "grazing_water_extractable_inorganic_phosphorus",
+                                         "grazing_water_extractable_organic_phosphorus",
+                                         "grazing_stable_inorganic_phosphorus",
+                                         "grazing_stable_organic_phosphorus"]
+        for pool in phosphorus_pools_to_draw_from:
             total_phosphorus_incorporated += self._remove_amount_incorporated(self.soil_data, pool,
                                                                               incorporation_fraction)
         self.soil_data.soil_layers[0].add_to_labile_phosphorus(total_phosphorus_incorporated,
@@ -104,6 +114,18 @@ class TillageApplication:
         mixing_fraction : float
             Fraction of stuff mixed and redistributed from each layer in the soil profile (unitless)
 
+        References
+        ----------
+        SWAT Theoretical documentation, example on page 361.
+
+        Notes
+        -----
+        This method executes the actual mixing between the soil layers. Each layer in the soil profile can be either
+        fully tilled, partially tilled, or not tilled at all. The method starts by determining how much total stuff will
+        be mixed in the profile based on the mixing fraction and how much stuff is in the pool of each layer. Then it
+        redistributes mixed stuff back into the tilled layers of the profile. The amount of stuff mixed back in to a
+        layer is determined by the ratio between the depth of tillage in the layer and the total overall tillage depth.
+
         """
         redistribution_fractions = []
         total_to_mix_from_pools = 0
@@ -123,7 +145,8 @@ class TillageApplication:
 
             current_pool_amount = getattr(layer, pool_name)
             amount_to_remove = current_pool_amount * mixing_fraction * fraction_of_layer_mixed
-            setattr(layer, pool_name, current_pool_amount - amount_to_remove)
+            unmixed_amount_in_pool = current_pool_amount - amount_to_remove
+            setattr(layer, pool_name, unmixed_amount_in_pool)
             total_to_mix_from_pools += amount_to_remove
 
         number_of_tilled_layers = len(redistribution_fractions)
@@ -155,11 +178,17 @@ class TillageApplication:
         Returns
         -------
         float
-            Amount of stuff removed from soil surface and added to soil profile (units vary)
+            Amount of stuff removed from soil surface and added to the top soil layer (units vary)
+
+        References
+        ----------
+        SurPhos fortran code, plow.f lines 20 - 32.
 
         Notes
         -----
-        The units of the value returned are the same as the units of the pool being removed from.
+        This method both calculates the amount that is removed from the soil surface and actually removes it from the
+        soil surface, returning that removed amount. The units of the value returned are the same as the units of the
+        pool being removed from.
 
         """
         amount_in_pool = getattr(data_container, attribute_name)

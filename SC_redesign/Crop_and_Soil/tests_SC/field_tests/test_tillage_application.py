@@ -58,7 +58,8 @@ def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values
 @pytest.mark.parametrize("till_depth,incorp_frac,mix_frac", [
     (30, 0.12, 0.33),
     (57.8, 0.05, 0.2),
-    (150, 0.23, 0.19)
+    (150, 0.23, 0.19),
+    (5000, 0.44, 0.51)
 ])
 def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float) -> None:
     """Tests that soil is tilled correctly."""
@@ -67,6 +68,11 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float) -> No
     till_app._remove_amount_incorporated = MagicMock(return_value=8)
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
     till_app._mix_soil_layers = MagicMock()
+    bottom_of_soil_profile = till_app.soil_data.soil_layers[-1].bottom_depth
+    if till_depth > bottom_of_soil_profile:
+        expected_till_depth = bottom_of_soil_profile
+    else:
+        expected_till_depth = till_depth
 
     till_app.till_soil(till_depth, incorp_frac, mix_frac)
 
@@ -83,12 +89,12 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float) -> No
     till_app._remove_amount_incorporated.assert_has_calls(remove_calls)
     expected_total_phosphorus = len(remove_calls) * 8
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expected_total_phosphorus, 1.5)
-    mix_calls = [call("labile_inorganic_phosphorus_content", till_depth, mix_frac),
-                 call("active_inorganic_phosphorus_content", till_depth, mix_frac),
-                 call("stable_inorganic_phosphorus_content", till_depth, mix_frac),
-                 call("nitrate_content", till_depth, mix_frac),
-                 call("ammonium_content", till_depth, mix_frac),
-                 call("active_organic_nitrogen_content", till_depth, mix_frac),
-                 call("stable_organic_nitrogen_content", till_depth, mix_frac),
-                 call("fresh_organic_nitrogen_content", till_depth, mix_frac)]
+    mix_calls = [call("labile_inorganic_phosphorus_content", expected_till_depth, mix_frac),
+                 call("active_inorganic_phosphorus_content", expected_till_depth, mix_frac),
+                 call("stable_inorganic_phosphorus_content", expected_till_depth, mix_frac),
+                 call("nitrate_content", expected_till_depth, mix_frac),
+                 call("ammonium_content", expected_till_depth, mix_frac),
+                 call("active_organic_nitrogen_content", expected_till_depth, mix_frac),
+                 call("stable_organic_nitrogen_content", expected_till_depth, mix_frac),
+                 call("fresh_organic_nitrogen_content", expected_till_depth, mix_frac)]
     till_app._mix_soil_layers.assert_has_calls(mix_calls)
