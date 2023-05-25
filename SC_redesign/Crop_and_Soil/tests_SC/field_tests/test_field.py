@@ -210,6 +210,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.soil_erosion.erode = MagicMock()
         incorp.soil.phosphorus_cycling.cycle_phosphorus = MagicMock()
         incorp.soil.nitrogen_cycling.cycle_nitrogen = MagicMock()
+        incorp.soil.carbon_cycling.cycle_carbon = MagicMock()
         incorp.soil.evaporation.evaporate = MagicMock()
 
         incorp._determine_watering_amount = MagicMock(return_value=0)
@@ -237,6 +238,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
+        incorp.soil.carbon_cycling.cycle_carbon.assert_called_once_with(2.0, mean_temp, field_size)
         expected_remaining_demand = 30.5
         crop_1.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
         crop_2.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
