@@ -9,6 +9,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu,
 """
 
 import math
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
 om = OutputManager()
@@ -82,17 +83,17 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
             day_of_pregnancy, calf_birth_weight)
         net_energy_lactation = calculate_NRC_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
+        dry_matter_intake_estimate = calculate_NRC_DMI(
+            animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat)
         metabolizable_protein_requirement = calculate_NRC_protein_requirements(
             body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
-            calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight)
+            calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate)
         calcium_requirement = calculate_NRC_calcium_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain,
             milk_production)
         phosphorus_requirement = calculate_NRC_phosphorus_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, milk_production, animal_type, average_daily_gain)
-        dry_matter_intake_estimate = calculate_NRC_DMI(
-            animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat)
-
+        
     elif AnimalBase.config['energy_and_nutrient_calculation_method'] == 'NASEM':
         net_energy_lactation = calculate_NASEM_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
@@ -588,7 +589,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: str, milk_fat: fl
 def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: float, day_of_pregnancy: Optional[int],
                                        animal_type: str, milk_production: float, milk_true_protein: float,
                                        calf_birth_weight: float, net_energy_growth: float, average_daily_gain: float,
-                                       equivalent_shrunk_body_weight: float) -> float:
+                                       equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float) -> float:
     """ Protein requirement for maintenance according to NRC (2001).
 
     Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -623,6 +624,17 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     metabolizable_protein_requirement : float
         Metabolizable protein requirement (grams per day)
 
+    Notes
+    -----
+    MP_bactria: Bacteria metabolizable protein production, g  
+    TDN: Total digestible nutrients 
+    MPm: Metabolizable protein requirement for maintenance, g
+    NPg: Net protein requirement for growth, g
+    EffMP_NPg: Efficiency of converting metabolizable protein to net protein
+    MPg: Metabolizable protein requirement for growth, g
+    MPpreg: Metabolizable protein requirement for pregnancy, g
+    MPlact: Metabolizable protein requirement for lactation, g 
+
     References
     ----------
     .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
@@ -637,10 +649,18 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     # ---------------------
     # [A.Cow.B.1]-[A.Heifer.B.1]
     # Metabolizable protein requirement for maintenance (g)
-    # (note this is not the full calculation, which will be completed within the
-    # non-linear program)
+
+    TDN_estimate = 0.7  
+    # communication with Dr. Edward Garcia
+    # TODO: Calculate TDN from the previous rations, when formulated. Using this constant as a placeholder value for the first formulation.
+    MP_bactria_estimate = dry_matter_intake_estimate * \
+        GeneralConstants.KG_TO_GRAMS * TDN_estimate * 0.13
+    # communication with Dr. Edward Garcia, to calculate a placeholder MP bacteria value for the first formulation.
+
     MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \
-        4.1 * (body_weight - conceptus_weight) ** 0.5
+        4.1 * (body_weight - conceptus_weight) ** 0.5 + \
+        (dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * 0.03 - 0.5 * (MP_bactria_estimate / 0.68 - MP_bactria_estimate)) + \
+        0.4 * 11.8 * dry_matter_intake_estimate / 0.67
     # Growth Requirement
     # ---------------------
     # [A.Cow.B.2]-[A.Heifer.B.2]
@@ -674,7 +694,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     # ---------------------
     if animal_type == 'cow':
         # [A.Cow.B.6]
-        MPlact = milk_production * (milk_true_protein / 100) * (1000 / 0.67)
+        MPlact = milk_production * \
+            (milk_true_protein / 100) * (GeneralConstants.KG_TO_GRAMS / 0.67)
     # Total Protein Requirement  (g)
     # ---------------------
     if animal_type == 'cow':
@@ -723,6 +744,15 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     MP requirements for maintenance includes: scurf + endogenous urinary loss + metabolic fecal protein.
     Current versions of RuFaS code for both NRC and NASEM do not split MP into physiological functions.
 
+    NPscurf: Net protein requirement for scurf, g 
+    NPEndUrin: Net protein requirement for endogenous urinary excretion, g 
+    CPMFP: Crude protein in metabolic fecal protein, g 
+    NPMFP: Net protein requirement for metabolic fecal protein, g  
+    NPGrowth: Net protein requirement for body frame weight gain, g 
+    NPGest: Net protein requirement for pregnancy, g 
+    NPMilk: Net protein in milk, or milk true protein yield, g 
+    TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
+
     # TODO Consider inclusion of equations for estimating requirement for Non-Essential Aminoacids (NEAA)
 
     References
@@ -730,8 +760,8 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle, 8th edition." 
         National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
     """
-    NPscurf = 0.20*body_weight**(0.60)*0.85
-    NPEndUrin = 53*6.25 * body_weight * 0.001
+    NPscurf = 0.20 * body_weight**(0.60) * 0.85
+    NPEndUrin = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
     NDF_conc = 0.3
     # TODO get the current NDF_conc
     # hardcoded '0.3' is a general value that works for initial simulation purposes
@@ -739,15 +769,15 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     # something like:
     # NDF_conc = conc['NDF']
     # amount, conc = ration_report(self.ration, feed.available_feeds)
-    CPMFP = (11.62+0.134*NDF_conc)*dry_matter_intake_estimate
-    NPMFP = CPMFP*0.73
-    NPGrowth = frame_weight_gain*0.11*0.86
+    CPMFP = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
+    NPMFP = CPMFP * 0.73
+    NPGrowth = frame_weight_gain * 0.11 * 0.86
     NPGest = gravid_uterine_weight_gain * 125
-    NPMilk = milk_true_protein*milk_production*1000
+    NPMilk = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
     TargetEffMP = 0.69
     if lactating:
-        metabolizable_protein_requirement = (((NPscurf + NPMFP + NPMilk + NPGrowth) /
-                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin)/100  # final div/100 is correcting the units g/kg
+        metabolizable_protein_requirement = ((NPscurf + NPMFP + NPMilk + NPGrowth) /
+                                              TargetEffMP) + (NPGest/0.33) + NPEndUrin
     else:
         metabolizable_protein_requirement = (NPscurf + NPMFP) / TargetEffMP + \
             (NPGest/0.33) + (NPGrowth/0.40) + NPEndUrin
@@ -1124,9 +1154,12 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
         National Academic Press, Chapter 2 "Dry matter intake" pp. 7-20, 2021.
     """
     if lactating:
-        dry_matter_intake_estimate = ((3.7 + parity*5.7)+0.305*net_energy_lactation
-                                      + 0.022*body_weight+(-0.689-1.87*parity)*body_condition_score_5) \
-            * (1-(0.212+parity*0.136)*math.exp(-0.053*days_in_milk))
+        parity_adjustment_factor = 0
+        if parity > 1:
+            parity_adjustment_factor = 1 
+        dry_matter_intake_estimate = ((3.7 + parity_adjustment_factor*5.7)+0.305*net_energy_lactation
+                                      + 0.022*body_weight+(-0.689-1.87*parity_adjustment_factor)*body_condition_score_5) \
+            * (1-(0.212+parity_adjustment_factor*0.136)*math.exp(-0.053*days_in_milk))
     else:
         dry_matter_intake_estimate = 0.022*mature_body_weight * \
             (1-math.exp(-1.54*(body_weight/mature_body_weight)))
