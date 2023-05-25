@@ -14,7 +14,7 @@ class OutputGatherer:
         info_map = {"class": self.__class__.__name__, "function": self.send_daily_variables.__name__}
         for field in self.fields:
             info_map["prefix"] = "field" + field.field_data.name
-            # adding field data
+            # --------------------------adding field data
             self.om.add_variable("current_residue", field.field_data.current_residue, info_map)
             self.om.add_variable("evaporation", field.field_data.evaporation, info_map)
             self.om.add_variable("transpiration", field.field_data.transpiration, info_map)
@@ -23,7 +23,7 @@ class OutputGatherer:
             self.om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
             self.om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
 
-            # adding soil data
+            # ----------------------------adding soil data
             self.om.add_variable("potential_evapotranspiration", field.soil.data.potential_evapotranspiration,
                                  info_map)
             self.om.add_variable("potential_evapotranspiration_adjusted",
@@ -40,6 +40,10 @@ class OutputGatherer:
             self.om.add_variable("runoff_phosphorus_pool", field.soil.data.runoff_phosphorus_pool, info_map)
             self.om.add_variable("days_since_application", field.soil.data.days_since_application, info_map)
             # not sure
+            self.om.add_variable("rain_events_after_fertilizer_application",
+                                 field.soil.data.rain_events_after_fertilizer_application,
+                                 info_map)
+
 
 
 
