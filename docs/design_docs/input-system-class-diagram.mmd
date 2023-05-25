@@ -1,0 +1,183 @@
+classDiagram
+    InputManager <|-- ConfigInputManager : extends
+    InputManager <|-- WeatherInputManager : extends
+    InputManager <|-- AnimalInputManager : extends
+    InputManager <|-- ManureInputManager : extends
+    InputManager <|-- FieldInputManager : extends
+    InputManager <|-- FeedInputManager : extends
+    InputManager o-- InputData : creates
+    InputManager o-- InputReader : uses
+    InputManager o-- InputValidator : uses
+
+    InputReader <|-- JSONFileInputReader : extends
+    InputReader <|-- DictInputReader : extends
+    InputReader <|-- CSVFileInputReader : extends
+
+    InputValidator <|-- ConfigInputValidator : extends
+    InputValidator <|-- WeatherInputValidator : extends
+    InputValidator <|-- AnimalInputValidator : extends
+    InputValidator <|-- ManureInputValidator : extends
+    InputValidator <|-- FieldInputValidator : extends
+    InputValidator <|-- FeedInputValidator  : extends
+
+    InputData <|-- ConfigInputData : extends
+    InputData <|-- WeatherInputData : extends
+    InputData <|-- AnimalInputData : extends
+    InputData <|-- ManureInputData : extends
+    InputData <|-- FieldInputData : extends
+    InputData <|-- FeedInputData : extends
+
+%% Comment these out to make the diagram more readable
+%%    ConfigManager *-- ConfigInputData : uses
+%%    WeatherManager *-- WeatherInputData : uses
+%%    AnimalManager *-- AnimalInputData : uses
+%%    ManureManager *-- ManureInputData : uses
+%%    FieldManager *-- FieldInputData : uses
+%%    FeedManager *-- FeedInputData : uses
+
+    DomainManager <|-- ConfigManager : extends
+    DomainManager <|-- WeatherManager : extends
+    DomainManager <|-- AnimalManager : extends
+    DomainManager <|-- ManureManager : extends
+    DomainManager <|-- FieldManager : extends
+    DomainManager <|-- FeedManager : extends
+
+    State *-- DomainManager : uses
+
+    SimulationEngine *-- State : uses
+    MultiProcessingSimulationRunner o-- SimulationEngine : uses
+    SimpleSimulationRunner o-- SimulationEngine : uses
+
+    NonSingletonOutputManager <|-- SensitivityAnalysisOutputManager : extends
+
+    class InputManager {
+        <<abstract>>
+        +__init__(InputReader, InputValidator)
+        +load_input(input_source: Any) InputData
+    }
+
+    class InputReader {
+        <<abstract>>
+        +read(input_source: Any) dict
+    }
+
+    class JSONFileInputReader {
+        +read(input_path: Path) dict
+    }
+
+    class DictInputReader {
+        +read(input_dict: dict) dict
+    }
+
+    class CSVFileInputReader {
+        +read(input_path: Path) dict
+    }
+
+    class InputValidator {
+        <<abstract>>
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class ConfigInputValidator {
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class WeatherInputValidator {
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class AnimalInputValidator {
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class ManureInputValidator {
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class FieldInputValidator {
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class FeedInputValidator {
+        +is_valid(input_data: dict) -> bool
+        +provide_default_values(input_data: dict) dict
+    }
+
+    class InputData {
+        <<abstract>>
+        +get_data() dict
+    }
+
+    class DomainManager {
+        <<abstract>>
+        +input_data : dict
+        +__init__(InputData, Optional[NonSingletonOutputManager])
+        +run_daily_update()
+        +set_sensitivity_analysis_params(dict[str=key, Any])
+    }
+
+    class AnimalManager {
+        +run_daily_update()
+    }
+
+    class ManureManager {
+        +run_daily_update()
+    }
+
+    class FieldManager {
+        +run_daily_update()
+    }
+
+    class FeedManager {
+        +run_daily_update()
+    }
+
+    class State {
+        +__init__(dict[str=manager_name, DomainManager])
+        +get_manager(manager_name: str) DomainManager
+    }
+
+    class SimulationEngine {
+        +__init__(State, Optional[NonSingletonOutputManager])
+        +run_daily_simulation()
+        +set_sensitivity_analysis_params(dict[str=manager_name, dict])
+    }
+
+    class NonSingletonOutputManager {
+        +add_variable(key: str, value: Any, info_map: dict)
+        +remove_variable(key: str)
+        +update_variable(key: str, value: Any)
+        +get_variable(key: str) Any
+        +get_variables(keys: list[str]) dict
+    }
+
+    class SingletonOutputManager {
+        +add_variable(key: str, value: Any, info_map: dict)
+        +remove_variable(key: str)
+        +update_variable(key: str, value: Any)
+        +get_variable(key: str) Any
+        +get_variables(keys: list[str]) dict
+    }
+
+    class SimpleSimulationRunner {
+%%        Add more details later
+        +__init__()
+        +run_simulation()
+    }
+
+    class MultiProcessingSimulationRunner {
+%%        Uncomment later
+%%        +__init__(simulation_params_list: list[tuple[State, Optional[NonSingletonOutputManager]]], sensitivity_analysis_params_list: list[dict[str=manager_name, dict]])
+%%        +run_simulation(simulation_params, sensitivity_analysis_params)
+        +__init__()
+        +run_simulation()
+        +start_processes()
+        +join_processes()
+    }
+
