@@ -390,6 +390,8 @@ class Field:
         self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
                                                       self.field_data.field_size, current_weather.mean_air_temperature)
         self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
+        self.soil.carbon_cycling.cycle_carbon(precipitation_reaching_soil, current_weather.mean_air_temperature,
+                                              self.field_data.field_size)
 
         weighted_transpiration_total = 0.0
         weights_sum = 0.0
