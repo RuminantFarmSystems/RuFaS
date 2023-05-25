@@ -51,6 +51,8 @@ class FertilizerApplication:
         phosphorus application method from SurPhos to apply phosphorus.
 
         """
+        # TODO: move application functionality from soil/phosphorus_cycling up to this module, and increase
+        #  functionality of this module - issue #492
         self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(phosphorus_applied)
 
         nitrates_applied = (fertilizer_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
