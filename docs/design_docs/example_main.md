@@ -1,3 +1,5 @@
+
+```
 def main():
     # An example of how to set up each component of a simulation engine manually.
     config_input_manager = ConfigInputManager(DictInputReader(), ConfigInputValidator())
@@ -76,5 +78,5 @@ def main():
     multi_processing_simulation_runner.join_processes()
     results1 = non_singleton_output_manager1.get_variables(['some_var1', 'some_var2'])
     results2 = non_singleton_output_manager2.get_variables(['some_var1', 'some_var2'])
-
+```
 
