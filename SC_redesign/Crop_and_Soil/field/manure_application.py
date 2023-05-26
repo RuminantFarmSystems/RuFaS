@@ -178,7 +178,9 @@ class ManureApplication:
 
     def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                      total_phosphorus_mass: float, field_coverage: float, field_size: float,
-                                     water_extractable_inorganic_phosphorus_fraction: float) -> None:
+                                     water_extractable_inorganic_phosphorus_fraction: float,
+                                     inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                                     organic_nitrogen_fraction: float) -> None:
         """This method applies manure with 15% solid content or less to a field.
 
         Parameters
@@ -196,6 +198,12 @@ class ManureApplication:
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
 
         Notes
         -----
@@ -246,6 +254,17 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
+        top_layer_mass = surface_retention * dry_matter_mass
+        top_layer_inorganic_nitrogen_fraction = surface_retention * inorganic_nitrogen_fraction
+        top_layer_organic_nitrogen_fraction = surface_retention * organic_nitrogen_fraction
+        self._add_nitrogen_to_soil_layer(0, top_layer_mass, top_layer_inorganic_nitrogen_fraction, ammonium_fraction,
+                                         top_layer_organic_nitrogen_fraction, field_size)
+        second_layer_mass = soil_infiltration * dry_matter_mass
+        second_layer_inorganic_nitrogen_fraction = soil_infiltration * inorganic_nitrogen_fraction
+        second_layer_organic_nitrogen_fraction = soil_infiltration * organic_nitrogen_fraction
+        self._add_nitrogen_to_soil_layer(1, second_layer_mass, second_layer_inorganic_nitrogen_fraction,
+                                         ammonium_fraction, second_layer_organic_nitrogen_fraction, field_size)
+
     def _add_nitrogen_to_soil_layer(self, layer_index: int, dry_matter_mass: float, inorganic_nitrogen_fraction: float,
                                     ammonium_fraction: float, organic_nitrogen_fraction: float,
                                     field_size: float) -> None:
@@ -270,6 +289,11 @@ class ManureApplication:
         References
         ----------
         SWAT Theoretical documentation section 6:1.7
+
+        Notes
+        -----
+        This method allows nitrogen to be added to any soil layer in the profile by specifying the index of that layer.
+        The top soil layer will always be at index 0.
 
         """
         nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
