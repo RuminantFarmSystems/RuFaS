@@ -6,6 +6,7 @@ from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from typing import Optional, List, Dict
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -35,6 +36,9 @@ class Field:
 
         self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
         """is today the last day of the simulation year?"""
+
+        self.manure_applicator = ManureApplication(self.soil.data)
+        """Manure application interface."""
 
     def manage_field(self, day: int, year: int, current_weather: CurrentWeather) -> None:
         """main Field function, runs all field routines based on current attribute configuration
