@@ -366,7 +366,7 @@ class Field:
                 - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
                     and this amount depends on the evapotranspirative demand after water has been removed from canopies)
 
-            It should also be noted that while this method is more messy and complex than it should be, this is a
+            It should also be noted that while this method is more messy and complex than it could be, this is a
             conscious design choice that will allow for SME's to more easily and freely experiment with different orders
             of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
