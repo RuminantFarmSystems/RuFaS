@@ -26,8 +26,8 @@ class ManureApplication:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                             total_phosphorus_mass: float, inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_fraction: float, total_phosphorus_mass: float,
+                             inorganic_nitrogen_fraction: float, ammonium_fraction: float,
                              organic_nitrogen_fraction: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
             be tracked.
@@ -76,6 +76,8 @@ class ManureApplication:
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
+                             inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                             organic_nitrogen_fraction: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
                              source_animal: str = None) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
@@ -93,6 +95,12 @@ class ManureApplication:
             Fraction of the field this manure is applied to (unitless)
         field_size : float
             Size of the field (ha)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
         water_extractable_inorganic_phosphorus_fraction : float, default=None
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
@@ -116,10 +124,12 @@ class ManureApplication:
         if dry_matter_fraction <= 0.15:
             self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
                                               field_coverage, field_size,
-                                              water_extractable_inorganic_phosphorus_fraction)
+                                              water_extractable_inorganic_phosphorus_fraction,
+                                              inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction)
         else:
             self._apply_solid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
-                                             field_coverage, water_extractable_inorganic_phosphorus_fraction)
+                                             field_coverage, water_extractable_inorganic_phosphorus_fraction,
+                                             inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction)
         self.data.machine_manure_applied_mass = dry_matter_mass
 
     def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
