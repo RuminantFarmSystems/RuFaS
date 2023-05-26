@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application import ManureApplication
+from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 
 
 # ---- Static method tests
@@ -56,15 +56,15 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
                                               app_mass: float, app_dry_fraction: float, app_coverage: float) -> None:
     """Tests that the new, weighted values for the manure phosphorus pools are calculated correctly."""
     with patch(
-            "SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application.ManureApplication"
-            "._determine_moisture_factor", new=MagicMock(return_value=0.65)):
+            "SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication._determine_moisture_factor",
+            new=MagicMock(return_value=0.65)) as patched_moisture_factor:
         observe = ManureApplication._determine_weighted_manure_attributes(old_mass, old_moisture, old_coverage,
                                                                           app_mass, app_dry_fraction, app_coverage)
         new_mass = old_mass + app_mass
         new_moisture = (old_moisture * old_mass) / new_mass + (0.65 * app_mass) / new_mass
         new_coverage = (old_coverage * old_mass) / new_mass + (app_coverage * app_mass) / new_mass
 
-        ManureApplication._determine_moisture_factor.assert_called_once_with(app_dry_fraction)
+        patched_moisture_factor.assert_called_once_with(app_dry_fraction)
         assert observe.get("new_dry_matter_mass") == new_mass
         assert observe.get("new_moisture_factor") == new_moisture
         assert observe.get("new_field_coverage") == new_coverage
@@ -136,7 +136,7 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
     (1780, 0.056, 345, 0.93, 3.81, 0.623),
 ])
 def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphorus_mass: float, coverage: float,
-                                     area: float, weiP_frac: float) -> float:
+                                     area: float, weiP_frac: float) -> None:
     """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
         sets surface pool characteristics.
     """
@@ -218,7 +218,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     (2500, 0.08, 175, 0.79, 3.4453, None, None),
 ])
 def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosphorus_mass: float, coverage: float,
-                              area: float, weiP_frac: float, source_animal: float) -> None:
+                              area: float, weiP_frac: float, source_animal: str) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
     data = SoilData(field_size=1.1)
     incorp = ManureApplication(data)
