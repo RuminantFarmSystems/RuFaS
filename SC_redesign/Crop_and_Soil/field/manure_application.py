@@ -11,7 +11,7 @@ SurPhos model.
 
 class ManureApplication:
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -27,7 +27,8 @@ class ManureApplication:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                             total_phosphorus_mass: float, field_size: float) -> None:
+                             total_phosphorus_mass: float, inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                             organic_nitrogen_fraction: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
             be tracked.
 
@@ -39,6 +40,12 @@ class ManureApplication:
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
         field_size : float
             Size of the field (ha)
 
@@ -63,6 +70,9 @@ class ManureApplication:
         self.data.grazing_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
         self.data.grazing_manure_applied_mass = dry_matter_mass
+
+        self._add_nitrogen_to_top_soil_layer(dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                             organic_nitrogen_fraction, field_size)
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
@@ -222,6 +232,39 @@ class ManureApplication:
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
+
+    def _add_nitrogen_to_top_soil_layer(self, dry_matter_mass: float, inorganic_nitrogen_fraction: float,
+                                        ammonium_fraction: float, organic_nitrogen_fraction: float,
+                                        field_size: float) -> None:
+        """
+        Adds nitrogen into the top of the soil profile when manure is applied to the field.
+
+        Parameters
+        ----------
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
+        field_size : float
+            Size of the field (ha)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 6:1.7
+
+        """
+        nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
+        ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
+        organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction * 0.5) / field_size
+
+        self.data.soil_layers[0].nitrate_content += nitrates_added
+        self.data.soil_layers[0].ammonium_content += ammonium_added
+        self.data.soil_layers[0].fresh_organic_nitrogen_content += organic_nitrogen_added
+        self.data.soil_layers[0].active_organic_nitrogen_content += organic_nitrogen_added
 
     # --- Static Methods ---
     @staticmethod
@@ -417,10 +460,10 @@ class ManureApplication:
 
         """
         if animal_type == "CATTLE":
-            return 0.55
+            return 0.50
         elif animal_type == "SWINE":
-            return 0.40
+            return 0.35
         elif animal_type == "POULTRY":
-            return 0.25
+            return 0.20
         else:
             raise ValueError(f"Expected \"CATTLE\", \"SWINE\", or \"POULTRY\", received '{animal_type}'.")

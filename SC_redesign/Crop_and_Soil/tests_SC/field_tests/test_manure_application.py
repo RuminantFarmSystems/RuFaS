@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
+from typing import List
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
@@ -99,9 +100,9 @@ def test_determine_infiltration_factor(wet_rate: float) -> None:
 
 
 @pytest.mark.parametrize("animal_type,expected", [
-    ("CATTLE", 0.55),
-    ("SWINE", 0.40),
-    ("POULTRY", 0.25)
+    ("CATTLE", 0.50),
+    ("SWINE", 0.35),
+    ("POULTRY", 0.20)
 ])
 def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str, expected: float) -> None:
     """Tests that the water extractable inorganic phosphorus fraction is correctly determined based on the animal
@@ -201,6 +202,31 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     assert incorp.data.machine_water_extractable_organic_phosphorus == expect_water_extractable_organic
     assert incorp.data.machine_stable_inorganic_phosphorus == expect_stable_inorganic
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
+
+
+@pytest.mark.parametrize("mass,inorganic_frac,ammonium_frac,organic_frac,field_size,expected", [
+    (100, 0.3, 0.5, 0.08, 1.6, [15, 15, 4]),
+    (44, 0.41, 0.35, 0.075, 2.2, [11.726, 6.314, 1.65]),
+    (50, 0.0, 0.0, 0.0, 1.3, [0, 0, 0])
+])
+def test_add_nitrogen_to_top_soil_layer(mass: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
+                                        field_size: float, expected: List[float]) -> None:
+    """Tests that nitrogen is added to the top soil layer correctly."""
+    man_app = ManureApplication(field_size=field_size)
+    man_app.data.soil_layers[0].nitrate_content = 5
+    man_app.data.soil_layers[0].ammonium_content = 5
+    man_app.data.soil_layers[0].fresh_organic_nitrogen_content = 5
+    man_app.data.soil_layers[0].active_organic_nitrogen_content = 5
+
+    man_app._add_nitrogen_to_top_soil_layer(mass, inorganic_frac, ammonium_frac, organic_frac, field_size)
+
+    expected_nitrates = 5 + (expected[0] / field_size)
+    expected_ammonium = 5 + (expected[1] / field_size)
+    expected_organic = 5 + (expected[2] / field_size)
+    assert pytest.approx(man_app.data.soil_layers[0].nitrate_content) == expected_nitrates
+    assert man_app.data.soil_layers[0].ammonium_content == expected_ammonium
+    assert man_app.data.soil_layers[0].fresh_organic_nitrogen_content == expected_organic
+    assert man_app.data.soil_layers[0].active_organic_nitrogen_content == expected_organic
 
 
 # ---- Main routine tests
