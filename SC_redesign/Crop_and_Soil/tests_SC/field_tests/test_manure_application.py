@@ -230,13 +230,14 @@ def test_add_nitrogen_to_top_soil_layer(mass: float, inorganic_frac: float, ammo
 
 
 # ---- Main routine tests
-@pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_size", [
-    (1000, 0.78, 150, 1.8),
-    (2344, 0.90, 201, 2.34),
-    (900, 0.688, 78, 1.12),
-    (1500, 0.89, 400, 4.1),
+@pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,inorganic_frac,ammonium_frac,organic_frac,field_size", [
+    (1000, 0.78, 150, 0.22, 0.45, 0.03, 1.8),
+    (2344, 0.90, 201, 0.3, 0.39, 0.05, 2.34),
+    (900, 0.688, 78, 0.29, 0.55, 0.1, 1.12),
+    (1500, 0.89, 400, 0.33, 0.4, 0.09, 4.1),
 ])
-def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, field_size: float) -> None:
+def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, inorganic_frac: float,
+                              ammonium_frac: float, organic_frac: float, field_size: float) -> None:
     """Tests that the grazing manure related attributes are correctly updated when grazing manure is applied."""
     data = SoilData(grazing_manure_dry_mass=4000, grazing_manure_moisture_factor=0.75, field_size=field_size,
                     grazing_manure_field_coverage=0.6)
@@ -245,12 +246,16 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 5000,
                                                                            "new_moisture_factor": 0.6,
                                                                            "new_field_coverage": 0.8})
+    incorp._add_nitrogen_to_top_soil_layer = MagicMock()
 
-    incorp.apply_grazing_manure(dry_mass, dry_fraction, phosphorus_mass, field_size)
+    incorp.apply_grazing_manure(dry_mass, dry_fraction, phosphorus_mass, inorganic_frac, ammonium_frac, organic_frac,
+                                field_size)
 
     incorp._determine_grazing_manure_field_coverage.assert_called_once_with(field_size, dry_mass)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(4000, 0.75, 0.6, dry_mass, dry_fraction,
                                                                          0.8)
+    incorp._add_nitrogen_to_top_soil_layer.assert_called_once_with(dry_mass, inorganic_frac, ammonium_frac,
+                                                                   organic_frac, field_size)
     assert incorp.data.grazing_water_extractable_inorganic_phosphorus == phosphorus_mass * 0.50
     assert incorp.data.grazing_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.grazing_stable_inorganic_phosphorus == phosphorus_mass * 0.1125
