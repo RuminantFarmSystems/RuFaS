@@ -140,15 +140,15 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 4000,
                                                                            "new_moisture_factor": 0.83,
                                                                            "new_field_coverage": 0.93})
-    incorp._add_nitrogen_to_top_soil_layer = MagicMock()
+    incorp._add_nitrogen_to_soil_layer = MagicMock()
 
     incorp._apply_solid_machine_manure(dry_mass, dry_fraction, phosphorus_mass, field_coverage, weiP_frac,
                                        inorganic_frac, ammonium_frac, organic_frac, 1.1)
 
     incorp._determine_weighted_manure_attributes.assert_called_once_with(3000, 0.65, 0.77, dry_mass, dry_fraction,
                                                                          field_coverage)
-    incorp._add_nitrogen_to_top_soil_layer.assert_called_once_with(dry_mass, inorganic_frac, ammonium_frac,
-                                                                   organic_frac, 1.1)
+    incorp._add_nitrogen_to_soil_layer.assert_called_once_with(0, dry_mass, inorganic_frac, ammonium_frac,
+                                                               organic_frac, 1.1)
     assert incorp.data.machine_water_extractable_inorganic_phosphorus == phosphorus_mass * weiP_frac
     assert incorp.data.machine_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.machine_stable_inorganic_phosphorus == \
@@ -210,29 +210,29 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
 
 
-@pytest.mark.parametrize("mass,inorganic_frac,ammonium_frac,organic_frac,field_size,expected", [
-    (100, 0.3, 0.5, 0.08, 1.6, [15, 15, 4]),
-    (44, 0.41, 0.35, 0.075, 2.2, [11.726, 6.314, 1.65]),
-    (50, 0.0, 0.0, 0.0, 1.3, [0, 0, 0])
+@pytest.mark.parametrize("index,mass,inorganic_frac,ammonium_frac,organic_frac,field_size,expected", [
+    (0, 100, 0.3, 0.5, 0.08, 1.6, [15, 15, 4]),
+    (1, 44, 0.41, 0.35, 0.075, 2.2, [11.726, 6.314, 1.65]),
+    (3, 50, 0.0, 0.0, 0.0, 1.3, [0, 0, 0])
 ])
-def test_add_nitrogen_to_top_soil_layer(mass: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
-                                        field_size: float, expected: List[float]) -> None:
+def test_add_nitrogen_to_soil_layer(index: int, mass: float, inorganic_frac: float, ammonium_frac: float,
+                                    organic_frac: float, field_size: float, expected: List[float]) -> None:
     """Tests that nitrogen is added to the top soil layer correctly."""
     man_app = ManureApplication(field_size=field_size)
-    man_app.data.soil_layers[0].nitrate_content = 5
-    man_app.data.soil_layers[0].ammonium_content = 5
-    man_app.data.soil_layers[0].fresh_organic_nitrogen_content = 5
-    man_app.data.soil_layers[0].active_organic_nitrogen_content = 5
+    man_app.data.soil_layers[index].nitrate_content = 5
+    man_app.data.soil_layers[index].ammonium_content = 5
+    man_app.data.soil_layers[index].fresh_organic_nitrogen_content = 5
+    man_app.data.soil_layers[index].active_organic_nitrogen_content = 5
 
-    man_app._add_nitrogen_to_top_soil_layer(mass, inorganic_frac, ammonium_frac, organic_frac, field_size)
+    man_app._add_nitrogen_to_soil_layer(index, mass, inorganic_frac, ammonium_frac, organic_frac, field_size)
 
     expected_nitrates = 5 + (expected[0] / field_size)
     expected_ammonium = 5 + (expected[1] / field_size)
     expected_organic = 5 + (expected[2] / field_size)
-    assert pytest.approx(man_app.data.soil_layers[0].nitrate_content) == expected_nitrates
-    assert man_app.data.soil_layers[0].ammonium_content == expected_ammonium
-    assert man_app.data.soil_layers[0].fresh_organic_nitrogen_content == expected_organic
-    assert man_app.data.soil_layers[0].active_organic_nitrogen_content == expected_organic
+    assert pytest.approx(man_app.data.soil_layers[index].nitrate_content) == expected_nitrates
+    assert man_app.data.soil_layers[index].ammonium_content == expected_ammonium
+    assert man_app.data.soil_layers[index].fresh_organic_nitrogen_content == expected_organic
+    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == expected_organic
 
 
 # ---- Main routine tests
@@ -252,7 +252,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 5000,
                                                                            "new_moisture_factor": 0.6,
                                                                            "new_field_coverage": 0.8})
-    incorp._add_nitrogen_to_top_soil_layer = MagicMock()
+    incorp._add_nitrogen_to_soil_layer = MagicMock()
 
     incorp.apply_grazing_manure(dry_mass, dry_fraction, phosphorus_mass, inorganic_frac, ammonium_frac, organic_frac,
                                 field_size)
@@ -260,8 +260,8 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     incorp._determine_grazing_manure_field_coverage.assert_called_once_with(field_size, dry_mass)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(4000, 0.75, 0.6, dry_mass, dry_fraction,
                                                                          0.8)
-    incorp._add_nitrogen_to_top_soil_layer.assert_called_once_with(dry_mass, inorganic_frac, ammonium_frac,
-                                                                   organic_frac, field_size)
+    incorp._add_nitrogen_to_soil_layer.assert_called_once_with(0, dry_mass, inorganic_frac, ammonium_frac,
+                                                               organic_frac, field_size)
     assert incorp.data.grazing_water_extractable_inorganic_phosphorus == phosphorus_mass * 0.50
     assert incorp.data.grazing_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.grazing_stable_inorganic_phosphorus == phosphorus_mass * 0.1125

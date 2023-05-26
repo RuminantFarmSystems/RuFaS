@@ -71,8 +71,8 @@ class ManureApplication:
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
         self.data.grazing_manure_applied_mass = dry_matter_mass
 
-        self._add_nitrogen_to_top_soil_layer(dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
-                                             organic_nitrogen_fraction, field_size)
+        self._add_nitrogen_to_soil_layer(0, dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                         organic_nitrogen_fraction, field_size)
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
@@ -173,8 +173,8 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-        self._add_nitrogen_to_top_soil_layer(dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
-                                             organic_nitrogen_fraction, field_size)
+        self._add_nitrogen_to_soil_layer(0, dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                         organic_nitrogen_fraction, field_size)
 
     def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                      total_phosphorus_mass: float, field_coverage: float, field_size: float,
@@ -246,14 +246,16 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-    def _add_nitrogen_to_top_soil_layer(self, dry_matter_mass: float, inorganic_nitrogen_fraction: float,
-                                        ammonium_fraction: float, organic_nitrogen_fraction: float,
-                                        field_size: float) -> None:
+    def _add_nitrogen_to_soil_layer(self, layer_index: int, dry_matter_mass: float, inorganic_nitrogen_fraction: float,
+                                    ammonium_fraction: float, organic_nitrogen_fraction: float,
+                                    field_size: float) -> None:
         """
         Adds nitrogen into the top of the soil profile when manure is applied to the field.
 
         Parameters
         ----------
+        layer_index : int
+            Index of the soil layer to be added to (unitless)
         dry_matter_mass : float
             Dry weight equivalent of this application (kg)
         inorganic_nitrogen_fraction : float
@@ -274,10 +276,10 @@ class ManureApplication:
         ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
         organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction * 0.5) / field_size
 
-        self.data.soil_layers[0].nitrate_content += nitrates_added
-        self.data.soil_layers[0].ammonium_content += ammonium_added
-        self.data.soil_layers[0].fresh_organic_nitrogen_content += organic_nitrogen_added
-        self.data.soil_layers[0].active_organic_nitrogen_content += organic_nitrogen_added
+        self.data.soil_layers[layer_index].nitrate_content += nitrates_added
+        self.data.soil_layers[layer_index].ammonium_content += ammonium_added
+        self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += organic_nitrogen_added
+        self.data.soil_layers[layer_index].active_organic_nitrogen_content += organic_nitrogen_added
 
     # --- Static Methods ---
     @staticmethod
