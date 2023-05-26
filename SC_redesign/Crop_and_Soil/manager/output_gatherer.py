@@ -130,21 +130,58 @@ class OutputGatherer:
                                      , info_map)
                 self.om.add_variable("fresh_organic_nitrogen_content", layer.fresh_organic_nitrogen_content
                                      , info_map)
-                self.om.add_variable("ammonium_content", layer.ammonium_content
-                                     , info_map)
-                self.om.add_variable("ammonium_content", layer.ammonium_content
-                                     , info_map)
-
-
-
-
-
-
 
             for crop in field.crops:
                 info_map["prefix"] = "field" + field.field_data.name + " crop" + crop.data.name
                 self.om.add_variable("root_depth", crop.data.root_depth, info_map)
-
+                self.om.add_variable("biomass", crop.data.biomass, info_map)
+                self.om.add_variable("usable_light", crop.data.usable_light, info_map)
+                self.om.add_variable("biomass_growth_max", crop.data.biomass_growth_max, info_map)
+                self.om.add_variable("biomass_growth", crop.data.biomass_growth, info_map)
+                self.om.add_variable("previous_biomass", crop.data.previous_biomass, info_map)
+                self.om.add_variable("above_ground_biomass", crop.data.above_ground_biomass, info_map)
+                self.om.add_variable("root_biomass", crop.data.root_biomass, info_map)
+                self.om.add_variable("water_uptake", crop.data.water_uptake, info_map)
+                self.om.add_variable("water_stress", crop.data.water_stress, info_map)
+                self.om.add_variable("temp_stress", crop.data.temp_stress, info_map)
+                self.om.add_variable("nitrogen_stress", crop.data.nitrogen_stress, info_map)
+                self.om.add_variable("phosphorus_stress", crop.data.phosphorus_stress, info_map)
+                self.om.add_variable("accumulated_heat_units", crop.data.accumulated_heat_units, info_map)
+                self.om.add_variable("is_growing", crop.data.is_growing, info_map)
+                self.om.add_variable("is_dormant", crop.data.is_dormant, info_map)
+                self.om.add_variable("canopy_height", crop.data.canopy_height, info_map)
+                self.om.add_variable("leaf_area_added", crop.data.leaf_area_added, info_map)
+                self.om.add_variable("optimal_leaf_area_change", crop.data.optimal_leaf_area_change, info_map)
+                self.om.add_variable("previous_leaf_area_index", crop.data.previous_leaf_area_index, info_map)
+                self.om.add_variable("previous_optimal_leaf_area_fraction",
+                                     crop.data.previous_optimal_leaf_area_fraction, info_map)
+                self.om.add_variable("previous_nitrogen", crop.data.previous_nitrogen, info_map)
+                self.om.add_variable("potential_nitrogen_uptake", crop.data.potential_nitrogen_uptake, info_map)
+                self.om.add_variable("previous_phosphorus", crop.data.previous_phosphorus, info_map)
+                self.om.add_variable("total_phosphorus_uptake", crop.data.total_phosphorus_uptake, info_map)
+                self.om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
+                self.om.add_variable("potential_phosphorus_uptake", crop.data.potential_phosphorus_uptake, info_map)
+                self.om.add_variable("actual_phosphorus_uptakes", crop.data.actual_phosphorus_uptakes, info_map)
+                self.om.add_variable("actual_nitrogen_uptakes", crop.data.actual_nitrogen_uptakes, info_map)
+                self.om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
+                self.om.add_variable("cumulative_evaporation", crop.data.cumulative_evaporation, info_map)
+                self.om.add_variable("cumulative_transpiration", crop.data.cumulative_transpiration, info_map)
+                self.om.add_variable("cumulative_evapotranspiration", crop.data.cumulative_evapotranspiration, info_map)
+                self.om.add_variable("max_transpiration", crop.data.max_transpiration, info_map)
+                self.om.add_variable("canopy_water", crop.data.canopy_water, info_map)
+                self.om.add_variable("cut_biomass", crop.data.cut_biomass, info_map)
+                self.om.add_variable("yield_collected", crop.data.yield_collected, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                self.om.add_variable("yield_nitrogen", crop.data.yield_nitrogen, info_map)
+                self.om.add_variable("yield_phosphorus", crop.data.yield_phosphorus, info_map)
+                self.om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)
+                self.om.add_variable("residue_phosphorus", crop.data.residue_phosphorus, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
+                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
 
     def send_annual_variables(self):
         """sends annual variables to the output manager"""
