@@ -124,7 +124,9 @@ class ManureApplication:
 
     def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                     total_phosphorus_mass: float, field_coverage: float,
-                                    water_extractable_inorganic_phosphorus_fraction: float) -> None:
+                                    water_extractable_inorganic_phosphorus_fraction: float,
+                                    inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                                    organic_nitrogen_fraction: float, field_size: float) -> None:
         """This method applies manure to the field surface when the dry matter content of the application is greater
             than 15%.
 
@@ -141,6 +143,14 @@ class ManureApplication:
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
+        field_size : float
+            Size of the field (ha)
 
         """
         water_extractable_organic_phosphorus_fraction = 0.05
@@ -162,6 +172,9 @@ class ManureApplication:
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
+
+        self._add_nitrogen_to_top_soil_layer(dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                             organic_nitrogen_fraction, field_size)
 
     def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                      total_phosphorus_mass: float, field_coverage: float, field_size: float,
