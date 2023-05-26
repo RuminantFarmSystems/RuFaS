@@ -9,7 +9,6 @@ SurPhos model.
 """
 
 
-# TODO: Move this module up to be part of field, manager, soil, whatever is decided to be best - Issue #433
 class ManureApplication:
 
     def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
@@ -392,3 +391,36 @@ class ManureApplication:
         # TODO: add note about and/or reference to origin of this equation after talking with Pete about it
         retention_rate = min(0.9, 0.000002 * wet_rate + 0.267)
         return 1.0 - retention_rate
+
+    @staticmethod
+    def _determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str) -> float:
+        """
+
+        Parameters
+        ----------
+        animal_type : str
+            Type of animal that produced the manure (can be either "CATTLE", "SWINE", or "POULTRY")
+
+        Returns
+        -------
+        float
+            Fraction of manure that is water-extractable inorganic phosphorus (unitless)
+
+        Raises
+        ------
+        ValueError
+            If the animal type passed does not match any of the supported types.
+
+        Notes
+        -----
+        These are reasonable defaults provided Pete Vadas.
+
+        """
+        if animal_type == "CATTLE":
+            return 0.55
+        elif animal_type == "SWINE":
+            return 0.40
+        elif animal_type == "POULTRY":
+            return 0.25
+        else:
+            raise ValueError(f"Expected \"CATTLE\", \"SWINE\", or \"POULTRY\", received '{animal_type}'.")

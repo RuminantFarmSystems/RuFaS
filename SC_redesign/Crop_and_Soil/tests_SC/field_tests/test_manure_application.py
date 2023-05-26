@@ -98,6 +98,30 @@ def test_determine_infiltration_factor(wet_rate: float) -> None:
     assert observe == expect
 
 
+@pytest.mark.parametrize("animal_type,expected", [
+    ("CATTLE", 0.55),
+    ("SWINE", 0.40),
+    ("POULTRY", 0.25)
+])
+def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str, expected: float) -> None:
+    """Tests that the water extractable inorganic phosphorus fraction is correctly determined based on the animal
+        type"""
+    actual = ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("animal_type", [
+    "CaTTLE",
+    "PORK",
+    "fish"
+])
+def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str) -> None:
+    """Tests that errors caused by unsupported animal types are handled appropriately."""
+    with pytest.raises(ValueError) as e:
+        ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
+    assert str(e.value) == f"Expected \"CATTLE\", \"SWINE\", or \"POULTRY\", received '{animal_type}'."
+
+
 # ---- Helper function tests
 @pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_coverage,weiP_frac", [
     (1000, 0.18, 200, 0.89, 0.5),
