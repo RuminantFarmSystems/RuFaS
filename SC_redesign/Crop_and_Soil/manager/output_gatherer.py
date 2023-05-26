@@ -18,9 +18,10 @@ class OutputGatherer:
             self.om.add_variable("current_residue", field.field_data.current_residue, info_map)
             self.om.add_variable("evaporation", field.field_data.evaporation, info_map)
             self.om.add_variable("transpiration", field.field_data.transpiration, info_map)
-            # max_transpiration needs to be added?
+            # not sure ----------------------------
             self.om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
             self.om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
+            # ---------------------------------------
             self.om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
 
             # ----------------------------adding soil data
@@ -34,11 +35,12 @@ class OutputGatherer:
             self.om.add_variable("maximum_soil_evaporation", field.soil.data.maximum_soil_evaporation, info_map)
             self.om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
             self.om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
-            # not sure
+            # not sure-------------------
             self.om.add_variable("surface_runoff_volume", field.soil.data.surface_runoff_volume, info_map)
             self.om.add_variable("available_phosphorus_pool", field.soil.data.available_phosphorus_pool, info_map)
             self.om.add_variable("runoff_phosphorus_pool", field.soil.data.runoff_phosphorus_pool, info_map)
             self.om.add_variable("days_since_application", field.soil.data.days_since_application, info_map)
+            # ----------------------------
             # not sure
             self.om.add_variable("rain_events_after_fertilizer_application",
                                  field.soil.data.rain_events_after_fertilizer_application,
@@ -48,10 +50,13 @@ class OutputGatherer:
             for layer in field.soil.data.soil_layers:
                 info_map["prefix"] = "field" + field.field_data.name + " layer top depth " + str(layer.top_depth) + \
                                      " layer bottom depth " + str(layer.bottom_depth)
-                # not sure
-                # self.om.add_variable("temperature", layer.temperature, info_map)
+                # not sure----------------------------------------
+                # does the temp change?
+                self.om.add_variable("temperature", layer.temperature, info_map)
+                # --------------------------------------------
                 self.om.add_variable("percolated_water", layer.percolated_water, info_map)
-                # not sure
+                # not sure ---------------------------------------
+                # This carbon part is confusing from the start, maybe look back later
                 self.om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage
                                      , info_map)
                 self.om.add_variable("plant_metabolic_active_carbon_loss", layer.plant_metabolic_active_carbon_loss
@@ -114,6 +119,7 @@ class OutputGatherer:
                                      , info_map)
                 self.om.add_variable("soil_active_decompose_carbon", layer.soil_active_decompose_carbon
                                      , info_map)
+                # --------------------------------------------------------------------
                 self.om.add_variable("active_inorganic_unbalanced_counter", layer.active_inorganic_unbalanced_counter
                                      , info_map)
                 self.om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter
@@ -155,6 +161,8 @@ class OutputGatherer:
                 self.om.add_variable("previous_leaf_area_index", crop.data.previous_leaf_area_index, info_map)
                 self.om.add_variable("previous_optimal_leaf_area_fraction",
                                      crop.data.previous_optimal_leaf_area_fraction, info_map)
+                # not sure ---------------------------------------
+                # are these totals updated daily? are the "potential" variables needed?
                 self.om.add_variable("previous_nitrogen", crop.data.previous_nitrogen, info_map)
                 self.om.add_variable("potential_nitrogen_uptake", crop.data.potential_nitrogen_uptake, info_map)
                 self.om.add_variable("previous_phosphorus", crop.data.previous_phosphorus, info_map)
@@ -164,6 +172,7 @@ class OutputGatherer:
                 self.om.add_variable("actual_phosphorus_uptakes", crop.data.actual_phosphorus_uptakes, info_map)
                 self.om.add_variable("actual_nitrogen_uptakes", crop.data.actual_nitrogen_uptakes, info_map)
                 self.om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
+                # -------------------------------------------------------
                 self.om.add_variable("cumulative_evaporation", crop.data.cumulative_evaporation, info_map)
                 self.om.add_variable("cumulative_transpiration", crop.data.cumulative_transpiration, info_map)
                 self.om.add_variable("cumulative_evapotranspiration", crop.data.cumulative_evapotranspiration, info_map)
@@ -176,12 +185,6 @@ class OutputGatherer:
                 self.om.add_variable("yield_phosphorus", crop.data.yield_phosphorus, info_map)
                 self.om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)
                 self.om.add_variable("residue_phosphorus", crop.data.residue_phosphorus, info_map)
-                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
-                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
-                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
-                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
-                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
-                self.om.add_variable("yield_residue", crop.data.yield_residue, info_map)
 
     def send_annual_variables(self):
         """sends annual variables to the output manager"""
