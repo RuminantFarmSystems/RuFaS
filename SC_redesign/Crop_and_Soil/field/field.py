@@ -4,6 +4,7 @@ from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, Cro
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from typing import Optional, List, Dict
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
@@ -32,6 +33,9 @@ class Field:
         # crop attributes
         self.crops: List[Crop] = list()  # empty crop list
         """crops currently in the field"""
+
+        self.fertilizer_applicator = FertilizerApplication(self.soil)
+        """Provides interface for adding fertilizer applications to the field."""
 
         self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
         """is today the last day of the simulation year?"""
