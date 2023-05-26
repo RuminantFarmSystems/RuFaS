@@ -53,6 +53,7 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
+            self.keys_list = []
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -301,18 +302,88 @@ class OutputManager(object):
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
+    def _exclude_info_maps(self, pair: dict[str, Any]) -> bool:
+
+        """Filtering function to remove info_maps from pool
+
+        Parameters
+        ----------
+        pair: dict[str, Any]
+            The key-value pair from the pool being filtered
+
+        Returns
+        -------
+        bool
+            Whether or not "info_maps" is found as a value in the pair
+        """
+
+        unwanted_value = "info_maps"
+        key, value = pair
+        if value == unwanted_value:
+            return False
+        else:
+            return True
+
+    def read_txt_file(self, path: str) -> List[str]:
+        with open(path) as keys_doc:
+            self.keys_list = keys_doc.read().splitlines()
+
+    def filter_variables_pool(self, pair: dict[str, Any]) -> bool:
+
+        """Filtering function to remove info_maps from pool
+
+        Parameters
+        ----------
+        pair: dict[str, Any]
+            The key-value pair from the pool being filtered
+
+        Returns
+        -------
+        bool
+            Whether or not "info_maps" is found as a value in the pair
+        """
+
+        key, value = pair
+        if key in self.keys_list:
+            return True
+        else:
+            return False
+
+    def save_variables(self, path: str, path2: str, exclude_info_maps: bool = False) -> None:
+        """
+        Reads a text file containing a list of keys and filters the variables pool by those keys.
+
+        Args:
+            path (str): path of the file containing the list of keys.
+        """
+        self.read_txt_file(path2)  # call to read the text file to get the list of keys to filter
+        for name, variable_data in self.variables_pool.items():  # for loop of main variables pool
+            if not variable_data["values"]:  # if there are no values in the pool, skip to the next iteration
+                continue
+            is_variable_nested = isinstance(variable_data["values"][0], Dict)  # check if the nested data is a dictionary
+            if is_variable_nested:
+                for variable_data_pool in variable_data.values():  # if the variable has a nested dict, iterate through the list of those dicts
+                    for variable_data_pool_dict in variable_data_pool:  
+                        # within the list of dicts, for each dict, run the filter function on it to eliminate things not on keys list
+                        variable_data_pool_dict = dict(filter(self.filter_variables_pool, variable_data_pool_dict.items()))
+                        # Figure out how to update self.variables_pool with new filtered nested dict
+        # if exclude_info_maps:
+        #     self.variables_pool = dict(filter(self._exclude_info_maps, self.variables_pool.items()))
+
+        file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
+        self._dict_to_file_json(self.variables_pool, file_path)
+
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
         """
-        vars_pool = self.variables_pool.copy()
-        if exclude_info_maps:
-            for key, value in vars_pool.items():
-                if isinstance(value, dict) and "info_maps" in value:
-                    value.pop("info_maps")
+        file_path = os.path.join(path, self._generate_file_name("dumped_variables", "json"))
 
-        file_path = os.path.join(path, self._generate_file_name("variables", "json"))
-        self._dict_to_file_json(self.variables_pool, file_path)
+        if exclude_info_maps:
+            vars_to_dump = dict(filter(self._exclude_info_maps, self.variables_pool.items()))
+            self._dict_to_file_json(vars_to_dump, file_path)
+        else:
+            self._dict_to_file_json(self.variables_pool, file_path)
 
     def dump_logs(self, path: str) -> None:
         """
@@ -417,6 +488,7 @@ class OutputManager(object):
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
+        self.save_variables(path, r"input/list_of_keys.txt", exclude_info_maps)  # TODO delete this line before pushing to GH
 
     def flush_pools(self) -> None:
         """
