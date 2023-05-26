@@ -7,10 +7,6 @@ from unittest.mock import patch, PropertyMock, MagicMock
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.evapotranspiration import Evapotranspiration
-from SC_redesign.Crop_and_Soil.soil.infiltration import Infiltration
-from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
 
@@ -45,11 +41,7 @@ def test_config_factory_defaults():
                                    LayerData(top_depth=20, bottom_depth=50, field_size=1),
                                    LayerData(top_depth=50, bottom_depth=80, field_size=1),
                                    LayerData(top_depth=80, bottom_depth=200, field_size=1)]
-    assert generic.potential_evapotranspiration is None
-    assert generic.potential_evapotranspiration_adjusted is None
-    assert generic.transpiration == 30
-    assert generic.soil_evaporation_adjusted is None
-    assert generic.maximum_soil_evaporation is None
+    assert generic.water_evaporated == 0
     assert generic.second_moisture_condition_parameter == 85
     assert generic.previous_retention_parameter is None
     assert generic.average_subbasin_slope == 0.05
@@ -189,54 +181,34 @@ def test_error_manual_soil_data_configuration() -> None:
 
 def test_annual_reset() -> None:
     """Test that annual_reset() actually resets the values it should"""
-    # Initialize objects
-    soil_data = SoilData(name="test", peak_runoff_rate=0.95, field_size=2.11,
-                         annual_runoff_machine_manure_organic_phosphorus=10,
-                         annual_runoff_machine_manure_inorganic_phosphorus=10,
-                         annual_runoff_grazing_manure_organic_phosphorus=10,
-                         annual_runoff_grazing_manure_inorganic_phosphorus=10)
-    evapotranspirator = Evapotranspiration(soil_data)
-    infiltrator = Infiltration(soil_data)
-    eroder = SoilErosion(soil_data)
-    fertilizer_phosphorus = Fertilizer(soil_data)
+    soil_data = SoilData(name="test", peak_runoff_rate=0.95, field_size=2.11)
 
-    # Run methods that add to annual totals
-    evapotranspirator.evapotranspirate(500, 24, 18, 20, 1000, 200, 0.12, 1.01)
-    infiltrator.infiltrate(20, 0.58392)
-    eroder.erode(1, 0.2, 800)
-    fertilizer_phosphorus.add_fertilizer_phosphorus(90)
-    fertilizer_phosphorus.do_fertilizer_phosphorus_operations(13, 5, 1.8)
+    soil_data.initial_water_content = 1.5
+    soil_data.initial_nitrates_total = 2.5
+    soil_data.annual_soil_evaporation_total = 1
+    soil_data.annual_runoff_total = 2
+    soil_data.annual_eroded_sediment_total = 3
+    soil_data.annual_surface_runoff_total = 4
+    soil_data.annual_runoff_fertilizer_phosphorus = 5
+    soil_data.annual_runoff_machine_manure_organic_phosphorus = 6
+    soil_data.annual_runoff_machine_manure_inorganic_phosphorus = 7
+    soil_data.annual_runoff_grazing_manure_organic_phosphorus = 8
+    soil_data.annual_runoff_grazing_manure_inorganic_phosphorus = 9
+    soil_data.annual_soil_phosphorus_runoff = 10
+    soil_data.annual_runoff_nitrates_total = 11
+    soil_data.annual_runoff_ammonium_total = 12
+    soil_data.annual_eroded_fresh_organic_nitrogen_total = 13
+    soil_data.annual_eroded_stable_organic_nitrogen_total = 14
+    soil_data.annual_eroded_active_organic_nitrogen_total = 15
 
-    # Patch profile soil water content and profile nitrates total so that they are different from their initial values
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData",
                         profile_soil_water_content=PropertyMock(return_value=1.05),
                         profile_nitrates_total=PropertyMock(return_value=2.83)):
-        # Check that annual totals actually need to be reset
-        assert soil_data.initial_water_content != soil_data.profile_soil_water_content
-        assert soil_data.initial_nitrates_total != soil_data.profile_nitrates_total
-        assert soil_data.annual_potential_evapotranspiration_total != 0
-        assert soil_data.annual_adjusted_potential_evapotranspiration_total != 0
-        assert soil_data.annual_maximum_soil_evaporation_total != 0
-        assert soil_data.annual_adjusted_soil_evaporation_total != 0
-        assert soil_data.annual_runoff_total != 0
-        assert soil_data.annual_eroded_sediment_total != 0
-        assert soil_data.annual_surface_runoff_total != 0
-        assert soil_data.annual_runoff_fertilizer_phosphorus != 0
-        assert soil_data.annual_runoff_machine_manure_organic_phosphorus != 0
-        assert soil_data.annual_runoff_machine_manure_inorganic_phosphorus != 0
-        assert soil_data.annual_runoff_grazing_manure_organic_phosphorus != 0
-        assert soil_data.annual_runoff_grazing_manure_inorganic_phosphorus != 0
-
-        # Run method
         soil_data.do_annual_reset()
 
-        # Check that annual totals were reset correctly
         assert soil_data.initial_water_content == soil_data.profile_soil_water_content
         assert soil_data.initial_nitrates_total == soil_data.profile_nitrates_total
-        assert soil_data.annual_potential_evapotranspiration_total == 0
-        assert soil_data.annual_adjusted_potential_evapotranspiration_total == 0
-        assert soil_data.annual_maximum_soil_evaporation_total == 0
-        assert soil_data.annual_adjusted_soil_evaporation_total == 0
+        assert soil_data.annual_soil_evaporation_total == 0
         assert soil_data.annual_runoff_total == 0
         assert soil_data.annual_eroded_sediment_total == 0
         assert soil_data.annual_surface_runoff_total == 0
@@ -245,6 +217,12 @@ def test_annual_reset() -> None:
         assert soil_data.annual_runoff_machine_manure_inorganic_phosphorus == 0
         assert soil_data.annual_runoff_grazing_manure_organic_phosphorus == 0
         assert soil_data.annual_runoff_grazing_manure_inorganic_phosphorus == 0
+        assert soil_data.annual_soil_phosphorus_runoff == 0
+        assert soil_data.annual_runoff_nitrates_total == 0
+        assert soil_data.annual_runoff_ammonium_total == 0
+        assert soil_data.annual_eroded_fresh_organic_nitrogen_total == 0
+        assert soil_data.annual_eroded_stable_organic_nitrogen_total == 0
+        assert soil_data.annual_eroded_active_organic_nitrogen_total == 0
 
 
 def test_profile_soil_water_content() -> None:
