@@ -44,12 +44,101 @@ class OutputGatherer:
                                  field.soil.data.rain_events_after_fertilizer_application,
                                  info_map)
 
+            # ----------------------------adding layer data
             for layer in field.soil.data.soil_layers:
-                info_map["prefix"] = "field" + field.field_data.name + " layer top depth" + layer.top_depth + \
-                                     " layer bottom depth" + layer.bottom_depth
+                info_map["prefix"] = "field" + field.field_data.name + " layer top depth " + str(layer.top_depth) + \
+                                     " layer bottom depth " + str(layer.bottom_depth)
                 # not sure
-                self.om.add_variable("temperature", layer.temperature, info_map)
+                # self.om.add_variable("temperature", layer.temperature, info_map)
                 self.om.add_variable("percolated_water", layer.percolated_water, info_map)
+                # not sure
+                self.om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage
+                                     , info_map)
+                self.om.add_variable("plant_metabolic_active_carbon_loss", layer.plant_metabolic_active_carbon_loss
+                                     , info_map)
+                self.om.add_variable("plant_metabolic_active_carbon_remaining"
+                                     , layer.plant_metabolic_active_carbon_remaining, info_map)
+                self.om.add_variable("plant_structural_active_carbon_usage", layer.plant_structural_active_carbon_usage
+                                     , info_map)
+                self.om.add_variable("plant_structural_active_carbon_remaining"
+                                     , layer.plant_structural_active_carbon_remaining, info_map)
+                self.om.add_variable("plant_structural_slow_carbon_usage", layer.plant_structural_slow_carbon_usage
+                                     , info_map)
+                self.om.add_variable("plant_structural_slow_carbon_loss", layer.plant_structural_slow_carbon_loss
+                                     , info_map)
+                self.om.add_variable("plant_structural_slow_carbon_remaining"
+                                     , layer.plant_structural_slow_carbon_remaining, info_map)
+                self.om.add_variable("soil_metabolic_active_carbon_usage", layer.soil_metabolic_active_carbon_usage
+                                     , info_map)
+                self.om.add_variable("soil_metabolic_active_carbon_loss", layer.soil_metabolic_active_carbon_loss
+                                     , info_map)
+                self.om.add_variable("soil_metabolic_active_carbon_remaining"
+                                     , layer.soil_metabolic_active_carbon_remaining, info_map)
+                self.om.add_variable("soil_structural_active_carbon_usage", layer.soil_structural_active_carbon_usage
+                                     , info_map)
+                self.om.add_variable("soil_structural_active_carbon_loss", layer.soil_structural_active_carbon_loss
+                                     , info_map)
+                self.om.add_variable("soil_structural_active_carbon_remaining"
+                                     , layer.soil_structural_active_carbon_remaining, info_map)
+                self.om.add_variable("soil_structural_slow_carbon_usage", layer.soil_structural_slow_carbon_usage
+                                     , info_map)
+                self.om.add_variable("soil_structural_slow_carbon_loss", layer.soil_structural_slow_carbon_loss
+                                     , info_map)
+                self.om.add_variable("soil_structural_slow_carbon_remaining"
+                                     , layer.soil_structural_slow_carbon_remaining, info_map)
+                self.om.add_variable("active_carbon_decomposition_amount", layer.active_carbon_decomposition_amount
+                                     , info_map)
+                self.om.add_variable("active_carbon_amount", layer.active_carbon_amount
+                                     , info_map)
+                self.om.add_variable("slow_carbon_amount", layer.slow_carbon_amount
+                                     , info_map)
+                self.om.add_variable("slow_carbon_decomposition_amount", layer.slow_carbon_decomposition_amount
+                                     , info_map)
+                self.om.add_variable("passive_carbon_decomposition_amount", layer.passive_carbon_decomposition_amount
+                                     , info_map)
+                self.om.add_variable("active_carbon_to_slow_amount", layer.active_carbon_to_slow_amount
+                                     , info_map)
+                self.om.add_variable("active_carbon_to_slow_loss", layer.active_carbon_to_slow_loss
+                                     , info_map)
+                self.om.add_variable("active_carbon_to_passive_amount", layer.active_carbon_to_passive_amount
+                                     , info_map)
+                self.om.add_variable("slow_to_active_carbon_amount", layer.slow_to_active_carbon_amount
+                                     , info_map)
+                self.om.add_variable("slow_carbon_co2_lost_amount", layer.slow_carbon_co2_lost_amount
+                                     , info_map)
+                self.om.add_variable("passive_to_active_carbon_amount", layer.passive_to_active_carbon_amount
+                                     , info_map)
+                self.om.add_variable("passive_carbon_co2_lost_amount", layer.passive_carbon_co2_lost_amount
+                                     , info_map)
+                self.om.add_variable("plant_active_decompose_carbon", layer.plant_active_decompose_carbon
+                                     , info_map)
+                self.om.add_variable("soil_active_decompose_carbon", layer.soil_active_decompose_carbon
+                                     , info_map)
+                self.om.add_variable("active_inorganic_unbalanced_counter", layer.active_inorganic_unbalanced_counter
+                                     , info_map)
+                self.om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter
+                                     , info_map)
+                self.om.add_variable("previous_phosphorus_balance", layer.previous_phosphorus_balance
+                                     , info_map)
+                self.om.add_variable("nitrate_content", layer.nitrate_content
+                                     , info_map)
+                self.om.add_variable("ammonium_content", layer.ammonium_content
+                                     , info_map)
+                self.om.add_variable("active_organic_nitrogen_content", layer.active_organic_nitrogen_content
+                                     , info_map)
+                self.om.add_variable("stable_organic_nitrogen_content", layer.stable_organic_nitrogen_content
+                                     , info_map)
+                self.om.add_variable("fresh_organic_nitrogen_content", layer.fresh_organic_nitrogen_content
+                                     , info_map)
+                self.om.add_variable("ammonium_content", layer.ammonium_content
+                                     , info_map)
+                self.om.add_variable("ammonium_content", layer.ammonium_content
+                                     , info_map)
+
+
+
+
+
 
 
             for crop in field.crops:
