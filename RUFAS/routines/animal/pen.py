@@ -584,6 +584,7 @@ class Pen:
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
+    # TODO: Fix this to use AnimalType enum
     def calc_daily_walking_dist(self):
         """
         Sets the daily walking distance for the cows in the pen (if any).

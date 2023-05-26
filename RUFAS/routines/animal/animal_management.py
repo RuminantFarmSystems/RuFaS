@@ -182,8 +182,8 @@ class AnimalManagement:
             'cow': 0
         }
 
-        self.phosphorus_concentration_by_animal_type = {animal_type: 0.0
-                                                        for animal_type in [Calf, HeiferI, HeiferII, HeiferIII, Cow]}
+        self.phosphorus_concentration_by_animal_class = {animal_type: 0.0
+                                                         for animal_type in [Calf, HeiferI, HeiferII, HeiferIII, Cow]}
 
         # housing type: barn or pasture
         self.housing = data['housing']
@@ -1413,9 +1413,9 @@ class AnimalManagement:
 
         """
 
-        for animal_type in self.phosphorus_concentration_by_animal_type:
+        for animal_type in self.phosphorus_concentration_by_animal_class:
             animals = self.animals_by_type[animal_type]
-            self.phosphorus_concentration_by_animal_type[animal_type] = \
+            self.phosphorus_concentration_by_animal_class[animal_type] = \
                 self._calc_phosphorus_concentration(animals)
 
     # New version of calc_ration
@@ -1536,7 +1536,157 @@ class AnimalManagement:
         animal_types_in_pen = cls._get_animal_types_in_pen(pen)
         return {animal_type.value for animal_type in animal_types_in_pen}
 
-    # New version of daily_updates
+    def _get_animals_snapshot(self):
+        """
+        Create a snapshot of the current state of all the animals in the system.
+
+        This function generates a dictionary that maps each animal group name to a set of animals within that group.
+        Additionally, it includes a mapping from each animal's ID to its associated animal combination as determined
+        by the current ANIMAL_GROUPING_SCENARIO.
+
+        The snapshot dictionary serves as a summary of the current state of all animals in the system,
+        allowing for efficient comparison of animal states before and after life cycle's updates.
+
+        Returns
+        -------
+        dict
+            A dictionary with the following structure:
+            - 'calves': a set containing all calves currently in the system.
+            - 'heiferIs': a set containing all heiferIs currently in the system.
+            - 'heiferIIs': a set containing all heiferIIs currently in the system.
+            - 'heiferIIIs': a set containing all heiferIIIs currently in the system.
+            - 'cows': a set containing all cows currently in the system.
+            - 'animal_combination_by_id': a dictionary mapping each animal's ID to its
+                associated animal combination according to the current ANIMAL_GROUPING_SCENARIO.
+
+        """
+        snapshot = {
+            'calves': set(self.calves),
+            'heiferIs': set(self.heiferIs),
+            'heiferIIs': set(self.heiferIIs),
+            'heiferIIIs': set(self.heiferIIIs),
+            'cows': set(self.cows),
+            'animal_combination_by_id': {}
+        }
+        for animal in [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]:
+            snapshot['animal_combination_by_id'][animal.id] = \
+                self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        return snapshot
+
+    def _handle_removed_animals_after_update(self, animals_snapshot_before_update,
+                                             animals_snapshot_after_update):
+        """
+        Identifies and handles animals that were present prior to the update, but not afterwards.
+
+        This function detects any animals that have been removed between updates (e.g., due to graduation,
+        being sold, or being culled), and then updates the internal state accordingly by calling
+        '_remove_animal_from_pen_and_id_map' for each removed animal.
+
+        Parameters
+        ----------
+        animals_snapshot_before_update : dict
+            A snapshot of the state of all the animals before the update. This dictionary uses
+            animal class names as keys ('calves', 'heiferIs', etc.) and sets of animal instances
+            as values.
+
+        animals_snapshot_after_update : dict
+            A snapshot of the state of all the animals after the update. This dictionary should
+            have the same structure as `animals_snapshot_before_update`.
+
+        Returns
+        -------
+        None
+            This function doesn't return any value. Its purpose is to modify the internal state of the
+            class instance by calling '_remove_animal_from_pen_and_id_map' for each animal that
+            has been removed.
+        """
+        animal_class_names = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+
+        # Reasons for removal: graduated, sold, culled
+        removed_animals = set()
+        for animal_type_name in animal_class_names:
+            removed_animals.update(animals_snapshot_before_update[animal_type_name]
+                                   - animals_snapshot_after_update[animal_type_name])
+
+        for animal in removed_animals:
+            self._remove_animal_from_pen_and_id_map(animal)
+
+    def _handle_animals_with_unchanged_class_and_changed_combination(self, animals_snapshot_before_update,
+                                                                     animals_snapshot_after_update,
+                                                                     feed, temp):
+        """
+        Handle animals that didn't change their classes but changed their animal combination.
+
+        The reason for the change in animal combination is that the animal's physiological states have changed.
+        Because each pen is associated with a specific animal combination, the animal needs to be moved to
+        a different pen with the new animal combination.
+
+        For example, a cow can be in the dry state or lactating state, but depending on the
+        current state of the cow, she can be in a different pen with a different animal combination.
+
+        Parameters
+        ----------
+        animals_snapshot_before_update : dict
+            Snapshot of the animals before the update. This should be a dictionary with animal
+            class names as keys and sets of animals as values. There should also be a special key
+            'animal_combination_by_id' that maps animal IDs to their animal combinations.
+        animals_snapshot_after_update : dict
+            Snapshot of the animals after the update. This should be a dictionary with the same
+            structure as animals_snapshot_before_update.
+        feed
+        temp
+
+        Returns
+        -------
+        None
+            This function does not return anything. It operates by side effects, changing the
+            assignments of animals to pens.
+
+        """
+        animal_class_names = ['calves', 'heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']
+        animals_with_unchanged_class = set()
+        for animal_class_name in animal_class_names:
+            animals_with_unchanged_class.update(animals_snapshot_before_update[animal_class_name]
+                                                & animals_snapshot_after_update[animal_class_name])
+        animals_with_unchanged_class_and_changed_combination = set()
+        for animal in animals_with_unchanged_class:
+            if animals_snapshot_before_update['animal_combination_by_id'][animal.id] \
+                    != animals_snapshot_after_update['animal_combination_by_id'][animal.id]:
+                animals_with_unchanged_class_and_changed_combination.add(animal)
+
+        for animal in animals_with_unchanged_class_and_changed_combination:
+            self._remove_animal_from_pen_and_id_map(animal)
+            self._add_animal_to_pen_and_id_map(animal, feed, temp)
+
+    def _handle_graduated_animals(self, animals_snapshot_before_update,
+                                  animals_snapshot_after_update,
+                                  feed, temp):
+        graduated_animals = set()
+        for animal_class_name in ['heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']:
+            graduated_animals.update(animals_snapshot_after_update[animal_class_name]
+                                     - animals_snapshot_before_update[animal_class_name])
+        for animal in graduated_animals:
+            self._add_animal_to_pen_and_id_map(animal, feed, temp)
+
+    def _handle_newly_added_animals(self, new_animals, feed, temp):
+        for animal in new_animals:
+            self._add_animal_to_pen_and_id_map(animal, feed, temp)
+            self.animals_by_type[type(animal)].append(animal)
+
+    def _remove_animal_from_pen_and_id_map(self, animal):
+        pen_id = self.animal_to_pen_id_map[animal.id]
+        self.all_pens[pen_id].remove_animal(animal.id)
+        del self.animal_to_pen_id_map[animal.id]
+
+    def _add_animal_to_pen_and_id_map(self, animal, feed, temp):
+        animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
+                                            key=lambda p: p.current_stocking_density)
+        pen_with_min_stocking_density.add_animal(animal, self.ANIMAL_GROUPING_SCENARIO,
+                                                 feed, temp,
+                                                 self.phosphorus_concentration_by_animal_class[type(animal)])
+        self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
+
     def daily_updates2(self, feed, weather, time):
         """
         Execute the daily routines relating to Animals. All animals are
@@ -1560,74 +1710,27 @@ class AnimalManagement:
         """
         if self.simulate_animals:
             temp = weather.T_avg[time.year - 1][time.day - 1]
-            calves_before_update = set(self.calves)
-            heiferIs_before_update = set(self.heiferIs)
-            heiferIIs_before_update = set(self.heiferIIs)
-            heiferIIIs_before_update = set(self.heiferIIIs)
-            cows_before_update = set(self.cows)
-
-            # It is somewhat tricky to track movement of those animals that change their physiological statuses
-            # but not their classes e.g. Dry cows and lactating cows both belong to the Cow class,
-            # but they belong to two different combinations. First, let's keep track of the old animal combinations
-            # before life cycle daily update. To keep things more general, we do it for all animal classes
-            # and not just for the cows.
-            old_animal_combination_by_id = {}
-            for animal in [*self.calves, *self.heiferIs, *self.heiferIIs, *self.heiferIIIs, *self.cows]:
-                old_animal_combination_by_id[animal.id] = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+            animals_snapshot_before_update = self._get_animals_snapshot()
 
             animals_added, animals_removed, calves_born, *rest = \
                 self.life_cycle_manager.daily_update(self.simulation_day, self.calves,
                                                      self.heiferIs, self.heiferIIs,
                                                      self.heiferIIIs, self.cows)
 
-            # Find those animals that were present before but not now
-            # Reasons for removal: graduated, sold, culled
-            calves_removed_after_update = calves_before_update - set(self.calves)
-            heiferIs_removed_after_update = heiferIs_before_update - set(self.heiferIs)
-            heiferIIs_removed_after_update = heiferIIs_before_update - set(self.heiferIIs)
-            heiferIIIs_removed_after_update = heiferIIIs_before_update - set(self.heiferIIIs)
-            cows_removed_after_update = cows_before_update - set(self.cows)
+            animals_snapshot_after_update = self._get_animals_snapshot()
 
-            # Find and combine all the animals that haven't changed their classes
-            # '|' is the union operator for sets
-            animals_with_unchanged_class = (calves_before_update & set(self.calves)) \
-                                             | (heiferIs_before_update & set(self.heiferIs)) \
-                                             | (heiferIIs_before_update & set(self.heiferIIs)) \
-                                             | (heiferIIIs_before_update & set(self.heiferIIIs)) \
-                                             | (cows_before_update & set(self.cows))
-            # Now, out of those animals, find the ones that have changed their animal combination
-            # Then, we remove them from their old pens and add them to their new pens
-            animals_with_unchanged_class_and_changed_combination = []
-            for animal in animals_with_unchanged_class:
-                new_animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
-                if new_animal_combination != old_animal_combination_by_id[animal.id]:
-                    animals_with_unchanged_class_and_changed_combination.append(animal)
+            self._handle_removed_animals_after_update(
+                animals_snapshot_before_update, animals_snapshot_after_update
+            )
+            self._handle_animals_with_unchanged_class_and_changed_combination(
+                animals_snapshot_before_update, animals_snapshot_after_update, feed, temp
+            )
 
-            for animal in [*calves_removed_after_update, *heiferIs_removed_after_update,
-                           *heiferIIs_removed_after_update, *heiferIIIs_removed_after_update,
-                           *cows_removed_after_update, *animals_with_unchanged_class_and_changed_combination]:
-                pen_id = self.animal_to_pen_id_map[animal.id]
-                self.all_pens[pen_id].remove_animal(animal.id)
-                del self.animal_to_pen_id_map[animal.id]
+            self._handle_graduated_animals(
+                animals_snapshot_before_update, animals_snapshot_after_update, feed, temp
+            )
 
-            # Find the graduated animals
-            heiferIs_from_graduated_calves = list(set(self.heiferIs) - heiferIs_before_update)
-            heiferIIs_from_graduated_heiferIs = list(set(self.heiferIIs) - heiferIIs_before_update)
-            heiferIIIs_from_graduated_heiferIIs = list(set(self.heiferIIIs) - heiferIIIs_before_update)
-            cows_from_graduated_heiferIIIs = list(set(self.cows) - cows_before_update)
-
-            for animal in [*heiferIs_from_graduated_calves, *heiferIIs_from_graduated_heiferIs,
-                           *heiferIIIs_from_graduated_heiferIIs, *cows_from_graduated_heiferIIIs,
-                           *animals_added, *calves_born, *animals_with_unchanged_class_and_changed_combination]:
-                animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
-                pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
-                                                    key=lambda p: p.current_stocking_density)
-                pen_with_min_stocking_density.add_animal(animal, self.ANIMAL_GROUPING_SCENARIO, feed, temp,
-                                                         self.phosphorus_concentration_by_animal_type[type(animal)])
-                self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
-
-            for animal in [*animals_added, *calves_born]:
-                self.animals_by_type[type(animal)].append(animal)
+            self._handle_newly_added_animals([*animals_added, *calves_born], feed, temp)
 
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
