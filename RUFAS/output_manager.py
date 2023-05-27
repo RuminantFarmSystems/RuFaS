@@ -334,9 +334,11 @@ class OutputManager(object):
                 Path of the input file to be read.
 
         """
-
-        with open(path) as keys_doc:
-            self.keys_list = keys_doc.read().splitlines()
+        try:
+            with open(path) as keys_doc:
+                self.keys_list = keys_doc.read().splitlines()
+        except Exception as e:
+            raise e
 
     def _filter_variables_pool(self, pair: dict[str, Any]) -> bool:
 
@@ -540,7 +542,7 @@ class OutputManager(object):
         ----------
             path : str
                 Path to the directory where the file will be saved.
-            
+
             input_path : str
                 Path to input file containing list of keys for filtering data pools.
 
