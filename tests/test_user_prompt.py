@@ -369,7 +369,7 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     assert mock_output_manager.flush_pools.call_count == len(file_list)
     assert mock_output_manager.dump_all_pools.call_count == len(file_list)
     assert mock_output_manager.dump_all_pools.call_args_list == [
-        mocker.call("output", True)
+        mocker.call("output", "input/list_of_keys.txt", True)
     ] * len(file_list)
 
 

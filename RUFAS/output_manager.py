@@ -362,7 +362,8 @@ class OutputManager(object):
         else:
             return False
 
-    def save_variables(self, path: str, keys_file_path: str, exclude_info_maps: bool = False) -> None:
+    def save_variables(self, path: str, keys_file_path: str,
+                       exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
         Saves resulting data pool to a json file in the given path to a directory.
@@ -533,7 +534,7 @@ class OutputManager(object):
         )
         self._list_to_file_txt(var_list, file_path)
 
-    def dump_all_pools(self, path: str, input_path: str = r"input/list_of_keys.txt",
+    def dump_all_pools(self, path: str, input_path: str = "input/list_of_keys.txt",
                        exclude_info_maps: bool = False) -> None:
         """
         Dumps all pool into the given path to a directory.

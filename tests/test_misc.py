@@ -569,9 +569,12 @@ def test_dump_all_pools(
         path, False
     )
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
+    mock_output_manager.save_variables.assert_called_once_with(path, input_path, False)
 
     mock_output_manager.dump_all_pools(path, input_path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
+    mock_output_manager.save_variables.assert_called_with(path, input_path, True)
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
@@ -589,6 +592,9 @@ def test_dump_all_pools(
     ]
     mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
         "dump_variable_names_and_contexts"
+    ]
+    mock_output_manager.save_variables = output_manager_original_method_states[
+        "save_variables"
     ]
 
 
@@ -760,6 +766,7 @@ def test_exclude_info_maps(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
+    """Test case for function _exclude_info_maps in output_manager.py"""
     pair = ("info_maps", 23)
     result = mock_output_manager._exclude_info_maps(pair)
     assert result is False
@@ -778,7 +785,7 @@ def test_read_txt_file(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
-
+    """Test case for function read_txt_file in output_manager.py"""
     expected_keys = ['apple', 'orange', 'banana']
 
     with patch("builtins.open", mock_open(read_data="\n".join(expected_keys))):
@@ -800,7 +807,7 @@ def test_filter_variables_pool(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
-
+    """Test case for function _filter_variables_pool in output_manager.py"""
     mock_output_manager.dummy_keys_list = ['apple', 'orange', 'banana']
 
     pair = ("apple", 23)
@@ -815,6 +822,29 @@ def test_filter_variables_pool(
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
         "_filter_variables_pool"
     ]
+
+
+def test_save_variables(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for function save_variables in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+    mock_output_manager.read_txt_file = MagicMock()
+
+    mock_output_manager.save_variables("dummy_path", "dummy_input_path", False)
+
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables", "json")
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
+
+    # Restore original method
+    mock_output_manager.save_variables = output_manager_original_method_states[
+        "save_variables"
+    ]
+
 
 class DummyClass:
     def __init__(self, value: int) -> None:

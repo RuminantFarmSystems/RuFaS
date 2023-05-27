@@ -63,7 +63,7 @@ def execute_simulations_from_files(
         output_manager.flush_pools()
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
-        output_manager.dump_all_pools(r"output", exclude_info_maps)
+        output_manager.dump_all_pools(r"output", r"input/list_of_keys.txt", exclude_info_maps)
 
 
 def parse_gnu_args():
