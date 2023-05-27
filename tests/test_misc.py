@@ -755,6 +755,24 @@ def test_list_to_file_txt(
     ]
 
 
+def test_exclude_info_maps(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    pair = ("info_maps", 23)
+    result = mock_output_manager._exclude_info_maps(pair)
+    assert result is False
+
+    pair = ("true_result", 23)
+    result = mock_output_manager._exclude_info_maps(pair)
+    assert result is True
+
+    # Restore original method
+    mock_output_manager._exclude_info_maps = output_manager_original_method_states[
+        "_exclude_info_maps"
+    ]
+
+
 class DummyClass:
     def __init__(self, value: int) -> None:
         self.value = value
