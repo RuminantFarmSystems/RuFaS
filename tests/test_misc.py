@@ -764,7 +764,7 @@ def test_exclude_info_maps(
     result = mock_output_manager._exclude_info_maps(pair)
     assert result is False
 
-    pair = ("true_result", 23)
+    pair = ("expected_true_result", 23)
     result = mock_output_manager._exclude_info_maps(pair)
     assert result is True
 
@@ -795,6 +795,26 @@ def test_read_txt_file(
         "read_txt_file"
     ]
 
+
+def test_filter_variables_pool(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+
+    mock_output_manager.dummy_keys_list = ['apple', 'orange', 'banana']
+
+    pair = ("apple", 23)
+    result = mock_output_manager._filter_variables_pool(pair)
+    assert result is True
+
+    pair = ("expected_false_result", 23)
+    result = mock_output_manager._filter_variables_pool(pair)
+    assert result is False
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
 
 class DummyClass:
     def __init__(self, value: int) -> None:
