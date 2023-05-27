@@ -382,11 +382,11 @@ class OutputManager(object):
             is_variable_nested = isinstance(variable_data["values"][0], Dict)
 
             if is_variable_nested:
-                for variable_data_key, variable_data_value in variable_data.items():
-                    for variable_data_pool_dict_num in range(len(variable_data_value)):  # list of dicts of values - the issue causing the crash
-                        # within the list of dicts, for each dict, run the filter function on it to eliminate things not on keys list
-                        for variable_data_pool_dict_key in variable_data_value[variable_data_pool_dict_num].keys():
-                            self.variables_pool[name][variable_data_key][variable_data_pool_dict_num][variable_data_pool_dict_key] = dict(filter(self.filter_variables_pool, variable_data_value[variable_data_pool_dict_num].items()))
+                for var_data_key, var_data_list in variable_data.items():
+                    for index in range(len(var_data_list)):
+                        for data_pool_key in var_data_list[index].keys():
+                            self.variables_pool[name][var_data_key][index][data_pool_key] = dict(filter(
+                                self.filter_variables_pool, var_data_list[index].items()))
 
         if exclude_info_maps:
             for name, variable_data in self.variables_pool.items():
@@ -530,14 +530,23 @@ class OutputManager(object):
 
     def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        dumps all pool into the given path to a directory.
+        Dumps all pool into the given path to a directory.
+
+        Parameters
+        ----------
+            path : str
+                Path to the directory where the file will be saved.
+
+            exclude_info_maps : bool
+                Flag for whether or not the user wants to inlcude info_maps data in their results files.
+
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
-        self.save_variables(path, r"input/list_of_keys.txt", exclude_info_maps)  # TODO delete this line before pushing to GH
+        self.save_variables(path, r"input/list_of_keys.txt", exclude_info_maps)
 
     def flush_pools(self) -> None:
         """
