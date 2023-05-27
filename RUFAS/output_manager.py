@@ -308,13 +308,14 @@ class OutputManager(object):
 
         Parameters
         ----------
-        pair: dict[str, Any]
+        pair : dict[str, Any]
             The key-value pair from the pool being filtered
 
         Returns
         -------
         bool
-            Whether or not "info_maps" is found as a value in the pair
+            If "info_maps" is found as a value in the pair
+
         """
 
         unwanted_value = "info_maps"
@@ -324,23 +325,33 @@ class OutputManager(object):
         else:
             return True
 
-    def read_txt_file(self, path: str) -> List[str]:
+    def read_txt_file(self, path: str) -> None:
+        """Reads a text file into a list
+
+        Parameters
+        ----------
+            path : str
+                Path of the input file to be read
+
+        """
+
         with open(path) as keys_doc:
             self.keys_list = keys_doc.read().splitlines()
 
     def filter_variables_pool(self, pair: dict[str, Any]) -> bool:
 
-        """Filtering function to remove info_maps from pool
+        """Filtering function to filter out data not in the list of keys from the input file
 
         Parameters
         ----------
-        pair: dict[str, Any]
-            The key-value pair from the pool being filtered
+            pair : dict[str, Any]
+                The key-value pair from the pool being filtered
 
         Returns
         -------
-        bool
-            Whether or not "info_maps" is found as a value in the pair
+            bool
+                If the key from pair is found in the list of keys from the input file
+
         """
 
         key, value = pair
@@ -349,36 +360,53 @@ class OutputManager(object):
         else:
             return False
 
-    def save_variables(self, path: str, path2: str, exclude_info_maps: bool = False) -> None:
+    def save_variables(self, path: str, keys_file_path: str, exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
 
         Parameters
         ----------
-            path: str
-                path of the file containing the list of keys.
-            path2: str
+            path : str
+                Path to the directory where the file will be saved.
+
+            keys_file_path : str
+                Path of the input file containing the list of keys.
+
         """
-        self.read_txt_file(path2)  # call to read the text file to get the list of keys to filter
-        for name, variable_data in self.variables_pool.items():  # for loop of main variables pool
-            if not variable_data["values"]:  # if there are no values in the pool, skip to the next iteration
+        self.read_txt_file(keys_file_path)
+        for name, variable_data in self.variables_pool.items():
+
+            if not variable_data["values"]:
                 continue
-            is_variable_nested = isinstance(variable_data["values"][0], Dict)  # check if the nested data is a dictionary
+
+            is_variable_nested = isinstance(variable_data["values"][0], Dict)
+
             if is_variable_nested:
-                for variable_data_key, variable_data_value in variable_data.items():  # if the variable has a nested dict, iterate through the list of those dicts
+                for variable_data_key, variable_data_value in variable_data.items():
                     for variable_data_pool_dict_num in range(len(variable_data_value)):  # list of dicts of values - the issue causing the crash
                         # within the list of dicts, for each dict, run the filter function on it to eliminate things not on keys list
                         for variable_data_pool_dict_key in variable_data_value[variable_data_pool_dict_num].keys():
                             self.variables_pool[name][variable_data_key][variable_data_pool_dict_num][variable_data_pool_dict_key] = dict(filter(self.filter_variables_pool, variable_data_value[variable_data_pool_dict_num].items()))
+
         if exclude_info_maps:
             for name, variable_data in self.variables_pool.items():
                 self.variables_pool[name] = dict(filter(self._exclude_info_maps, variable_data.items()))
+
         file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
         self._dict_to_file_json(self.variables_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
+
+        Parameters
+        ----------
+            path : str
+                Path to the directory where the file will be saved.
+
+            exclude_info_maps : bool
+                Flag for whether or not the user wants to inlcude info_maps data in their results files.
+
         """
 
         if exclude_info_maps:
@@ -391,6 +419,12 @@ class OutputManager(object):
     def dump_logs(self, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
+
+        Parameters
+        ----------
+            path : str
+                Path to the directory where the file will be saved.
+
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
@@ -398,6 +432,12 @@ class OutputManager(object):
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
+
+        Parameters
+        ----------
+            path : str
+                Path to the directory where the file will be saved.
+
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
@@ -405,6 +445,12 @@ class OutputManager(object):
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
+
+        Parameters
+        ----------
+            path : str
+                Path to the directory where the file will be saved.
+
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
@@ -418,31 +464,31 @@ class OutputManager(object):
 
         Parameters
         ----------
-        path : str
-            The path to the file to be dumped to
-        exclude_info_maps : bool
-            Flag to denote whether info_map data should be dumped with variable names
-        format_options : {"block", "inline", "verbose"}
-            The selection for the formatting option of the text written to the variables names text file
+            path : str
+                The path to the file to be dumped to
+            exclude_info_maps : bool
+                Flag to denote whether info_map data should be dumped with variable names
+            format_option : {"block", "inline", "verbose"}
+                The selection for the formatting option of the text written to the variables names text file
 
         Examples
         --------
-        format_option: str = "block"
-        class_name.function_name.variable_name
-                                              .values: variable1_name
-                                              .values: variable2_name
-                                              .info_maps: variable3_name
-                                              .info_maps: variable4_name
+            format_option: str = "block"
+            class_name.function_name.variable_name
+                                                .values: variable1_name
+                                                .values: variable2_name
+                                                .info_maps: variable3_name
+                                                .info_maps: variable4_name
 
-        format_option: str = "inline"
-        class_name.function_name.variable_name.values: [variable1_name, variable2_name]
-        class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
+            format_option: str = "inline"
+            class_name.function_name.variable_name.values: [variable1_name, variable2_name]
+            class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
 
-        format_option: str = "verbose"
-        class_name.function_name.variable_name.values: variable1_name
-        class_name.function_name.variable_name.values: variable2_name
-        class_name.function_name.variable_name.info_maps: variable3_name
-        class_name.function_name.variable_name.info_maps: variable4_name
+            format_option: str = "verbose"
+            class_name.function_name.variable_name.values: variable1_name
+            class_name.function_name.variable_name.values: variable2_name
+            class_name.function_name.variable_name.info_maps: variable3_name
+            class_name.function_name.variable_name.info_maps: variable4_name
         """
 
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
