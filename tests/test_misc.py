@@ -529,6 +529,10 @@ def output_manager_original_method_states(
         "_dict_to_file_json": mock_output_manager._dict_to_file_json,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_add_to_pool": mock_output_manager._add_to_pool,
+        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
+        "read_txt_file": mock_output_manager.read_txt_file,
+        "_filter_variables_pool": mock_output_manager._filter_variables_pool,
+        "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
@@ -547,13 +551,15 @@ def test_dump_all_pools(
 ) -> None:
     """Test case for function dump_all_pools in output_manager.py"""
     path = "dummy_path"
+    input_path = "dummy_input_path"
     mock_output_manager.dump_errors = MagicMock()
     mock_output_manager.dump_warnings = MagicMock()
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
+    mock_output_manager.save_variables = MagicMock()
 
-    mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
+    mock_output_manager.dump_all_pools(path, input_path, exclude_info_maps=False)
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
@@ -563,7 +569,7 @@ def test_dump_all_pools(
     )
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
 
-    mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
+    mock_output_manager.dump_all_pools(path, input_path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
@@ -608,7 +614,7 @@ def test_dump_variables(
 
     mock_output_manager.dump_variables("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("variables", "json")
+    mock_output_manager._generate_file_name.assert_called_once_with("dumped_variables", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )

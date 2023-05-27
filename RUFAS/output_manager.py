@@ -326,31 +326,31 @@ class OutputManager(object):
             return True
 
     def read_txt_file(self, path: str) -> None:
-        """Reads a text file into a list
+        """Reads a text file into a list.
 
         Parameters
         ----------
             path : str
-                Path of the input file to be read
+                Path of the input file to be read.
 
         """
 
         with open(path) as keys_doc:
             self.keys_list = keys_doc.read().splitlines()
 
-    def filter_variables_pool(self, pair: dict[str, Any]) -> bool:
+    def _filter_variables_pool(self, pair: dict[str, Any]) -> bool:
 
-        """Filters out data not in the list of keys from the input file
+        """Filters out data not in the list of keys from the input file.
 
         Parameters
         ----------
             pair : dict[str, Any]
-                The key-value pair from the pool being filtered
+                The key-value pair from the pool being filtered.
 
         Returns
         -------
             bool
-                If the key from pair is found in the list of keys from the input file
+                If the key from pair is found in the list of keys from the input file.
 
         """
 
@@ -387,7 +387,7 @@ class OutputManager(object):
                     for index in range(len(var_data_list)):
                         for data_pool_key in var_data_list[index].keys():
                             self.variables_pool[name][var_data_key][index][data_pool_key] = dict(filter(
-                                self.filter_variables_pool, var_data_list[index].items()))
+                                self._filter_variables_pool, var_data_list[index].items()))
 
         if exclude_info_maps:
             for name, variable_data in self.variables_pool.items():
@@ -466,11 +466,13 @@ class OutputManager(object):
         Parameters
         ----------
             path : str
-                The path to the file to be dumped to
+                The path to the file to be dumped to.
+
             exclude_info_maps : bool
-                Flag to denote whether info_map data should be dumped with variable names
+                Flag to denote whether info_map data should be dumped with variable names.
+
             format_option : {"block", "inline", "verbose"}
-                The selection for the formatting option of the text written to the variables names text file
+                The selection for the formatting option of the text written to the variables names text file.
 
         Examples
         --------
@@ -529,7 +531,8 @@ class OutputManager(object):
         )
         self._list_to_file_txt(var_list, file_path)
 
-    def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_all_pools(self, path: str, input_path: str = r"input/list_of_keys.txt",
+                       exclude_info_maps: bool = False) -> None:
         """
         Dumps all pool into the given path to a directory.
 
@@ -537,6 +540,9 @@ class OutputManager(object):
         ----------
             path : str
                 Path to the directory where the file will be saved.
+            
+            input_path : str
+                Path to input file containing list of keys for filtering data pools.
 
             exclude_info_maps : bool
                 Flag for whether or not the user wants to inlcude info_maps data in their results files.
@@ -547,7 +553,7 @@ class OutputManager(object):
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
-        self.save_variables(path, r"input/list_of_keys.txt", exclude_info_maps)
+        self.save_variables(path, input_path, exclude_info_maps)
 
     def flush_pools(self) -> None:
         """
