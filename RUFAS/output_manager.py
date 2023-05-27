@@ -304,7 +304,7 @@ class OutputManager(object):
 
     def _exclude_info_maps(self, pair: dict[str, Any]) -> bool:
 
-        """Filtering function to remove info_maps from pool
+        """Filters info_maps from pool
 
         Parameters
         ----------
@@ -340,7 +340,7 @@ class OutputManager(object):
 
     def filter_variables_pool(self, pair: dict[str, Any]) -> bool:
 
-        """Filtering function to filter out data not in the list of keys from the input file
+        """Filters out data not in the list of keys from the input file
 
         Parameters
         ----------
@@ -363,6 +363,7 @@ class OutputManager(object):
     def save_variables(self, path: str, keys_file_path: str, exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
+        Saves resulting data pool to a json file in the given path to a directory.
 
         Parameters
         ----------
