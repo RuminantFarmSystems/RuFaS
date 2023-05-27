@@ -8,6 +8,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 import os
 from typing import Callable
 from typing import Dict
+from mock import mock_open, patch
 
 import pytest
 from mock.mock import MagicMock
@@ -770,6 +771,28 @@ def test_exclude_info_maps(
     # Restore original method
     mock_output_manager._exclude_info_maps = output_manager_original_method_states[
         "_exclude_info_maps"
+    ]
+
+
+def test_read_txt_file(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+
+    expected_keys = ['apple', 'orange', 'banana']
+
+    with patch("builtins.open", mock_open(read_data="\n".join(expected_keys))):
+        mock_output_manager.read_txt_file("test.txt")
+
+    assert mock_output_manager.keys_list == expected_keys
+
+    with patch("builtins.open", side_effect=Exception("File not found")):
+        with pytest.raises(Exception):
+            mock_output_manager.read_txt_file("nonexistent.txt")
+
+    # Restore original method
+    mock_output_manager.read_txt_file = output_manager_original_method_states[
+        "read_txt_file"
     ]
 
 
