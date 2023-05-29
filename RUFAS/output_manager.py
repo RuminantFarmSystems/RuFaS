@@ -385,8 +385,7 @@ class OutputManager(object):
         """
 
         if exclude_info_maps:
-            for name, variable_data in self.variables_pool.items():
-                self.variables_pool[name] = dict(filter(self._exclude_info_maps, variable_data.items()))
+            pool =self._exclude_info_maps(self.variables_pool)
 
         file_path = os.path.join(path, self._generate_file_name("dumped_variables", "json"))
         self._dict_to_file_json(self.variables_pool, file_path)
