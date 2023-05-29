@@ -302,8 +302,7 @@ class OutputManager(object):
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
-    def _exclude_info_maps(self, pool:Dict[str, OutputManager.pool_element_type]) -> Dict[str, OutputManager.pool_element_type]:
-
+    def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
         """ Makes a copy of the given pool and removes info_maps from it.
 
         Returns
@@ -312,28 +311,28 @@ class OutputManager(object):
             A copy of the given pool with info_maps removed from it.
 
         """
-  
-        pool_copy = pool.copy()
-            for key, value in pool_copy.items():
-                if isinstance(value, dict) and "info_maps" in value:
-                    value.pop("info_maps")
-        return pool_copy 
 
-    def _load_txt_file_to_list(self, path: str) -> List[Str]:
+        pool_copy = pool.copy()
+        for key, value in pool_copy.items():
+            if isinstance(value, dict) and "info_maps" in value:
+                value.pop("info_maps")
+        return pool_copy
+
+    def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
 
         Parameters
         ----------
             path : str
                 Path of the input file to be read.
-                
-         Returns
-         -------
-            TODO
-            
-         Raises
-         -------
-         TODO            
+
+        Returns
+        -------
+        TODO
+
+        Raises
+        -------
+        TODO
 
         """
         try:
@@ -343,7 +342,7 @@ class OutputManager(object):
             raise e
 
     def _variables_pool_inclusion_filter(self, inclusion_key: str) -> bool:
-        """returns True is inclusion_key has a match in variables_pool"""
+        """returns True if inclusion_key has a match in variables_pool"""
 
         return True if inclusion_key in self.variables_pool.keys() else False
 
@@ -363,7 +362,7 @@ class OutputManager(object):
 
         """
         inclusion_keys = self._load_txt_file_to_list(keys_file_path)
-        filtered_pool = dict(filter(self._variables_pool_inclusion_filter,self.variables_pool))
+        filtered_pool = dict(filter(self._variables_pool_inclusion_filter, self.variables_pool))
         final_pool = filtered_pool
         if exclude_info_maps:
             final_pool = self._exlude_info_maps(filtered_pool)
@@ -383,9 +382,9 @@ class OutputManager(object):
                 Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
-        pool=self.variables_pool
+        pool = self.variables_pool
         if exclude_info_maps:
-            pool =self._exclude_info_maps(self.variables_pool)
+            pool = self._exclude_info_maps(self.variables_pool)
 
         file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
         self._dict_to_file_json(pool, file_path)
