@@ -319,18 +319,26 @@ class OutputManager(object):
                     value.pop("info_maps")
         return pool_copy 
 
-    def read_txt_file(self, path: str) -> None:
-        """Reads a text file into a list.
+    def _load_txt_file_to_list(self, path: str) -> List[Str]:
+        """ Reads a text file into a list.
 
         Parameters
         ----------
             path : str
                 Path of the input file to be read.
+                
+         Returns
+         -------
+            TODO
+            
+         Raises
+         -------
+         TODO            
 
         """
         try:
             with open(path) as keys_doc:
-                self.keys_list = keys_doc.read().splitlines()
+                return keys_doc.read().splitlines()
         except Exception as e:
             raise e
 
