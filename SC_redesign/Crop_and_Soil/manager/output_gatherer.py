@@ -109,9 +109,8 @@ class OutputGatherer:
                                  field.soil.data.grazing_stable_organic_phosphorus,
                                  info_map)
             # ----------------------------adding layer data
-            for layer in field.soil.data.soil_layers:
-                info_map["prefix"] = "field" + field.field_data.name + " layer top depth " + str(layer.top_depth) + \
-                                     " layer bottom depth " + str(layer.bottom_depth)
+            for index, layer in enumerate(field.soil.data.soil_layers):
+                info_map["prefix"] = "field" + field.field_data.name + " layer index " + str(index)
 
                 self.om.add_variable("temperature", layer.temperature, info_map)
                 self.om.add_variable("percolated_water", layer.percolated_water, info_map)
@@ -228,14 +227,9 @@ class OutputGatherer:
                 self.om.add_variable("canopy_height", crop.data.canopy_height, info_map)
                 self.om.add_variable("leaf_area_added", crop.data.leaf_area_added, info_map)
                 self.om.add_variable("optimal_leaf_area_change", crop.data.optimal_leaf_area_change, info_map)
-                self.om.add_variable("previous_leaf_area_index", crop.data.previous_leaf_area_index, info_map)
-                self.om.add_variable("previous_optimal_leaf_area_fraction",
-                                     crop.data.previous_optimal_leaf_area_fraction, info_map)
                 # not sure ---------------------------------------
                 # are these totals updated daily? are the "potential" variables needed?
-                self.om.add_variable("previous_nitrogen", crop.data.previous_nitrogen, info_map)
                 self.om.add_variable("potential_nitrogen_uptake", crop.data.potential_nitrogen_uptake, info_map)
-                self.om.add_variable("previous_phosphorus", crop.data.previous_phosphorus, info_map)
                 self.om.add_variable("total_phosphorus_uptake", crop.data.total_phosphorus_uptake, info_map)
                 self.om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
                 self.om.add_variable("potential_phosphorus_uptake", crop.data.potential_phosphorus_uptake, info_map)
