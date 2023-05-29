@@ -387,8 +387,8 @@ class OutputManager(object):
         if exclude_info_maps:
             pool =self._exclude_info_maps(self.variables_pool)
 
-        file_path = os.path.join(path, self._generate_file_name("dumped_variables", "json"))
-        self._dict_to_file_json(self.variables_pool, file_path)
+        file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        self._dict_to_file_json(pool, file_path)
 
     def dump_logs(self, path: str) -> None:
         """
