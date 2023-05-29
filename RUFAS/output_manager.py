@@ -302,28 +302,22 @@ class OutputManager(object):
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
-    def _exclude_info_maps(self, pair: dict[str, Any]) -> bool:
+    def _exclude_info_maps(self, pool:Dict[str, OutputManager.pool_element_type]) -> Dict[str, OutputManager.pool_element_type]:
 
-        """Filters info_maps from pool
-
-        Parameters
-        ----------
-        pair : dict[str, Any]
-            The key-value pair from the pool being filtered
+        """ Makes a copy of the given pool and removes info_maps from it.
 
         Returns
         -------
-        bool
-            If "info_maps" is found as a value in the pair
+        Dict[str, OutputManager.pool_element_type]
+            A copy of the given pool with info_maps removed from it.
 
         """
-
-        unwanted_value = "info_maps"
-        key, value = pair
-        if key == unwanted_value:
-            return False
-        else:
-            return True
+  
+        pool_copy = pool.copy()
+            for key, value in pool_copy.items():
+                if isinstance(value, dict) and "info_maps" in value:
+                    value.pop("info_maps")
+        return pool_copy 
 
     def read_txt_file(self, path: str) -> None:
         """Reads a text file into a list.
