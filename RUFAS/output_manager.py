@@ -383,7 +383,7 @@ class OutputManager(object):
                 Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
-
+        pool=self.variables_pool
         if exclude_info_maps:
             pool =self._exclude_info_maps(self.variables_pool)
 
