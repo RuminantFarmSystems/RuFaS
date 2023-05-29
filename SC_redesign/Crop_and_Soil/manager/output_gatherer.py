@@ -21,39 +21,99 @@ class OutputGatherer:
             # not sure ----------------------------
             self.om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
             self.om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
-            # ---------------------------------------
             self.om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
-
             # ----------------------------adding soil data
-            self.om.add_variable("potential_evapotranspiration", field.soil.data.potential_evapotranspiration,
+            self.om.add_variable("water_evaporated", field.soil.data.water_evaporated,
                                  info_map)
-            self.om.add_variable("potential_evapotranspiration_adjusted",
-                                 field.soil.data.potential_evapotranspiration_adjusted,
-                                 info_map)
-            self.om.add_variable("transpiration", field.soil.data.transpiration, info_map)
-            self.om.add_variable("soil_evaporation_adjusted", field.soil.data.soil_evaporation_adjusted, info_map)
-            self.om.add_variable("maximum_soil_evaporation", field.soil.data.maximum_soil_evaporation, info_map)
             self.om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
             self.om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
-            # not sure-------------------
-            self.om.add_variable("surface_runoff_volume", field.soil.data.surface_runoff_volume, info_map)
+
             self.om.add_variable("available_phosphorus_pool", field.soil.data.available_phosphorus_pool, info_map)
             self.om.add_variable("runoff_phosphorus_pool", field.soil.data.runoff_phosphorus_pool, info_map)
             self.om.add_variable("days_since_application", field.soil.data.days_since_application, info_map)
+            # not sure-------------------
+            self.om.add_variable("vadose_zone_layer", field.soil.data.vadose_zone_layer, info_map)
+            self.om.add_variable("vadose_active_organic_nitrogen_content",
+                                 field.soil.data.vadose_zone_layer.active_organic_nitrogen_content, info_map)
+            self.om.add_variable("vadose_stable_organic_nitrogen_content",
+                                 field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content, info_map)
             # ----------------------------
-            # not sure
+            self.om.add_variable("cover_type",
+                                 field.soil.data.cover_type,
+                                 info_map)
+            self.om.add_variable("full_available_phosphorus_pool",
+                                 field.soil.data.full_available_phosphorus_pool,
+                                 info_map)
+            self.om.add_variable("available_phosphorus_pool",
+                                 field.soil.data.available_phosphorus_pool,
+                                 info_map)
+            self.om.add_variable("recalcitrant_phosphorus_pool",
+                                 field.soil.data.recalcitrant_phosphorus_pool,
+                                 info_map)
+            self.om.add_variable("runoff_phosphorus_pool",
+                                 field.soil.data.runoff_phosphorus_pool,
+                                 info_map)
+            self.om.add_variable("days_since_application",
+                                 field.soil.data.days_since_application,
+                                 info_map)
             self.om.add_variable("rain_events_after_fertilizer_application",
                                  field.soil.data.rain_events_after_fertilizer_application,
                                  info_map)
 
+            self.om.add_variable("machine_manure_dry_mass",
+                                 field.soil.data.machine_manure_dry_mass,
+                                 info_map)
+            self.om.add_variable("machine_manure_applied_mass",
+                                 field.soil.data.machine_manure_applied_mass,
+                                 info_map)
+            self.om.add_variable("machine_manure_field_coverage",
+                                 field.soil.data.machine_manure_field_coverage,
+                                 info_map)
+            self.om.add_variable("machine_manure_moisture_factor",
+                                 field.soil.data.machine_manure_moisture_factor,
+                                 info_map)
+            self.om.add_variable("machine_water_extractable_inorganic_phosphorus",
+                                 field.soil.data.machine_water_extractable_inorganic_phosphorus,
+                                 info_map)
+            self.om.add_variable("machine_water_extractable_organic_phosphorus",
+                                 field.soil.data.machine_water_extractable_organic_phosphorus,
+                                 info_map)
+            self.om.add_variable("machine_stable_inorganic_phosphorus",
+                                 field.soil.data.machine_stable_inorganic_phosphorus,
+                                 info_map)
+            self.om.add_variable("machine_stable_organic_phosphorus",
+                                 field.soil.data.machine_stable_organic_phosphorus,
+                                 info_map)
+            self.om.add_variable("grazing_manure_dry_mass",
+                                 field.soil.data.grazing_manure_dry_mass,
+                                 info_map)
+            self.om.add_variable("grazing_manure_applied_mass",
+                                 field.soil.data.grazing_manure_applied_mass,
+                                 info_map)
+            self.om.add_variable("grazing_manure_field_coverage",
+                                 field.soil.data.grazing_manure_field_coverage,
+                                 info_map)
+            self.om.add_variable("grazing_manure_moisture_factor",
+                                 field.soil.data.grazing_manure_moisture_factor,
+                                 info_map)
+            self.om.add_variable("grazing_water_extractable_inorganic_phosphorus",
+                                 field.soil.data.grazing_water_extractable_inorganic_phosphorus,
+                                 info_map)
+            self.om.add_variable("grazing_water_extractable_organic_phosphorus",
+                                 field.soil.data.grazing_water_extractable_organic_phosphorus,
+                                 info_map)
+            self.om.add_variable("grazing_stable_inorganic_phosphorus",
+                                 field.soil.data.grazing_stable_inorganic_phosphorus,
+                                 info_map)
+            self.om.add_variable("grazing_stable_organic_phosphorus",
+                                 field.soil.data.grazing_stable_organic_phosphorus,
+                                 info_map)
             # ----------------------------adding layer data
             for layer in field.soil.data.soil_layers:
                 info_map["prefix"] = "field" + field.field_data.name + " layer top depth " + str(layer.top_depth) + \
                                      " layer bottom depth " + str(layer.bottom_depth)
-                # not sure----------------------------------------
-                # does the temp change?
+
                 self.om.add_variable("temperature", layer.temperature, info_map)
-                # --------------------------------------------
                 self.om.add_variable("percolated_water", layer.percolated_water, info_map)
                 # not sure ---------------------------------------
                 # This carbon part is confusing from the start, maybe look back later
@@ -120,11 +180,17 @@ class OutputGatherer:
                 self.om.add_variable("soil_active_decompose_carbon", layer.soil_active_decompose_carbon
                                      , info_map)
                 # --------------------------------------------------------------------
+                self.om.add_variable("mean_phosphorus_sorption_parameter", layer.mean_phosphorus_sorption_parameter
+                                     , info_map)
+                self.om.add_variable("labile_inorganic_phosphorus_contentr", layer.labile_inorganic_phosphorus_content
+                                     , info_map)
+                self.om.add_variable("active_inorganic_phosphorus_content", layer.active_inorganic_phosphorus_content
+                                     , info_map)
+                self.om.add_variable("stable_inorganic_phosphorus_content", layer.stable_inorganic_phosphorus_content
+                                     , info_map)
                 self.om.add_variable("active_inorganic_unbalanced_counter", layer.active_inorganic_unbalanced_counter
                                      , info_map)
                 self.om.add_variable("labile_inorganic_unbalanced_counter", layer.labile_inorganic_unbalanced_counter
-                                     , info_map)
-                self.om.add_variable("previous_phosphorus_balance", layer.previous_phosphorus_balance
                                      , info_map)
                 self.om.add_variable("nitrate_content", layer.nitrate_content
                                      , info_map)
@@ -144,7 +210,6 @@ class OutputGatherer:
                 self.om.add_variable("usable_light", crop.data.usable_light, info_map)
                 self.om.add_variable("biomass_growth_max", crop.data.biomass_growth_max, info_map)
                 self.om.add_variable("biomass_growth", crop.data.biomass_growth, info_map)
-                self.om.add_variable("previous_biomass", crop.data.previous_biomass, info_map)
                 self.om.add_variable("above_ground_biomass", crop.data.above_ground_biomass, info_map)
                 self.om.add_variable("root_biomass", crop.data.root_biomass, info_map)
                 self.om.add_variable("water_uptake", crop.data.water_uptake, info_map)
