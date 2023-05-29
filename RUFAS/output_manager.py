@@ -342,27 +342,10 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, pair: dict[str, Any]) -> bool:
+    def _variables_pool_inclusion_filter(self, inclusion_key: str) -> bool:
+        """returns True is inclusion_key has a match in variables_pool"""
 
-        """Filters out data not in the list of keys from the input file.
-
-        Parameters
-        ----------
-            pair : dict[str, Any]
-                The key-value pair from the pool being filtered.
-
-        Returns
-        -------
-            bool
-                If the key from pair is found in the list of keys from the input file.
-
-        """
-
-        key, value = pair
-        if key in self.keys_list:
-            return True
-        else:
-            return False
+        return True if inclusion_key in self.variables_pool.keys() else False
 
     def save_variables(self, path: str, keys_file_path: str,
                        exclude_info_maps: bool = False) -> None:
