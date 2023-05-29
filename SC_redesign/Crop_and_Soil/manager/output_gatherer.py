@@ -179,6 +179,10 @@ class OutputGatherer:
                                      , info_map)
                 self.om.add_variable("soil_active_decompose_carbon", layer.soil_active_decompose_carbon
                                      , info_map)
+                self.om.add_variable("soil_overall_carbon_fraction", layer.soil_overall_carbon_fraction
+                                     , info_map)
+                self.om.add_variable("total_soil_carbon_amount", layer.total_soil_carbon_amount
+                                     , info_map)
                 # --------------------------------------------------------------------
                 self.om.add_variable("mean_phosphorus_sorption_parameter", layer.mean_phosphorus_sorption_parameter
                                      , info_map)
@@ -220,6 +224,7 @@ class OutputGatherer:
                 self.om.add_variable("accumulated_heat_units", crop.data.accumulated_heat_units, info_map)
                 self.om.add_variable("is_growing", crop.data.is_growing, info_map)
                 self.om.add_variable("is_dormant", crop.data.is_dormant, info_map)
+                self.om.add_variable("leaf_area_index", crop.data.leaf_area_index, info_map)
                 self.om.add_variable("canopy_height", crop.data.canopy_height, info_map)
                 self.om.add_variable("leaf_area_added", crop.data.leaf_area_added, info_map)
                 self.om.add_variable("optimal_leaf_area_change", crop.data.optimal_leaf_area_change, info_map)
