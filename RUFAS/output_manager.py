@@ -362,27 +362,13 @@ class OutputManager(object):
                 Path of the input file containing the list of keys.
 
         """
-        self.read_txt_file(keys_file_path)
-        for name, variable_data in self.variables_pool.items():
-
-            if not variable_data["values"]:
-                continue
-
-            is_variable_nested = isinstance(variable_data["values"][0], Dict)
-
-            if is_variable_nested:
-                for var_data_key, var_data_list in variable_data.items():
-                    for index in range(len(var_data_list)):
-                        for data_pool_key in var_data_list[index].keys():
-                            self.variables_pool[name][var_data_key][index][data_pool_key] = dict(filter(
-                                self._filter_variables_pool, var_data_list[index].items()))
-
+        inclusion_keys = self._load_txt_file_to_list(keys_file_path)
+        filtered_pool = dict(filter(self._variables_pool_inclusion_filter,self.variables_pool))
+        final_pool = filtered_pool
         if exclude_info_maps:
-            for name, variable_data in self.variables_pool.items():
-                self.variables_pool[name] = dict(filter(self._exclude_info_maps, variable_data.items()))
-
+            final_pool = self._exlude_info_maps(filtered_pool)
         file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
-        self._dict_to_file_json(self.variables_pool, file_path)
+        self._dict_to_file_json(final_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
