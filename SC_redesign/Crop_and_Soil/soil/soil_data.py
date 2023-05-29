@@ -250,7 +250,6 @@ class SoilData:
             self.vadose_zone_layer.active_organic_nitrogen_content = 0
             self.vadose_zone_layer.stable_organic_nitrogen_content = 0
 
-
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
