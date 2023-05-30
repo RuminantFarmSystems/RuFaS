@@ -187,7 +187,6 @@ class CropData:
     accumulated_heat_units: float = 0  # accumulator
     """total heat units accumulated to date (unitless)"""
     is_growing: bool = True
-    # TODO: not currently used; SWAT 5:2.1.4 (pretty sure this is a section, not equation, reference)
     """is the crop currently growing?"""
     is_dormant: bool = False
     """is the crop currently dormant?"""
@@ -333,6 +332,8 @@ class CropData:
     """cumulative water demands not met by all previous layers"""
     actual_water_uptakes: Optional[List[float]] = None
     """the actual amount of water to be removed from the soil"""
+    total_water_uptake: float = 0.0
+    """Total amount of water the plant took from the soil on the current day (mm)"""
 
     # ---- yields
     harvest_efficiency: float = 1.0
@@ -398,8 +399,19 @@ class CropData:
 
     @property
     def is_mature(self) -> bool:
-        """checks if maturity has been reached based on the fraction of potential heat units accumulated"""
+        """checks if maturity has been reached based on the fraction of potential heat units accumulated
+
+        References
+        ----------
+        SWAT Theoretical documentation section 5:2.1.4
+        """
         return self.heat_fraction >= 1.0
+
+    @property
+    def in_growing_season(self) -> bool:
+        """Indicates if the plant is in its growing season.
+        """
+        return not self.is_mature and not self.is_dormant and self.is_alive and self.is_growing
 
     @property
     def do_harvest_index_override(self) -> bool:
