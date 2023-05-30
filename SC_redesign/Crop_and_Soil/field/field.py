@@ -350,7 +350,7 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        # TODO - issue #317
+        # TODO: implement snow addition, melting, and sublimation - issue #317
         snow_cover = 0
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
         self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
