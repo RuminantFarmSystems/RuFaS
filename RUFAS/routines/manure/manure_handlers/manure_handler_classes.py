@@ -33,7 +33,7 @@ class ManureHandlerType(DefaultEnum):
     FLUSH_SYSTEM = 'flush system'
     MANUAL_SCRAPING = 'manual scraping'
     ALLEY_SCRAPER = 'alley scraper'
-    COMPOST_BEDDED_PACK_BARN = 'compost bedded pack barn'
+    TILLAGE = 'tillage'
     DEFAULT = FLUSH_SYSTEM
 
 
@@ -216,8 +216,8 @@ class AlleyScraper(BaseManureHandler):
     pass
 
 
-class CompostBeddedPackBarn(BaseManureHandler):
-    """A class that handles calculations related to a compost bedded pack barn.
+class Tillage(BaseManureHandler):
+    """A class that handles calculations related to tillage.
 
     Attributes:
         All inherited from BaseManureHandler.
@@ -234,11 +234,13 @@ class ManureHandlerConfig:
         cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
         minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
         cleanings_per_day: Number of cleanings per day.
+        daily_tillage_frequency: Number of times per day that tillage occurs.
 
     """
     cleaning_water_use_rate: float = 0.0
-    minutes_per_cleaning: int = 8
-    cleanings_per_day: int = 2
+    minutes_per_cleaning: int = 0
+    cleanings_per_day: int = 0
+    daily_tillage_frequency: int = 0
 
 
 class DefaultManureHandlerConfigFactory:
@@ -246,17 +248,21 @@ class DefaultManureHandlerConfigFactory:
 
     FLUSH_SYSTEM_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=757.0,
+        minutes_per_cleaning=8,
+        cleanings_per_day=2,
     )
     MANUAL_SCRAPING_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=10.0,
+        minutes_per_cleaning=8,
+        cleanings_per_day=2,
     )
     ALLEY_SCRAPER_CONFIG = ManureHandlerConfig(
         cleaning_water_use_rate=10.0,
+        minutes_per_cleaning=8,
+        cleanings_per_day=2,
     )
-    COMPOST_BEDDED_PACK_BARN_CONFIG = ManureHandlerConfig(
-        cleaning_water_use_rate=0.0,
-        minutes_per_cleaning=0,
-        cleanings_per_day=0,
+    TILLAGE_CONFIG = ManureHandlerConfig(
+        daily_tillage_frequency=1,
     )
 
     @classmethod
@@ -278,7 +284,7 @@ class DefaultManureHandlerConfigFactory:
             ManureHandlerType.FLUSH_SYSTEM: cls.FLUSH_SYSTEM_CONFIG,
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
             ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG,
-            ManureHandlerType.COMPOST_BEDDED_PACK_BARN: cls.COMPOST_BEDDED_PACK_BARN_CONFIG,
+            ManureHandlerType.TILLAGE: cls.TILLAGE_CONFIG,
         }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
@@ -315,7 +321,7 @@ class ManureHandlerFactory:
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
-            ManureHandlerType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
+            ManureHandlerType.TILLAGE: Tillage,
         }
 
         manure_handler_type = ManureHandlerType.get_type(

@@ -323,3 +323,229 @@ class GasEmissions:
         MS = constants.MS
         METHANE_FACTOR = constants.METHANE_FACTOR
         return manure_volatile_solids * Bo * MCF * MS * METHANE_FACTOR
+
+    @classmethod
+    def _calc_compost_nitrification_rate(cls,
+                                         compost_ammonium_concentration: float,
+                                         temperature_factor: float,
+                                         compost_moisture_factor: float,
+                                         compost_pH_factor: float) -> float:
+        """
+        Calculate the rate of nitrification in compost.
+
+        The equation used for the calculation is as follows:
+
+        .. math::
+
+            R_{NO_3} = K_{max} \cdot N_{NH_4} \cdot F_{temp} \cdot F_{wfp} \cdot F_{pH}
+
+        where:
+
+            :math:`R_{NO_3}` = compost nitrification rate, :math:`g \, N/m^2 \cdot day`
+
+            :math:`K_{max}` = maximum fraction of ammonium concentration in the compost nitrified, dimensionless
+
+            :math:`N_{NH_4}` = ammonium concentration in the compost, :math:`g \, N/m^3`
+
+            :math:`F_{temp}` = factor for the effect of temperature, dimensionless
+
+            :math:`F_{wfp}` = factor for the effect of compost moisture, dimensionless
+
+            :math:`F_{pH}` = factor for the effect of compost pH, dimensionless
+
+        Parameters
+        ----------
+        compost_ammonium_concentration : float
+            Ammonium concentration in the compost, :math:`g \, N/m^3`.
+        temperature_factor : float
+            Factor for the effect of temperature, dimensionless.
+        compost_moisture_factor : float
+            Factor for the effect of compost moisture, dimensionless.
+        compost_pH_factor : float
+            Factor for the effect of compost pH, dimensionless.
+
+        Returns
+        -------
+        float
+            Compost nitrification rate, :math:`g \, N/m^2 \cdot day`.
+
+        """
+
+        K_max = GasEmissionConstants.MAX_COMPOST_AMMONIUM_CONCENTRATION_FRACTION
+        return K_max * compost_ammonium_concentration * temperature_factor * compost_moisture_factor * compost_pH_factor
+
+    @classmethod
+    def _calc_nitrification_emission(cls, nitrified_fraction: float, compost_nitrification_rate: float) -> float:
+        """
+        Calculate the emission of nitrous oxide (:math:`N_2O`) from nitrification in compost.
+
+        The equation used for the calculation is as follows:
+
+        .. math::
+
+            E_{N_{2}O,soil,N} = f_{nitrified \, N} \cdot R_{NO_3} \cdot F_{N,conv}
+
+        where:
+
+            :math:`f_{nitrified \, N}` = fraction of nitrified `N` lost as :math:`N_2O` flux, :math:`g \, N/g \, N_{2}O`
+
+            :math:`R_{NO_3}` = compost nitrification rate, :math:`g \, N/m^2 \cdot day`
+
+            :math:`F_{N,conv}` = nitrification conversion factor, :math:`(kg \, N_{2}O/ha \cdot day) / (g \, N/m^2 \cdot day) = 15.7`
+
+        Parameters
+        ----------
+        nitrified_fraction : float
+            The fraction of nitrified nitrogen that is lost as :math:`N_2O` flux. Should be between 0 and 1.
+        compost_nitrification_rate : float
+            The rate at which nitrogen is nitrified in the compost, :math:`g \, N/m^2 \cdot day`.
+
+        Returns
+        -------
+        float
+            The estimated emission of :math:`N_2O` from nitrification in compost, :math:`kg \, N_{2}O/ha \cdot day`.
+
+        """
+
+        return nitrified_fraction * compost_nitrification_rate * GasEmissionConstants.NITRIFICATION_CONVERSION_FACTOR
+
+    @classmethod
+    def _calc_compost_respiration_factor(cls, compost_carbon_dioxide_flux: float):
+        """
+        Calculate the factor for the effect of compost respiration on the emission of nitrous oxide (:math:`N_2O`)
+        due to denitritication.
+
+        The equation used for the calculation is as follows:
+
+        .. math::
+
+            F_{d, CO_2} = 0.1 \\cdot C_{CO_2}^{1.3}  \\quad (\\text{M.1.B.5})
+
+        where:
+
+            :math:`F_{d, CO_2}` = factor for the effect of compost respiration on the emission of :math:`N_2O` due to
+            denitrification, :math:`\mu g \, N/g \, compost \cdot day`
+
+            :math:`C_{CO_2}` = compost carbon dioxide flux, :math:`\mu g \, C/g \, compost`
+
+        Parameters
+        ----------
+        compost_carbon_dioxide_flux : float
+            The flux of carbon dioxide from compost, :math:`\mu g \, C/g \, compost`.
+
+        Returns
+        -------
+        float
+            The factor for the effect of compost respiration on the emission of :math:`N_2O` due to denitrification,
+            dimensionless.
+
+        """
+        return 0.1 * (compost_carbon_dioxide_flux ** 1.3)
+
+    @classmethod
+    def _calc_compost_moisture_factor(cls, pore_space: float, controlling_factor: float) -> float:
+        """
+        Calculate the factor for the effect of compost moisture on the emission of nitrous oxide (:math:`N_2O`) due to
+        denitrification.
+
+        The equation used for the calculation is as follows:
+
+        .. math::
+
+            F_{f,wfps} = 0.45 + \\frac{\\tan^{-1}(0.6 \\pi \\cdot (0.1 w_{wfps} - a))}{\\pi}  \\quad (\\text{M.1.B.6})
+
+        where:
+
+            :math:`F_{f,wfps}` = factor for the effect of compost moisture on the emission of :math:`N_2O` due to
+            denitrification, dimensionless
+
+            :math:`w_{wfps}` = water-filled pore space, %
+
+            :math:`a` = compost moisture content controlling factor, dimensionless
+
+
+        Parameters
+        ----------
+        pore_space : float
+            Water-filled pore space, %.
+        controlling_factor : float
+            Compost moisture content controlling factor, dimensionless.
+
+        Returns
+        -------
+        float
+            The factor for the effect of compost moisture on the emission of :math:`N_2O` due to denitrification,
+            dimensionless.
+        """
+
+        return 0.45 + (math.atan(0.6 * math.pi * (0.1 * pore_space - controlling_factor)) / math.pi)
+
+    @classmethod
+    def _calc_compost_moisture_content_controlling_factor(cls, interaction_term: float, carbon_dioxide_flux: float):
+        """
+        Calculate the compost moisture content controlling factor.
+
+        The equation used for the calculation is as follows:
+
+        .. math::
+
+            a = 9.0 - M \\cdot C_{CO_2} \\quad (\\text{M.1.B.7})
+
+        where:
+            :math:`a` = compost moisture content controlling factor, dimensionless
+
+            :math:`M` = interaction between compost moisture and compost respiration, dimensionless
+
+            :math:`C_{CO_2}` = compost carbon dioxide flux, :math:`\mu g \, C/g \, compost`
+
+        Parameters
+        ----------
+        interaction_term : float
+            The interaction between compost moisture and compost respiration, dimensionless.
+        carbon_dioxide_flux : float
+            The flux of carbon dioxide from compost, :math:`\mu g \, C/g \, compost`.
+
+        Returns
+        -------
+        float
+            The compost moisture content controlling factor, dimensionless.
+        """
+
+        return 9.0 - interaction_term * carbon_dioxide_flux
+
+    @classmethod
+    def _calc_compost_moisture_and_respiration_interaction(cls, gas_diffusivity_coefficient: float) -> float:
+        """
+        Calculate the interaction between compost moisture and compost respiration.
+
+        The equation used for the calculation is as follows:
+
+        .. math::
+
+            M = 0.145 - 1.25 \\cdot \\min(0.113, D_{fc}) \\quad (\\text{M.1.B.8})
+
+        where:
+            :math:`M` = interaction between compost moisture and compost respiration, dimensionless
+
+            :math:`D_{fc}` = gas diffusivity coefficient, dimensionless
+
+        Parameters
+        ----------
+        gas_diffusivity_coefficient : float
+            Gas diffusivity coefficient, dimensionless.
+
+        Returns
+        -------
+        float
+            The interaction between compost moisture and compost respiration, dimensionless.
+
+        Examples
+        --------
+        >>> GasEmissions._calc_compost_moisture_and_respiration_interaction(0.1)
+        0.01999999999999999
+
+        >>> GasEmissions._calc_compost_moisture_and_respiration_interaction(0.2)
+        0.0037499999999999756
+        """
+
+        return 0.145 - 1.25 * min(0.113, gas_diffusivity_coefficient)

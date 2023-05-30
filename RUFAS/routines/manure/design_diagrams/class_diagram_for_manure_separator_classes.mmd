@@ -1,0 +1,51 @@
+---
+title: "Class diagram for manure separator classes"
+---
+classDiagram
+    direction RL
+    BaseManureSeparator <|-- RotaryScreen : derived from
+    BaseManureSeparator <|-- ScrewPress
+    BaseManureSeparator <|-- SandLaneManureSeparation
+    ManureSeparatorFactory --> DefaultManureSeparatorConfigFactory : calls when no custom inputs
+    DefaultManureSeparatorConfigFactory --> ManureSeparatorConfig : creates
+    ManureSeparatorFactory --> BaseManureSeparator : creates
+    ManureSeparatorFactory --> ManureSeparatorType : maps each type to a subclass
+    class ManureSeparatorType {
+        <<enumeration>>
+        ROTARY_SCREEN
+        SCREW_PRESS
+        SAND_LANE_MANURE_SEPARATION
+    }
+
+    class BaseManureSeparator {
+        +config: ManureSeparatorConfig
+        +daily_update() ManureSeparatorDailyOutput
+    }
+
+    class RotaryScreen {
+        +daily_update() ManureSeparatorDailyOutput
+    }
+
+    class ScrewPress {
+        +daily_update() ManureSeparatorDailyOutput
+    }
+
+    class SandLaneManureSeparation {
+        +daily_update() ManureSeparatorDailyOutput
+    }
+
+
+    class ManureSeparatorConfig {
+        +total_solids_removal_efficiency: float
+        +volatile_solids_removal_efficiency: float
+        +nitrogen_removal_efficiency: float
+        +...
+    }
+
+    class DefaultManureSeparatorConfigFactory {
+        +get_instance() ManureSeparatorConfig
+    }
+
+    class ManureSeparatorFactory {
+        +get_instance() BaseManureSeparator
+    }

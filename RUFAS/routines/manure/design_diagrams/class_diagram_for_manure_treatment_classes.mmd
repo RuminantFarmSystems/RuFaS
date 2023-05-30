@@ -1,0 +1,65 @@
+---
+title: "Class diagram for manure treatment classes"
+---
+classDiagram
+    direction RL
+    BaseManureTreatment <|-- SlurryStorageUnderfloor : derived from
+    BaseManureTreatment <|-- SlurryStorageOutdoor
+    BaseManureTreatment <|-- AnaerobicLagoon
+    BaseManureTreatment <|-- AnaerobicDigestion
+    BaseManureTreatment <-- GasEmissions : used by daily_update()
+    ManureTreatmentFactory --> DefaultManureTreatmentConfigFactory : calls when no custom inputs
+    DefaultManureTreatmentConfigFactory --> ManureTreatmentConfig : creates
+    ManureTreatmentFactory --> BaseManureTreatment : creates
+    ManureTreatmentFactory --> ManureTreatmentType : maps each type to a subclass
+    class ManureTreatmentType {
+        <<enumeration>>
+        SLURRY_STORAGE_UNDERFLOOR
+        SLURRY_STORAGE_OUTDOOR
+        ANAEROBIC_LAGOON
+        ANAEROBIC_DIGESTION
+        DEFAULT = SLURRY_STORAGE_UNDERFLOOR
+    }
+
+    class BaseManureTreatment {
+        +weather: Weather
+        +time: Time
+        +config: ManureTreatmentConfig
+        +daily_update() ManureHandlerDailyOutput
+    }
+
+    class SlurryStorageUnderfloor {
+        +daily_update() ManureHandlerDailyOutput
+    }
+
+    class SlurryStorageOutdoor {
+        +daily_update() ManureHandlerDailyOutput
+    }
+
+    class AnaerobicLagoon {
+        +daily_update() ManureHandlerDailyOutput
+    }
+
+    class AnaerobicDigestion {
+        +daily_update() ManureHandlerDailyOutput
+    }
+
+    class GasEmissions {
+        +calc_storage_methane_emission() float
+        +calc_storage_ammonia_emission() float
+    }
+
+    class ManureTreatmentConfig {
+        +total_solids_removal_efficiency: float
+        +volatile_solids_removal_efficiency: float
+        +nitrogen_removal_efficiency: float
+        +...
+    }
+
+    class DefaultManureTreatmentConfigFactory {
+        +get_instance() ManureTreatmentConfig
+    }
+
+    class ManureTreatmentFactory {
+        +get_instance() BaseManureTreatment
+    }

@@ -58,10 +58,10 @@
     },
     {
       "scenario_id": 8,
-      "bedding_type": "sawdust",
-      "manure_handler": "compost bedded pack barn",
+      "bedding_type": "sawdust CBPB",
+      "manure_handler": "tillage",
       "manure_separator": "none",
-      "manure_treatment": "compost bedded pack barn with composting"
+      "manure_treatment": "compost bedded pack barn"
     }
   ],
   "bedding_configs": [
@@ -86,6 +86,12 @@
       "bedding_dry_matter_content": 0.9,
       "bedding_cleaned_fraction": 1.0,
       "sand_removal_efficiency": 1.0
+    },
+    {
+      "bedding_type": "sawdust CBPB",
+      "bedding_mass_per_day": 12,
+      "bedding_density": 350.0,
+      "bedding_dry_matter_content": 0.9
     }
   ],
   "manure_handler_configs": [
@@ -106,6 +112,10 @@
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
       "cleanings_per_day": 2
+    },
+    {
+      "manure_handler_type": "tillage",
+      "daily_tillage_frequency": 1
     }
   ],
   "manure_separator_configs": [
@@ -183,6 +193,23 @@
       "evaporation_fraction": 0.02,
       "anaerobic_digestion_temperature_set_point": 37.5,
       "anaerobic_digestion_temperature_celsius": 37.5
+    },
+    {
+      "manure_treatment_type": "composted bedded pack barn",
+      "total_solids_removal_efficiency_for_treatment": 0.45,
+      "nitrogen_removal_efficiency_for_treatment": 0.0,
+      "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
+      "phosphorus_removal_efficiency_for_treatment": 0.0,
+      "potassium_removal_efficiency_for_treatment": 0.0,
+
+
+
+      "volatile_solids_removal_efficiency_for_treatment": 0.85,
+      "hydraulic_retention_time": 365,
+      "sludge_accumulation_period": 10.0,
+      "sludge_accumulation_volume_fraction": 0.00251,
+      "storage_time_period": 365,
+      "freeboard_input": 0.3048
     }
   ]
 }

@@ -1,0 +1,49 @@
+---
+title: "Class diagram for the manure management module"
+---
+classDiagram
+    direction RL
+    ManureManagement "1" *-- "1..*" BaseManureHandler
+    ManureManagement "1" *-- "1..*" ReceptionPit
+    ManureManagement "1" *-- "0..*" BaseManureSeparator
+    ManureManagement "1" *-- "1..*" BaseManureTreatment
+
+    ManureManagement "1" *-- "1" ManureManagementConfigHandler
+    ManureManagement "1" *-- "1" ManureManagementOutputHandler
+
+    class ManureManagement {
+        +manure_handlers: Dict[int, BaseManureHandler]
+        +reception_pits: Dict[int, ReceptionPit]
+        +manure_separators: Dict[int, BaseManureSeparator]
+        +manure_treatments: Dict[int, BaseManureTreatment]
+        +manure_management_config_handler: ManureManagementConfigHandler
+        +manure_management_output_handler: ManureManagementOutputHandler
+        +daily_update(self, AnimalManagement) None
+    }
+
+    class BaseManureHandler {
+        +daily_update() ManureHandlerDailyOutput
+    }
+
+    class ReceptionPit {
+        +daily_update() ReceptionPitDailyOutput
+    }
+
+    class BaseManureSeparator {
+        +daily_update() ManureSeparatorDailyOutput
+    }
+
+    class BaseManureTreatment {
+        +daily_update() ManureTreatmentDailyOutput
+    }
+
+    class ManureManagementConfigHandler {
+        +get_custom_manure_handler_config() ManureHandlerConfig
+        +get_custom_manure_separator_config() ManureSeparatorConfig
+        +get_custom_manure_treatment_config() ManureTreatmentConfig
+    }
+
+    class ManureManagementOutputHandler {
+        +export_to_csv() None
+        +produce_graphics() None
+    }

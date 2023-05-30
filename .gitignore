@@ -26,6 +26,7 @@ output/*
 !output/.keep
 RUFAS/routines/manure/output/*
 !RUFAS/routines/manure/output/.keep
+RUFAS/routines/manure/design_diagrams/*
 
 # ignore project files
 *.sublime-project

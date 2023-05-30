@@ -1,53 +1,71 @@
 class GasEmissionConstants:
-    """Constants for gas emission calculations.
+    """Constants for gas emission calculations."""
 
-    Attributes:
-        b1: rate correcting factor, dimensionless.
-        b2: rate correcting factor, dimensionless.
-        lnA: natural log of Arrhenius constant, g CH4/kg VS-h.
-        E: activation energy, J/mol.
-        R: gas constant, J/mol-K.
+    b1 = 1.0
+    """Rate correcting factor, dimensionless."""
 
-        Bo: achievable emission of CH4 during anaerobic digestion, g CH4/kg VS.
-        MCF: TODO
-        MS: TODO
-        METHANE_FACTOR: TODO.
-        METHANE_ENERGY_DENSITY: methane energy density, MJ/kg.
-        METHANE_DENSITY: methane density, kg/m^3.
-        METHANE_POTENTIAL_Go: methane potential, mL/g VS.
-        POTENTIAL_METHANE_YIELD_OF_MANURE: potential methane yield of manure, g CH4/kg VS.
+    b2 = 0.01
+    """Rate correcting factor, dimensionless."""
 
-        DEFAULT_VOLATILE_SOLIDS_FRACTION: default volatile solids fraction, dimensionless.
-        CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH: Chen-Hashimoto kinetic constant, dimensionless.
-        SPECIFIC_GROWTH_RATE: specific growth rate, micrometers.
+    lnA = 43.33
+    """Natural log of Arrhenius constant, g CH4/kg VS-h."""
 
-        DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING: default housing specific constant, s/m.
+    E = 112700.0
+    """Activation energy, J/mol."""
 
-    """
-    b1 = 1.0  # rate correcting factor, dimensionless.
-    b2 = 0.01  # rate correcting factor, dimensionless.
-    lnA = 43.33  # natural log of Arrhenius constant, g CH4/kg VS-h.
-    E = 112700  # activation energy, J/mol.
-    R = 8.314  # gas constant, J/mol-K.
+    R = 8.314
+    """Gas constant, J/mol-K."""
 
-    # Methane related constants
-    Bo = 0.24  # achievable emission of CH4 during anaerobic digestion, g CH4/kg VS
+    Bo = 0.24
+    """Achievable emission of CH4 during anaerobic digestion, g CH4/kg VS."""
+
     MCF = 0.79
+    """Methane conversion factor, dimensionless."""
+
     MS = 1.0
-    METHANE_FACTOR = 0.67  # TODO: use a better name
+    """TODO"""
 
-    METHANE_ENERGY_DENSITY = 55  # MJ/kg
-    METHANE_DENSITY = 0.657  # kg/m^3
-    METHANE_POTENTIAL_Go = 240.0  # mL/g VS
-    POTENTIAL_METHANE_YIELD_OF_MANURE = 0.48  # g CH4/kg VS
-    DEFAULT_SLURRY_STORAGE_TEMPERATURE = 15.0  # deg C
+    METHANE_FACTOR = 0.67
+    """TODO"""
 
-    DEFAULT_VOLATILE_SOLIDS_FRACTION = 0.68  # dimensionless
-    CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH = 3.1  # dimensionless
-    SPECIFIC_GROWTH_RATE = 0.637  # micrometers
+    METHANE_ENERGY_DENSITY = 55.0
+    """Methane energy density, MJ/kg."""
+
+    METHANE_DENSITY = 0.657
+    """Methane density, kg/m^3."""
+
+    METHANE_POTENTIAL_Go = 240.0
+    """Methane potential, mL/g VS."""
+
+    POTENTIAL_METHANE_YIELD_OF_MANURE = 0.48
+    """Potential methane yield of manure, g CH4/kg VS."""
+
+    DEFAULT_SLURRY_STORAGE_TEMPERATURE = 15.0
+    """Default slurry storage temperature, :math:`^{\circ}C`."""
+
+    DEFAULT_VOLATILE_SOLIDS_FRACTION = 0.68
+    """Default volatile solids fraction, dimensionless."""
+
+    CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH = 3.1
+    """Chen-Hashimoto kinetic constant, dimensionless."""
+
+    SPECIFIC_GROWTH_RATE = 0.637
+    """Specific growth rate, micrometers."""
 
     DEFAULT_HOUSING_SPECIFIC_CONSTANT_FOR_HOUSING = 260.0  # s/m
+    """Default housing specific constant, s/m."""
 
-    DEFAULT_PH_FOR_HOUSING_AMMONIA = 7.7  # unitless
-    DEFAULT_PH_FOR_STORAGE_AMMONIA = 7.5  # unitless
-    DEFAULT_STORAGE_AREA = 1.0  # m^2
+    DEFAULT_PH_FOR_HOUSING_AMMONIA = 7.7
+    """Default pH for housing ammonia, dimensionless."""
+
+    DEFAULT_PH_FOR_STORAGE_AMMONIA = 7.5
+    """Default pH for storage ammonia, dimensionless."""
+
+    DEFAULT_STORAGE_AREA = 1.0
+    """Default storage area, :math:`m^2`."""
+
+    MAX_COMPOST_AMMONIUM_CONCENTRATION_FRACTION = 2.67 * (10 ** -4)
+    """Maximum compost ammonium concentration fraction, dimensionless."""
+
+    NITRIFICATION_CONVERSION_FACTOR = 15.7
+    """Nitrification conversion factor, :math:`(kg N_2O/ha-day)/(g N/m^2-day)`."""

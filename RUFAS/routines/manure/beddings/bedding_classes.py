@@ -15,6 +15,7 @@ class BeddingType(DefaultEnum):
     SAWDUST = 'sawdust'
     MANURE_SOLIDS = 'manure solids'
     SAND = 'sand'
+    SAWDUST_CBPB = 'sawdust CBPB'
     DEFAULT = SAND
 
 
@@ -164,6 +165,16 @@ class SandBedding(BaseBedding):
         return bedding_mass * (1 - self.sand_removal_efficiency)
 
 
+class SawdustCBPB(BaseOrganicBedding):
+    """Class for sawdust CBPB bedding.
+
+    Attributes:
+        Inherited from BaseOrganicBedding.
+
+    """
+    pass
+
+
 @dataclass
 class BeddingConfig:
     """Class for storing the configuration of a bedding.
@@ -177,11 +188,11 @@ class BeddingConfig:
         sand_removal_efficiency: Efficiency of removing sand from the bedding, [0.7, 1.0], dimensionless.
 
     """
-    bedding_mass_per_day: float
-    bedding_density: float
-    bedding_dry_matter_content: float
-    bedding_cleaned_fraction: float
-    bedding_type: BeddingType
+    bedding_mass_per_day: float = 0.0
+    bedding_density: float = 0.0
+    bedding_dry_matter_content: float = 0.0
+    bedding_cleaned_fraction: float = 0.0
+    bedding_type: BeddingType = BeddingType.DEFAULT
     sand_removal_efficiency: float = 0.0
 
 
@@ -189,28 +200,35 @@ class DefaultBeddingConfigFactory:
     """Class for creating default bedding configurations."""
 
     SAWDUST_BEDDING_CONFIG = BeddingConfig(
-            bedding_mass_per_day=1.97,
-            bedding_density=250.0,
-            bedding_dry_matter_content=0.9,
-            bedding_cleaned_fraction=1.0,
-            bedding_type=BeddingType.SAWDUST,
+        bedding_mass_per_day=1.97,
+        bedding_density=250.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_type=BeddingType.SAWDUST,
     )
 
     MANURE_SOLIDS_BEDDING_CONFIG = BeddingConfig(
-            bedding_mass_per_day=2.50,
-            bedding_density=400.0,
-            bedding_dry_matter_content=0.9,
-            bedding_cleaned_fraction=1.0,
-            bedding_type=BeddingType.MANURE_SOLIDS,
+        bedding_mass_per_day=2.50,
+        bedding_density=400.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_type=BeddingType.MANURE_SOLIDS,
     )
 
     SAND_BEDDING_CONFIG = BeddingConfig(
-            bedding_mass_per_day=25.0,
-            bedding_density=1500.0,
-            bedding_dry_matter_content=0.9,
-            bedding_cleaned_fraction=1.0,
-            bedding_type=BeddingType.SAND,
-            sand_removal_efficiency=1.0,
+        bedding_mass_per_day=25.0,
+        bedding_density=1500.0,
+        bedding_dry_matter_content=0.9,
+        bedding_cleaned_fraction=1.0,
+        bedding_type=BeddingType.SAND,
+        sand_removal_efficiency=1.0,
+    )
+
+    SAWDUST_CBPB_BEDDING_CONFIG = BeddingConfig(
+        bedding_mass_per_day=12,
+        bedding_density=210.0,
+        bedding_dry_matter_content=0.9,
+        bedding_type=BeddingType.SAWDUST_CBPB,
     )
 
     @classmethod
@@ -228,7 +246,8 @@ class DefaultBeddingConfigFactory:
         bedding_config_by_type = {
             BeddingType.SAWDUST: cls.SAWDUST_BEDDING_CONFIG,
             BeddingType.MANURE_SOLIDS: cls.MANURE_SOLIDS_BEDDING_CONFIG,
-            BeddingType.SAND: cls.SAND_BEDDING_CONFIG
+            BeddingType.SAND: cls.SAND_BEDDING_CONFIG,
+            BeddingType.SAWDUST_CBPB: cls.SAWDUST_CBPB_BEDDING_CONFIG
         }
         return bedding_config_by_type[bedding_type]
 
@@ -256,6 +275,7 @@ class BeddingFactory:
             BeddingType.SAWDUST: SawdustBedding,
             BeddingType.MANURE_SOLIDS: ManureSolidsBedding,
             BeddingType.SAND: SandBedding,
+            BeddingType.SAWDUST_CBPB: SawdustCBPB
         }
 
         bedding_type = BeddingType.get_type(bedding_type_name)

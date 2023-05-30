@@ -1,3 +1,6 @@
+---
+title: "Sequence of Events in the Simulation Engine Relating the Manure Module to the Other Modules"
+---
 sequenceDiagram
     autonumber
     participant S as SimulationEngine
@@ -45,7 +48,7 @@ sequenceDiagram
             deactivate MSC
 
             activate MM
-            opt is a digester present?
+            opt is a pre-separator digester present?
                 MM->>MSC: calls daily_update() on an anaerobic digester
                 deactivate MM
                 activate MSC
@@ -54,14 +57,16 @@ sequenceDiagram
             end
 
             activate MM
+            opt is a manure separator present?
             MM->>MSC: calls daily_update() on a manure separator
             deactivate MM
             activate MSC
             MSC->>MM: returns a manure separator daily output
             deactivate MSC
+            end
 
             activate MM
-            opt is a digester present?
+            opt is a post-separator digester present?
                 MM->>MSC: calls daily_update() on an anaerobic digester
                 deactivate MM
                 activate MSC
