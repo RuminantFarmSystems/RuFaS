@@ -53,7 +53,6 @@ class OutputManager(object):
                     "function": self.__init__.__name__,
                 },
             )
-            self.keys_list = []
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
