@@ -60,22 +60,9 @@ class Field:
         if self.field_data.is_tillage_day:
             self.till_soil()
 
-        # daily soil routine
-
-        # determine total amount of residue and above-ground biomass present on the given day
-        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
-
-        # TODO: track snow cover on soil surface somewhere - Issue #317
-        self.soil.daily_soil_routine(current_weather.incoming_light, current_weather.mean_air_temperature,
-                                     current_weather.min_air_temperature, current_weather.max_air_temperature,
-                                     total_plant_cover, current_weather.snow_fall,
-                                     current_weather.annual_mean_air_temperature)
-
-        # TODO: track snow cover on soil surface somewhere - Issue #317
-
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self.cycle_water(current_weather)
+        self._execute_daily_processes(current_weather)
         # ... Other ...
 
         # --- Crop Management ---
@@ -349,7 +336,47 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def cycle_water(self, current_weather: CurrentWeather):
+    def _execute_daily_processes(self, current_weather: CurrentWeather) -> None:
+        """Executes all daily updates on this field's soil and crop objects.
+
+        Parameters
+        ----------
+        current_weather : CurrentWeather
+            Object containing the environment conditions on this day.
+
+        Notes
+        -----
+        This method is designed to make it easier to change the order of process execution, which is desirable because
+        it will allow subject-matter experts to more easily experiment with different orders.
+
+        """
+        # TODO: implement snow addition, melting, and sublimation - issue #317
+        snow_cover = 0
+        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
+        self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
+                                                          current_weather.mean_air_temperature,
+                                                          current_weather.min_air_temperature,
+                                                          current_weather.max_air_temperature,
+                                                          total_plant_cover,
+                                                          snow_cover,
+                                                          current_weather.annual_mean_air_temperature)
+
+        self._cycle_water(current_weather)
+
+        for crop in self.crops:
+            if not crop.data.in_growing_season:
+                continue
+
+            crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,
+                                              current_weather.max_air_temperature)
+            crop.root_development.develop_roots()
+            crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
+            crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
+            crop.growth_constraints.constrain_growth(crop.data.max_transpiration, current_weather.mean_air_temperature)
+            crop.leaf_area_index.grow_canopy()
+            crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
+
+    def _cycle_water(self, current_weather: CurrentWeather):
         """allow the water to cycle through the field.
 
         Args:

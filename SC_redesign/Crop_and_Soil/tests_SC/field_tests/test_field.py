@@ -176,6 +176,67 @@ def test_amend_soil() -> None:
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
 
 
+@pytest.mark.parametrize("field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp,"
+                         "transpiration", [
+                             (1.5, False, 34.5, 128, 22.5, 18.9, 25.6, 19.22, 5.2),
+                             (2.4, True, 40.9, 150, 28, 24.55, 31.2, 17.9, 3.44),
+                             (0.8, True, 12.22, 222, 18.7, 13.44, 23.44, 16.4, 1.33)
+                         ])
+def test_execute_daily_processes(field_size: float, crops_growing: bool, residue: float, light: float, mean_temp: float,
+                                 min_temp: float, max_temp: float, annual_mean_temp: float,
+                                 transpiration: float) -> None:
+    """Tests that all component processes and subroutines are correctly called in Field."""
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
+               return_value=crops_growing):
+        field_data = FieldData(field_size=field_size, current_residue=residue)
+        incorp = Field(field_data=field_data)
+        crop_1 = Crop()
+        crop_1.data.max_transpiration = transpiration
+        crop_2 = Crop()
+        crop_2.data.max_transpiration = transpiration
+        incorp.crops = [crop_1, crop_2]
+        current_weather = CurrentWeather(incoming_light=light, mean_air_temperature=mean_temp,
+                                         min_air_temperature=min_temp, max_air_temperature=max_temp,
+                                         annual_mean_air_temperature=annual_mean_temp)
+
+        incorp._determine_total_above_ground_biomass = MagicMock(return_value=89)
+        incorp.soil.soil_temp.daily_soil_temperature_update = MagicMock()
+        incorp._cycle_water = MagicMock()
+        for crop in incorp.crops:
+            crop.heat_units.absorb_heat_units = MagicMock()
+            crop.root_development = MagicMock()
+            crop.nitrogen_incorporation.incorporate_nitrogen = MagicMock()
+            crop.phosphorus_incorporation.incorporate_phosphorus = MagicMock()
+            crop.growth_constraints.constrain_growth = MagicMock()
+            crop.leaf_area_index.grow_canopy = MagicMock()
+            crop.biomass_allocation.allocate_biomass = MagicMock()
+
+        incorp._execute_daily_processes(current_weather)
+
+        incorp._determine_total_above_ground_biomass.assert_called_once()
+        incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(light, mean_temp, min_temp,
+                                                                                    max_temp, 89 + residue, 0,
+                                                                                    annual_mean_temp)
+        incorp._cycle_water.assert_called_once_with(current_weather)
+        for crop in incorp.crops:
+            if crops_growing:
+                crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
+                crop.root_development.develop_roots.assert_called_once()
+                crop.nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
+                crop.phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
+                crop.growth_constraints.constrain_growth.assert_called_once_with(transpiration, mean_temp)
+                crop.leaf_area_index.grow_canopy.assert_called_once()
+                crop.biomass_allocation.allocate_biomass.assert_called_once_with(light)
+            else:
+                crop.heat_units.absorb_heat_units.assert_not_called()
+                crop.root_development.develop_roots.assert_not_called()
+                crop.nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
+                crop.phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
+                crop.growth_constraints.constrain_growth.assert_not_called()
+                crop.leaf_area_index.grow_canopy.assert_not_called()
+                crop.biomass_allocation.allocate_biomass.assert_not_called()
+
+
 @pytest.mark.parametrize("field_size,rainfall,runoff,high_water_table,residue,light,min_temp,max_temp,mean_temp,"
                          "surface_residue,crop_1_proportion,crop_2_proportion,crops_growing", [
                              (1.9, 4.66, 1.22, False, 30.6, 200, 16.5, 20.5, 18.5, 44.5, 0.6, 0.4, True),
@@ -227,7 +288,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         crop_2.water_dynamics.cycle_water = MagicMock()
         crop_2.water_uptake.uptake_water = MagicMock()
 
-        incorp.cycle_water(current_weather)
+        incorp._cycle_water(current_weather)
 
         incorp._determine_watering_amount.assert_called_once_with(rainfall)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
