@@ -383,7 +383,7 @@ class Field:
 
         # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
         #  #519
-        self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1, full_evapotranspirative_demand)
+        self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1.0, full_evapotranspirative_demand)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         # TODO: find reasonable values/way to set minimum cover management factor - issue #520
         self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue)
@@ -402,7 +402,7 @@ class Field:
         weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
         # TODO: Implement snow (melting and sublimation) - issue #317
-        snow_water_content = 0
+        snow_water_content = 0.0
         above_ground_biomass = self._determine_total_above_ground_biomass()
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
@@ -422,9 +422,9 @@ class Field:
                 crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
                                                 full_evapotranspirative_demand)
             else:
-                crop.data.cumulative_evaporation = 0
-                crop.data.cumulative_transpiration = 0
-                crop.data.cumulative_potential_evapotranspiration = 0
+                crop.data.cumulative_evaporation = 0.0
+                crop.data.cumulative_transpiration = 0.0
+                crop.data.cumulative_potential_evapotranspiration = 0.0
 
     def _determine_watering_amount(self, rainfall: float) -> float:
         """Manages watering of the field.
@@ -685,7 +685,7 @@ class Field:
         SWAT Theoretical documentation section 2:2.3.3.1
         """
         if soil_evaporation_adj < snow_water_content:
-            return 0
+            return 0.0
         else:
             return soil_evaporation_adj - snow_water_content
 

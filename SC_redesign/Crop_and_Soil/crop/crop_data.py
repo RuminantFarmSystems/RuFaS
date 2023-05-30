@@ -332,7 +332,7 @@ class CropData:
     """cumulative water demands not met by all previous layers"""
     actual_water_uptakes: Optional[List[float]] = None
     """the actual amount of water to be removed from the soil"""
-    total_water_uptake: float = 0
+    total_water_uptake: float = 0.0
     """Total amount of water the plant took from the soil on the current day (mm)"""
 
     # ---- yields
