@@ -840,28 +840,24 @@ def test_load_txt_file_to_list(
 
 def test_load_input_txt_file_names_to_list(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable]
+    output_manager_original_method_states: Dict[str, Callable],
+    tmpdir
 ) -> None:
     """Test case for function _load_input_txt_file_names_to_list in output_manager.py"""
-    # Test case 1: Valid file path
-    path = "tests/misc_test_files/test_keys_file.txt"
-    expected_result = ["key1", "key2", "key3"]
-    assert mock_output_manager._load_txt_file_to_list(path) == expected_result
+    tmpdir.join("file1.txt").write("File 1 content")
+    tmpdir.join("file2.txt").write("File 2 content")
+    tmpdir.join("file3.csv").write("File 3 content")
 
-    # Test case 2: Empty file
-    # MASM/tests/misc_test_files/empty_file.txt
-    path = "tests/misc_test_files/empty_keys_file.txt"
-    expected_result = []
-    assert mock_output_manager._load_txt_file_to_list(path) == expected_result
+    txt_files = mock_output_manager._load_input_txt_file_names_to_list(tmpdir)
 
-    # Test case 3: Nonexistent file
-    path = "tests/misc_test_files/nonexistent_keys_file.txt"
-    with pytest.raises(Exception):
-        mock_output_manager._load_txt_file_to_list(path)
+    assert len(txt_files) == 2
+    assert "file1.txt" in txt_files
+    assert "file2.txt" in txt_files
+    assert "file3.csv" not in txt_files
 
     # Restore original method
-    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
-        "_load_txt_file_to_list"
+    mock_output_manager._load_input_txt_file_names_to_list = output_manager_original_method_states[
+        "_load_input_txt_file_names_to_list"
     ]
 
 
