@@ -156,7 +156,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     failed_list = []
 
     # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-    if pen.animal_combination in ['AnimalCombination.LAC_COW']:
+    if pen.animal_combination.name in ['LAC_COW']:
         while not solution.success:
             num_reattempts += 1
             failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)

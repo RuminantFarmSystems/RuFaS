@@ -193,7 +193,7 @@ class AnimalManagement:
 
         self.ration_user_input = data['ration']['user_input']
 
-        # how often a ruser_defined_ration_valuesys
+        # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
 
         self.methane_model = data['methane_model']
@@ -1750,6 +1750,8 @@ class AnimalManagement:
 
         """
         if self.simulate_animals:
+            if self.end_ration_interval():
+                self.reset_milk_production_reduction() 
             temp = weather.T_avg[time.year - 1][time.day - 1]
             animals_snapshot_before_update = self._get_animals_snapshot()
 
@@ -1782,9 +1784,17 @@ class AnimalManagement:
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
 
+
             if self.end_ration_interval():
+                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_animals_to_pens2()
                 self._calc_ration_at_interval(feed)  # per pen
                 self.calc_avg_growth()  # per pen
+                for pen in self.all_pens:
+                    if pen.animal_combination.name == 'LAC_COW':
+                        for animal in pen.animals_in_pen:
+                            animal.update_milk_production_history(self.simulation_day)
+                        
+            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
