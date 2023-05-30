@@ -317,6 +317,27 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
+    def _load_input_txt_file_names_to_list(self, dir_path: str) -> List[str]:
+        """ Looks in inputs directory for txt file names.
+
+        Parameters
+        ----------
+        path : str
+            Path of the input directory to be searched.
+
+        Returns
+        -------
+        List
+            A list of input txt file names.
+
+        """
+
+        txt_files = []
+        for filename in os.listdir(dir_path):
+            if filename.endswith(".txt"):
+                txt_files.append(filename)
+        return txt_files
+
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
 
@@ -361,7 +382,7 @@ class OutputManager(object):
         """
         return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
 
-    def save_variables(self, path: str, keys_file_path: str,
+    def save_variables(self, path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -376,13 +397,17 @@ class OutputManager(object):
             Path of the input file containing the list of keys.
 
         """
-        inclusion_keys = self._load_txt_file_to_list(keys_file_path)
-        filtered_pool = self._filter_variables_pool(inclusion_keys)
-        final_pool = filtered_pool
-        if exclude_info_maps:
-            final_pool = self._exclude_info_maps(filtered_pool)
-        file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
-        self._dict_to_file_json(final_pool, file_path)
+        list_of_input_files = self._load_input_txt_file_names_to_list(dir_path)
+        for input_file in list_of_input_files:
+            input_path = dir_path + input_file
+            inclusion_keys = self._load_txt_file_to_list(input_path)
+            filtered_pool = self._filter_variables_pool(inclusion_keys)
+            final_pool = filtered_pool
+            if exclude_info_maps:
+                final_pool = self._exclude_info_maps(filtered_pool)
+            file_path = os.path.join(path, self._generate_file_name(
+                f"saved_variables_{input_file}", "json"))
+            self._dict_to_file_json(final_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
