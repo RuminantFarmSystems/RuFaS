@@ -49,7 +49,7 @@ class PhosphorusMineralization:
 
         """
         for layer in self.data.soil_layers:
-            soil_phosphorus_content = layer.determine_soil_phosphorus_concentration(
+            soil_phosphorus_content = layer.determine_soil_nutrient_concentration(
                 layer.labile_inorganic_phosphorus_content, layer.bulk_density, layer.layer_thickness, field_size)
             current_phosphorus_sorption_parameter = layer.calculate_phosphorus_sorption_parameter(
                 layer.percent_clay_content, soil_phosphorus_content, layer.percent_organic_carbon_content)

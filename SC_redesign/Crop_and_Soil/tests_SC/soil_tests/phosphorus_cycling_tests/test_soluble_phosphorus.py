@@ -19,8 +19,8 @@ from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import
 def test_determine_phosphorus_runoff_from_top_soil(runoff: float, field_size: float, phosphorus: float, density: float,
                                                    thickness: float) -> None:
     """Tests that the correct amount of phosphorus lost to runoff is calculated"""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_phosphorus_concentration",
-               new_callable=MagicMock, return_value=100) as mocked_soil_phosphorus_concentration:
+    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_concentration",
+               new_callable=MagicMock, return_value=100) as mocked_soil_nutrient_concentration:
         expected_runoff_liters_per_ha = runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS * \
                                         CUBIC_MILLIMETERS_TO_LITERS / field_size
         expected_unadjusted_phosphorus_removed = 100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)
@@ -29,7 +29,7 @@ def test_determine_phosphorus_runoff_from_top_soil(runoff: float, field_size: fl
         observed = SolublePhosphorus._determine_phosphorus_runoff_from_top_soil(runoff, field_size, phosphorus, density,
                                                                                 thickness)
 
-        mocked_soil_phosphorus_concentration.assert_called_once_with(phosphorus, density, thickness, field_size)
+        mocked_soil_nutrient_concentration.assert_called_once_with(phosphorus, density, thickness, field_size)
         assert observed == expected_actual_phosphorus_removed
 
 
@@ -94,7 +94,7 @@ def test_determine_percolated_water_volume(percolated_water: float, area: float)
 def test_determine_phosphorus_percolated_from_layer(phosphorus: float, density: float, thickness: float,
                                                     clay_content: float, percolated_water: float, area: float) -> None:
     """Tests that the correct amount of phosphorus removed from a layer of soil is calculated."""
-    LayerData.determine_soil_phosphorus_concentration = MagicMock(return_value=3.8)
+    LayerData.determine_soil_nutrient_concentration = MagicMock(return_value=3.8)
     SolublePhosphorus._determine_isotherm_slope = MagicMock(return_value=35)
     SolublePhosphorus._determine_isotherm_intercept = MagicMock(return_value=155)
     SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate = MagicMock(return_value=2_000_000)
@@ -105,7 +105,7 @@ def test_determine_phosphorus_percolated_from_layer(phosphorus: float, density: 
     observed = SolublePhosphorus._determine_phosphorus_percolated_from_layer(phosphorus, density, thickness,
                                                                              clay_content, percolated_water, area)
 
-    LayerData.determine_soil_phosphorus_concentration.assert_called_once_with(phosphorus, density, thickness, area)
+    LayerData.determine_soil_nutrient_concentration.assert_called_once_with(phosphorus, density, thickness, area)
     SolublePhosphorus._determine_isotherm_slope.assert_called_once_with(clay_content)
     SolublePhosphorus._determine_isotherm_intercept.assert_called_once_with(35)
     SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate.assert_called_once_with(3.8, 35, 155)

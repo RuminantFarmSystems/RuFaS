@@ -1,10 +1,14 @@
 from typing import Optional, List, Dict
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.field.field import Field
+from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
+    HECTARES_TO_SQUARE_MILLIMETERS
 
 
 @pytest.mark.parametrize("daylength,threshold_daylength", [
@@ -77,7 +81,7 @@ def test_add_crop():
         field.add_crop(crop)
         assert type(field.crops[i]) is Crop
     for crop in field.crops:
-        assert crop.data.field_proportion == 1/5
+        assert crop.data.field_proportion == 1 / 5
     assert len(field.crops) == 5
 
     # ---- second case: specific covers
@@ -123,7 +127,7 @@ def test_make_crop_from_config_dict(config: dict):
     ([{"species": "corn"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
     ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
-    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1/3, 1/3, 1/3])
+    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1 / 3, 1 / 3, 1 / 3])
 ])
 def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
     field = Field()
@@ -168,11 +172,200 @@ def test_amend_soil() -> None:
     field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
 
 
+@pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs", [
+    (3.4, 3, 1.5, False),  # No watering because water_occurs is False
+    (3.1, 5, 2.3, True),  # No watering because rainfall takes care of watering
+    (0.2, 5, 3.6, True),  # Watering occurs because water deficit has not been met
+    (0.19, 4, 2.8, True)  # No watering occurs because interval has not been met
+])
+def test_determine_watering_amount(rainfall: float, days_into_interval: int, water_deficit: float,
+                                   watering_occurs: float) -> None:
+    """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
+        totals are updated correctly."""
+    data = FieldData(watering_amount_in_liters=50_000, watering_interval=5,
+                     days_into_watering_interval=days_into_interval)
+    data.watering_amount_in_mm = 5.0
+    data.watering_occurs = watering_occurs
+    data.current_water_deficit = water_deficit
+    incorp = Field(field_data=data)
+
+    actual = incorp._determine_watering_amount(rainfall)
+
+    if not watering_occurs:
+        assert actual == 0.0
+        assert incorp.field_data.days_into_watering_interval == days_into_interval
+        assert incorp.field_data.annual_irrigation_water_use_total == 0
+    elif days_into_interval == incorp.field_data.watering_interval:
+        assert actual == max(0.0, water_deficit - rainfall)
+        assert incorp.field_data.days_into_watering_interval == 0
+        assert incorp.field_data.current_water_deficit == 5.0
+        assert incorp.field_data.annual_irrigation_water_use_total == actual
+    else:
+        assert actual == 0.0
+        assert incorp.field_data.days_into_watering_interval == days_into_interval + 1
+        assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall)
+        assert incorp.field_data.annual_irrigation_water_use_total == 0
+
+
+@pytest.mark.parametrize("precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
+                         "expected_first,expected_second", [
+                             (13, 8, 2, 4, 3, 8, 8),  # Fills both pools with some leftover
+                             (6, 7, 3, 2, 0, 7, 4),  # Fills one pool, puts some in second, none leftover
+                             (14, 5, 7, 1, 12, 5, 5),  # Removes from one pool, fills other, some leftover
+                             (3, 6, 8, 9, 8, 6, 6),  # Removes from both pools, lots left over
+                             (5, 10, 3, 12, 2, 8, 10)  # Fills one pool as much as possible, removes excess from
+                             # another
+                         ]
+                         )
+def test_handle_water_in_crop_canopies(precipitation: float, canopy_capacity: float, first_canopy_amount: float,
+                                       second_canopy_amount: float, expected_return: float, expected_first: float,
+                                       expected_second: float) -> None:
+    """Tests that water is properly added and removed from the crop canopies of field objects."""
+    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.water_canopy_storage_capacity",
+               new_callable=PropertyMock, return_value=canopy_capacity):
+        crop_data1 = CropData(canopy_water=first_canopy_amount)
+        crop1 = Crop(crop_data1)
+        crop_data2 = CropData(canopy_water=second_canopy_amount)
+        crop2 = Crop(crop_data2)
+        field = Field()
+        field.crops = [crop1, crop2]
+
+        actual = field._handle_water_in_crop_canopies(precipitation)
+        assert actual == expected_return
+        assert field.crops[0].data.canopy_water == expected_first
+        assert field.crops[1].data.canopy_water == expected_second
+
+
+@pytest.mark.parametrize("demand,canopy_water_1,canopy_water_2,expected_demand,expected_canopy_water1,"
+                         "expected_canopy_water2", [
+                             (14.5, 1.8, 2.3, 10.4, 0.0, 0.0),
+                             (8.6, 4.7, 4.1, 0.0, 0.0, 0.2),
+                             (9.5, 10.8, 5.7, 0.0, 1.3, 5.7)
+                         ])
+def test_evaporate_from_crop_canopies(demand: float, canopy_water_1: float, canopy_water_2: float,
+                                      expected_demand: float, expected_canopy_water1: float,
+                                      expected_canopy_water2: float) -> None:
+    """Tests that the evapotranspirative demand is correctly reduced by the amounts of water evaporated."""
+    data1 = CropData(canopy_water=canopy_water_1)
+    crop1 = Crop(data1)
+    data2 = CropData(canopy_water=canopy_water_2)
+    crop2 = Crop(data2)
+    field = Field()
+    field.crops = [crop1, crop2]
+
+    actual_demand = field._evaporate_from_crop_canopies(demand)
+    assert pytest.approx(actual_demand) == expected_demand
+    assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
+    assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
+
+
+@pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
+    (100, 28, 10, 14),
+    (568, 20, 14, 18),
+    (568, 20, 14, None),
+    (80, 14, 0, 8),
+    (678.0098, 26.8896, 10.3339, 18.3345),
+])
+def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
+    with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_latent_heat_vaporization",
+               new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
+        actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
+        if avg_temp is not None:
+            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                      (avg_temp + 17.8)) / 1.3
+        else:
+            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                      (((max_temp + min_temp) / 2) + 17.8)) / 1.3
+
+        if avg_temp is not None:
+            mocked_latent_heat.assert_called_once_with(avg_temp)
+        else:
+            mocked_latent_heat.assert_called_once_with((max_temp + min_temp) / 2)
+        assert actual == expect
+
+
+@pytest.mark.parametrize("avg_temp", [
+    12.86878,
+    0,
+    (-2.586948),
+    20.4486,
+])
+def test_determine_latent_heat_vaporization(avg_temp):
+    observe = Field._determine_latent_heat_vaporization(avg_temp)
+    expect = 2.501 - (0.002361 * avg_temp)
+    assert expect == observe
+
+
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
     field = Field()
     field.soil.data.do_annual_reset = MagicMock()
+    field.field_data.perform_annual_field_reset = MagicMock()
+
     field.perform_annual_reset()
+
     field.soil.data.do_annual_reset.assert_called_once()
+    field.field_data.perform_annual_field_reset.assert_called_once()
+
 
 # TODO: All field methods need to be tested in future PRs.
+
+
+# --- Test FieldData methods ---
+@pytest.mark.parametrize("liters,area", [
+    (100, 2.3),
+    (356, 4.556),
+    (60, 1.8)
+])
+def test_liters_to_millimeters(liters: float, area: float) -> None:
+    """Tests that the conversion from liters for evenly distributed millimeters is performed correctly."""
+    actual = FieldData.convert_liters_to_millimeters(liters, area)
+    expected = (liters * LITERS_TO_CUBIC_MILLIMETERS) / (area * HECTARES_TO_SQUARE_MILLIMETERS)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("latitude,min_daylength,watering_amount,watering_interval", [
+    (45.66, 12.5, 2000, 3),
+    (37.445, 9.88, 7500, 7),
+    (50.667, 10.334, 0, 5),
+    (49.551, 12.65, 3500, 0)
+])
+def test_field_data_initialization(latitude: float, min_daylength: float, watering_amount: float,
+                                   watering_interval: int) -> None:
+    """Tests that FieldData objects are initialized correctly."""
+    Dormancy.find_dormancy_threshold = MagicMock(return_value=14.5)
+    Dormancy.find_threshold_daylength = MagicMock(return_value=10.22)
+    FieldData.convert_liters_to_millimeters = MagicMock(return_value=0.8)
+
+    data = FieldData(field_size=3, absolute_latitude=latitude, minimum_daylength=min_daylength,
+                     watering_amount_in_liters=watering_amount, watering_interval=watering_interval)
+
+    Dormancy.find_dormancy_threshold.assert_called_once_with(latitude)
+    Dormancy.find_threshold_daylength.assert_called_once_with(min_daylength, 14.5)
+    assert data.dormancy_threshold == 14.5
+    assert data.dormancy_threshold_daylength == 10.22
+    if watering_amount is not None and watering_amount != 0.0 and watering_interval is not None and \
+            watering_interval != 0:
+        FieldData.convert_liters_to_millimeters.assert_called_once_with(watering_amount, 3)
+        assert data.watering_amount_in_mm == 0.8
+        assert data.current_water_deficit == 0.8
+        assert data.watering_occurs
+    else:
+        FieldData.convert_liters_to_millimeters.assert_not_called()
+        assert data.watering_amount_in_mm == 0
+        assert data.current_water_deficit == 0
+        assert not data.watering_occurs
+
+
+@pytest.mark.parametrize("watering_amount,interval", [
+    (-1300, 13),
+    (2000, -3)
+])
+def test_error_field_data_initialization(watering_amount: float, interval: int) -> None:
+    """Tests that errors are correctly raised when FieldData is initialized with invalid values."""
+    with pytest.raises(Exception) as e:
+        FieldData(watering_amount_in_liters=watering_amount, watering_interval=interval)
+    if watering_amount < 0:
+        assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
+    elif interval < 0:
+        assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)
