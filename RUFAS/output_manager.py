@@ -328,11 +328,13 @@ class OutputManager(object):
 
         Returns
         -------
-        TODO
+            List
+                A list of keys the user has selected to filter the variables pool.
 
         Raises
         -------
-        TODO
+            Exception
+                If an error occurs while opening or reading the file.
 
         """
         try:
@@ -341,10 +343,9 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _variables_pool_inclusion_filter(self, inclusion_key: str) -> bool:
-        """returns True if inclusion_key has a match in variables_pool"""
-
-        return True if inclusion_key in self.variables_pool.keys() else False
+    def _filter_variables_pool(self, inclusion_keys: List[str]):
+        """TODO"""
+        return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
 
     def save_variables(self, path: str, keys_file_path: str,
                        exclude_info_maps: bool = False) -> None:
@@ -362,10 +363,10 @@ class OutputManager(object):
 
         """
         inclusion_keys = self._load_txt_file_to_list(keys_file_path)
-        filtered_pool = dict(filter(self._variables_pool_inclusion_filter, self.variables_pool))
+        filtered_pool = self._filter_variables_pool(inclusion_keys)
         final_pool = filtered_pool
         if exclude_info_maps:
-            final_pool = self._exlude_info_maps(filtered_pool)
+            final_pool = self._exclude_info_maps(filtered_pool)
         file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
         self._dict_to_file_json(final_pool, file_path)
 
@@ -503,8 +504,7 @@ class OutputManager(object):
         )
         self._list_to_file_txt(var_list, file_path)
 
-    def dump_all_pools(self, path: str, input_path: str = "input/list_of_keys.txt",
-                       exclude_info_maps: bool = False) -> None:
+    def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Dumps all pool into the given path to a directory.
 
@@ -512,9 +512,6 @@ class OutputManager(object):
         ----------
             path : str
                 Path to the directory where the file will be saved.
-
-            input_path : str
-                Path to input file containing list of keys for filtering data pools.
 
             exclude_info_maps : bool
                 Flag for whether or not the user wants to inlcude info_maps data in their results files.
@@ -525,7 +522,6 @@ class OutputManager(object):
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
-        self.save_variables(path, input_path, exclude_info_maps)
 
     def flush_pools(self) -> None:
         """
