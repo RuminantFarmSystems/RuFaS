@@ -120,13 +120,13 @@ class BaseManureHandler:
         housing_methane_emission = GasEmissions.calc_housing_methane_emission(
             num_animals=pen.num_animals,
             barn_area=pen.barn_area_from_pen_type,
-            current_barn_temp=self._get_current_day_average_temperature_in_celsius(),
+            barn_temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
         housing_carbon_dioxide_emission = GasEmissions.calc_housing_carbon_dioxide_emission(
             num_animals=pen.num_animals,
             barn_area=pen.barn_area_from_pen_type,
-            current_barn_temp=self._get_current_day_average_temperature_in_celsius(),
+            barn_temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
         housing_ammonia_emission = GasEmissions.calc_housing_ammonia_emission(
@@ -134,7 +134,7 @@ class BaseManureHandler:
             barn_area=pen.barn_area_from_pen_type,  # m^2/animal
             urine_total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg
             urine=pen.manure.urine,  # kg
-            temperature_celsius=self._get_current_day_average_temperature_in_celsius(),
+            temp=self._get_current_day_average_temperature_in_celsius(),
         )
 
         daily_output = ManureHandlerDailyOutput(

@@ -8,41 +8,35 @@ from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 
 
-# TODO: Fix this test
-# @pytest.mark.parametrize('is_enclosed', [True, False])
-# def test_calc_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> None:
-#     """Tests calc_methane_emission_for_slurry_storage() in gas_emissions.py."""
-#
-#     # Arrange
-#     manure_total_solids = 1000.0
-#     tempC = 15.0
-#     tempK = 288.15
-#     patch_for_convert_tempC_to_tempK = mocker.patch(
-#         'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temperature_celsius_to_kelvin',
-#         return_value=tempK,
-#     )
-#     manure_volatile_solids_fraction = 0.5
-#     efficiency_fraction = 0.99
-#     degradable_volatile_solids = GasEmissionConstants.Bo / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE
-#     non_degradable_volatile_solids = 1 - degradable_volatile_solids
-#     b1 = GasEmissionConstants.b1
-#     b2 = GasEmissionConstants.b2
-#     ex = math.exp(GasEmissionConstants.lnA - (GasEmissionConstants.E / (GasEmissionConstants.R * tempK)))
-#     expected_E_CH4_open_air = (0.024 * manure_total_solids * manure_volatile_solids_fraction *
-#                                (degradable_volatile_solids * b1 + non_degradable_volatile_solids * b2) * ex)
-#     expected_E_CH4_enclosed = expected_E_CH4_open_air * (1 - efficiency_fraction)
-#
-#     # Act
-#     actual = GasEmissions.calc_methane_emission_for_slurry_storage(manure_total_solids, is_enclosed,
-#                                                                    tempC, manure_volatile_solids_fraction,
-#                                                                    efficiency_fraction)
-#
-#     # Assert
-#     patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)
-#     if is_enclosed:
-#         assert actual == expected_E_CH4_enclosed
-#     else:
-#         assert actual == expected_E_CH4_open_air
+def test_calc_methane_emission_for_slurry_storage(mocker: MockerFixture) -> None:
+    """
+    Unit test for calc_methane_emission_for_slurry_storage() in gas_emissions.py.
+
+    """
+    # Arrange
+    total_volatile_solids = 10.0
+    temperature_celsius = 20.0
+    temperature_kelvin = temperature_celsius + 273.15
+
+    constants = GasEmissionConstants
+    patch_for_convert_tempC_to_tempK = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temp_celsius_to_kelvin',
+        return_value=temperature_kelvin)
+    arrhenius_exponent = math.exp(constants.lnA - (constants.E / (constants.R * temperature_kelvin)))
+
+    volatile_solids_degradable = total_volatile_solids * (constants.Bo / constants.POTENTIAL_METHANE_YIELD_OF_MANURE)
+    volatile_solids_non_degradable = total_volatile_solids - volatile_solids_degradable
+
+    methane_emission_degradable = 24 * volatile_solids_degradable * constants.b1 * arrhenius_exponent
+    methane_emission_non_degradable = 24 * volatile_solids_non_degradable * constants.b2 * arrhenius_exponent
+    expected = methane_emission_degradable + methane_emission_non_degradable
+
+    # Act
+    actual = GasEmissions.calc_methane_emission_for_slurry_storage(total_volatile_solids, temperature_celsius)
+
+    # Assert
+    assert actual == expected
+    patch_for_convert_tempC_to_tempK.assert_called_once_with(temperature_celsius)
 
 
 @pytest.mark.parametrize('hours', [hour for hour in range(0, 24)])
@@ -85,99 +79,192 @@ def test_calc_ambient_temp(mocker: MockerFixture) -> None:
     patch_for_calc_modified_hours.assert_called_once_with(hours)
     assert actual == expected
 
-# TODO: Fix this test
-# @pytest.mark.parametrize('ambient_temp', [temp for temp in range(-40, 40, 10)])
-# def test_calc_methane_housing_emission(ambient_temp: float, mocker: MockerFixture) -> None:
-#     """Tests calc_housing_methane_emission() in gas_emissions.py."""
-#
-#     # Arrange
-#     num_animals = 100
-#     barn_area = 50.0
-#     hours = 10
-#     t_min = 20.0
-#     t_max = 30.0
-#     patch_for_calc_ambient_temp = mocker.patch(
-#         'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ambient_temp',
-#         return_value=ambient_temp,
-#     )
-#     expected = num_animals * max(0.0, 0.13 * max(-5.0, 0.63 * ambient_temp + 6.0)) * barn_area / 1000
-#
-#     # Act
-#     actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, hours, t_min, t_max)
-#
-#     # Assert
-#     patch_for_calc_ambient_temp.assert_called_once_with(hours, t_min, t_max)
-#     assert actual == expected
+
+def test_calc_housing_methane_emission() -> None:
+    """
+    Unit test for the calc_housing_methane_emission() method in the GasEmissions class.
+
+    This test verifies that the method correctly calculates the methane housing emissions
+    given the number of animals, the barn area, and the current barn temperature.
+
+    """
+    # Arrange
+    num_animals = 10
+    barn_area = 100.0
+    current_barn_temp = 30.0
+
+    expected = num_animals * max(0.0, 0.13 * current_barn_temp) * barn_area / 1000
+
+    # Act
+    actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, current_barn_temp)
+
+    # Assert
+    assert actual == expected
 
 
-# @pytest.mark.parametrize('ambient_temp', [temp for temp in range(-40, 40, 10)])
-# def test_calc_carbon_dioxide_housing_emission(ambient_temp: float, mocker: MockerFixture) -> None:
-#     """Tests calc_housing_carbon_dioxide_emission() in gas_emissions.py."""
-#
-#     # Arrange
-#     num_animals = 100
-#     barn_area = 50.0
-#     hours = 10
-#     t_min = 20.0
-#     t_max = 30.0
-#     patch_for_calc_ambient_temp = mocker.patch(
-#         'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ambient_temp',
-#         return_value=ambient_temp,
-#     )
-#     expected = num_animals * max(0.0, 0.0065 + 0.0192 * max(-5.0, 0.63 * ambient_temp + 6.0)) * barn_area / 1000
-#
-#     # Act
-#     actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, hours, t_min, t_max)
-#
-#     # Assert
-#     patch_for_calc_ambient_temp.assert_called_once_with(hours, t_min, t_max)
-#     assert actual == expected
+def test_calc_housing_carbon_dioxide_emission() -> None:
+    """
+    Unit test for calc_housing_carbon_dioxide_emission() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the carbon dioxide housing emissions
+    given the number of animals, the barn area, and the current barn temperature.
+
+    """
+    # Arrange
+    num_animals = 10
+    barn_area = 100.0
+    barn_temp = 25.0
+
+    expected = num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
+
+    # Act
+    actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+
+    # Assert
+    assert actual == expected
 
 
-# @pytest.mark.parametrize('sign_of_RMQ', [-1, 1])
-# def test_calc_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
-#     """Tests calc_ammonia_emission() in gas_emissions.py."""
-#
-#     # Arrange
-#     num_animals = 100
-#     barn_area = 50.0
-#     manure_urine_total_ammoniacal_nitrogen = 5.0
-#     manure_urine = 25.0
-#     c = GeneralConstants.SECONDS_PER_DAY
-#     tempC = 20.0
-#     tempK = 293.15
-#     patch_for_convert_tempC_to_tempK = mocker.patch(
-#         'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temperature_celsius_to_kelvin',
-#         return_value=tempK,
-#     )
-#     hsc = 200.0
-#     r = sign_of_RMQ * 42.0
-#     patch_for_calc_r_barn = mocker.patch(
-#         'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_barn_resistance',
-#         return_value=r,
-#     )
-#     p = ManureConstants.MANURE_DENSITY
-#     pH = 7.5
-#     Q = 2.0
-#     patch_for_calc_Q = mocker.patch(
-#         'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Q',
-#         return_value=Q,
-#     )
-#     M = manure_urine / barn_area
-#     expected = num_animals * barn_area * ((manure_urine_total_ammoniacal_nitrogen / barn_area) * c * p) / (r * M * Q)
-#
-#     # Act
-#     actual = GasEmissions.calc_ammonia_emission(num_animals, barn_area, manure_urine_total_ammoniacal_nitrogen,
-#                                                 manure_urine, tempC, hsc)
-#
-#     # Assert
-#     patch_for_convert_tempC_to_tempK.assert_called_once_with(tempC)
-#     patch_for_calc_r_barn.assert_called_once_with(tempC, hsc)
-#     patch_for_calc_Q.assert_called_once_with(tempK, pH)
-#     if r * M * Q > 0:
-#         assert actual == expected
-#     else:
-#         assert actual == 0.0
+def test_calc_housing_ammonia_emission(mocker: MockerFixture) -> None:
+    """
+    Unit test for calc_housing_ammonia_emission() method in GasEmissions class.
+
+    This test verifies that the method correctly calculates the ammonia housing emissions
+    given the input parameters.
+
+    """
+    # Arrange
+    num_animals = 10
+    barn_area = 100.0
+    urine_total_ammoniacal_nitrogen = 5.0
+    urine = 200.0
+    temp = 25.0
+    pH = 7.0
+    housing_specific_constant = 260.0
+
+    total_barn_area = num_animals * barn_area
+    TAN = urine_total_ammoniacal_nitrogen / total_barn_area
+    p = ManureConstants.MANURE_DENSITY  # kg/m^3
+    c = GeneralConstants.SECONDS_PER_DAY  # s/day
+
+    tempK = 298.15
+    barn_resistance = 100.0
+    Q = 10.0
+
+    patch_for_convert_temp_celsius_to_kelvin = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temp_celsius_to_kelvin',
+        return_value=tempK)
+
+    patch_for_calc_barn_resistance = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_barn_resistance',
+        return_value=barn_resistance)
+
+    patch_for_calc_Q = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Q',
+        return_value=Q)
+
+    M = urine / total_barn_area  # manure per area of exposed surface, kg/m^2
+    loss = (TAN * c * p) / (barn_resistance * M * Q)
+    expected = max(0.0, loss * total_barn_area)
+
+    # Act
+    actual = GasEmissions.calc_housing_ammonia_emission(num_animals, barn_area,
+                                                        urine_total_ammoniacal_nitrogen, urine,
+                                                        temp, pH, housing_specific_constant)
+
+    # Assert
+    assert actual == expected
+    patch_for_convert_temp_celsius_to_kelvin.assert_called_once_with(temp)
+    patch_for_calc_barn_resistance.assert_called_once_with(temp, housing_specific_constant)
+    patch_for_calc_Q.assert_called_once_with(tempK, pH)
+
+
+def test_calc_storage_ammonia_emission(mocker: MockerFixture) -> None:
+    """
+    Unit test for calc_storage_ammonia_emission() method in GasEmissions class.
+
+    This test verifies that the method correctly calculates the storage ammonia emissions
+    given the input parameters.
+
+    """
+    # Arrange
+    num_animals = 10
+    manure_total_ammoniacal_nitrogen = 5.0
+    manure_volume = 1.0
+    total_solids = 0.2
+    storage_area = 1.0
+    temp = 25.0
+    pH = 7.0
+
+    p = ManureConstants.MANURE_DENSITY  # kg/m^3
+    c = GeneralConstants.SECONDS_PER_DAY  # s/day
+
+    tempK = 298.15
+    housing_specific_constant = 100.0
+    barn_resistance = 100.0
+    Q = 10.0
+
+    patch_for_convert_temp_celsius_to_kelvin = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._convert_temp_celsius_to_kelvin',
+        return_value=tempK)
+
+    patch_for_calc_housing_specific_constant = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_housing_specific_constant',
+        return_value=housing_specific_constant)
+
+    patch_for_calc_barn_resistance = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_barn_resistance',
+        return_value=barn_resistance)
+
+    patch_for_calc_Q = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Q',
+        return_value=Q)
+
+    manure_mass = manure_volume * ManureConstants.MANURE_DENSITY
+    M = manure_mass - total_solids
+    loss = (manure_total_ammoniacal_nitrogen * c * p) / (barn_resistance * M * Q)
+    expected = max(0.0, loss * storage_area * num_animals)
+
+    # Act
+    actual = GasEmissions.calc_storage_ammonia_emission(num_animals, manure_total_ammoniacal_nitrogen,
+                                                        manure_volume, total_solids, storage_area, temp, pH)
+
+    # Assert
+    assert actual == expected
+    patch_for_convert_temp_celsius_to_kelvin.assert_called_once_with(temp)
+    patch_for_calc_housing_specific_constant.assert_called_once_with(manure_mass, total_solids)
+    patch_for_calc_barn_resistance.assert_called_once_with(temp, housing_specific_constant)
+    patch_for_calc_Q.assert_called_once_with(tempK, pH)
+
+
+def test_calc_housing_specific_constant() -> None:
+    """
+    Unit test for _calc_housing_specific_constant() method in GasEmissions class.
+
+    This test verifies that the method correctly calculates the housing specific constant
+    given different dry matter contents of manure.
+
+    """
+    # Arrange
+    total_solids_zero = 0.0
+    manure_mass_solid = 13.0
+    manure_mass_semi_solid = 8.0
+    manure_mass_slurry = 5.0
+    manure_mass_liquid = 4.0
+    total_solids_non_zero = 1.0
+
+    # Act
+    hsc_zero = GasEmissions._calc_housing_specific_constant(total_solids_zero, total_solids_zero)
+    hsc_solid = GasEmissions._calc_housing_specific_constant(manure_mass_solid, total_solids_non_zero)
+    hsc_semi_solid = GasEmissions._calc_housing_specific_constant(manure_mass_semi_solid, total_solids_non_zero)
+    hsc_slurry = GasEmissions._calc_housing_specific_constant(manure_mass_slurry, total_solids_non_zero)
+    hsc_liquid = GasEmissions._calc_housing_specific_constant(manure_mass_liquid, total_solids_non_zero)
+
+    # Assert
+    assert hsc_zero == 10.0
+    assert hsc_solid == 10.0
+    assert hsc_semi_solid == 10.0
+    assert hsc_slurry == 19.0
+    assert hsc_liquid == 4.1
 
 
 def test_calc_barn_resistance() -> None:
@@ -252,14 +339,14 @@ def test_calc_Q(mocker: MockerFixture) -> None:
 
 
 def test_convert_tempC_to_tempK() -> None:
-    """Tests _convert_temperature_celsius_to_kelvin() in gas_emissions.py."""
+    """Tests _convert_temp_celsius_to_kelvin() in gas_emissions.py."""
 
     # Arrange
     tempC = 15.0
     expected = tempC + 273.15
 
     # Act
-    actual = GasEmissions._convert_temperature_celsius_to_kelvin(tempC)
+    actual = GasEmissions._convert_temp_celsius_to_kelvin(tempC)
 
     # Assert
     assert actual == expected

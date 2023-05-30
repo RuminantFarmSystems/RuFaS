@@ -47,7 +47,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         methane_emission = GasEmissions.calc_methane_emission_for_slurry_storage(
             total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
-            temperature_celsius=self._get_current_day_average_temperature_celsius()
+            temp=self._get_current_day_average_temperature_celsius()
         )
         methane_emission = max(methane_emission, 0.0)
         daily_output.storage_methane = methane_emission
@@ -63,7 +63,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             manure_volume=daily_output.daily_final_manure_volume,
             total_solids=daily_output.liquid_manure_total_solids,
             storage_area=GasEmissionConstants.DEFAULT_STORAGE_AREA,
-            temperature_celsius=self._get_current_day_average_temperature_celsius(),
+            temp=self._get_current_day_average_temperature_celsius(),
             pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA
         )
         daily_output.storage_ammonia = storage_ammonia_emission
