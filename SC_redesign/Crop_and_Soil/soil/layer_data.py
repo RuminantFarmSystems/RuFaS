@@ -482,14 +482,14 @@ class LayerData:
         return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
 
     @staticmethod
-    def determine_soil_phosphorus_concentration(labile_phosphorus: float, bulk_density: float,
-                                                layer_thickness: float, field_size: float) -> float:
-        """Calculates the concentration of phosphorus in a soil layer.
+    def determine_soil_nutrient_concentration(nutrient_content: float, bulk_density: float,
+                                              layer_thickness: float, field_size: float) -> float:
+        """Calculates the concentration of nutrients in a soil layer.
 
         Parameters
         ----------
-        labile_phosphorus : float
-            Labile phosphorus content of this soil layer (kg / ha)
+        nutrient_content : float
+            Nutrient content of this soil layer (kg / ha)
         bulk_density : float
             Bulk density of the soil layer (Megagram / cubic meter)
         layer_thickness : float
@@ -500,13 +500,13 @@ class LayerData:
         Returns
         -------
         float
-            The concentration of phosphorus in the soil layer (mg phosphorous / kg soil)
+            The concentration of nutrients in the soil layer (mg / kg soil)
 
         """
         soil_volume_in_cubic_meters = layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
             CUBIC_MILLIMETERS_TO_CUBIC_METERS
         soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        soil_phosphorus_mass_in_mg = labile_phosphorus * field_size * KILOGRAMS_TO_MILLIGRAMS
+        soil_phosphorus_mass_in_mg = nutrient_content * field_size * KILOGRAMS_TO_MILLIGRAMS
         return soil_phosphorus_mass_in_mg / soil_mass_in_kg
 
     @staticmethod
@@ -537,7 +537,6 @@ class LayerData:
         total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
         return total_nutrient_mass_in_kg / field_size
 
-    # TODO: coordinate with Matthew to find best place for this so that it can be accessed by multiple modules
     @property
     def nutrient_cycling_temp_factor(self) -> float:
         """The nutrient cycling temperature factor (unitless)

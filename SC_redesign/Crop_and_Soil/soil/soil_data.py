@@ -30,14 +30,8 @@ class SoilData:
     """Total soil nitrate amounts at the beginning of a year, for use in determining annual change (kg per hectare)"""
 
     # Track annual hydrological activity
-    annual_potential_evapotranspiration_total: float = 0
-    """Cumulative total of potential evapotranspiration that occurred in a year (mm)"""
-    annual_adjusted_potential_evapotranspiration_total: float = 0
-    """Cumulative total of adjusted potential evapotranspiration that occurred in a year (mm)"""
-    annual_maximum_soil_evaporation_total: float = 0
-    """Cumulative total of maximum soil evaporation that occurred in a year (mm)"""
-    annual_adjusted_soil_evaporation_total: float = 0
-    """Cumulative total of adjusted soil evaporation that occurred in a year (mm)"""
+    annual_soil_evaporation_total: float = 0
+    """Cumulative total of water evaporated from the soil this year (mm)"""
     annual_runoff_total: float = 0
     """Cumulative total of runoff that occurred in a year (mm)"""
 
@@ -47,7 +41,7 @@ class SoilData:
     annual_surface_runoff_total: float = 0
     """Cumulative total of volume of surface runoff that occurred in a year (mm per hectare)"""
 
-    # Track annual nutrient activity
+    # Track annual phosphorus activity
     annual_runoff_fertilizer_phosphorus: float = 0
     """Cumulative total of phosphorus from surface-applied fertilizer that was carried off the field by runoff (kg)"""
     annual_runoff_machine_manure_inorganic_phosphorus: float = 0
@@ -65,18 +59,21 @@ class SoilData:
     annual_soil_phosphorus_runoff: float = 0
     """Cumulative total of phosphorus that was from the top layer of the soil profile by runoff (kg)"""
 
-    # ---- evapotranspiration
-    potential_evapotranspiration: Optional[float] = None
-    """potential evapotranspiration for a given day (mm per day)"""
-    potential_evapotranspiration_adjusted: Optional[float] = None
-    """amount of evapotranspiration adjusted for water in canopy (mm)
-        SWAT Reference: 2:2.3.1"""
-    transpiration: float = 30  # arbitrary
-    """amount of transpiration on a given day (mm)"""
-    soil_evaporation_adjusted: Optional[float] = None
-    """maximum amount of evaporation from soil on a given day adjusted for plant use (mm)"""
-    maximum_soil_evaporation: Optional[float] = None
-    """maximum amount of evaporation from soil on a given day (mm)"""
+    # Track annual nitrogen loss from field
+    annual_runoff_nitrates_total: float = 0
+    """Cumulative total of nitrates that were removed from the top soil layer by runoff (kg)"""
+    annual_runoff_ammonium_total: float = 0
+    """Cumulative total of ammonium that was removed from the top soil layer by runoff (kg)"""
+    annual_eroded_fresh_organic_nitrogen_total: float = 0
+    """Cumulative total of fresh organic nitrogen that was removed from the top soil layer by erosion (kg)"""
+    annual_eroded_stable_organic_nitrogen_total: float = 0
+    """Cumulative total of stable organic nitrogen that was removed from the top soil layer by erosion (kg)"""
+    annual_eroded_active_organic_nitrogen_total: float = 0
+    """Cumulative total of active organic nitrogen that was removed from the top soil layer by erosion (kg)"""
+
+    # ---- evaporation
+    water_evaporated: float = 0
+    """Amount of water evaporated from the soil profile on the current day (mm)"""
 
     # ---- infiltration
     second_moisture_condition_parameter: float = 85
@@ -248,7 +245,10 @@ class SoilData:
                                                soil_water_concentration=0,
                                                saturation_point_water_concentration=inf,
                                                initial_labile_inorganic_phosphorus_concentration=0,
+                                               initial_soil_nitrate_concentration=0,
                                                field_size=field_size)
+            self.vadose_zone_layer.active_organic_nitrogen_content = 0
+            self.vadose_zone_layer.stable_organic_nitrogen_content = 0
 
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
@@ -312,10 +312,7 @@ class SoilData:
         self.initial_nitrates_total = self.profile_nitrates_total
 
         # Reset hydrological activity totals
-        self.annual_potential_evapotranspiration_total = 0
-        self.annual_adjusted_potential_evapotranspiration_total = 0
-        self.annual_maximum_soil_evaporation_total = 0
-        self.annual_adjusted_soil_evaporation_total = 0
+        self.annual_soil_evaporation_total = 0
         self.annual_runoff_total = 0
 
         # Reset erosion activity totals
@@ -330,6 +327,12 @@ class SoilData:
         self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
 
         self.annual_soil_phosphorus_runoff = 0
+
+        self.annual_runoff_nitrates_total = 0
+        self.annual_runoff_ammonium_total = 0
+        self.annual_eroded_fresh_organic_nitrogen_total = 0
+        self.annual_eroded_stable_organic_nitrogen_total = 0
+        self.annual_eroded_active_organic_nitrogen_total = 0
 
         # Reset carbon cycle
         for layer in self.soil_layers:
