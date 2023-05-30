@@ -532,6 +532,7 @@ def output_manager_original_method_states(
         "_add_to_pool": mock_output_manager._add_to_pool,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
+        "_load_input_txt_file_names_to_list": mock_output_manager._load_input_txt_file_names_to_list,
         "_filter_variables_pool": mock_output_manager._filter_variables_pool,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
@@ -837,6 +838,33 @@ def test_load_txt_file_to_list(
     ]
 
 
+def test_load_input_txt_file_names_to_list(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for function _load_input_txt_file_names_to_list in output_manager.py"""
+    # Test case 1: Valid file path
+    path = "tests/misc_test_files/test_keys_file.txt"
+    expected_result = ["key1", "key2", "key3"]
+    assert mock_output_manager._load_txt_file_to_list(path) == expected_result
+
+    # Test case 2: Empty file
+    # MASM/tests/misc_test_files/empty_file.txt
+    path = "tests/misc_test_files/empty_keys_file.txt"
+    expected_result = []
+    assert mock_output_manager._load_txt_file_to_list(path) == expected_result
+
+    # Test case 3: Nonexistent file
+    path = "tests/misc_test_files/nonexistent_keys_file.txt"
+    with pytest.raises(Exception):
+        mock_output_manager._load_txt_file_to_list(path)
+
+    # Restore original method
+    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
+        "_load_txt_file_to_list"
+    ]
+
+
 def test_filter_variables_pool(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable]
@@ -904,6 +932,7 @@ def test_save_variables(
     mock_output_manager._load_input_txt_file_names_to_list = MagicMock(return_value=["dummy_input_filepath"])
 
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path", False)
+    mock_output_manager._load_input_txt_file_names_to_list.assert_called_once_with("dummy_dir_path")
     mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
