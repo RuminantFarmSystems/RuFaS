@@ -44,10 +44,10 @@ contribute get up to speed on the state of the module quickly.
 #### Water
 Biophysical processes that involve the movement of water are often complex and intertwined with Crop and Soil processes,
 so there is a need to make sure all these processes are coordinated between Crop and Soil objects.
-- [ ] Create a method that can be run on a daily basis which handles all water operations at the field level.
+- [x] Create a method that can be run on a daily basis which handles all water operations at the field level.
 
 #### Growth/Non-water Component Processes
-- [ ] Create a method that can be run on a daily basis that will run all daily crop growth and soil update operations.
+- [x] Create a method that can be run on a daily basis that will run all daily crop growth and soil update operations.
 
 #### Tillage
 - [x] Refactor the old `tillage.py`.

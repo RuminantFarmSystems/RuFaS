@@ -226,15 +226,15 @@ cross-checked with source documentation, tested, and documented (updated pseudoc
 The original versions should remain in-tact and new versions placed in `SC_redesign/Crop_and_Soil/` until the redesign
 is complete. In total, there are:
   - [x] 10 crop files, 2671 lines (`RUFAS/routines/field/crop/`): Done (Feb 2023)
-  - [ ] 23 soil files, 2213 lines (`RUFAS/routines/field/soil/`): Approx. 52% finished (Mar 2023), expected April 2023 
+  - [x] 23 soil files, 2213 lines (`RUFAS/routines/field/soil/`): Approx. 52% finished (Mar 2023), expected April 2023 
     - [x] soil files
-    - [ ] 4 carbon cycling files: approx. 50% finished
-    - [ ] nitrogen cycling files: not started
-    - [ ] phosphorus cycling files: approx. 33% finished
+    - [x] 4 carbon cycling files
+    - [x] nitrogen cycling files
+    - [x] phosphorus cycling files
   - [ ] 4 field management files, 295 lines (`RUFAS/routines/field/field_management`): 
 
 * The main classes need to be rewritten with new formatting guidelines, and linked to the process classes.
-  - [ ] `Soil`: mostly finished, dependent upon refactored soil files above: expected April 2023
+  - [x] `Soil`: mostly finished, dependent upon refactored soil files above: expected April 2023
   - [x] `Crop`: functionally finished (Mar 2023), minor tweaks likely as other files updated
   - [ ] `Field`: design finished, needs implementation (expected late April/early May 2023)
 
@@ -298,8 +298,39 @@ We have chosen to use the [composite class design](https://en.wikipedia.org/wiki
 pattern for this module. This pattern was chosen due to the complex nature of the main entities, each of which 
 are governed by many complex processes. Therefore, creating these entities as composite classes and making the 
 processes component classes, we are able to organize the complex project across files that each serve a specific 
-purpose. The composite contains all the functionality of the component classes, while the code for that class being 
+purpose. The composite contains all the functionality of the component classes, without the code for that class being 
 overly complex.
+
+While each composite class will contain the functionality to execute all processes associated with that class, this 
+functionality will not be utilized in RuFaS. A simplified example of what this means:
+* `Soil` is a composite class that contains process components for `Infiltration` and `Percolation`, and will also
+contain a method called `infiltrate_and_percolate()` that executes the infiltration and percolation processes. This 
+method would be implemented as
+```python
+def infiltrate_and_percolate():
+    self.infiltration.infiltrate()
+    self.percolation.percolate()
+```
+* `Field` is a composite class that will contain a `Soil` instance, and will have a method for executing all its various
+process components directly. This method will be implemented as 
+```python
+def execute_process_components():
+    self.soil.infiltration.infiltrate()
+    self.soil.percolation.percolate()
+```
+instead of 
+```python
+def execute_process_components():
+    self.soil.infiltrate_and_percolate()
+```
+
+By implementing `Soil`'s `infiltration_and_percolation()` method the user is provided with a correct routine that could 
+be used to model infiltration and percolation on their own. But by separating and executing the process components 
+directly in `execute_process_components()` more flexibility is added as more process components are added. This is 
+necessary because some process components from different composite classes need to be run in a mixed order. Also, since 
+there is not necessarily one single "correct" order when organizing the component processes from different composite 
+objects, different orders will likely be tried to see how output is effected and this pattern lends itself to more 
+easily changing the order of processes.
 
 Each method and feature that is re-written or refactored will be fully tested concurrently. This will ensure that
 the tests do not fall behind the implementation.
