@@ -901,10 +901,10 @@ def test_save_variables(
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._load_txt_file_to_list = MagicMock()
+    mock_output_manager._load_input_txt_file_names_to_list = MagicMock(return_value=["dummy_input_filepath"])
 
-    mock_output_manager.save_variables("dummy_path", "dummy_input_path", False)
-
-    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables", "json")
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path", False)
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )

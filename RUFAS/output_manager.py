@@ -405,8 +405,7 @@ class OutputManager(object):
             final_pool = filtered_pool
             if exclude_info_maps:
                 final_pool = self._exclude_info_maps(filtered_pool)
-            file_path = os.path.join(path, self._generate_file_name(
-                f"saved_variables_{input_file}", "json"))
+            file_path = os.path.join(path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
             self._dict_to_file_json(final_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
