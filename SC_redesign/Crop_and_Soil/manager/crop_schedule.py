@@ -1,5 +1,7 @@
 from typing import List, Any
 
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
+
 
 class CropSchedule:
 
@@ -48,18 +50,25 @@ class CropSchedule:
         if len(self.planting_days) == 1:
             self.planting_days *= len(self.planting_years)
 
+        if len(self.planting_days) != len(self.planting_years):
+            raise ValueError("Number of years that crops are planted in and days crops are planted on must be equal.")
+
         if len(self.harvest_days) == 1:
             self.harvest_days *= len(self.harvest_years)
 
         if len(self.harvest_operations) == 1:
             self.harvest_operations *= len(self.harvest_years)
 
-        if len(self.planting_days) != len(self.planting_years):
-            raise ValueError("Number of years that crops are planted in and days crops are planted on must be equal.")
-
         equal_harvest_parameters = len(self.harvest_years) == len(self.harvest_days) == len(self.harvest_operations)
         if not equal_harvest_parameters:
             raise ValueError("Number of values for harvest years, days, and operations must be equal.")
+
+        last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
+        others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
+        only_last_kills = last_kills and others_dont_kill
+        if not only_last_kills:
+            raise ValueError("The final element of harvest_events must specify an operation that will terminate "
+                             "the crop and the non-final harvest_events must not terminate the crop.")
 
         if pattern_skip < 0:
             raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
