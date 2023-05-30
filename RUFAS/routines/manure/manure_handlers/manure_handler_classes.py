@@ -109,6 +109,9 @@ class BaseManureHandler:
         Returns:
             A ManureHandlerDailyOutput object.
         """
+        if pen.num_animals == 0:
+            return ManureHandlerDailyOutput()
+        
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
                     "bedding": vars(bedding),

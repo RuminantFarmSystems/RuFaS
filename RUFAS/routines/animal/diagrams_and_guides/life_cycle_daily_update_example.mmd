@@ -1,0 +1,28 @@
+flowchart LR
+    CalvesDay0[Calf 80] -.-> |48 stayed| CalvesDay1[Calf' 48]
+    CalvesDay0[Calf 80] --> |32 graduated| HeiferIsDay1[HeiferI' 448]
+    HeiferIsDay0[HeiferI 440] --> |416 stayed| HeiferIsDay1[HeiferI' 448]
+    HeiferIsDay0[HeiferI 440] --> |24 graduated| HeiferIIsDay1[HeiferII' 396]
+    HeiferIIsDay0[HeiferII 380] --> |372 stayed| HeiferIIsDay1[HeiferII' 396]
+    HeiferIIsDay0[HeiferII 380] -.-> |8 graduated| HeiferIIIsDay1[HeiferIII' 0]
+    HeiferIIIsDay0[HeiferIII 50] -.-> |17 stayed| HeiferIIIsDay1[HeiferIII' 0]
+    HeiferIIIsDay0[HeiferIII 50] --> |33 graduated| LacCowsDay1[Cow' 866]
+    HeiferIIIsDay1[HeiferIII' 0] ==> |25 sold| HeiferIIIsSold[Sold 25]
+    CowsDay0[Cow 1000] -.-> |composed of| DryCowsDay0[DryCow 166] & LacCowsDay0[LacCow 834]
+    DryCowsDay0[DryCow 166] --> DryCowsDay1[DryCow' 166]
+    LacCowsDay0[LacCow 834] --> |833 stayed| LacCowsDay1[LacCow' 866]
+    LacCowsDay0[LacCow 834] ==> |1 culled| CowsCulled[Culled 1]
+    LacCowsDay1[LacCow' 866] -.-> |13 newborns| CalvesBornDay1[Calf' 13]
+    CalvesDay1[Calf' 48] & CalvesBornDay1[Calf' 13] ----> |merging| AllCalvesDay1[Calf' 61]
+    subgraph Day0
+        CalvesDay0 ~~~ HeiferIsDay0 ~~~ HeiferIIsDay0 ~~~ HeiferIIIsDay0 ~~~ CowsDay0 ~~~ DryCowsDay0 ~~~ LacCowsDay0
+    end
+    subgraph EndOfDay1
+        CalvesDay1 ~~~ HeiferIsDay1 ~~~ HeiferIIsDay1 ~~~ HeiferIIIsDay1 ~~~ DryCowsDay1 ~~~ LacCowsDay1 ~~~ AllCalvesDay1 ~~~ CalvesBornDay1
+    end
+    subgraph RemovedAnimalsDay1
+        HeiferIIIsSold ~~~ CowsCulled
+    end
+
+
+
