@@ -651,7 +651,8 @@ class LifeCycleManager:
         args.update(tai_method_c=AnimalBase.config['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
         new_cow = Cow(args)
-        new_cow.milk_production_reduction = cows[0].milk_production_reduction
+        if len(cows)>0:
+            new_cow.milk_production_reduction = cows[0].milk_production_reduction
         cows.append(new_cow)
 
     def _check_if_heifers_need_to_be_sold(self, heiferIIIs: List[HeiferIII], cows: List[Cow],
