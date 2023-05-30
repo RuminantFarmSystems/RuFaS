@@ -323,18 +323,18 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path of the input file to be read.
+        path : str
+            Path of the input file to be read.
 
         Returns
         -------
-            List
-                A list of keys the user has selected to filter the variables pool.
+        List
+            A list of keys the user has selected to filter the variables pool.
 
         Raises
         -------
-            Exception
-                If an error occurs while opening or reading the file.
+        Exception
+            If an error occurs while opening or reading the file.
 
         """
         try:
@@ -344,7 +344,22 @@ class OutputManager(object):
             raise e
 
     def _filter_variables_pool(self, inclusion_keys: List[str]):
-        """TODO"""
+        """
+        Takes the list of keys the user wants in their final data pool,
+        filters the variables pool accordingly, and returns the filtered pool.
+
+        Parameters
+        ----------
+        inclusion_keys : List[str]
+            A list of keys the user has selected to filter the variables pool.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]
+            The variables_pool with only the values paired with the keys
+            from the inclusion_keys list remaining.
+
+        """
         return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
 
     def save_variables(self, path: str, keys_file_path: str,
@@ -355,11 +370,11 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path to the directory where the file will be saved.
+        path : str
+            Path to the directory where the file will be saved.
 
-            keys_file_path : str
-                Path of the input file containing the list of keys.
+        keys_file_path : str
+            Path of the input file containing the list of keys.
 
         """
         inclusion_keys = self._load_txt_file_to_list(keys_file_path)
@@ -376,11 +391,11 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path to the directory where the file will be saved.
+        path : str
+            Path to the directory where the file will be saved.
 
-            exclude_info_maps : bool
-                Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
         pool = self.variables_pool
@@ -396,8 +411,8 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path to the directory where the file will be saved.
+        path : str
+            Path to the directory where the file will be saved.
 
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
@@ -409,8 +424,8 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path to the directory where the file will be saved.
+        path : str
+            Path to the directory where the file will be saved.
 
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
@@ -422,8 +437,8 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path to the directory where the file will be saved.
+        path : str
+            Path to the directory where the file will be saved.
 
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
@@ -438,33 +453,33 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                The path to the file to be dumped to.
+        path : str
+            The path to the file to be dumped to.
 
-            exclude_info_maps : bool
-                Flag to denote whether info_map data should be dumped with variable names.
+        exclude_info_maps : bool
+            Flag to denote whether info_map data should be dumped with variable names.
 
-            format_option : {"block", "inline", "verbose"}
-                The selection for the formatting option of the text written to the variables names text file.
+        format_option : {"block", "inline", "verbose"}
+            The selection for the formatting option of the text written to the variables names text file.
 
         Examples
         --------
-            format_option: str = "block"
-            class_name.function_name.variable_name
-                                                .values: variable1_name
-                                                .values: variable2_name
-                                                .info_maps: variable3_name
-                                                .info_maps: variable4_name
+        format_option: str = "block"
+        class_name.function_name.variable_name
+                                            .values: variable1_name
+                                            .values: variable2_name
+                                            .info_maps: variable3_name
+                                            .info_maps: variable4_name
 
-            format_option: str = "inline"
-            class_name.function_name.variable_name.values: [variable1_name, variable2_name]
-            class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
+        format_option: str = "inline"
+        class_name.function_name.variable_name.values: [variable1_name, variable2_name]
+        class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
 
-            format_option: str = "verbose"
-            class_name.function_name.variable_name.values: variable1_name
-            class_name.function_name.variable_name.values: variable2_name
-            class_name.function_name.variable_name.info_maps: variable3_name
-            class_name.function_name.variable_name.info_maps: variable4_name
+        format_option: str = "verbose"
+        class_name.function_name.variable_name.values: variable1_name
+        class_name.function_name.variable_name.values: variable2_name
+        class_name.function_name.variable_name.info_maps: variable3_name
+        class_name.function_name.variable_name.info_maps: variable4_name
         """
 
         var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
@@ -510,11 +525,11 @@ class OutputManager(object):
 
         Parameters
         ----------
-            path : str
-                Path to the directory where the file will be saved.
+        path : str
+            Path to the directory where the file will be saved.
 
-            exclude_info_maps : bool
-                Flag for whether or not the user wants to inlcude info_maps data in their results files.
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
         self.dump_variables(path, exclude_info_maps)
