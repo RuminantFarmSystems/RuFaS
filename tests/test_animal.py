@@ -4,7 +4,7 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
-
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 import pytest
 
@@ -20,7 +20,7 @@ def cow_a() -> dict:
         'body_weight': 600,
         'mature_body_weight': 700,
         'day_of_pregnancy': 30,
-        'animal_type': 'cow',
+        'animal_type': AnimalType.LAC_COW,
         'parity': 1,
         'calving_interval': 365,
         'milk_protein': 3.45,
@@ -45,7 +45,7 @@ def cow_b() -> dict:
         'body_weight': 680,
         'mature_body_weight': 700,
         'day_of_pregnancy': 150,
-        'animal_type': 'cow',
+        'animal_type': AnimalType.LAC_COW,
         'parity': 3,
         'calving_interval': 365,
         'milk_protein': 3.45,
@@ -70,7 +70,7 @@ def heifer_a() -> dict:
         'body_weight': 230,
         'mature_body_weight': 700,
         'day_of_pregnancy': None,
-        'animal_type': 'heifer',
+        'animal_type': AnimalType.HEIFER_I,
         'parity': 0,
         'calving_interval': None,
         'milk_protein': 0.0,
@@ -95,7 +95,7 @@ def heifer_b() -> dict:
         'body_weight': 340,
         'mature_body_weight': 700,
         'day_of_pregnancy': 1,
-        'animal_type': 'heifer',
+        'animal_type': AnimalType.HEIFER_I,
         'parity': 0,
         'calving_interval': None,
         'milk_protein': 0.0,
@@ -222,23 +222,23 @@ def test_calculate_NRC_protein_requirements(cow_a:dict, cow_b:dict, heifer_a:dic
     """Unit test for function calculate_NRC_protein_requirements in file routines/animal/ration/animal_requirements.py"""
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_protein_requirements(
         cow_a['body_weight'], 22, cow_a['day_of_pregnancy'], cow_a['animal_type'],
-        cow_a['Milk'], cow_a['milk_protein'], 40, 3, 1, 220)
-    assert (result_MP_req) == pytest.approx((1965), rel=1e-1)
+        cow_a['Milk'], cow_a['milk_protein'], 40, 3, 1, 220, 24)
+    assert (result_MP_req) == pytest.approx((2340), rel=1e-1)
 
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_protein_requirements(
         cow_b['body_weight'], 0, cow_b['day_of_pregnancy'], cow_b['animal_type'],
-        cow_b['Milk'], cow_b['milk_protein'], 0, 3, 1, 0)
-    assert (result_MP_req) == pytest.approx((1624), rel=1e-1)
+        cow_b['Milk'], cow_b['milk_protein'], 0, 3, 1, 0, 24)
+    assert (result_MP_req) == pytest.approx((2000), rel=1e-1)
 
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_protein_requirements(
         heifer_a['body_weight'], 22, heifer_a['day_of_pregnancy'], heifer_a['animal_type'],
-        heifer_a['Milk'], heifer_a['milk_protein'], 40, 3, 1, 220)
-    assert (result_MP_req) == pytest.approx((374), rel=1e-1)
+        heifer_a['Milk'], heifer_a['milk_protein'], 40, 3, 1, 220, 12)
+    assert (result_MP_req) == pytest.approx((562), rel=1e-1)
 
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_protein_requirements(
         heifer_b['body_weight'], 0, heifer_b['day_of_pregnancy'], heifer_b['animal_type'],
-        heifer_b['Milk'], heifer_b['milk_protein'], 0, 3, 1, 0)
-    assert (result_MP_req) == pytest.approx((301), rel=1e-1)
+        heifer_b['Milk'], heifer_b['milk_protein'], 0, 3, 1, 0, 12)
+    assert (result_MP_req) == pytest.approx((489), rel=1e-1)
 
 
 def test_calculate_NRC_calcium_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -438,7 +438,7 @@ def test_calculate_NASEM_protein_requirements(cow_a:dict, cow_b:dict, heifer_a:d
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_protein_requirements(
         cow_a['lactating'], cow_a['body_weight'], 1, 0.1, 22,
         cow_a['milk_protein'], cow_a['Milk'])
-    assert (result_MP_req) == pytest.approx((1505), rel=1e-1)
+    assert (result_MP_req) == pytest.approx((2020), rel=1e-1)
 
     result_MP_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NASEM_protein_requirements(
         cow_b['lactating'], cow_b['body_weight'], 1, 1, 8,

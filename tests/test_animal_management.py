@@ -5,7 +5,7 @@ Description: Implements test cases for the AnimalManagement class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
-from typing import List, Dict, Union, Any
+from typing import Any
 from typing import List, Dict, Union
 from unittest.mock import MagicMock, patch
 
@@ -14,13 +14,13 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.feed.feed import Feed
 
 
 def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[MagicMock]:
@@ -1078,3 +1078,414 @@ def test_sum_daily_milk(animal_management, cowlist):
         cow.estimated_daily_milk_produced = 50.0
     result = AnimalManagement.sum_daily_milk(animal_management, cowlist)
     assert result == 150
+
+def test_get_animals_snapshot(mocker: MockerFixture):
+    """
+    Unit test for function _get_animals_snapshot() in file animal_management.py
+
+    This test checks that the function correctly creates a snapshot of the current state of all animals
+    in the system, and additionally finds and stores the combination each animal belongs to.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(
+        data=mocker.MagicMock(),
+        config=mocker.MagicMock(),
+        feed=mocker.MagicMock(),
+        weather=mocker.MagicMock(),
+        time=mocker.MagicMock()
+    )
+    old_animal_grouping_scenario = AnimalManagement.ANIMAL_GROUPING_SCENARIO
+    mock_animal_grouping_scenario = mocker.MagicMock()
+    num_animal_classes = 5
+    num_animals_of_each_type = 10
+    animal_id = 0
+    mock_calves = []
+    mock_heifer_Is = []
+    mock_heifer_IIs = []
+    mock_heifer_IIIs = []
+    mock_cows = []
+    animal_combination_by_id = {}
+    for i in range(num_animals_of_each_type):
+        mock_calves.append(mocker.MagicMock())
+        mock_calves[i].id = animal_id
+        animal_combination_by_id[animal_id] = f'calf_{i}'
+        animal_id += 1
+
+        mock_heifer_Is.append(mocker.MagicMock())
+        mock_heifer_Is[i].id = animal_id
+        animal_combination_by_id[animal_id] = f'heiferI_{i}'
+        animal_id += 1
+
+        mock_heifer_IIs.append(mocker.MagicMock())
+        mock_heifer_IIs[i].id = animal_id
+        animal_combination_by_id[animal_id] = f'heiferII_{i}'
+        animal_id += 1
+
+        mock_heifer_IIIs.append(mocker.MagicMock())
+        mock_heifer_IIIs[i].id = animal_id
+        animal_combination_by_id[animal_id] = f'heiferIII_{i}'
+        animal_id += 1
+
+        mock_cows.append(mocker.MagicMock())
+        mock_cows[i].id = animal_id
+        animal_combination_by_id[animal_id] = f'cow_{i}'
+        animal_id += 1
+
+    mock_animal_grouping_scenario.find_animal_combination = \
+        mocker.MagicMock(side_effect=lambda animal: animal_combination_by_id[animal.id])
+
+    animal_management.calves = mock_calves
+    animal_management.heiferIs = mock_heifer_Is
+    animal_management.heiferIIs = mock_heifer_IIs
+    animal_management.heiferIIIs = mock_heifer_IIIs
+    animal_management.cows = mock_cows
+    AnimalManagement.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
+
+    expected_snapshot = {
+        'calves': set(mock_calves),
+        'heiferIs': set(mock_heifer_Is),
+        'heiferIIs': set(mock_heifer_IIs),
+        'heiferIIIs': set(mock_heifer_IIIs),
+        'cows': set(mock_cows),
+        'animal_combination_by_id': animal_combination_by_id,
+    }
+
+    # Act
+    actual_snapshot = animal_management._get_animals_snapshot()
+
+    # Assert
+    assert actual_snapshot == expected_snapshot
+    assert mock_animal_grouping_scenario.find_animal_combination.call_count == \
+           num_animal_classes * num_animals_of_each_type
+
+    # Reset
+    AnimalManagement.ANIMAL_GROUPING_SCENARIO = old_animal_grouping_scenario
+
+
+def test_handle_removed_animals_after_update(mocker: MockerFixture):
+    """
+    Unit test for the function _handle_removed_animals_after_update() in file animal_management.py
+
+    This test checks that the function correctly identifies the animals that have been removed after an update,
+    and that it successfully calls the '_remove_animal_from_pen_and_id_map' method for each of these animals.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                         time=mocker.MagicMock())
+
+    num_animals_of_each_type = 10
+    mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_Is = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_IIs = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_IIIs = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_cows = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+
+    animals_snapshot_before_update = {
+        'calves': set(mock_calves),
+        'heiferIs': set(mock_heifer_Is),
+        'heiferIIs': set(mock_heifer_IIs),
+        'heiferIIIs': set(mock_heifer_IIIs),
+        'cows': set(mock_cows),
+        'animal_combination_by_id': {}  # This is not used in this test
+    }
+
+    mock_calves_at_odd_indices = mock_calves[1::2]
+    mock_heifer_Is_at_odd_indices = mock_heifer_Is[1::2]
+    mock_heifer_IIs_at_odd_indices = mock_heifer_IIs[1::2]
+    mock_heifer_IIIs_at_odd_indices = mock_heifer_IIIs[1::2]
+    mock_cows_at_odd_indices = mock_cows[1::2]
+
+    mock_calves_at_even_indices = mock_calves[::2]
+    mock_heifer_Is_at_even_indices = mock_heifer_Is[::2]
+    mock_heifer_IIs_at_even_indices = mock_heifer_IIs[::2]
+    mock_heifer_IIIs_at_even_indices = mock_heifer_IIIs[::2]
+    mock_cows_at_even_indices = mock_cows[::2]
+
+    animals_snapshot_after_update = {
+        'calves': set(mock_calves_at_odd_indices),
+        'heiferIs': set(mock_heifer_Is_at_odd_indices),
+        'heiferIIs': set(mock_heifer_IIs_at_odd_indices),
+        'heiferIIIs': set(mock_heifer_IIIs_at_odd_indices),
+        'cows': set(mock_cows_at_odd_indices),
+        'animal_combination_by_id': {}  # This is not used in this test
+    }
+
+    removed_animals = set(mock_calves_at_even_indices + mock_heifer_Is_at_even_indices +
+                          mock_heifer_IIs_at_even_indices + mock_heifer_IIIs_at_even_indices +
+                          mock_cows_at_even_indices)
+    patch_remove_animal_from_pen_and_id_map = mocker.patch.object(animal_management,
+                                                                  '_remove_animal_from_pen_and_id_map')
+
+    # Act
+    animal_management._handle_removed_animals_after_update(animals_snapshot_before_update,
+                                                           animals_snapshot_after_update)
+
+    # Assert
+    assert patch_remove_animal_from_pen_and_id_map.call_count == len(removed_animals)
+    for animal in removed_animals:
+        patch_remove_animal_from_pen_and_id_map.assert_any_call(animal)
+
+
+def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: MockerFixture):
+    """
+    Unit test for the function _handle_animals_with_unchanged_class_and_changed_combination() in file animal_management.py
+
+    This test checks that the function correctly identifies the animals that didn't change their classes but changed their animal combination.
+    It also verifies that the functions '_remove_animal_from_pen_and_id_map' and '_add_animal_to_pen_and_id_map' are called for these animals.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                         time=mocker.MagicMock())
+
+    num_animals_of_each_type = 10
+    mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_Is = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_IIs = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_IIIs = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_cows = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+
+    animals = mock_calves + mock_heifer_Is + mock_heifer_IIs + mock_heifer_IIIs + mock_cows
+
+    animals_snapshot_before_update = {
+        'calves': set(mock_calves),
+        'heiferIs': set(mock_heifer_Is),
+        'heiferIIs': set(mock_heifer_IIs),
+        'heiferIIIs': set(mock_heifer_IIIs),
+        'cows': set(mock_cows),
+        'animal_combination_by_id': {animal.id: 'combination1' for animal in animals}
+    }
+
+    animals_snapshot_after_update = {
+        'calves': set(mock_calves),
+        'heiferIs': set(mock_heifer_Is),
+        'heiferIIs': set(mock_heifer_IIs),
+        'heiferIIIs': set(mock_heifer_IIIs),
+        'cows': set(mock_cows),
+        'animal_combination_by_id': {animal.id: 'combination2' for animal in animals}
+    }
+
+    mock_feed = mocker.MagicMock()
+    mock_temp = mocker.MagicMock()
+
+    patch_remove_animal = mocker.patch.object(animal_management, '_remove_animal_from_pen_and_id_map')
+    patch_add_animal = mocker.patch.object(animal_management, '_add_animal_to_pen_and_id_map')
+
+    # Act
+    animal_management._handle_animals_with_unchanged_class_and_changed_combination(animals_snapshot_before_update,
+                                                                                   animals_snapshot_after_update,
+                                                                                   mock_feed, mock_temp)
+
+    # Assert
+    assert patch_remove_animal.call_count == len(animals)
+    assert patch_add_animal.call_count == len(animals)
+    for animal in animals:
+        patch_remove_animal.assert_any_call(animal)
+        patch_add_animal.assert_any_call(animal, mock_feed, mock_temp)
+
+
+def test_handle_graduated_animals(mocker: MockerFixture):
+    """
+    Unit test for the function _handle_graduated_animals() in file animal_management.py
+
+    This test checks that the function correctly identifies the animals that have graduated to the next class.
+    It also verifies that the function '_add_animal_to_pen_and_id_map' is called for these graduated animals.
+
+    """
+    # Arrange
+    import random
+    random.seed(42)  # Set seed to make test reproducible
+
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                         time=mocker.MagicMock())
+
+    num_animals_of_each_type = 30  # To make easier to select a third of each class
+    mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_Is = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_IIs = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_heifer_IIIs = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+    mock_cows = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
+
+    # Randomly select a third of each class to graduate
+    graduated_heifer_Is = random.sample(mock_calves, num_animals_of_each_type // 3)
+    graduated_heifer_IIs = random.sample(mock_heifer_Is, num_animals_of_each_type // 3)
+    graduated_heifer_IIIs = random.sample(mock_heifer_IIs, num_animals_of_each_type // 3)
+    graduated_cows = random.sample(mock_heifer_IIIs, num_animals_of_each_type // 3)
+
+    animals_snapshot_before_update = {
+        'calves': set(mock_calves),
+        'heiferIs': set(mock_heifer_Is),
+        'heiferIIs': set(mock_heifer_IIs),
+        'heiferIIIs': set(mock_heifer_IIIs),
+        'cows': set(mock_cows),
+        'animal_combination_by_id': {}
+    }
+
+    animals_snapshot_after_update = {
+        'calves': set(mock_calves) - set(graduated_heifer_Is),
+        'heiferIs': set(mock_heifer_Is).union(set(graduated_heifer_Is)) - set(graduated_heifer_IIs),
+        'heiferIIs': set(mock_heifer_IIs).union(set(graduated_heifer_IIs)) - set(graduated_heifer_IIIs),
+        'heiferIIIs': set(mock_heifer_IIIs).union(set(graduated_heifer_IIIs)) - set(graduated_cows),
+        'cows': set(mock_cows).union(set(graduated_cows)),
+        'animal_combination_by_id': {}
+    }
+
+    mock_feed = mocker.MagicMock()
+    mock_temp = mocker.MagicMock()
+
+    patch_add_animal = mocker.patch.object(animal_management, '_add_animal_to_pen_and_id_map')
+
+    # Act
+    animal_management._handle_graduated_animals(animals_snapshot_before_update,
+                                                animals_snapshot_after_update,
+                                                mock_feed, mock_temp)
+
+    # Assert
+    all_graduated_animals = graduated_heifer_Is + graduated_heifer_IIs + graduated_heifer_IIIs + graduated_cows
+    assert patch_add_animal.call_count == len(all_graduated_animals)
+    for animal in all_graduated_animals:
+        patch_add_animal.assert_any_call(animal, mock_feed, mock_temp)
+
+
+def test_handle_newly_added_animals(mocker: MockerFixture):
+    """
+    Unit test for the function _handle_newly_added_animals() in file animal_management.py
+
+    This test checks that the function correctly handles newly added animals and adds them to
+    the appropriate data structures.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                         time=mocker.MagicMock())
+
+    # MockAnimal class
+    class MockAnimal:
+        def __init__(self, animal_id):
+            self.animal_id = animal_id
+
+    num_new_animals = 10
+    new_mock_animals = [MockAnimal(i) for i in range(num_new_animals)]
+
+    mock_feed = mocker.MagicMock()
+    mock_temp = mocker.MagicMock()
+
+    patch_add_animal = mocker.patch.object(animal_management, '_add_animal_to_pen_and_id_map')
+
+    # Set up property mock for animals_by_type
+    mock_animals_by_type = {MockAnimal: []}
+    mock_animals_by_type_property = mocker.patch.object(AnimalManagement, 'animals_by_type',
+                                                        new_callable=mocker.PropertyMock)
+    mock_animals_by_type_property.return_value = mock_animals_by_type
+
+    # Act
+    animal_management._handle_newly_added_animals(new_mock_animals, mock_feed, mock_temp)
+
+    # Assert
+    assert patch_add_animal.call_count == num_new_animals
+    for animal in new_mock_animals:
+        patch_add_animal.assert_any_call(animal, mock_feed, mock_temp)
+        assert animal in animal_management.animals_by_type[MockAnimal]
+
+
+def test_remove_animal_from_pen_and_id_map(mocker: MockerFixture):
+    """
+    Unit test for the function _remove_animal_from_pen_and_id_map() in file animal_management.py
+
+    This test checks that the function correctly removes the animal from the pen it is in and
+    from the animal_to_pen_id_map.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                         time=mocker.MagicMock())
+
+    mock_animal = mocker.MagicMock()
+    mock_animal.id = 1
+
+    mock_pen = mocker.MagicMock()
+    mock_pen.remove_animal = mocker.MagicMock()
+
+    mock_animal_to_pen_id_map = {mock_animal.id: 0}
+    mock_all_pens = [mock_pen]
+
+    animal_management.animal_to_pen_id_map = mock_animal_to_pen_id_map
+    animal_management.all_pens = mock_all_pens
+
+    # Act
+    animal_management._remove_animal_from_pen_and_id_map(mock_animal)
+
+    # Assert
+    mock_pen.remove_animal.assert_called_once_with(mock_animal.id)
+    assert mock_animal.id not in animal_management.animal_to_pen_id_map
+
+
+def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
+    """
+    Unit test for the function _add_animal_to_pen_and_id_map() in file animal_management.py
+
+    This test checks that the function correctly assigns an animal to a pen with the minimum stocking density,
+    updates the pen's animal count and stocking density, and updates the animal_to_pen_id_map.
+
+    """
+    # Arrange
+    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
+    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                         time=mocker.MagicMock())
+
+    mock_animal = mocker.MagicMock()
+    mock_animal.id = 1
+
+    mock_pen_1 = mocker.MagicMock()
+    mock_pen_1.current_stocking_density = 10
+    mock_pen_1.id = 1
+    mock_pen_1.add_animal = mocker.MagicMock()
+
+    mock_pen_2 = mocker.MagicMock()
+    mock_pen_2.current_stocking_density = 5
+    mock_pen_2.id = 2
+    mock_pen_2.add_animal = mocker.MagicMock()
+
+    mock_animal_combination = 'combination_1'
+    mock_feed = mocker.MagicMock()
+    mock_temp = mocker.MagicMock()
+
+    mock_animal_grouping_scenario = mocker.MagicMock()
+    mock_animal_grouping_scenario.find_animal_combination.return_value = mock_animal_combination
+
+    mock_pens_by_animal_combination = {mock_animal_combination: [mock_pen_1, mock_pen_2]}
+
+    original_ANIMAL_GROUPING_SCENARIO = AnimalManagement.ANIMAL_GROUPING_SCENARIO
+    AnimalManagement.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
+    animal_management.pens_by_animal_combination = mock_pens_by_animal_combination
+    animal_management.phosphorus_concentration_by_animal_class = {type(mock_animal): 0.0}
+    animal_management.animal_to_pen_id_map = {}
+
+    # Act
+    animal_management._add_animal_to_pen_and_id_map(mock_animal, mock_feed, mock_temp)
+
+    # Assert
+    mock_pen_1.add_animal.assert_not_called()
+    mock_pen_2.add_animal.assert_called_once_with(mock_animal,
+                                                  mock_animal_grouping_scenario,
+                                                  mock_feed,
+                                                  mock_temp,
+                                                  0.0)
+    assert animal_management.animal_to_pen_id_map[mock_animal.id] == mock_pen_2.id
+
+    # Reset ANIMAL_GROUPING_SCENARIO
+    AnimalManagement.ANIMAL_GROUPING_SCENARIO = original_ANIMAL_GROUPING_SCENARIO
