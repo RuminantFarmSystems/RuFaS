@@ -337,9 +337,9 @@ class OutputManager(object):
             for filename in os.listdir(dir_path):
                 if filename.endswith(".txt"):
                     if "inclusion" in dir_path:
-                        txt_files["inclusion_filters"] = filename
+                        txt_files[dir_path] = filename
                     elif "exclusion" in dir_path:
-                        txt_files["exclusion_filters"] = filename
+                        txt_files[dir_path] = filename
         return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
@@ -400,17 +400,21 @@ class OutputManager(object):
         dir_paths : List[str]
             Paths of the input file containing the list of keys for inclusion and exclusion filters.
 
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to inlcude info_maps data in their results files.
+
         """
-        list_of_input_files = self._load_input_txt_file_names_to_dict(dir_paths)
-        for input_file in list_of_input_files:
-            input_path = dir_path + input_file
-            inclusion_keys = self._load_txt_file_to_list(input_path)
-            filtered_pool = self._filter_variables_pool(inclusion_keys)
-            final_pool = filtered_pool
-            if exclude_info_maps:
-                final_pool = self._exclude_info_maps(filtered_pool)
-            file_path = os.path.join(path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
-            self._dict_to_file_json(final_pool, file_path)
+        dict_of_input_files = self._load_input_txt_file_names_to_dict(dir_paths)
+        for dir_path, input_file_list in dict_of_input_files.items():
+            for input_file in input_file_list:
+                input_path = dir_path + input_file
+                inclusion_keys = self._load_txt_file_to_list(input_path)
+                filtered_pool = self._filter_variables_pool(inclusion_keys)
+                final_pool = filtered_pool
+                if exclude_info_maps:
+                    final_pool = self._exclude_info_maps(filtered_pool)
+                file_path = os.path.join(path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
+                self._dict_to_file_json(final_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
