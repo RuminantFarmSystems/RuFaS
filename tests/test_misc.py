@@ -840,16 +840,32 @@ def test_load_input_txt_file_names_to_dict(
     tmpdir
 ) -> None:
     """Test case for function _load_input_txt_file_names_to_dict in output_manager.py"""
-    tmpdir.join("file1.txt").write("File 1 content")
-    tmpdir.join("file2.txt").write("File 2 content")
-    tmpdir.join("file3.csv").write("File 3 content")
+    inclusion_dir = tmpdir.mkdir("inclusion")
+    exclusion_dir = tmpdir.mkdir("exclusion")
 
-    txt_files = mock_output_manager._load_input_txt_file_names_to_dict(tmpdir)
+    inclusion_dir.join("file1.txt").write("File 1 content")
+    inclusion_dir.join("file2.txt").write("File 2 content")
+    inclusion_dir.join("file3.csv").write("File 3 content")
+
+    exclusion_dir.join("file4.txt").write("File 4 content")
+    exclusion_dir.join("file5.txt").write("File 5 content")
+    exclusion_dir.join("file6.csv").write("File 6 content")
+
+    dir_paths = [str(inclusion_dir), str(exclusion_dir)]
+    txt_files = mock_output_manager._load_input_txt_file_names_to_dict(dir_paths)
 
     assert len(txt_files) == 2
-    assert "file1.txt" in txt_files
-    assert "file2.txt" in txt_files
-    assert "file3.csv" not in txt_files
+    assert str(inclusion_dir) in txt_files
+    assert str(exclusion_dir) in txt_files
+    assert len(txt_files[str(inclusion_dir)]) == 2
+    assert len(txt_files[str(exclusion_dir)]) == 2
+    assert "file1.txt" in txt_files[str(inclusion_dir)]
+    assert "file2.txt" in txt_files[str(inclusion_dir)]
+    assert "file3.csv" not in txt_files[str(inclusion_dir)]
+    assert "file4.txt" not in txt_files[str(inclusion_dir)]
+    assert "file5.txt" in txt_files[str(exclusion_dir)]
+    assert "file6.csv" not in txt_files[str(exclusion_dir)]
+    assert "file1.txt" not in txt_files[str(exclusion_dir)]
 
     # Restore original method
     mock_output_manager._load_input_txt_file_names_to_dict = output_manager_original_method_states[
