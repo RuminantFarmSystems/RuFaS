@@ -14,17 +14,17 @@ additional specifications required to plant a crop beyond `year` and `day`
 
 
 class Event:
-    def __init__(self, year=0, day=120):
-        """Creates a new Event instance
+    def __init__(self, year: int = 1, day: int = 120):
+        """Creates a new Event instance.
 
-        an Event object determines when an event should occur, relative to the start of the RuFaS simulation.
-        An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur
+        An Event object determines when an event should occur, relative to the start of the RuFaS simulation.
+        An event can specify when a crop is planted or harvested, when a manure/fertilizer amendment should occur.
 
         Parameters
         ----------
-        year : int
-            years after the start of the simulation on which the event should occur
-        day : int
+        year : int, default=0
+            Year of the simulation on which the event should occur
+        day : int, default=120
             (julian) day of the year on which the event should occur
 
         Returns
@@ -157,15 +157,36 @@ class Event:
         return out_list
 
 
-class HarvestEvent(Event):
-    def __init__(self, year: int = 0, day: int = 120, operation: str = "default"):
-        """Creates a new HarvestEvent instance, which is a child of the Event class
-
-        a HarvestEvent object determines when (and how) a harvest operation should occur for a crop.
+class PlantingEvent(Event):
+    def __init__(self, crop_reference: str, year: int = 1, day: int = 120, heat_scheduled_harvest: bool = False):
+        """
+        Initializes a Planting Event, which dictates when a crop will be planted and tells the plant how it will
+        eventually be harvested.
 
         Parameters
         ----------
-        operation : str
+        crop_reference : str
+            Name of the crop to be planted in the ground.
+        heat_scheduled_harvest : bool, default=False
+            Flag indicating if the crop will be harvested when it has a certain amount of heat units.
+
+        """
+        super().__init__(year=year, day=day)
+        self.crop_reference = crop_reference
+        self.use_heat_scheduled_harvest = heat_scheduled_harvest
+
+
+class HarvestEvent(Event):
+    def __init__(self, crop_reference: str, year: int = 1, day: int = 240, operation: str = "default"):
+        """Creates a new HarvestEvent instance, which is a child of the Event class.
+
+        A HarvestEvent object determines when (and how) a harvest operation should occur for a crop.
+
+        Parameters
+        ----------
+        crop_reference : str
+            Name of the crop to be harvested.
+        operation : str, default="default"
             the name of an accepted harvest operation (see HarvestOperation)
 
         Returns
@@ -174,4 +195,5 @@ class HarvestEvent(Event):
             a HarvestEvent instance
         """
         super().__init__(year=year, day=day)
+        self.crop_reference = crop_reference
         self.operation = operation
