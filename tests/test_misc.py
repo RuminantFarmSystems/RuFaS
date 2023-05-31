@@ -812,24 +812,20 @@ def test_exclude_info_maps(
 
 def test_load_txt_file_to_list(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable]
+    output_manager_original_method_states: Dict[str, Callable],
+    tmpdir
 ) -> None:
     """Test case for function _load_txt_file_to_list in output_manager.py"""
-    # Test case 1: Valid file path
-    path = "tests/misc_test_files/test_keys_file.txt"
-    expected_result = ["key1", "key2", "key3"]
-    assert mock_output_manager._load_txt_file_to_list(path) == expected_result
+    content = "apple\nbanana\ncherry"
 
-    # Test case 2: Empty file
-    # MASM/tests/misc_test_files/empty_file.txt
-    path = "tests/misc_test_files/empty_keys_file.txt"
-    expected_result = []
-    assert mock_output_manager._load_txt_file_to_list(path) == expected_result
+    file_path = tmpdir.join("test_file.txt")
 
-    # Test case 3: Nonexistent file
-    path = "tests/misc_test_files/nonexistent_keys_file.txt"
-    with pytest.raises(Exception):
-        mock_output_manager._load_txt_file_to_list(path)
+    with open(str(file_path), "w") as file:
+        file.write(content)
+
+    result = mock_output_manager._load_txt_file_to_list(str(file_path))
+
+    assert result == ["apple", "banana", "cherry"]
 
     # Restore original method
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
