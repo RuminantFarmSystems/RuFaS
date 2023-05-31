@@ -393,8 +393,11 @@ class OutputManager(object):
         path : str
             Path to the directory where the file will be saved.
 
-        keys_file_path : str
-            Path of the input file containing the list of keys.
+        dir_path : str
+            Path of the input file containing the list of keys for inclusion filter.
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
         list_of_input_files = self._load_input_txt_file_names_to_list(dir_path)
