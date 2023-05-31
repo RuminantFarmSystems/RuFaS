@@ -378,11 +378,10 @@ class OutputManager(object):
         """
         inclusion_keys = self._load_txt_file_to_list(keys_file_path)
         filtered_pool = self._filter_variables_pool(inclusion_keys)
-        final_pool = filtered_pool
         if exclude_info_maps:
-            final_pool = self._exclude_info_maps(filtered_pool)
+            filtered_pool = self._exclude_info_maps(filtered_pool)
         file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
-        self._dict_to_file_json(final_pool, file_path)
+        self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
