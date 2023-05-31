@@ -35,13 +35,16 @@ def test_repeat_pattern() -> None:
     assert Event.repeat_pattern([2], 3, 1) == [2, 6]
     assert Event.repeat_pattern([2], 0, 5) == [2, 3, 4, 5, 6, 7]
 
+    assert Event.repeat_pattern([2, 3, 3], 2, 3) == [2, 3, 3, 6, 7, 7, 10, 11, 11, 14, 15, 15]
+    assert Event.repeat_pattern([1, 1], 0, 4) == [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
+    assert Event.repeat_pattern([1, 1, 3], 3, 1) == [1, 1, 3, 7, 7, 9]
+
     assert Event.repeat_pattern([], 0, 0) == []
     assert Event.repeat_pattern([], 3, 7) == []
 
 
 @pytest.mark.parametrize("pattern,skip,repeat,expected", [
-    ([2, 1, 5], 0, 0, "Values in pattern must be strictly ascending., received '[2, 1, 5]'."),
-    ([2, 2, 5], 0, 0, "Values in pattern must be strictly ascending., received '[2, 2, 5]'."),
+    ([2, 1, 5], 0, 0, "Values in pattern cannot be descending, received '[2, 1, 5]'."),
     ([1], -1, 0, "Expected skip to be >= 0, received '-1'."),
     [[1], 0, -1, "Expected repeat to be >= 0, received '-1'."]
 ])

@@ -100,8 +100,8 @@ class Event:
         differences = [skip + 1]
         in_pattern_differences = range(1, len(pattern[1:]) + 1)
         for difference in in_pattern_differences:
-            if pattern[difference] <= pattern[difference - 1]:
-                raise ValueError(f"Values in pattern must be strictly ascending., received '{pattern}'.")
+            if pattern[difference] < pattern[difference - 1]:
+                raise ValueError(f"Values in pattern cannot be descending, received '{pattern}'.")
             differences.append(pattern[difference] - pattern[difference - 1])
 
         full_pattern = deepcopy(pattern)
