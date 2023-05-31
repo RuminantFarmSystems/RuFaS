@@ -58,9 +58,9 @@ class TillageApplication:
 
         Notes
         -----
-        The tillage process starts by removing surface soil attributes from the soil surface and putting it into the top
-        soil layer, then mixing everything in together from the different soil layers. The method also checks that
-        tillage does not go deeper than the bottom of the soil profile.
+        The tillage process starts by removing matter from the soil surface pools and putting it into the top soil
+        layer, then mixing everything in together from the different soil layers. The method also checks that tillage
+        does not go deeper than the bottom of the soil profile.
 
         """
         # TODO: increase functionality and features - issue #538
@@ -123,7 +123,7 @@ class TillageApplication:
         This method executes the actual mixing between the soil layers. Each layer in the soil profile can be either
         fully tilled, partially tilled, or not tilled at all. The method starts by determining how much matter will be
         mixed back into the profile based on the mixing fraction and the amount in the pool of each layer. Then it
-        redistributes mixed stuff back into the tilled layers of the profile. The amount mixed back in to a layer is
+        redistributes mixed matter back into the tilled layers of the profile. The amount mixed back in to a layer is
         determined by the ratio between the depth of tillage in the layer and the total overall tillage depth.
 
         """
@@ -187,7 +187,7 @@ class TillageApplication:
         Notes
         -----
         This method both calculates the amount that is removed from the soil surface and actually removes it from the
-        soil surface, returning that removed amount. The units of the value returned are the same as the units of the
+        soil surface, returning the removed amount. The units of the value returned are the same as the units of the
         pool being removed from.
 
         """
