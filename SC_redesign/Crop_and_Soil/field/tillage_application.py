@@ -59,7 +59,7 @@ class TillageApplication:
 
         Notes
         -----
-        The tillage process starts by removing stuff from the soil surface and putting it into the top soil layer, then
+        The tillage process starts by removing surface soil attributes from the soil surface and putting it into the top soil layer, then
         mixing everything in together from the different soil layers. The method also checks that tillage does not go
         deeper than the bottom of the soil profile.
 
@@ -170,9 +170,9 @@ class TillageApplication:
         Parameters
         ----------
         data_container : object
-            Class instance containing the soil surface pool to be removed from (unitless)
+            Class instance containing the soil surface pool to be removed from 
         attribute_name : str
-            Name of the pool to be removed from (unitless)
+            Name of the pool to be removed from
         incorporation_fraction : float
             Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
 
