@@ -1,6 +1,9 @@
+import pdb
+
 from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
+from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent
 
 
 class CropSchedule:
@@ -78,6 +81,27 @@ class CropSchedule:
         self.pattern_repeat = pattern_repeat
 
         self.heat_scheduled = use_heat_scheduling
+
+    def generate_planting_events(self) -> List[PlantingEvent]:
+        """
+        Generates a list of all planting events that should happen for this crop schedule.
+
+        Returns
+        -------
+        List[PlantingEvent]
+            List of planting events all planting events that will happen for this crop schedule.
+
+        """
+        # pdb.set_trace()
+        all_planting_years = PlantingEvent.project_sequence(self.planting_years, self.pattern_repeat, self.pattern_skip)
+        all_planting_days = self.planting_days * self.pattern_repeat
+        all_planting_dates = list(zip(all_planting_years, all_planting_days))
+
+        planting_events = []
+        for date in all_planting_dates:
+            new_planting_event = PlantingEvent(self.crop_reference, date[0], date[1], self.heat_scheduled)
+            planting_events.append(new_planting_event)
+        return planting_events
 
     @staticmethod
     def _convert_to_list(to_be_converted: Any) -> List:

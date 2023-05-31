@@ -1,4 +1,6 @@
 from typing import List
+from copy import deepcopy
+
 
 from RUFAS.classes import Time
 
@@ -34,6 +36,15 @@ class Event:
         """
         self.year = year
         self.day = day
+
+    def __eq__(self, other):
+        """Overrides the equality operator for Event objects."""
+        correct_type = isinstance(other, Event)
+        equal_fields = other.year == self.year and other.day == self.day
+        return correct_type and equal_fields
+
+    def __str__(self):
+        return "Event on year " + str(self.year) + " and day " + str(self.day) + "."
 
     def occurs_today(self, time: Time) -> bool:
         """returns true if the event should take place today, false otherwise"""
@@ -155,6 +166,57 @@ class Event:
             out_list += [val + (cycle * span) + (cycle * (skip + 1)) for val in pattern_base]
 
         return out_list
+
+    @staticmethod
+    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+        """
+        Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
+        repetitions.
+
+        Parameters
+        ----------
+        pattern : List[int]
+            The pattern to be repeated.
+        skip : int
+            Number of steps to skip between repeats.
+        repeat : int
+            Number of times patter should be repeated.
+
+        Returns
+        -------
+        List[int]
+            The full repeated pattern of numbers.
+
+        Examples
+        --------
+        >>> repeat_pattern([1, 3, 5], 1, 3)
+        [1, 3, 5, 7, 9, 11, 13, 15, 17]
+
+        >>> repeat_pattern([1, 3, 5], 0, 2)
+        [1, 3, 5, 6, 8, 10]
+
+        >>> repeat_pattern([2, 3, 7], 3, 3)
+        [2, 3, 7, 11, 12, 16, 20, 21, 24]
+
+        """
+        if skip < 0:
+            raise ValueError(f"Expected skip to be >= 0, received '{skip}'.")
+        if repeat < 0:
+            raise ValueError(f"Expected repeat to be >= 0, received '{repeat}'.")
+
+        differences = [skip + 1]
+        for i in range(1, len(pattern[1:]) + 1):
+            if pattern[i] <= pattern[i - 1]:
+                raise ValueError(f"Values in pattern must be strictly ascending., received '{pattern}'.")
+            differences.append(pattern[i] - pattern[i - 1])
+
+        out = deepcopy(pattern)
+        j = 0
+        for i in range(repeat * len(pattern)):
+            out.append(out[-1] + differences[j])
+            j += 1
+            j %= len(pattern)
+        return out
 
 
 class PlantingEvent(Event):
