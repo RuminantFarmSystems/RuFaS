@@ -10,8 +10,8 @@ Events are simple classes that will facilitate scheduling of different managemen
 are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur. Children of
 the main `Event` class can extend the functionality by adding additional attributes specific to the type of management
 operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which specific harvest
-method will be used when harvesting a crop. By contrast no `PlantingEvent` class needs to occur, since there are no
-additional specifications required to plant a crop beyond `year` and `day`
+method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is 
+presently growing in a field will be harvested.
 """
 
 
@@ -24,7 +24,7 @@ class Event:
 
         Parameters
         ----------
-        year : int, default=0
+        year : int, default=1
             Year of the simulation on which the event should occur
         day : int, default=120
             (julian) day of the year on which the event should occur
