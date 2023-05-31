@@ -33,6 +33,19 @@ class CropSchedule:
         pattern_repeat : int, default=0
             Number of times the specified crop planting and harvesting pattern should be repeated.
 
+        Raises
+        ------
+        ValueError
+            If the number of planting years is not equal to the number of planting days.
+        ValueError
+            If the number of harvest years, days, and operations are not equal.
+        ValueError
+            If the last harvest operation is not a valid final harvest operation, or if any of the operations before the
+            last are final operations.
+        ValueError
+            If the pattern skip is less than 0.
+        ValueError
+            If the number of pattern repetitions is less than 0.
 
         Notes
         -----
@@ -68,8 +81,8 @@ class CropSchedule:
         others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
         only_last_kills = last_kills and others_dont_kill
         if not only_last_kills:
-            raise ValueError("The final element of harvest_events must specify an operation that will terminate "
-                             "the crop and the non-final harvest_events must not terminate the crop.")
+            raise ValueError(f"Expected the final harvest operation to be the only one that kills the crop, received "
+                             f"'{self.harvest_operations}'.")
 
         if pattern_skip < 0:
             raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
@@ -108,6 +121,11 @@ class CropSchedule:
         -------
         List[HarvestEvent]
             List of harvesting events that will happen for this crop schedule.
+
+        Notes
+        -----
+        If heat scheduled harvesting is used, then only the final harvesting event (i.e. the one that kills it) will be
+        scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
         all_harvesting_years = HarvestEvent.repeat_pattern(self.harvest_years, self.pattern_skip, self.pattern_repeat)
