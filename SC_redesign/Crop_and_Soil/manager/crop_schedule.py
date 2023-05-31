@@ -3,6 +3,11 @@ from typing import List, Any
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent, HarvestEvent
 
+"""
+The `CropSchedule` module allows users to specify a pattern for planting and harvesting a certain crop that can be
+repeated over a specified number of years, with specified breaks in between repetitions of the pattern.
+"""
+
 
 class CropSchedule:
 
