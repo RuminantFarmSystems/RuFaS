@@ -10,7 +10,7 @@ Events are simple classes that will facilitate scheduling of different managemen
 are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur. Children of
 the main `Event` class can extend the functionality by adding additional attributes specific to the type of management
 operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which specific harvest
-method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is 
+method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is
 presently growing in a field will be harvested.
 """
 
