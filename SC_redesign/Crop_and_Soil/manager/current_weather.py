@@ -4,7 +4,6 @@ from typing import Optional
 from RUFAS.classes import Weather
 
 
-# TODO: this object needs to be created from the `Weather` class.
 @dataclass
 class CurrentWeather:
     """class containing the current day's weather, used by the crop class"""  # TODO: useful for entire RUFAS model?
