@@ -862,49 +862,74 @@ def test_filter_variables_pool(
     output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
     """Test case for function _filter_variables_pool in output_manager.py"""
-    mock_output_manager.dummy_keys_list = ['apple', 'orange', 'banana']
+    dummy_inclusion_path = "dummy_inclusion_dir"
+    dummy_exclusion_path = "dummy_exclusion_dir"
 
-    # Test case 1: Empty inclusion_keys
-    inclusion_keys = []
+    # Test case 1: Empty filter_keys
+    filter_keys = []
     expected_result = {}
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result
 
-    # Test case 2: inclusion_keys with existing keys
-    inclusion_keys = ["key1", "key2"]
+    # Test case 2: filter_keys with existing keys
+    filter_keys = ["key1", "key2"]
     mock_output_manager.variables_pool = {
         "key1": "value1",
         "key2": "value2",
         "key3": "value3"
     }
-    expected_result = {
+
+    expected_result_inclusion = {
         "key1": "value1",
         "key2": "value2"
     }
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
 
-    # Test case 3: inclusion_keys with non-existing keys
-    inclusion_keys = ["key1", "key4"]
+    expected_result_exclusion = {
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
+
+    # Test case 3: filter_keys with non-existing keys
+    filter_keys = ["key1", "key4"]
     mock_output_manager.variables_pool = {
         "key1": "value1",
         "key2": "value2",
         "key3": "value3"
     }
-    expected_result = {
+
+    expected_result_inclusion = {
         "key1": "value1"
     }
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
 
-    # Test case 4: inclusion_keys with duplicate keys
-    inclusion_keys = ["key1", "key1"]
+    expected_result_exclusion = {
+        "key2": "value2",
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
+
+    # Test case 4: filter_keys with duplicate keys
+    filter_keys = ["key1", "key1"]
     mock_output_manager.variables_pool = {
         "key1": "value1",
         "key2": "value2",
         "key3": "value3"
     }
-    expected_result = {
+
+    expected_result_inclusion = {
         "key1": "value1"
     }
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
+
+    expected_result_exclusion = {
+        "key2": "value2",
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
 
     # Restore original method and variables_pool
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
