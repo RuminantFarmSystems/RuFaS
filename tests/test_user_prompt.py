@@ -374,7 +374,7 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     ] * len(file_list)
     assert mock_output_manager.save_variables.call_count == len(file_list)
     assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call("output", "input/output_filters/", True)
+        mocker.call("output", ["input/output_inclusion_filters/", "input/output_exclusion_filters/"], True)
     ] * len(file_list)
 
 
