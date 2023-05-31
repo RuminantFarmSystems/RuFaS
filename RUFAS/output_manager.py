@@ -317,18 +317,18 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _load_input_txt_file_names_to_dict(self, dir_paths: List[str]) -> List[str]:
+    def _load_input_txt_file_names_to_dict(self, dir_paths: List[str]) -> Dict[str, List[str]]:
         """ Looks in inputs directory for txt file names.
 
         Parameters
         ----------
-        path : str
-            Path of the input directory to be searched.
+        dir_paths : List[str]
+            List of paths of the inclusion and exclusion filter directories to be searched.
 
         Returns
         -------
-        List
-            A list of input txt file names.
+        Dict
+            A dict of paths to exclusion and exclusion dirs and the appropriate filter txt file names.
 
         """
 
@@ -367,7 +367,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, inclusion_keys: List[str]):
+    def _filter_variables_pool(self, filter_keys: List[str], dir_path: str) -> Dict[str, pool_element_type]:
         """
         Takes the list of keys the user wants in their final data pool,
         filters the variables pool accordingly, and returns the filtered pool.
@@ -384,7 +384,10 @@ class OutputManager(object):
             from the inclusion_keys list remaining.
 
         """
-        return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
+        if "inclusion" in dir_path:
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key in filter_keys}
+        elif "exclusion" in dir_path:
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key not in filter_keys}
 
     def save_variables(self, path: str, dir_paths: List[str],
                        exclude_info_maps: bool = False) -> None:
@@ -398,7 +401,8 @@ class OutputManager(object):
             Path to the directory where the file will be saved.
 
         dir_paths : List[str]
-            Paths of the input file containing the list of keys for inclusion and exclusion filters.
+            Paths of the dirs containing the input files with the
+            lists of keys for inclusion and exclusion filters.
 
         exclude_info_maps : bool
             Flag for whether or not the user wants to inlcude info_maps data in their results files.
@@ -409,7 +413,7 @@ class OutputManager(object):
             for input_file in input_file_list:
                 input_path = dir_path + input_file
                 inclusion_keys = self._load_txt_file_to_list(input_path)
-                filtered_pool = self._filter_variables_pool(inclusion_keys)
+                filtered_pool = self._filter_variables_pool(inclusion_keys, dir_path)
                 final_pool = filtered_pool
                 if exclude_info_maps:
                     final_pool = self._exclude_info_maps(filtered_pool)
