@@ -18,10 +18,10 @@ class OutputGatherer:
             self.om.add_variable("current_residue", field.field_data.current_residue, info_map)
             self.om.add_variable("evaporation", field.field_data.evaporation, info_map)
             self.om.add_variable("transpiration", field.field_data.transpiration, info_map)
-            # not sure ----------------------------
             self.om.add_variable("max_transpiration", field.field_data.max_transpiration, info_map)
             self.om.add_variable("max_evapotranspiration", field.field_data.max_evapotranspiration, info_map)
             self.om.add_variable("days_into_watering_interval", field.field_data.days_into_watering_interval, info_map)
+
             # ----------------------------adding soil data
             self.om.add_variable("water_evaporated", field.soil.data.water_evaporated,
                                  info_map)
@@ -31,13 +31,11 @@ class OutputGatherer:
             self.om.add_variable("available_phosphorus_pool", field.soil.data.available_phosphorus_pool, info_map)
             self.om.add_variable("runoff_phosphorus_pool", field.soil.data.runoff_phosphorus_pool, info_map)
             self.om.add_variable("days_since_application", field.soil.data.days_since_application, info_map)
-            # not sure-------------------
             self.om.add_variable("vadose_zone_layer", field.soil.data.vadose_zone_layer, info_map)
             self.om.add_variable("vadose_active_organic_nitrogen_content",
                                  field.soil.data.vadose_zone_layer.active_organic_nitrogen_content, info_map)
             self.om.add_variable("vadose_stable_organic_nitrogen_content",
                                  field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content, info_map)
-            # ----------------------------
             self.om.add_variable("cover_type",
                                  field.soil.data.cover_type,
                                  info_map)
@@ -59,7 +57,6 @@ class OutputGatherer:
             self.om.add_variable("rain_events_after_fertilizer_application",
                                  field.soil.data.rain_events_after_fertilizer_application,
                                  info_map)
-
             self.om.add_variable("machine_manure_dry_mass",
                                  field.soil.data.machine_manure_dry_mass,
                                  info_map)
@@ -108,13 +105,13 @@ class OutputGatherer:
             self.om.add_variable("grazing_stable_organic_phosphorus",
                                  field.soil.data.grazing_stable_organic_phosphorus,
                                  info_map)
+
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
                 info_map["prefix"] = "field" + field.field_data.name + " layer index " + str(index)
 
                 self.om.add_variable("temperature", layer.temperature, info_map)
                 self.om.add_variable("percolated_water", layer.percolated_water, info_map)
-                # not sure ---------------------------------------
                 # This carbon part is confusing from the start, maybe look back later
                 self.om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage
                                      , info_map)
@@ -182,7 +179,6 @@ class OutputGatherer:
                                      , info_map)
                 self.om.add_variable("total_soil_carbon_amount", layer.total_soil_carbon_amount
                                      , info_map)
-                # --------------------------------------------------------------------
                 self.om.add_variable("mean_phosphorus_sorption_parameter", layer.mean_phosphorus_sorption_parameter
                                      , info_map)
                 self.om.add_variable("labile_inorganic_phosphorus_contentr", layer.labile_inorganic_phosphorus_content
@@ -227,8 +223,6 @@ class OutputGatherer:
                 self.om.add_variable("canopy_height", crop.data.canopy_height, info_map)
                 self.om.add_variable("leaf_area_added", crop.data.leaf_area_added, info_map)
                 self.om.add_variable("optimal_leaf_area_change", crop.data.optimal_leaf_area_change, info_map)
-                # not sure ---------------------------------------
-                # are these totals updated daily? are the "potential" variables needed?
                 self.om.add_variable("potential_nitrogen_uptake", crop.data.potential_nitrogen_uptake, info_map)
                 self.om.add_variable("total_phosphorus_uptake", crop.data.total_phosphorus_uptake, info_map)
                 self.om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
@@ -236,7 +230,6 @@ class OutputGatherer:
                 self.om.add_variable("actual_phosphorus_uptakes", crop.data.actual_phosphorus_uptakes, info_map)
                 self.om.add_variable("actual_nitrogen_uptakes", crop.data.actual_nitrogen_uptakes, info_map)
                 self.om.add_variable("total_nitrogen_uptake", crop.data.total_nitrogen_uptake, info_map)
-                # -------------------------------------------------------
                 self.om.add_variable("cumulative_evaporation", crop.data.cumulative_evaporation, info_map)
                 self.om.add_variable("cumulative_transpiration", crop.data.cumulative_transpiration, info_map)
                 self.om.add_variable("cumulative_evapotranspiration", crop.data.cumulative_evapotranspiration, info_map)
