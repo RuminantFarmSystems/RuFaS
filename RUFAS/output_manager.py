@@ -407,12 +407,6 @@ class OutputManager(object):
     def dump_logs(self, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
@@ -420,12 +414,6 @@ class OutputManager(object):
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
@@ -433,12 +421,6 @@ class OutputManager(object):
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
@@ -520,16 +502,7 @@ class OutputManager(object):
 
     def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        Dumps all pool into the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
+        dumps all pool into the given path to a directory.
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
