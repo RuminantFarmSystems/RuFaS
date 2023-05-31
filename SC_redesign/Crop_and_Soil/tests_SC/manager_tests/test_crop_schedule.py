@@ -2,7 +2,7 @@ import pytest
 from typing import List, Dict, Any
 
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
-from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent
+from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent, HarvestEvent
 
 
 @pytest.mark.parametrize("crop_ref,plant_years,plant_days,harvest_years,harvest_days,harvest_ops,heat_sched,pat_skip,"
@@ -79,6 +79,11 @@ def test_generate_planting_events(years: List[int], days: List[int], heat_schedu
     crop_sched = CropSchedule("test", years, days, [1], [240], ["default"], heat_scheduled, skip, repeat)
     actual = crop_sched.generate_planting_events()
     assert actual == expected
+
+
+@pytest.mark.parametrize("years,days,harvest_ops,heat_scheduled,skip,repeat,expected", [
+    ([1, 2, 6], [245, 245, 240], ["no_kill", "no_kill", "default"], False, )
+])
 
 
 @pytest.mark.parametrize("to_be_converted,expected", [
