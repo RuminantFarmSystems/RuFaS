@@ -798,16 +798,10 @@ def test_load_txt_file_to_list(
     tmpdir
 ) -> None:
     """Test case for function _load_txt_file_to_list in output_manager.py"""
-    content = "apple\nbanana\ncherry"
+    with patch('builtins.open', mock_open(read_data='apples\nbananas\ncherries')):
+        result = mock_output_manager._load_txt_file_to_list('path/to/file.txt')
 
-    file_path = tmpdir.join("test_file.txt")
-
-    with open(str(file_path), "w") as file:
-        file.write(content)
-
-    result = mock_output_manager._load_txt_file_to_list(str(file_path))
-
-    assert result == ["apple", "banana", "cherry"]
+    assert result == ['apples', 'bananas', 'cherries']
 
     # Restore original method
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
