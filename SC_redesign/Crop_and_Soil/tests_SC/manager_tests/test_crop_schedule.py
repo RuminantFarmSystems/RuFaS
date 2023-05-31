@@ -50,7 +50,7 @@ def test_crop_schedule_init(crop_ref: str, plant_years: int | List[int], plant_d
     ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 3, -1, "Expected pattern repeat to be >= 0, received '-1'."),
     ([1], [1], [1] * 3, [1] * 3, ["no_kill", "default", "no_kill"], 0, 0, "Expected the final harvest operation to be "
                                                                           "the only one that kills the crop, received "
-                                                                          f"'['no_kill', 'default', 'no_kill']'.")
+                                                                          "'['no_kill', 'default', 'no_kill']'.")
 ])
 def test_crop_schedule_init_error(plant_years: int | List[int], plant_days: int | List[int],
                                   harvest_years: int | List[int], harvest_days: int | List[int],
