@@ -328,7 +328,7 @@ class OutputManager(object):
         Returns
         -------
         List[str]
-            A list of keys the user has selected to filter the variables pool.
+            A list of strings from a text file where each line of the file becomes a list element.
 
         Raises
         -------
@@ -337,12 +337,12 @@ class OutputManager(object):
 
         """
         try:
-            with open(path) as keys_doc:
-                return keys_doc.read().splitlines()
+            with open(path) as text_file:
+                return text_file.read().splitlines()
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, inclusion_keys: List[str]):
+    def _filter_variables_pool(self, inclusion_keys: List[str]) -> Dict[str, pool_element_type]:
         """
         Takes the list of keys the user wants in their final data pool,
         filters the variables pool accordingly, and returns the filtered pool.
@@ -355,13 +355,13 @@ class OutputManager(object):
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
-            The variables_pool with only the values paired with the keys
-            from the inclusion_keys list remaining.
+            A dictionary with only the values paired with the keys
+            from the inclusion_keys list remaining from the variables_pool.
 
         """
         return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
 
-    def save_variables(self, path: str, keys_file_path: str,
+    def save_variables(self, save_path: str, keys_file_path: str,
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -369,7 +369,7 @@ class OutputManager(object):
 
         Parameters
         ----------
-        path : str
+        save_path : str
             Path to the directory where the file will be saved.
 
         keys_file_path : str
@@ -380,7 +380,7 @@ class OutputManager(object):
         filtered_pool = self._filter_variables_pool(inclusion_keys)
         if exclude_info_maps:
             filtered_pool = self._exclude_info_maps(filtered_pool)
-        file_path = os.path.join(path, self._generate_file_name("saved_variables", "json"))
+        file_path = os.path.join(save_path, self._generate_file_name("saved_variables", "json"))
         self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
