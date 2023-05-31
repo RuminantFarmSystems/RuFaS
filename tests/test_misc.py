@@ -868,14 +868,19 @@ def test_save_variables(
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._load_txt_file_to_list = MagicMock()
+    mock_output_manager._exclude_info_maps = MagicMock()
 
     mock_output_manager.save_variables("dummy_path", "dummy_input_path", False)
 
     mock_output_manager._generate_file_name.assert_called_once_with("saved_variables", "json")
-    mock_output_manager._load_txt_file_to_list.assert_called_once_with()
+    mock_output_manager._load_txt_file_to_list.assert_called_once_with("dummy_input_path")
+    mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
+
+    mock_output_manager.save_variables("dummy_path", "dummy_input_path", True)
+    mock_output_manager._exclude_info_maps.assert_called_once_with({})
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
