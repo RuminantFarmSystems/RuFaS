@@ -334,12 +334,13 @@ class OutputManager(object):
 
         txt_files = {}
         for dir_path in dir_paths:
+            txt_files[dir_path] = []
             for filename in os.listdir(dir_path):
                 if filename.endswith(".txt"):
                     if "inclusion" in dir_path:
-                        txt_files[dir_path] = filename
+                        txt_files[dir_path].append(filename)
                     elif "exclusion" in dir_path:
-                        txt_files[dir_path] = filename
+                        txt_files[dir_path].append(filename)
         return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
@@ -369,13 +370,17 @@ class OutputManager(object):
 
     def _filter_variables_pool(self, filter_keys: List[str], dir_path: str) -> Dict[str, pool_element_type]:
         """
-        Takes the list of keys the user wants in their final data pool,
+        Takes the list of keys the user wants to their final data pool either by inclusion or exclusion,
         filters the variables pool accordingly, and returns the filtered pool.
 
         Parameters
         ----------
-        inclusion_keys : List[str]
+        filter_keys : List[str]
             A list of keys the user has selected to filter the variables pool.
+
+        dir_path : str
+            The path from which the filter_keys list was loaded. Used to indicate whether
+            these are inclusion or exclusion filter keys.
 
         Returns
         -------
