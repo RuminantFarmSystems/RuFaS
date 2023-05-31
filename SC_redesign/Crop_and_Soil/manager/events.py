@@ -43,37 +43,10 @@ class Event:
         equal_fields = other.year == self.year and other.day == self.day
         return correct_type and equal_fields
 
-    def __str__(self):
-        return "Event on year " + str(self.year) + " and day " + str(self.day) + "."
-
     def occurs_today(self, time: Time) -> bool:
         """returns true if the event should take place today, false otherwise"""
         years_since_start = (time.year - 1)
         return self.year == years_since_start and self.day == time.day
-
-    def project_next(self, years: int = 1, days: int = 0):  # Pycharm dislikes the return type hint
-        """creates the next Event in the sequence, projected forward by `years` and `days`
-
-        Parameters
-        ----------
-        years : int
-            the number of years to add to this instance's `year` attribute
-        days : int
-            the number of days to add to this instance's `day` attribute
-
-        Returns
-        -------
-        next : Event
-            the next Event, with days and years incremented as appropriate
-
-        Raises
-        ------
-        Exception
-            if days > 366
-        """
-        if days > 366:
-            raise Exception("days must not be greater than total number of days in a year")
-        return Event(self.year + years, self.day + days)
 
     @staticmethod
     def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
@@ -161,10 +134,6 @@ class HarvestEvent(Event):
         operation : str, default="default"
             the name of an accepted harvest operation (see HarvestOperation)
 
-        Returns
-        -------
-        harvest_event : HarvestEvent
-            a HarvestEvent instance
         """
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
