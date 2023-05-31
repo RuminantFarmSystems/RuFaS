@@ -44,9 +44,21 @@ class Event:
         return correct_type and equal_fields
 
     def occurs_today(self, time: Time) -> bool:
-        """returns true if the event should take place today, false otherwise"""
-        years_since_start = (time.year - 1)
-        return self.year == years_since_start and self.day == time.day
+        """
+        Checks if the event occurs on the current day.
+
+        Parameters
+        ----------
+        time : Time
+            Time object that contains the current day.
+
+        Returns
+        -------
+        bool
+            True if event occurs on the current day, false if not.
+
+        """
+        return self.year == time.year and self.day == time.day
 
     @staticmethod
     def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
@@ -86,8 +98,8 @@ class Event:
             raise ValueError(f"Expected repeat to be >= 0, received '{repeat}'.")
 
         differences = [skip + 1]
-        number_of_differences = range(1, len(pattern[1:]) + 1)
-        for difference in number_of_differences:
+        in_pattern_differences = range(1, len(pattern[1:]) + 1)
+        for difference in in_pattern_differences:
             if pattern[difference] <= pattern[difference - 1]:
                 raise ValueError(f"Values in pattern must be strictly ascending., received '{pattern}'.")
             differences.append(pattern[difference] - pattern[difference - 1])
