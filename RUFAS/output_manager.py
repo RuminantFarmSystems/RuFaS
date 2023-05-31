@@ -317,7 +317,7 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _load_input_txt_file_names_to_list(self, dir_path: str) -> List[str]:
+    def _load_input_txt_file_names_to_dict(self, dir_paths: List[str]) -> List[str]:
         """ Looks in inputs directory for txt file names.
 
         Parameters
@@ -332,10 +332,14 @@ class OutputManager(object):
 
         """
 
-        txt_files = []
-        for filename in os.listdir(dir_path):
-            if filename.endswith(".txt"):
-                txt_files.append(filename)
+        txt_files = {}
+        for dir_path in dir_paths:
+            for filename in os.listdir(dir_path):
+                if filename.endswith(".txt"):
+                    if "inclusion" in dir_path:
+                        txt_files["inclusion_filters"] = filename
+                    elif "exclusion" in dir_path:
+                        txt_files["exclusion_filters"] = filename
         return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
@@ -397,7 +401,7 @@ class OutputManager(object):
             Path of the input file containing the list of keys.
 
         """
-        list_of_input_files = self._load_input_txt_file_names_to_list(dir_path)
+        list_of_input_files = self._load_input_txt_file_names_to_dict(dir_path)
         for input_file in list_of_input_files:
             input_path = dir_path + input_file
             inclusion_keys = self._load_txt_file_to_list(input_path)
