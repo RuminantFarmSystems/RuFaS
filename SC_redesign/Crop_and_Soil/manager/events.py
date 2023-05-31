@@ -10,8 +10,8 @@ Events are simple classes that will facilitate scheduling of different managemen
 are simply pairs of attributes (`year` and `day`), indicating when particular operations should occur. Children of
 the main `Event` class can extend the functionality by adding additional attributes specific to the type of management
 operation. For example, the `HarvestEvent` contains the `operation` attribute, which specifies which specific harvest
-method will be used when harvesting a crop. By contrast no `PlantingEvent` class needs to occur, since there are no
-additional specifications required to plant a crop beyond `year` and `day`
+method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which crop that is
+presently growing in a field will be harvested.
 """
 
 
@@ -24,7 +24,7 @@ class Event:
 
         Parameters
         ----------
-        year : int, default=0
+        year : int, default=1
             Year of the simulation on which the event should occur
         day : int, default=120
             (julian) day of the year on which the event should occur
@@ -44,9 +44,21 @@ class Event:
         return correct_type and equal_fields
 
     def occurs_today(self, time: Time) -> bool:
-        """returns true if the event should take place today, false otherwise"""
-        years_since_start = (time.year - 1)
-        return self.year == years_since_start and self.day == time.day
+        """
+        Checks if the event occurs on the current day.
+
+        Parameters
+        ----------
+        time : Time
+            Time object that contains the current day.
+
+        Returns
+        -------
+        bool
+            True if event occurs on the current day, false if not.
+
+        """
+        return self.year == time.year and self.day == time.day
 
     @staticmethod
     def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
@@ -68,15 +80,24 @@ class Event:
         List[int]
             The full repeated pattern of numbers.
 
+        Raises
+        ------
+        ValueError
+            If the skip is less than 0.
+        ValueError
+            If the number of times to repeat is less than 0.
+        ValueError
+            If the values in the pattern descend.
+
         Examples
         --------
-        >>> repeat_pattern([1, 3, 5], 1, 3)
+        >>> repeat_pattern([1, 3, 5], 1, 2)
         [1, 3, 5, 7, 9, 11, 13, 15, 17]
 
-        >>> repeat_pattern([1, 3, 5], 0, 2)
+        >>> repeat_pattern([1, 3, 5], 0, 1)
         [1, 3, 5, 6, 8, 10]
 
-        >>> repeat_pattern([2, 3, 7], 3, 3)
+        >>> repeat_pattern([2, 3, 7], 3, 2)
         [2, 3, 7, 11, 12, 16, 20, 21, 24]
 
         """
@@ -86,10 +107,10 @@ class Event:
             raise ValueError(f"Expected repeat to be >= 0, received '{repeat}'.")
 
         differences = [skip + 1]
-        number_of_differences = range(1, len(pattern[1:]) + 1)
-        for difference in number_of_differences:
-            if pattern[difference] <= pattern[difference - 1]:
-                raise ValueError(f"Values in pattern must be strictly ascending., received '{pattern}'.")
+        in_pattern_differences = range(1, len(pattern[1:]) + 1)
+        for difference in in_pattern_differences:
+            if pattern[difference] < pattern[difference - 1]:
+                raise ValueError(f"Values in pattern cannot be descending, received '{pattern}'.")
             differences.append(pattern[difference] - pattern[difference - 1])
 
         full_pattern = deepcopy(pattern)
