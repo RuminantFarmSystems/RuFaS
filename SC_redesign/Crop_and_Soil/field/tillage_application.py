@@ -10,8 +10,7 @@ documentation section 6:1.6 and the SurPhos plow.f file.
 Notes
 -----
 This module was written to be as flexible as possible, because every attribute on the soil surface and in the soil
-profile gets incorporated and/or mixed with the same logic. That is why the term "stuff" is used in the docstrings to
-describe the pools/attributes that are effected by tillage.
+profile gets incorporated and/or mixed with the same logic.
 """
 
 
@@ -49,9 +48,9 @@ class TillageApplication:
         tillage_depth : float
             The lowest depth the tilling implement reaches (mm)
         incorporation_fraction : float
-            Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
+            Fraction of soil surface pool incorporated into the soil profile (unitless)
         mixing_fraction : float
-            Fraction of stuff mixed and redistributed from each layer in the soil profile (unitless)
+            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
 
         References
         ----------
@@ -59,9 +58,9 @@ class TillageApplication:
 
         Notes
         -----
-        The tillage process starts by removing surface soil attributes from the soil surface and putting it into the top soil layer, then
-        mixing everything in together from the different soil layers. The method also checks that tillage does not go
-        deeper than the bottom of the soil profile.
+        The tillage process starts by removing surface soil attributes from the soil surface and putting it into the top
+        soil layer, then mixing everything in together from the different soil layers. The method also checks that
+        tillage does not go deeper than the bottom of the soil profile.
 
         """
         # TODO: increase functionality and features - issue #538
@@ -104,7 +103,7 @@ class TillageApplication:
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
-        Redistributes stuff from the specified pool through the soil profile.
+        Redistributes matter from the specified pool throughout the soil profile.
 
         Parameters
         ----------
@@ -113,7 +112,7 @@ class TillageApplication:
         tillage_depth : float
             The lowest depth the tilling implement reaches (mm)
         mixing_fraction : float
-            Fraction of stuff mixed and redistributed from each layer in the soil profile (unitless)
+            Fraction taken from each layer that is mixed and redistributed back into the soil profile (unitless)
 
         References
         ----------
@@ -122,10 +121,10 @@ class TillageApplication:
         Notes
         -----
         This method executes the actual mixing between the soil layers. Each layer in the soil profile can be either
-        fully tilled, partially tilled, or not tilled at all. The method starts by determining how much total stuff will
-        be mixed in the profile based on the mixing fraction and how much stuff is in the pool of each layer. Then it
-        redistributes mixed stuff back into the tilled layers of the profile. The amount of stuff mixed back in to a
-        layer is determined by the ratio between the depth of tillage in the layer and the total overall tillage depth.
+        fully tilled, partially tilled, or not tilled at all. The method starts by determining how much matter will be
+        mixed back into the profile based on the mixing fraction and the amount in the pool of each layer. Then it
+        redistributes mixed stuff back into the tilled layers of the profile. The amount mixed back in to a layer is
+        determined by the ratio between the depth of tillage in the layer and the total overall tillage depth.
 
         """
         redistribution_fractions = []
@@ -165,21 +164,21 @@ class TillageApplication:
     def _remove_amount_incorporated(data_container: object, attribute_name: str,
                                     incorporation_fraction: float) -> float:
         """
-        Calculates amount of stuff incorporated from the soil surface into the soil profile.
+        Calculates amount incorporated from soil surface pools into the soil profile.
 
         Parameters
         ----------
         data_container : object
-            Class instance containing the soil surface pool to be removed from 
+            Class instance containing the soil surface pool to be removed from.
         attribute_name : str
-            Name of the pool to be removed from
+            Name of the pool to be removed from.
         incorporation_fraction : float
             Fraction of stuff incorporated into the soil profile from the soil surface (unitless)
 
         Returns
         -------
         float
-            Amount of stuff removed from soil surface and added to the top soil layer (units vary)
+            Amount removed from soil surface and added to the top soil layer (units vary)
 
         References
         ----------
