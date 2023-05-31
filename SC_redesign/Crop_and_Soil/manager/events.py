@@ -80,15 +80,24 @@ class Event:
         List[int]
             The full repeated pattern of numbers.
 
+        Raises
+        ------
+        ValueError
+            If the skip is less than 0.
+        ValueError
+            If the number of times to repeat is less than 0.
+        ValueError
+            If the values in the pattern descend.
+
         Examples
         --------
-        >>> repeat_pattern([1, 3, 5], 1, 3)
+        >>> repeat_pattern([1, 3, 5], 1, 2)
         [1, 3, 5, 7, 9, 11, 13, 15, 17]
 
-        >>> repeat_pattern([1, 3, 5], 0, 2)
+        >>> repeat_pattern([1, 3, 5], 0, 1)
         [1, 3, 5, 6, 8, 10]
 
-        >>> repeat_pattern([2, 3, 7], 3, 3)
+        >>> repeat_pattern([2, 3, 7], 3, 2)
         [2, 3, 7, 11, 12, 16, 20, 21, 24]
 
         """
