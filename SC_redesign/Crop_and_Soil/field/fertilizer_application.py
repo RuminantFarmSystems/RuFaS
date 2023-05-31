@@ -15,7 +15,7 @@ class FertilizerApplication:
         Parameters
         ----------
         field_size : float, optional
-            Used to initialize a Soil object for this module to work with, if a pre-configured SoilData object is not
+           Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured SoilData object is not
             provided (ha)
 
         """
