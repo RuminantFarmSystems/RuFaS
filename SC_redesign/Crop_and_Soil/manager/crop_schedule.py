@@ -1,5 +1,3 @@
-import pdb
-
 from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
@@ -92,9 +90,8 @@ class CropSchedule:
             List of planting events all planting events that will happen for this crop schedule.
 
         """
-        # pdb.set_trace()
-        all_planting_years = PlantingEvent.project_sequence(self.planting_years, self.pattern_repeat, self.pattern_skip)
-        all_planting_days = self.planting_days * self.pattern_repeat
+        all_planting_years = PlantingEvent.repeat_pattern(self.planting_years, self.pattern_skip, self.pattern_repeat)
+        all_planting_days = self.planting_days * (self.pattern_repeat + 1)
         all_planting_dates = list(zip(all_planting_years, all_planting_days))
 
         planting_events = []
