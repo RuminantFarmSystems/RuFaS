@@ -327,7 +327,7 @@ class OutputManager(object):
 
         Returns
         -------
-        List
+        List[str]
             A list of keys the user has selected to filter the variables pool.
 
         Raises
