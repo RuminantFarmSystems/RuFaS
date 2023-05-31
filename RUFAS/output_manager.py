@@ -386,7 +386,7 @@ class OutputManager(object):
         """
         return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
 
-    def save_variables(self, path: str, dir_path: str,
+    def save_variables(self, path: str, dir_paths: List[str],
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -397,11 +397,11 @@ class OutputManager(object):
         path : str
             Path to the directory where the file will be saved.
 
-        keys_file_path : str
-            Path of the input file containing the list of keys.
+        dir_paths : List[str]
+            Paths of the input file containing the list of keys for inclusion and exclusion filters.
 
         """
-        list_of_input_files = self._load_input_txt_file_names_to_dict(dir_path)
+        list_of_input_files = self._load_input_txt_file_names_to_dict(dir_paths)
         for input_file in list_of_input_files:
             input_path = dir_path + input_file
             inclusion_keys = self._load_txt_file_to_list(input_path)
