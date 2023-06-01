@@ -393,9 +393,11 @@ class OutputManager(object):
 
         """
         if "inclusion" in dir_path:
-            return {key: self.variables_pool[key] for key in filter_keys if key in self.variables_pool.keys()}
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if
+                    any(filter_key.lower() in key.lower() for filter_key in filter_keys)}
         elif "exclusion" in dir_path:
-            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key not in filter_keys}
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
+                    any(filter_key.lower() in key.lower() for filter_key in filter_keys)}
 
     def save_variables(self, save_path: str, dir_paths: List[str],
                        exclude_info_maps: bool = False) -> None:
