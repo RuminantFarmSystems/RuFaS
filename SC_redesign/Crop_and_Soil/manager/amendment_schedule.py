@@ -5,12 +5,15 @@ from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 
 class AmendmentSchedule:
 
-    def __init__(self, years: int | List[int], days: int | List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(self, name: str, years: int | List[int], days: int | List[int], pattern_skip: int = 0,
+                 pattern_repeat: int = 0):
         """
         Initializes a base soil amendment schedule.
 
         Parameters
         ----------
+        name : str
+            Name of this amendment schedule.
         years : int | List[int]
             Year(s) in which amendment will happen.
         days : int | List[int]
@@ -21,6 +24,7 @@ class AmendmentSchedule:
             Number of times the specified amendment schedule should be repeated.
 
         """
+        self.name = name
         self.years = CropSchedule.convert_to_list(years)
         self.days = CropSchedule.convert_to_list(days)
 
@@ -42,4 +46,54 @@ class AmendmentSchedule:
 
 class TillageSchedule(AmendmentSchedule):
 
-    def __init__(self, years: int | List[int], days: int | List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(self, name: str, years: int | List[int], days: int | List[int], tillage_depths: float | List[float],
+                 incorporation_fractions: float | List[float], mixing_fractions: float | List[float],
+                 pattern_skip: int = 0, pattern_repeat: int = 0):
+        """
+        Initializes a schedule for tilling.
+
+        Parameters
+        ----------
+        name : str
+            Name of this amendment schedule.
+        years : int | List[int]
+            Year(s) in which amendment will happen.
+        days : int | List[int]
+            Day(s) on which amendment will happen.
+        pattern_skip : int, default=0
+            Number of years to skip between amendment schedule repetitions.
+        pattern_repeat : int, default=0
+            Number of times the specified amendment schedule should be repeated.
+        tillage_depths : float | List[float]
+            The lowest depth(s) the tilling implement reaches (mm)
+        incorporation_fractions : List[float]
+            Fraction(s) of soil surface pool incorporated into the soil profile (unitless)
+        mixing_fractions : List[float]
+            Fraction(s) of pool in each layer mixed and redistributed back into the soil profile (unitless)
+        pattern_skip : int, default=0
+            Number of years to skip between amendment schedule repetitions.
+        pattern_repeat : int, default=0
+            Number of times the specified amendment schedule should be repeated.
+
+        """
+        super().__init__(name=name, years=years, days=days, pattern_skip=pattern_skip, pattern_repeat=pattern_repeat)
+
+        self.tillage_depths = CropSchedule.convert_to_list(tillage_depths)
+        self.incorporation_fractions = CropSchedule.convert_to_list(incorporation_fractions)
+        self.mixing_fractions = CropSchedule.convert_to_list(mixing_fractions)
+
+        if len(self.tillage_depths) == 1:
+            self.tillage_depths *= len(self.years)
+
+        if len(self.incorporation_fractions) == 1:
+            self.incorporation_fractions *= len(self.years)
+
+        if len(self.mixing_fractions) == 1:
+            self.mixing_fractions *= len(self.years)
+
+        equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.tillage_depths) \
+            == len(self.mixing_fractions)
+        if not equal_tillage_parameters:
+            raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
+        
+
