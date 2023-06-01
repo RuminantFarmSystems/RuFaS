@@ -29,10 +29,10 @@ class AmendmentSchedule:
         self.days = CropSchedule.convert_to_list(days)
 
         if len(self.days) == 1:
-            self.days *= days
+            self.days *= len(self.years)
 
         if len(self.days) != len(self.years):
-            raise ValueError("Number of days that event occurs on must be 1 or equal to the number of years the event"
+            raise ValueError("Number of days that event occurs on must be 1 or equal to the number of years the event "
                              "occurs on.")
 
         if pattern_skip < 0:
@@ -95,5 +95,5 @@ class TillageSchedule(AmendmentSchedule):
             == len(self.mixing_fractions)
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
-        
+
 
