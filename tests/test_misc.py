@@ -834,6 +834,9 @@ def test_load_input_txt_file_names_to_list(
     assert "file2.txt" in txt_files
     assert "file3.csv" not in txt_files
 
+    with pytest.raises(IsADirectoryError):
+        mock_output_manager._load_input_txt_file_names_to_list("nonexistent_directory")
+
     # Restore original method
     mock_output_manager._load_input_txt_file_names_to_list = output_manager_original_method_states[
         "_load_input_txt_file_names_to_list"
