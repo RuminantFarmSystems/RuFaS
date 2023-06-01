@@ -203,7 +203,7 @@ class OutputGatherer:
                                      , info_map)
 
             for crop in field.crops:
-                info_map["prefix"] = "field" + field.field_data.name + " crop" + crop.data.name
+                info_map["prefix"] = "field" + field.field_data.name + " crop " + crop.data.name
                 self.om.add_variable("root_depth", crop.data.root_depth, info_map)
                 self.om.add_variable("biomass", crop.data.biomass, info_map)
                 self.om.add_variable("usable_light", crop.data.usable_light, info_map)
