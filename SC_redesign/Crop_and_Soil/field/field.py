@@ -5,6 +5,7 @@ from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from typing import Optional, List, Dict
+from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
 # TODO: delete/replace the note block below once satisfied with the design
@@ -59,22 +60,9 @@ class Field:
         if self.field_data.is_tillage_day:
             self.till_soil()
 
-        # daily soil routine
-
-        # determine total amount of residue and above-ground biomass present on the given day
-        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
-
-        # TODO: track snow cover on soil surface somewhere - Issue #317
-        self.soil.daily_soil_routine(current_weather.incoming_light, current_weather.mean_air_temperature,
-                                     current_weather.min_air_temperature, current_weather.max_air_temperature,
-                                     total_plant_cover, current_weather.snow_fall,
-                                     current_weather.annual_mean_air_temperature)
-
-        # TODO: track snow cover on soil surface somewhere - Issue #317
-
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self.cycle_water(current_weather)
+        self._execute_daily_processes(current_weather)
         # ... Other ...
 
         # --- Crop Management ---
@@ -348,30 +336,71 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def cycle_water(self, current_weather: CurrentWeather):
+    def _execute_daily_processes(self, current_weather: CurrentWeather) -> None:
+        """Executes all daily updates on this field's soil and crop objects.
+
+        Parameters
+        ----------
+        current_weather : CurrentWeather
+            Object containing the environment conditions on this day.
+
+        Notes
+        -----
+        This method is designed to make it easier to change the order of process execution, which is desirable because
+        it will allow subject-matter experts to more easily experiment with different orders.
+
+        """
+        # TODO: implement snow addition, melting, and sublimation - issue #317
+        snow_cover = 0
+        total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
+        self.soil.soil_temp.daily_soil_temperature_update(current_weather.incoming_light,
+                                                          current_weather.mean_air_temperature,
+                                                          current_weather.min_air_temperature,
+                                                          current_weather.max_air_temperature,
+                                                          total_plant_cover,
+                                                          snow_cover,
+                                                          current_weather.annual_mean_air_temperature)
+
+        self._cycle_water(current_weather)
+
+        for crop in self.crops:
+            if not crop.data.in_growing_season:
+                continue
+
+            crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,
+                                              current_weather.max_air_temperature)
+            crop.root_development.develop_roots()
+            crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
+            crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
+            crop.growth_constraints.constrain_growth(crop.data.max_transpiration, current_weather.mean_air_temperature)
+            crop.leaf_area_index.grow_canopy()
+            crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
+
+    def _cycle_water(self, current_weather: CurrentWeather):
         """allow the water to cycle through the field.
 
         Args:
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
-        Details: Water cycling is intimately linked to both soil and crops and, as such, is a property of the
-            whole-field. Therefore, it makes most sense for this process to take place within the field class rather
-            than in both the crop and soil classes. This method coordinates the evapotranspiration from the field on any
-            given day, by first calculating the evapotranspirative demand, the removing water from the elements in the
-            field in the order listed below. The removal of water does not stop until either all elements have had water
-            removed from them or the evapotranspirative demand has been satisfied. Order of elements evapotranspirated
-            from:
+        Details: This method executes all water-related processes that occur within Crop and Soil objects. Having a
+            separate method to handle water processes altogether is necessary because processes that effect water in the
+            soil are dependent on processes that effect water in crops and vice versa. The most complex process that is
+            executed in this method is evapotranspiration, which is executed in the following order
                 - Evaporation of water in canopies of crops.
                 - Sublimation of water in snow pack (not implemented in V1)
                 - Evaporation from the soil profile.
                 - Transpiration from crops (amount of water taken up by plants is equal to the amount they transpirate,
                     and this amount depends on the evapotranspirative demand after water has been removed from canopies)
+
+            It should also be noted that while this method is more messy and complex than it could be, this is a
+            conscious design choice that will allow for SME's to more easily and freely experiment with different orders
+            of processes. This is necessary because there is not necessarily one correct order for processes to run in.
+
         """
-        total_precipitation = current_weather.rainfall
+        watering_amount = self._determine_watering_amount(current_weather.rainfall)
+        total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
-        self.soil.infiltration(precipitation_reaching_soil, 1)
-        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
 
         full_evapotranspirative_demand = self._determine_potential_evapotranspiration(
             current_weather.incoming_light, current_weather.max_air_temperature, current_weather.min_air_temperature,
@@ -379,41 +408,50 @@ class Field:
 
         remaining_evapotranspirative_demand = self._evaporate_from_crop_canopies(full_evapotranspirative_demand)
 
+        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field - issue
+        #  #519
+        self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1.0, full_evapotranspirative_demand)
+        self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
+        # TODO: find reasonable values/way to set minimum cover management factor - issue #520
+        self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue)
+        self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
+                                                      self.field_data.field_size, current_weather.mean_air_temperature)
+        self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
+        self.soil.carbon_cycling.cycle_carbon(precipitation_reaching_soil, current_weather.mean_air_temperature,
+                                              self.field_data.field_size)
+
+        weighted_transpiration_total = 0.0
+        weights_sum = 0.0
         for crop in self.crops:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
+            weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
+            weights_sum += crop.data.field_proportion
+        weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
-        total_initial_canopy_free_water = 0
-        should_water_field = False
+        # TODO: Implement snow (melting and sublimation) - issue #317
+        snow_water_content = 0.0
+        above_ground_biomass = self._determine_total_above_ground_biomass()
+
+        soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
+            above_ground_biomass, self.soil.data.plant_surface_residue, snow_water_content,
+            remaining_evapotranspirative_demand, weighted_average_transpiration)
+
+        # TODO: sublimate and adjust soil_evaporation_and_sublimation_amount here - issue #317
+
+        self.soil.evaporation.evaporate(soil_evaporation_and_sublimation_amount)
+        remaining_evapotranspirative_demand -= self.soil.data.water_evaporated
+
+        actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
+
         for crop in self.crops:
-            crop.water_dynamics.cycle_water()  # TODO: tweak this once water method sare more solidified.
-            total_initial_canopy_free_water += crop.data.initial_canopy_free_water
-            crop.water_uptake.uptake_water()
-
-            if not crop.data.is_dormant:
-                should_water_field = True
-
-        total_water_added_to_field = CurrentWeather.rainfall
-        if should_water_field:
-            total_water_added_to_field += self._determine_watering_amount(CurrentWeather.rainfall)
-        else:
-            self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
-            self.field_data.days_into_watering_interval = self.field_data.watering_interval
-
-        # TODO: track snow cover on soil surface somewhere - Issue #317
-        # TODO: figure out how to determine weighting coefficient when there are multiple crops in the field
-        # TODO: figure out how to determine minimum cover management factor when there are multiple crops in the field
-        self.soil.daily_soil_water_routine(rainfall=total_water_added_to_field, weighting_coefficient=1,
-                                           has_seasonal_high_water_table=self.field_data.seasonal_high_water_table,
-                                           solar_radiation=current_weather.incoming_light,
-                                           max_air_temp=current_weather.max_air_temperature,
-                                           min_air_temp=current_weather.min_air_temperature,
-                                           avg_air_temp=current_weather.mean_air_temperature,
-                                           above_ground_biomass=self._determine_total_above_ground_biomass(),
-                                           residue=self.field_data.current_residue,
-                                           snow_water_content=0,
-                                           initial_canopy_free_water=total_initial_canopy_free_water,
-                                           minimum_cover_management_factor=0.2, field_size=self.field_data.field_size)
-        pass
+            if crop.data.in_growing_season:
+                crop.water_uptake.uptake_water(self.soil)
+                crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
+                                                full_evapotranspirative_demand)
+            else:
+                crop.data.cumulative_evaporation = 0.0
+                crop.data.cumulative_transpiration = 0.0
+                crop.data.cumulative_potential_evapotranspiration = 0.0
 
     def _determine_watering_amount(self, rainfall: float) -> float:
         """Manages watering of the field.
@@ -593,6 +631,90 @@ class Field:
 
         """
         return 2.501 - ((2.361 * (10 ** (-3))) * avg_air_temp)
+
+    @staticmethod
+    def _determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass: float, residue: float,
+                                                             snow_water_content: float,
+                                                             potential_evapotranspiration_adjusted: float,
+                                                             transpiration: float) -> float:
+        """Calculate the amount of sublimation and soil evaporation for this day, adjusted for plant use.
+        Parameters
+        ----------
+        above_ground_biomass : float
+            Mass of plant above ground (kg per hectare)
+        residue : float
+            Biomass separated from plant on the ground (kg per hectare)
+        snow_water_content : float
+            Amount of water in the snow pack (mm)
+        potential_evapotranspiration_adjusted : float
+            Potential evapotranspiration adjusted for evaporation of free water in canopy (mm)
+        transpiration : float
+            Maximum transpiration for a given day (mm)
+        Returns
+        -------
+        float
+            Soil evaporation and sublimation, adjusted for plant water use (mm)
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:2.3.7, 9
+        """
+        soil_cover_index = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water_content)
+        max_soil_evaporation_sublimation = potential_evapotranspiration_adjusted * soil_cover_index
+        adjusted_soil_evaporation_sublimation = \
+            (max_soil_evaporation_sublimation * potential_evapotranspiration_adjusted) / \
+            (max_soil_evaporation_sublimation + transpiration)
+        actual_soil_evaporation_sublimation = min(max_soil_evaporation_sublimation,
+                                                  adjusted_soil_evaporation_sublimation)
+        return actual_soil_evaporation_sublimation
+
+    @staticmethod
+    def _determine_soil_cover_index(above_ground_biomass: float, residue: float, snow_water_content: float) -> float:
+        """Calculate the soil cover index.
+        Parameters
+        ----------
+        above_ground_biomass : float
+            Mass of plant above ground (kg per hectare)
+        residue : float
+            Biomass separated from plant on the ground (kg per hectare)
+        snow_water_content : float
+            Amount of water from snow (mm)
+        Returns
+        -------
+        Float
+            Soil cover index (unitless)
+        References
+        ----------
+        SWAT Theoretical documentation eqn. 2:2.3.8
+        """
+        if snow_water_content > 0.5:
+            return 0.5
+        else:
+            return exp((-5.0 * (10 ** (-5))) * (above_ground_biomass + residue))
+
+    # TODO: this method will not be used until sublimation is implemented - issue #317
+    @staticmethod
+    def _determine_maximum_soil_evaporation(soil_evaporation_adj: float, snow_water_content: float) -> float:
+        """Calculates the maximum amount of evaporation from soil in a given day
+        Parameters
+        ----------
+        soil_evaporation_adj : float
+            Maximum soil evaporation adjusted for plant water use on a given day (mm)
+        snow_water_content : float
+            Amount of water in the snow pack on a given day prior to accounting for sublimation (mm)
+        TODO: verify that "amount of water in the snow pack on a given day" (2:2.3.3.1) and "snow water content"
+            (2:2.3.3) mean the same thing - address this with #317
+        Returns
+        -------
+        float
+            Maximum soil water evaporation on a given day (mm)
+        References
+        ----------
+        SWAT Theoretical documentation section 2:2.3.3.1
+        """
+        if soil_evaporation_adj < snow_water_content:
+            return 0.0
+        else:
+            return soil_evaporation_adj - snow_water_content
 
     # </editor-fold>
 
