@@ -851,7 +851,7 @@ def test_load_input_txt_file_names_to_dict(
     assert "file1.txt" not in txt_files[str(exclusion_dir)]
 
     with pytest.raises(IsADirectoryError):
-        mock_output_manager._load_input_txt_file_names_to_list("nonexistent_directory")
+        mock_output_manager._load_input_txt_file_names_to_dict(["nonexistent_directory"])
 
     # Restore original method
     mock_output_manager._load_input_txt_file_names_to_dict = output_manager_original_method_states[

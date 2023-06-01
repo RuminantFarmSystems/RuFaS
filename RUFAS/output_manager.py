@@ -332,11 +332,11 @@ class OutputManager(object):
             A dict of paths to exclusion and exclusion dirs and the appropriate filter txt file names.
 
         """
-        dir_path = Path(dir_path)
-        if not dir_path.is_dir():
-            raise IsADirectoryError("specified path is not a directory")
         txt_files = {}
         for dir_path in dir_paths:
+            dir_path_check = Path(dir_path)
+            if not dir_path_check.is_dir():
+                raise IsADirectoryError("specified path is not a directory")
             txt_files[dir_path] = []
             for filename in os.listdir(dir_path):
                 if filename.endswith(".txt"):
@@ -422,15 +422,14 @@ class OutputManager(object):
                 input_path = dir_path + input_file
                 filter_keys = self._load_txt_file_to_list(input_path)
                 filtered_pool = self._filter_variables_pool(filter_keys, dir_path)
-                final_pool = filtered_pool
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
                 if "inclusion" in dir_path:
-                    file_path = os.path.join(path, self._generate_file_name(f"saved_variables_inclusion_{input_file}",
-                                                                            "json"))
+                    file_path = os.path.join(save_path, self._generate_file_name(
+                        f"saved_variables_inclusion_{input_file}", "json"))
                 if "exclusion" in dir_path:
-                    file_path = os.path.join(path, self._generate_file_name(f"saved_variables_exclusion_{input_file}",
-                                                                            "json"))
+                    file_path = os.path.join(save_path, self._generate_file_name(
+                        f"saved_variables_exclusion_{input_file}", "json"))
                 self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
