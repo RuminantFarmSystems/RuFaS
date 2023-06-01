@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from pathlib import Path
 from typing import Any, Dict, List, Union
 import json
 import os
@@ -331,7 +332,9 @@ class OutputManager(object):
             A dict of paths to exclusion and exclusion dirs and the appropriate filter txt file names.
 
         """
-
+        dir_path = Path(dir_path)
+        if not dir_path.is_dir():
+            raise IsADirectoryError("specified path is not a directory")
         txt_files = {}
         for dir_path in dir_paths:
             txt_files[dir_path] = []
@@ -353,8 +356,8 @@ class OutputManager(object):
 
         Returns
         -------
-        List
-            A list of keys the user has selected to filter the variables pool.
+        List[str]
+            A list of strings from a text file where each line of the file becomes a list element.
 
         Raises
         -------
@@ -363,8 +366,8 @@ class OutputManager(object):
 
         """
         try:
-            with open(path) as keys_doc:
-                return keys_doc.read().splitlines()
+            with open(path) as text_file:
+                return text_file.read().splitlines()
         except Exception as e:
             raise e
 
@@ -385,16 +388,16 @@ class OutputManager(object):
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
-            The variables_pool with only the values paired with the keys
-            from the inclusion_keys list remaining.
+            A dictionary with only the values paired with the keys
+            from the inclusion_keys list remaining from the variables_pool.
 
         """
         if "inclusion" in dir_path:
-            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key in filter_keys}
+            return {key: self.variables_pool[key] for key in filter_keys if key in self.variables_pool.keys()}
         elif "exclusion" in dir_path:
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key not in filter_keys}
 
-    def save_variables(self, path: str, dir_paths: List[str],
+    def save_variables(self, save_path: str, dir_paths: List[str],
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -402,7 +405,7 @@ class OutputManager(object):
 
         Parameters
         ----------
-        path : str
+        save_path : str
             Path to the directory where the file will be saved.
 
         dir_paths : List[str]
@@ -417,18 +420,18 @@ class OutputManager(object):
         for dir_path, input_file_list in dict_of_input_files.items():
             for input_file in input_file_list:
                 input_path = dir_path + input_file
-                inclusion_keys = self._load_txt_file_to_list(input_path)
-                filtered_pool = self._filter_variables_pool(inclusion_keys, dir_path)
+                filter_keys = self._load_txt_file_to_list(input_path)
+                filtered_pool = self._filter_variables_pool(filter_keys, dir_path)
                 final_pool = filtered_pool
                 if exclude_info_maps:
-                    final_pool = self._exclude_info_maps(filtered_pool)
+                    filtered_pool = self._exclude_info_maps(filtered_pool)
                 if "inclusion" in dir_path:
                     file_path = os.path.join(path, self._generate_file_name(f"saved_variables_inclusion_{input_file}",
                                                                             "json"))
                 if "exclusion" in dir_path:
                     file_path = os.path.join(path, self._generate_file_name(f"saved_variables_exclusion_{input_file}",
                                                                             "json"))
-                self._dict_to_file_json(final_pool, file_path)
+                self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
@@ -453,12 +456,6 @@ class OutputManager(object):
     def dump_logs(self, path: str) -> None:
         """
         Dumps logs_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
@@ -466,12 +463,6 @@ class OutputManager(object):
     def dump_warnings(self, path: str) -> None:
         """
         Dumps warnings_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
@@ -479,12 +470,6 @@ class OutputManager(object):
     def dump_errors(self, path: str) -> None:
         """
         Dumps errors_pool into a json file in the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
@@ -566,16 +551,7 @@ class OutputManager(object):
 
     def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        Dumps all pool into the given path to a directory.
-
-        Parameters
-        ----------
-        path : str
-            Path to the directory where the file will be saved.
-
-        exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
-
+        dumps all pool into the given path to a directory.
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
