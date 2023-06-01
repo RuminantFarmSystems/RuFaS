@@ -54,8 +54,7 @@ class CropSchedule:
 
         Notes
         -----
-        If use_heat_scheduling is True, then this is the only variable used to determine whether a crop should be
-        harvested on a given day.
+        If use_heat_scheduling is True, then all non-final harvest events will be ignored.
 
         """
         self.crop_reference = crop_reference
