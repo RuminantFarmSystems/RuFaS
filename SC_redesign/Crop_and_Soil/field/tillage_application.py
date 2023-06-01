@@ -169,7 +169,7 @@ class TillageApplication:
         Parameters
         ----------
         data_container : object
-            Class instance containing the soil surface pool to be removed from.
+            Instance of FieldData or SoilData containing the soil surface pool to be removed from.
         attribute_name : str
             Name of the pool to be removed from.
         incorporation_fraction : float
