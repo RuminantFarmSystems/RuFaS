@@ -34,7 +34,7 @@ class CropSchedule:
         use_heat_scheduling : bool, default=False
             Variable indicating if heat scheduling should be used to determine when crop is harvested.
         pattern_skip : int, default=0
-            Number of days/years to skip between cycles.
+            Number of years to skip between cycles.
         pattern_repeat : int, default=0
             Number of times the specified crop planting and harvesting pattern should be repeated.
 
