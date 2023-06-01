@@ -59,11 +59,11 @@ class CropSchedule:
         """
         self.crop_reference = crop_reference
 
-        self.planting_years = self._convert_to_list(planting_years)
-        self.planting_days = self._convert_to_list(planting_days)
-        self.harvest_years = self._convert_to_list(harvest_years)
-        self.harvest_days = self._convert_to_list(harvest_days)
-        self.harvest_operations = self._convert_to_list(harvest_operations)
+        self.planting_years = self.convert_to_list(planting_years)
+        self.planting_days = self.convert_to_list(planting_days)
+        self.harvest_years = self.convert_to_list(harvest_years)
+        self.harvest_days = self.convert_to_list(harvest_days)
+        self.harvest_operations = self.convert_to_list(harvest_operations)
 
         if len(self.planting_days) == 1:
             self.planting_days *= len(self.planting_years)
@@ -148,7 +148,7 @@ class CropSchedule:
         return harvest_events
 
     @staticmethod
-    def _convert_to_list(to_be_converted: Any) -> List:
+    def convert_to_list(to_be_converted: Any) -> List:
         """
         Converts any arbitrary data into a list that contains that data.
 
