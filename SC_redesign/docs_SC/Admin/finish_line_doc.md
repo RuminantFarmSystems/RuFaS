@@ -75,7 +75,7 @@ nearly identical for both modules.
 #### Scheduling
 Certain types of events, (Crop planting/harvesting, soil amendments) need to be scheduled by the user to occur over the
 run of the simulation.
-- [ ] Finish implementing and testing Crop planting/harvesting scheduler.
+- [x] Finish implementing and testing Crop planting/harvesting scheduler.
 - [ ] Integrate scheduler and execution of events into `Field` methods.
 - [ ] Implement tillage application scheduler and integrate into `Field`.
 - [ ] Implement fertilizer application scheduler and integrate into `Field`.
