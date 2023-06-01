@@ -8,7 +8,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 import os
 from typing import Callable
 from typing import Dict
-from mock import mock_open, patch
+from mock import Mock, mock_open, patch
 
 import pytest
 from mock.mock import MagicMock
@@ -801,6 +801,13 @@ def test_load_txt_file_to_list(
         result = mock_output_manager._load_txt_file_to_list('path/to/file.txt')
 
     assert result == ['apples', 'bananas', 'cherries']
+
+    mock_open_func = Mock()
+    mock_open_func.side_effect = Exception('Error opening file')
+
+    with patch('builtins.open', mock_open_func):
+        with pytest.raises(Exception):
+            mock_output_manager._load_txt_file_to_list('path/to/file.txt')
 
     # Restore original method
     mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
