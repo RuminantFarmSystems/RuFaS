@@ -180,6 +180,11 @@ class TillageApplication:
         float
             Amount removed from soil surface and added to the top soil layer (units vary)
 
+        Raises
+        ------
+        TypeError
+            If the type of the data container is not SoilData or FieldData.
+
         References
         ----------
         SurPhos fortran code, plow.f lines 20 - 32.
@@ -191,6 +196,11 @@ class TillageApplication:
         pool being removed from.
 
         """
+        data_container_is_correct_type = isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
+        if not data_container_is_correct_type:
+            raise TypeError(f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
+                            f"'{type(data_container)}'.")
+
         amount_in_pool = getattr(data_container, attribute_name)
         amount_removed = amount_in_pool * incorporation_fraction
         remaining_amount_in_pool = amount_in_pool - amount_removed

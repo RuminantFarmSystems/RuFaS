@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import MagicMock, call
 from typing import List
 
+from SC_redesign.Crop_and_Soil.field.field import Field
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -23,6 +24,18 @@ def test_remove_amount_incorporated(data: object, attr_name: str, attr_value: fl
 
     assert pytest.approx(actual_removed) == expected_removed
     assert pytest.approx(actual_remaining) == expected_remaining
+
+
+@pytest.mark.parametrize("data,expected", [
+    ([1, 2, 3], "<class 'list'>"),
+    (Field(), "<class 'SC_redesign.Crop_and_Soil.field.field.Field'>")
+])
+def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
+    """Test that errors are handled correctly when removing material from soil surface."""
+    with pytest.raises(TypeError) as e:
+        TillageApplication._remove_amount_incorporated(data, "test", 0.5)
+    assert str(e.value) == f"Expected object containing data to be type 'SoilData' or 'FieldData', received type " \
+                           f"'{expected}'."
 
 
 @pytest.mark.parametrize("layers,field_size,pool_values,pool_name,till_depth,mix_frac,expected", [
