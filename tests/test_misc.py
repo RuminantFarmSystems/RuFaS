@@ -910,11 +910,32 @@ def test_filter_variables_pool(
     assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
     assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
 
-    # Restore original method and variables_pool
+    # Test case 5: filter_keys with different cases than variables_pool
+    filter_keys = ["KeY1", "kEY2"]
+
+    expected_result_inclusion = {
+        "key1": "value1",
+        "key2": "value2"
+    }
+    expected_result_exclusion = {
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
+
+    # Test case 6: filter_keys with partial matches
+    filter_keys = ["y1", "ey2"]
+
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
+    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
+
+    mock_output_manager.flush_pools()
+
+    # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
         "_filter_variables_pool"
     ]
-    mock_output_manager.variables_pool = {}
 
 
 def test_save_variables(
@@ -936,7 +957,7 @@ def test_save_variables(
     mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_inclusion_dummy_input_filepath",
                                                                     "json")
     mock_output_manager._exclude_info_maps.assert_not_called()
-    
+
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
