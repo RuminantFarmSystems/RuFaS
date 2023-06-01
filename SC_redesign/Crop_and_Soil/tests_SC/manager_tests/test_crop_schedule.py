@@ -113,5 +113,5 @@ def test_generate_harvest_events(years: List[int], days: List[int], harvest_ops:
 ])
 def test_convert_to_list(to_be_converted: Any, expected: List):
     """Test that data is correctly converted to be in a list."""
-    actual = CropSchedule._convert_to_list(to_be_converted)
+    actual = CropSchedule.convert_to_list(to_be_converted)
     assert actual == expected
