@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from pathlib import Path
 from typing import Any, Dict, List, Union
 import json
 import os
@@ -331,7 +332,9 @@ class OutputManager(object):
             A list of input txt file names.
 
         """
-
+        dir_path = Path(dir_path)
+        if not dir_path.is_dir():
+            raise IsADirectoryError("specified path is not a directory")
         txt_files = []
         for filename in os.listdir(dir_path):
             if filename.endswith(".txt"):
