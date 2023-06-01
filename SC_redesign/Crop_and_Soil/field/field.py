@@ -4,11 +4,8 @@ from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, Cro
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
-<<<<<<< HEAD
 from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
-=======
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
->>>>>>> SC_redesign
 from typing import Optional, List, Dict
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
