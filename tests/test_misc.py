@@ -794,8 +794,7 @@ def test_exclude_info_maps(
 
 def test_load_txt_file_to_list(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    tmpdir
+    output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
     """Test case for function _load_txt_file_to_list in output_manager.py"""
     with patch('builtins.open', mock_open(read_data='apples\nbananas\ncherries')):
