@@ -96,4 +96,22 @@ class TillageSchedule(AmendmentSchedule):
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
 
+    @staticmethod
+    def _validate_depths(tillage_depths: List[float]) -> bool:
+        """
+        Checks that tillage depths passed are all valid.
 
+        Returns
+        -------
+        bool
+            True if all tillage depths are valid.
+
+        Notes
+        -----
+        Tillage depths must be > 0.
+
+        """
+        for depth in tillage_depths:
+            if depth <= 0.0:
+                return False
+        return True
