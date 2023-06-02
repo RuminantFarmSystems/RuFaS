@@ -85,11 +85,25 @@ class TillageSchedule(AmendmentSchedule):
         if len(self.tillage_depths) == 1:
             self.tillage_depths *= len(self.years)
 
+        valid_depths = self._validate_depths(self.tillage_depths)
+        if not valid_depths:
+            raise ValueError(f"Expected all tillage depths to be > 0.0, received `{self.tillage_depths}`.")
+
         if len(self.incorporation_fractions) == 1:
             self.incorporation_fractions *= len(self.years)
 
+        valid_fractions = self._validate_fractions(self.incorporation_fractions)
+        if not valid_fractions:
+            raise ValueError(f"Expected all incorporation fractions to in range [0.0, 1.0], received "
+                             f"'{self.incorporation_fractions}'.")
+
         if len(self.mixing_fractions) == 1:
             self.mixing_fractions *= len(self.years)
+
+        valid_fractions = self._validate_fractions(self.mixing_fractions)
+        if not valid_fractions:
+            raise ValueError(f"Expected all mixing fractions to be in range [0.0, 1.0], received "
+                             f"'{self.mixing_fractions}'.")
 
         equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.tillage_depths) \
             == len(self.mixing_fractions)
