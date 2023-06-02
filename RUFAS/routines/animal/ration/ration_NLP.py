@@ -11,6 +11,7 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
+from typing import Dict, List
 
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
@@ -502,23 +503,6 @@ def energy_req_limit_constraint(x):
         list.append(x[a + 1] * x[a + 2])
     return -sum(list)
 
-
-def get_ration_vals_null(x):
-    """
-    Deprecated use, possible
-    
-    Function that calculates and retrieves ration values used throughout the
-    ration.
-
-    Args:
-        x: the decision vector of the NLP (should be a completed ration)
-    """
-    #ration vals (subject to adding other ration vals)
-    ME_tot = sum(np.multiply(x, 0.0)) # TODO Import the actual MEact values
-    ration_vals = {'ME_tot': ME_tot}
-    return ration_vals
-
-
 def get_ration_vals(x):
     """
     Function that calculates and retrieves ration values used throughout the
@@ -533,7 +517,25 @@ def get_ration_vals(x):
     return ration_vals
 
 
-def userbounds(ration_percents):
+def userbounds(ration_percents: Dict) -> List:
+    """
+    Calculates user bounds for optimize function
+
+    Uses udrv object to get tolerance, e.g. the +/- percentage allowed around those.
+    Returns a list of each key/value pair three times, but divided by three
+        This return in triplicate is necessary for the scipy.minimize function,
+         which requires the decision vector in this shape
+    
+    Parameters
+    ----------
+    ration_percents: Dict
+        keys are feed IDs, values are percent of DMI
+
+    Returns
+    -------
+    List
+        List of each bound, divided by three and reported in triplicate for scipy.minimize function
+    """
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
