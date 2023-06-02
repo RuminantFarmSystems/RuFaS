@@ -101,10 +101,15 @@ class TillageSchedule(AmendmentSchedule):
         """
         Checks that tillage depths passed are all valid.
 
+        Parameters
+        ----------
+        tillage_depths : List[float]
+            List of tillage depths to be validated.
+
         Returns
         -------
         bool
-            True if all tillage depths are valid.
+            True if all tillage depths are valid, False otherwise.
 
         Notes
         -----
@@ -113,5 +118,31 @@ class TillageSchedule(AmendmentSchedule):
         """
         for depth in tillage_depths:
             if depth <= 0.0:
+                return False
+        return True
+
+    @staticmethod
+    def _validate_fractions(fractions: List[float]) -> bool:
+        """
+        Checks that all fractions passed are valid.
+
+        Parameters
+        ----------
+        fractions : List[float]
+            List of fractions to be valid
+
+        Returns
+        -------
+        bool
+            True if all fractions passed are valid, False otherwise.
+
+        Notes
+        -----
+        A fraction is valid if it is in the range[0.0, 1.0]
+
+        """
+        for fraction in fractions:
+            is_valid = 0.0 <= fraction <= 1.0
+            if not is_valid:
                 return False
         return True

@@ -48,4 +48,16 @@ def test_validate_depths(depths: List[float], expected: bool) -> None:
     assert actual == expected
 
 
+@pytest.mark.parametrize("fracs,expected", [
+    ([0.0, 0.3, 0.99], True),
+    ([0.5, 1.0], True),
+    ([], True),
+    ([-0.01, 0.03], False),
+    ([0.4, 1.1], False)
+])
+def test_validate_fractions(fracs: List[float], expected) -> None:
+    """Tests that all fractions passed are valid."""
+    actual = TillageSchedule._validate_fractions(fracs)
+    assert actual == expected
+
 # @pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,expected_depths")
