@@ -257,6 +257,7 @@ class Pen:
         self.avg_growth = 0.0
 
         self.MEdiet = 0.0
+        self.avg_milk_production_reduction = 0.0
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = AnimalManureExcretions(
@@ -335,7 +336,7 @@ class Pen:
         """
         self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction:float) -> None:
         """
         Sets the pen's average milk and average CP milk
 
@@ -348,6 +349,7 @@ class Pen:
         """
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
+        self.avg_milk_production_reduction = avg_milk_production_reduction
 
     def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """
@@ -476,7 +478,13 @@ class Pen:
         om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
         om.add_variable("MEdiet", self.MEdiet, info_map)
         om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
-
+        om.add_variable(f'avg_rqmts_for pen {self.id}', self.avg_nutrient_rqmts, info_map)
+        if self.animal_combination.name == 'LAC_COW':
+            cow_summary = {'avg_BW_pen': self.avg_BW, 'avg_milk_pen': self.avg_milk,
+                                'avg_milk_production_reduction_pen': self.avg_milk_production_reduction, 'num_animals':len(self.animals_in_pen)}
+            for key in ['DMIest', 'mPrt', 'estimated_daily_milk_produced', 'days_in_milk', 'days_in_preg', 'calves']:
+                cow_summary[key]=[getattr(animal, key) for animal in self.animals_in_pen]
+            om.add_variable(f'cow_summary for pen {self.id}', cow_summary, info_map)
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],

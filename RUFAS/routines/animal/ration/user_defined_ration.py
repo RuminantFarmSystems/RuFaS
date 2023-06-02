@@ -119,13 +119,13 @@ class UserDefinedRationValues(object):
             self.udr_or_not = None
             
 
-def ration_to_use(pen_animal_combo):
+def ration_to_use(pen_animal_combo) -> Dict:
     """
     Function outputs the correct dictionary from the UserDefinedRationValues class
     
     Parameters
     ----------
-    pen_animal_combo
+    pen_animal_combo: Pen.AnimalCombination
 
     Returns
     -------

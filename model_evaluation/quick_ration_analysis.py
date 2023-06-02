@@ -25,19 +25,19 @@ def read_csv(filename):
             csvout.append(line)
     return csvout
 
-def quickprint(ccc, pen_name):
+def quickprint(pen_report, pen_name):
     print('\n ~~~~~~~ summary of ration_report for '+ str(pen_name) + ' ~~~~~~~ \n')
-    print(ccc[0][4:])
+    print(pen_report[0][3:])
     # 
     for i in range(2,90,30):
-        num_animals = ccc[i][2]
+        num_animals = pen_report[i][2]
         print('\n')
         print('num_animals = '+str(num_animals))
-        [float(pos)/float(num_animals) for pos in ccc[i][4:]]
-        print('ration fed = '+ str([float(pos)/float(num_animals) for pos in ccc[i][4:]]))
-        summed = sum([float(pos)/float(num_animals) for pos in ccc[i][4:]])
-        print('total kg of ration = '+str(summed))
-        print('percentage of DMI = '+str([round(float(pos)/float(num_animals)/summed,4) for pos in ccc[i][4:]]))
+        summed = sum([float(pos)/float(num_animals) for pos in pen_report[i][3:]])
+        print('total kg of ration = '+str(round(summed,4)))
+        [float(pos)/float(num_animals) for pos in pen_report[i][3:]]
+        print('ration fed = '+ str([round(float(pos)/float(num_animals),4) for pos in pen_report[i][3:]]))
+        print('percentage of DMI = '+str([round(float(pos)/float(num_animals)/summed,4) for pos in pen_report[i][3:]]))
         print('\n')
 
 pen0 = read_csv(os.path.join(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')), 'output\\CSVs\\pen_report\\pen_0\\ration_report\\ration_report.csv'))

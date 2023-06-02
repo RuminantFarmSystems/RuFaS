@@ -1074,6 +1074,24 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.calc_avg_growth()
 
+    def sum_daily_milk(self, cows) -> float:
+        """
+        sums the daily milk production across all cows
+
+        Parameters
+        ----------
+        cows: List
+            the list of cows in the animal management class
+
+        Returns
+        -------
+        float: The total milk produced in the herd (kg milk/day)
+        """
+        total_milk = 0.0
+        for cow in cows:
+            total_milk += cow.estimated_daily_milk_produced
+        return(total_milk)
+    
     def gather_cow_class_history(self, cow_class):
         """
         Gathers all the pen history data for a given cow class type. Checks the current pen
@@ -1150,11 +1168,18 @@ class AnimalManagement:
                 pen.daily_p_update()
 
     
-    def reset_milk_production_reduction(self):
-        for pen in self.all_pens:
-            for animal in pen.animals_in_pen:
-                animal.milk_production_reduction = 0.0
+    def reset_milk_production_reduction(self) -> None:
+        """
+        Resets reduction value for milk production to 0.0 for all animals in all pens
 
+        The milk_production_reduction attribute is a value generated in ration_driver.py, 
+            in cases where a ration cannot be formulated such that it meets animal requirements
+
+        """
+        for pen in self.all_pens:
+            if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name =='CLOSE_UP':
+                for animal in pen.animals_in_pen:
+                    animal.milk_production_reduction = 0.0
 
     def daily_updates(self, feed, weather, time):
         """
@@ -1720,6 +1745,9 @@ class AnimalManagement:
 
         """
         if self.simulate_animals:
+            if self.end_ration_interval():
+                self.reset_milk_production_reduction() 
+ 
             temp = weather.T_avg[time.year - 1][time.day - 1]
             animals_snapshot_before_update = self._get_animals_snapshot()
 
@@ -1753,8 +1781,15 @@ class AnimalManagement:
             self.record_pen_history()
 
             if self.end_ration_interval():
+                self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
                 self.allocate_animals_to_pens2()
                 self._calc_ration_at_interval(feed)  # per pen
                 self.calc_avg_growth()  # per pen
+                for pen in self.all_pens:
+                    if pen.animal_combination.name == 'LAC_COW':
+                        for animal in pen.animals_in_pen:
+                            animal.update_milk_production_history(self.simulation_day)
+                        
+            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
