@@ -2,6 +2,7 @@ import pytest
 from typing import List
 
 from SC_redesign.Crop_and_Soil.manager.amendment_schedule import AmendmentSchedule, TillageSchedule
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
 
 @pytest.mark.parametrize("name,years,days,skip,repeat,expected_years,expected_days", [
@@ -90,3 +91,30 @@ def test_init_tillage_schedule_error(depths: float | List[float], incorp_fracs: 
     with pytest.raises(ValueError) as e:
         TillageSchedule("test", [1990, 1991], [160], depths, incorp_fracs, mix_fracs, 2, 2)
     assert str(e.value) == expected
+
+
+@pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,years,days,skip,repeat,expected", [
+    ([200, 200, 300], 0.5, [0.45, 0.45, 0.47], [1990, 1990, 1990], [90, 120, 200], 0, 1, [
+        TillageEvent(200, 0.5, 0.45, 1990, 90), TillageEvent(200, 0.5, 0.45, 1990, 120),
+        TillageEvent(200, 0.5, 0.47, 1990, 200), TillageEvent(200, 0.5, 0.45, 1991, 90),
+        TillageEvent(200, 0.5, 0.45, 1991, 120), TillageEvent(200, 0.5, 0.47, 1991, 200)]),
+    (150, 0.3, 0.6, [1993, 1996], 100, 2, 2, [TillageEvent(150, 0.3, 0.6, 1993, 100),
+                                              TillageEvent(150, 0.3, 0.6, 1996, 100),
+                                              TillageEvent(150, 0.3, 0.6, 1999, 100),
+                                              TillageEvent(150, 0.3, 0.6, 2002, 100),
+                                              TillageEvent(150, 0.3, 0.6, 2005, 100),
+                                              TillageEvent(150, 0.3, 0.6, 2008, 100)]),
+    ([150, 45], [0.4], [0.2], [1991, 1992], [120, 135], 3, 2, [TillageEvent(150, 0.4, 0.2, 1991, 120),
+                                                               TillageEvent(45, 0.4, 0.2, 1992, 135),
+                                                               TillageEvent(150, 0.4, 0.2, 1996, 120),
+                                                               TillageEvent(45, 0.4, 0.2, 1997, 135),
+                                                               TillageEvent(150, 0.4, 0.2, 2001, 120),
+                                                               TillageEvent(45, 0.4, 0.2, 2002, 135)])
+])
+def test_generate_tillage_events(depths: float | List[float], incorp_fracs: float | List[float],
+                                 mix_fracs: float | List[float], years: int | List[int], days: int | List[int],
+                                 skip: int, repeat: int, expected: List[TillageEvent]) -> None:
+    """Tests that correct list of TillageEvents are created by TillageSchedule."""
+    till_sched = TillageSchedule("test", years, days, depths, incorp_fracs, mix_fracs, skip, repeat)
+    actual = till_sched.generate_tillage_events()
+    assert actual == expected

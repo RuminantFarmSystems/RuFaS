@@ -107,7 +107,7 @@ class TillageSchedule(AmendmentSchedule):
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
 
-    def generate_tillage_events(self) -> TillageEvent:
+    def generate_tillage_events(self) -> List[TillageEvent]:
         """
         Generates a list of all tillage events that will happen over the full course of this TillageSchedule.
 
@@ -127,7 +127,7 @@ class TillageSchedule(AmendmentSchedule):
 
         tillage_events = []
         for event in all_tillage_events:
-            new_tillage_event = TillageEvent(event[0], event[1], event[2], event[3], event[4], event[5])
+            new_tillage_event = TillageEvent(event[0], event[1], event[2], event[3], event[4])
             tillage_events.append(new_tillage_event)
         return tillage_events
 
