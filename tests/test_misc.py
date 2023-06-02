@@ -897,13 +897,13 @@ def test_save_variables(
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
-    
-    mock_output_manager._load_input_txt_file_names_to_list = MagicMock(return_value=["dummy_input_filepath"])
+    mock_output_manager._load_input_txt_file_names_to_list = MagicMock(return_value=["dummy_input_filepath.txt"])
 
- # test case for when exclude_info_maps flag set to False
-    mock_output_manager.save_variables("dummy_path", "dummy_dir_path", False)
-    mock_output_manager._load_input_txt_file_names_to_list.assert_called_once_with("dummy_dir_path")
-    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath", "json")
+    # test case for when exclude_info_maps flag set to False
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
+    mock_output_manager._load_input_txt_file_names_to_list.assert_called_once_with("dummy_dir_path/")
+    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
@@ -911,10 +911,11 @@ def test_save_variables(
 
     # test case for when exclude_info_maps flag set to True
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
-    mock_output_manager.save_variables("dummy_path", "dummy_dir_path", True)
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
+    mock_output_manager._load_input_txt_file_names_to_list.assert_called_with("dummy_dir_path/")
+    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
+    mock_output_manager._generate_file_name.assert_called_with("saved_variables_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_called_once_with({})
-    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath", "json")
-    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path")
     mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
