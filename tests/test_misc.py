@@ -870,6 +870,7 @@ def test_save_variables(
     mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
 
+    # test case for when exclude_info_maps flag set to False
     mock_output_manager.save_variables("dummy_path", "dummy_input_path", False)
 
     mock_output_manager._generate_file_name.assert_called_once_with("saved_variables", "json")
@@ -879,6 +880,7 @@ def test_save_variables(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
 
+    # test case for when exclude_info_maps flag set to True
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager.save_variables("dummy_path", "dummy_input_path", True)
     mock_output_manager._exclude_info_maps.assert_called_once_with({})

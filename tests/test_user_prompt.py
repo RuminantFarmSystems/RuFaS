@@ -374,7 +374,7 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     ] * len(file_list)
     assert mock_output_manager.save_variables.call_count == len(file_list)
     assert mock_output_manager.save_variables.call_args_list == [
-        mocker.call("output", "input/list_of_keys.txt", True)
+        mocker.call("output", "input/example_list_of_keys.txt", True)
     ] * len(file_list)
 
 
