@@ -15,7 +15,7 @@ from RUFAS.classes import Time
 def test_occurs_today(year: int, day: int, current_year: int, current_day: int, expected: bool) -> None:
     """Tests that Event objects can correctly determine whether they run on a given day."""
     mocked_time = MagicMock(Time)
-    setattr(mocked_time, "year", current_year)
+    setattr(mocked_time, "calendar_year", current_year)
     setattr(mocked_time, "day", current_day)
     event = Event(year, day)
 
