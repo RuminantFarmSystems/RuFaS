@@ -58,7 +58,7 @@ class Event:
             True if event occurs on the current day, false if not.
 
         """
-        return self.year == time.year and self.day == time.day
+        return self.year == time.calendar_year and self.day == time.day
 
     @staticmethod
     def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
