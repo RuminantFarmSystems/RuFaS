@@ -14,6 +14,16 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
 
+# Methane Mitigation Methods 
+def methane_mitigation(methane_mitigation_method: str) -> float:  
+    if methane_mitigation_method == "3-NOP":
+
+    elif methane_mitigation_method == "Monensin": 
+
+    elif methane_mitigation_method == "Essential Oils":
+
+    elif methane_mitigation_method == "Seaweed":
+        
 
 def manure_calculations(ration_formulation,
                         feed,
@@ -187,6 +197,7 @@ def manure_calculations(ration_formulation,
         methane_emission = 0.065 * gross_energy_concentration * \
             dry_matter_intake / 0.05565  # [A.3B.C.3]
 
+    # Methane Mitigation  
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,
