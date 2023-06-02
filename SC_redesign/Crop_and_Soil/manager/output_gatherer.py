@@ -225,6 +225,57 @@ class OutputGatherer:
                 self.om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)
                 self.om.add_variable("residue_phosphorus", crop.data.residue_phosphorus, info_map)
 
-    def send_annual_variables(self):
+    def send_annual_variables(self, filter_specs: Optional[List] = None) -> None:
         """sends annual variables to the output manager"""
+        info_map = {"class": self.__class__.__name__, "function": self.send_annual_variables.__name__}
+        # adding field variable
+        for field in self.fields:
+            # Adding field data
+            info_map["prefix"] = "field" + field.field_data.name
+            self.om.add_variable("annual_irrigation_water_use_total", field.field_data.current_residue, info_map)
+
+            # Adding soil data
+            self.om.add_variable("annual_soil_evaporation_total", field.soil.data.annual_soil_evaporation_total,
+                                 info_map)
+            self.om.add_variable("annual_eroded_sediment_total", field.soil.data.annual_eroded_sediment_total,
+                                 info_map)
+            self.om.add_variable("annual_surface_runoff_total", field.soil.data.annual_surface_runoff_total,
+                                 info_map)
+            self.om.add_variable("annual_runoff_fertilizer_phosphorus",
+                                 field.soil.data.annual_runoff_fertilizer_phosphorus,
+                                 info_map)
+            self.om.add_variable("annual_runoff_machine_manure_inorganic_phosphorus",
+                                 field.soil.data.annual_runoff_machine_manure_inorganic_phosphorus,
+                                 info_map)
+            self.om.add_variable("annual_runoff_machine_manure_organic_phosphorus",
+                                 field.soil.data.annual_runoff_machine_manure_organic_phosphorus,
+                                 info_map)
+            self.om.add_variable("annual_runoff_grazing_manure_inorganic_phosphorus",
+                                 field.soil.data.annual_runoff_grazing_manure_inorganic_phosphorus,
+                                 info_map)
+            self.om.add_variable("annual_runoff_grazing_manure_organic_phosphorus",
+                                 field.soil.data.annual_runoff_grazing_manure_organic_phosphorus,
+                                 info_map)
+            self.om.add_variable("annual_soil_phosphorus_runoff",
+                                 field.soil.data.annual_soil_phosphorus_runoff,
+                                 info_map)
+            self.om.add_variable("annual_runoff_nitrates_total",
+                                 field.soil.data.annual_runoff_nitrates_total,
+                                 info_map)
+            self.om.add_variable("annual_runoff_ammonium_total",
+                                 field.soil.data.annual_runoff_ammonium_total,
+                                 info_map)
+            self.om.add_variable("annual_eroded_fresh_organic_nitrogen_total",
+                                 field.soil.data.annual_eroded_fresh_organic_nitrogen_total,
+                                 info_map)
+            self.om.add_variable("annual_eroded_stable_organic_nitrogen_total",
+                                 field.soil.data.annual_eroded_stable_organic_nitrogen_total,
+                                 info_map)
+            self.om.add_variable("annual_eroded_active_organic_nitrogen_total",
+                                 field.soil.data.annual_eroded_active_organic_nitrogen_total,
+                                 info_map)
+
+
+
+
         pass
