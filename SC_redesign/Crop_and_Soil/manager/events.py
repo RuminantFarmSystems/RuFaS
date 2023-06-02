@@ -45,17 +45,17 @@ class Event:
 
     def occurs_today(self, time: Time) -> bool:
         """
-        Checks if the event occurs on the current day.
+        Checks if the event occurs on the current day in the current year..
 
         Parameters
         ----------
         time : Time
-            Time object that contains the current day.
+            Time object that contains the current day and year.
 
         Returns
         -------
         bool
-            True if event occurs on the current day, false if not.
+            True if event occurs on the current day and year, false if not.
 
         """
         return self.year == time.calendar_year and self.day == time.day
