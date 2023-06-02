@@ -8,7 +8,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 import os
 from typing import Callable
 from typing import Dict
-from mock import Mock, mock_open, patch
+from mock import Mock, call, mock_open, patch
 
 import pytest
 from mock.mock import MagicMock
@@ -948,22 +948,52 @@ def test_save_variables(
     mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
 
+    # test case for when there are no filter keys txt files in output_inclusion_filters directory:
     mock_output_manager._load_input_txt_file_names_to_dict = MagicMock(return_value={"inclusion":
-                                                                                     ["dummy_input_filepath"]})
-
-    mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1", "dummy_dir_path_2"], False)
-    mock_output_manager._load_input_txt_file_names_to_dict.assert_called_once_with(["dummy_dir_path_1",
-                                                                                    "dummy_dir_path_2"])
-    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_inclusion_dummy_input_filepath",
-                                                                    "json")
+                                                                                     [],
+                                                                                     "exclusion":
+                                                                                     []})
+    mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1/", "dummy_dir_path_2/"], True)
+    mock_output_manager._load_input_txt_file_names_to_dict.assert_called_once_with(["dummy_dir_path_1/",
+                                                                                    "dummy_dir_path_2/"])
+    mock_output_manager._load_txt_file_to_list.assert_not_called()
+    mock_output_manager._generate_file_name.assert_not_called()
     mock_output_manager._exclude_info_maps.assert_not_called()
+    mock_output_manager._dict_to_file_json.assert_not_called()
 
-    mock_output_manager._dict_to_file_json.assert_called_once_with(
+    # test case for when exclude_info_maps flag set to False
+    mock_output_manager._load_input_txt_file_names_to_dict = MagicMock(return_value={"inclusion/":
+                                                                                     ["dummy_input_filepath.txt"],
+                                                                                     "exclusion/":
+                                                                                     ["dummy_input_filepath_2.txt"]})
+    mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1", "dummy_dir_path_2"], False)
+    mock_output_manager._load_input_txt_file_names_to_dict.assert_called_with(["dummy_dir_path_1", "dummy_dir_path_2"])
+    calls = [call("inclusion/dummy_input_filepath.txt"), call().__iter__(),
+             call("exclusion/dummy_input_filepath_2.txt")]
+    mock_output_manager._load_txt_file_to_list.assert_has_calls(calls)
+    calls = [call("saved_variables_inclusion_dummy_input_filepath.txt", "json"),
+             call("saved_variables_exclusion_dummy_input_filepath_2.txt", "json")]
+    mock_output_manager._generate_file_name.assert_has_calls(calls)
+    mock_output_manager._exclude_info_maps.assert_not_called()
+    mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
 
-    mock_output_manager.save_variables("dummy_path", "dummy_input_path", True)
-    mock_output_manager._exclude_info_maps.assert_called_once_with({})
+    # test case for when exclude_info_maps flag set to True
+    mock_output_manager._exclude_info_maps = MagicMock(return_value={})
+    mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1", "dummy_dir_path_2"], True)
+    mock_output_manager._load_input_txt_file_names_to_dict.assert_called_with(["dummy_dir_path_1", "dummy_dir_path_2"])
+    mock_output_manager._load_input_txt_file_names_to_dict.assert_called_with(["dummy_dir_path_1", "dummy_dir_path_2"])
+    calls = [call("inclusion/dummy_input_filepath.txt"), call().__iter__(),
+             call("exclusion/dummy_input_filepath_2.txt")]
+    mock_output_manager._load_txt_file_to_list.assert_has_calls(calls)
+    calls = [call("saved_variables_inclusion_dummy_input_filepath.txt", "json"),
+             call("saved_variables_exclusion_dummy_input_filepath_2.txt", "json")]
+    mock_output_manager._generate_file_name.assert_has_calls(calls)
+    mock_output_manager._exclude_info_maps.assert_called_with({})
+    mock_output_manager._dict_to_file_json.assert_called_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
