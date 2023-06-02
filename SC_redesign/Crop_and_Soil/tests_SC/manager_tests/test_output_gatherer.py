@@ -83,4 +83,3 @@ def test_send_daily_variables(runoff_values: List[float]) -> None:
     assert pool['field name 1  crop crop 2.root_depth']['values'] == [1, 1, 1]
     assert pool['field name 2  crop crop 1.root_depth']['values'] == [1, 1, 1]
     assert pool['field name 2  crop crop 2.root_depth']['values'] == [1, 1, 1]
-
