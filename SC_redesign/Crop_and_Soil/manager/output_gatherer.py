@@ -274,4 +274,16 @@ class OutputGatherer:
             self.om.add_variable("annual_eroded_active_organic_nitrogen_total",
                                  field.soil.data.annual_eroded_active_organic_nitrogen_total,
                                  info_map)
-        pass
+
+            # ----------------------------adding layer data
+            for index, layer in enumerate(field.soil.data.soil_layers):
+                info_map["prefix"] = "field" + field.field_data.name + " layer index " + str(index)
+
+                self.om.add_variable("annual_denitrified_nitrogen_total", layer.annual_denitrified_nitrogen_total
+                                     , info_map)
+                self.om.add_variable("annual_volatilized_ammonium_total", layer.annual_volatilized_ammonium_total
+                                     , info_map)
+                self.om.add_variable("annual_decomposition_carbon_CO2_lost", layer.annual_decomposition_carbon_CO2_lost
+                                     , info_map)
+                self.om.add_variable("annual_carbon_CO2_lost", layer.annual_carbon_CO2_lost
+                                     , info_map)
