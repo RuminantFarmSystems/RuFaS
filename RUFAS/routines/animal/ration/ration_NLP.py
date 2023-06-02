@@ -17,6 +17,7 @@ from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationValues as UserDefinedRationValues
+from RUFAS.routines.animal.ration import user_defined_ration
 udrv = UserDefinedRationValues()
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
@@ -546,7 +547,7 @@ def userbounds(ration_percents):
     return tribounds
 
 
-def optimize(animal_combination, user_defined_ration_select, ration_percents):
+def optimize(animal_combination) -> None:
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -556,7 +557,6 @@ def optimize(animal_combination, user_defined_ration_select, ration_percents):
     ----------
     animal_combination : Pen.AnimalCombination
         The animal combination to optimize the ration for.
-
     """
 
     n = len(price)
@@ -567,8 +567,8 @@ def optimize(animal_combination, user_defined_ration_select, ration_percents):
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    if user_defined_ration_select:
-        bnds = userbounds(ration_percents)
+    if udrv.udr_or_not:
+        bnds = userbounds(user_defined_ration(animal_combination))
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
@@ -603,7 +603,7 @@ def optimize(animal_combination, user_defined_ration_select, ration_percents):
     def find_failed_constraints(solution, constraints):
         return list(filter(lambda c: is_constraint_violated(solution, c), constraints))
 
-    if user_defined_ration_select:
+    if udrv.udr_or_not:
         # accumulator = []
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
@@ -611,10 +611,10 @@ def optimize(animal_combination, user_defined_ration_select, ration_percents):
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
         # Uncomment to use
         if usermod.success:
-            print(animal_type)
+            # print(animal_type)
             print('No constraints violated')
         if not usermod.success:
-            failed_constraints = find_failed_constraints(usermod.x, user_cons_cow)
+            failed_constraints = find_failed_constraints(usermod.x, cow_cons)
             if not failed_constraints:
                 print('No constraints violated')
             for constr in failed_constraints:

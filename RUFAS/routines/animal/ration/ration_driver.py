@@ -8,29 +8,24 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
-from RUFAS.routines.animal.ration import animal_requirements
-from RUFAS.routines.animal.ration import ration_NLP as NLP
-from typing import Dict, List, Set, Any, Union
 import collections
 import math
 import statistics as stat
-from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationValues as UserDefinedRationValues
-udrv = UserDefinedRationValues()
-from RUFAS.routines.animal.ration.user_defined_ration import ration_to_use as ration_to_use
-import collections
-import math
-import statistics as stat
-from typing import Set
+from typing import Any, Dict, List, Set, Union
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    UserDefinedRationValues as UserDefinedRationValues
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    ration_to_use as ration_to_use
 
-
+udrv = UserDefinedRationValues()
 om = OutputManager()
 
-def optimization(pen, requirements, available_feeds, animal_combination, user_defined_ration_select=False, ration_percents = None):
+def optimization(requirements, available_feeds, animal_combination):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -73,10 +68,9 @@ def optimization(pen, requirements, available_feeds, animal_combination, user_de
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize(animal_combination, user_defined_ration_select, ration_percents)
+            solution = NLP.optimize(animal_combination)
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
-
         except:
             i -= 1
         finally:
@@ -86,7 +80,7 @@ def optimization(pen, requirements, available_feeds, animal_combination, user_de
         # simulation if bounds error is not resolved
         if count > 30:
             solution = None
-            mock_solution = user_defined_solution(pen, requirements.DMIest)
+            mock_solution = user_defined_solution(animal_combination, requirements.DMIest)
             ration_vals = NLP.get_ration_vals_null(mock_solution)
             return solution, ration_vals
 
@@ -98,7 +92,7 @@ def optimization(pen, requirements, available_feeds, animal_combination, user_de
     return solution, ration_vals
 
 
-def user_defined_solution(pen, DMIest):
+def user_defined_solution(animal_combination, DMIest):
     """
     Returns a "solution" in format of the output from the optimization function
     Simply takes the percentage values and multiplies them by estimated DMI to retrieve the calculated  ration
@@ -115,7 +109,7 @@ def user_defined_solution(pen, DMIest):
     solution: list[float,]
         list of values in order of feeds available for a given animal_type
     """
-    ration_percents = ration_to_use(pen.animal_combination)
+    ration_percents = ration_to_use(animal_combination)
     solution = []
     for rationkey in ration_percents.keys():
         value = ration_percents[rationkey]*DMIest
@@ -125,7 +119,7 @@ def user_defined_solution(pen, DMIest):
     return solution
 
 
-def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_defined_ration_select):
+def user_defined_ration(req, pen, available_feeds):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -139,12 +133,11 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
             representation of the type of animal (cow, heifer)
         cow_type: Boolean 
             True if cow is lactating, False otherwise
-        user_defined_ration_select: Boolean of whether user input selected
     """
     ration_percents = ration_to_use(pen.animal_combination)
-    solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select, ration_percents)
+    solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
     # Reduction of milk production estimate process to achieve feasible solution
-    if animal_type == 'cow':
+    if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         total_milk_in_pen = 0.0
         num_animals = 0
         for animal in pen.animals_in_pen:
@@ -152,7 +145,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
             num_animals += 1
         average_total_milk = total_milk_in_pen/num_animals
     fixed_ration = False
-    if animal_type == 'cow' and solution is not None:
+    if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
         while not solution.success:
             reduction = 0.5
             running_total_milk = 0.0
@@ -163,8 +156,8 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
                 running_total_milk += animal.estimated_daily_milk_produced
             average_running_total_milk = running_total_milk / num_animals
             # recalculating requirements after reduction
-            req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type, user_defined_ration_select, ration_percents)
+            req.set_requirements(pen, pen.animal_combination, True)
+            solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
             if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
@@ -210,15 +203,14 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     # creating instance of class requirements
     req = Requirements()
     req.set_requirements(pen, animal_grouping_scenario, False)
-    user_defined_ration_select = udrv.udr_or_not
-    if user_defined_ration_select:
-        ration, ration_vals = user_defined_ration(req, pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
+    if udrv.udr_or_not:
+        ration, ration_vals = user_defined_ration(req, pen, available_feeds, True)
         return ration, ration_vals
 
-    solution, ration_vals = optimization(pen, req, available_feeds, pen.animal_combination)
+    solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
     # Reduction of milk production estimate process to achieve feasible solution
     # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-    if pen.animal_combination in ['AnimalCombination.LAC_COW']:
+    if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         while not solution.success:
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
@@ -234,7 +226,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
                 animal.milk_production_reduction -= reduction
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
-            solution, ration_vals = optimization(pen, req, available_feeds, pen.animal_combination)
+            solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
 
     if solution is not None:
         ration = {}
