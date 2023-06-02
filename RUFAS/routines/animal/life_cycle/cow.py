@@ -19,8 +19,11 @@ Description: This file updates the cow form first calving to leaving the herd.
 import math
 import numpy as np
 from scipy.stats import truncnorm
+
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import \
     manure_calculations as lactating_manure_calculations
 from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
@@ -28,6 +31,8 @@ from RUFAS.routines.animal.manure.dry_cow_manure_excretion import \
 from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+
+om = OutputManager()
 
 
 class MilkProductionHistory:
@@ -134,6 +139,78 @@ class Cow(HeiferIII):
             self.milking = self.days_in_milk != 0
             self.calves = args['parity']
             self.CI = args['calving_interval']
+
+    @property
+    def is_pregnant(self):
+        """
+        Check if the cow is pregnant.
+
+        Returns
+        -------
+        bool
+            True if the cow is pregnant, False otherwise.
+
+        """
+
+        return self.days_in_preg > 0
+
+    @property
+    def is_lactating(self):
+        """
+        Check if the cow is lactating.
+
+        Returns
+        -------
+        bool
+            True if the cow is lactating, False otherwise.
+
+        """
+
+        return self.milking
+
+    @property
+    def is_dry(self):
+        """
+        Check if the cow is in the dry state.
+
+        Returns
+        -------
+
+        """
+
+        return not self.is_lactating
+
+    # TODO: Not used yet & check for correctness
+    @property
+    def is_far_off_dry(self):
+        """
+        Check if the cow is in the far-off dry state.
+
+        Returns
+        -------
+        bool
+            True if the cow is in the far-off dry state, False otherwise.
+
+        """
+
+        return (self.is_pregnant and self.is_dry and
+                (self.days_in_preg < AnimalModuleConstants.DRY_CLOSE_UP_START_DATE))
+
+    # TODO: Not used yet & check for correctness
+    @property
+    def is_close_up_dry(self):
+        """
+        Check if the cow is in the close-up dry state.
+
+        Returns
+        -------
+        bool
+            True if the cow is in the close-up dry state, False otherwise.
+
+        """
+
+        return (self.is_pregnant and self.is_dry and
+                self.days_in_preg >= AnimalModuleConstants.DRY_CLOSE_UP_START_DATE)
 
     def update_milk_production_history(self, sim_day):
         """
@@ -242,11 +319,27 @@ class Cow(HeiferIII):
 
         self.body_weight += self.daily_growth
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.milking_update.__name__,
+                    "simulation_day": sim_day
+                    }
+
+        milk_data_update = {}
+        milk_data_update["days_in_milk"] = self.days_in_milk
+        milk_data_update["estimated_daily_milk_produced"] = self.estimated_daily_milk_produced
+        milk_data_update["milk_protein"] = self.mPrt
+        milk_data_update["milk_fat"] = self.fat_percent
+        milk_data_update["milk_lactose"] = self.lactose_milk
+        milk_data_update["lactating"] = self.milking
+        milk_data_update["parity"] = self.calves
+        milk_data_update["cow_id"] = self.id
+
+        om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
+
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
-        return estimated_daily_milk_produced, fat_percent, \
-               daily_fat_correct_milk_production
+        return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, ME_intake):
         """
@@ -268,14 +361,15 @@ class Cow(HeiferIII):
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
 
-    def set_nutrient_rqmts(self):
+    def set_nutrient_rqmts(self, animal_grouping_scenario):
         """
         Calculates this Cow's nutrient requirements.
         """
+
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
-                         animal_type='cow',
+                         animal_type=animal_grouping_scenario.get_animal_type(self),
                          parity=self.calves,
                          calving_interval=self.CI,
                          milk_true_protein=self.mPrt,
