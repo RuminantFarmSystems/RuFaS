@@ -60,4 +60,7 @@ def test_validate_fractions(fracs: List[float], expected) -> None:
     actual = TillageSchedule._validate_fractions(fracs)
     assert actual == expected
 
-# @pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,expected_depths")
+
+@pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,expected_depths,expected_incorp,expected_mix", [
+    ()
+])
