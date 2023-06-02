@@ -60,10 +60,6 @@ class TillageSchedule(AmendmentSchedule):
             Year(s) in which amendment will happen.
         days : int | List[int]
             Day(s) on which amendment will happen.
-        pattern_skip : int, default=0
-            Number of years to skip between amendment schedule repetitions.
-        pattern_repeat : int, default=0
-            Number of times the specified amendment schedule should be repeated.
         tillage_depths : float | List[float]
             The lowest depth(s) the tilling implement reaches (mm)
         incorporation_fractions : List[float]
@@ -87,14 +83,14 @@ class TillageSchedule(AmendmentSchedule):
 
         valid_depths = self._validate_depths(self.tillage_depths)
         if not valid_depths:
-            raise ValueError(f"Expected all tillage depths to be > 0.0, received `{self.tillage_depths}`.")
+            raise ValueError(f"Expected all tillage depths to be > 0.0, received '{self.tillage_depths}'.")
 
         if len(self.incorporation_fractions) == 1:
             self.incorporation_fractions *= len(self.years)
 
         valid_fractions = self._validate_fractions(self.incorporation_fractions)
         if not valid_fractions:
-            raise ValueError(f"Expected all incorporation fractions to in range [0.0, 1.0], received "
+            raise ValueError(f"Expected all incorporation fractions to be in range [0.0, 1.0], received "
                              f"'{self.incorporation_fractions}'.")
 
         if len(self.mixing_fractions) == 1:
@@ -105,7 +101,7 @@ class TillageSchedule(AmendmentSchedule):
             raise ValueError(f"Expected all mixing fractions to be in range [0.0, 1.0], received "
                              f"'{self.mixing_fractions}'.")
 
-        equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.tillage_depths) \
+        equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.incorporation_fractions) \
             == len(self.mixing_fractions)
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
