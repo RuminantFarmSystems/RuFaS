@@ -533,55 +533,55 @@ def output_manager_original_method_states(
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
         "add_warning": mock_output_manager.add_warning,
-        "save_variables": mock_output_manager.save_variables,
-        "save_logs": mock_output_manager.save_logs,
-        "save_warnings": mock_output_manager.save_warnings,
-        "save_errors": mock_output_manager.save_errors,
-        "save_variable_names_and_contexts": mock_output_manager.save_variable_names_and_contexts,
+        "dump_variables": mock_output_manager.dump_variables,
+        "dump_logs": mock_output_manager.dump_logs,
+        "dump_warnings": mock_output_manager.dump_warnings,
+        "dump_errors": mock_output_manager.dump_errors,
+        "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
     }
 
 
-def test_save_all_pools(
+def test_dump_all_pools(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_all_pools in output_manager.py"""
+    """Test case for function dump_all_pools in output_manager.py"""
     path = "dummy_path"
-    mock_output_manager.save_errors = MagicMock()
-    mock_output_manager.save_warnings = MagicMock()
-    mock_output_manager.save_logs = MagicMock()
-    mock_output_manager.save_variables = MagicMock()
-    mock_output_manager.save_variable_names_and_contexts = MagicMock()
+    mock_output_manager.dump_errors = MagicMock()
+    mock_output_manager.dump_warnings = MagicMock()
+    mock_output_manager.dump_logs = MagicMock()
+    mock_output_manager.dump_variables = MagicMock()
+    mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.save_all_pools(path, exclude_info_maps=False)
+    mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
 
-    mock_output_manager.save_errors.assert_called_once_with(path)
-    mock_output_manager.save_warnings.assert_called_once_with(path)
-    mock_output_manager.save_logs.assert_called_once_with(path)
-    mock_output_manager.save_variables.assert_called_once_with(
+    mock_output_manager.dump_errors.assert_called_once_with(path)
+    mock_output_manager.dump_warnings.assert_called_once_with(path)
+    mock_output_manager.dump_logs.assert_called_once_with(path)
+    mock_output_manager.dump_variables.assert_called_once_with(
         path, False
     )
-    mock_output_manager.save_variable_names_and_contexts.assert_called_once_with(path, False)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
 
-    mock_output_manager.save_all_pools(path, exclude_info_maps=True)
-    mock_output_manager.save_variables.assert_called_with(path, True)
-    assert mock_output_manager.save_logs.call_count == 2
-    assert mock_output_manager.save_warnings.call_count == 2
-    assert mock_output_manager.save_errors.call_count == 2
+    mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
+    mock_output_manager.dump_variables.assert_called_with(path, True)
+    assert mock_output_manager.dump_logs.call_count == 2
+    assert mock_output_manager.dump_warnings.call_count == 2
+    assert mock_output_manager.dump_errors.call_count == 2
 
     # Restore original methods
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        "save_variables"
+    mock_output_manager.dump_variables = output_manager_original_method_states[
+        "dump_variables"
     ]
-    mock_output_manager.save_logs = output_manager_original_method_states["save_logs"]
-    mock_output_manager.save_warnings = output_manager_original_method_states[
-        "save_warnings"
+    mock_output_manager.dump_logs = output_manager_original_method_states["dump_logs"]
+    mock_output_manager.dump_warnings = output_manager_original_method_states[
+        "dump_warnings"
     ]
-    mock_output_manager.save_errors = output_manager_original_method_states[
-        "save_errors"
+    mock_output_manager.dump_errors = output_manager_original_method_states[
+        "dump_errors"
     ]
-    mock_output_manager.save_variable_names_and_contexts = output_manager_original_method_states[
-        "save_variable_names_and_contexts"
+    mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
+        "dump_variable_names_and_contexts"
     ]
 
 
@@ -598,15 +598,15 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     )
 
 
-def test_save_variables(
+def test_dump_variables(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_variables in output_manager.py"""
+    """Test case for function dump_variables in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_variables("dummy_path")
+    mock_output_manager.dump_variables("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("variables", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -622,15 +622,15 @@ def test_save_variables(
     ]
 
 
-def test_save_logs(
+def test_dump_logs(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_logs in output_manager.py"""
+    """Test case for function dump_logs in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_logs("dummy_path")
+    mock_output_manager.dump_logs("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("logs", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -646,15 +646,15 @@ def test_save_logs(
     ]
 
 
-def test_save_warnings(
+def test_dump_warnings(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_warnings in output_manager.py"""
+    """Test case for function dump_warnings in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_warnings("dummy_path")
+    mock_output_manager.dump_warnings("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("warnings", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -670,15 +670,15 @@ def test_save_warnings(
     ]
 
 
-def test_save_errors(
+def test_dump_errors(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_errors in output_manager.py"""
+    """Test case for function dump_errors in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_errors("dummy_path")
+    mock_output_manager.dump_errors("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("errors", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -694,16 +694,16 @@ def test_save_errors(
     ]
 
 
-def test_save_variable_names_and_contexts(
+def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_variable_names_and_contexts in output_manager.py"""
+    """Test case for function dump_variable_names_and_contexts in output_manager.py"""
     dummy_list = ['_exclude_info_maps=False, expect info_maps accordingly.\n']
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.save_variable_names_and_contexts("dummy_path", False)
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(

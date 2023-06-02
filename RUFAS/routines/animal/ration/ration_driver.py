@@ -8,7 +8,6 @@ Description: Main file in the ration formulation process that connects all
 
 Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
 from typing import Dict, List, Set, Any, Union
@@ -18,11 +17,20 @@ import statistics as stat
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationValues as UserDefinedRationValues
 udrv = UserDefinedRationValues()
 from RUFAS.routines.animal.ration.user_defined_ration import ration_to_use as ration_to_use
+import collections
+import math
+import statistics as stat
+from typing import Set
+
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.ration import animal_requirements
+from RUFAS.routines.animal.ration import ration_NLP as NLP
 
 
 om = OutputManager()
 
-def optimization(pen, requirements, available_feeds, animal_type, cow_type, user_defined_ration_select=False, ration_percents = None):
+def optimization(pen, requirements, available_feeds, animal_combination, user_defined_ration_select=False, ration_percents = None):
     """
     Function that sets up the nutrients and requirements lists into structured
     inputs for the non-linear program and calls the optimization function.
@@ -30,8 +38,7 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
     Args:
         requirements: object of class Requirements
         available_feeds: object of class AvailableFeeds
-        animal_type: string representation of the animal
-        cow_type: Boolean which is True if cow is lactating, False otherwise
+        animal_combination: one of the animal combinations specified in the AnimalCombination enum
     """
     price = NLP.list_reconfig(available_feeds['price'])
     TDN = NLP.list_reconfig(available_feeds['TDN'])
@@ -48,25 +55,28 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
     N_B = NLP.list_reconfig(available_feeds['N_B'])
     CP = NLP.list_reconfig(available_feeds['CP'])
     dRUP = NLP.list_reconfig(available_feeds['dRUP'])
-    if cow_type:
+    # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
+    if str(animal_combination) in ['AnimalCombination.LAC_COW']:
         limit = NLP.list_reconfig(available_feeds['lactating_cow_limit'])
+        cow_type = True
     else:
         limit = NLP.list_reconfig(available_feeds['dry_cow_limit'])
+        cow_type = False
     NLP.set_globals(price, requirements.NEmaint, requirements.NEa, requirements.NEpreg,
                     requirements.NEl, requirements.NEg, requirements.MP_req,
                     requirements.Ca_req, requirements.P_req,
                     TDN, DE, EE, is_fat, requirements.avg_BW, calcium, phosphorus, NDF,
                     feed_type, is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type,
-                    animal_type_=animal_type,
                     DMIest_=requirements.DMIest)
     # try block for catching scipy SLSQP error
     i = 0
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize(user_defined_ration_select, ration_percents)
+            solution = NLP.optimize(animal_combination, user_defined_ration_select, ration_percents)
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
+
         except:
             i -= 1
         finally:
@@ -81,7 +91,7 @@ def optimization(pen, requirements, available_feeds, animal_type, cow_type, user
             return solution, ration_vals
 
     # retrieving MEact from diet
-    if solution == None:
+    if solution is None:
         ration_vals = None
     else:
         ration_vals = NLP.get_ration_vals(solution.x)
@@ -184,7 +194,7 @@ def user_defined_ration(req, pen, available_feeds, animal_type, cow_type, user_d
     return ration, ration_vals
 
 
-def ration_formulation(pen, available_feeds, animal_type, cow_type):
+def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -192,22 +202,23 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
 
     Args:
         pen: an object of class Pen
-        feed: an object of class Feed
         available_feeds: an object of class AvailableFeeds
-        animal_type: string representation of the type of animal (cow, heifer)
-        cow_type: Boolean which is True if cow is lactating, False otherwise
+        animal_grouping_scenario: A grouping scenario of animals used in the current simulation, specified in
+            AnimalGroupingScenario enum and AnimalManagement class
+
     """
     # creating instance of class requirements
     req = Requirements()
-    req.set_requirements(pen, animal_type, False)
+    req.set_requirements(pen, animal_grouping_scenario, False)
     user_defined_ration_select = udrv.udr_or_not
     if user_defined_ration_select:
         ration, ration_vals = user_defined_ration(req, pen, available_feeds, animal_type, cow_type,user_defined_ration_select)
         return ration, ration_vals
 
-    solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type,)
+    solution, ration_vals = optimization(pen, req, available_feeds, pen.animal_combination)
     # Reduction of milk production estimate process to achieve feasible solution
-    if animal_type == 'cow':
+    # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
+    if pen.animal_combination in ['AnimalCombination.LAC_COW']:
         while not solution.success:
             # This values for reduction are not from pseudocode, but the vales below
             # are based on fastest case runtime testing
@@ -222,10 +233,10 @@ def ration_formulation(pen, available_feeds, animal_type, cow_type):
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction
             # recalculating requirements after reduction
-            req.set_requirements(pen, animal_type, True)
-            solution, ration_vals = optimization(pen, req, available_feeds, animal_type, cow_type)
+            req.set_requirements(pen, animal_grouping_scenario, True)
+            solution, ration_vals = optimization(pen, req, available_feeds, pen.animal_combination)
 
-    if solution != None:
+    if solution is not None:
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
@@ -258,8 +269,9 @@ def ration_report(ration, available_feeds):
                        'N': 0, "EE": 0, "starch": 0}
     nutrient_conc = {}
     ration = ration.copy()
-    ration.pop('status')
-    ration.pop('objective')
+    for non_numeric_key in ['status', 'objective']:
+        if non_numeric_key in ration:
+            del ration[non_numeric_key]
     nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
                  'potassium', 'N', 'EE', 'starch']
 
@@ -283,6 +295,8 @@ def ration_report(ration, available_feeds):
 
     # feed nutrient concentrations
     dm_amount = nutrient_amount['dm']
+    if dm_amount == 0:
+        dm_amount = 1
     for nutr in nutrients:
         if nutr == 'DM':
             nutrient_conc['dm'] = (nutrient_amount['as_fed'] / dm_amount) * 100
@@ -297,7 +311,7 @@ def ration_report(ration, available_feeds):
 class Requirements:
     """
     Stores the information for the calculated requirements of animals to
-    be used in the the ration formulation.
+    be used in the ration formulation.
     """
 
     def __init__(self):
@@ -331,7 +345,7 @@ class Requirements:
         self.avg_CP_milk = 0
 
 
-    def set_requirements(self, pen, animal_type, recalc):
+    def set_requirements(self, pen, animal_grouping_scenario, recalc):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -339,7 +353,7 @@ class Requirements:
 
         Args:
             pen: an instance of an object of class Pen
-            animal_type: string representation of the animal
+            animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManagement
             recalc: boolean to see if requirements need to be recalculated since grouping
         """
         NEmaint = []
@@ -360,23 +374,30 @@ class Requirements:
             # temp parameter for heifer is hardcoded because heifer req should
             # never have to be recalculated
             for animal in pen.animals_in_pen:
-                a_type = type(animal).__name__
-                if a_type == 'HeiferI':
+                # For now, assuming calves are handled separately
+                animal_type = animal_grouping_scenario.get_animal_type(animal)
+                if animal_type in [AnimalType.HEIFER_I]:
                     req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
-                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = None, animal_type='heifer',
+                                                         mature_body_weight = animal.mature_body_weight,
+                                                         day_of_pregnancy = None, animal_type=animal_type,
                                                          body_condition_score_5=3, previous_temperature=15,
                                                          average_daily_gain_heifer=animal.daily_growth
                                                          )
-                elif a_type == 'HeiferII' or a_type == 'HeiferIII':
+                elif animal_type in [AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
                     req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
-                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
-                                                         animal_type='heifer', body_condition_score_5=3, previous_temperature=15,
+                                                         mature_body_weight = animal.mature_body_weight,
+                                                         day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type=animal_type, body_condition_score_5=3,
+                                                         previous_temperature=15,
                                                          average_daily_gain_heifer=animal.daily_growth)
-                else:
+                elif animal_type in [AnimalType.LAC_COW]:
                     req = animal_requirements.calc_rqmts(body_weight = animal.body_weight,
-                                                         mature_body_weight = animal.mature_body_weight, day_of_pregnancy = animal.days_in_preg,
-                                                         animal_type = 'cow', parity = animal.calves, calving_interval = animal.CI,
-                                                         milk_true_protein= animal.mPrt, milk_fat = animal.fat_percent, milk_lactose = animal.lactose_milk,
+                                                         mature_body_weight = animal.mature_body_weight,
+                                                         day_of_pregnancy = animal.days_in_preg,
+                                                         animal_type=animal_type, parity = animal.calves,
+                                                         calving_interval = animal.CI,
+                                                         milk_true_protein= animal.mPrt, milk_fat = animal.fat_percent,
+                                                         milk_lactose = animal.lactose_milk,
                                                          milk_production = animal.estimated_daily_milk_produced,
                                                          days_in_milk = animal.days_in_milk, lactating = animal.milking
                                                          )
@@ -390,7 +411,7 @@ class Requirements:
                 animal.P_req = req['P_req']
                 animal.DMIest = req['DMIest']
                 # these animal class variables are only used for grouping purposes
-                if animal_type == 'cow':
+                if animal_type in [AnimalType.LAC_COW]:
                     animal.DNED_req = (req['NEmaint'] + req['NEl']) / animal.DMIest
                     animal.DMDP_req = (req['MP_req']) / animal.DMIest
 
@@ -418,7 +439,8 @@ class Requirements:
         else:
             # iterating through each animal in the pen and setting requirements
             for animal in pen.animals_in_pen:
-                if animal_type == 'cow':
+                animal_type = animal_grouping_scenario.get_animal_type(animal)
+                if animal_type in [AnimalType.LAC_COW]:
                     # calculating the activity requirement for energy
                     animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor,
                                                    pen.horizontal_dist_to_parlor)

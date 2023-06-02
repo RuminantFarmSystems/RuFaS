@@ -4,7 +4,7 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
-
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 import pytest
 
@@ -20,7 +20,7 @@ def cow_a() -> dict:
         'body_weight': 600,
         'mature_body_weight': 700,
         'day_of_pregnancy': 30,
-        'animal_type': 'cow',
+        'animal_type': AnimalType.LAC_COW,
         'parity': 1,
         'calving_interval': 365,
         'milk_protein': 3.45,
@@ -45,7 +45,7 @@ def cow_b() -> dict:
         'body_weight': 680,
         'mature_body_weight': 700,
         'day_of_pregnancy': 150,
-        'animal_type': 'cow',
+        'animal_type': AnimalType.LAC_COW,
         'parity': 3,
         'calving_interval': 365,
         'milk_protein': 3.45,
@@ -70,7 +70,7 @@ def heifer_a() -> dict:
         'body_weight': 230,
         'mature_body_weight': 700,
         'day_of_pregnancy': None,
-        'animal_type': 'heifer',
+        'animal_type': AnimalType.HEIFER_I,
         'parity': 0,
         'calving_interval': None,
         'milk_protein': 0.0,
@@ -95,7 +95,7 @@ def heifer_b() -> dict:
         'body_weight': 340,
         'mature_body_weight': 700,
         'day_of_pregnancy': 1,
-        'animal_type': 'heifer',
+        'animal_type': AnimalType.HEIFER_I,
         'parity': 0,
         'calving_interval': None,
         'milk_protein': 0.0,

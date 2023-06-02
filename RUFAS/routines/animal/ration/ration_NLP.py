@@ -11,6 +11,7 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
+
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
@@ -21,7 +22,7 @@ udrv = UserDefinedRationValues()
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
                  is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_, cow_type_,
-                 animal_type_ = 'cow', DMIest_= None):
+                 DMIest_= None):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below. If the input described below is a list, it is a
@@ -58,12 +59,11 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
         CP_: A list of crude protein in each feed (% of DM)
         dRUP_: A list of RUP degradability in each feed (% of RUP)
         limit_: A list of the limiting upper bounds for each feed (kg)
-        animal_type: A string representing the type of the animal
         cow_type_: A boolean which is True if cow is lactating, False else
     """
     global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
         DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, animal_type, cow_type
+        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
 
     price = price_
     n = len(price)
@@ -92,7 +92,6 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     CP = CP_
     dRUP = dRUP_
     limit = limit_
-    animal_type = animal_type_
     cow_type = cow_type_
 
 
@@ -547,15 +546,16 @@ def userbounds(ration_percents):
     return tribounds
 
 
-def optimize(user_defined_ration_select, ration_percents):
+def optimize(animal_combination, user_defined_ration_select, ration_percents):
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
     as a dictionary with feed keys corresponding to their ration (kg).
 
-    Args:
-        *This function requires no inputs, but utilizes the functions created
-        above in this file*
+    Parameters
+    ----------
+    animal_combination : Pen.AnimalCombination
+        The animal combination to optimize the ration for.
 
     """
 
@@ -590,8 +590,6 @@ def optimize(user_defined_ration_select, ration_percents):
     
     cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
     heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
-    user_cons_cow = [con1, con2, con3, con4, con5, con6, con7, con9, con10, con11, con12]
-    user_cons_heif = [con1, con3, con4, con5, con6, con7, con9, con10, con11, con12]
 
     def is_constraint_violated(solution, constraint) -> bool:
         result = constraint['fun'](solution)
@@ -607,10 +605,10 @@ def optimize(user_defined_ration_select, ration_percents):
 
     if user_defined_ration_select:
         # accumulator = []
-        if animal_type == "cow":
-            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons_cow)
+        if str(animal_combination) in ['AnimalCombination.LAC_COW']:
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
         else:
-            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons_heif)
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
         # Uncomment to use
         if usermod.success:
             print(animal_type)
@@ -628,7 +626,11 @@ def optimize(user_defined_ration_select, ration_percents):
                 # print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
                 pass
         return usermod
-    elif animal_type == 'cow':
+    # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
+    elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
-    elif animal_type == 'heifer':
+    elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
+                                     'AnimalCombination.GROWING_AND_CLOSE_UP']:
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
+    else:
+        raise ValueError("Invalid animal combination: " + str(animal_combination))
