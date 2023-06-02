@@ -3,7 +3,7 @@
 # ignore text files
 *.txt
 *.txt#
-!list_of_keys.txt
+!example_list_of_keys.txt
 !requirements.txt
 *.doc
 *.docx
