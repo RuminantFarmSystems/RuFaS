@@ -11,7 +11,7 @@ repeated over a specified number of years, with specified breaks in between repe
 
 class CropSchedule:
 
-    def __init__(self, crop_reference: str, planting_years: int | List[int], planting_days: int | List[int],
+    def __init__(self, name: str, crop_reference: str, planting_years: int | List[int], planting_days: int | List[int],
                  harvest_years: int | List[int], harvest_days: int | List[int], harvest_operations: str | List[str],
                  use_heat_scheduling: bool = False, pattern_skip: int = 0, pattern_repeat: int = 0):
         """
@@ -19,8 +19,10 @@ class CropSchedule:
 
         Parameters
         ----------
+        name : str
+            Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
         crop_reference : str
-            Reference to name of the crop that will be used to identify the correct configuration.
+            Reference to name of the crop that will be used to identify the correct crop specifications.
         planting_years : int | List[int]
             Year(s) in which crop is planted.
         planting_days : int | List[int]
@@ -57,6 +59,7 @@ class CropSchedule:
         If use_heat_scheduling is True, then all non-final harvest events will be ignored.
 
         """
+        self.name = name
         self.crop_reference = crop_reference
 
         self.planting_years = self.convert_to_list(planting_years)
