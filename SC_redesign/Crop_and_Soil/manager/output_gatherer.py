@@ -274,8 +274,4 @@ class OutputGatherer:
             self.om.add_variable("annual_eroded_active_organic_nitrogen_total",
                                  field.soil.data.annual_eroded_active_organic_nitrogen_total,
                                  info_map)
-
-
-
-
         pass
