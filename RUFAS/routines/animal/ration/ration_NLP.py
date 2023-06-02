@@ -568,7 +568,7 @@ def optimize(animal_combination) -> None:
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
-        bnds = userbounds(user_defined_ration(animal_combination))
+        bnds = userbounds(user_defined_ration.ration_to_use(animal_combination))
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))

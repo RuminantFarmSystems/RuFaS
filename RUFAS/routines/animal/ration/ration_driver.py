@@ -119,7 +119,7 @@ def user_defined_solution(animal_combination, DMIest):
     return solution
 
 
-def user_defined_ration(req, pen, available_feeds):
+def user_defined_ration(req, pen, available_feeds, animal_grouping_scenario):
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -156,14 +156,14 @@ def user_defined_ration(req, pen, available_feeds):
                 running_total_milk += animal.estimated_daily_milk_produced
             average_running_total_milk = running_total_milk / num_animals
             # recalculating requirements after reduction
-            req.set_requirements(pen, pen.animal_combination, True)
+            req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
             if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
                 break
 
-    if solution is not None and not fixed_ration:
+    if solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3
@@ -204,7 +204,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     req = Requirements()
     req.set_requirements(pen, animal_grouping_scenario, False)
     if udrv.udr_or_not:
-        ration, ration_vals = user_defined_ration(req, pen, available_feeds, True)
+        ration, ration_vals = user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
         return ration, ration_vals
 
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
