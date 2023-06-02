@@ -75,18 +75,58 @@ nearly identical for both modules.
 #### Scheduling
 Certain types of events, (Crop planting/harvesting, soil amendments) need to be scheduled by the user to occur over the
 run of the simulation.
-- [ ] Finish implementing and testing Crop planting/harvesting scheduler.
-- [ ] Integrate scheduler and execution of events into `Field` methods.
-- [ ] Implement tillage application scheduler and integrate into `Field`.
-- [ ] Implement fertilizer application scheduler and integrate into `Field`.
-- [ ] Implement manure application scheduler and integrate into `Field`.
+- Crop planting and harvesting.
+  - [ ] Finish implementing and testing Crop planting/harvesting scheduler.
+  - Integrate crop scheduler and execution of events into `Field` methods.
+    - [ ] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
+    all planting events that should happen call `plant_crop()` on them.
+    - [ ] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
+    attribute of `Field`.
+    - Implement and test `check_crop_harvesting_schedule()`, which will
+      - [ ] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day.
+      - [ ] Iterate through the `crops` attribute to check if any are harvested using optimal (a.k.a. heat scheduled 
+      harvesting) and if so, harvest them if they have met the optimal harvesting threshold.
+    - [ ] Add calls to `check_crop_planting_schedule()` and `check_crop_harvesting_schedule()` in `Field`s daily 
+    routine.
+- Tillage
+  - [ ] Implement and test tillage application scheduler.
+  - [ ] Implement and test `check_tillage_schedule()` which will iterate through a list of `TillageEvent`s and collect 
+    and execute all the ones that happen on the current day.
+  - [ ] Add call to `check_tillage_schedule()` in `Field`s daily routine.
+- Fertilizer
+  - [ ] Implement and test fertilizer application scheduler.
+  - [ ] Implement and test `check_fertilizer_schedule()` which will iterate through a list of `FertilizerEvent`s and 
+  collect and execute all the ones that happen on the current day.
+  - [ ] Add call to `check_fertilizer_schedule()` in `Field`s daily routine.
+- Manure
+  - [ ] Implement and test manure application scheduler.
+  - [ ] Implement and test `check_manure_schedule()` which will iterate through a list of `ManureEvent`s and collect and 
+  execute all the ones that happen on the current day.
+  - [ ] Add call to `check_manure_schedule()` in `Field`s daily routine.
 
 ### Field Manager
-- [ ] Integrate the `OutputGatherer` and `InputManager` modules into `FieldManager`.
-- Implement methods that mirror the public facing methods of the old `Field` module
+- Implement and test methods to translate user input into configuration dictionary.
+  - [ ] Schedules for crop plantings and harvestings.
+  - [ ] Schedules for manure applications.
+  - [ ] Schedules for fertilizer applications.
+  - [ ] Schedules for tillage operations.
+  - [ ] Soil profile configurations.
+  - [ ] Custom crop types.
+- Implement methods that turn configurations dictionaries into object instances that will be used to run the simulation.
+  - [ ] Create `Soil` instances.
+  - [ ] Create `FieldData` instances.
+  - Load lists of `Event` objects into `Field` instances.
+    - [ ] Crop `PlantingEvent`s and `HarvestEvent`s.
+    - [ ] `TillageEvent`s.
+    - [ ] `FertilizerEvent`s.
+    - [ ] `ManureEvent`s.
+- Implement and test methods that mirror the public facing methods of the old `Field` module.
   - [ ] Daily update routine
   - [ ] Pre-annual routine
-- [ ] Integrate `FieldManager` into `SimulationEngine`
+- Integrate `FieldManager` into `SimulationEngine` and `State`.
+  - [ ] Replace calls to old daily fields routine with calls to new one in `SimulationEngine`.
+  - [ ] Replace calls to old annual fields routine with calls to new one in `SimulationEngine`.
+  - [ ] Replace initialization of `Fields` with initialization of `FieldManager` in `State`.
 
 #### OutputGatherer
 - Implement an `OutputGatherer` module that will handle all output from the Crop and Soil modules
@@ -94,8 +134,10 @@ run of the simulation.
   - [ ] Implement a method that will collect and pass values to the Output Manager annually.
 - [ ] Integrate the `OutputGatherer` into the `FieldManager` module.
 
-#### InputManager
-- Implement an `InputManager` module that can initialize `Field` instances with the following information
+#### FieldInputManager
+- Note: this `FieldInputManager` is dependent on being able to interface with the `InputManager`, so this task should 
+only be started when `InputManager` is ready.
+- Implement an `FieldInputManager` module that can initialize `Field` instances with the following information
   - [ ] Schedules for crop rotations, plantings, and harvestings.
   - [ ] Schedules for manure applications.
   - [ ] Schedules for fertilizer applications.
