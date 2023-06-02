@@ -1,6 +1,7 @@
 from typing import List
 
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
 
 class AmendmentSchedule:
@@ -105,6 +106,30 @@ class TillageSchedule(AmendmentSchedule):
             == len(self.mixing_fractions)
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
+
+    def generate_tillage_events(self) -> TillageEvent:
+        """
+        Generates a list of all tillage events that will happen over the full course of this TillageSchedule.
+
+        Returns
+        -------
+        List[TillageEvent]
+            List of all tillage events that will happen over the course of this TillageSchedule.
+
+        """
+        all_tilling_years = TillageEvent.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_tilling_days = self.days * (self.pattern_repeat + 1)
+        all_tillage_depths = self.tillage_depths * (self.pattern_repeat + 1)
+        all_incorporation_fractions = self.incorporation_fractions * (self.pattern_repeat + 1)
+        all_mixing_fractions = self.mixing_fractions * (self.pattern_repeat + 1)
+        all_tillage_events = list(zip(all_tillage_depths, all_incorporation_fractions, all_mixing_fractions,
+                                      all_tilling_years, all_tilling_days))
+
+        tillage_events = []
+        for event in all_tillage_events:
+            new_tillage_event = TillageEvent(event[0], event[1], event[2], event[3], event[4], event[5])
+            tillage_events.append(new_tillage_event)
+        return tillage_events
 
     @staticmethod
     def _validate_depths(tillage_depths: List[float]) -> bool:
