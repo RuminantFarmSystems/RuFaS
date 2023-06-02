@@ -318,18 +318,18 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _load_input_txt_file_names_to_list(self, dir_path: str) -> List[str]:
-        """ Looks in inputs directory for txt file names.
+    def _load_txt_file_names_to_list(self, dir_path: str) -> List[str]:
+        """ Looks in directory for txt file names and adds them to a list.
 
         Parameters
         ----------
         path : str
-            Path of the input directory to be searched.
+            Path of the directory to be searched.
 
         Returns
         -------
         List
-            A list of input txt file names.
+            A list of txt file names.
 
         """
         dir_path = Path(dir_path)
@@ -403,7 +403,7 @@ class OutputManager(object):
             Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
-        list_of_input_files = self._load_input_txt_file_names_to_list(dir_path)
+        list_of_input_files = self._load_txt_file_names_to_list(dir_path)
         for input_file in list_of_input_files:
             input_path = dir_path + input_file
             inclusion_keys = self._load_txt_file_to_list(input_path)
