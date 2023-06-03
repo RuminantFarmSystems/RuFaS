@@ -112,7 +112,6 @@ class OutputGatherer:
 
                 self.om.add_variable("temperature", layer.temperature, info_map)
                 self.om.add_variable("percolated_water", layer.percolated_water, info_map)
-                # This carbon part is confusing from the start, maybe look back later
                 self.om.add_variable("plant_metabolic_active_carbon_usage", layer.plant_metabolic_active_carbon_usage,
                                      info_map)
                 self.om.add_variable("plant_metabolic_active_carbon_loss", layer.plant_metabolic_active_carbon_loss,
