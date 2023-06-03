@@ -17,13 +17,13 @@ from RUFAS.routines.animal.ration.ration_driver import ration_report
 # Methane Mitigation Methods 
 def methane_mitigation(methane_mitigation_method: str) -> float:  
     if methane_mitigation_method == "3-NOP":
-
+        pass
     elif methane_mitigation_method == "Monensin": 
-
+        pass
     elif methane_mitigation_method == "Essential Oils":
-
+        pass
     elif methane_mitigation_method == "Seaweed":
-        
+        pass
 
 def manure_calculations(ration_formulation,
                         feed,
