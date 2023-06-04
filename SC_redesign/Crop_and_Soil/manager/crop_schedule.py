@@ -1,4 +1,5 @@
-from typing import List, Any
+from typing import List
+from copy import deepcopy
 
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent, HarvestEvent
@@ -28,6 +29,15 @@ class Schedule:
         pattern_repeat : int, default=0
             Number of times the specified crop planting and harvesting pattern should be repeated.
 
+        Raises
+        ------
+        ValueError
+            If the number of years is not equal to the number of days.
+        ValueError
+            If the pattern skip is less than 0.
+        ValueError
+            If the number of pattern repetitions is less than 0.
+
         """
         self.name = name
 
@@ -45,7 +55,7 @@ class Schedule:
             self.days *= len(self.years)
 
         if len(self.days) != len(self.years):
-            raise ValueError("Number of years that crops are planted in and days crops are planted on must be equal.")
+            raise ValueError("Number of years and days must be equal.")
 
         if pattern_skip < 0:
             raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
@@ -109,11 +119,69 @@ class Schedule:
 
         return True
 
+    @staticmethod
+    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+        """
+        Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
+        repetitions.
 
-class CropSchedule():
+        Parameters
+        ----------
+        pattern : List[int]
+            The pattern to be repeated.
+        skip : int
+            Number of steps to skip between repeats.
+        repeat : int
+            Number of times patter should be repeated.
 
-    def __init__(self, name: str, crop_reference: str, planting_years: int | List[int], planting_days: int | List[int],
-                 harvest_years: int | List[int], harvest_days: int | List[int], harvest_operations: str | List[str],
+        Returns
+        -------
+        List[int]
+            The full repeated pattern of numbers.
+
+        Raises
+        ------
+        ValueError
+            If the skip is less than 0.
+        ValueError
+            If the number of times to repeat is less than 0.
+
+        Examples
+        --------
+        >>> repeat_pattern([1, 3, 5], 1, 2)
+        [1, 3, 5, 7, 9, 11, 13, 15, 17]
+
+        >>> repeat_pattern([1, 3, 5], 0, 1)
+        [1, 3, 5, 6, 8, 10]
+
+        >>> repeat_pattern([2, 3, 7], 3, 2)
+        [2, 3, 7, 11, 12, 16, 20, 21, 24]
+
+        """
+        if skip < 0:
+            raise ValueError(f"Expected skip to be >= 0, received '{skip}'.")
+        if repeat < 0:
+            raise ValueError(f"Expected repeat to be >= 0, received '{repeat}'.")
+
+        differences = [skip + 1]
+        in_pattern_differences = range(1, len(pattern[1:]) + 1)
+        for difference in in_pattern_differences:
+            differences.append(pattern[difference] - pattern[difference - 1])
+
+        full_pattern = deepcopy(pattern)
+        differences_index = 0
+        number_of_new_values = range(repeat * len(pattern))
+        for _new_value in number_of_new_values:
+            full_pattern.append(full_pattern[-1] + differences[differences_index])
+            differences_index += 1
+            differences_index %= len(pattern)
+        return full_pattern
+
+
+class CropSchedule(Schedule):
+
+    def __init__(self, name: str, crop_reference: str, planting_years: List[int], planting_days: List[int],
+                 harvest_years: List[int], harvest_days: List[int], harvest_operations: List[str],
                  use_heat_scheduling: bool = False, pattern_skip: int = 0, pattern_repeat: int = 0):
         """
         Creates a CropSchedule instance based on user input.
@@ -160,26 +228,40 @@ class CropSchedule():
         If use_heat_scheduling is True, then all non-final harvest events will be ignored.
 
         """
-        self.name = name
+        try:
+            super().__init__(name, planting_years, planting_days, pattern_skip, pattern_repeat)
+        except ValueError as e:
+            error_message = str(e)
+            if error_message == f"Expected all days to be in range [1, 366], received `{planting_days}`.":
+                raise ValueError(f"Expected all planting days to be in range [1, 366], received `{planting_days}`.")
+            elif error_message == f"Expected all years to be > 0 and in non-descending order, received " \
+                                  f"`{planting_years}`":
+                raise ValueError(f"Expected all years to be > 0 and in non-descending order, received "
+                                 f"`{planting_years}`")
+            elif error_message == "Number of years and days must be equal.":
+                raise ValueError("Number of years and days must be equal.")
+
         self.crop_reference = crop_reference
+        self.planting_years = self.years
+        self.planting_days = self.days
 
-        self.planting_years = self._convert_to_list(planting_years)
-        self.planting_days = self._convert_to_list(planting_days)
-        self.harvest_years = self._convert_to_list(harvest_years)
-        self.harvest_days = self._convert_to_list(harvest_days)
-        self.harvest_operations = self._convert_to_list(harvest_operations)
+        harvest_days_valid = self._validate_days(harvest_days)
+        if not harvest_days_valid:
+            raise ValueError(f"Expected all harvest days to be in range [1, 366], received `{harvest_days}`.")
+        self.harvest_days = harvest_days
 
-        if len(self.planting_days) == 1:
-            self.planting_days *= len(self.planting_years)
-
-        if len(self.planting_days) != len(self.planting_years):
-            raise ValueError("Number of years that crops are planted in and days crops are planted on must be equal.")
+        harvest_years_valid = self._validate_years(harvest_years)
+        if not harvest_years_valid:
+            raise ValueError(f"Expected all harvest years to be > 0 and in non-descending order, received "
+                             f"`{harvest_years}`")
+        self.harvest_years = harvest_years
 
         if len(self.harvest_days) == 1:
             self.harvest_days *= len(self.harvest_years)
 
-        if len(self.harvest_operations) == 1:
-            self.harvest_operations *= len(self.harvest_years)
+        if len(harvest_operations) == 1:
+            harvest_operations *= len(self.harvest_years)
+        self.harvest_operations = harvest_operations
 
         equal_harvest_parameters = len(self.harvest_years) == len(self.harvest_days) == len(self.harvest_operations)
         if not equal_harvest_parameters:
@@ -191,13 +273,6 @@ class CropSchedule():
         if not only_last_kills:
             raise ValueError(f"Expected the final harvest operation to be the only one that kills the crop, received "
                              f"'{self.harvest_operations}'.")
-
-        if pattern_skip < 0:
-            raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
-        elif pattern_repeat < 0:
-            raise ValueError(f"Expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
-        self.pattern_skip = pattern_skip
-        self.pattern_repeat = pattern_repeat
 
         self.heat_scheduled = use_heat_scheduling
 
@@ -250,27 +325,3 @@ class CropSchedule():
             new_harvest_event = HarvestEvent(self.crop_reference, date[0], date[1], date[2])
             harvest_events.append(new_harvest_event)
         return harvest_events
-
-    @staticmethod
-    def _convert_to_list(to_be_converted: Any) -> List:
-        """
-        Converts any arbitrary data into a list that contains that data.
-
-        Parameters
-        ----------
-        to_be_converted : Any
-            Data to be converted.
-
-        Returns
-        -------
-        List
-            The data passed contained in a list.
-
-        Notes
-        -----
-        If the data passed is already a list, it doesn't do anything to it.
-
-        """
-        if type(to_be_converted) == list:
-            return to_be_converted
-        return [to_be_converted]
