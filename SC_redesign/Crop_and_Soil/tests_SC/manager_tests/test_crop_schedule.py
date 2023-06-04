@@ -1,8 +1,10 @@
 import pytest
 from typing import List, Dict, Any
 
-from SC_redesign.Crop_and_Soil.manager.crop_schedule import Schedule, CropSchedule
+from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent, HarvestEvent
+
 
 def test_repeat_pattern() -> None:
     """Tests that repeat_pattern correctly repeats patterns."""
@@ -130,14 +132,4 @@ def test_generate_harvest_events(years: List[int], days: List[int], harvest_ops:
     crop_sched = CropSchedule("test_name", "test_crop", [1], [120], years, days, harvest_ops, heat_scheduled, skip,
                               repeat)
     actual = crop_sched.generate_harvest_events()
-    assert actual == expected
-
-
-@pytest.mark.parametrize("to_be_converted,expected", [
-    (120, [120]),
-    (["default"], ["default"])
-])
-def test_convert_to_list(to_be_converted: Any, expected: List):
-    """Test that data is correctly converted to be in a list."""
-    actual = CropSchedule._convert_to_list(to_be_converted)
     assert actual == expected
