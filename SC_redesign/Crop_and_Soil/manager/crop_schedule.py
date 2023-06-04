@@ -9,7 +9,108 @@ repeated over a specified number of years, with specified breaks in between repe
 """
 
 
-class CropSchedule:
+class Schedule:
+
+    def __init__(self, name: str, years: List[int], days: List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
+        """
+        Creates a base Schedule object which specific types of Scheduling classes will inherit from.
+
+        Parameters
+        ----------
+        name : str
+            Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
+        years : List[int]
+            Year(s) in which this event will occur.
+        days : List[int]
+            Day(s) in which this event will occur.
+        pattern_skip : int, default=0
+            Number of years to skip between cycles.
+        pattern_repeat : int, default=0
+            Number of times the specified crop planting and harvesting pattern should be repeated.
+
+        """
+        self.name = name
+
+        days_valid = self._validate_days(days)
+        if not days_valid:
+            raise ValueError(f"Expected all days to be in range [1, 366], received `{days}`.")
+        self.days = days
+
+        years_valid = self._validate_years(years)
+        if not years_valid:
+            raise ValueError(f"Expected all years to be > 0 and in non-descending order, received `{years}`")
+        self.years = years
+
+        if len(self.days) == 1:
+            self.days *= len(self.years)
+
+        if len(self.days) != len(self.years):
+            raise ValueError("Number of years that crops are planted in and days crops are planted on must be equal.")
+
+        if pattern_skip < 0:
+            raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
+        elif pattern_repeat < 0:
+            raise ValueError(f"Expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
+        self.pattern_skip = pattern_skip
+        self.pattern_repeat = pattern_repeat
+
+    @staticmethod
+    def _validate_days(days: List[int]) -> bool:
+        """
+        Checks that all values passed for days are in the correct range.
+
+        Parameters
+        ----------
+        days : List[int]
+            Day(s) in which this event will occur.
+
+        Returns
+        -------
+        bool
+            True if all days are valid.
+
+        Notes
+        -----
+        A day is 'valid' if it in the range [1, 366].
+
+        """
+        for day in days:
+            if not 0 < day <= 366:
+                return False
+        return True
+
+    @staticmethod
+    def _validate_years(years: List[int]) -> bool:
+        """
+        Checks that all years passed are valid and ordered.
+
+        Parameters
+        ----------
+        years : List[int]
+
+        Returns
+        -------
+        bool
+            True if years are valid and ordered, False if not.
+
+        Notes
+        -----
+        A list of years is valid if every year is > 0, and the list of years does not descend at all.
+
+        """
+        if not years[0] > 0:
+            return False
+
+        for index in range(1, len(years) - 1):
+            year_valid = years[index]
+            not_descending = years[index - 1] <= years[index]
+            if not year_valid or not not_descending:
+                return False
+
+        return True
+
+
+class CropSchedule():
 
     def __init__(self, name: str, crop_reference: str, planting_years: int | List[int], planting_days: int | List[int],
                  harvest_years: int | List[int], harvest_days: int | List[int], harvest_operations: str | List[str],
