@@ -75,65 +75,64 @@ nearly identical for both modules.
 #### Scheduling
 Certain types of events, (Crop planting/harvesting, soil amendments) need to be scheduled by the user to occur over the
 run of the simulation.
-
 - Crop planting and harvesting.
-  - [ ] Finish implementing and testing Crop planting/harvesting scheduler.
+  - [ ] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
   - Integrate crop scheduler and execution of events into `Field` methods.
     - [ ] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
-    all planting events that should happen call `plant_crop()` on them.
+    all planting events that should happen call `plant_crop()` on them. - 1 point
     - [ ] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
-    attribute of `Field`.
+    attribute of `Field`. - 2 points
     - Implement and test `check_crop_harvesting_schedule()`, which will
-      - [ ] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day.
+      - [ ] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day. - 2 points
       - [ ] Iterate through the `crops` attribute to check if any are harvested using optimal (a.k.a. heat scheduled 
-      harvesting) and if so, harvest them if they have met the optimal harvesting threshold.
+      harvesting) and if so, harvest them if they have met the optimal harvesting threshold. - 2 points
     - [ ] Add calls to `check_crop_planting_schedule()` and `check_crop_harvesting_schedule()` in `Field`s daily 
-    routine.
+    routine. - 1 point
 - Tillage
-  - [ ] Implement and test tillage application scheduler.
+  - [ ] Implement and test tillage application scheduler. - 3 points
   - [ ] Implement and test `check_tillage_schedule()` which will iterate through a list of `TillageEvent`s and collect 
-    and execute all the ones that happen on the current day.
-  - [ ] Add call to `check_tillage_schedule()` in `Field`s daily routine.
+    and execute all the ones that happen on the current day. - 2 points
+  - [ ] Add call to `check_tillage_schedule()` in `Field`s daily routine. - 1 point
 - Fertilizer
-  - [ ] Implement and test fertilizer application scheduler.
+  - [ ] Implement and test fertilizer application scheduler. - 3 points
   - [ ] Implement and test `check_fertilizer_schedule()` which will iterate through a list of `FertilizerEvent`s and 
-  collect and execute all the ones that happen on the current day.
-  - [ ] Add call to `check_fertilizer_schedule()` in `Field`s daily routine.
+  collect and execute all the ones that happen on the current day. - 2 points
+  - [ ] Add call to `check_fertilizer_schedule()` in `Field`s daily routine. - 1 point
 - Manure
-  - [ ] Implement and test manure application scheduler.
+  - [ ] Implement and test manure application scheduler. - 3 points
   - [ ] Implement and test `check_manure_schedule()` which will iterate through a list of `ManureEvent`s and collect and 
-  execute all the ones that happen on the current day.
-  - [ ] Add call to `check_manure_schedule()` in `Field`s daily routine.
+  execute all the ones that happen on the current day. - 2 points
+  - [ ] Add call to `check_manure_schedule()` in `Field`s daily routine. - 1 point
 
 ### Field Manager
 - Implement and test methods to translate user input into configuration dictionary.
-  - [ ] Schedules for crop plantings and harvestings.
-  - [ ] Schedules for manure applications.
-  - [ ] Schedules for fertilizer applications.
-  - [ ] Schedules for tillage operations.
-  - [ ] Soil profile configurations.
-  - [ ] Custom crop types.
+  - [ ] Schedules for crop plantings and harvestings. - 3 points
+  - [ ] Schedules for manure applications. - 2 points
+  - [ ] Schedules for fertilizer applications. - 2 points
+  - [ ] Schedules for tillage operations. - 2 points
+  - [ ] Soil profile configurations. - 4 points
+  - [ ] Custom crop types. - 2 points
 - Implement methods that turn configurations dictionaries into object instances that will be used to run the simulation.
-  - [ ] Create `Soil` instances.
-  - [ ] Create `FieldData` instances.
+  - [ ] Create `Soil` instances. - 3 points
+  - [ ] Create `FieldData` instances. - 2 point
   - Load lists of `Event` objects into `Field` instances.
-    - [ ] Crop `PlantingEvent`s and `HarvestEvent`s.
-    - [ ] `TillageEvent`s.
-    - [ ] `FertilizerEvent`s.
-    - [ ] `ManureEvent`s.
+    - [ ] Crop `PlantingEvent`s and `HarvestEvent`s. - 2 points
+    - [ ] `TillageEvent`s. - 2 points
+    - [ ] `FertilizerEvent`s. - 2 points
+    - [ ] `ManureEvent`s. - 2 points
 - Implement and test methods that mirror the public facing methods of the old `Field` module.
-  - [ ] Daily update routine
-  - [ ] Pre-annual routine
+  - [ ] Daily update routine - 1 point
+  - [ ] Pre-annual routine - 1 point
 - Integrate `FieldManager` into `SimulationEngine` and `State`.
-  - [ ] Replace calls to old daily fields routine with calls to new one in `SimulationEngine`.
-  - [ ] Replace calls to old annual fields routine with calls to new one in `SimulationEngine`.
-  - [ ] Replace initialization of `Fields` with initialization of `FieldManager` in `State`.
+  - [ ] Replace calls to old daily fields routine with calls to new one in `SimulationEngine`. - 1 point
+  - [ ] Replace calls to old annual fields routine with calls to new one in `SimulationEngine`. - 1 point
+  - [ ] Replace initialization of `Fields` with initialization of `FieldManager` in `State`. - 3 points
 
 #### OutputGatherer
 - Implement an `OutputGatherer` module that will handle all output from the Crop and Soil modules
-  - [ ] Implement a method that will collect and pass values to the Output Manager daily.
-  - [ ] Implement a method that will collect and pass values to the Output Manager annually.
-- [ ] Integrate the `OutputGatherer` into the `FieldManager` module.
+  - [ ] Implement a method that will collect and pass values to the Output Manager daily. - 2 points
+  - [ ] Implement a method that will collect and pass values to the Output Manager annually. - 2 points
+- [ ] Integrate the `OutputGatherer` into the `FieldManager` module. - 2 points
 
 #### FieldInputManager
 - Note: this `FieldInputManager` is dependent on being able to interface with the `InputManager`, so this task should 
