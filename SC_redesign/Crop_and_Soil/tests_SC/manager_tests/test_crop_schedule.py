@@ -38,29 +38,6 @@ def test_crop_schedule_init(name: str, crop_ref: str, plant_years: List[int], pl
     assert crop_schedule.pattern_repeat == pat_repeat
 
 
-# @pytest.mark.parametrize("plant_years,plant_days,harvest_years,harvest_days,harvest_ops,pat_skip,pat_repeat,expected", [
-#     ([1] * 3, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 0, 3,
-#      "Number of planting years and days must be equal."),
-#     ([1] * 2, [1] * 2, [1] * 3, [1] * 2, ["default"] * 3, 0, 3,
-#      "Number of values for harvest years, days, and operations must be equal."),
-#     ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, -1, 3, "Expected pattern skip for this crop schedule to be >="
-#                                                                  " 0, received '-1'."),
-#     ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 3, -1, "Expected pattern repeat for this crop schedule to be "
-#                                                                  ">= 0, received '-1'."),
-#     ([1], [1], [1] * 3, [1] * 3, ["no_kill", "default", "no_kill"], 0, 0, "Expected the final harvest operation to be "
-#                                                                           "the only one that kills the crop, received "
-#                                                                           "'['no_kill', 'default', 'no_kill']'.")
-# ])
-# def test_crop_schedule_init_error(plant_years: List[int], plant_days: List[int], harvest_years: List[int],
-#                                   harvest_days: List[int], harvest_ops: List[str], pat_skip: int, pat_repeat: int,
-#                                   expected: str) -> None:
-#     """Tests that errors are correctly raised when invalid input is passed."""
-#     with pytest.raises(ValueError) as e:
-#         CropSchedule("test_name", "test_crop", plant_years, plant_days, harvest_years, harvest_days, harvest_ops, False,
-#                      pat_skip, pat_repeat)
-#     assert str(e.value) == expected
-
-
 @pytest.mark.parametrize("name,years,days,expected", [
     ("test_1", [1990, 1989], [], "'test_1': expected all years to be > 0 and in non-descending order, received "
                                  "'[1990, 1989]'."),
@@ -74,6 +51,31 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
     with pytest.raises(ValueError) as e:
         test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["default"], False, 1, 1)
         test._validate_planting_parameters()
+    assert str(e.value) == expected
+
+
+@pytest.mark.parametrize("name,years,days,operations,expected", [
+    ("test_1", [1996, 1993], [200], ["default"], "'test_1': expected all harvest years to be > 0 and in non-descending "
+                                                 "order, received '[1996, 1993]'."),
+    ("test_2", [1999], [200, 0], ["default"], "'test_2': expected all harvest days to be in range [1, 366], received "
+                                              "'[200, 0]'."),
+    ("test_3", [1998, 1999, 2000], [200, 200], ["no_kill", "default"], "'test_3': expected number of values for harvest"
+                                                                       " years, days, and operations to be equal, "
+                                                                       "received '[1998, 1999, 2000]' years, "
+                                                                       "'[200, 200]' days, and '['no_kill', "
+                                                                       "'default']' operations."),
+    ("test_4", [1998, 1999, 1999], [200, 200, 240], ["no_kill", "default", "no_kill"], "'test_4': expected the final "
+                                                                                       "harvest operation to be the "
+                                                                                       "only one that kills the crop, "
+                                                                                       "received '['no_kill', "
+                                                                                       "'default', 'no_kill']'.")
+])
+def test_validate_harvest_parameters(name: str, years: List[int], days: List[int], operations: List[str],
+                                     expected: str) -> None:
+    """Tests that harvest schedule parameters are valid."""
+    with pytest.raises(ValueError) as e:
+        test = CropSchedule(name, "test_crop", [1990], [130], years, days, operations, False, 1, 1)
+        test._validate_harvest_parameters()
     assert str(e.value) == expected
 
 
