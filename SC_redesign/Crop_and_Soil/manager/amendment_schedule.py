@@ -32,13 +32,7 @@ class TillageSchedule(Schedule):
             Number of times the specified amendment schedule should be repeated.
 
         """
-        try:
-            super().__init__(name, years, days, pattern_skip, pattern_repeat)
-        except ValueError as e:
-            error_message = str(e)
-            detailed_error_message = self._create_specific_error_message(error_message, years, days, pattern_skip,
-                                                                         pattern_repeat)
-            raise ValueError(detailed_error_message)
+        super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
         self.tillage_depths = tillage_depths
         self.incorporation_fractions = incorporation_fractions
@@ -47,30 +41,68 @@ class TillageSchedule(Schedule):
         if len(self.tillage_depths) == 1:
             self.tillage_depths *= len(self.years)
 
-        valid_depths = self._validate_depths(self.tillage_depths)
-        if not valid_depths:
-            raise ValueError(f"Expected all tillage depths to be > 0.0, received '{self.tillage_depths}'.")
-
         if len(self.incorporation_fractions) == 1:
             self.incorporation_fractions *= len(self.years)
-
-        valid_fractions = self._validate_fractions(self.incorporation_fractions)
-        if not valid_fractions:
-            raise ValueError(f"Expected all incorporation fractions to be in range [0.0, 1.0], received "
-                             f"'{self.incorporation_fractions}'.")
 
         if len(self.mixing_fractions) == 1:
             self.mixing_fractions *= len(self.years)
 
-        valid_fractions = self._validate_fractions(self.mixing_fractions)
-        if not valid_fractions:
-            raise ValueError(f"Expected all mixing fractions to be in range [0.0, 1.0], received "
-                             f"'{self.mixing_fractions}'.")
+        self._validate_tillage_parameters()
 
-        equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.incorporation_fractions) \
-            == len(self.mixing_fractions)
+    def _validate_tillage_parameters(self) -> None:
+        """
+        Checks all fields that define the tillage schedule and raises errors if any are invalid.
+
+        Raises
+        ------
+        ValueError
+            If not all tilling years are valid.
+        ValueError
+            If not all tilling days are valid.
+        ValueError
+            If not all tillage depths are valid.
+        ValueError
+            If not all incorporation fractions are valid.
+        ValueError
+            If not all mixing fractions are valid.
+        ValueError
+            If number of years, days, depths, and incorporation and mixing fractions are not equal.
+
+        """
+        error_header = f"'{self.name}': "
+
+        valid_years = self._validate_years(self.years)
+        if not valid_years:
+            raise ValueError(error_header + f"expected all years to be > 0 and in non-descending order, received "
+                                            f"'{self.years}'.")
+
+        valid_days = self._validate_days(self.days)
+        if not valid_days:
+            raise ValueError(error_header + f"expected all planting days to be in range [1, 366], received "
+                                            f"'{self.days}'.")
+
+        valid_depths = self._validate_depths(self.tillage_depths)
+        if not valid_depths:
+            raise ValueError(error_header + f"expected all tillage depths to be > 0.0, received "
+                                            f"'{self.tillage_depths}'.")
+
+        valid_incorp_fractions = self._validate_fractions(self.incorporation_fractions)
+        if not valid_incorp_fractions:
+            raise ValueError(error_header + f"expected all incorporation fractions to be in range [0.0, 1.0], received "
+                                            f"'{self.incorporation_fractions}'.")
+
+        valid_mix_fractions = self._validate_fractions(self.mixing_fractions)
+        if not valid_mix_fractions:
+            raise ValueError(error_header + f"expected all mixing fractions to be in range [0.0, 1.0], received "
+                                            f"'{self.mixing_fractions}'.")
+
+        equal_tillage_parameters = len(self.years) == len(self.days) == len(self.tillage_depths) == \
+            len(self.incorporation_fractions) == len(self.mixing_fractions)
         if not equal_tillage_parameters:
-            raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
+            raise ValueError(error_header + f"expected number of years, days, depths, incorporation and mixing "
+                                            f"fractions to be equal, received '{self.years}' years, '{self.days}' days,"
+                                            f" '{self.tillage_depths}' tillage depths, '{self.incorporation_fractions}'"
+                                            f" incorporation fractions, and '{self.mixing_fractions}' mixing fractions")
 
     def generate_tillage_events(self) -> List[TillageEvent]:
         """
@@ -146,41 +178,3 @@ class TillageSchedule(Schedule):
             if not is_valid:
                 return False
         return True
-
-    @staticmethod
-    def _create_specific_error_message(error_message: str, years: List[int], days: List[int], skip: int,
-                                       repeat: int) -> str:
-        """
-        This method creates an error message more specific to TillageSchedule instance based on the error raised in the
-        base class's init method.
-
-        Parameters
-        ----------
-        error_message : str
-            The error message from the error raised by `Schedule.__init__()`.
-        years : List[int]
-            Year(s) in which soil is tilled.
-        days : List[int]
-            Day(s) on which soil is tilled.
-        skip : int, default=0
-            Number of years to skip between cycles.
-        repeat : int, default=0
-            Number of times the specified tillage pattern should be repeated.
-
-        Returns
-        -------
-        str
-            A more detailed error message.
-
-        """
-        if error_message == "Years invalid.":
-            return f"Expected all tillage years to be > 0 and in non-descending order, received '{years}'."
-        elif error_message == "Days invalid.":
-            return f"Expected all tillage days to be in range [1, 366], received '{days}'."
-        elif error_message == "Number of years and days not equal.":
-            return "Number of tillage years and days must be equal."
-        elif error_message == "Skip invalid.":
-            return f"Expected pattern skip for this tillage schedule to be >= 0, received '{skip}'."
-        elif error_message == "Repeat invalid.":
-            return f"Expected pattern repeat for this tillage schedule to be >= 0, received '{repeat}'."
-        return error_message

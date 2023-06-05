@@ -87,22 +87,3 @@ def test_generate_tillage_events(depths: List[float], incorp_fracs: List[float],
     till_sched = TillageSchedule("test", years, days, depths, incorp_fracs, mix_fracs, skip, repeat)
     actual = till_sched.generate_tillage_events()
     assert actual == expected
-
-
-@pytest.mark.parametrize("message,years,days,skip,repeat,expected", [
-    ("Years invalid.", [1990, 1992, 1991], [200], 1, 1,
-     "Expected all tillage years to be > 0 and in non-descending order, received '[1990, 1992, 1991]'."),
-    ("Days invalid.", [1990], [367], 1, 1, "Expected all tillage days to be in range [1, 366], received '[367]'."),
-    ("Number of years and days not equal.", [1990], [200, 200], 1, 1,
-     "Number of tillage years and days must be equal."),
-    ("Skip invalid.", [1990], [200], -1, 1, "Expected pattern skip for this tillage schedule to be >= 0, "
-                                            "received '-1'."),
-    ("Repeat invalid.", [1990], [200], 1, -1,
-     "Expected pattern repeat for this tillage schedule to be >= 0, received '-1'."),
-    ("An unexpected error message.", [1990], [200], 1, 1, "An unexpected error message.")
-])
-def test_create_specific_error_message(message: str, years: List[int], days: List[int], skip: int, repeat: int,
-                                       expected: str) -> None:
-    """Tests that the correct specific error message is created from a more generic one."""
-    actual = TillageSchedule._create_specific_error_message(message, years, days, skip, repeat)
-    assert actual == expected
