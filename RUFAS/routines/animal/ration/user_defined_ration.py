@@ -9,80 +9,6 @@ Author: Joseph C. Waddell, jw2574@cornell.edu
 from typing import Any, Dict, List, Union
 import json
 
-def generate_user_feed_json(ration_percentage_filename = 'input/userdefinedration/user_defined_ration_input_percentages.json',
-                            reference_filename = 'input/feed/purchased_feed.json',
-                            new_feed_filename = 'input/feed/user_defined_ration_feed.json')->None:
-    """
-    This will use the user_defined_ration file to generate the feed input json
-    It reads in the input file, compares it to the purchased_feed file, and prints a new user_defined_ration_feed file
-
-    Returns nothing, BUT the feed JSON needs to have the PRICES manually adjusted. placeholdervalues of 0.9999 
-        used for any not found in the reference JSON
-
-    Parameters
-    ----------
-    ration_percentage_filename: str
-
-    reference_filename: str
-
-    new_feed_filename: str
-
-    """
-    import json
-    with open(ration_percentage_filename, 'r') as f:
-        rationall = json.load(f)
-        key_list = list(rationall.keys())
-    ration_calf = rationall[key_list[0]]
-
-    ration_all_heifers = rationall[key_list[1]]
-    ration_cow_lactating = rationall[key_list[2]]
-    ration_cow_dry = rationall[key_list[3]]
-    with open(reference_filename, 'r') as f:
-        ff = json.load(f)
-        key_list = list(ff.keys())
-
-    new_calf_feeds = [int(i) for i in ration_calf]
-    new_growing_feeds = [int(i) for i in ration_all_heifers]
-    new_close_up_feeds = [int(i) for i in ration_cow_dry]
-    new_lac_cow_feeds = [int(i) for i in ration_cow_lactating]
-
-    ff['calf_feeds']=new_calf_feeds
-    ff['growing_feeds']=new_growing_feeds
-    ff['close_up_feeds']=new_close_up_feeds
-    ff['lac_cow_feeds']=new_lac_cow_feeds
-
-    with open(new_feed_filename, 'w') as file:
-        json.dump(ff, file)
-    with open(new_feed_filename, 'r') as f:
-        fff = json.load(f)
-    fff['purchased_feeds_costs']
-
-    feedslisted = list(fff['purchased_feeds_costs'].keys())
-
-    newlist = new_lac_cow_feeds + new_calf_feeds + new_close_up_feeds \
-        + new_growing_feeds
-    setlist = set(newlist)
-    newsetted = list(setlist)
-    newsetted.sort()
-    newsetted = [str(i) for i in newsetted]
-    difflist = list(set(newsetted).difference(feedslisted))
-    difflist.sort()
-    newpricesdict = {}
-    for i in newsetted:
-        print(i)
-        if i in fff['purchased_feeds_costs'].keys():
-            price = fff['purchased_feeds_costs'][str(i)]
-            print(fff['purchased_feeds_costs'][str(i)])
-        else: 
-            price = 0.9999
-        newpricesdict[i] = price
-    fff['purchased_feeds_costs'] = newpricesdict
-    purchased_feeds_keynames = list(newpricesdict.keys())
-    fff['purchased_feeds'] = [int(i) for i in purchased_feeds_keynames]
-    with open(new_feed_filename, 'w') as file:
-        json.dump(fff, file, indent=3)
-
-
 class UserDefinedRationValues(object):
     """
     Reads in the user_defined_ration JSON and collects variables and dicts to use later
@@ -119,7 +45,7 @@ class UserDefinedRationValues(object):
             self.udr_or_not = None
             
 
-def ration_to_use(pen_animal_combo) -> Dict:
+def ration_to_use(pen_animal_combo, available_feeds) -> Dict:
     """
     Function outputs the correct dictionary from the UserDefinedRationValues class
     
@@ -143,4 +69,14 @@ def ration_to_use(pen_animal_combo) -> Dict:
         ration_percents = udrv.dry_cow_ration
     else: 
         ration_percents = udrv.calf_ration
+    return feed_quality_fix(ration_percents, available_feeds)
+
+
+def feed_quality_fix(ration_percents, available_feeds):
+    key_list = list(ration_percents.keys())
+    for key in key_list:
+        if int(key) not in available_feeds['feed_id']:
+            new_key = str(int(key)+2)
+            ration_percents[new_key] = ration_percents[key]
+            del ration_percents[key]
     return ration_percents

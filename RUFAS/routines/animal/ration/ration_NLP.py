@@ -549,7 +549,7 @@ def userbounds(ration_percents: Dict) -> List:
     return tribounds
 
 
-def optimize(animal_combination) -> None:
+def optimize(animal_combination, available_feeds) -> None:
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -559,6 +559,12 @@ def optimize(animal_combination) -> None:
     ----------
     animal_combination : Pen.AnimalCombination
         The animal combination to optimize the ration for.
+    
+    available_feeds: : a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+    
+    Returns
+    -------
+    OptimizeResult object from scipy package
     """
 
     n = len(price)
@@ -570,7 +576,7 @@ def optimize(animal_combination) -> None:
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
-        bnds = userbounds(user_defined_ration.ration_to_use(animal_combination))
+        bnds = userbounds(user_defined_ration.ration_to_use(animal_combination, available_feeds))
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))

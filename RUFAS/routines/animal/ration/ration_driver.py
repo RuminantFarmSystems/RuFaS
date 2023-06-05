@@ -68,7 +68,7 @@ def optimization(requirements, available_feeds, animal_combination):
     count = 0
     while i < 1:
         try:
-            solution = NLP.optimize(animal_combination)
+            solution = NLP.optimize(animal_combination, available_feeds)
             # TODO here we need to add a way to check why this is failing to optimize and
             # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
@@ -106,7 +106,7 @@ def get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             True if cow is lactating, False otherwise
     """
     fixed_ration = False
-    ration_percents = ration_to_use(pen.animal_combination)
+    ration_percents = ration_to_use(pen.animal_combination, available_feeds)
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
     # Reduction of milk production estimate process to achieve feasible solution
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
