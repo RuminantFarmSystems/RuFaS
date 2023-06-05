@@ -11,7 +11,7 @@ class Schedule:
         Parameters
         ----------
         name : str
-            Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
+            Reference to the name of this schedule that will be used to distinguish this schedule from others.
         years : List[int]
             Year(s) in which this event will occur.
         days : List[int]
@@ -19,20 +19,7 @@ class Schedule:
         pattern_skip : int, default=0
             Number of years to skip between cycles.
         pattern_repeat : int, default=0
-            Number of times the specified crop planting and harvesting pattern should be repeated.
-
-        Raises
-        ------
-        ValueError
-            If any of the days passed are invalid.
-        ValueError
-            If any of the years passed are invalid.
-        ValueError
-            If the number of years is not equal to the number of days.
-        ValueError
-            If the pattern skip is less than 0.
-        ValueError
-            If the number of pattern repetitions is less than 0.
+            Number of times the specified pattern of this schedule should be repeated.
 
         Notes
         -----
@@ -41,27 +28,12 @@ class Schedule:
 
         """
         self.name = name
-
-        years_valid = self._validate_years(years)
-        if not years_valid:
-            raise ValueError("Years invalid.")
         self.years = years
 
-        days_valid = self._validate_days(days)
-        if not days_valid:
-            raise ValueError("Days invalid.")
         self.days = days
-
         if len(self.days) == 1:
             self.days *= len(self.years)
 
-        if len(self.days) != len(self.years):
-            raise ValueError("Number of years and days not equal.")
-
-        if pattern_skip < 0:
-            raise ValueError("Skip invalid.")
-        elif pattern_repeat < 0:
-            raise ValueError("Repeat invalid.")
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
 
@@ -85,10 +57,7 @@ class Schedule:
         A day is 'valid' if it in the range [1, 366].
 
         """
-        for day in days:
-            if not 0 < day <= 366:
-                return False
-        return True
+        return all(0 < day <= 366 for day in days)
 
     @staticmethod
     def _validate_years(years: List[int]) -> bool:
@@ -109,19 +78,7 @@ class Schedule:
         A list of years is valid if every year is > 0, and the list of years does not descend at all.
 
         """
-        if len(years) == 0:
-            return True
-
-        if not years[0] > 0:
-            return False
-
-        for index in range(0, len(years) - 1):
-            year_valid = years[index] > 0
-            not_descending = years[index] <= years[index + 1]
-            if not year_valid or not not_descending:
-                return False
-
-        return True
+        return all(0 < years[index] <= years[index + 1] for index in range(0, len(years) - 1))
 
     @staticmethod
     def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
