@@ -3,7 +3,7 @@ from copy import deepcopy
 
 
 """
-This module contains `Schedule`, which acts as the base class for all the different schedule objects that are utilized 
+This module contains `Schedule`, which acts as the base class for all the different schedule objects that are utilized
 by the Crop and Soil module.
 """
 
