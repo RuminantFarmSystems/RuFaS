@@ -24,35 +24,44 @@ class Schedule:
         Raises
         ------
         ValueError
+            If any of the days passed are invalid.
+        ValueError
+            If any of the years passed are invalid.
+        ValueError
             If the number of years is not equal to the number of days.
         ValueError
             If the pattern skip is less than 0.
         ValueError
             If the number of pattern repetitions is less than 0.
 
+        Notes
+        -----
+        It is expected that this generic schedule class will only see use through its child classes, and for the errors
+        raised they are expected to be caught by child classes and given more appropriate and specific error messages.
+
         """
         self.name = name
 
-        days_valid = self._validate_days(days)
-        if not days_valid:
-            raise ValueError(f"Expected all days to be in range [1, 366], received `{days}`.")
-        self.days = days
-
         years_valid = self._validate_years(years)
         if not years_valid:
-            raise ValueError(f"Expected all years to be > 0 and in non-descending order, received `{years}`")
+            raise ValueError("Years invalid.")
         self.years = years
+
+        days_valid = self._validate_days(days)
+        if not days_valid:
+            raise ValueError("Days invalid.")
+        self.days = days
 
         if len(self.days) == 1:
             self.days *= len(self.years)
 
         if len(self.days) != len(self.years):
-            raise ValueError("Number of years and days must be equal.")
+            raise ValueError("Number of years and days not equal.")
 
         if pattern_skip < 0:
-            raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
+            raise ValueError("Skip invalid.")
         elif pattern_repeat < 0:
-            raise ValueError(f"Expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
+            raise ValueError("Repeat invalid.")
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
 
@@ -100,19 +109,22 @@ class Schedule:
         A list of years is valid if every year is > 0, and the list of years does not descend at all.
 
         """
+        if len(years) == 0:
+            return True
+
         if not years[0] > 0:
             return False
 
-        for index in range(1, len(years) - 1):
-            year_valid = years[index]
-            not_descending = years[index - 1] <= years[index]
+        for index in range(0, len(years) - 1):
+            year_valid = years[index] > 0
+            not_descending = years[index] <= years[index + 1]
             if not year_valid or not not_descending:
                 return False
 
         return True
 
     @staticmethod
-    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+    def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
         """
         Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
         repetitions.
@@ -131,13 +143,6 @@ class Schedule:
         List[int]
             The full repeated pattern of numbers.
 
-        Raises
-        ------
-        ValueError
-            If the skip is less than 0.
-        ValueError
-            If the number of times to repeat is less than 0.
-
         Examples
         --------
         >>> repeat_pattern([1, 3, 5], 1, 2)
@@ -150,11 +155,6 @@ class Schedule:
         [2, 3, 7, 11, 12, 16, 20, 21, 24]
 
         """
-        if skip < 0:
-            raise ValueError(f"Expected skip to be >= 0, received '{skip}'.")
-        if repeat < 0:
-            raise ValueError(f"Expected repeat to be >= 0, received '{repeat}'.")
-
         differences = [skip + 1]
         in_pattern_differences = range(1, len(pattern[1:]) + 1)
         for difference in in_pattern_differences:
