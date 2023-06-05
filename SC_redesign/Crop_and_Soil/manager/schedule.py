@@ -37,6 +37,23 @@ class Schedule:
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
 
+    def _validate_pattern_parameters(self) -> None:
+        """
+        Checks the pattern skip and repeat parameters, if they are not correct raises errors.
+
+        Raises
+        ------
+        ValueError
+            If the skip is < 0.
+        ValueError
+            If the repeat is < 0.
+
+        """
+        if self.pattern_skip < 0:
+            raise ValueError(f"'{self.name}': expected pattern skip to be >= 0, received '{self.pattern_skip}'.")
+        if self.pattern_repeat < 0:
+            raise ValueError(f"'{self.name}': expected pattern repeat to be >= 0, received '{self.pattern_repeat}'.")
+
     @staticmethod
     def _validate_days(days: List[int]) -> bool:
         """
