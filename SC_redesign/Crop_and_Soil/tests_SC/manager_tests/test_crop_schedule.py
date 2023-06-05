@@ -1,5 +1,5 @@
 import pytest
-from typing import List, Dict, Any
+from typing import List, Dict
 
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule

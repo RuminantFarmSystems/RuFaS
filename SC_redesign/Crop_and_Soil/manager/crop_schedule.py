@@ -55,23 +55,14 @@ class CropSchedule(Schedule):
         ValueError
             If the number of pattern repetitions is less than 0.
 
-        Notes
-        -----
-        If use_heat_scheduling is True, then all non-final harvest events will be ignored.
-
         """
         try:
             super().__init__(name, planting_years, planting_days, pattern_skip, pattern_repeat)
         except ValueError as e:
             error_message = str(e)
-            if error_message == f"Expected all days to be in range [1, 366], received `{planting_days}`.":
-                raise ValueError(f"Expected all planting days to be in range [1, 366], received `{planting_days}`.")
-            elif error_message == f"Expected all years to be > 0 and in non-descending order, received " \
-                                  f"`{planting_years}`":
-                raise ValueError(f"Expected all years to be > 0 and in non-descending order, received "
-                                 f"`{planting_years}`")
-            elif error_message == "Number of years and days must be equal.":
-                raise ValueError("Number of years and days must be equal.")
+            detailed_error_message = self._create_specific_error_message(error_message, planting_years, planting_days,
+                                                                         pattern_skip, pattern_repeat)
+            raise ValueError(detailed_error_message)
 
         self.crop_reference = crop_reference
         self.planting_years = self.years
@@ -118,7 +109,7 @@ class CropSchedule(Schedule):
             List of all planting events that will happen for this crop schedule.
 
         """
-        all_planting_years = self.repeat_pattern(self.planting_years, self.pattern_skip, self.pattern_repeat)
+        all_planting_years = self._repeat_pattern(self.planting_years, self.pattern_skip, self.pattern_repeat)
         all_planting_days = self.planting_days * (self.pattern_repeat + 1)
         all_planting_dates = list(zip(all_planting_years, all_planting_days))
 
@@ -143,7 +134,7 @@ class CropSchedule(Schedule):
         scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
-        all_harvesting_years = self.repeat_pattern(self.harvest_years, self.pattern_skip, self.pattern_repeat)
+        all_harvesting_years = self._repeat_pattern(self.harvest_years, self.pattern_skip, self.pattern_repeat)
         all_harvesting_days = self.harvest_days * (self.pattern_repeat + 1)
         all_harvesting_operations = self.harvest_operations * (self.pattern_repeat + 1)
         all_harvesting_dates = list(zip(all_harvesting_years, all_harvesting_days, all_harvesting_operations))
@@ -157,3 +148,41 @@ class CropSchedule(Schedule):
             new_harvest_event = HarvestEvent(self.crop_reference, date[0], date[1], date[2])
             harvest_events.append(new_harvest_event)
         return harvest_events
+
+    @staticmethod
+    def _create_specific_error_message(self, error_message: str, years: List[int], days: List[int], skip: int,
+                                       repeat: int) -> str:
+        """
+        This method creates an error message more specific to CropSchedule instance based on the error raised in the
+        base class's init method.
+
+        Parameters
+        ----------
+        error_message : str
+            The error message from the error raised by `Schedule.__init__()`.
+        years : List[int]
+            Year(s) in which crop is planted.
+        days : List[int]
+            Day(s) on which crop is planted.
+        skip : int, default=0
+            Number of years to skip between cycles.
+        repeat : int, default=0
+            Number of times the specified crop planting and harvesting pattern should be repeated.
+
+        Returns
+        -------
+        str
+            A more detailed error message.
+
+        """
+        if error_message == "Days invalid.":
+            return f"Expected all planting days to be in range [1, 366], received `{days}`."
+        elif error_message == "Years invalid..":
+            return f"Expected all years to be > 0 and in non-descending order, received `{years}`."
+        elif error_message == "Number of years and days must be equal.":
+            return "Number of planting years and days must be equal."
+        elif error_message == "Skip invalid.":
+            return f"Expected pattern skip for this crop schedule to be >= 0, received '{skip}'."
+        elif error_message == "Pattern invalid.":
+            return f"Expected pattern repeat for this crop schedule to be >= 0, received '{repeat}'."
+        return error_message
