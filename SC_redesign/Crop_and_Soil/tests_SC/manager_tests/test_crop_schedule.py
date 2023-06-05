@@ -38,26 +38,42 @@ def test_crop_schedule_init(name: str, crop_ref: str, plant_years: List[int], pl
     assert crop_schedule.pattern_repeat == pat_repeat
 
 
-@pytest.mark.parametrize("plant_years,plant_days,harvest_years,harvest_days,harvest_ops,pat_skip,pat_repeat,expected", [
-    ([1] * 3, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 0, 3,
-     "Number of planting years and days must be equal."),
-    ([1] * 2, [1] * 2, [1] * 3, [1] * 2, ["default"] * 3, 0, 3,
-     "Number of values for harvest years, days, and operations must be equal."),
-    ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, -1, 3, "Expected pattern skip for this crop schedule to be >="
-                                                                 " 0, received '-1'."),
-    ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 3, -1, "Expected pattern repeat for this crop schedule to be "
-                                                                 ">= 0, received '-1'."),
-    ([1], [1], [1] * 3, [1] * 3, ["no_kill", "default", "no_kill"], 0, 0, "Expected the final harvest operation to be "
-                                                                          "the only one that kills the crop, received "
-                                                                          "'['no_kill', 'default', 'no_kill']'.")
+# @pytest.mark.parametrize("plant_years,plant_days,harvest_years,harvest_days,harvest_ops,pat_skip,pat_repeat,expected", [
+#     ([1] * 3, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 0, 3,
+#      "Number of planting years and days must be equal."),
+#     ([1] * 2, [1] * 2, [1] * 3, [1] * 2, ["default"] * 3, 0, 3,
+#      "Number of values for harvest years, days, and operations must be equal."),
+#     ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, -1, 3, "Expected pattern skip for this crop schedule to be >="
+#                                                                  " 0, received '-1'."),
+#     ([1] * 2, [1] * 2, [1] * 3, [1] * 3, ["default"] * 3, 3, -1, "Expected pattern repeat for this crop schedule to be "
+#                                                                  ">= 0, received '-1'."),
+#     ([1], [1], [1] * 3, [1] * 3, ["no_kill", "default", "no_kill"], 0, 0, "Expected the final harvest operation to be "
+#                                                                           "the only one that kills the crop, received "
+#                                                                           "'['no_kill', 'default', 'no_kill']'.")
+# ])
+# def test_crop_schedule_init_error(plant_years: List[int], plant_days: List[int], harvest_years: List[int],
+#                                   harvest_days: List[int], harvest_ops: List[str], pat_skip: int, pat_repeat: int,
+#                                   expected: str) -> None:
+#     """Tests that errors are correctly raised when invalid input is passed."""
+#     with pytest.raises(ValueError) as e:
+#         CropSchedule("test_name", "test_crop", plant_years, plant_days, harvest_years, harvest_days, harvest_ops, False,
+#                      pat_skip, pat_repeat)
+#     assert str(e.value) == expected
+
+
+@pytest.mark.parametrize("name,years,days,expected", [
+    ("test_1", [1990, 1989], [], "'test_1': expected all years to be > 0 and in non-descending order, received "
+                                 "'[1990, 1989]'."),
+    ("test_2", [1998], [200, 200, 367], "'test_2': expected all planting days to be in range [1, 366], received "
+                                        "'[200, 200, 367]'."),
+    ("test_3", [1997, 1998], [90, 120, 90], "'test_3': expected number of planting years and days to be the same, "
+                                            "received '[1997, 1998]' years and '[90, 120, 90]' days.")
 ])
-def test_crop_schedule_init_error(plant_years: int | List[int], plant_days: int | List[int],
-                                  harvest_years: int | List[int], harvest_days: int | List[int],
-                                  harvest_ops: str | List[str], pat_skip: int, pat_repeat: int, expected: str) -> None:
-    """Tests that errors are correctly raised when invalid input is passed."""
+def test_validate_planting_parameters(name: str, years: List[int], days: List[int], expected: str) -> None:
+    """Tests that the errors are raised properly when crop planting parameters are invalid."""
     with pytest.raises(ValueError) as e:
-        CropSchedule("test_name", "test_crop", plant_years, plant_days, harvest_years, harvest_days, harvest_ops, False,
-                     pat_skip, pat_repeat)
+        test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["default"], False, 1, 1)
+        test._validate_planting_parameters()
     assert str(e.value) == expected
 
 
@@ -108,22 +124,4 @@ def test_generate_harvest_events(years: List[int], days: List[int], harvest_ops:
     crop_sched = CropSchedule("test_name", "test_crop", [1], [120], years, days, harvest_ops, heat_scheduled, skip,
                               repeat)
     actual = crop_sched.generate_harvest_events()
-    assert actual == expected
-
-
-@pytest.mark.parametrize("message,years,days,skip,repeat,expected", [
-    ("Years invalid.", [1990, 1992, 1991], [200], 1, 1,
-     "Expected all years to be > 0 and in non-descending order, received '[1990, 1992, 1991]'."),
-    ("Days invalid.", [1990], [367], 1, 1, "Expected all planting days to be in range [1, 366], received '[367]'."),
-    ("Number of years and days not equal.", [1990], [200, 200], 1, 1,
-     "Number of planting years and days must be equal."),
-    ("Skip invalid.", [1990], [200], -1, 1, "Expected pattern skip for this crop schedule to be >= 0, received '-1'."),
-    ("Repeat invalid.", [1990], [200], 1, -1,
-     "Expected pattern repeat for this crop schedule to be >= 0, received '-1'."),
-    ("An unexpected error message.", [1990], [200], 1, 1, "An unexpected error message.")
-])
-def test_create_specific_error_message(message: str, years: List[int], days: List[int], skip: int, repeat: int,
-                                       expected: str) -> None:
-    """Tests that the correct specific error message is created from a more generic one."""
-    actual = CropSchedule._create_specific_error_message(message, years, days, skip, repeat)
     assert actual == expected

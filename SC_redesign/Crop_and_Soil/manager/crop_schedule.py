@@ -56,13 +56,7 @@ class CropSchedule(Schedule):
             If the number of pattern repetitions is less than 0.
 
         """
-        try:
-            super().__init__(name, planting_years, planting_days, pattern_skip, pattern_repeat)
-        except ValueError as e:
-            error_message = str(e)
-            detailed_error_message = self._create_specific_error_message(error_message, planting_years, planting_days,
-                                                                         pattern_skip, pattern_repeat)
-            raise ValueError(detailed_error_message)
+        super().__init__(name, planting_years, planting_days, pattern_skip, pattern_repeat)
 
         self.crop_reference = crop_reference
         self.planting_years = self.years
@@ -98,6 +92,34 @@ class CropSchedule(Schedule):
                              f"'{self.harvest_operations}'.")
 
         self.heat_scheduled = use_heat_scheduling
+
+    def _validate_planting_parameters(self) -> None:
+        """
+        Checks fields that dictate planting for correctness, otherwise raises errors.
+
+        Raises
+        ------
+        ValueError
+            If not all planting years are valid.
+        ValueError
+            If not all planting days are valid.
+        ValueError
+            If not number of planting years and days are not equal.
+
+        """
+        valid_years = self._validate_years(self.planting_years)
+        if not valid_years:
+            raise ValueError(f"'{self.name}': expected all years to be > 0 and in non-descending order, received "
+                             f"'{self.planting_years}'.")
+
+        valid_days = self._validate_days(self.planting_days)
+        if not valid_days:
+            raise ValueError(f"'{self.name}': expected all planting days to be in range [1, 366], received "
+                             f"'{self.planting_days}'.")
+
+        if len(self.planting_years) != len(self.planting_days):
+            raise ValueError(f"'{self.name}': expected number of planting years and days to be the same, received "
+                             f"'{self.planting_years}' years and '{self.planting_days}' days.")
 
     def generate_planting_events(self) -> List[PlantingEvent]:
         """
@@ -148,41 +170,3 @@ class CropSchedule(Schedule):
             new_harvest_event = HarvestEvent(self.crop_reference, date[0], date[1], date[2])
             harvest_events.append(new_harvest_event)
         return harvest_events
-
-    @staticmethod
-    def _create_specific_error_message(error_message: str, years: List[int], days: List[int], skip: int,
-                                       repeat: int) -> str:
-        """
-        This method creates an error message more specific to CropSchedule instance based on the error raised in the
-        base class's init method.
-
-        Parameters
-        ----------
-        error_message : str
-            The error message from the error raised by `Schedule.__init__()`.
-        years : List[int]
-            Year(s) in which crop is planted.
-        days : List[int]
-            Day(s) on which crop is planted.
-        skip : int, default=0
-            Number of years to skip between cycles.
-        repeat : int, default=0
-            Number of times the specified crop planting and harvesting pattern should be repeated.
-
-        Returns
-        -------
-        str
-            A more detailed error message.
-
-        """
-        if error_message == "Years invalid.":
-            return f"Expected all years to be > 0 and in non-descending order, received '{years}'."
-        elif error_message == "Days invalid.":
-            return f"Expected all planting days to be in range [1, 366], received '{days}'."
-        elif error_message == "Number of years and days not equal.":
-            return "Number of planting years and days must be equal."
-        elif error_message == "Skip invalid.":
-            return f"Expected pattern skip for this crop schedule to be >= 0, received '{skip}'."
-        elif error_message == "Repeat invalid.":
-            return f"Expected pattern repeat for this crop schedule to be >= 0, received '{repeat}'."
-        return error_message
