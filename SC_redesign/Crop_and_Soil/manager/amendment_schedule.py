@@ -32,7 +32,13 @@ class TillageSchedule(Schedule):
             Number of times the specified amendment schedule should be repeated.
 
         """
-        super().__init__(name=name, years=years, days=days, pattern_skip=pattern_skip, pattern_repeat=pattern_repeat)
+        try:
+            super().__init__(name, years, days, pattern_skip, pattern_repeat)
+        except ValueError as e:
+            error_message = str(e)
+            detailed_error_message = self._create_specific_error_message(error_message, years, days, pattern_skip,
+                                                                         pattern_repeat)
+            raise ValueError(detailed_error_message)
 
         self.tillage_depths = tillage_depths
         self.incorporation_fractions = incorporation_fractions
@@ -62,7 +68,7 @@ class TillageSchedule(Schedule):
                              f"'{self.mixing_fractions}'.")
 
         equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.incorporation_fractions) \
-                                   == len(self.mixing_fractions)
+            == len(self.mixing_fractions)
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
 
@@ -140,3 +146,41 @@ class TillageSchedule(Schedule):
             if not is_valid:
                 return False
         return True
+
+    @staticmethod
+    def _create_specific_error_message(error_message: str, years: List[int], days: List[int], skip: int,
+                                       repeat: int) -> str:
+        """
+        This method creates an error message more specific to TillageSchedule instance based on the error raised in the
+        base class's init method.
+
+        Parameters
+        ----------
+        error_message : str
+            The error message from the error raised by `Schedule.__init__()`.
+        years : List[int]
+            Year(s) in which soil is tilled.
+        days : List[int]
+            Day(s) on which soil is tilled.
+        skip : int, default=0
+            Number of years to skip between cycles.
+        repeat : int, default=0
+            Number of times the specified tillage pattern should be repeated.
+
+        Returns
+        -------
+        str
+            A more detailed error message.
+
+        """
+        if error_message == "Years invalid.":
+            return f"Expected all tillage years to be > 0 and in non-descending order, received '{years}'."
+        elif error_message == "Days invalid.":
+            return f"Expected all tillage days to be in range [1, 366], received '{days}'."
+        elif error_message == "Number of years and days not equal.":
+            return "Number of tillage years and days must be equal."
+        elif error_message == "Skip invalid.":
+            return f"Expected pattern skip for this tillage schedule to be >= 0, received '{skip}'."
+        elif error_message == "Repeat invalid.":
+            return f"Expected pattern repeat for this tillage schedule to be >= 0, received '{repeat}'."
+        return error_message
