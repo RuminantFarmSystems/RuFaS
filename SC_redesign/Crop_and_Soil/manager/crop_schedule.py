@@ -44,7 +44,7 @@ class CropSchedule(Schedule):
         Raises
         ------
         ValueError
-            If the number of planting years is not equal to the number of planting days.
+            If the init() method of the base Schedule class raises a ValueError.
         ValueError
             If the number of harvest years, days, and operations are not equal.
         ValueError
@@ -150,7 +150,7 @@ class CropSchedule(Schedule):
         return harvest_events
 
     @staticmethod
-    def _create_specific_error_message(self, error_message: str, years: List[int], days: List[int], skip: int,
+    def _create_specific_error_message(error_message: str, years: List[int], days: List[int], skip: int,
                                        repeat: int) -> str:
         """
         This method creates an error message more specific to CropSchedule instance based on the error raised in the
@@ -175,10 +175,10 @@ class CropSchedule(Schedule):
             A more detailed error message.
 
         """
-        if error_message == "Days invalid.":
-            return f"Expected all planting days to be in range [1, 366], received `{days}`."
-        elif error_message == "Years invalid..":
-            return f"Expected all years to be > 0 and in non-descending order, received `{years}`."
+        if error_message == "Years invalid.":
+            return f"Expected all years to be > 0 and in non-descending order, received '{years}'."
+        elif error_message == "Days invalid.":
+            return f"Expected all planting days to be in range [1, 366], received '{days}'."
         elif error_message == "Number of years and days must be equal.":
             return "Number of planting years and days must be equal."
         elif error_message == "Skip invalid.":
