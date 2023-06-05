@@ -47,3 +47,15 @@ def test_validate_years(years: List[int], expected: bool) -> None:
     """Tests that all years passed to be scheduled are valid."""
     actual = Schedule._validate_years(years)
     assert actual == expected
+
+
+@pytest.mark.parametrize("name,skip,repeat,expected", [
+    ("test_1", -1, 1, "'test_1': expected pattern skip to be >= 0, received '-1'."),
+    ("test_2", 1, -1, "'test_2': expected pattern repeat to be >= 0, received '-1'.")
+])
+def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected: str) -> None:
+    """Tests that errors are correctly raised by Schedule when invalid"""
+    with pytest.raises(ValueError) as e:
+        test = Schedule(name, [], [], skip, repeat)
+        test._validate_pattern_parameters()
+    assert str(e.value) == expected
