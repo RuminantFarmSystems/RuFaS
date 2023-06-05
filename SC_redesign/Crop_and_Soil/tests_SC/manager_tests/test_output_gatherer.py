@@ -41,7 +41,7 @@ def test_send_daily_variables(runoff_values: List[float]) -> None:
     assert pool['field name 2 .current_residue']['values'] == [0, 0, 0]
 
     # Testing soil variables
-    assert 'field name 1 .accumulated_runoff' in pool.keys()
+    assert 'field name 1 .water_evaporated' in pool.keys()
     assert len(pool['field name 1 .water_evaporated']['info_maps']) == 3
     assert pool['field name 1 .water_evaporated']['values'] == [0, 0, 0]
 
