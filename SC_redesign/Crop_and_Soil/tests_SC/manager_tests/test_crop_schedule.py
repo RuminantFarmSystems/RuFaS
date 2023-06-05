@@ -2,27 +2,7 @@ import pytest
 from typing import List, Dict
 
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
-from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent, HarvestEvent
-
-
-def test_repeat_pattern() -> None:
-    """Tests that repeat_pattern correctly repeats patterns."""
-    assert Schedule.repeat_pattern([1, 3, 5], 1, 3) == [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23]
-    assert Schedule.repeat_pattern([1, 3, 5], 0, 1) == [1, 3, 5, 6, 8, 10]
-    assert Schedule.repeat_pattern([2, 3, 7], 3, 2) == [2, 3, 7, 11, 12, 16, 20, 21, 25]
-    assert Schedule.repeat_pattern([2, 3, 7], 0, 0) == [2, 3, 7]
-
-    assert Schedule.repeat_pattern([2], 0, 0) == [2]
-    assert Schedule.repeat_pattern([2], 3, 1) == [2, 6]
-    assert Schedule.repeat_pattern([2], 0, 5) == [2, 3, 4, 5, 6, 7]
-
-    assert Schedule.repeat_pattern([2, 3, 3], 2, 3) == [2, 3, 3, 6, 7, 7, 10, 11, 11, 14, 15, 15]
-    assert Schedule.repeat_pattern([1, 1], 0, 4) == [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
-    assert Schedule.repeat_pattern([1, 1, 3], 3, 1) == [1, 1, 3, 7, 7, 9]
-
-    assert Schedule.repeat_pattern([], 0, 0) == []
-    assert Schedule.repeat_pattern([], 3, 7) == []
 
 
 @pytest.mark.parametrize("name,crop_ref,plant_years,plant_days,harvest_years,harvest_days,harvest_ops,heat_sched,"
@@ -132,4 +112,22 @@ def test_generate_harvest_events(years: List[int], days: List[int], harvest_ops:
     crop_sched = CropSchedule("test_name", "test_crop", [1], [120], years, days, harvest_ops, heat_scheduled, skip,
                               repeat)
     actual = crop_sched.generate_harvest_events()
+    assert actual == expected
+
+
+@pytest.mark.parametrize("message,years,days,skip,repeat,expected", [
+    ("Years invalid.", [1990, 1992, 1991], [200], 1, 1,
+     "Expected all years to be > 0 and in non-descending order, received '[1990, 1992, 1991]'."),
+    ("Days invalid.", [1990], [367], 1, 1, "Expected all planting days to be in range [1, 366], received '[367]'."),
+    ("Number of years and days must be equal.", [1990], [200, 200], 1, 1,
+     "Number of planting years and days must be equal."),
+    ("Skip invalid.", [1990], [200], -1, 1, "Expected pattern skip for this crop schedule to be >= 0, received '-1'."),
+    ("Pattern invalid.", [1990], [200], 1, -1,
+     "Expected pattern repeat for this crop schedule to be >= 0, received '-1'."),
+    ("An unexpected error message.", [1990], [200], 1, 1, "An unexpected error message.")
+])
+def test_create_specific_error_message(message: str, years: List[int], days: List[int], skip: int, repeat: int,
+                                       expected: str) -> None:
+    """Tests that the correct specific error message is created from a more generic one."""
+    actual = CropSchedule._create_specific_error_message(message, years, days, skip, repeat)
     assert actual == expected
