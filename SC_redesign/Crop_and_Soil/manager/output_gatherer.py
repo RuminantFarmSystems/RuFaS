@@ -231,7 +231,8 @@ class OutputGatherer:
         for field in self.fields:
             # Adding field data
             info_map["prefix"] = "field" + field.field_data.name
-            self.om.add_variable("annual_irrigation_water_use_total", field.field_data.current_residue, info_map)
+            self.om.add_variable("annual_irrigation_water_use_total",
+                                 field.field_data.annual_irrigation_water_use_total, info_map)
 
             # Adding soil data
             self.om.add_variable("annual_soil_evaporation_total", field.soil.data.annual_soil_evaporation_total,
