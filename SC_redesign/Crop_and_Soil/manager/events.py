@@ -1,7 +1,3 @@
-from typing import List
-from copy import deepcopy
-
-
 from RUFAS.classes import Time
 
 """This module defines the various Event classes and helper functions
@@ -59,68 +55,6 @@ class Event:
 
         """
         return self.year == time.calendar_year and self.day == time.day
-
-    @staticmethod
-    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
-        """
-        Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
-        repetitions.
-
-        Parameters
-        ----------
-        pattern : List[int]
-            The pattern to be repeated.
-        skip : int
-            Number of steps to skip between repeats.
-        repeat : int
-            Number of times patter should be repeated.
-
-        Returns
-        -------
-        List[int]
-            The full repeated pattern of numbers.
-
-        Raises
-        ------
-        ValueError
-            If the skip is less than 0.
-        ValueError
-            If the number of times to repeat is less than 0.
-        ValueError
-            If the values in the pattern descend.
-
-        Examples
-        --------
-        >>> repeat_pattern([1, 3, 5], 1, 2)
-        [1, 3, 5, 7, 9, 11, 13, 15, 17]
-
-        >>> repeat_pattern([1, 3, 5], 0, 1)
-        [1, 3, 5, 6, 8, 10]
-
-        >>> repeat_pattern([2, 3, 7], 3, 2)
-        [2, 3, 7, 11, 12, 16, 20, 21, 24]
-
-        """
-        if skip < 0:
-            raise ValueError(f"Expected skip to be >= 0, received '{skip}'.")
-        if repeat < 0:
-            raise ValueError(f"Expected repeat to be >= 0, received '{repeat}'.")
-
-        differences = [skip + 1]
-        in_pattern_differences = range(1, len(pattern[1:]) + 1)
-        for difference in in_pattern_differences:
-            if pattern[difference] < pattern[difference - 1]:
-                raise ValueError(f"Values in pattern cannot be descending, received '{pattern}'.")
-            differences.append(pattern[difference] - pattern[difference - 1])
-
-        full_pattern = deepcopy(pattern)
-        differences_index = 0
-        number_of_new_values = range(repeat * len(pattern))
-        for _new_value in number_of_new_values:
-            full_pattern.append(full_pattern[-1] + differences[differences_index])
-            differences_index += 1
-            differences_index %= len(pattern)
-        return full_pattern
 
 
 class PlantingEvent(Event):
