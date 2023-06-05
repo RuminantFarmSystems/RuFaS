@@ -41,20 +41,6 @@ class CropSchedule(Schedule):
         pattern_repeat : int, default=0
             Number of times the specified crop planting and harvesting pattern should be repeated.
 
-        Raises
-        ------
-        ValueError
-            If the init() method of the base Schedule class raises a ValueError.
-        ValueError
-            If the number of harvest years, days, and operations are not equal.
-        ValueError
-            If the last harvest operation is not a valid final harvest operation, or if any of the operations before the
-            last are final operations.
-        ValueError
-            If the pattern skip is less than 0.
-        ValueError
-            If the number of pattern repetitions is less than 0.
-
         """
         super().__init__(name, planting_years, planting_days, pattern_skip, pattern_repeat)
 
@@ -74,7 +60,7 @@ class CropSchedule(Schedule):
         if len(harvest_operations) == 1:
             harvest_operations *= len(self.harvest_years)
 
-        # self._validate_harvest_parameters()
+        self._validate_harvest_parameters()
 
         self.heat_scheduled = use_heat_scheduling
 
