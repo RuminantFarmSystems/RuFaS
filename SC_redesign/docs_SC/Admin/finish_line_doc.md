@@ -77,7 +77,7 @@ Certain types of events, (Crop planting/harvesting, soil amendments) need to be 
 run of the simulation.
 
 - Crop planting and harvesting.
-  - [x] Finish implementing and testing Crop planting/harvesting scheduler.
+  - [ ] Finish implementing and testing Crop planting/harvesting scheduler.
   - Integrate crop scheduler and execution of events into `Field` methods.
     - [ ] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
     all planting events that should happen call `plant_crop()` on them.
