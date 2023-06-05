@@ -12,11 +12,43 @@ from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 @pytest.mark.parametrize(
     'methane_model',
     [
-        'Mills',
-        'IPCC',
+        'Mills', 
+        'IPCC'
     ]
 )
+
+@pytest.mark.parametrize(
+    'methane_mitigation_method',
+    [
+        '3-NOP',
+        'Monensin', 
+        'Essential Oils', 
+        'Seaweed'
+    ]
+)
+
+@pytest.mark.parametrize(
+    'methane_mitigation_additive_amount',
+    [
+        0.0, 
+        16.8
+    ]
+)
+
+def test_methane_mitigation(ration_formulation,
+                       feed,
+                       methane_mitigation_method: str,
+                       methane_mitigation_additive_amount: float,
+                       mocker: MockerFixture) -> float:
+    """Unit test for the test_methane_mitigation function in dry_cow_manure_excretion.py."""
+    # Arrange
+    mock_ration_formulation = mocker.MagicMock()
+    mock_feed = mocker.MagicMock()
+    pass 
+
 def test_dry_cow_manure_calculations(methane_model: str,
+                                     methane_mitigation_method: str, 
+                                     methane_mitigation_additive_amount: float, 
                                      mocker: MockerFixture) -> None:
     """Unit test for the manure_calculations function in dry_cow_manure_excretion.py."""
     # Arrange
@@ -137,6 +169,8 @@ def test_dry_cow_manure_calculations(methane_model: str,
         fecal_phosphorus=fecal_phosphorus,
         urine_phosphorus_required=urine_phosphorus_required,
         methane_model=methane_model,
+        methane_mitigation_method=methane_mitigation_method, 
+        methane_mitigation_additive_amount=methane_mitigation_additive_amount,
         metabolizable_energy_intake=metabolizable_energy_intake
     )
 

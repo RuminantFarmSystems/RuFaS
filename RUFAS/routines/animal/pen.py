@@ -229,11 +229,14 @@ class Pen:
         self.avg_p_req = 0.0
         self.avg_p_animal = 0.0
 
-        self.animals_in_pen = []  # TODO: We should use a dictionary to map animal id to animal object.
-        self.populated = False  # TODO: To be removed. Use the property 'is_populated' instead.
+        # TODO: We should use a dictionary to map animal id to animal object.
+        self.animals_in_pen = []
+        # TODO: To be removed. Use the property 'is_populated' instead.
+        self.populated = False
 
         self.classes_in_pen = set()
-        self.stocking_density = 0.0  # TODO: To be removed. Use the property 'current_stocking_density' instead.
+        # TODO: To be removed. Use the property 'current_stocking_density' instead.
+        self.stocking_density = 0.0
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -333,7 +336,8 @@ class Pen:
         avg_nutrient_rqmts: Dict[str, float]
             The new average nutrient requirements
         """
-        self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
+        self.avg_nutrient_rqmts = {key: value for (
+            key, value) in avg_nutrient_rqmts.items()}
 
     def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
         """
@@ -440,19 +444,22 @@ class Pen:
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, 'heifer', False)
+                    ration_driver.ration_formulation(
+                        self, available_feeds, 'heifer', False)
 
             # AnimalCombination.LAC_COW
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, 'cow', True)
+                    ration_driver.ration_formulation(
+                        self, available_feeds, 'cow', True)
 
             # AnimalCombination.CLOSE_UP
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
-                    ration_driver.ration_formulation(self, available_feeds, 'cow', False)
+                    ration_driver.ration_formulation(
+                        self, available_feeds, 'cow', False)
 
             else:  # this should never occur
                 print('error in pen ration calculation')
@@ -618,7 +625,8 @@ class Pen:
             for animal in self.animals_in_pen:
                 animal.daily_p_update()
                 total_p_animal += animal.p_animal
-            total_p_animal = max(total_p_animal, 0)  # TODO: Add warning if total_p_animal < 0
+            # TODO: Add warning if total_p_animal < 0
+            total_p_animal = max(total_p_animal, 0)
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
     def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
@@ -675,13 +683,15 @@ class Pen:
                 animal.ration_formulation[key] = self.ration[key]
 
             else:  # feeds and price
-                animal.ration_formulation[key] = self.ration[key] / num_animals_before_additions
+                animal.ration_formulation[key] = self.ration[key] / \
+                    num_animals_before_additions
 
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
             if len(self.animals_in_pen) > 0:
-                animal.manure_excretion[key] = self.manure[key] / (len(self.animals_in_pen))
+                animal.manure_excretion[key] = self.manure[key] / \
+                    (len(self.animals_in_pen))
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
@@ -734,7 +744,8 @@ class Pen:
         if not animal_ids:
             return
         animal_ids = set(animal_ids)
-        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id not in animal_ids]
+        self.animals_in_pen = [
+            animal for animal in self.animals_in_pen if animal.id not in animal_ids]
 
     def clear(self):
         """
@@ -762,7 +773,7 @@ class Pen:
     # =========================================================================
     # Manure-related methods
     # ----------------------
-    def calc_total_manure(self, feed, methane_model: str) -> None:
+    def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str, methane_mitigation_additive_amount: float) -> None:
         """
         Calculate the total manure excreted by all animals in the pen.
 
@@ -784,12 +795,14 @@ class Pen:
 
         for animal in self.animals_in_pen:
             if type(animal) == Cow:
-                animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
+                animal.calc_manure_excretion(
+                    feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, self.MEdiet)
             else:
                 animal.calc_manure_excretion(feed, methane_model)
 
         for animal in self.animals_in_pen:
-            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
+            self.manure = add_animal_manure_excretions(
+                self.manure, animal.manure_excretion)
 
     # Ration-related methods
     # ----------------------
@@ -835,7 +848,8 @@ class Pen:
                 'NEl']) / animal.DMIest
             animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
 
-            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+            animal.calc_daily_walking_dist(
+                self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
         if animal_type in [AnimalType.CALF]:
             if self.avg_calf_nutrient_rqmts:
@@ -857,10 +871,12 @@ class Pen:
             animal.p_animal = animal.body_weight * phosphorus_concentration
 
         animal.dry_matter_intake = self.dry_matter_intake
-        animal.set_ration(self.ration_per_animal, self.ration_nutrient_amount['dm'])
+        animal.set_ration(self.ration_per_animal,
+                          self.ration_nutrient_amount['dm'])
 
         # animal.p_intake = self.avg_p_intake
-        animal.set_p_intake(self.ration_nutrient_amount['phosphorus'], self.ration_nutrient_conc['phosphorus'])
+        animal.set_p_intake(
+            self.ration_nutrient_amount['phosphorus'], self.ration_nutrient_conc['phosphorus'])
 
     def _calc_new_ration(self, num_animals: int):
         """
@@ -907,7 +923,8 @@ class Pen:
 
         """
 
-        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
+        self._set_animal_nutrient_values(
+            animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
         self.animals_in_pen.append(animal)
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
 
@@ -926,7 +943,6 @@ class Pen:
 
         """
 
-        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id != animal_id]
+        self.animals_in_pen = [
+            animal for animal in self.animals_in_pen if animal.id != animal_id]
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
-
-

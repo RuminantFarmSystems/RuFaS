@@ -197,6 +197,8 @@ class AnimalManagement:
         self.formulation_interval = data['ration']['formulation_interval']
 
         self.methane_model = data['methane_model']
+        self.methane_mitigation_method = data['methane_mitigation_method']
+        self.methane_mitigation_additive_amount = data['methane_mitigation_additive_amount']
 
         # Minimum number of pens in the simulation (for default pen initialization)
         self.MIN_NUM_PENS = 3
@@ -1734,7 +1736,7 @@ class AnimalManagement:
 
             for pen in self.all_pens:
                 pen.classes_in_pen = self._get_classes_in_pen(pen)
-                pen.calc_total_manure(feed, self.methane_model)
+                pen.calc_total_manure(feed, self.methane_model, self.methane_mitigation_method, self.methane_mitigation_additive_amount)
                 pen.call_p_rqmts()
                 pen.daily_p_update()  # Average phosphorus concentration per pen
 
