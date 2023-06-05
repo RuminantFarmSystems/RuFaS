@@ -24,15 +24,15 @@ class CropSchedule(Schedule):
             Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
         crop_reference : str
             Reference to name of the crop that will be used to identify the correct crop specifications.
-        planting_years : int | List[int]
+        planting_years : List[int]
             Year(s) in which crop is planted.
-        planting_days : int | List[int]
+        planting_days : List[int]
             Day(s) on which crop is planted.
-        harvest_years : int | List[int]
+        harvest_years : List[int]
             Year(s) in which crop is harvested.
-        harvest_days : int | List[int]
+        harvest_days : List[int]
             Day(s) on which crop is harvested.
-        harvest_operations : str | List[str]
+        harvest_operations : List[str]
             Operation(s) with which a crop is harvested.
         use_heat_scheduling : bool, default=False
             Variable indicating if heat scheduling should be used to determine when crop is harvested.
@@ -179,10 +179,10 @@ class CropSchedule(Schedule):
             return f"Expected all years to be > 0 and in non-descending order, received '{years}'."
         elif error_message == "Days invalid.":
             return f"Expected all planting days to be in range [1, 366], received '{days}'."
-        elif error_message == "Number of years and days must be equal.":
+        elif error_message == "Number of years and days not equal.":
             return "Number of planting years and days must be equal."
         elif error_message == "Skip invalid.":
             return f"Expected pattern skip for this crop schedule to be >= 0, received '{skip}'."
-        elif error_message == "Pattern invalid.":
+        elif error_message == "Repeat invalid.":
             return f"Expected pattern repeat for this crop schedule to be >= 0, received '{repeat}'."
         return error_message
