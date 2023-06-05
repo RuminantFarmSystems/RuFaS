@@ -1,67 +1,26 @@
 from typing import List
 
-from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
 
-class AmendmentSchedule:
+class TillageSchedule(Schedule):
 
-    def __init__(self, name: str, years: int | List[int], days: int | List[int], pattern_skip: int = 0,
+    def __init__(self, name: str, years: List[int], days: List[int], tillage_depths: List[float],
+                 incorporation_fractions: List[float], mixing_fractions: List[float], pattern_skip: int = 0,
                  pattern_repeat: int = 0):
-        """
-        Initializes a base soil amendment schedule.
-
-        Parameters
-        ----------
-        name : str
-            Name of this amendment schedule.
-        years : int | List[int]
-            Year(s) in which amendment will happen.
-        days : int | List[int]
-            Day(s) on which amendment will happen.
-        pattern_skip : int, default=0
-            Number of years to skip between amendment schedule repetitions.
-        pattern_repeat : int, default=0
-            Number of times the specified amendment schedule should be repeated.
-
-        """
-        self.name = name
-        self.years = CropSchedule.convert_to_list(years)
-        self.days = CropSchedule.convert_to_list(days)
-
-        if len(self.days) == 1:
-            self.days *= len(self.years)
-
-        if len(self.days) != len(self.years):
-            raise ValueError("Number of days that event occurs on must be 1 or equal to the number of years the event "
-                             "occurs on.")
-
-        if pattern_skip < 0:
-            raise ValueError(f"Expected pattern skip to be >= 0, received '{pattern_skip}'.")
-        self.pattern_skip = pattern_skip
-
-        if pattern_repeat < 0:
-            raise ValueError(f"Expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
-        self.pattern_repeat = pattern_repeat
-
-
-class TillageSchedule(AmendmentSchedule):
-
-    def __init__(self, name: str, years: int | List[int], days: int | List[int], tillage_depths: float | List[float],
-                 incorporation_fractions: float | List[float], mixing_fractions: float | List[float],
-                 pattern_skip: int = 0, pattern_repeat: int = 0):
         """
         Initializes a schedule for tilling.
 
         Parameters
         ----------
         name : str
-            Name of this amendment schedule.
-        years : int | List[int]
-            Year(s) in which amendment will happen.
-        days : int | List[int]
-            Day(s) on which amendment will happen.
-        tillage_depths : float | List[float]
+            Name of this tillage schedule.
+        years : List[int]
+            Year(s) in which tillage will happen.
+        days : List[int]
+            Day(s) on which tillage will happen.
+        tillage_depths : List[float]
             The lowest depth(s) the tilling implement reaches (mm)
         incorporation_fractions : List[float]
             Fraction(s) of soil surface pool incorporated into the soil profile (unitless)
@@ -75,9 +34,9 @@ class TillageSchedule(AmendmentSchedule):
         """
         super().__init__(name=name, years=years, days=days, pattern_skip=pattern_skip, pattern_repeat=pattern_repeat)
 
-        self.tillage_depths = CropSchedule.convert_to_list(tillage_depths)
-        self.incorporation_fractions = CropSchedule.convert_to_list(incorporation_fractions)
-        self.mixing_fractions = CropSchedule.convert_to_list(mixing_fractions)
+        self.tillage_depths = tillage_depths
+        self.incorporation_fractions = incorporation_fractions
+        self.mixing_fractions = mixing_fractions
 
         if len(self.tillage_depths) == 1:
             self.tillage_depths *= len(self.years)
@@ -103,7 +62,7 @@ class TillageSchedule(AmendmentSchedule):
                              f"'{self.mixing_fractions}'.")
 
         equal_tillage_parameters = len(self.years) == len(self.tillage_depths) == len(self.incorporation_fractions) \
-            == len(self.mixing_fractions)
+                                   == len(self.mixing_fractions)
         if not equal_tillage_parameters:
             raise ValueError("Number of years, days, depths, incorporation and mixing fractions must be equal.")
 
@@ -117,7 +76,7 @@ class TillageSchedule(AmendmentSchedule):
             List of all tillage events that will happen over the course of this TillageSchedule.
 
         """
-        all_tilling_years = TillageEvent.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_tilling_years = self._repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
         all_tilling_days = self.days * (self.pattern_repeat + 1)
         all_tillage_depths = self.tillage_depths * (self.pattern_repeat + 1)
         all_incorporation_fractions = self.incorporation_fractions * (self.pattern_repeat + 1)
