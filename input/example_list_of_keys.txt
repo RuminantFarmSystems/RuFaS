@@ -1,0 +1,2 @@
+MilkingParlor.__init__.fresh_water_use_rate
+LifeCycleManager.daily_update.life_cycle_daily_herd_update
