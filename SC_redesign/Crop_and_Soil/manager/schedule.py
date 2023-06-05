@@ -42,15 +42,15 @@ class Schedule:
         """
         self.name = name
 
-        days_valid = self._validate_days(days)
-        if not days_valid:
-            raise ValueError("Days invalid.")
-        self.days = days
-
         years_valid = self._validate_years(years)
         if not years_valid:
             raise ValueError("Years invalid.")
         self.years = years
+
+        days_valid = self._validate_days(days)
+        if not days_valid:
+            raise ValueError("Days invalid.")
+        self.days = days
 
         if len(self.days) == 1:
             self.days *= len(self.years)
