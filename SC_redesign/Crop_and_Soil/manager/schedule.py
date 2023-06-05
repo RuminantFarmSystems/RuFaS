@@ -11,7 +11,7 @@ class Schedule:
         Parameters
         ----------
         name : str
-            Reference to the name of this crop schedule that will be used to distinguish this schedule from others.
+            Reference to the name of this schedule that will be used to distinguish this schedule from others.
         years : List[int]
             Year(s) in which this event will occur.
         days : List[int]
@@ -19,7 +19,7 @@ class Schedule:
         pattern_skip : int, default=0
             Number of years to skip between cycles.
         pattern_repeat : int, default=0
-            Number of times the specified crop planting and harvesting pattern should be repeated.
+            Number of times the specified pattern of this schedule should be repeated.
 
         Raises
         ------
