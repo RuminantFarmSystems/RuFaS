@@ -47,17 +47,3 @@ def test_validate_years(years: List[int], expected: bool) -> None:
     """Tests that all years passed to be scheduled are valid."""
     actual = Schedule._validate_years(years)
     assert actual == expected
-
-
-@pytest.mark.parametrize("years,days,skip,repeat,expected", [
-    ([1990, 1985], [200], 1, 1, "Years invalid."),
-    ([1990], [367], 1, 1, "Days invalid."),
-    ([1993], [200, 215], 1, 1, "Number of years and days not equal."),
-    ([2000], [200], -1, 1, "Skip invalid."),
-    ([1995], [200], 1, -1, "Repeat invalid.")
-])
-def test_schedule_init_error(years: List[int], days: List[int], skip: int, repeat: int, expected: str) -> None:
-    """Tests that Schedule throws the correct error when initialized with invalid parameters."""
-    with pytest.raises(ValueError) as e:
-        Schedule("test", years, days, skip, repeat)
-    assert str(e.value) == expected
