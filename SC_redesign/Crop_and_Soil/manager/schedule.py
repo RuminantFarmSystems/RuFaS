@@ -2,6 +2,12 @@ from typing import List
 from copy import deepcopy
 
 
+"""
+This module contains `Schedule`, which acts as the base class for all the different schedule objects that are utilized 
+by the Crop and Soil module.
+"""
+
+
 class Schedule:
 
     def __init__(self, name: str, years: List[int], days: List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
