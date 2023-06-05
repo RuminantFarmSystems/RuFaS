@@ -62,36 +62,23 @@ class CropSchedule(Schedule):
         self.planting_years = self.years
         self.planting_days = self.days
 
-        harvest_days_valid = self._validate_days(harvest_days)
-        if not harvest_days_valid:
-            raise ValueError(f"Expected all harvest days to be in range [1, 366], received `{harvest_days}`.")
-        self.harvest_days = harvest_days
+        self._validate_planting_parameters()
 
-        harvest_years_valid = self._validate_years(harvest_years)
-        if not harvest_years_valid:
-            raise ValueError(f"Expected all harvest years to be > 0 and in non-descending order, received "
-                             f"`{harvest_years}`")
         self.harvest_years = harvest_years
+        self.harvest_days = harvest_days
+        self.harvest_operations = harvest_operations
 
         if len(self.harvest_days) == 1:
             self.harvest_days *= len(self.harvest_years)
 
         if len(harvest_operations) == 1:
             harvest_operations *= len(self.harvest_years)
-        self.harvest_operations = harvest_operations
 
-        equal_harvest_parameters = len(self.harvest_years) == len(self.harvest_days) == len(self.harvest_operations)
-        if not equal_harvest_parameters:
-            raise ValueError("Number of values for harvest years, days, and operations must be equal.")
-
-        last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
-        others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
-        only_last_kills = last_kills and others_dont_kill
-        if not only_last_kills:
-            raise ValueError(f"Expected the final harvest operation to be the only one that kills the crop, received "
-                             f"'{self.harvest_operations}'.")
+        # self._validate_harvest_parameters()
 
         self.heat_scheduled = use_heat_scheduling
+
+        self._validate_pattern_parameters()
 
     def _validate_planting_parameters(self) -> None:
         """
@@ -120,6 +107,45 @@ class CropSchedule(Schedule):
         if len(self.planting_years) != len(self.planting_days):
             raise ValueError(f"'{self.name}': expected number of planting years and days to be the same, received "
                              f"'{self.planting_years}' years and '{self.planting_days}' days.")
+
+    def _validate_harvest_parameters(self) -> None:
+        """
+        Checks fields that dictate harvesting of crop for correctness, otherwise raises errors.
+
+        Raises
+        ------
+        ValueError
+            If not all harvest years are valid.
+        ValueError
+            If not all harvest days are valid.
+        ValueError
+            If the number of harvest years, days, and operations are not equal.
+        ValueError
+            If the last harvest operation is not a final one, or if any operations before the last are final ones.
+
+        """
+        harvest_years_valid = self._validate_years(self.harvest_years)
+        if not harvest_years_valid:
+            raise ValueError(f"'{self.name}': expected all harvest years to be > 0 and in non-descending order, "
+                             f"received '{self.harvest_years}'.")
+
+        harvest_days_valid = self._validate_days(self.harvest_days)
+        if not harvest_days_valid:
+            raise ValueError(f"'{self.name}': expected all harvest days to be in range [1, 366], received "
+                             f"'{self.harvest_days}'.")
+
+        equal_harvest_parameters = len(self.harvest_years) == len(self.harvest_days) == len(self.harvest_operations)
+        if not equal_harvest_parameters:
+            raise ValueError(f"'{self.name}': expected number of values for harvest years, days, and operations to be "
+                             f"equal, received '{self.harvest_years}' years, '{self.harvest_days}' days, and "
+                             f"'{self.harvest_operations}' operations.")
+
+        last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
+        others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
+        only_last_kills = last_kills and others_dont_kill
+        if not only_last_kills:
+            raise ValueError(f"'{self.name}': expected the final harvest operation to be the only one that kills the "
+                             f"crop, received '{self.harvest_operations}'.")
 
     def generate_planting_events(self) -> List[PlantingEvent]:
         """
