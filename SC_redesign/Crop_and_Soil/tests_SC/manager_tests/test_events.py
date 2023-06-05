@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import MagicMock
-from typing import List
 
 from SC_redesign.Crop_and_Soil.manager.events import Event
 from RUFAS.classes import Time

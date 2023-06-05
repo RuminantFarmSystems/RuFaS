@@ -1,7 +1,3 @@
-from typing import List
-from copy import deepcopy
-
-
 from RUFAS.classes import Time
 
 """This module defines the various Event classes and helper functions
