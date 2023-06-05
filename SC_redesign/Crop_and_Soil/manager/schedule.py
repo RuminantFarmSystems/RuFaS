@@ -44,12 +44,12 @@ class Schedule:
 
         days_valid = self._validate_days(days)
         if not days_valid:
-            raise ValueError(f"Days invalid.")
+            raise ValueError("Days invalid.")
         self.days = days
 
         years_valid = self._validate_years(years)
         if not years_valid:
-            raise ValueError(f"Years invalid.")
+            raise ValueError("Years invalid.")
         self.years = years
 
         if len(self.days) == 1:
@@ -59,9 +59,9 @@ class Schedule:
             raise ValueError("Number of years and days not equal.")
 
         if pattern_skip < 0:
-            raise ValueError(f"Skip invalid.")
+            raise ValueError("Skip invalid.")
         elif pattern_repeat < 0:
-            raise ValueError(f"Repeat invalid.")
+            raise ValueError("Repeat invalid.")
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
 
@@ -109,19 +109,22 @@ class Schedule:
         A list of years is valid if every year is > 0, and the list of years does not descend at all.
 
         """
+        if len(years) == 0:
+            return True
+
         if not years[0] > 0:
             return False
 
-        for index in range(1, len(years) - 1):
-            year_valid = years[index]
-            not_descending = years[index - 1] <= years[index]
+        for index in range(0, len(years) - 1):
+            year_valid = years[index] > 0
+            not_descending = years[index] <= years[index + 1]
             if not year_valid or not not_descending:
                 return False
 
         return True
 
     @staticmethod
-    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+    def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
         """
         Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
         repetitions.
