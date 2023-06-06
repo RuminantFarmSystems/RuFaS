@@ -3,17 +3,19 @@ from typing import Type
 from typing import Union
 
 import pytest
-from mock.mock import call
 from mock.mock import PropertyMock
+from mock.mock import call
 from pytest import approx
 from pytest_mock import MockFixture
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.base_slurry_storage import BaseSlurryStorage
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
@@ -755,191 +757,140 @@ def test_daily_update(manure_treatment_type_name: str,
     # assert actual_manure_treatment_daily_output == expected_manure_treatment_daily_output
 
 
-# Test SlurryStorageUnderfloor and SlurryStorageOutdoor
+# Test BaseSlurryStorage
 # =====================================================
 
-# TODO: Fix this test
-# @pytest.mark.parametrize(
-#     'slurry_storage_treatment_type_name',
-#     [
-#         'slurry storage underfloor',
-#         'slurry storage outdoor',
-#     ]
-# )
-# def test_slurry_storage_daily_update_helper(slurry_storage_treatment_type_name: str,
-#                                             mocker: MockFixture) -> None:
-#     """Unit test for _daily_update_helper() in both slurry storage treatments."""
-#     # Arrange
-#     slurry_storage = ManureTreatmentFactory.get_instance(
-#         manure_treatment_type_name=slurry_storage_treatment_type_name,
-#         weather=mocker.MagicMock(),
-#         time=mocker.MagicMock
-#     )
-#     mock_accumulated_output: ManureTreatmentDailyOutput = mocker.MagicMock()
-#     mock_accumulated_output.liquid_manure_total_solids = liquid_manure_total_solids = 20.0
-#     mock_accumulated_output.daily_final_manure_volume = final_manure_volume = 30.0
-#     mock_accumulated_output.liquid_manure_total_ammoniacal_nitrogen = liquid_manure_total_ammoniacal_nitrogen = 40.0
-#     slurry_storage._accumulated_output = mock_accumulated_output
-#     patch_for_accumulate_daily_output = mocker.patch.object(
-#         slurry_storage, '_accumulate_daily_output'
-#     )
-#
-#     mock_pen = mocker.MagicMock()
-#     mock_pen.num_animals = num_animals = 100
-#     mock_pen.barn_area_from_pen_type = barn_area_from_pen_type = 1000.0
-#     slurry_storage._current_pen = mock_pen
-#
-#     initial_manure_treatment_daily_output = ManureTreatmentDailyOutput()
-#     slurry_storage._current_manure_treatment_daily_input = \
-#         current_manure_treatment_daily_input = mocker.MagicMock()
-#     patch_for_initialize_daily_output_during_update = mocker.patch.object(
-#         slurry_storage, '_initialize_daily_output_during_update',
-#         return_value=initial_manure_treatment_daily_output
-#     )
-#
-#     expected_methane_loss = 10.0
-#     expected_new_accumulated_liquid_manure_total_solids = 30.0
-#     patch_for_calc_methane_emission = mocker.patch.object(
-#         slurry_storage, 'calc_methane_emission',
-#         return_value=[expected_methane_loss, expected_new_accumulated_liquid_manure_total_solids]
-#     )
-#
-#     expected_ammonia_loss = 50.0
-#     expected_new_accumulated_liquid_manure_total_ammoniacal_nitrogen = 60.0
-#     patch_for_calc_ammonia_emission = mocker.patch.object(
-#         slurry_storage, 'calc_ammonia_emission',
-#         return_value=[expected_ammonia_loss, expected_new_accumulated_liquid_manure_total_ammoniacal_nitrogen]
-#     )
-#
-#     # Act
-#     actual_manure_treatment_daily_output = slurry_storage._daily_update_helper()
-#
-#     # Assert
-#     patch_for_initialize_daily_output_during_update.assert_called_once_with(current_manure_treatment_daily_input)
-#     patch_for_accumulate_daily_output.assert_called_once_with(initial_manure_treatment_daily_output)
-#
-#     patch_for_calc_methane_emission.assert_called_once_with(liquid_manure_total_solids)
-#     assert slurry_storage._accumulated_output.liquid_manure_total_solids == \
-#            expected_new_accumulated_liquid_manure_total_solids
-#     assert actual_manure_treatment_daily_output.storage_methane == expected_methane_loss
-#
-#     patch_for_calc_ammonia_emission.assert_called_once_with(
-#         num_animals=num_animals,
-#         barn_area=barn_area_from_pen_type,
-#         accumulated_manure_volume=final_manure_volume,
-#         accumulated_manure_total_ammoniacal_nitrogen=liquid_manure_total_ammoniacal_nitrogen,
-#     )
-#     assert slurry_storage._accumulated_output.liquid_manure_total_ammoniacal_nitrogen == \
-#            expected_new_accumulated_liquid_manure_total_ammoniacal_nitrogen
-#     assert actual_manure_treatment_daily_output.storage_ammonia == expected_ammonia_loss
-#
+def test_update_methane_emission(mocker: MockFixture) -> None:
+    """
+    Unit test for _update_methane_emission() in base_slurry_storage.py.
 
-# TODO: Fix this test
-# @pytest.mark.parametrize(
-#     'slurry_storage_treatment_type_name, is_enclosed',
-#     [
-#         ('slurry storage underfloor', True),
-#         ('slurry storage outdoor', False),
-#     ]
-# )
-# def test_slurry_storage_calc_methane_emission(slurry_storage_treatment_type_name: str,
-#                                               is_enclosed: bool,
-#                                               mocker: MockFixture) -> None:
-#     """Unit test for calc_methane_emission() in both slurry storage treatments."""
-#     # Arrange
-#     slurry_storage = ManureTreatmentFactory.get_instance(
-#         manure_treatment_type_name=slurry_storage_treatment_type_name,
-#         weather=mocker.MagicMock(),
-#         time=mocker.MagicMock(),
-#     )
-#     accumulated_liquid_manure_total_solids = 10.0
-#     temperature_celsius = 20.0
-#     patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
-#         slurry_storage, '_get_current_day_average_temperature_celsius',
-#         return_value=temperature_celsius
-#     )
-#     expected_methane_loss = 2.0
-#     patch_for_calc_methane_emission_for_slurry_storage = mocker.patch(
-#         'RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.'
-#         'GasEmissions.calc_methane_emission_for_slurry_storage',
-#         return_value=expected_methane_loss
-#     )
-#     expected_new_accumulated_liquid_manure_total_solids = max(
-#         accumulated_liquid_manure_total_solids - expected_methane_loss, 0.0)
-#
-#     # Act
-#     actual_methane_loss, actual_new_accumulated_liquid_manure_total_solids = \
-#         slurry_storage.calc_methane_emission(
-#             accumulated_liquid_manure_total_solids=accumulated_liquid_manure_total_solids
-#         )
-#
-#     # Assert
-#     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-#     patch_for_calc_methane_emission_for_slurry_storage.assert_called_once_with(
-#         manure_total_solids=accumulated_liquid_manure_total_solids,
-#         is_enclosed=is_enclosed,
-#         temperature_celsius=temperature_celsius,
-#     )
-#     assert actual_methane_loss == expected_methane_loss
-#     assert actual_new_accumulated_liquid_manure_total_solids == expected_new_accumulated_liquid_manure_total_solids
+    This test checks that the _update_methane_emission() method correctly calculates
+    methane emission based on the given liquid_manure_total_volatile_solids and temperature,
+    and updates the storage_methane and liquid_manure_total_volatile_solids
+    of the accumulated output.
+
+    """
+    # Arrange
+    volatile_solids_factor = 3
+    current_liquid_manure_total_volatile_solids = 10.0
+    mock_daily_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
+    mock_daily_output.liquid_manure_total_volatile_solids = current_liquid_manure_total_volatile_solids
+    mock_methane_emission_value = 100.0
+    patch_for_calc_methane_emission_for_slurry_storage = mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.base_slurry_storage'
+        '.GasEmissions.calc_methane_emission_for_slurry_storage',
+        return_value=mock_methane_emission_value)
+
+    base_slurry_storage = BaseSlurryStorage(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock())
+    base_slurry_storage._accumulated_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
+    base_slurry_storage._accumulated_output.storage_methane = 0.0
+    base_slurry_storage._accumulated_output.liquid_manure_total_volatile_solids = 0.0
+    mock_temp_value = 25.0
+    patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
+        base_slurry_storage, '_get_current_day_average_temperature_celsius', return_value=mock_temp_value)
+
+    # Act
+    base_slurry_storage._update_methane_emission(mock_daily_output)
+
+    # Assert
+    patch_for_calc_methane_emission_for_slurry_storage.assert_called_once_with(
+        total_volatile_solids=current_liquid_manure_total_volatile_solids,
+        temp=mock_temp_value
+    )
+    patch_for_get_current_day_average_temperature_celsius.assert_called_once()
+    assert mock_daily_output.storage_methane == mock_methane_emission_value
+    assert base_slurry_storage._accumulated_output.storage_methane == mock_methane_emission_value
+    assert base_slurry_storage._accumulated_output.liquid_manure_total_volatile_solids == \
+           current_liquid_manure_total_volatile_solids - mock_methane_emission_value * volatile_solids_factor
 
 
-# @pytest.mark.parametrize(
-#     'slurry_storage_treatment_type_name',
-#     [
-#         'slurry storage underfloor',
-#         'slurry storage outdoor',
-#     ]
-# )
-# def test_slurry_storage_calc_ammonia_emission(slurry_storage_treatment_type_name: str,
-#                                               mocker: MockFixture) -> None:
-#     """Unit test for calc_ammonia_emission() in both slurry storage treatments."""
-#     # Arrange
-#     slurry_storage = ManureTreatmentFactory.get_instance(
-#         manure_treatment_type_name=slurry_storage_treatment_type_name,
-#         weather=mocker.MagicMock(),
-#         time=mocker.MagicMock(),
-#     )
-#
-#     num_animals = 100
-#     barn_area = 1000.0
-#     accumulated_manure_volume = 200.0
-#     accumulated_manure_total_ammoniacal_nitrogen = 20.0
-#     temperature_celsius = 20.0
-#     patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
-#         slurry_storage, '_get_current_day_average_temperature_celsius',
-#         return_value=temperature_celsius
-#     )
-#     expected_ammonia_loss = 2.0
-#     patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch(
-#         'RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor.'
-#         'GasEmissions.calc_ammonia_emission',
-#         return_value=expected_ammonia_loss
-#     )
-#     expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
-#         accumulated_manure_total_ammoniacal_nitrogen - expected_ammonia_loss, 0.0)
-#
-#     # Act
-#     actual_ammonia_loss, actual_new_accumulated_manure_total_ammoniacal_nitrogen = \
-#         slurry_storage.calc_ammonia_emission(
-#             num_animals=num_animals,
-#             barn_area=barn_area,
-#             accumulated_manure_volume=accumulated_manure_volume,
-#             accumulated_manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen
-#         )
-#
-#     # Assert
-#     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-#     patch_for_calc_ammonia_emission_for_slurry_storage.assert_called_once_with(
-#         num_animals=num_animals,
-#         barn_area=barn_area,
-#         total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-#         mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
-#         temperature_celsius=temperature_celsius
-#     )
-#     assert actual_ammonia_loss == expected_ammonia_loss
-#     assert actual_new_accumulated_manure_total_ammoniacal_nitrogen == \
-#            expected_new_accumulated_manure_total_ammoniacal_nitrogen
+def test_update_ammonia_emission(mocker: MockFixture) -> None:
+    """
+    Unit test for _update_ammonia_emission() in base_slurry_storage.py.
+
+    This test checks that the _update_ammonia_emission() method correctly calculates
+    ammonia emission based on the given parameters and updates the storage_ammonia
+    of the daily output and the accumulated output.
+
+    """
+    # Arrange
+    mock_daily_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
+    mock_ammonia_emission_value = 100.0
+    patch_for_calc_storage_ammonia_emission = mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.base_slurry_storage'
+        '.GasEmissions.calc_storage_ammonia_emission',
+        return_value=mock_ammonia_emission_value)
+
+    base_slurry_storage = BaseSlurryStorage(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock())
+    base_slurry_storage._accumulated_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
+    base_slurry_storage._accumulated_output.storage_ammonia = 0.0
+    base_slurry_storage._current_pen = mocker.MagicMock()
+    base_slurry_storage._manure_handler_daily_output = mocker.MagicMock()
+
+    mock_temp_value = 25.0
+    patch_for_get_current_day_average_temperature_celsius = mocker.patch.object(
+        base_slurry_storage, '_get_current_day_average_temperature_celsius', return_value=mock_temp_value)
+
+    # Act
+    base_slurry_storage._update_ammonia_emission(mock_daily_output)
+
+    # Assert
+    manure_total_ammoniacal_nitrogen = (
+            mock_daily_output.liquid_manure_total_ammoniacal_nitrogen +
+            base_slurry_storage._current_pen.manure.urine_total_ammoniacal_nitrogen -
+            base_slurry_storage._manure_handler_daily_output.housing_ammonia
+    )
+    patch_for_calc_storage_ammonia_emission.assert_called_once_with(
+        num_animals=base_slurry_storage._current_pen.num_animals,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+        manure_volume=mock_daily_output.daily_final_manure_volume,
+        total_solids=mock_daily_output.liquid_manure_total_solids,
+        storage_area=GasEmissionConstants.DEFAULT_STORAGE_AREA,
+        temp=mock_temp_value,
+        pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA
+    )
+    patch_for_get_current_day_average_temperature_celsius.assert_called_once()
+    assert mock_daily_output.storage_ammonia == mock_ammonia_emission_value
+    assert base_slurry_storage._accumulated_output.storage_ammonia == mock_ammonia_emission_value
+
+
+def test_daily_update_helper(mocker: MockFixture) -> None:
+    """
+    Unit test for _daily_update_helper() in base_slurry_storage.py.
+
+    This test checks that the _daily_update_helper() method correctly initializes
+    and accumulates the daily output, updates methane and ammonia emission and returns
+    the daily output.
+
+    """
+    # Arrange
+    base_slurry_storage = BaseSlurryStorage(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock())
+
+    mock_daily_output = mocker.MagicMock(spec=ManureTreatmentDailyOutput)
+
+    patch_for_initialize_daily_output_during_update = mocker.patch.object(
+        base_slurry_storage, '_initialize_daily_output_during_update', return_value=mock_daily_output)
+
+    patch_for_accumulate_daily_output = mocker.patch.object(
+        base_slurry_storage, '_accumulate_daily_output')
+
+    patch_for_update_methane_emission = mocker.patch.object(
+        base_slurry_storage, '_update_methane_emission')
+
+    patch_for_update_ammonia_emission = mocker.patch.object(
+        base_slurry_storage, '_update_ammonia_emission')
+
+    # Act
+    result = base_slurry_storage._daily_update_helper()
+
+    # Assert
+    patch_for_initialize_daily_output_during_update.assert_called_once_with(
+        base_slurry_storage._current_manure_treatment_daily_input)
+    patch_for_accumulate_daily_output.assert_called_once_with(mock_daily_output)
+    patch_for_update_methane_emission.assert_called_once_with(mock_daily_output)
+    patch_for_update_ammonia_emission.assert_called_once_with(mock_daily_output)
+
+    assert result == mock_daily_output
 
 
 # Test SlurryStorageUnderfloor specific methods
@@ -1744,6 +1695,7 @@ def test_flushing_volume_property(mocker: MockFixture) -> None:
 
     # Assert
     assert actual_flushing_volume == expected_flushing_volume
+
 
 # TODO: Fix this test
 # @pytest.mark.parametrize(

@@ -17,8 +17,6 @@ from typing import Type
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
-from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
@@ -96,22 +94,27 @@ class BaseManureHandler:
                      pen: ManureManagementPen,
                      bedding: BaseBedding,
                      sim_day: int) -> ManureHandlerDailyOutput:
-        """Calculates and stores the daily output of the manure handler.
+        """
+        Calculate the daily output of the manure handler.
 
-        Notes:
-            "pseudocode_manure_management" MS.3
+        Parameters
+        ----------
+        pen : ManureManagementPen
+            A ManureManagementPen object.
+        bedding : BaseBedding
+            A BaseBedding object that specifies the type of bedding used.
+        sim_day : int
+            The current simulation day.
 
-        Args:
-            pen: A ManureManagementPen object.
-            bedding: A BaseBedding object that specifies the type of bedding used.
-            sim_day: The current simulation day.
-
-        Returns:
+        Returns
+        -------
+        ManureHandlerDailyOutput
             A ManureHandlerDailyOutput object.
+
         """
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
-        
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
                     "bedding": vars(bedding),
@@ -167,12 +170,17 @@ class BaseManureHandler:
         return daily_output
 
     def calc_cleaning_water_volume_in_main_barn(self, num_animals: int) -> float:
-        """Calculate the volume of cleaning water needed for all the animals in pen.
+        """
+        Calculate the volume of cleaning water needed for all the animals in pen.
 
-        Args:
-            num_animals: The number of animals in the pen.
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
 
-        Returns:
+        Returns
+        -------
+        float
             Volume of cleaning water needed for the given pen, L.
 
         """

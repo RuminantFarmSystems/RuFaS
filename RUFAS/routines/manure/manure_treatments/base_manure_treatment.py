@@ -16,15 +16,10 @@ from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import Liqui
 
 
 class BaseManureTreatment(ABC):
-    """Base class for all manure treatment classes.
-
-    Attributes:
-        weather: A Weather object.
-        time: A Time object.
-        config: A ManureTreatmentConfig object containing the configuration for the manure treatment.
+    """
+    Base class for all manure treatment classes.
 
     """
-
     def __init__(self, weather, time,
                  manure_treatment_config: Union[ManureTreatmentConfig,
                                                 Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]
