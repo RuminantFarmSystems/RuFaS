@@ -320,16 +320,16 @@ class OutputManager(object):
 
     def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
         """ Returns the list of files in the given path"""
-        dir_path = Path(dir_path)
-        if dir_path.is_dir():
+        dir_path_check = Path(dir_path)
+        if dir_path_check.is_dir():
             txt_files = []
             all_files = os.listdir(dir_path)
             for filename in all_files:
                 if filename.endswith(".txt"):
                     txt_files.append(filename)
+            return txt_files
         else:
             raise NotADirectoryError("specified path is not a directory")
-        return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
