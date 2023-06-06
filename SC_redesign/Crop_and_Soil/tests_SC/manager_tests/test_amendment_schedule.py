@@ -59,9 +59,9 @@ def test_validate_fractions(fracs: List[float], expected) -> None:
     ([30, 30], [0.5, 0.5], [0.4, 0.4], [30, 30], [0.5, 0.5], [0.4, 0.4]),
     ([20], [0.4], [0.3], [20, 20], [0.4, 0.4], [0.3, 0.3])
 ])
-def test_init_tillage_schedule(depths: float | List[float], incorp_fracs: float | List[float],
-                               mix_fracs: float | List[float], expected_depths: float | List[float],
-                               expected_incorp: float | List[float], expected_mix: float | List[float]) -> None:
+def test_init_tillage_schedule(depths: List[float], incorp_fracs: List[float], mix_fracs: List[float],
+                               expected_depths: List[float], expected_incorp: List[float],
+                               expected_mix: List[float]) -> None:
     """Tests that TillageSchedules are created correctly."""
     till_sched = TillageSchedule("test", [1990, 1991], [160, 160], depths, incorp_fracs, mix_fracs, 1, 1)
     assert till_sched.tillage_depths == expected_depths
