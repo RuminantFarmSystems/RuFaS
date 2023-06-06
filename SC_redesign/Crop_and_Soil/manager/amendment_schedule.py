@@ -155,10 +155,7 @@ class TillageSchedule(Schedule):
         Tillage depths must be > 0.
 
         """
-        for depth in tillage_depths:
-            if depth <= 0.0:
-                return False
-        return True
+        return all(depth > 0.0 for depth in tillage_depths)
 
     @staticmethod
     def _validate_fractions(fractions: List[float]) -> bool:
@@ -180,8 +177,4 @@ class TillageSchedule(Schedule):
         A fraction is valid if it is in the range[0.0, 1.0]
 
         """
-        for fraction in fractions:
-            is_valid = 0.0 <= fraction <= 1.0
-            if not is_valid:
-                return False
-        return True
+        return all(0.0 <= fraction <= 1.0 for fraction in fractions)
