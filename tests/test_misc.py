@@ -856,6 +856,7 @@ def test_filter_variables_pool(
 
     # Test case 2: filter_keys with existing keys
     filter_keys = ["key1", "key2"]
+    exclude_filter_keys = ["exclude", "key1", "key2"]
     mock_output_manager.variables_pool = {
         "key1": "value1",
         "key2": "value2",
@@ -865,21 +866,34 @@ def test_filter_variables_pool(
         "key1": "value1",
         "key2": "value2"
     }
+    expected_result_exclude = {
+        "key3": "value3"
+    }
+
     assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
     # Test case 3: filter_keys with non-existing keys
     filter_keys = ["key1", "key4"]
+    exclude_filter_keys = ["exclude", "key1", "key4"]
     expected_result = {
         "key1": "value1"
     }
+    expected_result_exclude = {
+        "key2": "value2",
+        "key3": "value3"
+    }
     assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
     # Test case 4: filter_keys with duplicate keys
     filter_keys = ["key1", "key1"]
+    exclude_filter_keys = ["exclude", "key1", "key1"]
     expected_result = {
         "key1": "value1"
     }
     assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
     # Restore original method and variables_pool
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
