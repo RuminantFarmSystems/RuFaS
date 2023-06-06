@@ -1,7 +1,7 @@
 from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
-from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent, ManureEvent
 
 """
 This module contains `TillageSchedule`, a `Schedule` child class that defines when and how a field will be tilled.
@@ -296,6 +296,33 @@ class ManureSchedule(Schedule):
                                             f"'{self.field_coverages}' field coverage fractions, "
                                             f"'{self.application_depths}' application depths, and "
                                             f"'{self.surface_remainder_fractions}' surface remainder fractions.")
+
+    def generate_manure_events(self) -> List[ManureEvent]:
+        """
+        Creates a list of all manure applications that will be applied as dictated by this manure schedule.
+
+        Returns
+        -------
+        List[ManureEvent]
+            List of ManureEvents representing all manure applications that will occur over the simulation run.
+
+        """
+        all_years = self._repeat_pattern(self.years)
+        all_days = self.days * (self.pattern_repeat + 1)
+        all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
+        all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
+        all_field_coverages = self.field_coverages * (self.pattern_repeat + 1)
+        all_application_depths = self.application_depths * (self.pattern_repeat + 1)
+        all_surface_remainder_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
+        all_manure_application_events = list(zip(all_years, all_days, all_nitrogen_masses, all_phosphorus_masses,
+                                                 all_field_coverages, all_application_depths,
+                                                 all_surface_remainder_fractions))
+
+        manure_application_events = []
+        for event in all_manure_application_events:
+            new_event = ManureEvent(event[0], event[1], event[2], event[3], event[4], event[5], event[6])
+            manure_application_events.append(new_event)
+        return manure_application_events
 
     @staticmethod
     def _determine_if_all_non_negative_values(values: List[Any]) -> bool:
