@@ -116,3 +116,36 @@ class TillageEvent(Event):
         self.tillage_depth = tillage_depth
         self.incorporation_fraction = incorporation_fraction
         self.mixing_fraction = mixing_fraction
+
+
+class ManureEvent(Event):
+    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, field_coverage: float,
+                 application_depth: float, surface_remainder_fraction: float):
+        """
+        Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
+        field.
+
+        Parameters
+        ----------
+        year : int
+            Year in which this manure application occurs.
+        day : int
+            Day in which this manure application occurs.
+        nitrogen_mass : float
+            Minimum mass of nitrogen that should be contained in this manure application (kg)
+        phosphorus_mass : float
+            Minimum mass of phosphorus that should be contained in this manure application (kg)
+        field_coverage : float
+            Fraction of the field covered by this manure application (unitless)
+        application_depth : float
+            Depth that manure is injected into the soil at (mm)
+        surface_remainder_fraction
+            Fraction of manure applied that remains on the soil surface (unitless)
+
+        """
+        super().__init__(year=year, day=day)
+        self.nitrogen_mass = nitrogen_mass
+        self.phosphorus_mass = phosphorus_mass
+        self.field_coverage = field_coverage
+        self.application_depth = application_depth
+        self.surface_remainder_fraction = surface_remainder_fraction
