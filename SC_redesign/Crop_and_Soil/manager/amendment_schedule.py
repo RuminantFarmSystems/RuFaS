@@ -178,3 +178,62 @@ class TillageSchedule(Schedule):
 
         """
         return all(0.0 <= fraction <= 1.0 for fraction in fractions)
+
+
+class ManureSchedule(Schedule):
+
+    def __init__(self, name: str, years: [List], days: [List], nitrogen_masses: List[float],
+                 phosphorus_masses: List[float], field_coverages: List[float], application_depths: List[float] = [0.0],
+                 surface_remainder_fractions: List[float] = [1.0], pattern_skip: int = 0, pattern_repeat: int = 0):
+        """
+        Creates and validates a manure application schedule.
+
+        Parameters
+        ----------
+        name : str
+            Name of this tillage schedule.
+        years : List[int]
+            Year(s) in which manure will be applied.
+        days : List[int]
+            Day(s) on which manure will be applied.
+        nitrogen_masses : List[float]
+            Minimum mass(s) of nitrogen that should be contained in manure applications (kg)
+        phosphorus_masses : List[float]
+            Minimum mass(s) of phosphorus that should be contained in manure applications (kg)
+        field_coverages : List[float]
+            Fraction(s) of the field covered by manure applications (unitless)
+        application_depths : List[float], default=[0.0]
+            Bottom depth(s) of manure injection applications (mm)
+        surface_remainder_fractions : List[float], default = [1.0]
+            Fractions(s) of manure application that remains on the soil surface (unitless)
+        pattern_skip : int, default=0
+            Number of years to skip between manure application schedule repetitions.
+        pattern_repeat : int, default=0
+            Number of times the specified manure application schedule should be repeated.
+
+        """
+        super().__init__(name, years, days, pattern_skip, pattern_repeat)
+
+        self.nitrogen_masses = nitrogen_masses
+        if len(self.nitrogen_masses) == 1:
+            self.nitrogen_masses *= len(years)
+
+        self.phosphorus_masses = phosphorus_masses
+        if len(self.phosphorus_masses) == 1:
+            self.phosphorus_masses *= len(years)
+
+        self.field_coverages = field_coverages
+        if len(self.field_coverages) == 1:
+            self.field_coverages *= len(years)
+
+        self.application_depths = application_depths
+        if len(self.application_depths) == 1:
+            self.application_depths *= len(years)
+
+        self.surface_remainder_fractions = surface_remainder_fractions
+        if len(self.surface_remainder_fractions) == 1:
+            self.surface_remainder_fractions *= len(years)
+
+        self._validate_manure_parameters()
+
+        self._validate_pattern_parameters()
