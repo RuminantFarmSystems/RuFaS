@@ -1390,7 +1390,7 @@ def test_ration_report():
 
 def test_set_requirements():
     """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
-
+    pass
 
 def test_is_constraint_violated():
     """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
@@ -1465,17 +1465,18 @@ def test_calc_pen_requirements():
     req = RUFAS.routines.animal.ration.ration_driver.Requirements()
     req.calc_pen_requirements(
         [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
-        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], True)
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3])
     attributelist = ['NEmaint','NEa','NEg','NEpreg', 'NEl', 'MP_req', 'Ca_req', 'P_req', 
         'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
     
-    req.calc_pen_requirements(
-        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
-        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], False)
-    for attribute in attributelist:
-        assert getattr(req, attribute) == 2.8
+    # this assumes use of 80 or 90 percentile, commented in case it's useful in the future
+    # req.calc_pen_requirements(
+    #     [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
+    #     [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], False)
+    # for attribute in attributelist:
+    #     assert getattr(req, attribute) == 2.8
 
 
 def test_feed_nutrients():

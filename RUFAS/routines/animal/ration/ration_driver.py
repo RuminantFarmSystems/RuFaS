@@ -294,7 +294,7 @@ class Requirements:
     def calc_pen_requirements(self, NEmaint: List[float], NEa: List[float], NEg: List[float], NEpreg: List[float],
                                NEl: List[float], MP_req: List[float], Ca_req: List[float], P_req: List[float], 
                                DMIest: List[float], BW: List[float], milk: List[float], CP_milk: List[float],
-                               milk_production_reduction: List[float], use_the_mean: bool) -> None:
+                               milk_production_reduction: List[float]) -> None:
         """
         This functions sets the average (or #th percentile) pen requirements. Each input parameter is a list of floats generated in ration_driver.set_requirements
         
@@ -331,7 +331,9 @@ class Requirements:
             TODO: implement this function in an elegant manner: 
                 e.g. should we move both the percentile value and decision to the constants file?
         """
-        if use_the_mean == True:
+        # this will be set in the argument, here hardcoded to show the rough logic and keep using the mean
+        calc_method = 'mean'
+        if calc_method == 'mean':
             # populating the class variables as an average across cows for each requirement
             self.NEmaint = stat.mean(NEmaint)
             self.NEa = stat.mean(NEa)
@@ -347,6 +349,7 @@ class Requirements:
             self.avg_CP_milk = stat.mean(CP_milk)
             self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
         else:
+            # here we'd implement another method, e.g. percentile, median, etc.
             requirement_percentile = 90
             self.NEmaint = np.percentile(NEmaint, requirement_percentile)
             self.NEa = np.percentile(NEa, requirement_percentile)
@@ -488,7 +491,7 @@ class Requirements:
                 # CP_milk.append(CP_milk)
         
         self.calc_pen_requirements(NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
-                               milk_production_reduction, use_the_mean = True)
+                               milk_production_reduction)
         
         # setting average nutrient requirements pen class variable
         avg_nutrient_rqmts = {'NEmaint': self.NEmaint, 'NEa': self.NEa,
