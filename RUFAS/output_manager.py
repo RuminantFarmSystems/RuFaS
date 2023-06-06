@@ -322,12 +322,12 @@ class OutputManager(object):
         """ Returns the list of files in the given path"""
         dir_path = Path(dir_path)
         if not dir_path.is_dir():
-            raise IsADirectoryError("specified path is not a directory")
+            raise NotADirectoryError("specified path is not a directory")
         txt_files = []
         all_files = os.listdir(dir_path)
         for filename in all_files:
             if filename.endswith(".txt"):
-                txt_files.append(os.join(dir_path,filename))
+                txt_files.append(filename)
         return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
@@ -386,14 +386,14 @@ class OutputManager(object):
             Path to the directory where the file will be saved.
 
         dir_path : str
-            Path of the input file containing the list of keys for inclusion filter.
+            Path of the directory containing the list of files containg the keys for inclusion filter.
 
         exclude_info_maps : bool
             Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
-        list_of_input_files = self._load_txt_file_names_to_list(dir_path)
-        for input_file in list_of_input_files:
+        list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
+        for input_file in list_of_filter_files:
             input_path = dir_path + input_file
             inclusion_keys = self._load_txt_file_to_list(input_path)
             filtered_pool = self._filter_variables_pool(inclusion_keys)
