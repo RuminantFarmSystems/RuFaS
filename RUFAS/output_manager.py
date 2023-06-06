@@ -319,19 +319,7 @@ class OutputManager(object):
         return pool_copy
 
     def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
-        """ Looks in directory for txt file names and adds them to a list.
-
-        Parameters
-        ----------
-        path : str
-            Path of the directory to be searched.
-
-        Returns
-        -------
-        List
-            A list of txt file names.
-
-        """
+        """ Returns the list of files in the given path"""
         dir_path = Path(dir_path)
         if not dir_path.is_dir():
             raise IsADirectoryError("specified path is not a directory")
