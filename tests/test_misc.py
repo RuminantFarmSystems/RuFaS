@@ -929,7 +929,6 @@ def test_filter_variables_pool(
 
     assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
     assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
-
     mock_output_manager.flush_pools()
 
     # Restore original method
@@ -949,13 +948,11 @@ def test_save_variables(
     mock_output_manager._exclude_info_maps = MagicMock()
 
     # test case for when there are no filter keys txt files in output_inclusion_filters directory:
-    mock_output_manager._load_txt_file_names_to_dict = MagicMock(return_value={"inclusion":
-                                                                                     [],
-                                                                                     "exclusion":
-                                                                                     []})
+    mock_output_manager._load_txt_file_names_to_dict = MagicMock(return_value={"inclusion": [],
+                                                                               "exclusion": []})
     mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1/", "dummy_dir_path_2/"], True)
     mock_output_manager._load_txt_file_names_to_dict.assert_called_once_with(["dummy_dir_path_1/",
-                                                                                    "dummy_dir_path_2/"])
+                                                                              "dummy_dir_path_2/"])
     mock_output_manager._load_txt_file_to_list.assert_not_called()
     mock_output_manager._generate_file_name.assert_not_called()
     mock_output_manager._exclude_info_maps.assert_not_called()
@@ -964,9 +961,9 @@ def test_save_variables(
     # test case for when exclude_info_maps flag set to False
 
     mock_output_manager._load_txt_file_names_to_dict = MagicMock(return_value={"inclusion/":
-                                                                                     ["dummy_input_filepath.txt"],
-                                                                                     "exclusion/":
-                                                                                     ["dummy_input_filepath_2.txt"]})
+                                                                               ["dummy_input_filepath.txt"],
+                                                                               "exclusion/":
+                                                                               ["dummy_input_filepath_2.txt"]})
     mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1", "dummy_dir_path_2"], False)
     mock_output_manager._load_txt_file_names_to_dict.assert_called_with(["dummy_dir_path_1", "dummy_dir_path_2"])
     calls = [call("inclusion/dummy_input_filepath.txt"),
