@@ -51,14 +51,8 @@ class CropSchedule(Schedule):
         self._validate_planting_parameters()
 
         self.harvest_years = harvest_years
-        self.harvest_days = harvest_days
-        self.harvest_operations = harvest_operations
-
-        if len(self.harvest_days) == 1:
-            self.harvest_days *= len(self.harvest_years)
-
-        if len(harvest_operations) == 1:
-            harvest_operations *= len(self.harvest_years)
+        self.harvest_days = self._elongate_list(harvest_days, len(harvest_years))
+        self.harvest_operations = self._elongate_list(harvest_operations, len(harvest_years))
 
         self._validate_harvest_parameters()
 
