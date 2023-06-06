@@ -1,5 +1,5 @@
 import pytest
-from typing import List
+from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 
@@ -21,6 +21,21 @@ def test_repeat_pattern() -> None:
 
     assert Schedule._repeat_pattern([], 0, 0) == []
     assert Schedule._repeat_pattern([], 3, 7) == []
+
+
+@pytest.mark.parametrize("test_list,length,expected", [
+    ([], 3, []),
+    ([], 0, []),
+    ([1, 2], 1, [1, 2]),
+    ([1.0, 2.0], 5, [1.0, 2.0]),
+    (["test"], 4, ["test", "test", "test", "test"]),
+    ([3], 1, [3]),
+    ([5], 5, [5, 5, 5, 5, 5])
+])
+def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -> None:
+    """Check that lists are elongated correctly."""
+    actual = Schedule._elongate_list(test_list, length)
+    assert actual == expected
 
 
 @pytest.mark.parametrize("days,expected", [
