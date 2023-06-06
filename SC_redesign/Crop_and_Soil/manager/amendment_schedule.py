@@ -3,6 +3,10 @@ from typing import List
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
+"""
+This module contains `TillageSchedule`, a `Schedule` child class that defines when and how a field will be tilled.
+"""
+
 
 class TillageSchedule(Schedule):
 
