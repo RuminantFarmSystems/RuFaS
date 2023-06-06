@@ -53,6 +53,8 @@ class TillageSchedule(Schedule):
 
         self._validate_tillage_parameters()
 
+        self._validate_pattern_parameters()
+
     def _validate_tillage_parameters(self) -> None:
         """
         Checks all fields that define the tillage schedule and raises errors if any are invalid.
