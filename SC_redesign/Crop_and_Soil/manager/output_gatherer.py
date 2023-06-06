@@ -32,11 +32,6 @@ class OutputGatherer:
             om.add_variable("available_phosphorus_pool", field.soil.data.available_phosphorus_pool, info_map)
             om.add_variable("runoff_phosphorus_pool", field.soil.data.runoff_phosphorus_pool, info_map)
             om.add_variable("days_since_application", field.soil.data.days_since_application, info_map)
-            om.add_variable("vadose_zone_layer", field.soil.data.vadose_zone_layer, info_map)
-            om.add_variable("vadose_active_organic_nitrogen_content",
-                            field.soil.data.vadose_zone_layer.active_organic_nitrogen_content, info_map)
-            om.add_variable("vadose_stable_organic_nitrogen_content",
-                            field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content, info_map)
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
                             info_map)
@@ -106,6 +101,26 @@ class OutputGatherer:
             om.add_variable("grazing_stable_organic_phosphorus",
                             field.soil.data.grazing_stable_organic_phosphorus,
                             info_map)
+            # Adding vadose zone layer data
+            info_map["prefix"] = "field:'" + field.field_data.name + "_vadose_layer'"
+            om.add_variable("active_organic_nitrogen_content",
+                            field.soil.data.vadose_zone_layer.active_organic_nitrogen_content, info_map)
+            om.add_variable("stable_organic_nitrogen_content",
+                            field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content, info_map)
+            om.add_variable("nitrate_content",
+                            field.soil.data.vadose_zone_layer.nitrate_content, info_map)
+            om.add_variable("fresh_organic_nitrogen_content",
+                            field.soil.data.vadose_zone_layer.fresh_organic_nitrogen_content, info_map)
+            om.add_variable("water_content",
+                            field.soil.data.vadose_zone_layer.water_content, info_map)
+            om.add_variable("labile_inorganic_phosphorus_content",
+                            field.soil.data.vadose_zone_layer.labile_inorganic_phosphorus_content, info_map)
+            om.add_variable("active_inorganic_phosphorus_content",
+                            field.soil.data.vadose_zone_layer.active_inorganic_phosphorus_content, info_map)
+            om.add_variable("stable_inorganic_phosphorus_content",
+                            field.soil.data.vadose_zone_layer.stable_inorganic_phosphorus_content, info_map)
+            om.add_variable("fresh_organic_phosphorus_content",
+                            field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content, info_map)
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
