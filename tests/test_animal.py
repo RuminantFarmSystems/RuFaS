@@ -1381,6 +1381,10 @@ def test_optimization():
     pass
 
 
+def test_get_user_defined_ration():
+    """Unit test for function get_user_defined_ration in file routines/animal/ration/ration_driver.py"""
+    pass
+
 def test_ration_formulation():
     """Unit test for function ration_formulation in file routines/animal/ration/ration_driver.py"""
     pass
@@ -1469,3 +1473,28 @@ def test_get_feed_data_from_feed_ids() -> None:
         'type': ['Milk', 'Starter']
     }
     assert pen_specific_feed_data == expected_pen_specific_feed_data
+
+
+def test_feed_quality_fix():
+    """Unit test for function feed_quality_fix in file routines/animal/ration/ration_driver.py"""
+    pass
+# make a fake available feeds dict
+# make two fake ration percents dicts
+# first has a couple values that need to be checked
+# assert that keys are same as the available feeds afterward 
+# second has no values, needs to check that keys are equivalent to orig
+
+
+def test_ration_to_use():
+    """Unit test for function ration_to_use in file routines/animal/ration/ration_driver.py"""
+    # assign the  the fake rations to a mocked object
+    # assert for each of the group possibilities that they equal the assigned
+    pass
+
+
+def test_userbounds():
+    """Unit test for function test_userbounds in file routines/animal/ration/ration_driver.py"""
+    # make fake udvr with tolerance
+    # make fake DMI
+    # assert that list output is those repeated 3X
+    pass

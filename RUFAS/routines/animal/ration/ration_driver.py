@@ -18,11 +18,10 @@ from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
 from RUFAS.routines.animal.ration.user_defined_ration import \
-    UserDefinedRationValues as UserDefinedRationValues
-from RUFAS.routines.animal.ration.user_defined_ration import \
-    ration_to_use as ration_to_use
+    UserDefinedRationManager as UserDefinedRationManager
 
-udrv = UserDefinedRationValues()
+
+udrv = UserDefinedRationManager()
 om = OutputManager()
 
 def optimization(requirements, available_feeds, animal_combination):
@@ -106,9 +105,10 @@ def get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             True if cow is lactating, False otherwise
     """
     fixed_ration = False
-    ration_percents = ration_to_use(pen.animal_combination, available_feeds)
+    ration_percents =UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
     # Reduction of milk production estimate process to achieve feasible solution
+    # def get_starting_milk_total()
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         total_milk_in_pen = 0.0
         num_animals = 0
@@ -119,10 +119,11 @@ def get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
     
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
         while not solution.success:
+            # def reduce_milk_production()
             reduction = 0.25
             running_total_milk = 0.0
             for animal in pen.animals_in_pen:
-                if animal.estimated_daily_milk_produced > 1.0:
+                if animal.estimated_daily_milk_produced > 1.0: #TODO CHANGE THIS SO IT"S NOT GOING NEGATIVE
                     animal.estimated_daily_milk_produced -= reduction
                     animal.milk_production_reduction -= reduction
                 running_total_milk += animal.estimated_daily_milk_produced
@@ -130,13 +131,15 @@ def get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-            if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or average_running_total_milk == 0.0:
+            if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or \
+               average_running_total_milk == 0.0:
                 fixed_ration = True
                 solution.success = True
                 break
     if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
     if fixed_ration:
+        # def make_ration_from_user_values() 
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             if available_feeds['feed_key'][feed_id] in ration_percents:
@@ -148,6 +151,7 @@ def get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
         ration['status'] = 'Optimal'
         ration['objective'] = 0.0 # setting as optimal
     elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
+        # def make_ration_from_solution()
         ration = {}
         for feed_id in range(len(available_feeds['feed_id'])):
             i = feed_id * 3

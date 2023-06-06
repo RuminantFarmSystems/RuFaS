@@ -192,7 +192,7 @@ class AnimalManagement:
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
 
-        udrv = udr.UserDefinedRationValues()
+        udrv = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
         udrv.udr_or_not = self.ration_user_input
 

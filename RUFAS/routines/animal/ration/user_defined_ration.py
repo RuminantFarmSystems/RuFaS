@@ -9,7 +9,7 @@ Author: Joseph C. Waddell, jw2574@cornell.edu
 from typing import Any, Dict, List, Union
 import json
 
-class UserDefinedRationValues(object):
+class UserDefinedRationManager(object):
     """
     Reads in the user_defined_ration JSON and collects variables and dicts to use later
     """
@@ -21,12 +21,12 @@ class UserDefinedRationValues(object):
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
-            cls.instance = super(UserDefinedRationValues, cls).__new__(cls)
+            cls.instance = super(UserDefinedRationManager, cls).__new__(cls)
         return cls.instance
 
     def __init__(self) -> None:
-        if UserDefinedRationValues.__instance is None:
-            UserDefinedRationValues.__instance = self
+        if UserDefinedRationManager.__instance is None:
+            UserDefinedRationManager.__instance = self
             with open('input/userdefinedration/user_defined_ration_input_percentages.json', 'r') as f:
                 ration_all = json.load(f)
             lactating_cow_ration = ration_all['cow_lactating']
@@ -43,40 +43,40 @@ class UserDefinedRationValues(object):
             self.tolerance = ration_all['tolerance']
             self.milk_reduction_percent = ration_all['milk_reduction_percent']
             self.udr_or_not = None
-            
-
-def ration_to_use(pen_animal_combo, available_feeds) -> Dict:
-    """
-    Function outputs the correct dictionary from the UserDefinedRationValues class
     
-    Parameters
-    ----------
-    pen_animal_combo: Pen.AnimalCombination
 
-    Returns
-    -------
-    ration_percents: Dict
-        dictionary of feed ids and their associated percentage of DMI 
-    """
-    udrv = UserDefinedRationValues()
-    group = pen_animal_combo.name 
-    if group == 'LAC_COW':
-        ration_percents = udrv.lactating_cow_ration
-    # elif pen.classes
-    elif group == 'GROWING':
-        ration_percents = udrv.heifer_ration
-    elif group == 'CLOSE_UP':
-        ration_percents = udrv.dry_cow_ration
-    else: 
-        ration_percents = udrv.calf_ration
-    return feed_quality_fix(ration_percents, available_feeds)
+    def feed_quality_fix(ration_percents, available_feeds):
+        key_list = list(ration_percents.keys())
+        for key in key_list:
+            if int(key) not in available_feeds['feed_id']:
+                new_key = str(int(key)+2)
+                ration_percents[new_key] = ration_percents[key]
+                del ration_percents[key]
+        return ration_percents
+    
 
+    def ration_to_use(pen_animal_combo, available_feeds) -> Dict:
+        """
+        Function outputs the correct dictionary from the UserDefinedRationManager class
+        
+        Parameters
+        ----------
+        pen_animal_combo: Pen.AnimalCombination
 
-def feed_quality_fix(ration_percents, available_feeds):
-    key_list = list(ration_percents.keys())
-    for key in key_list:
-        if int(key) not in available_feeds['feed_id']:
-            new_key = str(int(key)+2)
-            ration_percents[new_key] = ration_percents[key]
-            del ration_percents[key]
-    return ration_percents
+        Returns
+        -------
+        ration_percents: Dict
+            dictionary of feed ids and their associated percentage of DMI 
+        """
+        udrv = UserDefinedRationManager()
+        group = pen_animal_combo.name 
+        if group == 'LAC_COW':
+            ration_percents = udrv.lactating_cow_ration
+        # elif pen.classes
+        elif group == 'GROWING':
+            ration_percents = udrv.heifer_ration
+        elif group == 'CLOSE_UP':
+            ration_percents = udrv.dry_cow_ration
+        else: 
+            ration_percents = udrv.calf_ration
+        return UserDefinedRationManager.feed_quality_fix(ration_percents, available_feeds)
