@@ -174,8 +174,8 @@ class TillageSchedule(Schedule):
 class ManureSchedule(Schedule):
 
     def __init__(self, name: str, years: [List], days: [List], nitrogen_masses: List[float],
-                 phosphorus_masses: List[float], field_coverages: List[float], application_depths: List[float] = [0.0],
-                 surface_remainder_fractions: List[float] = [1.0], pattern_skip: int = 0, pattern_repeat: int = 0):
+                 phosphorus_masses: List[float], field_coverages: List[float], application_depths: List[float] = None,
+                 surface_remainder_fractions: List[float] = None, pattern_skip: int = 0, pattern_repeat: int = 0):
         """
         Creates and validates a manure application schedule.
 
@@ -205,25 +205,11 @@ class ManureSchedule(Schedule):
         """
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
-        self.nitrogen_masses = nitrogen_masses
-        if len(self.nitrogen_masses) == 1:
-            self.nitrogen_masses *= len(years)
-
-        self.phosphorus_masses = phosphorus_masses
-        if len(self.phosphorus_masses) == 1:
-            self.phosphorus_masses *= len(years)
-
-        self.field_coverages = field_coverages
-        if len(self.field_coverages) == 1:
-            self.field_coverages *= len(years)
-
-        self.application_depths = application_depths
-        if len(self.application_depths) == 1:
-            self.application_depths *= len(years)
-
-        self.surface_remainder_fractions = surface_remainder_fractions
-        if len(self.surface_remainder_fractions) == 1:
-            self.surface_remainder_fractions *= len(years)
+        self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
+        self.phosphorus_masses = self._elongate_list(phosphorus_masses, len(years))
+        self.field_coverages = self._elongate_list(field_coverages, len(years))
+        self.application_depths = self._elongate_list(application_depths, len(years))
+        self.surface_remainder_fractions = self._elongate_list(surface_remainder_fractions, len(years))
 
         self._validate_manure_parameters()
 
