@@ -38,18 +38,9 @@ class TillageSchedule(Schedule):
         """
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
-        self.tillage_depths = tillage_depths
-        self.incorporation_fractions = incorporation_fractions
-        self.mixing_fractions = mixing_fractions
-
-        if len(self.tillage_depths) == 1:
-            self.tillage_depths *= len(self.years)
-
-        if len(self.incorporation_fractions) == 1:
-            self.incorporation_fractions *= len(self.years)
-
-        if len(self.mixing_fractions) == 1:
-            self.mixing_fractions *= len(self.years)
+        self.tillage_depths = self._elongate_list(tillage_depths, len(years))
+        self.incorporation_fractions = self._elongate_list(incorporation_fractions, len(years))
+        self.mixing_fractions = self._elongate_list(mixing_fractions, len(years))
 
         self._validate_tillage_parameters()
 
