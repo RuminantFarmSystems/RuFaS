@@ -102,7 +102,8 @@ class TillageSchedule(Schedule):
             raise ValueError(error_header + f"expected number of years, days, depths, incorporation and mixing "
                                             f"fractions to be equal, received '{self.years}' years, '{self.days}' days,"
                                             f" '{self.tillage_depths}' tillage depths, '{self.incorporation_fractions}'"
-                                            f" incorporation fractions, and '{self.mixing_fractions}' mixing fractions")
+                                            f" incorporation fractions, and '{self.mixing_fractions}' mixing "
+                                            f"fractions.")
 
     def generate_tillage_events(self) -> List[TillageEvent]:
         """

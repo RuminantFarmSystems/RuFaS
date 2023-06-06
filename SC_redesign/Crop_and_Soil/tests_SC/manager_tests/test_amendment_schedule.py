@@ -5,6 +5,30 @@ from SC_redesign.Crop_and_Soil.manager.amendment_schedule import TillageSchedule
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
 
+@pytest.mark.parametrize("name,years,days,depths,incorp_fracs,mix_fracs,expected", [
+    ("test_1", [1990, 1989, 1991], [100], [100], [0.5], [0.5],
+     "'test_1': expected all years to be > 0 and in non-descending order, received '[1990, 1989, 1991]'."),
+    ("test_2", [1990, 1991], [200, 0], [100], [0.5], [0.5],
+     "'test_2': expected all planting days to be in range [1, 366], received '[200, 0]'."),
+    ("test_3", [1990], [150], [150, 0, 150], [0.5], [0.5],
+     "'test_3': expected all tillage depths to be > 0.0, received '[150, 0, 150]'."),
+    ("test_4", [1990], [150], [100], [1.1, 0.9], [0.5],
+     "'test_4': expected all incorporation fractions to be in range [0.0, 1.0], received '[1.1, 0.9]'."),
+    ("test_5", [1990], [150], [100], [0.5], [-0.2, 0.3],
+     "'test_5': expected all mixing fractions to be in range [0.0, 1.0], received '[-0.2, 0.3]'."),
+    ("test_6", [1990], [150, 200], [100], [0.5], [0.5],
+     "'test_6': expected number of years, days, depths, incorporation and mixing fractions to be equal, received "
+     "'[1990]' years, '[150, 200]' days, '[100]' tillage depths, '[0.5]' incorporation fractions, and '[0.5]' mixing "
+     "fractions.")
+])
+def test_validate_tillage_parameters(name: str, years: List[int], days: List[int], depths: List[float],
+                                     incorp_fracs: List[float], mix_fracs: List[float], expected: str) -> None:
+    """Tests that errors are raised correctly when invalid input is passed."""
+    with pytest.raises(ValueError) as e:
+        TillageSchedule(name, years, days, depths, incorp_fracs, mix_fracs, 1, 1)
+    assert str(e.value) == expected
+
+
 @pytest.mark.parametrize("depths,expected", [
     ([13, 22, 300], True),
     ([200, -200, 200], False),
@@ -43,23 +67,6 @@ def test_init_tillage_schedule(depths: float | List[float], incorp_fracs: float 
     assert till_sched.tillage_depths == expected_depths
     assert till_sched.incorporation_fractions == expected_incorp
     assert till_sched.mixing_fractions == expected_mix
-
-
-@pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,expected", [
-    ([200, 200, 200], [0.5], [0.5], "Number of years, days, depths, incorporation and mixing fractions must be equal."),
-    ([300, 300], [0.5, 0.8, 0.5], [0.4, 0.4], "Number of years, days, depths, incorporation and mixing fractions must "
-                                              "be equal."),
-    ([200], [0.3], [0.4, 0.5, 0.6], "Number of years, days, depths, incorporation and mixing fractions must be equal."),
-    ([100, -50], [0.4], [0.5], "Expected all tillage depths to be > 0.0, received '[100, -50]'."),
-    ([200], [1.1], [0.55], "Expected all incorporation fractions to be in range [0.0, 1.0], received '[1.1, 1.1]'."),
-    ([400], [0.66], [0.5, -0.4], "Expected all mixing fractions to be in range [0.0, 1.0], received '[0.5, -0.4]'.")
-])
-def test_init_tillage_schedule_error(depths: float | List[float], incorp_fracs: float | List[float],
-                                     mix_fracs: float | List[float], expected: str) -> None:
-    """Tests that TillageSchedule throws the correct error when passed invalid parameters."""
-    with pytest.raises(ValueError) as e:
-        TillageSchedule("test", [1990, 1991], [160], depths, incorp_fracs, mix_fracs, 2, 2)
-    assert str(e.value) == expected
 
 
 @pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,years,days,skip,repeat,expected", [
