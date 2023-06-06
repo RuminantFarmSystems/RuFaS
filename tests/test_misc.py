@@ -532,7 +532,7 @@ def output_manager_original_method_states(
         "_add_to_pool": mock_output_manager._add_to_pool,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
         "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
-        "_load_input_txt_file_names_to_dict": mock_output_manager._load_input_txt_file_names_to_dict,
+        "_load_txt_file_names_to_dict": mock_output_manager._load_txt_file_names_to_dict,
         "_filter_variables_pool": mock_output_manager._filter_variables_pool,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
@@ -835,7 +835,7 @@ def test_load_txt_file_names_to_dict(
     exclusion_dir.join("file6.csv").write("File 6 content")
 
     dir_paths = [str(inclusion_dir), str(exclusion_dir)]
-    txt_files = mock_output_manager._load_input_txt_file_names_to_dict(dir_paths)
+    txt_files = mock_output_manager._load_txt_file_names_to_dict(dir_paths)
 
     assert len(txt_files) == 2
     assert str(inclusion_dir) in txt_files
@@ -855,7 +855,7 @@ def test_load_txt_file_names_to_dict(
 
     # Restore original method
     mock_output_manager._load_txt_file_names_to_dict = output_manager_original_method_states[
-        "_load_input_txt_file_names_to_dict"
+        "_load_txt_file_names_to_dict"
     ]
 
 

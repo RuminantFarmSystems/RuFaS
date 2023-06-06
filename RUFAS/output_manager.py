@@ -318,7 +318,7 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _load_input_txt_file_names_to_dict(self, dir_paths: List[str]) -> Dict[str, List[str]]:
+    def _load_txt_file_names_to_dict(self, dir_paths: List[str]) -> Dict[str, List[str]]:
         """ Looks in inputs directory for txt file names.
 
         Parameters
@@ -416,7 +416,7 @@ class OutputManager(object):
             Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
-        dict_of_input_files = self._load_input_txt_file_names_to_dict(dir_paths)
+        dict_of_input_files = self._load_txt_file_names_to_dict(dir_paths)
         for dir_path, input_file_list in dict_of_input_files.items():
             for input_file in input_file_list:
                 input_path = dir_path + input_file
