@@ -318,7 +318,7 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _load_txt_file_names_to_list(self, dir_path: str) -> List[str]:
+    def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
         """ Looks in directory for txt file names and adds them to a list.
 
         Parameters
