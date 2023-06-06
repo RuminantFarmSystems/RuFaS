@@ -318,32 +318,16 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _load_txt_file_names_to_list(self, dir_paths: List[str]) -> Dict[str, List[str]]:
-        """ Looks in inputs directory for txt file names.
-
-        Parameters
-        ----------
-        dir_paths : List[str]
-            List of paths of the inclusion and exclusion filter directories to be searched.
-
-        Returns
-        -------
-        Dict
-            A dict of paths to exclusion and exclusion dirs and the appropriate filter txt file names.
-
-        """
-        txt_files = {}
-        for dir_path in dir_paths:
-            dir_path_check = Path(dir_path)
-            if not dir_path_check.is_dir():
-                raise IsADirectoryError("specified path is not a directory")
-            txt_files[dir_path] = []
-            for filename in os.listdir(dir_path):
-                if filename.endswith(".txt"):
-                    if "inclusion" in dir_path:
-                        txt_files[dir_path].append(filename)
-                    elif "exclusion" in dir_path:
-                        txt_files[dir_path].append(filename)
+    def _list_txt_file_names_in_dir(self, dir_path: str) -> Dict[str, List[str]]:
+        """Returns the list of files in the given path"""
+        dir_path_check = Path(dir_path)
+        if not dir_path_check.is_dir():
+            raise IsADirectoryError("specified path is not a directory")
+        txt_files = []
+        all_files = os.listdir(dir_path)
+        for filename in all_files:
+            if filename.endswith(".txt"):
+                txt_files.append(filename)
         return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
