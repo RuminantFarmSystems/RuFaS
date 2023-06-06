@@ -327,7 +327,7 @@ class OutputManager(object):
         all_files = os.listdir(dir_path)
         for filename in all_files:
             if filename.endswith(".txt"):
-                txt_files.append(filename)
+                txt_files.append(os.join(dir_path,filename))
         return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
