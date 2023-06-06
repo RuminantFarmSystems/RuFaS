@@ -27,11 +27,6 @@ class Schedule:
         pattern_repeat : int, default=0
             Number of times the specified pattern of this schedule should be repeated.
 
-        Notes
-        -----
-        It is expected that this generic schedule class will only see use through its child classes, and for the errors
-        raised they are expected to be caught by child classes and given more appropriate and specific error messages.
-
         """
         self.name = name
         self.years = years
