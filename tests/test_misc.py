@@ -969,7 +969,7 @@ def test_save_variables(
                                                                                      ["dummy_input_filepath_2.txt"]})
     mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1", "dummy_dir_path_2"], False)
     mock_output_manager._load_txt_file_names_to_dict.assert_called_with(["dummy_dir_path_1", "dummy_dir_path_2"])
-    calls = [call("inclusion/dummy_input_filepath.txt"), call().__iter__(),
+    calls = [call("inclusion/dummy_input_filepath.txt"),
              call("exclusion/dummy_input_filepath_2.txt")]
     mock_output_manager._load_txt_file_to_list.assert_has_calls(calls)
     calls = [call("saved_variables_inclusion_dummy_input_filepath.txt", "json"),
@@ -984,8 +984,8 @@ def test_save_variables(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager.save_variables("dummy_path", ["dummy_dir_path_1", "dummy_dir_path_2"], True)
     mock_output_manager._load_txt_file_names_to_dict.assert_called_with(["dummy_dir_path_1", "dummy_dir_path_2"])
-    calls = [call("inclusion/dummy_input_filepath.txt"), call().__iter__(),
-             call("exclusion/dummy_input_filepath_2.txt")]
+    calls = [call("inclusion/dummy_input_filepath.txt"), call('exclusion/dummy_input_filepath_2.txt'),
+             call('inclusion/dummy_input_filepath.txt'), call("exclusion/dummy_input_filepath_2.txt")]
     mock_output_manager._load_txt_file_to_list.assert_has_calls(calls)
     calls = [call("saved_variables_inclusion_dummy_input_filepath.txt", "json"),
              call("saved_variables_exclusion_dummy_input_filepath_2.txt", "json")]
