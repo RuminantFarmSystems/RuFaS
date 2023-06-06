@@ -327,9 +327,9 @@ class OutputManager(object):
             for filename in all_files:
                 if filename.endswith(".txt"):
                     txt_files.append(filename)
+            return txt_files
         else:
             raise NotADirectoryError("specified path is not a directory")
-        return txt_files
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
