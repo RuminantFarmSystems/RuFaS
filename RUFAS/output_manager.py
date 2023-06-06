@@ -324,7 +324,8 @@ class OutputManager(object):
         if not dir_path.is_dir():
             raise IsADirectoryError("specified path is not a directory")
         txt_files = []
-        for filename in os.listdir(dir_path):
+        all_files = os.listdir(dir_path)
+        for filename in all_files:
             if filename.endswith(".txt"):
                 txt_files.append(filename)
         return txt_files
