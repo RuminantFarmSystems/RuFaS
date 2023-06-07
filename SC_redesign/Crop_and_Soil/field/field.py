@@ -1,13 +1,15 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from RUFAS.classes import Time
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -22,7 +24,8 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 class Field:
     """object representing an agricultural field"""
 
-    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None):
+    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
+                 plantings: Optional[List[PlantingEvent]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -35,25 +38,27 @@ class Field:
         self.crops: List[Crop] = list()  # empty crop list
         """crops currently in the field"""
 
+        self.planting_events: List[PlantingEvent] = plantings
+        """List of all planting events that will occur over the run of the simulation in this field."""
+
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
 
         self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
         """is today the last day of the simulation year?"""
 
-    def manage_field(self, day: int, year: int, current_weather: CurrentWeather) -> None:
+    def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
         """main Field function, runs all field routines based on current attribute configuration
 
         Args:
-            day: the current (sequential) day of the simulation  - TODO: not yet implemented
-            year: the current (sequential) year of the simulation - TODO: not yet implemented
+            time : a Time object, containing the current year and day that the simulation is on.
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
         Details: **All the logic (after setup) will go in this function**
         """
         # What needs to be done today?
-        self.check_schedule(day, year)
+        # self.check_schedule(day, year)
 
         # --- Soil Management---
         # nutrient amendments
@@ -133,19 +138,62 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def check_schedule(self, year: int, day: int) -> None:
-        """check if any scheduled activities need to be completed today.
+    # def check_schedule(self, year: int, day: int) -> None:
+    #     """check if any scheduled activities need to be completed today.
+    #
+    #     Args:
+    #         year: the current year
+    #         day: the current day of the year
+    #
+    #     Details:
+    #         This method should check the dates on which certain actions should be performed against the year and day.
+    #         Then, the boolean attributes that trigger the relevant operations should be updated.
+    #         For example, if we need to plant a crop today, this method will set `self.field_data.is_planting_day=True`.
+    #      """
+    #     pass
 
-        Args:
-            year: the current year
-            day: the current day of the year
+    def check_crop_planting_schedule(self, time: Time) -> None:
+        """
+        Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
+        executed.
 
-        Details:
-            This method should check the dates on which certain actions should be performed against the year and day.
-            Then, the boolean attributes that trigger the relevant operations should be updated.
-            For example, if we need to plant a crop today, this method will set `self.field_data.is_planting_day=True`.
-         """
+        Parameters
+        ----------
+        time : Time
+            Time object containing the current day and year of the simulation.
+
+        """
         pass
+
+    @staticmethod
+    def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
+        """
+        Filters out all events from a list that occur on the current day, and creates a new list with all the events
+        that were filtered out.
+
+        Parameters
+        ----------
+        all_events : List[Event]
+            List of all Events that will occur over the run of the simulation in this field.
+        time : Time
+            Object containing the current day and year of the simulation.
+
+        Returns
+        -------
+        Tuple
+            A tuple containing the list of all Events that will occur in this field after the current day, and a list of
+            Events that will occur on the current day.
+
+        Notes
+        -----
+        This method is written to work with generic Events so that it may be used on all the different child classes of
+        Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
+
+        """
+        todays_events = [event for event in all_events if event.occurs_today(time)]
+        remaining_events = [event for event in all_events if event not in todays_events]
+        return remaining_events, todays_events
+
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
