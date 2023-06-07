@@ -6,6 +6,7 @@ from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.field import Field
@@ -13,6 +14,30 @@ from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
+from RUFAS.classes import Time
+
+
+@pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
+    ([Event(1990, 120), Event(1990, 200), Event(1993, 100)], 1990, 120,
+     [Event(1990, 200), Event(1993, 100)], [Event(1990, 120)]),
+    ([PlantingEvent("corn", 1993, 120, False), PlantingEvent("corn_supplement", 1993, 120, True),
+      PlantingEvent("cover_crop", 1993, 245, False)], 1993, 120, [PlantingEvent("cover_crop", 1993, 245, False)],
+     [PlantingEvent("corn", 1993, 120, False), PlantingEvent("corn_supplement", 1993, 120, True)]),
+    ([HarvestEvent("corn_1", 1999, 240, "default"), HarvestEvent("corn_1", 2000, 240, "default"),
+      HarvestEvent("alfalfa_2", 2001, 240, "default")], 1999, 200,
+     [HarvestEvent("corn_1", 1999, 240, "default"), HarvestEvent("corn_1", 2000, 240, "default"),
+      HarvestEvent("alfalfa_2", 2001, 240, "default")], [])
+])
+def test_create_and_update_events(events: List[Event], year: int, day: int, expected_remaining: List[Event],
+                                  expected_current: List[Event]) -> None:
+    """Tests that list of events are properly checked and have current events correctly removed from them."""
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+
+    actual = Field._create_and_update_events(events, mocked_time)
+    assert actual[0] == expected_remaining
+    assert actual[1] == expected_current
 
 
 @pytest.mark.parametrize("daylength,threshold_daylength", [
