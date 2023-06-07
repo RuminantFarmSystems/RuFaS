@@ -47,7 +47,6 @@ def test_send_daily_variables(runoff_values: List[float],
     pool = om.variables_pool
 
     # Testing layer variables
-    assert "field:'name 1'.current_residue" in pool.keys()
     assert len(pool["field:'name 1'.current_residue"]['info_maps']) == 3
     assert pool["field:'name 1'.current_residue"]['values'] == [1.3, 4.2, 6.94]
     assert "field:'name 2'.current_residue" in pool.keys()
@@ -55,23 +54,17 @@ def test_send_daily_variables(runoff_values: List[float],
     assert pool["field:'name 2'.current_residue"]['values'] == [1.3, 4.2, 6.94]
 
     # Testing soil variables
-    assert "field:'name 1'.accumulated_runoff" in pool.keys()
     assert len(pool["field:'name 1'.accumulated_runoff"]['info_maps']) == 3
     assert pool["field:'name 1'.accumulated_runoff"]['values'] == [1.3, 2.4, 1.22]
 
-    assert "field:'name 2'.accumulated_runoff" in pool.keys()
     assert len(pool["field:'name 2'.accumulated_runoff"]['info_maps']) == 3
     assert pool["field:'name 2'.accumulated_runoff"]['values'] == [1.3, 2.4, 1.22]
 
+    # Testing vadose data
+    assert len(pool["field:'name 1_vadose_layer'.active_organic_nitrogen_content"]['info_maps']) == 3
+    assert pool["field:'name 1_vadose_layer'.active_organic_nitrogen_content"]['values'] == [0, 0, 0]
+
     # Testing layer data
-    assert "field:'name 1',layer_index:'0'.percolated_water" in pool.keys()
-    assert "field:'name 1',layer_index:'1'.percolated_water" in pool.keys()
-    assert "field:'name 1',layer_index:'2'.percolated_water" in pool.keys()
-    assert "field:'name 1',layer_index:'3'.percolated_water" in pool.keys()
-    assert "field:'name 2',layer_index:'0'.percolated_water" in pool.keys()
-    assert "field:'name 2',layer_index:'1'.percolated_water" in pool.keys()
-    assert "field:'name 2',layer_index:'2'.percolated_water" in pool.keys()
-    assert "field:'name 2',layer_index:'3'.percolated_water" in pool.keys()
     assert len(pool["field:'name 1',layer_index:'0'.percolated_water"]['info_maps']) == 3
     assert len(pool["field:'name 1',layer_index:'1'.percolated_water"]['info_maps']) == 3
     assert len(pool["field:'name 1',layer_index:'2'.percolated_water"]['info_maps']) == 3
@@ -90,10 +83,6 @@ def test_send_daily_variables(runoff_values: List[float],
     assert pool["field:'name 2',layer_index:'3'.percolated_water"]['values'] == [50, 50, 50]
 
     # Testing crop data
-    assert "field:'name 1',crop:'crop 1'.root_depth" in pool.keys()
-    assert "field:'name 1',crop:'crop 2'.root_depth" in pool.keys()
-    assert "field:'name 2',crop:'crop 1'.root_depth" in pool.keys()
-    assert "field:'name 2',crop:'crop 2'.root_depth" in pool.keys()
     assert len(pool["field:'name 1',crop:'crop 1'.root_depth"]['info_maps']) == 3
     assert len(pool["field:'name 1',crop:'crop 2'.root_depth"]['info_maps']) == 3
     assert len(pool["field:'name 2',crop:'crop 1'.root_depth"]['info_maps']) == 3
