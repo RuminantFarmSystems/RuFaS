@@ -133,6 +133,9 @@ class Cow(HeiferIII):
 
         self.lactation_curve = AnimalBase.config['lactation_curve']
         self.milk_production_history = []
+        self.breed_index = 0
+        self.parity_index = 0
+        self.set_breed_index()
 
         # grouping nutrition requirement values
         # Required net energy density (Mcal/kg of DM)
@@ -218,27 +221,32 @@ class Cow(HeiferIII):
         return (self.is_pregnant and self.is_dry and
                 self.days_in_preg >= AnimalModuleConstants.DRY_CLOSE_UP_START_DATE)
 
+    def set_breed_index(self):
+        """Sets the cow's breed index for use in the lactation curve parameter calculation"""
+        if self.breed == 'HO':
+            self.breed_index = 0
+        elif self.breed == 'JE':
+            self.breed_index = 1
+    
+    def set_parity_index(self):
+        """Sets the cow's parity index for use in the lactation curve parameter calculation"""
+        self.parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
+
     def set_lactation_curve_params(self):
         """
-        Set cow's lactation curve params based on cow's lactation curve attribute.
+        Set cow's lactation curve parameters based on cow's lactation curve attribute.
         Currently only set up for wood model.
         """
-        if self.breed == 'HO':
-            breed_index = 0
-        elif self.breed == 'JE':
-            breed_index = 1
-        parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
-
         if AnimalBase.config['lactation_curve'] == 'wood':
             self.wood_l = self.determine_param_value(
-                AnimalBase.config['wood_l'][breed_index][parity_index],
-                AnimalBase.config['wood_l_std'][breed_index][parity_index])
+                AnimalBase.config['wood_l'][self.breed_index][self.parity_index],
+                AnimalBase.config['wood_l_std'][self.breed_index][self.parity_index])
             self.wood_m = self.determine_param_value(
-                AnimalBase.config['wood_m'][breed_index][parity_index],
-                AnimalBase.config['wood_m_std'][breed_index][parity_index])
+                AnimalBase.config['wood_m'][self.breed_index][self.parity_index],
+                AnimalBase.config['wood_m_std'][self.breed_index][self.parity_index])
             self.wood_n = self.determine_param_value(
-                AnimalBase.config['wood_n'][breed_index][parity_index],
-                AnimalBase.config['wood_n_std'][breed_index][parity_index])
+                AnimalBase.config['wood_n'][self.breed_index][self.parity_index],
+                AnimalBase.config['wood_n_std'][self.breed_index][self.parity_index])
 
     def calculate_daily_milk_produced(self):
         if self.lactation_curve == 'wood':
