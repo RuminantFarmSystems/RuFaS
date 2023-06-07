@@ -10,7 +10,7 @@ class OutputGatherer:
     def __init__(self, fields: List[Field]):
         self.fields = fields
 
-    def send_daily_variables(self, filter_specs: Optional[List] = None) -> None:
+    def send_daily_variables(self) -> None:
         """sends daily variables to the output manager"""
         info_map = {"class": self.__class__.__name__, "function": self.send_daily_variables.__name__}
         for field in self.fields:
@@ -240,7 +240,7 @@ class OutputGatherer:
                 om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)
                 om.add_variable("residue_phosphorus", crop.data.residue_phosphorus, info_map)
 
-    def send_annual_variables(self, filter_specs: Optional[List] = None) -> None:
+    def send_annual_variables(self) -> None:
         """sends annual variables to the output manager"""
         info_map = {"class": self.__class__.__name__, "function": self.send_annual_variables.__name__}
         # adding field variable
