@@ -34,6 +34,8 @@ class FieldData:
     attribute-value pairs, with attributes matching those of CropData."""
 
     # --- Field-level Variables ---
+    name: Optional[str] = None
+    """Name of this field for identification purposes."""
     evaporation: Optional[float] = None
     """total water lost to evaporation in the field on the current day (mm)"""
     transpiration: Optional[float] = None
