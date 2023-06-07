@@ -40,23 +40,25 @@ class AnaerobicLagoon(BaseManureTreatment):
                 0.03 / ManureConstants.MANURE_DENSITY)  # TODO: Use constants instead
         return new_daily_output
 
-    def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
-        """Updates the daily output variables for the anaerobic lagoon.
+    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
+        """
+        Calculate the methane emission from the anaerobic lagoon.
 
-        Returns:
-            The daily output variables for the anaerobic lagoon.
+        Parameters
+        ----------
+        daily_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
+
+        Returns
+        -------
+        None
+            Update the `storage_methane` attribute of the daily output object.
+
+            Update the `storage_methane` and `liquid_manure_total_volatile_solids` attributes of the accumulated
+            output object.
 
         """
-        daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
-        adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
-        daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
-        daily_output.daily_precipitation_volume = self.precipitation_volume
-        daily_output.daily_rainfall = self._get_current_day_rainfall()
-
-        daily_output = self._calc_daily_sludge_output(daily_output, self._current_manure_treatment_daily_input)
-        self._accumulated_output = self._adjust_accumulated_output(daily_output)
-        self._accumulated_precipitation_volume += self.precipitation_volume
-
+        volatile_solids_factor = 3
         methane_emission = GasEmissions.calc_methane_emission_for_slurry_storage(
             total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
             temp=self._get_current_day_average_temperature_celsius()
@@ -64,14 +66,36 @@ class AnaerobicLagoon(BaseManureTreatment):
         methane_emission = max(methane_emission, 0.0)
         daily_output.storage_methane = methane_emission
         self._accumulated_output.storage_methane += methane_emission
-        self._accumulated_output.liquid_manure_total_volatile_solids += \
-            daily_output.liquid_manure_total_volatile_solids - methane_emission * 3
 
+        new_liquid_manure_total_volatile_solids = (daily_output.liquid_manure_total_volatile_solids -
+                                                   methane_emission * volatile_solids_factor)
+        self._accumulated_output.liquid_manure_total_volatile_solids += new_liquid_manure_total_volatile_solids
+
+    def _update_ammonia_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
+        """
+        Calculate the ammonia emission from the anaerobic lagoon.
+
+        Parameters
+        ----------
+        daily_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
+
+        Returns
+        -------
+        None
+            Update the `storage_ammonia` attribute of the daily output object.
+
+            Update the `storage_ammonia` attribute of the accumulated output object.
+
+        """
+        manure_total_ammoniacal_nitrogen = (
+                daily_output.liquid_manure_total_ammoniacal_nitrogen +
+                self._current_pen.manure.urine_total_ammoniacal_nitrogen -
+                self._manure_handler_daily_output.housing_ammonia
+        )
         storage_ammonia_emission = GasEmissions.calc_storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
-            manure_total_ammoniacal_nitrogen=(daily_output.liquid_manure_total_ammoniacal_nitrogen
-                                              + self._current_pen.manure.urine_total_ammoniacal_nitrogen
-                                              - self._manure_handler_daily_output.housing_ammonia),
+            manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
             manure_volume=daily_output.daily_final_manure_volume,
             total_solids=daily_output.liquid_manure_total_solids,
             storage_area=GasEmissionConstants.DEFAULT_STORAGE_AREA,
@@ -80,6 +104,30 @@ class AnaerobicLagoon(BaseManureTreatment):
         )
         daily_output.storage_ammonia = storage_ammonia_emission
         self._accumulated_output.storage_ammonia += storage_ammonia_emission
+
+    def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
+        """
+        Update the daily output variables for the anaerobic lagoon.
+
+        Returns
+        -------
+        ManureTreatmentDailyOutput
+            The daily output variables for the anaerobic lagoon.
+
+        """
+        daily_output = self._initialize_daily_output_during_update(self._current_manure_treatment_daily_input)
+        daily_output.set_daily_final_manure_volume(
+            self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
+        )
+        daily_output.daily_precipitation_volume = self.precipitation_volume
+        daily_output.daily_rainfall = self._get_current_day_rainfall()
+
+        daily_output = self._calc_daily_sludge_output(daily_output, self._current_manure_treatment_daily_input)
+        self._accumulated_output = self._adjust_accumulated_output(daily_output)
+        self._accumulated_precipitation_volume += self.precipitation_volume
+
+        self._update_methane_emission(daily_output)
+        self._update_ammonia_emission(daily_output)
 
         return daily_output
 
@@ -116,14 +164,19 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) \
             -> ManureTreatmentDailyOutput:
-        """Adjusts the accumulated output by either resetting it or adding the daily output to it.
+        """
+        Adjust the accumulated output by either resetting it or adding the daily output to it.
 
         The accumulated output will be reset on the first day of every storage time period.
 
-        Args:
-            manure_treatment_daily_output: The daily output from the manure treatment system.
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
-        Returns:
+        Returns
+        -------
+        ManureTreatmentDailyOutput
             The adjusted accumulated output.
 
         """

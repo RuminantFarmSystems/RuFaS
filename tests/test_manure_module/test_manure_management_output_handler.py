@@ -3,13 +3,13 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+from mock.mock import call
 from pytest_mock import MockFixture
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.output_handler.manure_management_output_handler import ManureManagementOutputHandler
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
@@ -18,9 +18,9 @@ def test_manure_management_output_handler_init(mocker: MockFixture) -> None:
     """Unit test for __init__() in manure_management_output_handler.py."""
     # Arrange
     patch_for_empty_main_output_directory = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.empty_main_output_directory',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.empty_main_output_directory',
+        return_value=None
     )
 
     # Act
@@ -35,9 +35,9 @@ def test_property_data(mocker: MockFixture) -> None:
     """Unit test for property data() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
     manure_management_output_handler._df = expected_data = mocker.MagicMock()
@@ -71,24 +71,24 @@ def test_convert_dataclass_obj_into_formatted_dict(mocker: MockFixture) -> None:
         expected_dataframe_dict[key_name].append(i)
 
     patch_for_capitalize_first_letters = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._capitalize_first_letters',
-            side_effect=mock_capitalized_data_fields
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._capitalize_first_letters',
+        side_effect=mock_capitalized_data_fields
     )
 
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
     # Act
     actual_dataframe_dict = manure_management_output_handler._convert_dataclass_obj_into_formatted_dict(
-            mock_dataclass_obj,
-            tuple(mock_data_fields),
-            mock_prefix,
-            mock_delimiter
+        mock_dataclass_obj,
+        tuple(mock_data_fields),
+        mock_prefix,
+        mock_delimiter
     )
 
     # Assert
@@ -162,25 +162,25 @@ def test_process_dataclass_output_obj(mocker: MockFixture) -> None:
     mock_extra_prefix = '<test_prefix>'
 
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
 
     manure_management_output_handler = ManureManagementOutputHandler()
 
     mock_random_formatted_dict = mocker.MagicMock()
     patch_for_convert_dataclass_obj_into_formatted_dict = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._convert_dataclass_obj_into_formatted_dict',
-            return_value=mock_random_formatted_dict
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._convert_dataclass_obj_into_formatted_dict',
+        return_value=mock_random_formatted_dict
     )
 
     mock_dataclass_fields = mocker.MagicMock()
     patch_for_dataclass_fields_method = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'fields',
-            return_value=mock_dataclass_fields
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'fields',
+        return_value=mock_dataclass_fields
     )
     temp_header_prefixes = ManureManagementOutputHandler.HEADER_PREFIXES
     mock_header_prefix = '<test_header_prefix>'
@@ -197,19 +197,19 @@ def test_process_dataclass_output_obj(mocker: MockFixture) -> None:
 
     # Act
     actual_dataframe_dict = manure_management_output_handler._process_dataclass_output_obj(
-            dataclass_obj=mock_dataclass_obj,
-            obj_type=mock_obj_type,
-            extra_prefix=mock_extra_prefix,
+        dataclass_obj=mock_dataclass_obj,
+        obj_type=mock_obj_type,
+        extra_prefix=mock_extra_prefix,
     )
 
     # Assert
     assert actual_dataframe_dict == mock_random_formatted_dict
     patch_for_dataclass_fields_method.assert_called_once_with(mock_obj_type)
     patch_for_convert_dataclass_obj_into_formatted_dict.assert_called_once_with(
-            dataclass_obj=mock_dataclass_obj,
-            data_fields=mock_dataclass_fields,
-            prefix=f'{mock_header_prefix}{mock_header_secondary_delimiter}{mock_extra_prefix}',
-            delimiter=mock_header_primary_delimiter
+        dataclass_obj=mock_dataclass_obj,
+        data_fields=mock_dataclass_fields,
+        prefix=f'{mock_header_prefix}{mock_header_secondary_delimiter}{mock_extra_prefix}',
+        delimiter=mock_header_primary_delimiter
     )
 
     # Cleanup
@@ -263,37 +263,37 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
     }
 
     patch_for_process_pen = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._process_pen',
-            return_value=mock_pen_dataframe_dict
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._process_pen',
+        return_value=mock_pen_dataframe_dict
     )
 
     patch_for_process_dataclass_output_obj = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._process_dataclass_output_obj',
-            side_effect=[
-                mock_manure_dataframe_dict,
-                mock_manure_handler_daily_output_dataframe_dict,
-                mock_reception_pit_daily_output_dataframe_dict,
-                mock_manure_separator_daily_output_dataframe_dict,
-                mock_manure_treatment_daily_output_dataframe_dict,
-                mock_manure_treatment_accumulated_output_dataframe_dict,
-                mock_anaerobic_digestion_daily_output_dataframe_dict
-            ]
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._process_dataclass_output_obj',
+        side_effect=[
+            mock_manure_dataframe_dict,
+            mock_manure_handler_daily_output_dataframe_dict,
+            mock_reception_pit_daily_output_dataframe_dict,
+            mock_manure_separator_daily_output_dataframe_dict,
+            mock_manure_treatment_daily_output_dataframe_dict,
+            mock_manure_treatment_accumulated_output_dataframe_dict,
+            mock_anaerobic_digestion_daily_output_dataframe_dict
+        ]
     )
 
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
     mock_dataframe_with_appended_row = mocker.MagicMock()
     patch_for_append_row = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._append_row',
-            return_value=mock_dataframe_with_appended_row
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._append_row',
+        return_value=mock_dataframe_with_appended_row
     )
 
     mock_row_data = {
@@ -311,8 +311,8 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
 
     # Act
     manure_management_output_handler.append_daily_update_output_for_pen(
-            simulation_day=simulation_day,
-            data=mock_data
+        simulation_day=simulation_day,
+        data=mock_data
     )
 
     # Assert
@@ -331,11 +331,11 @@ def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
 
 
 @pytest.mark.parametrize(
-        'instance_df_exists',
-        [
-            True,
-            False
-        ]
+    'instance_df_exists',
+    [
+        True,
+        False
+    ]
 )
 def test_append_row(instance_df_exists: bool,
                     mocker: MockFixture) -> None:
@@ -344,20 +344,20 @@ def test_append_row(instance_df_exists: bool,
     mock_row_data = {'<test_field>': ['<test_value>']}
     mock_row_dataframe = mocker.MagicMock()
     patch_for_pandas_dataframe_init = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'pd.DataFrame',
-            return_value=mock_row_dataframe
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'pd.DataFrame',
+        return_value=mock_row_dataframe
     )
     mock_concatenated_dataframe = mocker.MagicMock()
     patch_for_pandas_concat = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'pd.concat',
-            return_value=mock_concatenated_dataframe
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'pd.concat',
+        return_value=mock_concatenated_dataframe
     )
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
     mock_instance_df = mocker.MagicMock()
@@ -379,20 +379,20 @@ def test_append_row(instance_df_exists: bool,
 
 
 @pytest.mark.parametrize(
-        'instance_df_exists',
-        [
-            True,
-            False
-        ]
+    'instance_df_exists',
+    [
+        True,
+        False
+    ]
 )
 def test_sort_by(instance_df_exists: bool,
                  mocker: MockFixture) -> None:
     """Unit test for sort_by() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
@@ -416,20 +416,20 @@ def test_sort_by(instance_df_exists: bool,
 
 
 @pytest.mark.parametrize(
-        'instance_df_exists',
-        [
-            True,
-            False
-        ]
+    'instance_df_exists',
+    [
+        True,
+        False
+    ]
 )
 def test_move_columns_to_front(instance_df_exists: bool,
                                mocker: MockFixture) -> None:
     """Unit test for move_columns_to_front() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
@@ -467,22 +467,22 @@ def test_sort_by_pen_id_and_simulation_day(mocker: MockFixture) -> None:
     """Unit test for sort_by_pen_id_and_simulation_day() in manure_management_output_handler.py."""
     # Arrange
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
     patch_for_sort_by = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.sort_by',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.sort_by',
+        return_value=None
     )
 
     patch_for_move_columns_to_front = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.move_columns_to_front',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.move_columns_to_front',
+        return_value=None
     )
 
     # Act
@@ -493,60 +493,83 @@ def test_sort_by_pen_id_and_simulation_day(mocker: MockFixture) -> None:
     patch_for_move_columns_to_front.assert_called_once_with(['pen_id', 'sim_day'])
 
 
-# TODO: Fix this test
-# @pytest.mark.parametrize(
-#         'instance_df_exists',
-#         [
-#             True,
-#             False
-#         ]
-# )
-# def test_export_to_csv(instance_df_exists: bool,
-#                        mocker: MockFixture) -> None:
-#     """Unit test for export_to_csv() in manure_management_output_handler.py."""
-#     # Arrange
-#     mocker.patch(
-#             'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-#             'ManureManagementOutputHandler.__init__',
-#             return_value=None
-#     )
-#     manure_management_output_handler = ManureManagementOutputHandler()
-#     if instance_df_exists:
-#         mock_instance_df = mocker.MagicMock()
-#         mock_instance_df.to_csv.return_value = None
-#     else:
-#         mock_instance_df = None
-#     manure_management_output_handler._df = mock_instance_df
-#     mock_csv_output_path = mocker.MagicMock()
-#     patch_for_get_csv_output_path = mocker.patch(
-#             'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-#             'ManureManagementOutputHandler.get_csv_output_file_path',
-#             return_value=mock_csv_output_path
-#     )
-#
-#     # Act
-#     actual_csv_output_path = manure_management_output_handler.export_to_csv()
-#
-#     # Assert
-#     if instance_df_exists:
-#         mock_instance_df.to_csv.assert_called_once_with(mock_csv_output_path, index=False)
-#         patch_for_get_csv_output_path.assert_called_once()
-#         assert actual_csv_output_path == mock_csv_output_path
-#     else:
-#         patch_for_get_csv_output_path.assert_not_called()
-#         assert actual_csv_output_path is None
+@pytest.mark.parametrize(
+    'instance_df_exists, column_count',
+    [
+        (True, 0),
+        (True, 2),
+        (False, 0)
+    ]
+)
+def test_export_to_csv(instance_df_exists: bool, column_count: int, mocker: MockFixture) -> None:
+    """
+    Unit test for export_to_csv() in manure_management_output_handler.py.
+
+    This test verifies if the export_to_csv() method correctly exports DataFrame to CSV files
+    depending on the DataFrame's existence and its number of columns. The method should return
+    the path of the aggregate CSV file, or None if no DataFrame exists.
+
+    """
+    # Arrange
+    mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
+    )
+    manure_management_output_handler = ManureManagementOutputHandler()
+    if instance_df_exists:
+        mock_instance_df = mocker.MagicMock()
+        mock_instance_df.columns = [f'col_{i}' for i in range(column_count)]
+        mock_instance_df.to_csv.return_value = None
+    else:
+        mock_instance_df = None
+    manure_management_output_handler._df = mock_instance_df
+    mock_drop_all_zeros_nan_none_columns = mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.drop_all_zeros_nan_none_columns',
+        return_value=mock_instance_df
+    )
+    mock_time = 'time'
+    mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._get_formatted_current_time',
+        return_value=mock_time
+    )
+    mock_dir_path = Path('mock_dir')
+    mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.get_csv_output_directory_path',
+        return_value=mock_dir_path
+    )
+    mock_export_columns_to_csv = mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._export_columns_to_csv'
+    )
+
+    # Act
+    actual_csv_output_path = manure_management_output_handler.export_to_csv()
+
+    # Assert
+    if instance_df_exists:
+        mock_drop_all_zeros_nan_none_columns.assert_called_once_with(mock_instance_df)
+        mock_instance_df.to_csv.assert_called_once_with(mock_dir_path / f'ALL_DATA_{mock_time}.csv', index=False)
+        assert mock_export_columns_to_csv.call_count == column_count
+        assert actual_csv_output_path == mock_dir_path / f'ALL_DATA_{mock_time}.csv'
+    else:
+        mock_drop_all_zeros_nan_none_columns.assert_not_called()
+        assert actual_csv_output_path is None
 
 
 @pytest.mark.parametrize(
-        'phrase, delimiter, expected_result',
-        [
-            ('test phrase', ' ', 'Test Phrase'),
-            ('test phrase', '_', 'Test phrase'),
-            ('test', ' ', 'Test'),
-            ('test', '_', 'Test'),
-            ('', ' ', ''),
-            ('', '_', ''),
-        ]
+    'phrase, delimiter, expected_result',
+    [
+        ('test phrase', ' ', 'Test Phrase'),
+        ('test phrase', '_', 'Test phrase'),
+        ('test', ' ', 'Test'),
+        ('test', '_', 'Test'),
+        ('', ' ', ''),
+        ('', '_', ''),
+    ]
 )
 def test_capitalize_first_letters(phrase: str,
                                   delimiter: str,
@@ -557,6 +580,7 @@ def test_capitalize_first_letters(phrase: str,
 
     # Assert
     assert actual_result == expected_result
+
 
 # TODO: Fix this test
 # def test_get_main_output_directory(mocker: MockFixture) -> None:
@@ -584,22 +608,22 @@ def test_get_csv_output_directory(mocker: MockFixture) -> None:
     # Arrange
     mock_main_output_directory_path = Path('test_main_output_directory')
     patch_for_get_main_output_directory = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.get_main_output_directory_path',
-            return_value=mock_main_output_directory_path
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.get_main_output_directory_path',
+        return_value=mock_main_output_directory_path
     )
     patch_for_path_mkdir = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'Path.mkdir',
-            return_value=None,
-            side_effect=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'Path.mkdir',
+        return_value=None,
+        side_effect=None
     )
-    expected_csv_dir_path = mock_main_output_directory_path / 'csv'
+    expected_csv_dir_path = mock_main_output_directory_path / 'CSVs' / 'manure_module_reports'
 
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
@@ -617,23 +641,23 @@ def test_get_csv_output_path(mocker: MockFixture) -> None:
     # Arrange
     mock_csv_output_directory_path = Path('test_csv_output_directory')
     patch_for_get_csv_output_directory_path = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.get_csv_output_directory_path',
-            return_value=mock_csv_output_directory_path
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.get_csv_output_directory_path',
+        return_value=mock_csv_output_directory_path
     )
     mock_formatted_current_datetime = 'test_formatted_current_datetime'
     patch_for_get_formatted_current_time = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._get_formatted_current_time',
-            return_value=mock_formatted_current_datetime
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._get_formatted_current_time',
+        return_value=mock_formatted_current_datetime
     )
     file_name = f'manure_management_output_{mock_formatted_current_datetime}.csv'
     expected_csv_output_file_path = mock_csv_output_directory_path / file_name
 
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
@@ -649,21 +673,27 @@ def test_get_csv_output_path(mocker: MockFixture) -> None:
 def test_empty_main_output_directory(mocker: MockFixture) -> None:
     """Unit test for empty_main_output_directory() in manure_management_output_handler.py."""
     # Arrange
-    mock_main_output_directory = mocker.MagicMock()
-    patch_for_get_main_output_directory = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.get_main_output_directory_path',
-            return_value=mock_main_output_directory
+    csv_output_directory_path = 'test_csv_output_directory_path'
+    patch_for_get_csv_output_directory_path = mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.get_csv_output_directory_path',
+        return_value=csv_output_directory_path
+    )
+    graphics_dir_path = 'test_graphics_dir_path'
+    patch_for_get_graphics_dir = mocker.patch(
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._get_graphics_dir',
+        return_value=graphics_dir_path
     )
     path_for_delete_files_and_subdirectories = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler._delete_files_and_subdirectories',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler._delete_files_and_subdirectories',
+        return_value=None
     )
     mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'ManureManagementOutputHandler.__init__',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'ManureManagementOutputHandler.__init__',
+        return_value=None
     )
     manure_management_output_handler = ManureManagementOutputHandler()
 
@@ -671,15 +701,21 @@ def test_empty_main_output_directory(mocker: MockFixture) -> None:
     manure_management_output_handler.empty_main_output_directory()
 
     # Assert
-    patch_for_get_main_output_directory.assert_called_once()
-    path_for_delete_files_and_subdirectories.assert_called_once_with(mock_main_output_directory)
+    patch_for_get_csv_output_directory_path.assert_called_once()
+    patch_for_get_graphics_dir.assert_called_once()
+    path_for_delete_files_and_subdirectories.assert_has_calls(
+        [
+            call(csv_output_directory_path),
+            call(graphics_dir_path)
+        ]
+    )
 
 
 @pytest.mark.parametrize(
-        'path_exists',
-        [
-            True,
-            False]
+    'path_exists',
+    [
+        True,
+        False]
 )
 def test_delete_files_and_subdirectories(path_exists: bool,
                                          mocker: MockFixture,
@@ -690,17 +726,19 @@ def test_delete_files_and_subdirectories(path_exists: bool,
     mock_path.exists.return_value = path_exists
 
     mock_file = mocker.MagicMock()
+    mock_file.name = 'test_file'
     mock_file.is_file.return_value = True
     mock_file.is_dir.return_value = False
     mock_file.unlink.return_value = None
 
     mock_dir = mocker.MagicMock()
+    mock_dir.name = 'test_dir'
     mock_dir.is_file.return_value = False
     mock_dir.is_dir.return_value = True
     patch_for_shutil_rmtree = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'shutil.rmtree',
-            return_value=None
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'shutil.rmtree',
+        return_value=None
     )
 
     mock_iterdir = [mock_file, mock_dir]
@@ -735,9 +773,9 @@ def test_get_formatted_current_time(mocker: MockFixture) -> None:
     # Arrange
     mock_current_datetime = datetime(2023, 1, 1, 1, 1, 1)
     patch_for_datetime = mocker.patch(
-            'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
-            'datetime',
-            wraps=datetime
+        'RUFAS.routines.manure.output_handler.manure_management_output_handler.'
+        'datetime',
+        wraps=datetime
     )
     patch_for_datetime.now.return_value = mock_current_datetime
     expected_formatted_current_datetime = '2023_01_01__01_00'

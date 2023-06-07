@@ -311,12 +311,25 @@ class ManureManagementOutputHandler:
             temp_df.to_csv(file_path, index=False)
 
     def export_to_csv(self) -> Optional[Path]:
-        """Exports all data to a csv file.
+        """
+        Export the DataFrame to a series of CSV files, one for aggregate data and others for each column of the DataFrame.
+
+        The method first checks if the DataFrame (_df) exists. If it does, it proceeds to drop all columns that consist
+        entirely of zeros, NaNs, or None values. This step is done to save computational resources, as such columns would
+        not contribute valuable information to the data analysis or visualization.
+
+        The cleaned DataFrame is then exported to an aggregate CSV file, named 'ALL_DATA_{timestamp}.csv'. This file
+        contains all the data in a single CSV file. The timestamp in the file name is obtained from the current time
+        formatted appropriately, helping distinguish between different versions of the output.
+
+        For each column in the DataFrame, the method creates a specific CSV file containing the data of that column.
+
+        If the DataFrame (_df) does not exist, the method simply returns None, indicating no data was available for export.
 
         Returns
         -------
         Optional[Path]
-            The path to the csv file if there is data to be exported, None otherwise.
+            The path to the aggregate CSV file, or None if the DataFrame doesn't exist.
 
         """
         if self._df is None:
@@ -449,7 +462,6 @@ class ManureManagementOutputHandler:
         """Empties the main output directory."""
         self._delete_files_and_subdirectories(self.get_csv_output_directory_path())
         self._delete_files_and_subdirectories(self._get_graphics_dir())
-
 
     @classmethod
     def _delete_files_and_subdirectories(cls, path: Path) -> None:

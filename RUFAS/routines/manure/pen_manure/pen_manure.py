@@ -88,7 +88,6 @@ class PenManure:
         num_animals : int
             The number of animals in the pen.
 
-
         Returns
         -------
         PenManure

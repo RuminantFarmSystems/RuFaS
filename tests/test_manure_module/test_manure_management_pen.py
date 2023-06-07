@@ -56,7 +56,6 @@ def test_manure_management_pen_init(mocker: MockerFixture) -> None:
     assert pen.num_lactating_cows == expected_num_animals
 
 
-# TODO: Fill in the remaining combinations
 @pytest.mark.parametrize('animal_combination, expected_num_lactating_cows', [
     (Pen.AnimalCombination.LAC_COW, 10),
     (Pen.AnimalCombination.CALF, 0),
@@ -76,31 +75,36 @@ def test_count_lactating_cows(mocker: MockerFixture, animal_combination: Pen.Ani
     # Assert
     assert actual_num_lactating_cows == expected_num_lactating_cows
 
-# @pytest.mark.parametrize(
-#         "pen_type, has_cows, expected_area",
-#         [('tiestall', True, 1.2),
-#          ('tiestall', False, 1.0),
-#          ('bedded pack', True, 5.0),
-#          ('bedded pack', False, 3.0),
-#          ('freestall', True, 3.5),
-#          ('freestall', False, 2.5),
-#          ('dummy', True, 3.5),
-#          ('dummy', False, 2.5)
-#          ])
-# def test_barn_area_from_pen_type(pen_type: str,
-#                                  has_cows: bool,
-#                                  expected_area: float,
-#                                  mocker: MockerFixture
-#                                  ) -> None:
-#     """Unit test for function barn_area_from_pen_type in file manure_management_pen.py"""
-#
-#     # Arrange
-#     mocker.patch(
-#             'RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.__init__',
-#             return_value=None)
-#     mock_pen = ManureManagementPen(mocker.MagicMock(autospec=Pen))
-#     mock_pen.pen_type = pen_type
-#     mock_pen.classes_in_pen = {'Cow'} if has_cows else {'Calf'}
-#
-#     # Assert
-#     assert mock_pen.barn_area_from_pen_type == expected_area
+
+@pytest.mark.parametrize(
+    "pen_type, classes_in_pen, expected_area",
+    [('tiestall', {'Cow'}, 1.5),
+     ('tiestall', {'Calf', 'HeiferI'}, 1.2),
+     ('tiestall', {'HeiferII', 'HeiferIII'}, 1.2),
+     ('bedded pack', {'Cow'}, 5.0),
+     ('bedded pack', {'Calf', 'HeiferI'}, 3.0),
+     ('bedded pack', {'HeiferII', 'HeiferIII'}, 3.0),
+     ('freestall', {'Cow'}, 3.5),
+     ('freestall', {'Calf', 'HeiferI'}, 2.0),
+     ('freestall', {'HeiferII', 'HeiferIII'}, 2.5),
+     ('dummy', {'Cow'}, 3.5),
+     ('dummy', {'Calf', 'HeiferI'}, 2.0),
+     ('dummy', {'HeiferII', 'HeiferIII'}, 2.5)
+     ])
+def test_barn_area_from_pen_type(pen_type: str,
+                                 classes_in_pen: set,
+                                 expected_area: float,
+                                 mocker: MockerFixture
+                                 ) -> None:
+    """Unit test for function barn_area_from_pen_type in file manure_management_pen.py"""
+
+    # Arrange
+    mocker.patch(
+        'RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.__init__',
+        return_value=None)
+    mock_pen = ManureManagementPen(mocker.MagicMock(autospec=Pen))
+    mock_pen.pen_type = pen_type
+    mock_pen.classes_in_pen = classes_in_pen
+
+    # Assert
+    assert mock_pen.barn_area_from_pen_type == expected_area
