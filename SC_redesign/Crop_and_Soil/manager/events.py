@@ -93,3 +93,35 @@ class HarvestEvent(Event):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.operation = operation
+
+
+class FertilizerEvent(Event):
+    def __init__(self, mix_name: str, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, depth: float,
+                 surface_remainder_fraction: float):
+        """
+        Creates a new FertilizerEvent instance, which defines the parameters of a single fertilizer application.
+
+        Parameters
+        ----------
+        mix_name : str
+            Name of the fertilizer mix being used.
+        year : int
+            Year in which this application occurs.
+        day : int
+            Day on which this application occurs.
+        nitrogen_mass : float
+            Minimum mass of nitrogen that should be in this application (kg)
+        phosphorus_mass : float
+            Minimum mass of phosphorus that should be in this application (kg)
+        depth : float
+            Depth at which fertilizer is injected into the soil.
+        surface_remainder_fraction : float
+            Fraction of fertilizer that remains on the soil surface after application.
+
+        """
+        super().__init__(year=year, day=day)
+        self.mix_name = mix_name
+        self.nitrogen_mass = nitrogen_mass
+        self.phosphorus_mass = phosphorus_mass
+        self.depth = depth
+        self.surface_remainder_fraction = surface_remainder_fraction
