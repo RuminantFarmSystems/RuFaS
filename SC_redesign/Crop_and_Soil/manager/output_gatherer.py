@@ -251,12 +251,11 @@ class OutputGatherer:
                             field.field_data.annual_irrigation_water_use_total, info_map)
 
             # Adding soil data
-            water_content_change = field.soil.data.initial_water_content - field.soil.data.profile_soil_water_content
+            water_content_change = field.soil.data.profile_soil_water_content - field.soil.data.initial_water_content
             om.add_variable("annual_water_content_change", water_content_change, info_map)
-            nitrates_content_change = field.soil.data.initial_nitrates_total - \
-                field.soil.data.profile_nitrates_total
+            nitrates_content_change = field.soil.data.profile_nitrates_total - field.soil.data.initial_nitrates_total
             om.add_variable("annual_nitrates_content_change", nitrates_content_change, info_map)
-            om.add_variable("annual_water_content_change", water_content_change, info_map)
+
             om.add_variable("annual_soil_evaporation_total", field.soil.data.annual_soil_evaporation_total,
                             info_map)
             om.add_variable("annual_eroded_sediment_total", field.soil.data.annual_eroded_sediment_total,
