@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import FertilizerEvent
@@ -57,3 +57,68 @@ class FertilizerSchedule(Schedule):
 
         self._validate_pattern_parameters()
 
+    def _validate_fertilizer_parameters(self) -> None:
+        """
+        Checks that all fields defining a fertilizer application schedule are valid, raises errors if not.
+
+        Raises
+        ------
+
+        """
+        error_header = f"'{self.name}': "
+
+        valid_years = self._validate_years(self.years)
+        if not valid_years:
+            raise ValueError(error_header + f"expected all years to be > 0 and in non-descending order, received "
+                                            f"'{self.years}'.")
+
+        valid_days = self._validate_days(self.days)
+        if not valid_days:
+            raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
+
+        valid_nitrogen_masses = self._determine_if_all_non_negative_values(self.nitrogen_masses)
+        if not valid_nitrogen_masses:
+            raise ValueError(error_header + f"expected all nitrogen masses to be in >= 0, received "
+                                            f"'{self.nitrogen_masses}'.")
+
+        valid_phosphorus_masses = self._determine_if_all_non_negative_values(self.phosphorus_masses)
+        if not valid_phosphorus_masses:
+            raise ValueError(error_header + f"expected all phosphorus masses to be >= 0, received "
+                                            f"'{self.phosphorus_masses}'.")
+
+        valid_depths = self._determine_if_all_non_negative_values(self.application_depths)
+        if not valid_depths:
+            raise ValueError(error_header + f"expected all application depths to be >= 0, received "
+                                            f"'{self.application_depths}'.")
+
+        valid_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.application_depths)
+        if not valid_fractions:
+            raise ValueError(error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
+                                            f"received '{self.surface_remainder_fractions}'.")
+
+        equal_fertilizer_parameters = len(self.years) == len(self.days) == len(self.nitrogen_masses) == \
+            len(self.phosphorus_masses) == len(self.application_depths) == len(self.surface_remainder_fractions)
+        if not equal_fertilizer_parameters:
+            raise ValueError(error_header + f"expected equal numbers of fertilizer application parameters, received "
+                                            f"'{self.years}' years, '{self.days}' days, '{self.nitrogen_masses}' "
+                                            f"nitrogen masses, '{self.phosphorus_masses}' phosphorus masses, "
+                                            f"'{self.application_depths}' application depths, and "
+                                            f"'{self.surface_remainder_fractions}' surface remainder fractions.")
+
+    @staticmethod
+    def _determine_if_all_non_negative_values(values: List[Any]) -> bool:
+        """
+        Checks that all values in a list are >= 0.
+
+        Parameters
+        ----------
+        values : List[Any]
+            List of values to be checked.
+
+        Returns
+        -------
+        bool
+            True if all values are >= 0, False otherwise.
+
+        """
+        return all(value >= 0 for value in values)
