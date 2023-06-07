@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from RUFAS.output_manager import OutputManager
 from SC_redesign.Crop_and_Soil.field.field import Field
