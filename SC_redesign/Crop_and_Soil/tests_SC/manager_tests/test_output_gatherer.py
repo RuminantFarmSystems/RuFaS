@@ -16,6 +16,7 @@ def test_send_daily_variables(runoff_values: List[float],
                               current_residues: List[float],
                               percolated_waters: List[float],
                               root_depths: List[float]) -> None:
+    """Tests that daily variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")
     crop_data_1 = CropData(name="crop 1")
@@ -99,6 +100,7 @@ def test_send_daily_variables(runoff_values: List[float],
 def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
                                annual_soil_evaporation_total: List[float],
                                annual_denitrified_nitrogen_total: List[float]) -> None:
+    """Tests that annual variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name=" name 1 ")
     field_data_2 = FieldData(name=" name 2 ")
     crop_data_1 = CropData(name="crop 1")
@@ -122,35 +124,23 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
         for index, layer in enumerate(field_2.soil.data.soil_layers):
             layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
         og.send_annual_variables()
-    print(og.om.variables_pool)
-    pool = og.om.variables_pool
+    print(om.variables_pool)
+    pool = om.variables_pool
 
     # Testing field variables
-    assert 'field name 1 .annual_irrigation_water_use_total' in pool.keys()
     assert len(pool['field name 1 .annual_irrigation_water_use_total']['info_maps']) == 3
     assert pool['field name 1 .annual_irrigation_water_use_total']['values'] == [1.3, 2.4, 1.22]
-    assert 'field name 2 .annual_irrigation_water_use_total' in pool.keys()
     assert len(pool['field name 2 .annual_irrigation_water_use_total']['info_maps']) == 3
     assert pool['field name 2 .annual_irrigation_water_use_total']['values'] == [1.3, 2.4, 1.22]
 
     # Testing soil variables
-    assert 'field name 1 .annual_soil_evaporation_total' in pool.keys()
     assert len(pool['field name 1 .annual_soil_evaporation_total']['info_maps']) == 3
     assert pool['field name 1 .annual_soil_evaporation_total']['values'] == [1.5, 2.4, 3.8]
 
-    assert 'field name 2 .annual_soil_evaporation_total' in pool.keys()
     assert len(pool['field name 2 .annual_soil_evaporation_total']['info_maps']) == 3
     assert pool['field name 2 .annual_soil_evaporation_total']['values'] == [1.5, 2.4, 3.8]
 
     # Testing layer data
-    assert 'field name 1  layer index 0.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 1  layer index 1.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 1  layer index 2.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 1  layer index 3.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 2  layer index 0.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 2  layer index 1.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 2  layer index 2.annual_denitrified_nitrogen_total' in pool.keys()
-    assert 'field name 2  layer index 3.annual_denitrified_nitrogen_total' in pool.keys()
     assert len(pool['field name 1  layer index 0.annual_denitrified_nitrogen_total']['info_maps']) == 3
     assert len(pool['field name 1  layer index 1.annual_denitrified_nitrogen_total']['info_maps']) == 3
     assert len(pool['field name 1  layer index 2.annual_denitrified_nitrogen_total']['info_maps']) == 3
