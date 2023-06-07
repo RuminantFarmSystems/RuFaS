@@ -1,7 +1,7 @@
 import pytest
 from typing import List
 
-from SC_redesign.Crop_and_Soil.manager.amendment_schedule import TillageSchedule
+from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
 
