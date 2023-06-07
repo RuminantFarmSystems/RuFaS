@@ -8,13 +8,28 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import manure_calculations
 
+def test_methane_mitigation(ration_formulation,
+                       feed,
+                       methane_mitigation_method: str,
+                       methane_mitigation_additive_amount: float,
+                       mocker: MockerFixture) -> float:
+    """Unit test for the test_methane_mitigation function in dry_cow_manure_excretion.py."""
+    # Arrange
+    mock_ration_formulation = mocker.MagicMock()
+    mock_feed = mocker.MagicMock()
+
+    #Act
+    pass  
+
+    #Assert 
+    pass 
 
 @pytest.mark.parametrize(
-    'methane_model',
+    'methane_model, methane_mitigation_method, methane_mitigation_additive_amount',
     [
-        'Mutian',
-        'Mills',
-        'IPCC',
+        ('Mutian', '3-NOP', 0.0), 
+        ('Mills', '3-NOP', 0.0), 
+        ('IPCC', '3-NOP', 0.0)
     ]
 )
 def test_lactating_cow_manure_calculations(methane_model: str,
