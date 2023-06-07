@@ -192,7 +192,7 @@ class CropData:
     """is the crop currently dormant?"""
     use_heat_unit_temperature: bool = False
     """should the alternative heat unit method be used?
-    Determines if heat unit temperature will be used for heat unit  accumulation."""
+    Determines if heat unit temperature will be used for heat unit accumulation."""
     new_heat_units: Optional[float] = None
     """heat units accumulated on the current day; degrees C above minimum growth temperature (Celsius*)"""
     heat_fraction: Optional[float] = None
