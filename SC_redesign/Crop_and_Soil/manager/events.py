@@ -95,29 +95,6 @@ class HarvestEvent(Event):
         self.operation = operation
 
 
-class TillageEvent(Event):
-    def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
-                 day: int = 160):
-        """
-        Creates a new TillageEvent instance, which defines a tillage application to be applied on a specific day of a
-        year.
-
-        Parameters
-        ----------
-        tillage_depth : float
-            The lowest depth the tilling implement reaches (mm)
-        incorporation_fraction : float
-            Fraction of soil surface pool incorporated into the soil profile (unitless)
-        mixing_fraction : float
-            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
-
-        """
-        super().__init__(year=year, day=day)
-        self.tillage_depth = tillage_depth
-        self.incorporation_fraction = incorporation_fraction
-        self.mixing_fraction = mixing_fraction
-
-
 class ManureEvent(Event):
     def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, field_coverage: float,
                  application_depth: float, surface_remainder_fraction: float):
