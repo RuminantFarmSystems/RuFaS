@@ -359,7 +359,7 @@ class Cow(HeiferIII):
         else:
             self.p_excrt, self.manure_excretion = dry_manure_calculations(
                 self.ration_formulation, feed, self.body_weight,
-                self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, ME_intake)
+                self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
 
     def set_nutrient_rqmts(self, animal_grouping_scenario):
         """
