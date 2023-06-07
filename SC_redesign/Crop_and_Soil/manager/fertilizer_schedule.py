@@ -91,7 +91,7 @@ class FertilizerSchedule(Schedule):
             raise ValueError(error_header + f"expected all application depths to be >= 0, received "
                                             f"'{self.application_depths}'.")
 
-        valid_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.application_depths)
+        valid_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
         if not valid_fractions:
             raise ValueError(error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
                                             f"received '{self.surface_remainder_fractions}'.")
