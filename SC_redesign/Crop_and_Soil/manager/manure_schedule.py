@@ -3,6 +3,11 @@ from typing import List, Any
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import ManureEvent
 
+"""
+This module contains `ManureSchedule`, a `Schedule` child class that defines when and how much manure will be applied to
+a field.
+"""
+
 
 class ManureSchedule(Schedule):
 
