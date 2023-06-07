@@ -7,6 +7,7 @@ from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import om
+from unittest.mock import patch, PropertyMock
 
 
 @pytest.mark.parametrize("runoff_values, current_residues, percolated_waters, root_depths", [
@@ -95,11 +96,15 @@ def test_send_daily_variables(runoff_values: List[float],
 
 
 @pytest.mark.parametrize("annual_irrigation_water_use_total, annual_soil_evaporation_total,"
-                         "annual_denitrified_nitrogen_total", [
-                            ([1.3, 2.4, 1.22], [1.5, 2.4, 3.8], [1.2, 7.7, 9.24, 1.31])])
+                         "annual_denitrified_nitrogen_total, initial_water_content,"
+                         "initial_nitrates_total", [
+                            ([1.3, 2.4, 1.22], [1.5, 2.4, 3.8], [1.2, 7.7, 9.24, 1.31], [2, 3, 4],
+                             [4.2, 5.3, 6.5])])
 def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
                                annual_soil_evaporation_total: List[float],
-                               annual_denitrified_nitrogen_total: List[float]) -> None:
+                               annual_denitrified_nitrogen_total: List[float],
+                               initial_water_content: List[float],
+                               initial_nitrates_total: List[float]) -> None:
     """Tests that annual variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name=" name 1 ")
     field_data_2 = FieldData(name=" name 2 ")
@@ -115,18 +120,35 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
     field_2.add_crop(crop_2)
     og = OutputGatherer([field_1, field_2])
     for i in range(3):
-        field_1.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
-        field_2.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
-        field_1.soil.data.annual_soil_evaporation_total = annual_soil_evaporation_total[i]
-        field_2.soil.data.annual_soil_evaporation_total = annual_soil_evaporation_total[i]
-        for index, layer in enumerate(field_1.soil.data.soil_layers):
-            layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
-        for index, layer in enumerate(field_2.soil.data.soil_layers):
-            layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
-        og.send_annual_variables()
+        with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData",
+                            profile_soil_water_content=PropertyMock(return_value=2),
+                            profile_nitrates_total=PropertyMock(return_value=8.5)):
+            field_1.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
+            field_2.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
+            field_1.soil.data.annual_soil_evaporation_total = annual_soil_evaporation_total[i]
+            field_2.soil.data.annual_soil_evaporation_total = annual_soil_evaporation_total[i]
+            field_1.soil.data.initial_water_content = initial_water_content[i]
+            field_2.soil.data.initial_water_content = initial_water_content[i]
+            field_1.soil.data.initial_nitrates_total = initial_nitrates_total[i]
+            field_2.soil.data.initial_nitrates_total = initial_nitrates_total[i]
+
+            for index, layer in enumerate(field_1.soil.data.soil_layers):
+                layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
+            for index, layer in enumerate(field_2.soil.data.soil_layers):
+                layer.annual_denitrified_nitrogen_total = annual_denitrified_nitrogen_total[index]
+            og.send_annual_variables()
     print(om.variables_pool)
     pool = om.variables_pool
+    # Testing water and nitrates changes
+    assert len(pool["field:' name 1 '.annual_water_content_change"]['info_maps']) == 3
+    assert pool["field:' name 1 '.annual_water_content_change"]['values'] == [0, -1, -2]
+    assert len(pool["field:' name 2 '.annual_water_content_change"]['info_maps']) == 3
+    assert pool["field:' name 2 '.annual_water_content_change"]['values'] == [0, -1, -2]
 
+    assert len(pool["field:' name 1 '.annual_nitrates_content_change"]['info_maps']) == 3
+    assert pool["field:' name 1 '.annual_nitrates_content_change"]['values'] == [4.3, 3.2, 2.0]
+    assert len(pool["field:' name 2 '.annual_nitrates_content_change"]['info_maps']) == 3
+    assert pool["field:' name 2 '.annual_nitrates_content_change"]['values'] == [4.3, 3.2, 2.0]
     # Testing field variables
     assert len(pool["field:' name 1 '.annual_irrigation_water_use_total"]['info_maps']) == 3
     assert pool["field:' name 1 '.annual_irrigation_water_use_total"]['values'] == [1.3, 2.4, 1.22]
