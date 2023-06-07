@@ -516,7 +516,7 @@ def get_ration_vals(x):
     return ration_vals
 
 
-def userbounds(ration_percents: Dict) -> List:
+def userbounds(ration_percents: Dict, DMIest: float) -> List:
     """
     Calculates user bounds for optimize function
 
@@ -529,7 +529,8 @@ def userbounds(ration_percents: Dict) -> List:
     ----------
     ration_percents: Dict
         keys are feed IDs, values are percent of DMI
-
+    DMIest: float
+        average estimated DMI for pen
     Returns
     -------
     List
@@ -548,7 +549,7 @@ def userbounds(ration_percents: Dict) -> List:
     return tribounds
 
 
-def optimize(animal_combination, available_feeds) -> None:
+def optimize(animal_combination, available_feeds: Dict) -> None:
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
@@ -559,11 +560,13 @@ def optimize(animal_combination, available_feeds) -> None:
     animal_combination : Pen.AnimalCombination
         The animal combination to optimize the ration for.
     
-    available_feeds: : a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+    available_feeds: Dict 
+        a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
     
     Returns
     -------
     OptimizeResult object from scipy package
+
     """
 
     n = len(price)
@@ -575,7 +578,7 @@ def optimize(animal_combination, available_feeds) -> None:
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
-        bnds = userbounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds))
+        bnds = userbounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))

@@ -4,15 +4,18 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
+import pytest
+from unittest.mock import MagicMock
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
-import pytest
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
-
+import RUFAS.routines.animal.ration.user_defined_ration
+import RUFAS.routines.animal.ration.ration_NLP
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -1476,25 +1479,65 @@ def test_get_feed_data_from_feed_ids() -> None:
 
 
 def test_feed_quality_fix():
-    """Unit test for function feed_quality_fix in file routines/animal/ration/ration_driver.py"""
-    pass
-# make a fake available feeds dict
-# make two fake ration percents dicts
-# first has a couple values that need to be checked
-# assert that keys are same as the available feeds afterward 
-# second has no values, needs to check that keys are equivalent to orig
+    """Unit test for function feed_quality_fix in file routines/animal/ration/user_defined_ration.py"""
+    # make a fake available feeds dict
+    fakefeeds_available = {}
+    fakefeeds_available['feed_id']=[1,2,5] 
+    # make two fake ration percents dicts
+    fake_ration_OK = {'1': 2, '2': 3, '5': 4}
+    fake_ration_missing = {'1':2, '2': 3, '3':4}
+    # assert that keys are same as the available feeds afterward 
+    fake_ration_OK = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(fake_ration_OK, fakefeeds_available)
+    assert list(fake_ration_OK.keys())==['1','2','5']
+    # second has missing values, needs to check that keys are equivalent to orig
+    fake_ration_missing = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.feed_quality_fix(fake_ration_missing, fakefeeds_available)
+    assert list(fake_ration_missing.keys())==['1','2','5']
 
 
-def test_ration_to_use():
+@pytest.fixture
+def mock_user_defined_ration_manager(mocker) -> UserDefinedRationManager:
+    user_defined_ration_manager = UserDefinedRationManager()
+    return user_defined_ration_manager
+
+def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManager):
     """Unit test for function ration_to_use in file routines/animal/ration/ration_driver.py"""
-    # assign the  the fake rations to a mocked object
-    # assert for each of the group possibilities that they equal the assigned
-    pass
+    
+    #udrv = MagicMock()
+    mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
+    mock_user_defined_ration_manager.dry_cow_ration = {'1': 10, '2': 20, '3': 30}
+    mock_user_defined_ration_manager.heifer_ration = {'1': 1, '2': 2, '3': 3}
+    mock_user_defined_ration_manager.calf_ration = {'1': 0.1, '2': 0.2, '3': 0.3}
+
+    pen_animal_combo = MagicMock()
+    pen_animal_combo.name = 'LAC_COW'
+    
+    fakefeeds_available = {}
+    fakefeeds_available['feed_id']=[1,2,3] 
+
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 100, '2': 200, '3': 300}
+
+    pen_animal_combo.name = 'GROWING'
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 1, '2': 2, '3': 3}
+
+    pen_animal_combo.name = 'CLOSE_UP'
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 10, '2': 20, '3': 30}
+
+    pen_animal_combo.name = 'CALF'
+    result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
+    assert result == {'1': 0.1, '2': 0.2, '3': 0.3}
 
 
-def test_userbounds():
-    """Unit test for function test_userbounds in file routines/animal/ration/ration_driver.py"""
-    # make fake udvr with tolerance
-    # make fake DMI
-    # assert that list output is those repeated 3X
-    pass
+def test_userbounds(mock_user_defined_ration_manager: UserDefinedRationManager):
+    """Unit test for function test_userbounds in file routines/animal/ration/ration_NLP.py"""
+    mock_user_defined_ration_manager.tolerance = 0.1
+    ration_percents = {'1': 10, '2': 20}
+    predicted = [[9/3,11/3], [9/3,11/3], [9/3,11/3], \
+                 [18/3,22/3], [18/3,22/3], [18/3,22/3]]
+    result = RUFAS.routines.animal.ration.ration_NLP.userbounds(ration_percents, 100)
+    # assert that list output is those modified and repeated 3X
+    for i in range(len(predicted)):
+        assert predicted[i][0] == pytest.approx(result[i][0])
+        assert predicted[i][1] == pytest.approx(result[i][1])

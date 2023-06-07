@@ -6,12 +6,13 @@ Description: Tools for accessing and providing user-defined ration  variables
 Author: Joseph C. Waddell, jw2574@cornell.edu
 """
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 import json
 
 class UserDefinedRationManager(object):
     """
-    Reads in the user_defined_ration JSON and collects variables and dicts to use later
+    Reads in the user_defined_ration JSON and collects variables as Dicts.
+    Methods return rations and change keys in the dict as needed.
     """
 
     # check the setup JSON
@@ -45,7 +46,25 @@ class UserDefinedRationManager(object):
             self.udr_or_not = None
     
 
-    def feed_quality_fix(ration_percents, available_feeds):
+    def feed_quality_fix(ration_percents: Dict, available_feeds: Dict) -> Dict:
+        """
+        This checks the keys in the ration_percents dictionary and checks
+         against the AvailableFeeds dictionary. If a given key is not found in the 
+         latter, 2 is added to the key. This is because there is a 'quality' change
+         in the Feed module that changes keys that vary in quality. Said functionality may be deprecated, hence this quick solution. 
+        
+        Parameters
+        ----------
+        ration_percents: Dict
+            dictionary of feed ids and their associated percentage of DMI 
+        available_feeds: available feeds dictionary from the Feed class object
+
+        Returns
+        -------
+        ration_percents: Dict
+            dictionary of feed ids and their associated percentage of DMI 
+
+        """
         key_list = list(ration_percents.keys())
         for key in key_list:
             if int(key) not in available_feeds['feed_id']:
@@ -62,6 +81,9 @@ class UserDefinedRationManager(object):
         Parameters
         ----------
         pen_animal_combo: Pen.AnimalCombination
+            AnimalCombination in the given pen
+        available_feeds: Dict
+            available feeds dictionary from the Feed class object
 
         Returns
         -------
