@@ -329,7 +329,7 @@ class OutputManager(object):
                     txt_files.append(filename)
             return txt_files
         else:
-            raise NotADirectoryError("specified path is not a directory")
+            raise NotADirectoryError("The specified path must be a directory")
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
