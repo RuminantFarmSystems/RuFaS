@@ -4,6 +4,9 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
+from typing import Any, Dict
+from mock import MagicMock
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 import pytest
@@ -1392,6 +1395,67 @@ def test_set_requirements():
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     pass
+
+
+@pytest.fixture
+def mock_cow_args(mocker) -> Dict[str, Any]:
+    cow_args = {
+        "birth_date": 0,
+        "days_born": 0,
+        "p_init": 0,
+        "birth_weight": 0,
+        "id": 1,
+        "calf_birth_weight": 30,
+        "repro_program": "ED",
+        "presynch_method": "PreSynch",
+        "tai_method_c": "OvSynch 56",
+        "tai_method_h": "OvSynch 56",
+        "resynch_method": "TAIafterPD",
+        "synch_ed_method_h": "example",
+        "wean_day": 4
+    }
+    return cow_args
+
+
+@pytest.fixture
+def mock_holstein(mocker, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = MagicMock()
+    mock_cow_args["breed"] = "HO"
+    mock_holstein_cow = Cow(mock_cow_args)
+    return mock_holstein_cow
+
+
+@pytest.fixture
+def mock_jersey(mocker, mock_cow_args) -> Cow:
+    AnimalBase.config = MagicMock()
+    mock_cow_args["breed"] = "JE"
+    mock_jersey_cow = Cow(mock_cow_args)
+    return mock_jersey_cow
+
+
+@pytest.fixture
+def mock_generic_cow(mocker, mock_cow_args) -> Cow:
+    AnimalBase.config = MagicMock()
+    mock_cow_args["breed"] = "Generic"
+    mock_generic = Cow(mock_cow_args)
+    return mock_generic
+
+
+def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
+    """Unit test for function _presynch_update in file routines/animal/life_cycle/cow.py"""
+
+    mock_holstein.set_breed_index()
+    assert mock_holstein.breed_index == 0
+    assert mock_holstein.breed == 'HO'
+
+    mock_holstein.set_breed_index()
+    assert mock_jersey.breed_index == 1
+    assert mock_jersey.breed == 'JE'
+
+    mock_generic_cow.set_breed_index()
+    assert mock_generic_cow.breed_index == 0
+    assert mock_generic_cow.breed != 'HO'
+    assert mock_generic_cow.breed != 'JE'
 
 
 def test_get_feed_data_from_feed_ids() -> None:
