@@ -6,10 +6,12 @@ from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
+from SC_redesign.Crop_and_Soil.manager.events import Event
+from RUFAS.classes import Time
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -24,7 +26,13 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 class Field:
     """object representing an agricultural field"""
 
-    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None):
+    def __init__(self, events: Optional[Event] = None, field_data: Optional[FieldData] = None,
+                 soil: Optional[Soil] = None, ):
+
+        # Tillage events
+        self.events: List[Event] = events
+        """List of all tillage events that will occur over the run of the simulation in this field."""
+
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -49,7 +57,7 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
         """Manure application interface."""
 
-    def manage_field(self, day: int, year: int, current_weather: CurrentWeather) -> None:
+    def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
         """main Field function, runs all field routines based on current attribute configuration
 
         Args:
@@ -57,11 +65,12 @@ class Field:
             year: the current (sequential) year of the simulation - TODO: not yet implemented
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
+            time: a time object that wil help indicate the year and day
 
         Details: **All the logic (after setup) will go in this function**
         """
         # What needs to be done today?
-        self.check_schedule(day, year)
+        self.check_schedule(time.day, time.year)
 
         # --- Soil Management---
         # nutrient amendments
@@ -93,7 +102,7 @@ class Field:
             if self.field_data.grazers_present:
                 self.graze_field()
 
-            self.check_harvest_schedules(day, year)
+            self.check_harvest_schedules(time.day, time.year)
             self.harvest_scheduled_crops()
 
         # annual resets
@@ -101,6 +110,31 @@ class Field:
             self.perform_annual_reset()
 
         pass
+
+    @staticmethod
+    def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
+        """
+        Filters out all events from a list that occur on the current day, and creates a new list with all the events
+        that were filtered out.
+        Parameters
+        ----------
+        all_events : List[Event]
+            List of all Events that will occur over the run of the simulation in this field.
+        time : Time
+            Object containing the current day and year of the simulation.
+        Returns
+        -------
+        Tuple
+            A tuple containing the list of all Events that will occur in this field after the current day, and a list of
+            Events that will occur on the current day.
+        Notes
+        -----
+        This method is written to work with generic Events so that it may be used on all the different child classes of
+        Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
+        """
+        todays_events = [event for event in all_events if event.occurs_today(time)]
+        remaining_events = [event for event in all_events if event not in todays_events]
+        return remaining_events, todays_events
 
     @property
     def _composition_sums_to_one(self) -> bool:
@@ -129,8 +163,17 @@ class Field:
         # </editor-fold>
 
     # <editor-fold desc="--- Soil Management Methods ---">
-    def till_soil(self) -> None:
-        """till the soil"""
+    def till_soil(self, time: Time) -> None:
+        """
+        Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
+        executed.
+
+        Parameters
+        ----------
+        time : Time
+            Time object containing the current day and year of the simulation.
+        """
+
         pass
 
     def amend_soil(self) -> None:
