@@ -154,7 +154,7 @@ class Field:
         """
         self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
         for event in todays_planting_events:
-            self.plant_crop(event)
+            self.plant_crop(event.crop_reference, event.use_heat_scheduled_harvest)
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
