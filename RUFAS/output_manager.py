@@ -358,8 +358,7 @@ class OutputManager(object):
 
     def _filter_variables_pool(self, filter_keys: List[str]) -> Dict[str, pool_element_type]:
         """
-        Takes the list of keys the user wants to their final data pool either by inclusion or exclusion,
-        filters the variables pool accordingly, and returns the filtered pool.
+        Returns a filtered variables pool based on either inclusion or exclusion.
 
         Parameters
         ----------
@@ -369,8 +368,15 @@ class OutputManager(object):
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
-            A dictionary with only the values paired with the keys
-            from the inclusion_keys list remaining from the variables_pool.
+            A filtered variables pool based on either inclusion or exclusion.
+
+        Notes
+        -----
+        The first key in the filter_keys list will determine whether the keys are treated as
+        exclusionary or inclusionary. If the first key matches the value of the exclude_keyword
+        variable defined in this function, it will treat the rest of the filter list as exclusionary
+        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
+        as inclusionary.
 
         """
         exclude_keyword_location = 0
