@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from pathlib import Path
 from typing import Any, Dict, List, Union
 import json
 import os
@@ -317,6 +318,19 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
+    def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
+        """ Returns the list of files in the given path"""
+        dir_path_check = Path(dir_path)
+        if dir_path_check.is_dir():
+            txt_files = []
+            all_files = os.listdir(dir_path)
+            for filename in all_files:
+                if filename.endswith(".txt"):
+                    txt_files.append(filename)
+            return txt_files
+        else:
+            raise NotADirectoryError("The specified path must be a directory")
+
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
 
@@ -361,7 +375,7 @@ class OutputManager(object):
         """
         return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
 
-    def save_variables(self, save_path: str, keys_file_path: str,
+    def save_variables(self, save_path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -372,16 +386,22 @@ class OutputManager(object):
         save_path : str
             Path to the directory where the file will be saved.
 
-        keys_file_path : str
-            Path of the input file containing the list of keys.
+        dir_path : str
+            Path of the directory containing the files containing the keys for filtering.
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to inlcude info_maps data in their results files.
 
         """
-        inclusion_keys = self._load_txt_file_to_list(keys_file_path)
-        filtered_pool = self._filter_variables_pool(inclusion_keys)
-        if exclude_info_maps:
-            filtered_pool = self._exclude_info_maps(filtered_pool)
-        file_path = os.path.join(save_path, self._generate_file_name("saved_variables", "json"))
-        self._dict_to_file_json(filtered_pool, file_path)
+        list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
+        for input_file in list_of_filter_files:
+            input_path = os.path.join(dir_path, input_file)
+            inclusion_keys = self._load_txt_file_to_list(input_path)
+            filtered_pool = self._filter_variables_pool(inclusion_keys)
+            if exclude_info_maps:
+                filtered_pool = self._exclude_info_maps(filtered_pool)
+            file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
+            self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
