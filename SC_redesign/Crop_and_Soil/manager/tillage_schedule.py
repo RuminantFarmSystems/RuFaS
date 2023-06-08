@@ -23,7 +23,7 @@ class TillageSchedule(Schedule):
         years : List[int]
             Year(s) in which tillage will happen.
         days : List[int]
-            Day(s) on which tillage will happen.
+            Julian day(s) on which tillage will happen.
         tillage_depths : List[float]
             The lowest depth(s) the tilling implement reaches (mm)
         incorporation_fractions : List[float]
