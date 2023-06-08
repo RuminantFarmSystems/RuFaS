@@ -366,10 +366,6 @@ class OutputManager(object):
         filter_keys : List[str]
             A list of keys the user has selected to filter the variables pool.
 
-        dir_path : str
-            The path from which the filter_keys list was loaded. Used to indicate whether
-            these are inclusion or exclusion filter keys.
-
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
