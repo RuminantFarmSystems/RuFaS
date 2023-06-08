@@ -897,29 +897,31 @@ def test_filter_variables_pool(
 
     # Test case 5: filter_keys with different cases than variables_pool
     filter_keys = ["KeY1", "kEY2"]
+    exclude_filter_keys = ["exclude", "KeY1", "kEY2"]
 
-    expected_result_inclusion = {
+    expected_result = {
         "key1": "value1",
         "key2": "value2"
     }
-    expected_result_exclusion = {
+    expected_result_exclude = {
         "key3": "value3"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
-    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
     # Test case 6: filter_keys with partial matches
     filter_keys = ["y1", "ey2"]
+    exclude_filter_keys = ["exclude", "y1", "ey2"]
 
-    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_inclusion_path) == expected_result_inclusion
-    assert mock_output_manager._filter_variables_pool(filter_keys, dummy_exclusion_path) == expected_result_exclusion
-    mock_output_manager.flush_pools()
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
         "_filter_variables_pool"
     ]
+    mock_output_manager.variables_pool = {}
 
 
 def test_save_variables(
@@ -927,6 +929,7 @@ def test_save_variables(
     output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
     """Test case for function save_variables in output_manager.py"""
+    mock_output_manager.variables_pool = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._load_txt_file_to_list = MagicMock()
