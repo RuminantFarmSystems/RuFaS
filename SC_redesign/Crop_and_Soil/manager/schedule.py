@@ -21,7 +21,7 @@ class Schedule:
         years : List[int]
             Year(s) in which this event will occur.
         days : List[int]
-            Day(s) in which this event will occur.
+            Julian day(s) in which this event will occur.
         pattern_skip : int, default=0
             Number of years to skip between cycles.
         pattern_repeat : int, default=0
@@ -89,7 +89,7 @@ class Schedule:
         Parameters
         ----------
         days : List[int]
-            Day(s) in which this event will occur.
+            Julian day(s) in which this event will occur.
 
         Returns
         -------
