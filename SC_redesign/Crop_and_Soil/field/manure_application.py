@@ -9,10 +9,9 @@ SurPhos model.
 """
 
 
-# TODO: Move this module up to be part of field, manager, soil, whatever is decided to be best - Issue #433
 class ManureApplication:
 
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
         Parameters
@@ -27,8 +26,9 @@ class ManureApplication:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                             total_phosphorus_mass: float, field_size: float) -> None:
+    def apply_grazing_manure(self, dry_matter_mass: float, dry_matter_fraction: float, total_phosphorus_mass: float,
+                             inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                             organic_nitrogen_fraction: float, field_size: float) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
             be tracked.
 
@@ -40,6 +40,12 @@ class ManureApplication:
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
         field_size : float
             Size of the field (ha)
 
@@ -65,8 +71,13 @@ class ManureApplication:
         self.data.grazing_manure_field_coverage = new_vals.get("new_field_coverage")
         self.data.grazing_manure_applied_mass = dry_matter_mass
 
+        self._add_nitrogen_to_soil_layer(0, dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                         organic_nitrogen_fraction, field_size)
+
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                              total_phosphorus_mass: float, field_coverage: float, field_size: float,
+                             inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                             organic_nitrogen_fraction: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
                              source_animal: str = None) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
@@ -84,6 +95,12 @@ class ManureApplication:
             Fraction of the field this manure is applied to (unitless)
         field_size : float
             Size of the field (ha)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
         water_extractable_inorganic_phosphorus_fraction : float, default=None
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
@@ -107,15 +124,19 @@ class ManureApplication:
         if dry_matter_fraction <= 0.15:
             self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
                                               field_coverage, field_size,
-                                              water_extractable_inorganic_phosphorus_fraction)
+                                              water_extractable_inorganic_phosphorus_fraction,
+                                              inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction)
         else:
             self._apply_solid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
-                                             field_coverage, water_extractable_inorganic_phosphorus_fraction)
+                                             field_coverage, water_extractable_inorganic_phosphorus_fraction,
+                                             inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction)
         self.data.machine_manure_applied_mass = dry_matter_mass
 
     def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                     total_phosphorus_mass: float, field_coverage: float,
-                                    water_extractable_inorganic_phosphorus_fraction: float) -> None:
+                                    water_extractable_inorganic_phosphorus_fraction: float,
+                                    inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                                    organic_nitrogen_fraction: float, field_size: float) -> None:
         """This method applies manure to the field surface when the dry matter content of the application is greater
             than 15%.
 
@@ -132,6 +153,14 @@ class ManureApplication:
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
+        field_size : float
+            Size of the field (ha)
 
         """
         water_extractable_organic_phosphorus_fraction = 0.05
@@ -154,9 +183,14 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
+        self._add_nitrogen_to_soil_layer(0, dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                         organic_nitrogen_fraction, field_size)
+
     def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
                                      total_phosphorus_mass: float, field_coverage: float, field_size: float,
-                                     water_extractable_inorganic_phosphorus_fraction: float) -> None:
+                                     water_extractable_inorganic_phosphorus_fraction: float,
+                                     inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                                     organic_nitrogen_fraction: float) -> None:
         """This method applies manure with 15% solid content or less to a field.
 
         Parameters
@@ -174,13 +208,20 @@ class ManureApplication:
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
             in the range [0.0, 1.0] (unitless)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
 
         Notes
         -----
         When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
         SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
         and adds 60% of all manure P to corresponding soil P pools", but is handled differently in the actual SurPhos
-        implementation. Currently, RuFaS uses the same equations as the SurPhos code.
+        implementation. The actual SurPhos code contains experimental new features that Pete Vadas was working with when
+        the Fortran code was sent to the RuFaS team.
 
         """
         wet_rate = self._determine_wet_rate_factor(dry_matter_mass, dry_matter_fraction, field_coverage, field_size)
@@ -201,8 +242,7 @@ class ManureApplication:
         self.data.machine_stable_organic_phosphorus += total_phosphorus_mass * \
             stable_organic_phosphorus_fraction * surface_retention
 
-        # TODO: remove or explain why 0.95 is preset of stable organic phosphorus and water extractable inorganic
-        #  phosphorus after getting explanation from Pete
+        # TODO: put infiltrated organic phosphorus into corresponding soil pools - issue #444
         mass_to_add_to_labile_P = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * \
             soil_infiltration
         mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
@@ -223,6 +263,57 @@ class ManureApplication:
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
+
+        top_layer_mass = surface_retention * dry_matter_mass
+        top_layer_inorganic_nitrogen_fraction = surface_retention * inorganic_nitrogen_fraction
+        top_layer_organic_nitrogen_fraction = surface_retention * organic_nitrogen_fraction
+        self._add_nitrogen_to_soil_layer(0, top_layer_mass, top_layer_inorganic_nitrogen_fraction, ammonium_fraction,
+                                         top_layer_organic_nitrogen_fraction, field_size)
+        second_layer_mass = soil_infiltration * dry_matter_mass
+        second_layer_inorganic_nitrogen_fraction = soil_infiltration * inorganic_nitrogen_fraction
+        second_layer_organic_nitrogen_fraction = soil_infiltration * organic_nitrogen_fraction
+        self._add_nitrogen_to_soil_layer(1, second_layer_mass, second_layer_inorganic_nitrogen_fraction,
+                                         ammonium_fraction, second_layer_organic_nitrogen_fraction, field_size)
+
+    def _add_nitrogen_to_soil_layer(self, layer_index: int, dry_matter_mass: float, inorganic_nitrogen_fraction: float,
+                                    ammonium_fraction: float, organic_nitrogen_fraction: float,
+                                    field_size: float) -> None:
+        """
+        Adds nitrogen into the top of the soil profile when manure is applied to the field.
+
+        Parameters
+        ----------
+        layer_index : int
+            Index of the soil layer to be added to (unitless)
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless)
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless)
+        field_size : float
+            Size of the field (ha)
+
+        References
+        ----------
+        SWAT Theoretical documentation section 6:1.7
+
+        Notes
+        -----
+        This method allows nitrogen to be added to any soil layer in the profile by specifying the index of that layer.
+        The top soil layer will always be at index 0.
+
+        """
+        nitrates_added = (dry_matter_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
+        ammonium_added = (dry_matter_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
+        organic_nitrogen_added = (dry_matter_mass * organic_nitrogen_fraction * 0.5) / field_size
+
+        self.data.soil_layers[layer_index].nitrate_content += nitrates_added
+        self.data.soil_layers[layer_index].ammonium_content += ammonium_added
+        self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += organic_nitrogen_added
+        self.data.soil_layers[layer_index].active_organic_nitrogen_content += organic_nitrogen_added
 
     # --- Static Methods ---
     @staticmethod
@@ -283,10 +374,11 @@ class ManureApplication:
         Notes
         -----
         This equation is not listed in the SurPhos theoretical documentation, but is present in both the SurPhos Python
-        and Fortran code (see manure.f and manure.py, lines 30, 31 and 41, 42 respectively).
+        and Fortran code (see manure.f and manure.py, lines 30, 31 and 41, 42 respectively). This equation is a way of
+        determining the moisture factor based on the amount of dry matter mass in the manure application that produces
+        more accurate results.
 
         """
-        # TODO: clarify where this equation comes from / how it works after finding out from Pete
         if not 0.0 < dry_matter_fraction <= 1.0:
             raise ValueError(f"Dry matter content must be in the range (0.0, 1.0], received: '{dry_matter_fraction}'.")
         return min(0.9, (1 - dry_matter_fraction))
@@ -363,10 +455,11 @@ class ManureApplication:
         Notes
         -----
         This equation is not present in the SurPhos theoretical documentation, but can be found on line 32 of the
-        manure.f file of the SurPhos Fortran code.
+        manure.f file of the SurPhos Fortran code. It is an experimental way of determining how much slurry manure
+        immediately infiltrates the soil that Pete Vadas was working on when the SurPhos code was sent to the RuFaS
+        team.
 
         """
-        # TODO: add note about and/or reference to origin of this equation after talking with Pete about it
         return dry_matter_mass / dry_matter_fraction / (field_size * field_coverage)
 
     @staticmethod
@@ -386,9 +479,43 @@ class ManureApplication:
         -----
         This function will only be used to determine the amount of phosphorus that infiltrates the soil after an
         application of manure that has 15% or less solid matter content. It is not present in the SurPhos documentation,
-        but can be found on line 33 of the manure.f file of the SurPhos Fortran code.
+        but can be found on line 33 of the manure.f file of the SurPhos Fortran code. This equation is an experimental
+        way of determining how much slurry manure immediately infiltrates the soil, and was being developed by Pete
+        Vadas when the SurPhos code was sent to RuFaS.
 
         """
-        # TODO: add note about and/or reference to origin of this equation after talking with Pete about it
         retention_rate = min(0.9, 0.000002 * wet_rate + 0.267)
         return 1.0 - retention_rate
+
+    @staticmethod
+    def _determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str) -> float:
+        """
+
+        Parameters
+        ----------
+        animal_type : str
+            Type of animal that produced the manure (can be either "CATTLE", "SWINE", or "POULTRY")
+
+        Returns
+        -------
+        float
+            Fraction of manure that is water-extractable inorganic phosphorus (unitless)
+
+        Raises
+        ------
+        ValueError
+            If the animal type passed does not match any of the supported types.
+
+        Notes
+        -----
+        These are reasonable defaults provided Pete Vadas.
+
+        """
+        if animal_type == "CATTLE":
+            return 0.50
+        elif animal_type == "SWINE":
+            return 0.35
+        elif animal_type == "POULTRY":
+            return 0.20
+        else:
+            raise ValueError(f"Expected \"CATTLE\", \"SWINE\", or \"POULTRY\", received '{animal_type}'.")
