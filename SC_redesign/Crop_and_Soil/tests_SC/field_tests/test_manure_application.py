@@ -1,8 +1,9 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
+from typing import List
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application import ManureApplication
+from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 
 
 # ---- Static method tests
@@ -56,15 +57,15 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
                                               app_mass: float, app_dry_fraction: float, app_coverage: float) -> None:
     """Tests that the new, weighted values for the manure phosphorus pools are calculated correctly."""
     with patch(
-            "SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application.ManureApplication"
-            "._determine_moisture_factor", new=MagicMock(return_value=0.65)):
+            "SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication._determine_moisture_factor",
+            new=MagicMock(return_value=0.65)) as patched_moisture_factor:
         observe = ManureApplication._determine_weighted_manure_attributes(old_mass, old_moisture, old_coverage,
                                                                           app_mass, app_dry_fraction, app_coverage)
         new_mass = old_mass + app_mass
         new_moisture = (old_moisture * old_mass) / new_mass + (0.65 * app_mass) / new_mass
         new_coverage = (old_coverage * old_mass) / new_mass + (app_coverage * app_mass) / new_mass
 
-        ManureApplication._determine_moisture_factor.assert_called_once_with(app_dry_fraction)
+        patched_moisture_factor.assert_called_once_with(app_dry_fraction)
         assert observe.get("new_dry_matter_mass") == new_mass
         assert observe.get("new_moisture_factor") == new_moisture
         assert observe.get("new_field_coverage") == new_coverage
@@ -98,14 +99,40 @@ def test_determine_infiltration_factor(wet_rate: float) -> None:
     assert observe == expect
 
 
-# ---- Helper function tests
-@pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_coverage,weiP_frac", [
-    (1000, 0.18, 200, 0.89, 0.5),
-    (955, 0.44, 100, 0.76, 0.47),
-    (2500, 0.411, 350, 0.96, 0.33),
+@pytest.mark.parametrize("animal_type,expected", [
+    ("CATTLE", 0.50),
+    ("SWINE", 0.35),
+    ("POULTRY", 0.20)
 ])
+def test_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str, expected: float) -> None:
+    """Tests that the water extractable inorganic phosphorus fraction is correctly determined based on the animal
+        type"""
+    actual = ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("animal_type", [
+    "CaTTLE",
+    "PORK",
+    "fish"
+])
+def test_error_determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type: str) -> None:
+    """Tests that errors caused by unsupported animal types are handled appropriately."""
+    with pytest.raises(ValueError) as e:
+        ManureApplication._determine_water_extractable_inorganic_phosphorus_fraction_by_animal(animal_type)
+    assert str(e.value) == f"Expected \"CATTLE\", \"SWINE\", or \"POULTRY\", received '{animal_type}'."
+
+
+# ---- Helper function tests
+@pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_coverage,weiP_frac,inorganic_frac,ammonium_frac,"
+                         "organic_frac", [
+                             (1000, 0.18, 200, 0.89, 0.5, 0.33, 0.51, 0.05),
+                             (955, 0.44, 100, 0.76, 0.47, 0.2, 0.45, 0.03),
+                             (2500, 0.411, 350, 0.96, 0.33, 0.15, 0.42, 0.045),
+                         ])
 def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, field_coverage: float,
-                                    weiP_frac: float) -> None:
+                                    weiP_frac: float, inorganic_frac: float, ammonium_frac: float,
+                                    organic_frac: float) -> None:
     """Tests that manure with greater than 15% solid matter content is added to the field correctly."""
     data = SoilData(machine_manure_dry_mass=3000, machine_manure_moisture_factor=0.65,
                     machine_manure_field_coverage=0.77, field_size=1.1)
@@ -113,30 +140,36 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 4000,
                                                                            "new_moisture_factor": 0.83,
                                                                            "new_field_coverage": 0.93})
+    incorp._add_nitrogen_to_soil_layer = MagicMock()
 
-    incorp._apply_solid_machine_manure(dry_mass, dry_fraction, phosphorus_mass, field_coverage, weiP_frac)
+    incorp._apply_solid_machine_manure(dry_mass, dry_fraction, phosphorus_mass, field_coverage, weiP_frac,
+                                       inorganic_frac, ammonium_frac, organic_frac, 1.1)
 
     incorp._determine_weighted_manure_attributes.assert_called_once_with(3000, 0.65, 0.77, dry_mass, dry_fraction,
                                                                          field_coverage)
+    incorp._add_nitrogen_to_soil_layer.assert_called_once_with(0, dry_mass, inorganic_frac, ammonium_frac,
+                                                               organic_frac, 1.1)
     assert incorp.data.machine_water_extractable_inorganic_phosphorus == phosphorus_mass * weiP_frac
     assert incorp.data.machine_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.machine_stable_inorganic_phosphorus == \
-        (phosphorus_mass * (1 - (weiP_frac + 0.05))) * 0.25
+           (phosphorus_mass * (1 - (weiP_frac + 0.05))) * 0.25
     assert pytest.approx(incorp.data.machine_stable_organic_phosphorus) == \
-        (phosphorus_mass * (1 - (weiP_frac + 0.05))) * 0.75
+           (phosphorus_mass * (1 - (weiP_frac + 0.05))) * 0.75
     assert incorp.data.machine_manure_dry_mass == 4000
     assert incorp.data.machine_manure_moisture_factor == 0.83
     assert incorp.data.machine_manure_field_coverage == 0.93
 
 
-@pytest.mark.parametrize("dry_mass,dry_frac,phosphorus_mass,coverage,area,weiP_frac", [
-    (1000, 0.15, 122, 0.88, 1.94, 0.4),
-    (1230, 0.115, 180, 0.97, 2.45, 0.356),
-    (2015, 0.0911, 233.2, 0.66, 4.8, 0.22),
-    (1780, 0.056, 345, 0.93, 3.81, 0.623),
-])
+@pytest.mark.parametrize("dry_mass,dry_frac,phosphorus_mass,coverage,area,weiP_frac,inorganic_frac,ammonium_frac,"
+                         "organic_frac", [
+                            (1000, 0.15, 122, 0.88, 1.94, 0.4, 0.3, 0.39, 0.044),
+                            (1230, 0.115, 180, 0.97, 2.45, 0.356, 0.14, 0.5, 0.018),
+                            (2015, 0.0911, 233.2, 0.66, 4.8, 0.22, 0.2, 0.51, 0.023),
+                            (1780, 0.056, 345, 0.93, 3.81, 0.623, 0.18, 0.6, 0.033),
+                         ])
 def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphorus_mass: float, coverage: float,
-                                     area: float, weiP_frac: float) -> float:
+                                     area: float, weiP_frac: float, inorganic_frac: float, ammonium_frac: float,
+                                     organic_frac: float) -> None:
     """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
         sets surface pool characteristics.
     """
@@ -150,8 +183,10 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 2050,
                                                                            "new_moisture_factor": 0.93,
                                                                            "new_field_coverage": 0.98})
+    incorp._add_nitrogen_to_soil_layer = MagicMock()
 
-    incorp._apply_liquid_machine_manure(dry_mass, dry_frac, phosphorus_mass, coverage, area, weiP_frac)
+    incorp._apply_liquid_machine_manure(dry_mass, dry_frac, phosphorus_mass, coverage, area, weiP_frac, inorganic_frac,
+                                        ammonium_frac, organic_frac)
 
     expect_adjusted_dry_mass = dry_mass * 0.8
     expect_adjusted_coverage = coverage * 0.5
@@ -164,10 +199,19 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5 * 0.95
     expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5
 
+    expected_mass = dry_mass * 0.5
+    expected_inorganic_frac = inorganic_frac * 0.5
+    expected_organic_frac = organic_frac * 0.5
+    expected_nitrogen_calls = [
+        call(0, expected_mass, expected_inorganic_frac, ammonium_frac, expected_organic_frac, area),
+        call(1, expected_mass, expected_inorganic_frac, ammonium_frac, expected_organic_frac, area)]
+
     incorp._determine_wet_rate_factor.assert_called_once_with(dry_mass, dry_frac, coverage, area)
     incorp._determine_infiltration_factor.assert_called_once_with(2000)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(1000, 0.8, 0.9, expect_adjusted_dry_mass,
                                                                          dry_frac, expect_adjusted_coverage)
+
+    incorp._add_nitrogen_to_soil_layer.assert_has_calls(expected_nitrogen_calls)
     incorp.data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expect_labile, area)
     incorp.data.soil_layers[0].add_to_active_phosphorus.assert_called_once_with(expect_active, area)
     assert incorp.data.machine_manure_dry_mass == 2050
@@ -179,14 +223,40 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
 
 
-# ---- Main routine tests
-@pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,field_size", [
-    (1000, 0.78, 150, 1.8),
-    (2344, 0.90, 201, 2.34),
-    (900, 0.688, 78, 1.12),
-    (1500, 0.89, 400, 4.1),
+@pytest.mark.parametrize("index,mass,inorganic_frac,ammonium_frac,organic_frac,field_size,expected", [
+    (0, 100, 0.3, 0.5, 0.08, 1.6, [15, 15, 4]),
+    (1, 44, 0.41, 0.35, 0.075, 2.2, [11.726, 6.314, 1.65]),
+    (3, 50, 0.0, 0.0, 0.0, 1.3, [0, 0, 0])
 ])
-def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, field_size: float) -> None:
+def test_add_nitrogen_to_soil_layer(index: int, mass: float, inorganic_frac: float, ammonium_frac: float,
+                                    organic_frac: float, field_size: float, expected: List[float]) -> None:
+    """Tests that nitrogen is added to the top soil layer correctly."""
+    man_app = ManureApplication(field_size=field_size)
+    man_app.data.soil_layers[index].nitrate_content = 5
+    man_app.data.soil_layers[index].ammonium_content = 5
+    man_app.data.soil_layers[index].fresh_organic_nitrogen_content = 5
+    man_app.data.soil_layers[index].active_organic_nitrogen_content = 5
+
+    man_app._add_nitrogen_to_soil_layer(index, mass, inorganic_frac, ammonium_frac, organic_frac, field_size)
+
+    expected_nitrates = 5 + (expected[0] / field_size)
+    expected_ammonium = 5 + (expected[1] / field_size)
+    expected_organic = 5 + (expected[2] / field_size)
+    assert pytest.approx(man_app.data.soil_layers[index].nitrate_content) == expected_nitrates
+    assert man_app.data.soil_layers[index].ammonium_content == expected_ammonium
+    assert man_app.data.soil_layers[index].fresh_organic_nitrogen_content == expected_organic
+    assert man_app.data.soil_layers[index].active_organic_nitrogen_content == expected_organic
+
+
+# ---- Main routine tests
+@pytest.mark.parametrize("dry_mass,dry_fraction,phosphorus_mass,inorganic_frac,ammonium_frac,organic_frac,field_size", [
+    (1000, 0.78, 150, 0.22, 0.45, 0.03, 1.8),
+    (2344, 0.90, 201, 0.3, 0.39, 0.05, 2.34),
+    (900, 0.688, 78, 0.29, 0.55, 0.1, 1.12),
+    (1500, 0.89, 400, 0.33, 0.4, 0.09, 4.1),
+])
+def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, inorganic_frac: float,
+                              ammonium_frac: float, organic_frac: float, field_size: float) -> None:
     """Tests that the grazing manure related attributes are correctly updated when grazing manure is applied."""
     data = SoilData(grazing_manure_dry_mass=4000, grazing_manure_moisture_factor=0.75, field_size=field_size,
                     grazing_manure_field_coverage=0.6)
@@ -195,12 +265,16 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     incorp._determine_weighted_manure_attributes = MagicMock(return_value={"new_dry_matter_mass": 5000,
                                                                            "new_moisture_factor": 0.6,
                                                                            "new_field_coverage": 0.8})
+    incorp._add_nitrogen_to_soil_layer = MagicMock()
 
-    incorp.apply_grazing_manure(dry_mass, dry_fraction, phosphorus_mass, field_size)
+    incorp.apply_grazing_manure(dry_mass, dry_fraction, phosphorus_mass, inorganic_frac, ammonium_frac, organic_frac,
+                                field_size)
 
     incorp._determine_grazing_manure_field_coverage.assert_called_once_with(field_size, dry_mass)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(4000, 0.75, 0.6, dry_mass, dry_fraction,
                                                                          0.8)
+    incorp._add_nitrogen_to_soil_layer.assert_called_once_with(0, dry_mass, inorganic_frac, ammonium_frac,
+                                                               organic_frac, field_size)
     assert incorp.data.grazing_water_extractable_inorganic_phosphorus == phosphorus_mass * 0.50
     assert incorp.data.grazing_water_extractable_organic_phosphorus == phosphorus_mass * 0.05
     assert incorp.data.grazing_stable_inorganic_phosphorus == phosphorus_mass * 0.1125
@@ -211,14 +285,16 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
     assert incorp.data.grazing_manure_applied_mass == dry_mass
 
 
-@pytest.mark.parametrize("dry_mass,dry_fraction,total_phosphorus_mass,coverage,area,weiP_frac,source_animal", [
-    (1000, 0.75, 200, 0.85, 1.835, 0.5, None),
-    (3000, 0.10, 150, 0.975, 2.2254, None, "CATTLE"),
-    (2000, 0.44, 103.5, 0.88, 0.8898, 0.25, "SWINE"),
-    (2500, 0.08, 175, 0.79, 3.4453, None, None),
-])
+@pytest.mark.parametrize("dry_mass,dry_fraction,total_phosphorus_mass,coverage,area,inorganic_frac,ammonium_frac,"
+                         "organic_frac,weiP_frac,source_animal", [
+                            (1000, 0.75, 200, 0.85, 1.835, 0.11, 0.55, 0.01, 0.5, None),
+                            (3000, 0.10, 150, 0.975, 2.2254, 0.2, 0.6, 0.03, None, "CATTLE"),
+                            (2000, 0.44, 103.5, 0.88, 0.8898, 0.14, 0.44, 0.06, 0.25, "SWINE"),
+                            (2500, 0.08, 175, 0.79, 3.4453, 0.33, 0.39, 0.09, None, None),
+                         ])
 def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosphorus_mass: float, coverage: float,
-                              area: float, weiP_frac: float, source_animal: float) -> None:
+                              area: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
+                              weiP_frac: float, source_animal: str) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
     data = SoilData(field_size=1.1)
     incorp = ManureApplication(data)
@@ -227,7 +303,8 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
     incorp._apply_liquid_machine_manure = MagicMock()
     incorp._apply_solid_machine_manure = MagicMock()
 
-    incorp.apply_machine_manure(dry_mass, dry_fraction, total_phosphorus_mass, coverage, area, weiP_frac, source_animal)
+    incorp.apply_machine_manure(dry_mass, dry_fraction, total_phosphorus_mass, coverage, area, inorganic_frac,
+                                ammonium_frac, organic_frac, weiP_frac, source_animal)
 
     expected_weiP_frac = weiP_frac
     if weiP_frac is None:
@@ -239,8 +316,10 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
 
     if dry_fraction <= 0.15:
         incorp._apply_liquid_machine_manure.assert_called_once_with(dry_mass, dry_fraction, total_phosphorus_mass,
-                                                                    coverage, area, expected_weiP_frac)
+                                                                    coverage, area, expected_weiP_frac, inorganic_frac,
+                                                                    ammonium_frac, organic_frac)
     else:
         incorp._apply_solid_machine_manure.assert_called_once_with(dry_mass, dry_fraction, total_phosphorus_mass,
-                                                                   coverage, expected_weiP_frac)
+                                                                   coverage, expected_weiP_frac, inorganic_frac,
+                                                                   ammonium_frac, organic_frac)
     assert incorp.data.machine_manure_applied_mass == dry_mass
