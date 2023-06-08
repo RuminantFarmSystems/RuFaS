@@ -382,9 +382,11 @@ class OutputManager(object):
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
         if filter_keys and filter_keys[exclude_keyword_location] == exclude_keyword:
-            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key not in filter_keys}
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
+                    any(filter_key.lower() in key.lower() for filter_key in filter_keys)}
         else:
-            return {key: self.variables_pool[key] for key in filter_keys if key in self.variables_pool.keys()}
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if
+                    any(filter_key.lower() in key.lower() for filter_key in filter_keys)}
 
     def save_variables(self, save_path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
