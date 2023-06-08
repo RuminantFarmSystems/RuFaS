@@ -143,7 +143,8 @@ class CropSchedule(Schedule):
 
         planting_events = []
         for date in all_planting_dates:
-            new_planting_event = PlantingEvent(self.crop_reference, date[0], date[1], self.heat_scheduled)
+            new_planting_event = PlantingEvent(crop_reference=self.crop_reference, year=date[0], day=date[1],
+                                               heat_scheduled_harvest=self.heat_scheduled)
             planting_events.append(new_planting_event)
         return planting_events
 
@@ -173,6 +174,7 @@ class CropSchedule(Schedule):
 
         harvest_events = []
         for date in all_harvesting_dates:
-            new_harvest_event = HarvestEvent(self.crop_reference, date[0], date[1], date[2])
+            new_harvest_event = HarvestEvent(crop_reference=self.crop_reference, year=date[0], day=date[1],
+                                             operation=date[2])
             harvest_events.append(new_harvest_event)
         return harvest_events
