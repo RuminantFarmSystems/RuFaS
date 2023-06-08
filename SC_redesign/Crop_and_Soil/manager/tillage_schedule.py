@@ -122,7 +122,8 @@ class TillageSchedule(Schedule):
 
         tillage_events = []
         for event in all_tillage_events:
-            new_tillage_event = TillageEvent(event[0], event[1], event[2], event[3], event[4])
+            new_tillage_event = TillageEvent(tillage_depth=event[0], incorporation_fraction=event[1],
+                                             mixing_fraction=event[2], year=event[3], day=event[4])
             tillage_events.append(new_tillage_event)
         return tillage_events
 
