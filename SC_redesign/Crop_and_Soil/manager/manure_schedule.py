@@ -24,7 +24,7 @@ class ManureSchedule(Schedule):
         years : List[int]
             Year(s) in which manure will be applied.
         days : List[int]
-            Day(s) on which manure will be applied.
+            Julian day(s) on which manure will be applied.
         nitrogen_masses : List[float]
             Minimum mass(s) of nitrogen that should be contained in manure applications (kg)
         phosphorus_masses : List[float]
