@@ -27,11 +27,11 @@ class CropSchedule(Schedule):
         planting_years : List[int]
             Year(s) in which crop is planted.
         planting_days : List[int]
-            Day(s) on which crop is planted.
+            Julian day(s) on which crop is planted.
         harvest_years : List[int]
             Year(s) in which crop is harvested.
         harvest_days : List[int]
-            Day(s) on which crop is harvested.
+            Julian day(s) on which crop is harvested.
         harvest_operations : List[str]
             Operation(s) with which a crop is harvested.
         use_heat_scheduling : bool, default=False
