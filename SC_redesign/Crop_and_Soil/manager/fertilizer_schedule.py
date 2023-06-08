@@ -26,7 +26,7 @@ class FertilizerSchedule(Schedule):
         years : List[int]
             Year(s) in which fertilizer will be applied.
         days : List[int]
-            Day(s) in which fertilizer will be applied.
+            Julian day(s) in which fertilizer will be applied.
         nitrogen_masses : List[float]
             Minimum mass(es) of nitrogen in applications (kg)
         phosphorus_masses : List[float]
