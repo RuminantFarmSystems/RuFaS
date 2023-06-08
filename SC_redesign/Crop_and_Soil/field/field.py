@@ -25,7 +25,8 @@ class Field:
     """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 plantings: Optional[List[PlantingEvent]] = None):
+                 plantings: Optional[List[PlantingEvent]] = None,
+                 custom_crop_specifications: Optional[Dict[str, Dict]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -40,6 +41,9 @@ class Field:
 
         self.planting_events: List[PlantingEvent] = plantings
         """List of all planting events that will occur over the run of the simulation in this field."""
+
+        self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications
+        """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
@@ -76,8 +80,7 @@ class Field:
 
         # --- Crop Management ---
         # planting
-        if self.field_data.is_planting_day:
-            self.plant_crops(self.field_data.current_crop_config)
+        self.check_crop_planting_schedule(time)
 
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
@@ -151,7 +154,7 @@ class Field:
         """
         self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
         for event in todays_planting_events:
-            pass
+            self.plant_crop(event)
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
@@ -185,23 +188,49 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def plant_crops(self, crops_config: List[Dict], coverage: Optional[List[float]] = None) -> None:
-        """adds all crop(s) into the field from the current configuration specs
-
-        Args:
-            crops_config: a list of crop config dictionaries (see make_crop_from_config_dict), one for each crop to be
-                planted
-            coverage: a list of field coverages for each crop (% of the field); must sum to less than 1
+    def plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool) -> None:
         """
-        if coverage is not None:
-            if sum(coverage) > 1.0:
-                raise ValueError("the sum of coverage is greater than 1.0")
+        Takes a PlantingEvent and creates a new Crop based on it, then adds it to the field's list of current crops.
 
-        for i in range(len(crops_config)):
-            conf = crops_config[i]
-            cov = coverage[i] if coverage is not None else None
-            crop = self.make_crop_from_config_dict(conf)
-            self.add_crop(crop, cov)
+        Parameters
+        ----------
+        crop_reference : str
+            Name used to get the specifications for the crop to be
+        use_heat_scheduled_harvesting : bool
+            Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
+
+        Notes
+        -----
+        The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
+        reference to a custom crop that has user-defined attributes.
+
+        """
+        supported_species = set(item.value for item in CropSpecies)
+        if crop_reference in supported_species:
+            crop = self.make_supported_crop(crop_reference)
+        else:
+            try:
+                crop_specifications = self.custom_crop_specifications.get(crop_reference)
+            except KeyError:
+                raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}',"
+                               f"received specifications for '{self.custom_crop_specifications.keys()}' crop types.")
+            crop = self.make_crop_from_config_dict(crop_specifications)
+        crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
+
+        self.crops.append(crop)
+        self._reset_crop_field_coverage_fractions()
+
+    def _reset_crop_field_coverage_fractions(self) -> None:
+        """
+        Resets crops to have equal field coverage while in the field.
+        """
+        number_of_crops_in_field = len(self.crops)
+        if number_of_crops_in_field == 0:
+            return
+
+        field_coverage_fraction = 1 / number_of_crops_in_field
+        for crop in self.crops:
+            crop.data.field_proportion = field_coverage_fraction
 
     @staticmethod
     def make_crop_from_config_dict(config: Dict) -> Crop:
@@ -258,29 +287,6 @@ class Field:
         """
         crop_data = CropData(**specs)
         return Crop(crop_data)
-
-    def add_crop(self, crop: Crop, field_cover: Optional[float] = None) -> None:
-        """add a crop to the field's current crop list and update relevant attributes
-
-        Args:
-            crop: the crop object to add to the field
-            field_cover: the desired proportion of the field for this crop to occupy, must be space available. If not
-                provided, each crop will occupy an equal proportion of the field.
-
-        Raises: ValueError if there is no room in the field for the desired field_cover of this crop
-        """
-
-        if field_cover is None:
-            self.crops.append(crop)
-            for this_crop in self.crops:
-                this_crop.data.field_proportion = 1 / len(self.crops)
-        else:
-            crop.data.field_proportion = field_cover
-            self.crops.append(crop)
-
-        total_cover = sum([crp.data.field_proportion for crp in self.crops])
-        if total_cover > 1.0:
-            raise ValueError("more than 100% of the field is occupied")
 
     def reset_perennial(self):
         """resets some attributes for perennial crops at the start of the new growing season"""
