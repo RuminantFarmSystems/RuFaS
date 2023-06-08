@@ -20,7 +20,7 @@ class ManureSchedule(Schedule):
         Parameters
         ----------
         name : str
-            Name of this tillage schedule.
+            Name of this manure schedule.
         years : List[int]
             Year(s) in which manure will be applied.
         days : List[int]
