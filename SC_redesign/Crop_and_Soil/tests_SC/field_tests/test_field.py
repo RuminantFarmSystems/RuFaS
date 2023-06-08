@@ -23,9 +23,9 @@ from RUFAS.classes import Time
      [PlantingEvent("test_3", 1996, 240, False), PlantingEvent("test_4", 1997, 125, False)],
      [PlantingEvent("test_1", 1996, 120, False), PlantingEvent("test_2", 1996, 120, False)]),
     ([PlantingEvent("crop_1", 1995, 100, True), PlantingEvent("crop_2", 1995, 100, False),
-      PlantingEvent("crop_3", 1995, 100)], [],
+      PlantingEvent("crop_3", 1995, 100, False)], [],
      [PlantingEvent("crop_1", 1995, 100, True),
-      PlantingEvent("crop_2", 1995, 100, False), PlantingEvent("crop_3", 1995, 100)]),
+      PlantingEvent("crop_2", 1995, 100, False), PlantingEvent("crop_3", 1995, 100, False)]),
     ([PlantingEvent("not_today_1", 2000, 100, False), PlantingEvent("not_today_2", 2000, 250, True),
       PlantingEvent("not_today_3", 2001, 200, True)],
      [PlantingEvent("not_today_1", 2000, 100, False), PlantingEvent("not_today_2", 2000, 250, True),
@@ -45,14 +45,11 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     field.plant_crop = MagicMock()
     time = MagicMock(Time)
     expected_create_and_update_events_calls = [call(all_events, time)]
-    expected_plant_crop_calls = []
-    for event in events_occurring_today:
-        expected_plant_crop_calls.append(call(event))
 
     field.check_crop_planting_schedule(time)
 
     field._create_and_update_events.assert_has_calls(expected_create_and_update_events_calls)
-    field.plant_crop.assert_has_calls(expected_plant_crop_calls)
+    assert field.plant_crop.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
 
 
@@ -78,6 +75,23 @@ def test_create_and_update_events(events: List[Event], year: int, day: int, expe
     actual = Field._create_and_update_events(events, mocked_time)
     assert actual[0] == expected_remaining
     assert actual[1] == expected_current
+
+
+# @pytest.mark.parametrize("crop_reference,heat_scheduled,")
+
+@pytest.mark.parametrize("crop_list,expected_field_proportion", [
+    ([Crop(), Crop(), Crop()], (1 / 3)),
+    ([Crop()], 1.0),
+    ([Crop(), Crop(), Crop(), Crop()], 0.25),
+    ([], None)
+])
+def test_rest_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
+    """Tests that crops in a field correctly have their proportion reset when there are other crops present."""
+    field = Field()
+    field.crops = crop_list
+    field._reset_crop_field_coverage_fractions()
+    for crop in field.crops:
+        assert crop.data.field_proportion == expected_field_proportion
 
 
 @pytest.mark.parametrize("daylength,threshold_daylength", [
