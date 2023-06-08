@@ -145,7 +145,8 @@ class FertilizerSchedule(Schedule):
 
         fertilizer_events = []
         for event in all_events:
-            new_event = FertilizerEvent(event[0], event[1], event[2], event[3], event[4], event[5], event[6])
+            new_event = FertilizerEvent(mix_name=event[0], year=event[1], day=event[2], nitrogen_mass=event[3],
+                                        phosphorus_mass=event[4], depth=event[5], surface_remainder_fraction=event[6])
             fertilizer_events.append(new_event)
         return fertilizer_events
 
