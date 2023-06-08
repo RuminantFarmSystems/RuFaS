@@ -158,7 +158,9 @@ class ManureSchedule(Schedule):
 
         manure_application_events = []
         for event in all_manure_application_events:
-            new_event = ManureEvent(event[0], event[1], event[2], event[3], event[4], event[5], event[6])
+            new_event = ManureEvent(year=event[0], day=event[1], nitrogen_mass=event[2], phosphorus_mass=event[3],
+                                    field_coverage=event[4], application_depth=event[5],
+                                    surface_remainder_fraction=event[6])
             manure_application_events.append(new_event)
         return manure_application_events
 
