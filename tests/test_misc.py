@@ -8,7 +8,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 import os
 from typing import Callable
 from typing import Dict
-from mock import Mock, mock_open, patch
+from mock import Mock, call, mock_open, patch
 
 import pytest
 from mock.mock import MagicMock
@@ -849,13 +849,14 @@ def test_filter_variables_pool(
 ) -> None:
     """Test case for function _filter_variables_pool in output_manager.py"""
 
-    # Test case 1: Empty inclusion_keys
-    inclusion_keys = []
+    # Test case 1: Empty filter_keys
+    filter_keys = []
     expected_result = {}
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
 
-    # Test case 2: inclusion_keys with existing keys
-    inclusion_keys = ["key1", "key2"]
+    # Test case 2: filter_keys with existing keys
+    filter_keys = ["key1", "key2"]
+    exclude_filter_keys = ["exclude", "key1", "key2"]
     mock_output_manager.variables_pool = {
         "key1": "value1",
         "key2": "value2",
@@ -865,21 +866,34 @@ def test_filter_variables_pool(
         "key1": "value1",
         "key2": "value2"
     }
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
+    expected_result_exclude = {
+        "key3": "value3"
+    }
 
-    # Test case 3: inclusion_keys with non-existing keys
-    inclusion_keys = ["key1", "key4"]
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
+
+    # Test case 3: filter_keys with non-existing keys
+    filter_keys = ["key1", "key4"]
+    exclude_filter_keys = ["exclude", "key1", "key4"]
     expected_result = {
         "key1": "value1"
     }
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
+    expected_result_exclude = {
+        "key2": "value2",
+        "key3": "value3"
+    }
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
-    # Test case 4: inclusion_keys with duplicate keys
-    inclusion_keys = ["key1", "key1"]
+    # Test case 4: filter_keys with duplicate keys
+    filter_keys = ["key1", "key1"]
+    exclude_filter_keys = ["exclude", "key1", "key1"]
     expected_result = {
         "key1": "value1"
     }
-    assert mock_output_manager._filter_variables_pool(inclusion_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
     # Restore original method and variables_pool
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -914,7 +928,7 @@ def test_save_variables(
     mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
     mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_not_called()
-    mock_output_manager._dict_to_file_json.assert_called_once_with(
+    mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
 

@@ -356,24 +356,35 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, inclusion_keys: List[str]) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_keys: List[str]) -> Dict[str, pool_element_type]:
         """
-        Takes the list of keys the user wants in their final data pool,
-        filters the variables pool accordingly, and returns the filtered pool.
+        Returns a filtered variables pool based on either inclusion or exclusion.
 
         Parameters
         ----------
-        inclusion_keys : List[str]
+        filter_keys : List[str]
             A list of keys the user has selected to filter the variables pool.
 
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
-            A dictionary with only the values paired with the keys
-            from the inclusion_keys list remaining from the variables_pool.
+            A filtered variables pool based on either inclusion or exclusion.
+
+        Notes
+        -----
+        The first key in the filter_keys list will determine whether the keys are treated as
+        exclusionary or inclusionary. If the first key matches the value of the exclude_keyword
+        variable defined in this function, it will treat the rest of the filter list as exclusionary
+        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
+        as inclusionary.
 
         """
-        return {key: self.variables_pool[key] for key in inclusion_keys if key in self.variables_pool.keys()}
+        exclude_keyword_location = 0
+        exclude_keyword = "exclude"
+        if filter_keys and filter_keys[exclude_keyword_location] == exclude_keyword:
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if key not in filter_keys}
+        else:
+            return {key: self.variables_pool[key] for key in filter_keys if key in self.variables_pool.keys()}
 
     def save_variables(self, save_path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
@@ -388,9 +399,9 @@ class OutputManager(object):
 
         dir_path : str
             Path of the directory containing the files containing the keys for filtering.
-
+            
         exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
+            Flag for whether or not the user wants to include info_maps data in their results files.
 
         """
         list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
@@ -398,6 +409,7 @@ class OutputManager(object):
             input_path = os.path.join(dir_path, input_file)
             inclusion_keys = self._load_txt_file_to_list(input_path)
             filtered_pool = self._filter_variables_pool(inclusion_keys)
+
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
