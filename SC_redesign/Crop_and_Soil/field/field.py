@@ -138,20 +138,6 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    # def check_schedule(self, year: int, day: int) -> None:
-    #     """check if any scheduled activities need to be completed today.
-    #
-    #     Args:
-    #         year: the current year
-    #         day: the current day of the year
-    #
-    #     Details:
-    #         This method should check the dates on which certain actions should be performed against the year and day.
-    #         Then, the boolean attributes that trigger the relevant operations should be updated.
-    #         For example, if we need to plant a crop today, this method will set `self.field_data.is_planting_day=True`.
-    #      """
-    #     pass
-
     def check_crop_planting_schedule(self, time: Time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
@@ -163,7 +149,9 @@ class Field:
             Time object containing the current day and year of the simulation.
 
         """
-        pass
+        self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
+        for event in todays_planting_events:
+            pass
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
