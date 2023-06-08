@@ -202,7 +202,9 @@ class Field:
         Notes
         -----
         The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
-        reference to a custom crop that has user-defined attributes.
+        reference to a custom crop that has user-defined attributes. The harvest method is overwritten for the crop
+        created because that is specified directly by the user, and the crop id is set so that the HarvestEvents will
+        be able to identify the correct crop in the field's list of active crops.
 
         """
         supported_species = set(item.value for item in CropSpecies)
@@ -216,6 +218,7 @@ class Field:
                                f"received specifications for '{self.custom_crop_specifications.keys()}' crop types.")
             crop = self.make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
+        crop.data.id = crop_reference
 
         self.crops.append(crop)
         self._reset_crop_field_coverage_fractions()

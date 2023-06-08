@@ -1,6 +1,6 @@
 from math import exp
-from typing import Optional, List, Dict
-from unittest.mock import MagicMock, PropertyMock, patch
+from typing import Optional, List, Dict, Tuple
+from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
@@ -17,6 +17,45 @@ from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MI
 from RUFAS.classes import Time
 
 
+@pytest.mark.parametrize("all_events,events_remaining,events_occurring_today", [
+    ([PlantingEvent("test_1", 1996, 120, False), PlantingEvent("test_2", 1996, 120, False),
+      PlantingEvent("test_3", 1996, 240, False), PlantingEvent("test_4", 1997, 125, False)],
+     [PlantingEvent("test_3", 1996, 240, False), PlantingEvent("test_4", 1997, 125, False)],
+     [PlantingEvent("test_1", 1996, 120, False), PlantingEvent("test_2", 1996, 120, False)]),
+    ([PlantingEvent("crop_1", 1995, 100, True), PlantingEvent("crop_2", 1995, 100, False),
+      PlantingEvent("crop_3", 1995, 100)], [],
+     [PlantingEvent("crop_1", 1995, 100, True),
+      PlantingEvent("crop_2", 1995, 100, False), PlantingEvent("crop_3", 1995, 100)]),
+    ([PlantingEvent("not_today_1", 2000, 100, False), PlantingEvent("not_today_2", 2000, 250, True),
+      PlantingEvent("not_today_3", 2001, 200, True)],
+     [PlantingEvent("not_today_1", 2000, 100, False), PlantingEvent("not_today_2", 2000, 250, True),
+      PlantingEvent("not_today_3", 2001, 200, True)], []),
+    ([], [], [])
+])
+def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_remaining: List[PlantingEvent],
+                                      events_occurring_today: List[PlantingEvent]) -> None:
+    """
+    Tests that the planting schedule is updated correctly and that planting events are executed correctly. This test
+    contains four cases: some planting events occur on the current day, all planting events occur on the current day,
+    no planting events occur on the current day, and no planting events left.
+    """
+    field = Field(plantings=all_events)
+    field._create_and_update_events = MagicMock(return_value=(events_remaining, events_occurring_today))
+
+    field.plant_crop = MagicMock()
+    time = MagicMock(Time)
+    expected_create_and_update_events_calls = [call(all_events, time)]
+    expected_plant_crop_calls = []
+    for event in events_occurring_today:
+        expected_plant_crop_calls.append(call(event))
+
+    field.check_crop_planting_schedule(time)
+
+    field._create_and_update_events.assert_has_calls(expected_create_and_update_events_calls)
+    field.plant_crop.assert_has_calls(expected_plant_crop_calls)
+    assert field.planting_events == events_remaining
+
+
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
     ([Event(1990, 120), Event(1990, 200), Event(1993, 100)], 1990, 120,
      [Event(1990, 200), Event(1993, 100)], [Event(1990, 120)]),
@@ -26,7 +65,8 @@ from RUFAS.classes import Time
     ([HarvestEvent("corn_1", 1999, 240, "default"), HarvestEvent("corn_1", 2000, 240, "default"),
       HarvestEvent("alfalfa_2", 2001, 240, "default")], 1999, 200,
      [HarvestEvent("corn_1", 1999, 240, "default"), HarvestEvent("corn_1", 2000, 240, "default"),
-      HarvestEvent("alfalfa_2", 2001, 240, "default")], [])
+      HarvestEvent("alfalfa_2", 2001, 240, "default")], []),
+    ([], 1993, 140, [], [])
 ])
 def test_create_and_update_events(events: List[Event], year: int, day: int, expected_remaining: List[Event],
                                   expected_current: List[Event]) -> None:
@@ -100,35 +140,6 @@ def test_make_custom_crop(config: dict):
         assert getattr(crop.data, key) == val
 
 
-def test_add_crop():
-    """checks that crops are added to the field properly"""
-    field = Field()
-
-    # --- first case: no cover specification ----
-    for i in range(5):
-        crop = Crop()
-        field.add_crop(crop)
-        assert type(field.crops[i]) is Crop
-    for crop in field.crops:
-        assert crop.data.field_proportion == 1 / 5
-    assert len(field.crops) == 5
-
-    # ---- second case: specific covers
-    new_field = Field()
-    new_field.add_crop(Crop(), 0.10)
-    new_field.add_crop(Crop(), 0.20)
-    new_field.add_crop(Crop(), 0.33)
-    assert new_field.crops[0].data.field_proportion == 0.10
-    assert new_field.crops[1].data.field_proportion == 0.20
-    assert new_field.crops[2].data.field_proportion == 0.33
-
-    # --- failing cases ---
-    newer_field = Field()
-    with pytest.raises(Exception):
-        newer_field.add_crop(Crop(), 1.1)  # over 1
-        new_field.add_crop(Crop(), 0.5)  # total is over 1
-
-
 @pytest.mark.parametrize("config", [
     {"species": "corn"},  # supported species
     {"species": "corn", "minimum_temperature": -2.0, "is_perennial": True},  # supported species, with alterations
@@ -150,18 +161,6 @@ def test_make_crop_from_config_dict(config: dict):
     else:
         Field.make_supported_crop.assert_not_called()
         Field.make_custom_crop.assert_called_once()
-
-
-@pytest.mark.parametrize("config_list,coverages", [
-    ([{"species": "corn"}], None),
-    ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "triticale"}], None),
-    ([{"species": "alfalfa", "minimum_temperature": -2.0}, {"species": "grass"}], None),
-    ([{"species": "corn"}, {"species": "alfalfa"}, {"species": "grass"}], [1 / 3, 1 / 3, 1 / 3])
-])
-def test_plant_crops(config_list: List[Dict], coverages: Optional[List[float]]):
-    field = Field()
-    field.plant_crops(config_list, coverages)
-    assert len(field.crops) == len(config_list)
 
 
 def test_check_harvest_schedules():
