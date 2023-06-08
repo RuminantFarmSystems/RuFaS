@@ -387,7 +387,7 @@ class OutputManager(object):
             Path to the directory where the file will be saved.
 
         dir_path : str
-            Path of the directory containing the list of files containg the keys for inclusion filter.
+            Path of the directory containing the files containing the keys for filtering.
 
         exclude_info_maps : bool
             Flag for whether or not the user wants to inlcude info_maps data in their results files.
