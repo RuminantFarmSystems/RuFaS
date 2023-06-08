@@ -9,17 +9,20 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
+import collections
 import copy
 from enum import Enum
 from typing import List, Dict, Union, DefaultDict, Any
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
+    get_default_animal_manure_excretions, scalar_mult_animal_manure_excretions
 from RUFAS.routines.animal.ration import animal_requirements as req
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
@@ -226,11 +229,11 @@ class Pen:
         self.avg_p_req = 0.0
         self.avg_p_animal = 0.0
 
-        self.animals_in_pen = []
-        self.populated = False
+        self.animals_in_pen = []  # TODO: We should use a dictionary to map animal id to animal object.
+        self.populated = False  # TODO: To be removed. Use the property 'is_populated' instead.
 
         self.classes_in_pen = set()
-        self.stocking_density = 0.0
+        self.stocking_density = 0.0  # TODO: To be removed. Use the property 'current_stocking_density' instead.
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -242,10 +245,13 @@ class Pen:
         self.avg_CP_milk = 0.0
 
         self.ration = {}
+        self.ration_per_animal = {}
         self.ration_nutrient_amount = {'dm': 0, 'CP': 0, 'ADF': 0,
                                        'NDF': 0, 'lignin': 0, 'ash': 0,
                                        'phosphorus': 0, 'potassium': 0, 'N': 0}
-        self.ration_nutrient_conc = {}
+        self.ration_nutrient_conc = {'dm': 0, 'CP': 0, 'ADF': 0,
+                                     'NDF': 0, 'lignin': 0, 'ash': 0,
+                                     'phosphorus': 0, 'potassium': 0, 'N': 0}
         self.dry_matter_intake = 0.0
 
         self.avg_growth = 0.0
@@ -285,6 +291,38 @@ class Pen:
 
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
+
+    # TODO: (Not used yet) Use this property instead of self.stocking_density because it is dynamically calculated
+    @property
+    def current_stocking_density(self) -> float:
+        """
+        Return the current stocking density of the pen.
+
+        Returns
+        -------
+        float
+            the current stocking density of the pen.
+
+        """
+
+        return len(self.animals_in_pen) / self.num_stalls
+
+    @property
+    def is_populated(self) -> bool:
+        """
+        Returns whether the pen is populated.
+
+        Returns
+        -------
+        bool
+            True if the pen is populated, False otherwise.
+
+        """
+        return len(self.animals_in_pen) > 0
+
+    @property
+    def current_pen_ration(self):
+        pass
 
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
@@ -546,6 +584,7 @@ class Pen:
             total_growth += animal.daily_growth
         self.avg_growth = total_growth / len(self.animals_in_pen)
 
+    # TODO: Fix this to use AnimalType enum
     def calc_daily_walking_dist(self):
         """
         Sets the daily walking distance for the cows in the pen (if any).
@@ -574,11 +613,12 @@ class Pen:
         """
         Calls each animal's method to calculate daily phosphorus update.
         """
-        if not len(self.animals_in_pen) == 0:
+        if len(self.animals_in_pen) > 0:
             total_p_animal = 0
             for animal in self.animals_in_pen:
                 animal.daily_p_update()
                 total_p_animal += animal.p_animal
+            total_p_animal = max(total_p_animal, 0)  # TODO: Add warning if total_p_animal < 0
             self.avg_p_animal = total_p_animal / len(self.animals_in_pen)
 
     def set_up_new_animal(self, animal, p_conc, feed, temp, num_animals_before_additions):
@@ -717,3 +757,176 @@ class Pen:
         """
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
+
+    # Refactoring Zone
+    # =========================================================================
+    # Manure-related methods
+    # ----------------------
+    def calc_total_manure(self, feed, methane_model: str) -> None:
+        """
+        Calculate the total manure excreted by all animals in the pen.
+
+        Parameters
+        ----------
+        feed
+        methane_model
+
+        Returns
+        -------
+        None
+
+        """
+
+        self.manure = get_default_animal_manure_excretions()
+
+        if not self.is_populated:
+            return
+
+        for animal in self.animals_in_pen:
+            if type(animal) == Cow:
+                animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
+            else:
+                animal.calc_manure_excretion(feed, methane_model)
+
+        for animal in self.animals_in_pen:
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
+
+    # Ration-related methods
+    # ----------------------
+    # TODO: Review
+    def _set_animal_nutrient_values(self, animal, animal_grouping_scenario,
+                                    feed, temp, phosphorus_concentration) -> None:
+        """
+        Set the nutrient values for the animal.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            The animal to set the nutrient values for.
+        animal_grouping_scenario
+        feed
+        temp
+        phosphorus_concentration : float
+
+        Returns
+        -------
+        None
+
+        """
+        animal_type = animal_grouping_scenario.get_animal_type(animal)
+        if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+            requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
+                                          day_of_pregnancy=animal.days_in_preg, animal_type=animal_type,
+                                          parity=animal.calves, calving_interval=animal.CI,
+                                          milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
+                                          milk_lactose=animal.lactose_milk,
+                                          milk_production=animal.estimated_daily_milk_produced,
+                                          days_in_milk=animal.days_in_milk, lactating=animal.milking,
+                                          previous_temperature=temp)
+            animal.NEmaint = requirements['NEmaint']
+            animal.NEg = requirements['NEg']
+            animal.NEpreg = requirements['NEpreg']
+            animal.NEl = requirements['NEl']
+            animal.MP_req = requirements['MP_req']
+            animal.Ca_req = requirements['Ca_req']
+            animal.P_req = requirements['P_req']
+            animal.DMIest = requirements['DMIest']
+            animal.DNED_req = (requirements['NEmaint'] + requirements[
+                'NEl']) / animal.DMIest
+            animal.DMPD_req = (requirements['MP_req']) / animal.DMIest
+
+            animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+
+        if animal_type in [AnimalType.CALF]:
+            if self.avg_calf_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_calf_nutrient_rqmts
+            else:
+                animal.calc_nutrient_rqmts(feed, temp)
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+            if self.avg_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_nutrient_rqmts
+            else:
+                animal.set_nutrient_rqmts(temp, animal_grouping_scenario)
+        else:
+            if self.avg_nutrient_rqmts:
+                animal.nutrient_rqmts = self.avg_nutrient_rqmts
+            else:
+                animal.set_nutrient_rqmts(animal_grouping_scenario)
+
+        if phosphorus_concentration != -1:
+            animal.p_animal = animal.body_weight * phosphorus_concentration
+
+        animal.dry_matter_intake = self.dry_matter_intake
+        animal.set_ration(self.ration_per_animal, self.ration_nutrient_amount['dm'])
+
+        # animal.p_intake = self.avg_p_intake
+        animal.set_p_intake(self.ration_nutrient_amount['phosphorus'], self.ration_nutrient_conc['phosphorus'])
+
+    def _calc_new_ration(self, num_animals: int):
+        """
+        Calculate the new ration for the pen based on the number of animals in the pen.
+
+        Parameters
+        ----------
+        num_animals : int
+            The number of animals in the pen.
+
+        Returns
+        -------
+        ration : Dict[str, Union[float, str]]
+            The new ration for the pen.
+
+        """
+
+        ration = {}
+        for key in self.ration_per_animal:
+            if key == 'status':
+                ration[key] = self.ration_per_animal[key]
+            else:  # feeds and price
+                ration[key] = self.ration_per_animal[key] * num_animals
+        return ration
+
+    # Population-related methods
+    def add_animal(self, animal, animal_grouping_scenario,
+                   feed, temp, phosphorus_concentration: float) -> None:
+        """
+        Add an animal to the pen and adjust the ration accordingly.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            The animal to be added to the pen.
+        animal_grouping_scenario
+        feed
+        temp
+        phosphorus_concentration : float
+
+        Returns
+        -------
+        None
+
+        """
+
+        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
+        self.animals_in_pen.append(animal)
+        self.ration = self._calc_new_ration(len(self.animals_in_pen))
+
+    def remove_animal(self, animal_id: int) -> None:
+        """
+        Remove an animal from the pen by its id and adjust the ration accordingly.
+
+        Parameters
+        ----------
+        animal_id : int
+            The id of the animal to be removed from the pen.
+
+        Returns
+        -------
+        None
+
+        """
+
+        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id != animal_id]
+        self.ration = self._calc_new_ration(len(self.animals_in_pen))
+
+

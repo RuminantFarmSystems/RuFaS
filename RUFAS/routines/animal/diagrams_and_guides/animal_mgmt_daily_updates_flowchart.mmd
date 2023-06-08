@@ -1,0 +1,32 @@
+---
+title: "Flowchart for daily_updates2() function"
+---
+%% TODO: Add more details to the flowchart
+flowchart TD
+    Start[Start] --> IsSimulateAnimals{Is simulating animals?}
+    IsSimulateAnimals --> |Yes| GetAnimalsBeforeUpdate[Keep tracks of animals and combinations before update]
+    GetAnimalsBeforeUpdate --> LifeCycleDailyUpdate["Call daily_update() on life_cycle_manager"]
+    LifeCycleDailyUpdate --> AnimalsRemoved[Find removed animals after update]
+    LifeCycleDailyUpdate --> AnimalsWithUnchangedClass[Find animals with unchanged class]
+    AnimalsWithUnchangedClass --> AnimalsChangedCombination[Out of these, find animals with changed combinations]
+    AnimalsChangedCombination --> RemoveAnimals[Remove animals from old pens]
+    AnimalsRemoved --> RemoveAnimals
+    LifeCycleDailyUpdate --> FindGraduatedAnimals[Find graduated animals]
+    RemoveAnimals --> AddAnimals[Add graduated animals, animals with changed combinations, newly added animals to appropriate pens]
+    FindGraduatedAnimals --> AddAnimals
+    LifeCycleDailyUpdate --> FindNewlyAddedAnimals[Find newly added animals]
+    FindNewlyAddedAnimals --> UpdateAnimalsByType[Add new animals to existing lists]
+    FindNewlyAddedAnimals --> AddAnimals
+    AddAnimals --> UpdatePens[Update classes in pens, calculate pen-level manure, P requirements, and daily P update]
+    UpdateAnimalsByType --> UpdatePhosphorusConcentrations[Update phosphorus concentrations]
+    UpdatePhosphorusConcentrations --> RecordPenHistory[Record pen history]
+    UpdatePens --> RecordPenHistory
+    RecordPenHistory --> EndRationInterval{End of ration interval?}
+    EndRationInterval --> |Yes| CalcNutrientRqmts[Calculate nutrient requirements]
+    CalcNutrientRqmts --> ClearPens[Clear pens]
+    ClearPens --> AllocateAnimalsToPens[Allocate animals to pens]
+    AllocateAnimalsToPens --> CalcRationAtInterval[Calculate ration at interval]
+    CalcRationAtInterval --> CalcAvgGrowth[Calculate average growth]
+    CalcAvgGrowth --> Done[End]
+    EndRationInterval --> |No| Done
+    IsSimulateAnimals --> |No| Done
