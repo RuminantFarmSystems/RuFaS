@@ -329,7 +329,7 @@ class OutputManager(object):
                     txt_files.append(filename)
             return txt_files
         else:
-            raise NotADirectoryError("specified path is not a directory")
+            raise NotADirectoryError("The specified path must be a directory")
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
@@ -358,23 +358,25 @@ class OutputManager(object):
 
     def _filter_variables_pool(self, filter_keys: List[str]) -> Dict[str, pool_element_type]:
         """
-        Takes the list of keys the user wants to their final data pool either by inclusion or exclusion,
-        filters the variables pool accordingly, and returns the filtered pool.
+        Returns a filtered variables pool based on either inclusion or exclusion.
 
         Parameters
         ----------
         filter_keys : List[str]
             A list of keys the user has selected to filter the variables pool.
 
-        dir_path : str
-            The path from which the filter_keys list was loaded. Used to indicate whether
-            these are inclusion or exclusion filter keys.
-
         Returns
         -------
         Dict[str, OutputManager.pool_element_type]
-            A dictionary with only the values paired with the keys
-            from the inclusion_keys list remaining from the variables_pool.
+            A filtered variables pool based on either inclusion or exclusion.
+
+        Notes
+        -----
+        The first key in the filter_keys list will determine whether the keys are treated as
+        exclusionary or inclusionary. If the first key matches the value of the exclude_keyword
+        variable defined in this function, it will treat the rest of the filter list as exclusionary
+        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
+        as inclusionary.
 
         """
         exclude_keyword_location = 0
@@ -396,8 +398,8 @@ class OutputManager(object):
             Path to the directory where the file will be saved.
 
         dir_path : str
-            Path of the directory containing the filter files.
-
+            Path of the directory containing the files containing the keys for filtering.
+            
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
