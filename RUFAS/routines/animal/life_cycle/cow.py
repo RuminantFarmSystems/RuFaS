@@ -361,7 +361,7 @@ class Cow(HeiferIII):
                 self.ration_formulation, feed, self.body_weight,
                 self.estimated_daily_milk_produced, p_feces_excrt, p_urine, methane_model, ME_intake)
 
-    def set_nutrient_rqmts(self):
+    def set_nutrient_rqmts(self, animal_grouping_scenario):
         """
         Calculates this Cow's nutrient requirements.
         """
@@ -369,7 +369,7 @@ class Cow(HeiferIII):
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
-                         animal_type='cow',
+                         animal_type=animal_grouping_scenario.get_animal_type(self),
                          parity=self.calves,
                          calving_interval=self.CI,
                          milk_true_protein=self.mPrt,
