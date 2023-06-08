@@ -13,7 +13,7 @@ from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrogen_cycling import Nit
 
 
 class Soil:
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """Creates a Soil object based on a SoilData object.
 
         Parameters
