@@ -14,9 +14,7 @@ from scipy.optimize import minimize
 from typing import Dict, List
 
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
 udrv = UserDefinedRationManager()
 
@@ -627,14 +625,6 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
             failed_constraints = find_failed_constraints(usermod.x, cow_cons)
             if not failed_constraints:
                 print('No constraints violated')
-            for constr in failed_constraints:
-                # add warnings to output manager
-                # or print out to console or both
-                # print(f'Constraint {constr} violated')
-                # print(f'Constraint value: {constr["fun"](usermod.x)}')
-                # print(f'Constraint type: {constr["type"]}')
-                # print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
-                pass
         return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
     elif str(animal_combination) in ['AnimalCombination.LAC_COW']:

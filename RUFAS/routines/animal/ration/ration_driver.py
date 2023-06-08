@@ -20,7 +20,6 @@ from RUFAS.routines.animal.ration import ration_NLP as NLP
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
 
-
 udrv = UserDefinedRationManager()
 om = OutputManager()
 
@@ -89,78 +88,133 @@ def optimization(requirements, available_feeds, animal_combination):
     return solution, ration_vals
 
 
-def get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario):
+def calc_starting_milk_average(pen) -> float:
+    """
+    Calculates starting average milk produced in a pen.
+    
+    Parameters
+    ----------
+    pen: an object of class Pen
+
+    Returns
+    -------
+    float
+        Average running milk
+    """
+    total_milk_in_pen = 0.0
+    for animal in pen.animals_in_pen:
+        total_milk_in_pen += animal.estimated_daily_milk_produced
+    num_animals = len(pen.animals_in_pen)
+    starting_milk_average = total_milk_in_pen/num_animals
+    return starting_milk_average
+
+def reduce_milk_production(pen, reduction) -> float:
+    """
+    Reduces milk production for all animals in a pen.
+    Only does so if post-reduction production would be above 1.0.
+    Returns running total milk produced in the pen.
+    
+    Parameters
+    ----------
+    pen: an object of class Pen
+    
+    reduction: float
+        The kg amount of lactation should be reduced in each loop, per animal
+    
+    Returns
+    -------
+    float
+        running total of milk produced daily in pen
+    
+    """
+    running_total_milk = 0.0
+    for animal in pen.animals_in_pen:
+        if animal.estimated_daily_milk_produced - reduction > 1.0:
+            animal.estimated_daily_milk_produced -= reduction
+            animal.milk_production_reduction -= reduction
+        running_total_milk += animal.estimated_daily_milk_produced
+    return running_total_milk
+
+import scipy
+def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.OptimizeResult):
+    """
+    Generates ration dictionary from scipy result
+    
+    Parameters
+    ----------
+    available_feeds : an object of class AvailableFeeds
+        a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+    
+    solution : OptimizeResult object from scipy package
+    
+    Returns
+    -------
+    Dict
+    
+    """
+    ration = {}
+    for feed_id in range(len(available_feeds['feed_id'])):
+        i = feed_id * 3
+        num = solution.x[i]
+        num += solution.x[i + 1]
+        num += solution.x[i + 2]
+        ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
+    ration['status'] = 'Optimal'
+    ration['objective'] = NLP.objective(solution.x)
+    return ration
+
+#TODO how should we handle type hints for classes that aren't imported already? Import just for type hint?
+def get_user_defined_ration(req: animal_requirements, pen, available_feeds, animal_grouping_scenario) \
+    -> tuple[Dict[str, float], Dict[str, float]]:
     """
     Function that links the ration_driver file with the calc_ration function in
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
     optimization.
 
-    Args:
-        pen: an object of class Pen
-        feed: an object of class Feed
-        available_feeds: an object of class AvailableFeeds
-        animal_type: string
-            representation of the type of animal (cow, heifer)
-        cow_type: Boolean 
-            True if cow is lactating, False otherwise
+    
+    Parameters
+    ----------
+    req : an object of class Requirements
+    
+    pen : an object of class Pen
+    
+    available_feeds : an object of class AvailableFeeds
+    
+    animal_grouping_scenario : AnimalCombination
+        the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
+    
+    Returns
+    -------
+    ration : Dict
+    
+    ration_vals : Dict
+    
     """
     fixed_ration = False
     ration_percents =UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-    # Reduction of milk production estimate process to achieve feasible solution
-    # def get_starting_milk_total()
+    if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
+        fixed_ration = True
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
-        total_milk_in_pen = 0.0
-        num_animals = 0
-        for animal in pen.animals_in_pen:
-            total_milk_in_pen += animal.estimated_daily_milk_produced
-            num_animals += 1
-        average_total_milk = total_milk_in_pen/num_animals
-    
+        starting_milk_average = calc_starting_milk_average(pen)
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
         while not solution.success:
-            # def reduce_milk_production()
             reduction = 0.25
-            running_total_milk = 0.0
-            for animal in pen.animals_in_pen:
-                if animal.estimated_daily_milk_produced > 1.0: #TODO CHANGE THIS SO IT"S NOT GOING NEGATIVE
-                    animal.estimated_daily_milk_produced -= reduction
-                    animal.milk_production_reduction -= reduction
-                running_total_milk += animal.estimated_daily_milk_produced
-            average_running_total_milk = running_total_milk / num_animals
+            running_total_milk = reduce_milk_production(pen, reduction)
+            average_running_milk = running_total_milk / len(pen.animals_in_pen)
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-            if average_running_total_milk < udrv.milk_reduction_percent*average_total_milk or \
-               average_running_total_milk == 0.0:
+            if average_running_milk < udrv.milk_reduction_percent*starting_milk_average or \
+               average_running_milk < 1.0:
                 fixed_ration = True
                 solution.success = True
                 break
-    if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
-        fixed_ration = True
+
     if fixed_ration:
-        # def make_ration_from_user_values() 
-        ration = {}
-        for feed_id in range(len(available_feeds['feed_id'])):
-            if available_feeds['feed_key'][feed_id] in ration_percents:
-                ingredient_percentage = ration_percents[available_feeds['feed_key'][feed_id]]
-                ingredient_as_proportion = ingredient_percentage/100*req.DMIest
-                ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
-            else:
-                ration[available_feeds['feed_key'][feed_id]] = 0.0
-        ration['status'] = 'Optimal'
-        ration['objective'] = 0.0 # setting as optimal
+        ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
     elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
-        # def make_ration_from_solution()
-        ration = {}
-        for feed_id in range(len(available_feeds['feed_id'])):
-            i = feed_id * 3
-            num = solution.x[i]
-            num += solution.x[i + 1]
-            num += solution.x[i + 2]
-            ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
-        ration['status'] = 'Optimal'
-        ration['objective'] = NLP.objective(solution.x)
+        ration = make_ration_from_solution(available_feeds, solution)
     else:
         print('ERROR')
     return ration, ration_vals
@@ -207,15 +261,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
 
     if solution is not None:
-        ration = {}
-        for feed_id in range(len(available_feeds['feed_id'])):
-            i = feed_id * 3
-            num = solution.x[i]
-            num += solution.x[i + 1]
-            num += solution.x[i + 2]
-            ration[available_feeds['feed_key'][feed_id]] = round(num, 6)
-        ration['status'] = 'Optimal'
-        ration['objective'] = NLP.objective(solution.x)
+        ration = make_ration_from_solution(available_feeds, solution)
         return ration, ration_vals
     # safeguard if scipy SLSQP bounds error still occurs after many iterations
     # using previous cycles ration for this pen

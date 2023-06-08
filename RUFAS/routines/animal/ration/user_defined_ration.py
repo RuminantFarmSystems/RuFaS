@@ -80,14 +80,14 @@ class UserDefinedRationManager(object):
         
         Parameters
         ----------
-        pen_animal_combo: Pen.AnimalCombination
+        pen_animal_combo : Pen.AnimalCombination
             AnimalCombination in the given pen
-        available_feeds: Dict
+        available_feeds : Dict
             available feeds dictionary from the Feed class object
 
         Returns
         -------
-        ration_percents: Dict
+        ration_percents : Dict
             dictionary of feed ids and their associated percentage of DMI 
         """
         udrv = UserDefinedRationManager()
@@ -102,3 +102,36 @@ class UserDefinedRationManager(object):
         else: 
             ration_percents = udrv.calf_ration
         return UserDefinedRationManager.feed_quality_fix(ration_percents, available_feeds)
+
+
+    def make_ration_from_user_values(ration_percents: Dict, available_feeds, req) -> Dict:
+        """
+        Generate ration dict from user ration percents input
+        
+        Parameters
+        ----------
+        ration_percents : Dict
+            dictionary of feed ids and their associated percentage of DMI 
+        
+        available_feeds : Dict
+            available feeds dictionary from the Feed class object
+        
+        req : an object of class Requirements        
+        
+        Returns
+        -------
+        Dict
+            dictionary of formulated ration
+        
+        """
+        ration = {}
+        for feed_id in range(len(available_feeds['feed_id'])):
+            if available_feeds['feed_key'][feed_id] in ration_percents:
+                ingredient_percentage = ration_percents[available_feeds['feed_key'][feed_id]]
+                ingredient_as_proportion = ingredient_percentage/100*req.DMIest
+                ration[available_feeds['feed_key'][feed_id]] = round(ingredient_as_proportion, 6)
+            else:
+                ration[available_feeds['feed_key'][feed_id]] = 0.0
+        ration['status'] = 'Optimal'
+        ration['objective'] = 0.0 # setting as optimal
+        return ration
