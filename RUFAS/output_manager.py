@@ -329,7 +329,7 @@ class OutputManager(object):
                     txt_files.append(filename)
             return txt_files
         else:
-            raise NotADirectoryError("specified path is not a directory")
+            raise NotADirectoryError("The specified path must be a directory")
 
     def _load_txt_file_to_list(self, path: str) -> List[str]:
         """ Reads a text file into a list.
@@ -396,8 +396,8 @@ class OutputManager(object):
             Path to the directory where the file will be saved.
 
         dir_path : str
-            Path of the directory containing the filter files.
-
+            Path of the directory containing the files containing the keys for filtering.
+            
         exclude_info_maps : bool
             Flag for whether or not the user wants to include info_maps data in their results files.
 
