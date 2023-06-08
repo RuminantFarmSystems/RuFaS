@@ -8,7 +8,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 import os
 from typing import Callable
 from typing import Dict
-from mock import Mock, call, mock_open, patch
+from mock import Mock, mock_open, patch
 
 import pytest
 from mock.mock import MagicMock
@@ -848,20 +848,28 @@ def test_filter_variables_pool(
     output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
     """Test case for function _filter_variables_pool in output_manager.py"""
-
-    # Test case 1: Empty filter_keys
-    filter_keys = []
-    expected_result = {}
-    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
-
-    # Test case 2: filter_keys with existing keys
-    filter_keys = ["key1", "key2"]
-    exclude_filter_keys = ["exclude", "key1", "key2"]
     mock_output_manager.variables_pool = {
         "key1": "value1",
         "key2": "value2",
         "key3": "value3"
     }
+
+    # Test case 1: Empty filter_keys
+    filter_keys = []
+    exclude_filter_keys = ["exclude"]
+    expected_result = {}
+    expected_result_exclude = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
+    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
+
+    # Test case 2: filter_keys with existing keys
+    filter_keys = ["key1", "key2"]
+    exclude_filter_keys = ["exclude", "key1", "key2"]
     expected_result = {
         "key1": "value1",
         "key2": "value2"
