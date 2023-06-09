@@ -10,7 +10,7 @@ from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
-from SC_redesign.Crop_and_Soil.manager.events import Event
+from SC_redesign.Crop_and_Soil.manager.events import Event, TillageEvent
 from RUFAS.classes import Time
 
 # TODO: delete/replace the note block below once satisfied with the design
@@ -26,11 +26,11 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 class Field:
     """object representing an agricultural field"""
 
-    def __init__(self, events: Optional[Event] = None, field_data: Optional[FieldData] = None,
+    def __init__(self, tillage_events: Optional[TillageEvent] = None, field_data: Optional[FieldData] = None,
                  soil: Optional[Soil] = None, ):
 
         # Tillage events
-        self.events: List[Event] = events
+        self.tillage_events: List[TillageEvent] = tillage_events
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
         # field-wide attributes
@@ -78,8 +78,7 @@ class Field:
             self.amend_soil()
 
         # tillage
-        if self.field_data.is_tillage_day:
-            self.till_soil()
+        self.till_soil_event()
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -163,7 +162,7 @@ class Field:
         # </editor-fold>
 
     # <editor-fold desc="--- Soil Management Methods ---">
-    def till_soil(self, time: Time) -> None:
+    def till_soil_event(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -173,7 +172,9 @@ class Field:
         time : Time
             Time object containing the current day and year of the simulation.
         """
-
+        self.tillage_events, todays_events = self._create_and_update_events(self.tillage_events, time)
+        for event in todays_events:
+            self.tiller.till_soil(event.tillage_depth, event.)
         pass
 
     def amend_soil(self) -> None:
