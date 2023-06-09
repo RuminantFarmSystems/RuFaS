@@ -6,6 +6,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 from typing import Any, Dict
 from mock import MagicMock
+from pytest_mock import MockerFixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
@@ -1418,61 +1419,102 @@ def mock_cow_args(mocker) -> Dict[str, Any]:
 
 
 @pytest.fixture
-def mock_holstein(mocker, mock_cow_args: Dict[str, Any]) -> Cow:
+def mock_AnimalBase_config(mocker) -> AnimalBase.config:
     AnimalBase.config = MagicMock()
+    AnimalBase.config.update({'lactation_curve': 'wood'})
+    AnimalBase.config.update({
+        "wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
+        "wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
+        "wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
+        "wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
+        "wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
+        "wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
+        })
+    return AnimalBase.config
+
+
+@pytest.fixture
+def mock_holstein(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
     mock_cow_args["breed"] = "HO"
     mock_holstein_cow = Cow(mock_cow_args)
+    mock_holstein_cow.calves = 4
+    mock_holstein_cow.lactation_curve = 'wood'
     return mock_holstein_cow
 
 
 @pytest.fixture
-def mock_jersey(mocker, mock_cow_args) -> Cow:
-    AnimalBase.config = MagicMock()
+def mock_jersey(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
     mock_cow_args["breed"] = "JE"
     mock_jersey_cow = Cow(mock_cow_args)
+    mock_jersey_cow.calves = 2
+    mock_jersey_cow.lactation_curve = 'wood'
     return mock_jersey_cow
 
 
 @pytest.fixture
-def mock_generic_cow(mocker, mock_cow_args) -> Cow:
-    AnimalBase.config = MagicMock()
+def mock_generic_cow(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
     mock_cow_args["breed"] = "Generic"
     mock_generic = Cow(mock_cow_args)
+    mock_generic.calves = 1
+    mock_generic.lactation_curve = 'wood'
     return mock_generic
 
 
 def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
     """Unit test for function set_breed_index in file routines/animal/life_cycle/cow.py"""
     mock_holstein.set_breed_index()
-    assert mock_holstein.breed_index == 0
     assert mock_holstein.breed == 'HO'
+    assert mock_holstein.breed_index == 0
 
     mock_holstein.set_breed_index()
-    assert mock_jersey.breed_index == 1
     assert mock_jersey.breed == 'JE'
+    assert mock_jersey.breed_index == 1
 
     mock_generic_cow.set_breed_index()
-    assert mock_generic_cow.breed_index == 0
     assert mock_generic_cow.breed != 'HO'
     assert mock_generic_cow.breed != 'JE'
+    assert mock_generic_cow.breed_index == 0
 
 
 def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
     """Unit test for function set_parity_index in file routines/animal/life_cycle/cow.py"""
-    mock_holstein.calves = 4
     mock_holstein.set_parity_index()
     assert mock_holstein.calves == 4
     assert mock_holstein.parity_index == 2
 
-    mock_jersey.calves = 2
     mock_jersey.set_parity_index()
     assert mock_jersey.calves == 2
     assert mock_jersey.parity_index == 1
 
-    mock_generic_cow.calves = 1
     mock_generic_cow.set_parity_index()
     assert mock_generic_cow.calves == 1
     assert mock_generic_cow.parity_index == 0
+
+
+def test_set_lactation_curve_params(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow,
+                                    mocker: MockerFixture, mock_AnimalBase_config: AnimalBase.config) -> None:
+    """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+    # mock_holstein has parity_index 2, breed_index 0
+    AnimalBase.config = mock_AnimalBase_config
+    mock_holstein.set_breed_index()
+    mock_holstein.set_parity_index()
+    mock_holstein.set_lactation_curve_params()
+    # assert mock_holstein.wood_l == 23.81
+    # assert mock_holstein.wood_m == 0.244
+    # assert mock_holstein.wood_n == 0.0036
+
+#     patch_determine_param_value_wood_l = mocker.patch('RUFAS.routines.animal.life_cycle.cow.determine_param_value',
+#                                                       return_value=1)
+#     patch_determine_param_value_wood_m = mocker.patch('RUFAS.routines.animal.life_cycle.cow.determine_param_value',
+#                                                       return_value=2)
+#     patch_determine_param_value_wood_n = mocker.patch('RUFAS.routines.animal.life_cycle.cow.determine_param_value',
+#                                                       return_value=3)
+#     mock_holstein.set_lactation_curve_params()
+#     # mock_jersey has parity_index 2, breed_index 0
+#     # mock_generic_cow has parity_index 2, breed_index 0
 
 
 def test_get_feed_data_from_feed_ids() -> None:

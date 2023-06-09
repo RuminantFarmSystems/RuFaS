@@ -227,14 +227,14 @@ class Cow(HeiferIII):
             self.breed_index = 0
         elif self.breed == 'JE':
             self.breed_index = 1
-    
+
     def set_parity_index(self):
         """Sets the cow's parity index for use in the lactation curve parameter calculation"""
         self.parity_index = 2 if self.calves - 1 > 2 else self.calves - 1
 
     def set_lactation_curve_params(self):
         """
-        Set cow's lactation curve parameters based on cow's lactation curve attribute.
+        Sets cow's lactation curve parameters based on cow's lactation curve attribute.
         Currently only set up for wood model.
         """
         if AnimalBase.config['lactation_curve'] == 'wood':
