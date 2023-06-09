@@ -1,5 +1,5 @@
 from math import exp
-from typing import Optional, List, Dict, Tuple
+from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
@@ -77,7 +77,31 @@ def test_create_and_update_events(events: List[Event], year: int, day: int, expe
     assert actual[1] == expected_current
 
 
-# @pytest.mark.parametrize("crop_reference,heat_scheduled,")
+@pytest.mark.parametrize("crop_reference,heat_scheduled,custom_crop_specs,is_supported", [
+    ("corn", False, None, True),
+    ("custom_alfalfa", False, {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}}, False),
+    ("alien_crop", True, {"custom_corn": {"species": "corn", "is_nitrogen_fixer": True},
+                          "alien_crop": {"species": "halo_alien_corn", "minimum_temperature": -60}},
+     False)
+])
+def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs: Dict, is_supported: bool) -> None:
+    """Tests that a new Crop instance is properly created and added to a field."""
+    field = Field(custom_crop_specifications=custom_crop_specs)
+    field._reset_crop_field_coverage_fractions = MagicMock()
+    field.plant_crop(crop_reference, heat_scheduled)
+
+    if is_supported:
+        expected_crop = field.make_supported_crop(crop_reference)
+    else:
+        expected_crop = field.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
+    expected_crop.data.use_heat_scheduling = heat_scheduled
+    expected_crop.data.id = crop_reference
+
+    field._reset_crop_field_coverage_fractions.assert_called_once()
+    assert field.crops[0].data.id == expected_crop.data.id
+    assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
+    assert field.crops[0].data.species == expected_crop.data.species
+
 
 @pytest.mark.parametrize("crop_list,expected_field_proportion", [
     ([Crop(), Crop(), Crop()], (1 / 3)),
