@@ -43,7 +43,7 @@ class Field:
         self.planting_events: List[PlantingEvent] = plantings
         """List of all planting events that will occur over the run of the simulation in this field."""
 
-        self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications
+        self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
         """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
@@ -222,10 +222,11 @@ class Field:
             crop = self.make_supported_crop(crop_reference)
         else:
             try:
-                crop_specifications = deepcopy(self.custom_crop_specifications.get(crop_reference))
+                crop_specifications = deepcopy(self.custom_crop_specifications[crop_reference])
             except KeyError:
-                raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}',"
-                               f"received specifications for '{self.custom_crop_specifications.keys()}' crop types.")
+                raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}', "
+                               f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
+                               f"types.")
             crop = self.make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference

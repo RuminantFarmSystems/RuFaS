@@ -81,8 +81,7 @@ def test_create_and_update_events(events: List[Event], year: int, day: int, expe
     ("corn", False, None, True),
     ("custom_alfalfa", False, {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}}, False),
     ("alien_crop", True, {"custom_corn": {"species": "corn", "is_nitrogen_fixer": True},
-                          "alien_crop": {"species": "halo_alien_corn", "minimum_temperature": -60}},
-     False)
+                          "alien_crop": {"species": "halo_alien_corn", "minimum_temperature": -60}}, False)
 ])
 def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs: Dict, is_supported: bool) -> None:
     """Tests that a new Crop instance is properly created and added to a field."""
@@ -101,6 +100,26 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species
+
+
+@pytest.mark.parametrize("field_name,crop_reference,custom_crop_specs,expected", [
+    ("test_field_1", "halo_alien_alfalfa", {"halo_alien_winter_wheat": {"species": "halo_alien_winter_wheat",
+                                                                        "minimum_temperature": -75},
+                                            "halo_alien_corn": {"species": "halo_alien_corn",
+                                                                "minimum_temperature": -60}},
+     "'test_field_1': expected to have crop specification for 'halo_alien_alfalfa', received specifications for "
+     "'('halo_alien_winter_wheat', 'halo_alien_corn')' crop types."),
+    ("test_field_2", "halo_alien_durum_wheat", None, "'test_field_2': expected to have crop specification for "
+                                                     "'halo_alien_durum_wheat', received specifications for '()' crop "
+                                                     "types.")
+])
+def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_specs: Dict, expected: str) -> None:
+    """Tests that errors are correctly raised when a crop specification for a requested planting is not present."""
+    field = Field(custom_crop_specifications=custom_crop_specs)
+    field.field_data.name = field_name
+    with pytest.raises(KeyError) as e:
+        field.plant_crop(crop_reference, True)
+    assert expected in str(e.value)
 
 
 @pytest.mark.parametrize("crop_list,expected_field_proportion", [
