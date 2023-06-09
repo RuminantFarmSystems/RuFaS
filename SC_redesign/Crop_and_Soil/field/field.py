@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from RUFAS.classes import Time
+from copy import deepcopy
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -93,7 +94,6 @@ class Field:
             if self.field_data.grazers_present:
                 self.graze_field()
 
-            self.check_harvest_schedules(day, year)
             self.harvest_scheduled_crops()
 
         # annual resets
@@ -195,16 +195,26 @@ class Field:
         Parameters
         ----------
         crop_reference : str
-            Name used to get the specifications for the crop to be
+            Name used to get the specifications for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
+
+        Raises
+        ------
+        KeyError
+            If the crop reference is to a custom crop specification, but that specification is not present in the list
+            of custom crop specifications.
 
         Notes
         -----
         The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
-        reference to a custom crop that has user-defined attributes. The harvest method is overwritten for the crop
-        created because that is specified directly by the user, and the crop id is set so that the HarvestEvents will
-        be able to identify the correct crop in the field's list of active crops.
+        reference to a custom crop that has user-defined attributes. This method starts by trying to determine if the
+        crop is of a supported species, if so it passes it to the supported crop creation method. If not, it passes it
+        to the custom crop creation method.
+
+        The harvest method is overwritten for the crop created because that is specified directly by the user, and the
+        crop id is set so that the HarvestEvents will be able to identify the correct crop in the field's list of active
+        crops.
 
         """
         supported_species = set(item.value for item in CropSpecies)
@@ -212,7 +222,7 @@ class Field:
             crop = self.make_supported_crop(crop_reference)
         else:
             try:
-                crop_specifications = self.custom_crop_specifications.get(crop_reference)
+                crop_specifications = deepcopy(self.custom_crop_specifications.get(crop_reference))
             except KeyError:
                 raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}',"
                                f"received specifications for '{self.custom_crop_specifications.keys()}' crop types.")
