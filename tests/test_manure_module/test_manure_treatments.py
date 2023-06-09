@@ -5,8 +5,8 @@ from typing import Union
 import pytest
 from mock.mock import PropertyMock
 from mock.mock import call
-from pytest import approx
 from pytest_mock import MockFixture
+from pytest import approx
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
@@ -1832,7 +1832,15 @@ def test_anaerobic_lagoon_calc_abc(mocker: MockFixture) -> None:
     assert actual_c == expected_c
 
 
-def test_anaerobic_lagoon_width(mocker: MockFixture) -> None:
+@pytest.mark.parametrize("a,b,c", [
+    # discriminant > 0
+    (2.0, 6.0, 4.0),
+    # discriminant == 0
+    (2.0, 4.0, 2.0),
+    # discriminant < 0
+    (2.0, 2.0, 2.0),
+])
+def test_anaerobic_lagoon_width(a, b, c, mocker: MockFixture) -> None:
     """Unit test for lagoon_width() in anaerobic_lagoon.py."""
     # Arrange
     anaerobic_lagoon = AnaerobicLagoon(
@@ -1840,20 +1848,26 @@ def test_anaerobic_lagoon_width(mocker: MockFixture) -> None:
         time=mocker.MagicMock(),
         manure_treatment_config=mocker.MagicMock(),
     )
-    a, b, c = 2.0, 10.0, 4.0
+
     patch_for_calc_abc = mocker.patch.object(
         anaerobic_lagoon,
         '_calc_abc',
         return_value=(a, b, c)
     )
-    expected_anaerobic_lagoon_width = (-b + (b ** 2 - 4 * a * c) ** 0.5) / (2 * a)
+
+    discriminant = (b ** 2) - (4 * a * c)
 
     # Act
     actual_anaerobic_lagoon_width = anaerobic_lagoon.lagoon_width
 
     # Assert
     patch_for_calc_abc.assert_called_once()
-    assert actual_anaerobic_lagoon_width == approx(expected_anaerobic_lagoon_width)
+
+    if discriminant < 0:
+        assert actual_anaerobic_lagoon_width == 0.0
+    else:
+        assert actual_anaerobic_lagoon_width == \
+               approx(max((-b + discriminant ** 0.5) / (2 * a), (-b - discriminant ** 0.5) / (2 * a)))
 
 
 def test_anaerobic_lagoon_length(mocker: MockFixture) -> None:
