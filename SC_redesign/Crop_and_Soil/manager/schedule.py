@@ -1,5 +1,5 @@
 from typing import List, Any
-from copy import deepcopy
+from copy import copy
 
 
 """
@@ -161,7 +161,7 @@ class Schedule:
         for difference in in_pattern_differences:
             differences.append(pattern[difference] - pattern[difference - 1])
 
-        full_pattern = deepcopy(pattern)
+        full_pattern = copy(pattern)
         differences_index = 0
         number_of_new_values = range(repeat * len(pattern))
         for _new_value in number_of_new_values:
