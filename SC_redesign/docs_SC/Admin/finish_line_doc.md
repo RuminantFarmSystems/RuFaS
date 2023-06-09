@@ -58,7 +58,7 @@ so there is a need to make sure all these processes are coordinated between Crop
 #### Fertilizer
 Fertilizer application and update routines have already been implemented, but are contained in 
 `soil/phosphorus_cycling`.
-- [ ] Write a fertilizer module at the level of `Field`.
+- [x] Write a fertilizer module at the level of `Field`.
     - This module will, for now, be a wrapper for the existing fertilizer routines in `soil/phosphorus_cycling`, with 
     the understanding that the functionality will eventually be moved to the level of `Field` after delivery of v1 Crop 
     and Soil module.
@@ -76,7 +76,7 @@ nearly identical for both modules.
 Certain types of events, (Crop planting/harvesting, soil amendments) need to be scheduled by the user to occur over the
 run of the simulation.
 - Crop planting and harvesting.
-  - [ ] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
+  - [x] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
   - Integrate crop scheduler and execution of events into `Field` methods.
     - [x] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
     all planting events that should happen call `plant_crop()` on them. - 1 point

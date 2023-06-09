@@ -5,6 +5,7 @@ from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
 from typing import Optional, List, Dict, Tuple
 from math import exp
@@ -45,6 +46,10 @@ class Field:
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
         """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
+
+        # Soil amendment attributes
+        self.fertilizer_applicator = FertilizerApplication(self.soil)
+        """Provides interface for adding fertilizer to the field."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""

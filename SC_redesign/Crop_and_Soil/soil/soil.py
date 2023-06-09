@@ -9,12 +9,11 @@ from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
 from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
 from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure_application import ManureApplication
 from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
 
 
 class Soil:
-    def __init__(self, soil_data: Optional[SoilData], field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """Creates a Soil object based on a SoilData object.
 
         Parameters
@@ -38,9 +37,6 @@ class Soil:
         """Process component that tracks and updates the temperatures within the soil profile"""
         self.phosphorus_cycling = PhosphorusCycling(self.data)
         """Process component managing phosphorus on top of and in the soil profile"""
-        self.manure_applicator = ManureApplication(self.data)
-        """Process component that provides interface for adding manure to a field
-            TODO: move this component up into a higher level, more sensible module - Issue #433"""
         self.carbon_cycling = CarbonCycling(self.data)
         """Process component that handles carbon cycling (through decomposition) in the soil."""
         # TODO: need to add phosphorus, manure, and carbon cycling main methods methods to the soil methods.
