@@ -106,8 +106,8 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
                                initial_water_content: List[float],
                                initial_nitrates_total: List[float]) -> None:
     """Tests that annual variables were sent correctly through OutputManager"""
-    field_data_1 = FieldData(name=" name 1 ")
-    field_data_2 = FieldData(name=" name 2 ")
+    field_data_1 = FieldData(name="name 1")
+    field_data_2 = FieldData(name="name 2")
     crop_data_1 = CropData(name="crop 1")
     crop_data_2 = CropData(name="crop 2")
     crop_1 = Crop(crop_data_1)
@@ -140,43 +140,43 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
     print(om.variables_pool)
     pool = om.variables_pool
     # Testing water and nitrates changes
-    assert len(pool["field:' name 1 '.annual_water_content_change"]['info_maps']) == 3
-    assert pool["field:' name 1 '.annual_water_content_change"]['values'] == [0, -1, -2]
-    assert len(pool["field:' name 2 '.annual_water_content_change"]['info_maps']) == 3
-    assert pool["field:' name 2 '.annual_water_content_change"]['values'] == [0, -1, -2]
+    assert len(pool["field:'name 1'.annual_water_content_change"]['info_maps']) == 3
+    assert pool["field:'name 1'.annual_water_content_change"]['values'] == [0, -1, -2]
+    assert len(pool["field:'name 2'.annual_water_content_change"]['info_maps']) == 3
+    assert pool["field:'name 2'.annual_water_content_change"]['values'] == [0, -1, -2]
 
-    assert len(pool["field:' name 1 '.annual_nitrates_content_change"]['info_maps']) == 3
-    assert pool["field:' name 1 '.annual_nitrates_content_change"]['values'] == [4.3, 3.2, 2.0]
-    assert len(pool["field:' name 2 '.annual_nitrates_content_change"]['info_maps']) == 3
-    assert pool["field:' name 2 '.annual_nitrates_content_change"]['values'] == [4.3, 3.2, 2.0]
+    assert len(pool["field:'name 1'.annual_nitrates_content_change"]['info_maps']) == 3
+    assert pool["field:'name 1'.annual_nitrates_content_change"]['values'] == [4.3, 3.2, 2.0]
+    assert len(pool["field:'name 2'.annual_nitrates_content_change"]['info_maps']) == 3
+    assert pool["field:'name 2'.annual_nitrates_content_change"]['values'] == [4.3, 3.2, 2.0]
     # Testing field variables
-    assert len(pool["field:' name 1 '.annual_irrigation_water_use_total"]['info_maps']) == 3
-    assert pool["field:' name 1 '.annual_irrigation_water_use_total"]['values'] == [1.3, 2.4, 1.22]
-    assert len(pool["field:' name 2 '.annual_irrigation_water_use_total"]['info_maps']) == 3
-    assert pool["field:' name 2 '.annual_irrigation_water_use_total"]['values'] == [1.3, 2.4, 1.22]
+    assert len(pool["field:'name 1'.annual_irrigation_water_use_total"]['info_maps']) == 3
+    assert pool["field:'name 1'.annual_irrigation_water_use_total"]['values'] == [1.3, 2.4, 1.22]
+    assert len(pool["field:'name 2'.annual_irrigation_water_use_total"]['info_maps']) == 3
+    assert pool["field:'name 2'.annual_irrigation_water_use_total"]['values'] == [1.3, 2.4, 1.22]
 
     # Testing soil variables
-    assert len(pool["field:' name 1 '.annual_soil_evaporation_total"]['info_maps']) == 3
-    assert pool["field:' name 1 '.annual_soil_evaporation_total"]['values'] == [1.5, 2.4, 3.8]
+    assert len(pool["field:'name 1'.annual_soil_evaporation_total"]['info_maps']) == 3
+    assert pool["field:'name 1'.annual_soil_evaporation_total"]['values'] == [1.5, 2.4, 3.8]
 
-    assert len(pool["field:' name 2 '.annual_soil_evaporation_total"]['info_maps']) == 3
-    assert pool["field:' name 2 '.annual_soil_evaporation_total"]['values'] == [1.5, 2.4, 3.8]
+    assert len(pool["field:'name 2'.annual_soil_evaporation_total"]['info_maps']) == 3
+    assert pool["field:'name 2'.annual_soil_evaporation_total"]['values'] == [1.5, 2.4, 3.8]
 
     # Testing layer data
-    assert len(pool["field:' name 1 ',layer_index:'0'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 1 ',layer_index:'1'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 1 ',layer_index:'2'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 1 ',layer_index:'3'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 2 ',layer_index:'0'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 2 ',layer_index:'1'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 2 ',layer_index:'2'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
-    assert len(pool["field:' name 2 ',layer_index:'3'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 1',layer_index:'0'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 1',layer_index:'1'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 1',layer_index:'2'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 1',layer_index:'3'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 2',layer_index:'0'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 2',layer_index:'1'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 2',layer_index:'2'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
+    assert len(pool["field:'name 2',layer_index:'3'.annual_denitrified_nitrogen_total"]['info_maps']) == 3
 
-    assert pool["field:' name 1 ',layer_index:'0'.annual_denitrified_nitrogen_total"]['values'] == [1.2, 1.2, 1.2]
-    assert pool["field:' name 1 ',layer_index:'1'.annual_denitrified_nitrogen_total"]['values'] == [7.7, 7.7, 7.7]
-    assert pool["field:' name 1 ',layer_index:'2'.annual_denitrified_nitrogen_total"]['values'] == [9.24, 9.24, 9.24]
-    assert pool["field:' name 1 ',layer_index:'3'.annual_denitrified_nitrogen_total"]['values'] == [1.31, 1.31, 1.31]
-    assert pool["field:' name 2 ',layer_index:'0'.annual_denitrified_nitrogen_total"]['values'] == [1.2, 1.2, 1.2]
-    assert pool["field:' name 2 ',layer_index:'1'.annual_denitrified_nitrogen_total"]['values'] == [7.7, 7.7, 7.7]
-    assert pool["field:' name 2 ',layer_index:'2'.annual_denitrified_nitrogen_total"]['values'] == [9.24, 9.24, 9.24]
-    assert pool["field:' name 2 ',layer_index:'3'.annual_denitrified_nitrogen_total"]['values'] == [1.31, 1.31, 1.31]
+    assert pool["field:'name 1',layer_index:'0'.annual_denitrified_nitrogen_total"]['values'] == [1.2, 1.2, 1.2]
+    assert pool["field:'name 1',layer_index:'1'.annual_denitrified_nitrogen_total"]['values'] == [7.7, 7.7, 7.7]
+    assert pool["field:'name 1',layer_index:'2'.annual_denitrified_nitrogen_total"]['values'] == [9.24, 9.24, 9.24]
+    assert pool["field:'name 1',layer_index:'3'.annual_denitrified_nitrogen_total"]['values'] == [1.31, 1.31, 1.31]
+    assert pool["field:'name 2',layer_index:'0'.annual_denitrified_nitrogen_total"]['values'] == [1.2, 1.2, 1.2]
+    assert pool["field:'name 2',layer_index:'1'.annual_denitrified_nitrogen_total"]['values'] == [7.7, 7.7, 7.7]
+    assert pool["field:'name 2',layer_index:'2'.annual_denitrified_nitrogen_total"]['values'] == [9.24, 9.24, 9.24]
+    assert pool["field:'name 2',layer_index:'3'.annual_denitrified_nitrogen_total"]['values'] == [1.31, 1.31, 1.31]
