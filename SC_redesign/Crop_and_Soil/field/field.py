@@ -12,7 +12,7 @@ from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 from RUFAS.classes import Time
-from copy import deepcopy
+from copy import copy
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -71,8 +71,6 @@ class Field:
 
         Details: **All the logic (after setup) will go in this function**
         """
-        # What needs to be done today?
-        # self.check_schedule(day, year)
 
         # --- Soil Management---
         # nutrient amendments
@@ -199,7 +197,8 @@ class Field:
     # <editor-fold desc="--- Crop Management Methods ---">
     def plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool) -> None:
         """
-        Takes a PlantingEvent and creates a new Crop based on it, then adds it to the field's list of current crops.
+        Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
+        list of current crops.
 
         Parameters
         ----------
@@ -231,7 +230,7 @@ class Field:
             crop = self.make_supported_crop(crop_reference)
         else:
             try:
-                crop_specifications = deepcopy(self.custom_crop_specifications[crop_reference])
+                crop_specifications = copy(self.custom_crop_specifications[crop_reference])
             except KeyError:
                 raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}', "
                                f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
