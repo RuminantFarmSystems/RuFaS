@@ -240,7 +240,16 @@ class AnaerobicLagoon(BaseManureTreatment):
         abc = self._calc_abc()
         a, b, c = abc[0], abc[1], abc[2]
         discriminant = b ** 2 - 4 * a * c
-        return (-b + discriminant ** 0.5) / (2 * a)
+
+        if discriminant < 0:
+            # raise ValueError("No real solution exists for these parameters.")
+            return 0.0
+        else:
+            solution = (-b + discriminant ** 0.5) / (2 * a)
+            if solution < 0:
+                solution = (-b - discriminant ** 0.5) / (2 * a)
+            # Ensuring that the solution is a float
+            return float(solution.real)
 
     @property
     def lagoon_length(self):
