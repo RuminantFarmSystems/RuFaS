@@ -1442,8 +1442,7 @@ def mock_generic_cow(mocker, mock_cow_args) -> Cow:
 
 
 def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
-    """Unit test for function _presynch_update in file routines/animal/life_cycle/cow.py"""
-
+    """Unit test for function set_breed_index in file routines/animal/life_cycle/cow.py"""
     mock_holstein.set_breed_index()
     assert mock_holstein.breed_index == 0
     assert mock_holstein.breed == 'HO'
@@ -1456,6 +1455,24 @@ def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow:
     assert mock_generic_cow.breed_index == 0
     assert mock_generic_cow.breed != 'HO'
     assert mock_generic_cow.breed != 'JE'
+
+
+def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
+    """Unit test for function set_parity_index in file routines/animal/life_cycle/cow.py"""
+    mock_holstein.calves = 4
+    mock_holstein.set_parity_index()
+    assert mock_holstein.calves == 4
+    assert mock_holstein.parity_index == 2
+
+    mock_jersey.calves = 2
+    mock_jersey.set_parity_index()
+    assert mock_jersey.calves == 2
+    assert mock_jersey.parity_index == 1
+
+    mock_generic_cow.calves = 1
+    mock_generic_cow.set_parity_index()
+    assert mock_generic_cow.calves == 1
+    assert mock_generic_cow.parity_index == 0
 
 
 def test_get_feed_data_from_feed_ids() -> None:
