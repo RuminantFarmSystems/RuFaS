@@ -5,6 +5,7 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 from typing import Any, Dict
+from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -1399,7 +1400,7 @@ def test_feed_nutrients():
 
 
 @pytest.fixture
-def mock_cow_args(mocker) -> Dict[str, Any]:
+def mock_cow_args() -> Dict[str, Any]:
     cow_args = {
         "birth_date": 0,
         "days_born": 0,
@@ -1413,13 +1414,16 @@ def mock_cow_args(mocker) -> Dict[str, Any]:
         "tai_method_h": "OvSynch 56",
         "resynch_method": "TAIafterPD",
         "synch_ed_method_h": "example",
-        "wean_day": 4
+        "wean_day": 4,
+        "wood_l": 0,
+        "wood_m": 0,
+        "wood_n": 0
     }
     return cow_args
 
 
 @pytest.fixture
-def mock_AnimalBase_config(mocker) -> AnimalBase.config:
+def mock_AnimalBase_config() -> AnimalBase.config:
     AnimalBase.config = MagicMock()
     AnimalBase.config.update({'lactation_curve': 'wood'})
     AnimalBase.config.update({
@@ -1434,7 +1438,7 @@ def mock_AnimalBase_config(mocker) -> AnimalBase.config:
 
 
 @pytest.fixture
-def mock_holstein(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+def mock_holstein(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
     AnimalBase.config = mock_AnimalBase_config
     mock_cow_args["breed"] = "HO"
     mock_holstein_cow = Cow(mock_cow_args)
@@ -1444,7 +1448,7 @@ def mock_holstein(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_ar
 
 
 @pytest.fixture
-def mock_jersey(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+def mock_jersey(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
     AnimalBase.config = mock_AnimalBase_config
     mock_cow_args["breed"] = "JE"
     mock_jersey_cow = Cow(mock_cow_args)
@@ -1454,7 +1458,7 @@ def mock_jersey(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args
 
 
 @pytest.fixture
-def mock_generic_cow(mocker, mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+def mock_generic_cow(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
     AnimalBase.config = mock_AnimalBase_config
     mock_cow_args["breed"] = "Generic"
     mock_generic = Cow(mock_cow_args)
@@ -1494,27 +1498,35 @@ def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow
     assert mock_generic_cow.parity_index == 0
 
 
-def test_set_lactation_curve_params(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow,
-                                    mocker: MockerFixture, mock_AnimalBase_config: AnimalBase.config) -> None:
+@pytest.mark.parametrize('wood_l, wood_m, wood_n', [
+        (25.0, 0.24, 0.0035),
+    ])
+def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> None:
     """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
-    # mock_holstein has parity_index 2, breed_index 0
-    AnimalBase.config = mock_AnimalBase_config
-    mock_holstein.set_breed_index()
-    mock_holstein.set_parity_index()
-    mock_holstein.set_lactation_curve_params()
-    # assert mock_holstein.wood_l == 23.81
-    # assert mock_holstein.wood_m == 0.244
-    # assert mock_holstein.wood_n == 0.0036
 
-#     patch_determine_param_value_wood_l = mocker.patch('RUFAS.routines.animal.life_cycle.cow.determine_param_value',
-#                                                       return_value=1)
-#     patch_determine_param_value_wood_m = mocker.patch('RUFAS.routines.animal.life_cycle.cow.determine_param_value',
-#                                                       return_value=2)
-#     patch_determine_param_value_wood_n = mocker.patch('RUFAS.routines.animal.life_cycle.cow.determine_param_value',
-#                                                       return_value=3)
-#     mock_holstein.set_lactation_curve_params()
-#     # mock_jersey has parity_index 2, breed_index 0
-#     # mock_generic_cow has parity_index 2, breed_index 0
+    with patch('numpy.random.normal') as mock_normal:
+
+        mock_normal.side_effect = [wood_l, wood_m, wood_n]
+
+        mock_cow_args["breed"] = "HO"
+        mock_cow = Cow(mock_cow_args)
+        mock_cow.calves = 3
+
+        AnimalBase.config = {
+            'lactation_curve': 'wood',
+            'wood_l': [[1, 2], [3, 4]],
+            'wood_l_std': [[0.1, 0.2], [0.3, 0.4]],
+            'wood_m': [[5, 6], [7, 8]],
+            'wood_m_std': [[0.5, 0.6], [0.7, 0.8]],
+            'wood_n': [[9, 10], [11, 12]],
+            'wood_n_std': [[0.9, 1.0], [1.1, 1.2]],
+        }
+
+        mock_cow.set_lactation_curve_params()
+
+        assert mock_cow.wood_l == wood_l
+        assert mock_cow.wood_m == wood_m
+        assert mock_cow.wood_n == wood_n
 
 
 def test_get_feed_data_from_feed_ids() -> None:
