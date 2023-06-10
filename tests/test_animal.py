@@ -4,6 +4,7 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
+import math
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
@@ -1527,6 +1528,28 @@ def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> No
         assert mock_cow.wood_l == wood_l
         assert mock_cow.wood_m == wood_m
         assert mock_cow.wood_n == wood_n
+
+
+@pytest.mark.parametrize('lactation_curve, wood_l, wood_m, wood_n, days_in_milk, expected_milk', [
+        ('wood', 16.13, 0.235, 0.0019, 100, 39.366),
+        ('wood', 23.81, 0.244, 0.0036, 150, 47.120),
+    ])
+def test_calculate_daily_milk_produced(lactation_curve, wood_l, wood_m, wood_n, days_in_milk,
+                                       expected_milk, mock_cow_args) -> None:
+    """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+    AnimalBase.config = MagicMock()
+    mock_cow_args["breed"] = "HO"
+    mock_cow = Cow(mock_cow_args)
+    mock_cow.calves = 3
+    mock_cow.lactation_curve = lactation_curve
+    mock_cow.wood_l = wood_l
+    mock_cow.wood_m = wood_m
+    mock_cow.wood_n = wood_n
+    mock_cow.days_in_milk = days_in_milk
+
+    daily_milk_produced = mock_cow.calculate_daily_milk_produced()
+
+    assert math.isclose(daily_milk_produced, expected_milk, rel_tol=1e-3)
 
 
 def test_get_feed_data_from_feed_ids() -> None:
