@@ -133,3 +133,17 @@ class ManureEvent(Event):
         self.field_coverage = field_coverage
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
+
+    def __eq__(self, other):
+        """Overrides the equality operator for ManureEvent objects."""
+        correct_type = isinstance(other, ManureEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for ManureEvent objects."""
+        str_representation = str(self.year) + str(self.day) + str(self.nitrogen_mass) + str(self.phosphorus_mass) + \
+            str(self.field_coverage) + str(self.application_depth) + str(self.surface_remainder_fraction)
+        return hash(str_representation)
