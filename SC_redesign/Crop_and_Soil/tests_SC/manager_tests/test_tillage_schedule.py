@@ -72,8 +72,8 @@ def test_init_tillage_schedule(depths: List[float], incorp_fracs: List[float], m
 @pytest.mark.parametrize("depths,incorp_fracs,mix_fracs,years,days,skip,repeat,expected", [
     ([200, 200, 300], [0.5], [0.45, 0.45, 0.47], [1990, 1990, 1990], [90, 120, 200], 0, 1, [
         TillageEvent(200, 0.5, 0.45, 1990, 90), TillageEvent(200, 0.5, 0.45, 1990, 120),
-        TillageEvent(200, 0.5, 0.47, 1990, 200), TillageEvent(200, 0.5, 0.45, 1991, 90),
-        TillageEvent(200, 0.5, 0.45, 1991, 120), TillageEvent(200, 0.5, 0.47, 1991, 200)]),
+        TillageEvent(300, 0.5, 0.47, 1990, 200), TillageEvent(200, 0.5, 0.45, 1991, 90),
+        TillageEvent(200, 0.5, 0.45, 1991, 120), TillageEvent(300, 0.5, 0.47, 1991, 200)]),
     ([150], [0.3], [0.6], [1993, 1996], [100], 2, 2, [TillageEvent(150, 0.3, 0.6, 1993, 100),
                                                       TillageEvent(150, 0.3, 0.6, 1996, 100),
                                                       TillageEvent(150, 0.3, 0.6, 1999, 100),
