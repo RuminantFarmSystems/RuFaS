@@ -36,8 +36,15 @@ class Event:
     def __eq__(self, other):
         """Overrides the equality operator for Event objects."""
         correct_type = isinstance(other, Event)
-        equal_fields = other.year == self.year and other.day == self.day
-        return correct_type and equal_fields
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for Event objects."""
+        str_representation = str(self.year) + str(self.day)
+        return hash(str_representation)
 
     def occurs_today(self, time: Time) -> bool:
         """
