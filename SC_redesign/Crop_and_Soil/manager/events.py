@@ -123,7 +123,7 @@ class ManureEvent(Event):
             Fraction of the field covered by this manure application (unitless)
         application_depth : float
             Depth that manure is injected into the soil at (mm)
-        surface_remainder_fraction
+        surface_remainder_fraction : float
             Fraction of manure applied that remains on the soil surface (unitless)
 
         """

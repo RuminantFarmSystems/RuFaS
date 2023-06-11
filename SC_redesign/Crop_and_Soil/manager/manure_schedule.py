@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Optional, Union
 
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import ManureEvent
@@ -11,9 +11,11 @@ a field.
 
 class ManureSchedule(Schedule):
 
-    def __init__(self, name: str, years: [List], days: [List], nitrogen_masses: List[float],
-                 phosphorus_masses: List[float], field_coverages: List[float], application_depths: List[float] = None,
-                 surface_remainder_fractions: List[float] = None, pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(self, name: str, years: List[int], days: List[int], nitrogen_masses: List[float],
+                 phosphorus_masses: List[float], field_coverages: List[float],
+                 application_depths: Optional[List[float]] = None,
+                 surface_remainder_fractions: Optional[List[float]] = None, pattern_skip: int = 0,
+                 pattern_repeat: int = 0):
         """
         Creates and validates a manure application schedule.
 
@@ -165,13 +167,13 @@ class ManureSchedule(Schedule):
         return manure_application_events
 
     @staticmethod
-    def _determine_if_all_non_negative_values(values: List[Any]) -> bool:
+    def _determine_if_all_non_negative_values(values: List[Union[int, float]]) -> bool:
         """
         Checks that all values in a list are >= 0.
 
         Parameters
         ----------
-        values : List[Any]
+        values : List[Union[int, float]]
             List of values to be checked.
 
         Returns
