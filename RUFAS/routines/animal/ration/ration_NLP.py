@@ -323,10 +323,10 @@ def phosphorus_constraint(x):
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
-def protien_constraint(x):
+def protein_constraint(x):
     """
-    Sets up the protien requirement constraint in the NLP. Because part of the
-    maintenance requirement for protien contains non-linearity properties, that
+    Sets up the protein requirement constraint in the NLP. Because part of the
+    maintenance requirement for protein contains non-linearity properties, that
     requirement will be calculated in this function. Each calculation has a
     reference to the respective calculation in the pseudocode.
 
@@ -385,7 +385,7 @@ def protien_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
-    # B: PROTIEN REQUIREMENTS:
+    # B: PROTEIN REQUIREMENTS:
     # Maintenance Requirement
     # ---------------------
     # [A.Cow.B.1]-[A.Heifer.B.1]
@@ -508,6 +508,26 @@ def get_ration_vals(x):
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
+# establishing the constraints of the NLP
+constraint_functions = [
+    NEmact_constraint,
+    NEl_constraint,
+    NEgact_constraint,
+    calcium_constraint,
+    phosphorus_constraint,
+    protein_constraint,
+    NDF_constraint_1,
+    NDF_constraint_2,
+    forage_NDF_constraint,
+    fat_constraint,
+    DMI_constraint_upper,
+    DMI_constraint_lower
+]
+
+cow_cons = [{'type': 'ineq', 'fun': func} for func in constraint_functions]
+
+heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [NEl_constraint, DMI_constraint_lower]]
+
 def optimize(animal_combination):
     """
     Calls the objective function and constraint functions and formulates
@@ -532,22 +552,6 @@ def optimize(animal_combination):
     for i in range(len(limit)):
         bnds.append((0, (limit[i] / 3) + 0.0001))
     bnds = tuple(bnds)
-
-    # establishing the constraints of the NLP
-    con1 = {'type': 'ineq', 'fun': NEmact_constraint}
-    con2 = {'type': 'ineq', 'fun': NEl_constraint}
-    con3 = {'type': 'ineq', 'fun': NEgact_constraint}
-    con4 = {'type': 'ineq', 'fun': calcium_constraint}
-    con5 = {'type': 'ineq', 'fun': phosphorus_constraint}
-    con6 = {'type': 'ineq', 'fun': protien_constraint}
-    con7 = {'type': 'ineq', 'fun': NDF_constraint_1}
-    con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
-    con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
-    con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
-    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
 
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
     if str(animal_combination) in ['AnimalCombination.LAC_COW']:
