@@ -12,6 +12,7 @@ from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 from RUFAS.classes import Time
+from RUFAS.output_manager import OutputManager
 from copy import copy
 
 # TODO: delete/replace the note block below once satisfied with the design
@@ -22,6 +23,8 @@ in an agricultural field.
 
 Note that some of the field-level attributes will be tracked by the FieldData class
 """
+
+om = OutputManager()
 
 
 class Field:
@@ -278,7 +281,7 @@ class Field:
         self.crops.append(crop)
         self._reset_crop_field_coverage_fractions()
 
-    def harvest_crop(self, crop_reference: str, harvest_operation: str) -> None:
+    def harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -288,8 +291,23 @@ class Field:
             Name used to get the specifications for the crop to be harvested.
         harvest_operation : str
             Name of the harvest operation to be performed on the referenced crop.
+        time : Time
+            Object containing the current day and year of the simulation.
 
         """
+        crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
+
+        info_map = {"class": self.__class__.__name__, "function": self.harvest_crop.__name__,
+                    "prefix": f"Field:'{self.field_data.name}'.",
+                    "date": {"Day": time.day, "Year": time.calendar_year}}
+        if len(crops_to_be_harvested) > 1:
+            om.add_warning("Harvest Warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
+        elif len(crops_to_be_harvested) < 1:
+            om.add_warning("Harvest Warning", "No crop found to be harvested by a HarvestEvent.", info_map)
+
+        for crop in crops_to_be_harvested:
+            harvest_operation_enum = HarvestOperation(harvest_operation)
+            crop.crop_management.manage_harvest(harvest_operation_enum)
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """
