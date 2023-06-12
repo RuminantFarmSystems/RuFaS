@@ -21,3 +21,17 @@ def test_occurs_today(year: int, day: int, current_year: int, current_day: int, 
     actual = event.occurs_today(mocked_time)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize("year1,day1,,year2,day2,expected", [
+    (1, 240, 1, 240, True),
+    (2, 120, 3, 120, False),
+    (4, 220, 4, 240, False),
+    (5, 150, 6, 200, False)
+])
+def test_event_equality(year1: int, day1: int, year2: int, day2: int, expected: bool) -> None:
+    """Tests that equality is tested correctly between Event objects."""
+    event1 = Event(year1, day1)
+    event2 = Event(year2, day2)
+    actual = event1 == event2
+    assert actual == expected
