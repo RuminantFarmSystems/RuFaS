@@ -84,6 +84,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field._create_and_update_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
     field.harvest_crop = MagicMock()
     field._harvest_heat_scheduled_crops = MagicMock()
+    field._remove_dead_crops = MagicMock()
     field._reset_crop_field_coverage_fractions = MagicMock()
 
     harvest_crop_calls = []
@@ -96,6 +97,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field._create_and_update_events.assert_called_once_with(all_harvest_events, mocked_time)
     field.harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
+    field._remove_dead_crops.assert_called_once()
     field._reset_crop_field_coverage_fractions.assert_called_once()
 
 
@@ -255,13 +257,48 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
     assert actual['values'].__contains__(expected_message)
 
 
+def test_remove_dead_crops() -> None:
+    """
+    Tests that dead crops are removed from a field correctly.
+    This test contains four cases: there are no crops in the field, some crops in the field are dead, no crops in the
+    field are dead, and all crops in the field are dead.
+    """
+    field_1 = Field()
+    field_1._remove_dead_crops()
+    assert field_1.crops == []
+
+    field_2 = Field()
+    crop_1 = Crop()
+    crop_1.data.is_alive = False
+    crop_2 = Crop()
+    crop_3 = Crop()
+    field_2.crops = [crop_1, crop_2, crop_3]
+    field_2._remove_dead_crops()
+    assert field_2.crops == [crop_2, crop_3]
+
+    field_3 = Field()
+    crop_4 = Crop()
+    crop_5 = Crop()
+    crop_6 = Crop()
+    field_3.crops = [crop_4, crop_5, crop_6]
+    field_3._remove_dead_crops()
+    assert field_3.crops == [crop_4, crop_5, crop_6]
+
+    field_4 = Field()
+    crop_7 = Crop()
+    crop_8 = Crop()
+    field_4.crops = [crop_7, crop_8]
+    field_4._remove_dead_crops()
+    assert field_4.crops == [crop_7, crop_8]
+
+
 @pytest.mark.parametrize("crop_list,expected_field_proportion", [
     ([Crop(), Crop(), Crop()], (1 / 3)),
     ([Crop()], 1.0),
     ([Crop(), Crop(), Crop(), Crop()], 0.25),
     ([], None)
 ])
-def test_rest_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
+def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
     """Tests that crops in a field correctly have their proportion reset when there are other crops present."""
     field = Field()
     field.crops = crop_list

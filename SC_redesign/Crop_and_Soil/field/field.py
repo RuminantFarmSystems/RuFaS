@@ -194,6 +194,8 @@ class Field:
 
         self._harvest_heat_scheduled_crops()
 
+        self._remove_dead_crops()
+
         self._reset_crop_field_coverage_fractions()
 
     def _harvest_heat_scheduled_crops(self) -> None:
@@ -304,12 +306,27 @@ class Field:
         time : Time
             Object containing the current day and year of the simulation.
 
+        Raises
+        ------
+        Warning
+            If multiple crops are found that will be harvested by a single harvest operation.
+        Warning
+            If no crop is found to be harvested from the field's currently active crops.
+
+        Notes
+        -----
+        This method raises two different warnings, one if multiple active crops share the same id, and one if no active
+        crop is found with an id that matches the given crop reference. These are both raised as warnings and not errors
+        (which would stop the simulation run) because they could both plausibly happen in a simulation run. The first
+        scenario could happen if someone were to specify multiple plantings of the same crop in the same year and
+        schedule them to be harvested together, and the second could happen if there was a catastrophic weather event
+        that killed off a crop before it could be harvested.
+
         """
         crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
 
         info_map = {"class": self.__class__.__name__, "function": self.harvest_crop.__name__,
-                    "prefix": f"Field:'{self.field_data.name}'",
-                    "date": {"Day": time.day, "Year": time.calendar_year}}
+                    "prefix": f"Field:'{self.field_data.name}'", "date": {"Day": time.day, "Year": time.calendar_year}}
         if len(crops_to_be_harvested) > 1:
             om.add_warning("harvest_warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
         elif len(crops_to_be_harvested) < 1:
@@ -318,6 +335,12 @@ class Field:
         for crop in crops_to_be_harvested:
             harvest_operation_enum = HarvestOperation(harvest_operation)
             crop.crop_management.manage_harvest(harvest_operation_enum)
+
+    def _remove_dead_crops(self) -> None:
+        """
+        This method removes any crops from the field's list of active crops if they are no longer alive.
+        """
+        self.crops = [crop for crop in self.crops if crop.data.is_alive]
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """
