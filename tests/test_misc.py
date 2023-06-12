@@ -905,24 +905,27 @@ def test_filter_variables_pool(
     assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
     assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
 
-    # Test case 5: filter_keys with different cases than variables_pool
-    filter_keys = ["KeY1", "kEY2"]
-    exclude_filter_keys = ["exclude", "KeY1", "kEY2"]
+    # Test case 5: filter_keys with pattern matching
+    mock_output_manager.variables_pool = {
+        "apple.key1": "value1",
+        "banana.key2": "value2",
+        "apple.banana.key3": "value3",
+        "banana.apple.key4": "value4",
+        "cherry.apple.key5": "value5",
+        "apple.banana.cherry.key6": "value6",
+        "key7.cherry.banana": "value7"
+    }
+    filter_keys = ["^che.*", ".*key2$"]
+    exclude_filter_keys = ["exclude", ".*apple.*"]
 
     expected_result = {
-        "key1": "value1",
-        "key2": "value2"
+        "banana.key2": "value2",
+        "cherry.apple.key5": "value5"
     }
     expected_result_exclude = {
-        "key3": "value3"
+        "banana.key2": "value2",
+        "key7.cherry.banana": "value7"
     }
-
-    assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
-    assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
-
-    # Test case 6: filter_keys with partial matches
-    filter_keys = ["y1", "ey2"]
-    exclude_filter_keys = ["exclude", "y1", "ey2"]
 
     assert mock_output_manager._filter_variables_pool(filter_keys) == expected_result
     assert mock_output_manager._filter_variables_pool(exclude_filter_keys) == expected_result_exclude
