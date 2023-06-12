@@ -15,8 +15,6 @@ from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
 
-import pdb
-
 # TODO: delete/replace the note block below once satisfied with the design
 """
 The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm
