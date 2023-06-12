@@ -1,7 +1,7 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
@@ -28,7 +28,7 @@ class Field:
     """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 plantings: Optional[List[PlantingEvent]] = None,
+                 plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
                  custom_crop_specifications: Optional[Dict[str, Dict]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
@@ -44,6 +44,9 @@ class Field:
 
         self.planting_events: List[PlantingEvent] = plantings
         """List of all planting events that will occur over the run of the simulation in this field."""
+
+        self.harvest_events: List[HarvestEvent] = harvestings
+        """List of all harvesting events that will occur over the run of the simulation in the field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
         """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
@@ -89,6 +92,9 @@ class Field:
         # --- Crop Management ---
         # planting
         self.check_crop_planting_schedule(time)
+
+        # Harvesting.
+        self.check_crop_harvest_schedule(time)
 
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
@@ -162,6 +168,36 @@ class Field:
         self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
         for event in todays_planting_events:
             self.plant_crop(event.crop_reference, event.use_heat_scheduled_harvest)
+
+    def check_crop_harvest_schedule(self, time: Time) -> None:
+        """
+        Checks for all crops for potential harvests that may happen on the current day.
+
+        Parameters
+        ----------
+        time : Time
+            Time object containing the current day and year of the simulation.
+
+        References
+        ----------
+        SWAT Theoretical documentation section 5:1.1.1 (Heat Scheduling)
+
+        Notes
+        -----
+        This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It also checks if any of
+        the active crops are to be harvested using heat scheduling, and if so checks they have met the harvesting
+        threshold.
+
+        """
+        self.harvest_events, todays_harvest_events = self._create_and_update_events(self.harvest_events, time)
+        for event in todays_harvest_events:
+            pass
+
+        for crop in self.crops:
+            execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
+                                             crop.data.heat_fraction >= crop.data.harvest_heat_fraction
+            if execute_heat_scheduled_harvest:
+                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
@@ -241,6 +277,19 @@ class Field:
 
         self.crops.append(crop)
         self._reset_crop_field_coverage_fractions()
+
+    def harvest_crop(self, crop_reference: str, harvest_operation: str) -> None:
+        """
+        Performs the specified crop operation on the specified crop.
+
+        Parameters
+        ----------
+        crop_reference : str
+            Name used to get the specifications for the crop to be harvested.
+        harvest_operation : str
+            Name of the harvest operation to be performed on the referenced crop.
+
+        """
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """
