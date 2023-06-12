@@ -1,4 +1,3 @@
-import pdb
 from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
@@ -125,6 +124,7 @@ def test_harvest_heat_scheduled_crops(crops: List[Crop], heat_scheduled: List[bo
             crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_NOKILL)
         else:
             crops[index].crop_management.manage_harvest.assert_not_called()
+
 
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
     ([Event(1990, 120), Event(1990, 200), Event(1993, 100)], 1990, 120,
