@@ -15,6 +15,8 @@ from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
 
+import pdb
+
 # TODO: delete/replace the note block below once satisfied with the design
 """
 The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm
@@ -181,21 +183,31 @@ class Field:
         time : Time
             Time object containing the current day and year of the simulation.
 
-        References
-        ----------
-        SWAT Theoretical documentation section 5:1.1.1 (Heat Scheduling)
-
         Notes
         -----
         This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It also checks if any of
-        the active crops are to be harvested using heat scheduling, and if so checks they have met the harvesting
+        the active crops are to be harvested using heat scheduling, and if so checks if they have met the harvesting
         threshold.
 
         """
         self.harvest_events, todays_harvest_events = self._create_and_update_events(self.harvest_events, time)
         for event in todays_harvest_events:
-            pass
+            self.harvest_crop(event.crop_reference, event.operation, time)
 
+        self._harvest_heat_scheduled_crops()
+
+        self._reset_crop_field_coverage_fractions()
+
+    def _harvest_heat_scheduled_crops(self) -> None:
+        """
+        Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
+        them if they meet the heat threshold.
+
+        References
+        ----------
+        SWAT Theoretical documentation section 5:1.1.1 (Heat Scheduling)
+
+        """
         for crop in self.crops:
             execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
                                              crop.data.heat_fraction >= crop.data.harvest_heat_fraction
