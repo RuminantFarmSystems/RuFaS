@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 from pathlib import Path
+import re
 from typing import Any, Dict, List, Union
 import json
 import os
@@ -383,10 +384,10 @@ class OutputManager(object):
         exclude_keyword = "exclude"
         if filter_keys and filter_keys[exclude_keyword_location] == exclude_keyword:
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
-                    any(filter_key.lower() in key.lower() for filter_key in filter_keys)}
+                    any(re.match(filter_key, key) for filter_key in filter_keys)}
         else:
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if
-                    any(filter_key.lower() in key.lower() for filter_key in filter_keys)}
+                    any(re.match(filter_key, key) for filter_key in filter_keys)}
 
     def save_variables(self, save_path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
