@@ -260,8 +260,6 @@ class Cow(HeiferIII):
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
-            #self.milk_production_reduction = 0.0
-
             return 0, 0, 0
 
         breed_index = 0

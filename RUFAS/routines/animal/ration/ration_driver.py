@@ -10,7 +10,6 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 import collections
 import math
-import statistics as stat
 from typing import Callable
 from typing import List
 import numpy as np
@@ -326,28 +325,24 @@ class Requirements:
             List of milk crude protein content of the animals in the pen.
         milk_production_reduction: List[float]
             list of milk_production_reduction values for all animals in the pen
-        use_the_mean: bool
-            True is mean should be used, False if percentile should be used.
-            TODO: implement this function in an elegant manner: 
-                e.g. should we move both the percentile value and decision to the constants file?
         """
-        # this will be set in the argument, here hardcoded to show the rough logic and keep using the mean
+        # in future will be set in the argument, here hardcoded to show the rough logic and keep using the mean
         calc_method = 'mean'
         if calc_method == 'mean':
             # populating the class variables as an average across cows for each requirement
-            self.NEmaint = stat.mean(NEmaint)
-            self.NEa = stat.mean(NEa)
-            self.NEg = stat.mean(NEg)
-            self.NEpreg = stat.mean(NEpreg)
-            self.NEl = stat.mean(NEl)
-            self.MP_req = stat.mean(MP_req)
-            self.Ca_req = stat.mean(Ca_req)
-            self.P_req = stat.mean(P_req)
-            self.DMIest = stat.mean(DMIest)
-            self.avg_BW = stat.mean(BW)
-            self.avg_milk = stat.mean(milk)
-            self.avg_CP_milk = stat.mean(CP_milk)
-            self.avg_milk_production_reduction = stat.mean(milk_production_reduction)
+            self.NEmaint = np.mean(NEmaint)
+            self.NEa = np.mean(NEa)
+            self.NEg = np.mean(NEg)
+            self.NEpreg = np.mean(NEpreg)
+            self.NEl = np.mean(NEl)
+            self.MP_req = np.mean(MP_req)
+            self.Ca_req = np.mean(Ca_req)
+            self.P_req = np.mean(P_req)
+            self.DMIest = np.mean(DMIest)
+            self.avg_BW = np.mean(BW)
+            self.avg_milk = np.mean(milk)
+            self.avg_CP_milk = np.mean(CP_milk)
+            self.avg_milk_production_reduction = np.mean(milk_production_reduction)
         else:
             # here we'd implement another method, e.g. percentile, median, etc.
             requirement_percentile = 90

@@ -323,10 +323,10 @@ def phosphorus_constraint(x):
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
-def protien_constraint(x):
+def protein_constraint(x):
     """
-    Sets up the protien requirement constraint in the NLP. Because part of the
-    maintenance requirement for protien contains non-linearity properties, that
+    Sets up the protein requirement constraint in the NLP. Because part of the
+    maintenance requirement for protein contains non-linearity properties, that
     requirement will be calculated in this function. Each calculation has a
     reference to the respective calculation in the pseudocode.
 
@@ -385,7 +385,7 @@ def protien_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
-    # B: PROTIEN REQUIREMENTS:
+    # B: PROTEIN REQUIREMENTS:
     # Maintenance Requirement
     # ---------------------
     # [A.Cow.B.1]-[A.Heifer.B.1]
@@ -515,7 +515,7 @@ constraint_functions = [
     NEgact_constraint,
     calcium_constraint,
     phosphorus_constraint,
-    protien_constraint,  # Mispelled
+    protein_constraint,
     NDF_constraint_1,
     NDF_constraint_2,
     forage_NDF_constraint,

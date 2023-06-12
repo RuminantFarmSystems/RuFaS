@@ -479,12 +479,6 @@ class Pen:
         om.add_variable("MEdiet", self.MEdiet, info_map)
         om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
         om.add_variable(f'avg_rqmts_for pen {self.id}', self.avg_nutrient_rqmts, info_map)
-        if self.animal_combination.name == 'LAC_COW':
-            cow_summary = {'avg_BW_pen': self.avg_BW, 'avg_milk_pen': self.avg_milk,
-                                'avg_milk_production_reduction_pen': self.avg_milk_production_reduction, 'num_animals':len(self.animals_in_pen)}
-            for key in ['DMIest', 'mPrt', 'estimated_daily_milk_produced', 'days_in_milk', 'days_in_preg', 'calves']:
-                cow_summary[key]=[getattr(animal, key) for animal in self.animals_in_pen]
-            om.add_variable(f'cow_summary for pen {self.id}', cow_summary, info_map)
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],
