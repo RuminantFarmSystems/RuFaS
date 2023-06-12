@@ -16,6 +16,9 @@ from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.classes import Time
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 @pytest.mark.parametrize("all_events,events_remaining,events_occurring_today", [
@@ -193,6 +196,63 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     with pytest.raises(KeyError) as e:
         field.plant_crop(crop_reference, True)
     assert expected in str(e.value)
+
+
+@pytest.mark.parametrize("crop_reference,harvest_op,expected", [
+    ("test_1", "default", HarvestOperation.HARVEST),
+    ("test_2", "no_kill", HarvestOperation.HARVEST_NOKILL),
+])
+def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOperation) -> None:
+    """Tests that crops are harvested correctly."""
+    harvest_crop = Crop()
+    harvest_crop.data.id = crop_reference
+    other_crop_1 = Crop()
+    other_crop_2 = Crop()
+    other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
+    field = Field()
+    field.crops = [harvest_crop, other_crop_1, other_crop_2]
+    for crop in field.crops:
+        crop.crop_management.manage_harvest = MagicMock()
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "day", 100)
+    setattr(mocked_time, "calendar_year", 1995)
+
+    field.harvest_crop(crop_reference, harvest_op, mocked_time)
+
+    for crop in field.crops:
+        if crop.data.id == "not this crop":
+            crop.crop_management.manage_harvest.assert_not_called()
+        else:
+            print(crop.data.id)
+            crop.crop_management.manage_harvest.assert_called_once_with(expected)
+
+
+@pytest.mark.parametrize("crops,expected_info_map,expected_message", [
+    ([Crop(), Crop()], {"prefix": "Field:'test'", "date": {"Day": 200, "Year": 2000}},
+     "Multiple crops to be harvested by single HarvestEvent."),
+    ([], {"prefix": "Field:'test'", "date": {"Day": 200, "Year": 2000}},
+     "No crop found to be harvested by a HarvestEvent.")
+])
+def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expected_message: str) -> None:
+    """Tests that warnings are raised correctly to the OutputManager."""
+    for crop in crops:
+        crop.data.id = "test"
+        crop.crop_management.manage_harvest = MagicMock()
+    field = Field()
+    field.field_data.name = "test"
+    field.crops = crops
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "day", 200)
+    setattr(mocked_time, "calendar_year", 2000)
+
+    field.harvest_crop("test", "default", mocked_time)
+
+    actual = om.warnings_pool["Field:'test'.harvest_warning"]
+    print(actual)
+    print(actual['values'])
+    print(expected_message)
+    assert actual['info_maps'].__contains__(expected_info_map)
+    assert actual['values'].__contains__(expected_message)
 
 
 @pytest.mark.parametrize("crop_list,expected_field_proportion", [
