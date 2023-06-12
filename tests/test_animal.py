@@ -1297,8 +1297,8 @@ def test_phosphorus_constraint():
     pass
 
 
-def test_protien_constraint():
-    """Unit test for function protien_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+def test_protein_constraint():
+    """Unit test for function protein_constraint in file routines/animal/ration/cow_ration_NLP.py"""
     pass
 
 
