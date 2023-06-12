@@ -308,12 +308,12 @@ class Field:
         crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
 
         info_map = {"class": self.__class__.__name__, "function": self.harvest_crop.__name__,
-                    "prefix": f"Field:'{self.field_data.name}'.",
+                    "prefix": f"Field:'{self.field_data.name}'",
                     "date": {"Day": time.day, "Year": time.calendar_year}}
         if len(crops_to_be_harvested) > 1:
-            om.add_warning("Harvest Warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
+            om.add_warning("harvest_warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
         elif len(crops_to_be_harvested) < 1:
-            om.add_warning("Harvest Warning", "No crop found to be harvested by a HarvestEvent.", info_map)
+            om.add_warning("harvest_warning", "No crop found to be harvested by a HarvestEvent.", info_map)
 
         for crop in crops_to_be_harvested:
             harvest_operation_enum = HarvestOperation(harvest_operation)
