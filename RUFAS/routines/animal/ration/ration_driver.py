@@ -163,7 +163,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
             if failed_constraints:
                 for constr in failed_constraints:
                     failed_list.append(constr["fun"].__name__)
-            # This values for reduction are not from pseudocode, but the vales below
+            # These values for reduction are not from pseudocode, but the values below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
             # NEl_con = NLP.NEl_constraint(solution.x)

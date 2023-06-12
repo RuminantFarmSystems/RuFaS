@@ -1099,10 +1099,7 @@ class AnimalManagement:
         -------
         float: The total milk produced in the herd (kg milk/day)
         """
-        total_milk = 0.0
-        for cow in cows:
-            total_milk += cow.estimated_daily_milk_produced
-        return(total_milk)
+        return sum(cow.estimated_daily_milk_produced for cow in cows)
 
     def gather_cow_class_history(self, cow_class):
         """

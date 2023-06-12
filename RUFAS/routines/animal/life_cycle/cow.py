@@ -311,9 +311,7 @@ class Cow(HeiferIII):
             fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
                 0.0926 * (math.log(self.days_in_milk)) ** 2) * \
                           (math.log(self.days_in_milk) ** 1.107)
-            daily_fat_correct_milk_production = \
-                0.4 * self.estimated_daily_milk_produced + \
-                0.15 * fat_percent * self.estimated_daily_milk_produced
+            daily_fat_correct_milk_production = self.estimated_daily_milk_produced * (0.4 + 0.15 * fat_percent)
         else:
             fat_percent = 0
             daily_fat_correct_milk_production = 0

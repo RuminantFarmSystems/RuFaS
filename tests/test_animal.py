@@ -7,6 +7,9 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 import pytest
+from unittest.mock import MagicMock
+from pytest_mock.plugin import MockerFixture
+import numpy as np
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
@@ -1384,80 +1387,53 @@ def test_ration_report():
     pass
 
 
-
-
-
-
 def test_set_requirements():
     """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
     pass
 
-def test_is_constraint_violated():
-    """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
-    def dummy_solution():
-        return [1,2,3,4]
-    def dummy_constraint_1(dummy_solution):
-        return sum(dummy_solution)
-    def dummy_constraint_2(dummy_solution):
-        return -sum(dummy_solution)
-    def dummy_constraint_3(dummy_solution):
-        return sum(dummy_solution)-10
-    test_constraints = [{'type': 'ineq', 'fun': dummy_constraint_1},
-                        {'type': 'ineq', 'fun': dummy_constraint_2},
-                        {'type': 'eq', 'fun': dummy_constraint_3},
-                        {'type': 'eq', 'fun': dummy_constraint_1},]
-    for i, constraint in enumerate(test_constraints):
-        result = RUFAS.routines.animal.ration.ration_driver.is_constraint_violated(dummy_solution(), constraint)
-        assert result == [False, True, False, True][i]
     
+def eq_constraint(x):
+    return np.sum(x) - 10  # This 'eq' constraint checks if the sum of x is equal to 10
 
-def test_find_failed_constraints():
+def ineq_constraint(x):
+    return np.sum(x) - 10  # This 'ineq' constraint checks if the sum of x is greater than 10
+
+@pytest.mark.parametrize("solution_x,constraint,expected", [
+    (np.array([2, 3, 5]), {'type': 'eq', 'fun': eq_constraint}, False),  # Constraint not violated, hence expecting False
+    (np.array([2, 3, 4]), {'type': 'eq', 'fun': eq_constraint}, True),
+    (np.array([1, 3, 5]), {'type': 'ineq', 'fun': ineq_constraint}, True),
+    (np.array([3, 4, 5]), {'type': 'ineq', 'fun': ineq_constraint}, False),
+])
+def test_is_constraint_violated(solution_x, constraint, expected):
+    """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
+    assert RUFAS.routines.animal.ration.ration_driver.is_constraint_violated(solution_x, constraint) == expected
+
+
+@pytest.mark.parametrize('mock_results, expected_result', [
+    ([False, True, False], [1]),  
+    ([False, False, False], []),  
+    ([True, True, True], [0, 1, 2]),  
+])
+def test_find_failed_constraints(mocker: MockerFixture, mock_results, expected_result):
     """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
-    def dummy_solution():
-        return [1,2,3,4]
-    def dummy_constraint_1(dummy_solution):
-        return sum(dummy_solution)
-    def dummy_constraint_2(dummy_solution):
-        return -sum(dummy_solution)
-    def dummy_constraint_3(dummy_solution):
-        return sum(dummy_solution)-10
+    # Arrange
+    solution_x = MagicMock()  
+    constraints = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    
+    # The exact path depends on where is_constraint_violated() is 'used' (which may differ from where it is 'defined') - a common bug
+    # The path below may need to be adjusted
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.is_constraint_violated', side_effect=mock_results)
+    
+    # Act
+    failed_constraints = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(solution_x, constraints)
+    failed_constraints_indices = []
 
-    test_constraints = [{'type': 'ineq', 'fun': dummy_constraint_1},
-                        {'type': 'ineq', 'fun': dummy_constraint_2},
-                        {'type': 'eq', 'fun': dummy_constraint_3},
-                        {'type': 'eq', 'fun': dummy_constraint_1},]
-    result = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(dummy_solution(), test_constraints)
-    assert len(result)==2
-    assert result[0]['fun'].__name__ == 'dummy_constraint_2'
-    assert result[1]['fun'].__name__ == 'dummy_constraint_1'
-
-
-# @pytest.fixture
-# def dummy_solution():
-#     return [1,2,3,4]
-
-# @pytest.fixture
-# def dummy_constraint_1(dummy_solution):
-#     return sum(dummy_solution)
-
-# @pytest.fixture
-# def dummy_constraint_2(dummy_solution):
-#     return -sum(dummy_solution)
-
-# @pytest.fixture
-# def dummy_constraint_3(dummy_solution):
-#     return sum(dummy_solution)-10
-
-# def	test_find_failed_constraints():
-#     """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
-#     test_constraints = [{'type': 'ineq', 'fun': dummy_constraint_1},
-#                         {'type': 'ineq', 'fun': dummy_constraint_2},
-#                         {'type': 'eq', 'fun': dummy_constraint_3},
-#                         {'type': 'eq', 'fun': dummy_constraint_1},]
-#     result = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(dummy_solution(), test_constraints)
-#     assert len(result)==2
-#     assert result[0]['fun'].__name__ == 'dummy_constraint_2'
-#     assert result[1]['fun'].__name__ == 'dummy_constraint_1'
+    for i, constraint in enumerate(constraints): 
+        if constraint in failed_constraints:
+            failed_constraints_indices.append(i)
+                    
+    # Assert
+    assert failed_constraints_indices == expected_result
 
 
 def test_calc_pen_requirements():
@@ -1470,13 +1446,6 @@ def test_calc_pen_requirements():
         'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
-    
-    # this assumes use of 80 or 90 percentile, commented in case it's useful in the future
-    # req.calc_pen_requirements(
-    #     [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
-    #     [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], False)
-    # for attribute in attributelist:
-    #     assert getattr(req, attribute) == 2.8
 
 
 def test_feed_nutrients():
