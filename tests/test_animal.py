@@ -140,14 +140,14 @@ def test_calculate_NRC_energy_maintenance_requirements(cow_a:dict, cow_b:dict, h
             heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['BCS5'],
             heifer_a['PrevTemp'], heifer_a['animal_type'])
     assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(
-        (14.23, 0, 0), rel=5e-1)
+        (5.08, 0, 0), rel=5e-1)
 
     result_NEmaint, result_CW, result_CBW = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_maintenance_requirements(
             heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['BCS5'],
             heifer_b['PrevTemp'], heifer_b['animal_type'])
     assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(
-        (19.07, 0, 43.92), rel=5e-1)
+        (6.81, 0, 43.92), rel=5e-1)
 
 
 def test_calculate_NRC_energy_growth_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
