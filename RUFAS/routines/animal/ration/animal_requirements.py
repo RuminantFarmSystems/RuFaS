@@ -185,7 +185,7 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
         body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
         net_energy_maintenance = (body_weight-conceptus_weight)**(0.75) * \
-            (0.086*(0.8 + (body_condition_score_9 - 1) * 0.5)) + \
+            (0.086*(0.8 + (body_condition_score_9 - 1) * 0.05)) + \
             0.0007*(20-previous_temperature)
     return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
