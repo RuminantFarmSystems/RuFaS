@@ -2,10 +2,13 @@ from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from RUFAS.output_manager import OutputManager
 
 """
 This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
 """
+
+om = OutputManager()
 
 
 class CropManagement:
@@ -156,6 +159,29 @@ class CropManagement:
 
         # TODO: are above- and below-ground lignin residue (percent) needed?
         #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
+
+    def _record_yield(self, field_name: str, year: int, day: int) -> None:
+        """
+        Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
+
+        Parameters
+        ----------
+        field_name : str
+            Name of the field that contains this crop.
+        year : int
+            Year in which this harvest occurred.
+        day : int
+            Julian day on which this harvest occurred.
+
+        """
+        mass_harvested = self.data.yield_collected
+        nitrogen_harvested = self.data.yield_nitrogen
+        phosphorus_harvested = self.data.yield_phosphorus
+        info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
+                    "prefix": f"field_name:'{field_name}'", "species": f"'{self.data.species}'", "date": {"year": year,
+                                                                                                          "day": day}}
+        value = {"yield": mass_harvested, "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested}
+        om.add_variable("harvest_yield", value, info_map)
 
     # ---- Harvest Scheduling ----
 

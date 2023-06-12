@@ -6,6 +6,9 @@ from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 # ---- Test Static Functions ----
@@ -220,3 +223,32 @@ def cut_crop(efficiency: float, harvest: float, override: bool):
         assert data.yield_phosphorus == collected * 0.0092
         assert data.residue_nitrogen == residue * 0.12
         assert data.residue_phosphorus == residue * 0.0092
+
+
+@pytest.mark.parametrize("field_name,species,year,day,mass,nitrogen,phosphorus", [
+    ("field_1", "alfalfa", 1993, 200, 100, 12.5, 5),
+    ("field_2", "corn", 1998, 216, 1500, 188, 24.5),
+    ("field_2", "corn", 1999, 218, 1550, 172, 22.3),
+    ("field_3", "soybeans", 2003, 245, 1200, 199, 89.3)
+])
+def test_record_yield(field_name: str, species: str, year: int, day: int, mass: float, nitrogen: float,
+                      phosphorus: float) -> None:
+    """Tests that harvest yields are correctly recorded to the OutputManager."""
+    crop_manager = CropManagement()
+
+    crop_manager.data.species = species
+    crop_manager.data.yield_collected = mass
+    crop_manager.data.yield_nitrogen = nitrogen
+    crop_manager.data.yield_phosphorus = phosphorus
+
+    crop_manager._record_yield(field_name, year, day)
+
+    expected_info_map = {"prefix": f"field_name:'{field_name}'", "species": f"'{species}'", "date":
+                         {"year": year, "day": day}}
+    expected_value = {"yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus}
+
+    actual = om.variables_pool[f"field_name:'{field_name}'.harvest_yield"]
+    print(actual['info_maps'])
+    print(expected_info_map)
+    assert actual['info_maps'].__contains__(expected_info_map)
+    assert actual['values'].__contains__(expected_value)
