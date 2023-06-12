@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent
@@ -66,7 +67,8 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
                  HarvestEvent("cover_2", 1992, 230, "default")],
      [HarvestEvent("corn", 1992, 230, "default"),
       HarvestEvent("cover_1", 1992, 230, "default"),
-      HarvestEvent("cover_2", 1992, 230, "default")])
+      HarvestEvent("cover_2", 1992, 230, "default")]),
+    (1993, 145, [], [])
 ])
 def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: List[HarvestEvent],
                                      current_harvest_events: List[HarvestEvent]) -> None:
@@ -94,6 +96,35 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field._harvest_heat_scheduled_crops.assert_called_once()
     field._reset_crop_field_coverage_fractions.assert_called_once()
 
+
+@pytest.mark.parametrize("crops,heat_scheduled,expected_harvested", [
+    ([Crop(), Crop(), Crop(), Crop(), Crop()], [True, False, True, True, False], [True, False, False, True, False]),
+    ([Crop(), Crop()], [True, True], [False, True]),
+    ([Crop(), Crop()], [False, False], [False, False]),
+    ([], [], [])
+])
+def test_harvest_heat_scheduled_crops(crops: List[Crop], heat_scheduled: List[bool],
+                                      expected_harvested: List[bool]) -> None:
+    """Tests that all crops which are set to be harvested based on heat level are."""
+    for index in range(len(crops)):
+        if heat_scheduled[index]:
+            crops[index].data.use_heat_scheduling = True
+        if expected_harvested[index]:
+            crops[index].data.heat_fraction = crops[index].data.harvest_heat_fraction
+        else:
+            crops[index].data.heat_fraction = 0.0
+        crops[index].crop_management.manage_harvest = MagicMock()
+
+    field = Field()
+    field.crops = crops
+
+    field._harvest_heat_scheduled_crops()
+
+    for index in range(len(crops)):
+        if expected_harvested[index]:
+            crops[index].crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST_NOKILL)
+        else:
+            crops[index].crop_management.manage_harvest.assert_not_called()
 
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
     ([Event(1990, 120), Event(1990, 200), Event(1993, 100)], 1990, 120,
