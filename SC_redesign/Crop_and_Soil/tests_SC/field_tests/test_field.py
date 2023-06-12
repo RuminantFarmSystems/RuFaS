@@ -1,3 +1,4 @@
+import pdb
 from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
@@ -51,6 +52,47 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     field._create_and_update_events.assert_has_calls(expected_create_and_update_events_calls)
     assert field.plant_crop.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
+
+
+@pytest.mark.parametrize("year,day,all_harvest_events,current_harvest_events", [
+    (1990, 240,
+     [HarvestEvent("corn", 1990, 240, "no_kill"), HarvestEvent("corn", 1990, 255, "default")],
+     [HarvestEvent("cover", 1990, 240, "default")]),
+    (1991, 126,
+     [HarvestEvent("corn", 1991, 240, "default"), HarvestEvent("cover", 1991, 260, "default")],
+     []),
+    (1992, 230, [HarvestEvent("corn", 1992, 230, "default"),
+                 HarvestEvent("cover_1", 1992, 230, "default"),
+                 HarvestEvent("cover_2", 1992, 230, "default")],
+     [HarvestEvent("corn", 1992, 230, "default"),
+      HarvestEvent("cover_1", 1992, 230, "default"),
+      HarvestEvent("cover_2", 1992, 230, "default")])
+])
+def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: List[HarvestEvent],
+                                     current_harvest_events: List[HarvestEvent]) -> None:
+    """Tests that the schedule of crop harvests is determined correctly for any given day."""
+    field = Field(harvestings=all_harvest_events)
+
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+    remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
+    field._create_and_update_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
+    field.harvest_crop = MagicMock()
+    field._harvest_heat_scheduled_crops = MagicMock()
+    field._reset_crop_field_coverage_fractions = MagicMock()
+
+    harvest_crop_calls = []
+    for event in current_harvest_events:
+        new_call = call(event.crop_reference, event.operation, mocked_time)
+        harvest_crop_calls.append(new_call)
+
+    field.check_crop_harvest_schedule(mocked_time)
+
+    field._create_and_update_events.assert_called_once_with(all_harvest_events, mocked_time)
+    field.harvest_crop.assert_has_calls(harvest_crop_calls)
+    field._harvest_heat_scheduled_crops.assert_called_once()
+    field._reset_crop_field_coverage_fractions.assert_called_once()
 
 
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
