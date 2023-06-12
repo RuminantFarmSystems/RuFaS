@@ -112,6 +112,7 @@ class Cow(HeiferIII):
         self.milking = False
         self.days_in_milk = 0
         self.estimated_daily_milk_produced = 0
+        self.milk_production_reduction = 0.0
         self.single_acc_milk_prod = 0
         self.future_cull_date = 0
         self.future_death_date = 0
@@ -259,7 +260,6 @@ class Cow(HeiferIII):
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
             self.estimated_daily_milk_produced = 0
-
             return 0, 0, 0
 
         breed_index = 0
@@ -301,6 +301,7 @@ class Cow(HeiferIII):
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
         else:
             self.estimated_daily_milk_produced = 0
+        self.estimated_daily_milk_produced += self.milk_production_reduction
         self.single_acc_milk_prod += estimated_daily_milk_produced
 
         # calculate fat percent in milk and fat corrected milk production
@@ -308,9 +309,7 @@ class Cow(HeiferIII):
             fat_percent = 12.86 * self.days_in_milk ** (-1.081) * math.exp(
                 0.0926 * (math.log(self.days_in_milk)) ** 2) * \
                           (math.log(self.days_in_milk) ** 1.107)
-            daily_fat_correct_milk_production = \
-                0.4 * estimated_daily_milk_produced + \
-                0.15 * fat_percent * estimated_daily_milk_produced
+            daily_fat_correct_milk_production = self.estimated_daily_milk_produced * (0.4 + 0.15 * fat_percent)
         else:
             fat_percent = 0
             daily_fat_correct_milk_production = 0
@@ -339,7 +338,8 @@ class Cow(HeiferIII):
         # if not self.milking:
         # 	self.daily_growth = self.body_weight - prev_weight
 
-        return estimated_daily_milk_produced, fat_percent, daily_fat_correct_milk_production
+        return self.estimated_daily_milk_produced, fat_percent, \
+               daily_fat_correct_milk_production
 
     def calc_manure_excretion(self, feed, methane_model, ME_intake):
         """
@@ -537,8 +537,6 @@ class Cow(HeiferIII):
             cull_stage: True if a cow is culled, false if it stays in the herd
             new_born: True if a calf is born
         """
-        self.update_body_weight_history(sim_day)
-        self.update_milk_production_history(sim_day)
         if self.culled:
             return None
 
@@ -569,6 +567,10 @@ class Cow(HeiferIII):
         # if self.milking:
         estimated_daily_milk_produced, fat_percent, \
         daily_fat_correct_milk_production = self.milking_update(sim_day, calving_interval)
+
+        self.update_body_weight_history(sim_day)
+        self.update_milk_production_history(sim_day)
+
         if not self.do_not_breed:
             if self.repro_program == 'ED':
                 self.ed_update(sim_day)
