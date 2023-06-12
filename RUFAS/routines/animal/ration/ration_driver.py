@@ -10,6 +10,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 """
 import collections
 import math
+import scipy
 import statistics as stat
 from typing import Any, Dict, List, Set, Union
 
@@ -17,6 +18,9 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration import ration_NLP as NLP
+# TODO can't import Pen for typing hint because it causes circular import
+    # so how should we import for type hints?
+#from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.user_defined_ration import \
     UserDefinedRationManager as UserDefinedRationManager
 
@@ -108,7 +112,7 @@ def calc_starting_milk_average(pen) -> float:
     starting_milk_average = total_milk_in_pen/num_animals
     return starting_milk_average
 
-def reduce_milk_production(pen, reduction) -> float:
+def reduce_milk_production(pen, reduction: float) -> float:
     """
     Reduces milk production for all animals in a pen.
     Only does so if post-reduction production would be above 1.0.
@@ -135,8 +139,7 @@ def reduce_milk_production(pen, reduction) -> float:
         running_total_milk += animal.estimated_daily_milk_produced
     return running_total_milk
 
-import scipy
-def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.OptimizeResult):
+def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.OptimizeResult) -> dict:
     """
     Generates ration dictionary from scipy result
     
@@ -361,7 +364,7 @@ class Requirements:
         self.avg_CP_milk = 0
 
 
-    def set_requirements(self, pen, animal_grouping_scenario, recalc):
+    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then

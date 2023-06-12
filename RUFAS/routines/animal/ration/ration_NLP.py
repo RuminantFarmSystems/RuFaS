@@ -491,7 +491,7 @@ def energy_req_limit_constraint(x):
     Args:
         x: The decision vector of the NLP
     """
-    n = len(price) / 3
+    n = len(price) /    3
     list = []
     for i in range(int(n)):
         a = i * 3
@@ -514,7 +514,7 @@ def get_ration_vals(x):
     return ration_vals
 
 
-def userbounds(ration_percents: Dict, DMIest: float) -> List:
+def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     """
     Calculates user bounds for optimize function
 
@@ -576,7 +576,7 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
-        bnds = userbounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
+        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))

@@ -8,6 +8,7 @@ import pytest
 from unittest.mock import MagicMock
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+from RUFAS.routines.animal.ration import ration_driver
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
@@ -16,6 +17,7 @@ import RUFAS.routines.animal.ration.animal_requirements
 import RUFAS.routines.animal.ration.user_defined_ration
 import RUFAS.routines.animal.ration.ration_NLP
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
+import RUFAS.routines.animal.ration.ration_NLP as NLP
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -1384,9 +1386,67 @@ def test_optimization():
     pass
 
 
+def test_calc_starting_milk_average() -> None:
+    """Unit test for function calc_starting_milk_average in file routines/animal/ration/ration_driver.py"""
+    mockpen = MagicMock()
+    mockpen.animals_in_pen = [MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock()]
+    production = [1,2,3,4,5]
+    for i in range(len(production)):
+        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
+    result = ration_driver.calc_starting_milk_average(mockpen)
+    assert result == sum(production)/len(production)
+
+def test_reduce_milk_production() -> None:
+    """Unit test for function reduce_milk_production in file routines/animal/ration/ration_driver.py"""
+    mockpen = MagicMock()
+    mockpen.animals_in_pen = [MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock(),
+                              MagicMock()]
+    production = [1,2,3,4,5]
+    reduced_predicted = [1,2,2,3,4]
+    # assign production to mocked animals
+    for i in range(len(production)):
+        mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
+    # assert all were reduced, but not reaching below 1.0 kg/day
+    ration_driver.reduce_milk_production(mockpen, 1.0)
+    for i, animal in enumerate(mockpen.animals_in_pen):
+        assert reduced_predicted[i] == animal.estimated_daily_milk_produced
+
+
+def test_make_ration_from_solution():
+    """Unit test for function make_ration_from_solution in file routines/animal/ration/ration_driver.py"""
+    
+    # make a mocked solution object - the critical component being the x
+    mock_solution = MagicMock()
+    mock_solution.x = [1, 1, 1, 2, 2, 2, 3, 3, 3]
+    predicted = {'100': 3, '200': 6, '300': 9}
+    predicted['status'] = 'Optimal'
+    predicted['objective'] = 0.0
+    price = []
+    for _ in range(len(mock_solution.x)):
+        price.append(0.0)
+    NLP.price = price
+    # TODO how to reset the above? Since it relies on a global, I tried patch
+        # however, this solution worked for now, and forthcoming PRs will remove usage of globals
+
+    # make a mocked available_feeds dict - the critical component being the 'feed_key' and 'feed_id'
+    mock_avail_feeds = {}
+    mock_avail_feeds['feed_id'] = [100, 200, 300]
+    mock_avail_feeds['feed_key'] = ['100', '200', '300']
+    # with patch.object(RUFAS.routines.animal.ration.ration_NLP, 'price', price):
+    result = ration_driver.make_ration_from_solution(mock_avail_feeds, mock_solution)
+    assert result == predicted
+
 def test_get_user_defined_ration():
     """Unit test for function get_user_defined_ration in file routines/animal/ration/ration_driver.py"""
     pass
+
 
 def test_ration_formulation():
     """Unit test for function ration_formulation in file routines/animal/ration/ration_driver.py"""
@@ -1530,13 +1590,13 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     assert result == {'1': 0.1, '2': 0.2, '3': 0.3}
 
 
-def test_userbounds(mock_user_defined_ration_manager: UserDefinedRationManager):
-    """Unit test for function test_userbounds in file routines/animal/ration/ration_NLP.py"""
+def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationManager):
+    """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
     mock_user_defined_ration_manager.tolerance = 0.1
     ration_percents = {'1': 10, '2': 20}
     predicted = [[9/3,11/3], [9/3,11/3], [9/3,11/3], \
                  [18/3,22/3], [18/3,22/3], [18/3,22/3]]
-    result = RUFAS.routines.animal.ration.ration_NLP.userbounds(ration_percents, 100)
+    result = RUFAS.routines.animal.ration.ration_NLP.make_user_bounds(ration_percents, 100)
     # assert that list output is those modified and repeated 3X
     for i in range(len(predicted)):
         assert predicted[i][0] == pytest.approx(result[i][0])

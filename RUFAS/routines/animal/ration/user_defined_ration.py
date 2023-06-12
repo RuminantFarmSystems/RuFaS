@@ -74,7 +74,7 @@ class UserDefinedRationManager(object):
         return ration_percents
     
 
-    def ration_to_use(pen_animal_combo, available_feeds) -> Dict:
+    def ration_to_use(pen_animal_combo, available_feeds: Dict) -> Dict:
         """
         Function outputs the correct dictionary from the UserDefinedRationManager class
         
