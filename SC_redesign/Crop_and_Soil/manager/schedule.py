@@ -1,5 +1,6 @@
 from typing import List, Any
 from copy import copy
+from RUFAS.classes import is_leap_year
 
 
 """
@@ -82,12 +83,14 @@ class Schedule:
         return elongated_list
 
     @staticmethod
-    def _validate_days(days: List[int]) -> bool:
+    def _validate_days(years: List[int], days: List[int]) -> bool:
         """
         Checks that all values passed for days are in the correct range.
 
         Parameters
         ----------
+        years : List[int]
+            Calendar year(s) in which this event will occur.
         days : List[int]
             Julian day(s) in which this event will occur.
 
@@ -98,10 +101,16 @@ class Schedule:
 
         Notes
         -----
-        A day is 'valid' if it in the range [1, 366].
+        A day is 'valid' if it is in the range [1, 366] in leap years, and in the range [1, 365] in non-leap years.
 
         """
-        return all(0 < day <= 366 for day in days)
+        dates = list(zip(years, days))
+        for date in dates:
+            if not is_leap_year(date[0]) and not 0 < date[1] <= 365:
+                return False
+            if is_leap_year(date[0]) and not 0 < date[1] <= 366:
+                return False
+        return True
 
     @staticmethod
     def _validate_years(years: List[int]) -> bool:
