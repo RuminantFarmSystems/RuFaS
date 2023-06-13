@@ -147,7 +147,31 @@ class Field:
         can be passed to the FertilizerApplication module.
 
         """
-        pass
+        try:
+            fertilizer_mix = self.available_fertilizer_mixes.get(event.mix_name)
+        except KeyError:
+            raise KeyError(f"'{self.field_data.name}': expected to have fertilizer mix for '{event.mix_name}', "
+                           f"received '{self.available_fertilizer_mixes}'.")
+        nitrogen_fraction = fertilizer_mix.get("N")
+        phosphorus_fraction = fertilizer_mix.get("P")
+        potassium_fraction = fertilizer_mix.get("K")
+
+        fertilizer_applied = self._formulate_fertilizer_required(nitrogen_fraction, phosphorus_fraction,
+                                                                 potassium_fraction, event.nitrogen_mass,
+                                                                 event.phosphorus_mass)
+        total_mass_applied = fertilizer_applied.get("mass")
+        phosphorus_applied = fertilizer_applied.get("phosphorus_mass")
+
+        # TODO: specify these fractions in fertilizer mixes - issue #573
+        inorganic_nitrogen_fraction = total_mass_applied / fertilizer_applied.get("nitrogen_mass")
+        ammonium_fraction = 0.0
+        organic_nitrogen_fraction = 0.0
+
+        self.fertilizer_applicator.apply_fertilizer(phosphorus_applied, total_mass_applied, inorganic_nitrogen_fraction,
+                                                    ammonium_fraction, organic_nitrogen_fraction,
+                                                    self.field_data.field_size)
+
+
 
     @staticmethod
     def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
@@ -221,21 +245,25 @@ class Field:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
+
         Parameters
         ----------
         all_events : List[Event]
             List of all Events that will occur over the run of the simulation in this field.
         time : Time
             Object containing the current day and year of the simulation.
+
         Returns
         -------
         Tuple
             A tuple containing the list of all Events that will occur in this field after the current day, and a list of
             Events that will occur on the current day.
+
         Notes
         -----
         This method is written to work with generic Events so that it may be used on all the different child classes of
         Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
+
         """
         todays_events = [event for event in all_events if event.occurs_today(time)]
         remaining_events = [event for event in all_events if event not in todays_events]
