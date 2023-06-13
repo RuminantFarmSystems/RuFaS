@@ -385,13 +385,7 @@ def protein_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
-    # B: PROTEIN REQUIREMENTS:
-    # Maintenance Requirement
-    # ---------------------
-    # [A.Cow.B.1]-[A.Heifer.B.1]
-    # Metabolizable protein requirement for maintenance (g)
-    MPm = (DMI * 1000 * 0.03 - 0.5 * ((MPbact / 0.8) - MPbact)) + 0.4 * 11.8 * (DMI / 0.67)
-    return (MP_supply - ((MP_req + MPm) / 1000))
+    # TODO: Separate the DMI components from MPm requirements calculated by both NRC (2001) and NASEM (2021) and put them in this section because DMI gets reestimated during each iteration.
 
 
 def NDF_constraint_1(x):
