@@ -226,7 +226,7 @@ class Cow(HeiferIII):
         """Sets the cow's breed index for use in the lactation curve parameter calculation"""
         if self.breed == 'HO':
             self.breed_index = 0
-        elif self.breed == 'JE':
+        if self.breed == 'JE':
             self.breed_index = 1
 
     def set_parity_index(self):
@@ -249,7 +249,8 @@ class Cow(HeiferIII):
                 AnimalBase.config['wood_n'][self.breed_index][self.parity_index],
                 AnimalBase.config['wood_n_std'][self.breed_index][self.parity_index])
 
-    def calculate_daily_milk_produced(self):
+    def calculate_daily_milk_produced(self) -> float:
+        """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
         if self.lactation_curve == 'wood':
             return self.wood_l * math.pow(self.days_in_milk, self.wood_m) * math.exp((0 - self.wood_n) *
                                                                                      self.days_in_milk)
