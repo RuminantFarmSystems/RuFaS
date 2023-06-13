@@ -357,14 +357,14 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, filter_keys: List[str]) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_patterns: List[str]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
         Parameters
         ----------
-        filter_keys : List[str]
-            A list of keys the user has selected to filter the variables pool.
+        filter_patterns : List[str]
+            A list of patterns the user has selected to filter the variables pool.
 
         Returns
         -------
@@ -373,8 +373,8 @@ class OutputManager(object):
 
         Notes
         -----
-        The first key in the filter_keys list will determine whether the keys are treated as
-        exclusionary or inclusionary. If the first key matches the value of the exclude_keyword
+        The first item in the filter_patterns list will determine whether the patterns are treated as
+        exclusionary or inclusionary. If the first pattern matches the value of the exclude_keyword
         variable defined in this function, it will treat the rest of the filter list as exclusionary
         and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
         as inclusionary.
@@ -382,12 +382,13 @@ class OutputManager(object):
         """
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
-        if filter_keys and filter_keys[exclude_keyword_location] == exclude_keyword:
+        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        if filter_by_exclusion:
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
-                    any(re.match(filter_key, key) for filter_key in filter_keys)}
+                    any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if
-                    any(re.match(filter_key, key) for filter_key in filter_keys)}
+                    any(re.match(pattern, key) for pattern in filter_patterns)}
 
     def save_variables(self, save_path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
