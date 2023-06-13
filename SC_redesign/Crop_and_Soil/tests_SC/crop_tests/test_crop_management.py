@@ -6,6 +6,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -252,3 +253,24 @@ def test_record_yield(field_name: str, species: str, year: int, day: int, mass: 
     print(expected_info_map)
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_value)
+
+
+@pytest.mark.parametrize("residue,nitrogen", [
+    (100, 22),
+    (0, 0),
+    (200.23, 45.66)
+])
+def test_transfer_residue(residue: float, nitrogen: float) -> None:
+    """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
+        soil."""
+    soil_data = SoilData(field_size=1)
+    soil_data.plant_surface_residue = 0
+    soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
+    crop_data = CropData(yield_residue=residue, yield_nitrogen=nitrogen)
+    crop_manage = CropManagement(crop_data)
+
+    crop_manage._transfer_residue(soil_data)
+
+    assert soil_data.plant_surface_residue == residue
+    assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen
+

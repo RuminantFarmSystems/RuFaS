@@ -2,6 +2,7 @@ from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
 """
@@ -182,6 +183,21 @@ class CropManagement:
                                                                                                           "day": day}}
         value = {"yield": mass_harvested, "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested}
         om.add_variable("harvest_yield", value, info_map)
+
+    def _transfer_residue(self, soil_data: SoilData) -> None:
+        """
+        Transfers residue from harvest to SoilData that tracks how that residue is degraded and assimilated into the
+        soil.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            Object that tracks the attributes of the soil profile that contains this crop.
+
+        """
+        soil_data.plant_surface_residue += self.data.yield_residue
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
+        # TODO: Add organic phosphorus to correct pool in soil - GitHub issue #444
 
     # ---- Harvest Scheduling ----
 
