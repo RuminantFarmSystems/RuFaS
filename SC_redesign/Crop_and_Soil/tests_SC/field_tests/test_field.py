@@ -168,12 +168,24 @@ def test_harvest_scheduled_crops():
     crop3.crop_management.manage_harvest.assert_called_once()
 
 
-def test_amend_soil() -> None:
-    """Tests that amend_soil() properly calls all the subroutines that add nutrients to the field"""
-    field = Field()
-    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
-    field.amend_soil()
-    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
+@pytest.mark.parametrize("nitrogen_frac,phosphorus_frac,potassium_frac,requested_nitrogen,requested_phosphorus,"
+                         "expected", [
+                             (0.2, 0.1, 0.3, 100.0, 80.0, {"mass": 800.0, "nitrogen_mass": 160.0,
+                                                           "phosphorus_mass": 80.0, "potassium_mass": 240.0}),
+                             (0.82, 0.0, 0.0, 200.0, 50.0, {"mass": 243.90243902439025, "nitrogen_mass": 200.0,
+                                                            "phosphorus_mass": 0.0, "potassium_mass": 0.0}),
+                             (0.4, 0.2, 0.1, 80.0, 40.0, {"mass": 200.0, "nitrogen_mass": 80.0,
+                                                          "phosphorus_mass": 40.0, "potassium_mass": 20.0}),
+                             (0.05, 0.1, 0.3, 45.0, 100.0, {"mass": 1000.0, "nitrogen_mass": 50.0,
+                                                            "phosphorus_mass": 100.0, "potassium_mass": 300.0})
+                         ])
+def test_formulate_fertilizer_required(nitrogen_frac: float, phosphorus_frac: float, potassium_frac: float,
+                                       requested_nitrogen: float, requested_phosphorus: float,
+                                       expected: Dict[str, float]) -> None:
+    """Tests that fertilizer formulations are made correctly."""
+    actual = Field._formulate_fertilizer_required(nitrogen_frac, phosphorus_frac, potassium_frac, requested_nitrogen,
+                                                  requested_phosphorus)
+    assert actual == expected
 
 
 @pytest.mark.parametrize("field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp,"
