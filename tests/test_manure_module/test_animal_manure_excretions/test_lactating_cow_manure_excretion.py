@@ -222,10 +222,10 @@ def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigatio
         metabolizable_energy_intake=metabolizable_energy_intake,
     )
 
-    # Assert
-    # patch_for_ration_report.assert_called_once_with(
-    #     mock_ration_formulation, mock_feed.available_feeds
-    # )
+    #Assert
+    patch_for_ration_report.assert_called_once_with(
+        mock_ration_formulation, mock_feed.available_feeds
+    )
     patch_for_calculate_phosphorus_excretion_values.assert_called_once_with(
         daily_milk_production=daily_milk_production,
         total_manure_excreted=total_manure_excreted,
