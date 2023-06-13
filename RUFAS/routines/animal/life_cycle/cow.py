@@ -237,7 +237,7 @@ class Cow(HeiferIII):
         Sets cow's lactation curve parameters based on cow's lactation curve attribute.
         Currently only set up for wood model.
         """
-        if AnimalBase.config['lactation_curve'] == 'wood':
+        if self.lactation_curve == 'wood':
             self.wood_l = self.determine_param_value(
                 AnimalBase.config['wood_l'][self.breed_index][self.parity_index],
                 AnimalBase.config['wood_l_std'][self.breed_index][self.parity_index])
