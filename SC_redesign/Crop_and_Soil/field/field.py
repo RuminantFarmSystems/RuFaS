@@ -2,14 +2,16 @@ from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
+from SC_redesign.Crop_and_Soil.manager.events import Event, FertilizerEvent
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
+from RUFAS.classes import Time
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -24,7 +26,9 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 class Field:
     """object representing an agricultural field"""
 
-    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None):
+    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
+                 fertilizer_events: Optional[List[FertilizerEvent]] = None,
+                 fertilizer_mixes: Optional[Dict[str, Dict]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -40,6 +44,12 @@ class Field:
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
         """Provides interface for adding fertilizer to the field."""
+
+        self.fertilizer_events = fertilizer_events or []
+        """List of all fertilizer application events that will in this field."""
+
+        self.available_fertilizer_mixes = fertilizer_mixes or {}
+
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
 
@@ -49,28 +59,18 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
         """Manure application interface."""
 
-    def manage_field(self, day: int, year: int, current_weather: CurrentWeather) -> None:
+    def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
         """main Field function, runs all field routines based on current attribute configuration
 
         Args:
-            day: the current (sequential) day of the simulation  - TODO: not yet implemented
-            year: the current (sequential) year of the simulation - TODO: not yet implemented
+            time: Time object containing the current year and day of the simulation.
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
         Details: **All the logic (after setup) will go in this function**
         """
-        # What needs to be done today?
-        self.check_schedule(day, year)
-
         # --- Soil Management---
-        # nutrient amendments
-        if self.field_data.is_amendment_day:
-            self.amend_soil()
-
-        # tillage
-        if self.field_data.is_tillage_day:
-            self.till_soil()
+        self.check_fertilizer_application_schedule(time)
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -93,7 +93,6 @@ class Field:
             if self.field_data.grazers_present:
                 self.graze_field()
 
-            self.check_harvest_schedules(day, year)
             self.harvest_scheduled_crops()
 
         # annual resets
@@ -133,10 +132,58 @@ class Field:
         """till the soil"""
         pass
 
-    def amend_soil(self) -> None:
-        """amend the soil with nutrients"""
-        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(0)
-        return
+    def _execute_fertilizer_event(self, event: FertilizerEvent) -> None:
+        """
+        Executes a fertilizer application as defined in the FertilizerEvent passed.
+
+        Parameters
+        ----------
+        event : FertilizerEvent
+            The fertilizer event containing all the necessary information to formulate a single fertilizer application.
+
+        Notes
+        -----
+        This method is responsible for translating all the information provided in the FertilizerEvent into data that
+        can be passed to the FertilizerApplication module.
+
+        """
+        pass
+
+    @staticmethod
+    def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
+                                       potassium_fraction: float, requested_nitrogen: float,
+                                       requested_phosphorus: float) -> Dict[str, float]:
+        """
+        Determines the total mass of a specific fertilizer mix needed to meet the specified nutrient requirements.
+
+        Parameters
+        ----------
+        nitrogen_fraction : float
+            Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0]
+        phosphorus_fraction : float
+            Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0]
+        potassium_fraction : float
+            Fraction of fertilizer mix that is potassium, in range [0.0, 1.0]
+        requested_nitrogen : float
+            Minimum mass of nitrogen to be included in fertilizer application (kg)
+        requested_phosphorus : float
+            Minimum mass of phosphorus to be included in fertilizer application (kg)
+
+        Returns
+        -------
+        Dict[str, float]
+            The total mass of fertilizer, and the masses of nitrogen, phosphorus, and potassium in the fertilizer.
+
+        """
+        minimum_mass_for_nitrogen = (0 if nitrogen_fraction == 0 else (requested_nitrogen / nitrogen_fraction))
+        minimum_mass_for_phosphorus = (0 if phosphorus_fraction == 0 else (requested_phosphorus / phosphorus_fraction))
+
+        total_mass = max(minimum_mass_for_nitrogen, minimum_mass_for_phosphorus)
+        nitrogen_mass = total_mass * nitrogen_fraction
+        phosphorus_mass = total_mass * phosphorus_fraction
+        potassium_mass = total_mass * potassium_fraction
+        return {"mass": total_mass, "nitrogen_mass": nitrogen_mass, "phosphorus_mass": phosphorus_mass,
+                "potassium_mass": potassium_mass}
 
     # </editor-fold>
 
@@ -154,6 +201,46 @@ class Field:
             For example, if we need to plant a crop today, this method will set `self.field_data.is_planting_day=True`.
          """
         pass
+
+    def check_fertilizer_application_schedule(self, time: Time) -> None:
+        """
+        Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
+
+        Parameters
+        ----------
+        time : Time
+            Object containing the current year and day of the simulation.
+
+        """
+        self.fertilizer_events, todays_fertilizer_events = self._create_and_update_events(self.fertilizer_events, time)
+        for event in todays_fertilizer_events:
+            self._execute_fertilizer_event(event)
+
+    @staticmethod
+    def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
+        """
+        Filters out all events from a list that occur on the current day, and creates a new list with all the events
+        that were filtered out.
+        Parameters
+        ----------
+        all_events : List[Event]
+            List of all Events that will occur over the run of the simulation in this field.
+        time : Time
+            Object containing the current day and year of the simulation.
+        Returns
+        -------
+        Tuple
+            A tuple containing the list of all Events that will occur in this field after the current day, and a list of
+            Events that will occur on the current day.
+        Notes
+        -----
+        This method is written to work with generic Events so that it may be used on all the different child classes of
+        Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
+        """
+        todays_events = [event for event in all_events if event.occurs_today(time)]
+        remaining_events = [event for event in all_events if event not in todays_events]
+        return remaining_events, todays_events
+
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
@@ -345,6 +432,7 @@ class Field:
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False
+
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
