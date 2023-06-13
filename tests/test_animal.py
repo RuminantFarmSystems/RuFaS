@@ -4,23 +4,25 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
-import pytest
 from unittest.mock import MagicMock
-from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
-from RUFAS.routines.animal.ration import ration_driver
 
-from pytest_mock.plugin import MockerFixture
 import numpy as np
+import pytest
+from pytest_mock.plugin import MockerFixture
 
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
-import RUFAS.routines.animal.ration.user_defined_ration
 import RUFAS.routines.animal.ration.ration_NLP
-from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 import RUFAS.routines.animal.ration.ration_NLP as NLP
+
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.ration import ration_driver
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+
+import RUFAS.routines.animal.ration.user_defined_ration
+from RUFAS.routines.animal.ration.user_defined_ration import \
+    UserDefinedRationManager
 
 
 @pytest.fixture
@@ -311,13 +313,11 @@ def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         heifer_a['animal_type'], heifer_a['body_weight'], heifer_a['day_of_pregnancy'], heifer_a['DIM'], heifer_a['lactating'],
         heifer_a['Milk'], heifer_a['Fat_Milk'])
-
     assert (result_DMIest) == pytest.approx((4.9), rel=1e-1)
 
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
         heifer_b['animal_type'], heifer_b['body_weight'], heifer_b['day_of_pregnancy'], heifer_b['DIM'], heifer_b['lactating'],
         heifer_b['Milk'], heifer_b['Fat_Milk'])
-
     assert (result_DMIest) == pytest.approx((6.7), rel=1e-1)
 
 
@@ -1277,7 +1277,7 @@ def test_set_globals():
 )
 def test_list_reconfig(input, expected)->None:
     """Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py"""
-    assert list_reconfig(input) == expected
+    assert NLP.list_reconfig(input) == expected
 
 
 def test_objective():

@@ -920,7 +920,6 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
                      (day_of_pregnancy - 1)) * (body_weight/715)
     Ca_Lact = (0.295 + 0.239 * milk_true_protein) * milk_production
     calcium_requirement = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
-
     return max(calcium_requirement, ration_constants.minimum_calcium)
 
 
@@ -1046,7 +1045,6 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     else:
         P_Lact = milk_production * (0.49 + 0.13*milk_true_protein)
     phosphorus_requirement = P_Maint + P_Growth + P_Preg + P_Lact
-
     return max(phosphorus_requirement, ration_constants.minimum_phosophorus)
 
 
@@ -1110,7 +1108,6 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
             adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
             dry_matter_intake_estimate -= adjustment_factor
         # this comment is a holdover from the previous version
-
     dry_matter_intake_estimate_minimum_flat = ration_constants.minimum_DMI
     dry_matter_intake_estimate_minimum_percentage = ration_constants.minimum_DMI_percentage * body_weight
     return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
@@ -1175,7 +1172,6 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
             -(0.082*(NDF_concentration_percentage\
             -(23.1+56*(body_weight/mature_body_weight)-30.6(body_weight/mature_body_weight)^2)))
         """
-
     dry_matter_intake_estimate_minimum_flat = ration_constants.minimum_DMI
     dry_matter_intake_estimate_minimum_percentage = ration_constants.minimum_DMI_percentage * body_weight
     return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 

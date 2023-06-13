@@ -32,7 +32,6 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from random import random
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
-
 om = OutputManager()
 
 
@@ -299,17 +298,9 @@ class Cow(HeiferIII):
                                                           AnimalBase.config['b']) / 2) * \
                                             math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
         if self.milking:
-            # if sim_day % 30 == 1:
-            #     self.estimated_daily_milk_produced = estimated_daily_milk_produced
-            # else:
-            #     self.estimated_daily_milk_produced = estimated_daily_milk_produced + self.milk_production_reduction
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
-            #if self.milk_production_reduction != 0: print(self.milk_production_reduction)
-            #estimated_daily_milk_produced += self.milk_production_reduction
-            #self.estimated_daily_milk_produced += self.milk_production_reduction
         else:
             self.estimated_daily_milk_produced = 0
-
         self.estimated_daily_milk_produced += self.milk_production_reduction
         self.single_acc_milk_prod += estimated_daily_milk_produced
 

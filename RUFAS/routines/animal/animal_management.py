@@ -420,9 +420,7 @@ class AnimalManagement:
             if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name =='CLOSE_UP':
                 for animal in pen.animals_in_pen:
                     animal.milk_production_reduction = 0.0
-
                     
-
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
         Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
@@ -1102,7 +1100,6 @@ class AnimalManagement:
         -------
         float: The total milk produced in the herd (kg milk/day)
         """
-
         return sum(cow.estimated_daily_milk_produced for cow in cows)
 
     def gather_cow_class_history(self, cow_class):
@@ -1181,19 +1178,6 @@ class AnimalManagement:
                 pen.daily_p_update()
 
     
-    def reset_milk_production_reduction(self) -> None:
-        """
-        Resets reduction value for milk production to 0.0 for all animals in all pens
-
-        The milk_production_reduction attribute is a value generated in ration_driver.py, 
-            in cases where a ration cannot be formulated such that it meets animal requirements
-
-        """
-        for pen in self.all_pens:
-            if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name =='CLOSE_UP':
-                for animal in pen.animals_in_pen:
-                    animal.milk_production_reduction = 0.0
-
     def daily_updates(self, feed, weather, time):
         """
         Executes the daily routines relating to Animals. All animals are
@@ -1516,7 +1500,7 @@ class AnimalManagement:
                     counter += 1
                     if counter > 50:
                         raise Exception('Too many attempts at optimizing ration.')
-
+                # TODO add in proper methods to record these (and pen nutrient requirements) to output manager
                 # recording ration nutrition information in pen
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
@@ -1768,7 +1752,6 @@ class AnimalManagement:
         if self.simulate_animals:
             if self.end_ration_interval():
                 self.reset_milk_production_reduction() 
-
             temp = weather.T_avg[time.year - 1][time.day - 1]
             animals_snapshot_before_update = self._get_animals_snapshot()
 

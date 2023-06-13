@@ -11,10 +11,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 import collections
 import math
 import scipy
-import statistics as stat
-from typing import Any, Dict, List, Set, Union
-
-from typing import Callable
+from typing import Any, Dict, List, Set, Union, Callable
 import numpy as np
 import numpy.typing as npt
 from RUFAS.output_manager import OutputManager
@@ -74,8 +71,6 @@ def optimization(requirements, available_feeds, animal_combination):
     while i < 1:
         try:
             solution = NLP.optimize(animal_combination, available_feeds)
-            # TODO here we need to add a way to check why this is failing to optimize and
-            # certainly happening at the minimize step, but we must  quantify which requirements aren't being met
         except:
             i -= 1
         finally:
@@ -201,10 +196,18 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
     if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
-    if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
-        starting_milk_average = calc_starting_milk_average(pen)
+    failed_list = []
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
+        num_reattempts = 0
+        failed_list = []
+        starting_milk_average = calc_starting_milk_average(pen)
         while not solution.success:
+            num_reattempts += 1
+            failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+            if failed_constraints:
+                failed_list.append(num_reattempts)
+                for constr in failed_constraints:
+                    failed_list.append(constr["fun"].__name__)
             reduction = 0.25
             running_total_milk = reduce_milk_production(pen, reduction)
             average_running_milk = running_total_milk / len(pen.animals_in_pen)
@@ -216,14 +219,21 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
                 fixed_ration = True
                 solution.success = True
                 break
-
+    if failed_list != []:
+            info_map = {"class": "no_caller_class",
+                "function": pen.__init__.__name__,
+                }
+            fail_summary = [num_reattempts, failed_list]
+            om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
+            
     if fixed_ration:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
     elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         ration = make_ration_from_solution(available_feeds, solution)
     else:
-        print('ERROR')
+        print('ERROR') #TODO output to error log? Or force a fixed ration?
     return ration, ration_vals
+
 def is_constraint_violated(solution_x: npt.NDArray, constraint: dict[str, Callable]) -> bool:
         """
         Helper function to check a solution dictionary to see if a given constraint 
@@ -294,12 +304,13 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     failed_list = []
 
     # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-    #TODO pick one! if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
+    #TODO pick one! other option: if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
     if pen.animal_combination.name in ['LAC_COW']:
         while not solution.success:
             num_reattempts += 1
             failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
             if failed_constraints:
+                failed_list.append(num_reattempts)
                 for constr in failed_constraints:
                     failed_list.append(constr["fun"].__name__)
             # These values for reduction are not from pseudocode, but the values below
@@ -310,7 +321,6 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
                 reduction = 3 * (-NEl_con)
             else:
                 reduction = 1.5
-
             for animal in pen.animals_in_pen:
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction
@@ -495,9 +505,7 @@ class Requirements:
             self.avg_milk_production_reduction = np.percentile(milk_production_reduction, requirement_percentile)
         
 
-
-
-    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
+    def set_requirements(self, pen, animal_grouping_scenario, recalc):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
