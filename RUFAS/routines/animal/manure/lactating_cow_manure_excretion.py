@@ -51,9 +51,9 @@ def methane_mitigation(ration_formulation,
         methane_yield_reduction = 0.30054 - 0.00377 * \
             methane_mitigation_additive_amount - 1.57832 * CP_concentration
     elif methane_mitigation_method == "Essential Oils":
-        pass
+        methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
-        pass
+        methane_yield_reduction = 0.0
     else:
         methane_yield_reduction = 0.0
     return methane_yield_reduction
