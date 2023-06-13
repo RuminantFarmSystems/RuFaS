@@ -603,8 +603,6 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
         bnds = tuple(bnds)
-
-
     if udrv.udr_or_not:
         # accumulator = []
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
@@ -615,10 +613,6 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         if usermod.success:
             # print(animal_type)
             print('No constraints violated')
-        if not usermod.success:
-            failed_constraints = find_failed_constraints(usermod.x, cow_cons)
-            if not failed_constraints:
-                print('No constraints violated')
         return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
     elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
