@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>tests package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -53,6 +54,11 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tests.test_animal">tests.test_animal module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.cow_a"><code class="docutils literal notranslate"><span class="pre">cow_a()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.cow_b"><code class="docutils literal notranslate"><span class="pre">cow_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.cow_fixture"><code class="docutils literal notranslate"><span class="pre">cow_fixture()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.heifer_a"><code class="docutils literal notranslate"><span class="pre">heifer_a()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.heifer_b"><code class="docutils literal notranslate"><span class="pre">heifer_b()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_DMI_constraint"><code class="docutils literal notranslate"><span class="pre">test_DMI_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_NDF_constraint_1"><code class="docutils literal notranslate"><span class="pre">test_NDF_constraint_1()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_NDF_constraint_2"><code class="docutils literal notranslate"><span class="pre">test_NDF_constraint_2()</span></code></a></li>
@@ -104,7 +110,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_assign_heiferII_values"><code class="docutils literal notranslate"><span class="pre">test_assign_heiferII_values()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_growth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_nutrient_rqmts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_avg_stats"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_stats()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_base_manure"><code class="docutils literal notranslate"><span class="pre">test_calc_base_manure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_daily_walking_dist"><code class="docutils literal notranslate"><span class="pre">test_calc_daily_walking_dist()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_manure"><code class="docutils literal notranslate"><span class="pre">test_calc_manure()</span></code></a></li>
@@ -114,6 +119,22 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_requirements"><code class="docutils literal notranslate"><span class="pre">test_calc_requirements()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calc_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calcium_constraint"><code class="docutils literal notranslate"><span class="pre">test_calcium_constraint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_DMI"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_DMI()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_calcium_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_calcium_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_energy_growth_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_growth_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_energy_lactation_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_lactation_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_energy_maintenance_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_maintenance_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_energy_pregnancy_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_pregnancy_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_phosphorus_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_phosphorus_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NASEM_protein_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_protein_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_DMI"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_DMI()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_calcium_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_calcium_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_energy_growth_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_growth_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_energy_lactation_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_lactation_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_energy_maintenance_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_maintenance_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_energy_pregnancy_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_pregnancy_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_phosphorus_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_phosphorus_requirements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_NRC_protein_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_protein_requirements()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_calculate_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calculate_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_call_animal_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_call_animal_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_call_p_rqmts"><code class="docutils literal notranslate"><span class="pre">test_call_p_rqmts()</span></code></a></li>
@@ -158,7 +179,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_optimize"><code class="docutils literal notranslate"><span class="pre">test_optimize()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_percentile_list"><code class="docutils literal notranslate"><span class="pre">test_percentile_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_phosphorus_constraint"><code class="docutils literal notranslate"><span class="pre">test_phosphorus_constraint()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_phosphorus_excreted"><code class="docutils literal notranslate"><span class="pre">test_phosphorus_excreted()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_phosphorus_rqmts"><code class="docutils literal notranslate"><span class="pre">test_phosphorus_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_protien_constraint"><code class="docutils literal notranslate"><span class="pre">test_protien_constraint()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal.test_ration_formulation"><code class="docutils literal notranslate"><span class="pre">test_ration_formulation()</span></code></a></li>
@@ -184,10 +204,16 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.animal_management"><code class="docutils literal notranslate"><span class="pre">animal_management()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.animal_management_with_mock_pens"><code class="docutils literal notranslate"><span class="pre">animal_management_with_mock_pens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.create_mock_object_list"><code class="docutils literal notranslate"><span class="pre">create_mock_object_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.mock_animals"><code class="docutils literal notranslate"><span class="pre">mock_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.mock_animals_small"><code class="docutils literal notranslate"><span class="pre">mock_animals_small()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.mock_herd_data"><code class="docutils literal notranslate"><span class="pre">mock_herd_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.mock_manure_management_scenarios"><code class="docutils literal notranslate"><span class="pre">mock_manure_management_scenarios()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.mock_pen_data"><code class="docutils literal notranslate"><span class="pre">mock_pen_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.mock_pens"><code class="docutils literal notranslate"><span class="pre">mock_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.pens_test_data_dict"><code class="docutils literal notranslate"><span class="pre">pens_test_data_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.setup_dummy_animal"><code class="docutils literal notranslate"><span class="pre">setup_dummy_animal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.setup_dummy_animal_management_with_pens"><code class="docutils literal notranslate"><span class="pre">setup_dummy_animal_management_with_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.setup_dummy_pen"><code class="docutils literal notranslate"><span class="pre">setup_dummy_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_add_animal_to_pen_and_id_map"><code class="docutils literal notranslate"><span class="pre">test_add_animal_to_pen_and_id_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_allocate_all_pens"><code class="docutils literal notranslate"><span class="pre">test_allocate_all_pens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_annual_reset"><code class="docutils literal notranslate"><span class="pre">test_annual_reset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_avg_pen_dist"><code class="docutils literal notranslate"><span class="pre">test_avg_pen_dist()</span></code></a></li>
@@ -199,23 +225,32 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_calc_p_conc"><code class="docutils literal notranslate"><span class="pre">test_calc_p_conc()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_calc_p_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_p_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_calc_ration"><code class="docutils literal notranslate"><span class="pre">test_calc_ration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_calculate_pen_rations"><code class="docutils literal notranslate"><span class="pre">test_calculate_pen_rations()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_clear_pens"><code class="docutils literal notranslate"><span class="pre">test_clear_pens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_daily_animal_routine"><code class="docutils literal notranslate"><span class="pre">test_daily_animal_routine()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_daily_p_update"><code class="docutils literal notranslate"><span class="pre">test_daily_p_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_daily_update_id_pen"><code class="docutils literal notranslate"><span class="pre">test_daily_update_id_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_daily_update_id_map"><code class="docutils literal notranslate"><span class="pre">test_daily_update_id_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_daily_updates"><code class="docutils literal notranslate"><span class="pre">test_daily_updates()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_end_ration_interval"><code class="docutils literal notranslate"><span class="pre">test_end_ration_interval()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_fully_update_id_pen"><code class="docutils literal notranslate"><span class="pre">test_fully_update_id_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_fully_update_animal_to_pen_id_map"><code class="docutils literal notranslate"><span class="pre">test_fully_update_animal_to_pen_id_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_generate_animal_output"><code class="docutils literal notranslate"><span class="pre">test_generate_animal_output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_get_animal_config"><code class="docutils literal notranslate"><span class="pre">test_get_animal_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_get_animals_snapshot"><code class="docutils literal notranslate"><span class="pre">test_get_animals_snapshot()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_get_initialize_db_summary"><code class="docutils literal notranslate"><span class="pre">test_get_initialize_db_summary()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_get_life_cycle_output"><code class="docutils literal notranslate"><span class="pre">test_get_life_cycle_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_handle_animals_with_unchanged_class_and_changed_combination"><code class="docutils literal notranslate"><span class="pre">test_handle_animals_with_unchanged_class_and_changed_combination()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_handle_graduated_animals"><code class="docutils literal notranslate"><span class="pre">test_handle_graduated_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_handle_newly_added_animals"><code class="docutils literal notranslate"><span class="pre">test_handle_newly_added_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_handle_removed_animals_after_update"><code class="docutils literal notranslate"><span class="pre">test_handle_removed_animals_after_update()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_init_animals"><code class="docutils literal notranslate"><span class="pre">test_init_animals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_init_default_pens"><code class="docutils literal notranslate"><span class="pre">test_init_default_pens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_init_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_init_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_init_pens"><code class="docutils literal notranslate"><span class="pre">test_init_pens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_print_animal_num_warnings"><code class="docutils literal notranslate"><span class="pre">test_print_animal_num_warnings()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_record_pen_history"><code class="docutils literal notranslate"><span class="pre">test_record_pen_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_remove_animal_from_pen_and_id_map"><code class="docutils literal notranslate"><span class="pre">test_remove_animal_from_pen_and_id_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_remove_animals_from_herd"><code class="docutils literal notranslate"><span class="pre">test_remove_animals_from_herd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_animal_management.test_track_former_pen_population"><code class="docutils literal notranslate"><span class="pre">test_track_former_pen_population()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tests.test_feed">tests.test_feed module</a><ul>
@@ -454,6 +489,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tests.test_misc">tests.test_misc module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.DummyClass"><code class="docutils literal notranslate"><span class="pre">DummyClass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.DummyNestedClass"><code class="docutils literal notranslate"><span class="pre">DummyNestedClass</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.mock_output_manager"><code class="docutils literal notranslate"><span class="pre">mock_output_manager()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.output_manager_original_method_states"><code class="docutils literal notranslate"><span class="pre">output_manager_original_method_states()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.patch_simulation_engine"><code class="docutils literal notranslate"><span class="pre">patch_simulation_engine()</span></code></a></li>
@@ -462,6 +499,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_add_LP_constraints"><code class="docutils literal notranslate"><span class="pre">test_add_LP_constraints()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_add_error"><code class="docutils literal notranslate"><span class="pre">test_add_error()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_add_log"><code class="docutils literal notranslate"><span class="pre">test_add_log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_add_to_pool"><code class="docutils literal notranslate"><span class="pre">test_add_to_pool()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_add_variable"><code class="docutils literal notranslate"><span class="pre">test_add_variable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_add_warning"><code class="docutils literal notranslate"><span class="pre">test_add_warning()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_advance"><code class="docutils literal notranslate"><span class="pre">test_advance()</span></code></a></li>
@@ -472,8 +510,16 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_calc_sim_length"><code class="docutils literal notranslate"><span class="pre">test_calc_sim_length()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_create_LP_problem"><code class="docutils literal notranslate"><span class="pre">test_create_LP_problem()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_daily_simulation"><code class="docutils literal notranslate"><span class="pre">test_daily_simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_dump_all_pools"><code class="docutils literal notranslate"><span class="pre">test_dump_all_pools()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_dump_errors"><code class="docutils literal notranslate"><span class="pre">test_dump_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_dump_logs"><code class="docutils literal notranslate"><span class="pre">test_dump_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_dump_variable_names_and_contexts"><code class="docutils literal notranslate"><span class="pre">test_dump_variable_names_and_contexts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_dump_variables"><code class="docutils literal notranslate"><span class="pre">test_dump_variables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_dump_warnings"><code class="docutils literal notranslate"><span class="pre">test_dump_warnings()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_end_simulation"><code class="docutils literal notranslate"><span class="pre">test_end_simulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_end_year"><code class="docutils literal notranslate"><span class="pre">test_end_year()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_exclude_info_maps"><code class="docutils literal notranslate"><span class="pre">test_exclude_info_maps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_filter_variables_pool"><code class="docutils literal notranslate"><span class="pre">test_filter_variables_pool()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_flush_pools"><code class="docutils literal notranslate"><span class="pre">test_flush_pools()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_general_constants"><code class="docutils literal notranslate"><span class="pre">test_general_constants()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_generate_LP_vars"><code class="docutils literal notranslate"><span class="pre">test_generate_LP_vars()</span></code></a></li>
@@ -481,22 +527,20 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_generate_key"><code class="docutils literal notranslate"><span class="pre">test_generate_key()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_get_base_dir"><code class="docutils literal notranslate"><span class="pre">test_get_base_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_get_prefix"><code class="docutils literal notranslate"><span class="pre">test_get_prefix()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_get_time_based_suffix"><code class="docutils literal notranslate"><span class="pre">test_get_time_based_suffix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_init_simulation_engine"><code class="docutils literal notranslate"><span class="pre">test_init_simulation_engine()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_input_prompt"><code class="docutils literal notranslate"><span class="pre">test_input_prompt()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_is_correct_structure"><code class="docutils literal notranslate"><span class="pre">test_is_correct_structure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_is_leap_year"><code class="docutils literal notranslate"><span class="pre">test_is_leap_year()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_list_to_file_txt"><code class="docutils literal notranslate"><span class="pre">test_list_to_file_txt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_load_txt_file_to_list"><code class="docutils literal notranslate"><span class="pre">test_load_txt_file_to_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_make_serializable_recursive"><code class="docutils literal notranslate"><span class="pre">test_make_serializable_recursive()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_organize_results"><code class="docutils literal notranslate"><span class="pre">test_organize_results()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_output_manager_singleton"><code class="docutils literal notranslate"><span class="pre">test_output_manager_singleton()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_percent_calculator"><code class="docutils literal notranslate"><span class="pre">test_percent_calculator()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_query"><code class="docutils literal notranslate"><span class="pre">test_query()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_read_json_file"><code class="docutils literal notranslate"><span class="pre">test_read_json_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_remove_items_from_list_by_indices"><code class="docutils literal notranslate"><span class="pre">test_remove_items_from_list_by_indices()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_save_all_pools"><code class="docutils literal notranslate"><span class="pre">test_save_all_pools()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_save_errors"><code class="docutils literal notranslate"><span class="pre">test_save_errors()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_save_logs"><code class="docutils literal notranslate"><span class="pre">test_save_logs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_save_variables"><code class="docutils literal notranslate"><span class="pre">test_save_variables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_save_warnings"><code class="docutils literal notranslate"><span class="pre">test_save_warnings()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_show_final_messages"><code class="docutils literal notranslate"><span class="pre">test_show_final_messages()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_simulate"><code class="docutils literal notranslate"><span class="pre">test_simulate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_misc.test_solve_with_fastest_solver"><code class="docutils literal notranslate"><span class="pre">test_solve_with_fastest_solver()</span></code></a></li>
@@ -531,8 +575,13 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.calf_daily_growth_values"><code class="docutils literal notranslate"><span class="pre">calf_daily_growth_values()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.dict_to_tuple_list"><code class="docutils literal notranslate"><span class="pre">dict_to_tuple_list()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.feed_allocations"><code class="docutils literal notranslate"><span class="pre">feed_allocations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.mock_animal_list"><code class="docutils literal notranslate"><span class="pre">mock_animal_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.mock_animal_list_combined"><code class="docutils literal notranslate"><span class="pre">mock_animal_list_combined()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.mock_animal_list_ii"><code class="docutils literal notranslate"><span class="pre">mock_animal_list_ii()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.mock_calves_with_daily_growth"><code class="docutils literal notranslate"><span class="pre">mock_calves_with_daily_growth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.pen"><code class="docutils literal notranslate"><span class="pre">pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.pen_with_animals"><code class="docutils literal notranslate"><span class="pre">pen_with_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_add_new_animals"><code class="docutils literal notranslate"><span class="pre">test_add_new_animals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_growth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_calc_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_calc_avg_stats"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_stats()</span></code></a></li>
@@ -544,9 +593,14 @@
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_clear"><code class="docutils literal notranslate"><span class="pre">test_clear()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_daily_p_update"><code class="docutils literal notranslate"><span class="pre">test_daily_p_update()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_reset_manure"><code class="docutils literal notranslate"><span class="pre">test_reset_manure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_set_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_set_avg_nutrient_rqmts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_set_milk_avgs"><code class="docutils literal notranslate"><span class="pre">test_set_milk_avgs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_set_up_new_animal"><code class="docutils literal notranslate"><span class="pre">test_set_up_new_animal()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_subset_class_feeds"><code class="docutils literal notranslate"><span class="pre">test_subset_class_feeds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_update_animal_combination"><code class="docutils literal notranslate"><span class="pre">test_update_animal_combination()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_update_animals"><code class="docutils literal notranslate"><span class="pre">test_update_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_update_pen_populated"><code class="docutils literal notranslate"><span class="pre">test_update_pen_populated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tests.test_pen.test_update_stocking_density"><code class="docutils literal notranslate"><span class="pre">test_update_stocking_density()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-tests.test_user_prompt">tests.test_user_prompt module</a><ul>
@@ -582,7 +636,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
       <li class="breadcrumb-item active">tests package</li>
       <li class="wy-breadcrumbs-aside">
@@ -683,6 +737,8 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_accumulate_daily_output"><code class="docutils literal notranslate"><span class="pre">test_accumulate_daily_output()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_adjust_accumulated_output"><code class="docutils literal notranslate"><span class="pre">test_adjust_accumulated_output()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_adjust_final_manure_volume"><code class="docutils literal notranslate"><span class="pre">test_adjust_final_manure_volume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_anaerobic_digestion_and_lagoon_daily_update_helper"><code class="docutils literal notranslate"><span class="pre">test_anaerobic_digestion_and_lagoon_daily_update_helper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_anaerobic_digestion_and_lagoon_init"><code class="docutils literal notranslate"><span class="pre">test_anaerobic_digestion_and_lagoon_init()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_anaerobic_digestion_default_config"><code class="docutils literal notranslate"><span class="pre">test_anaerobic_digestion_default_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_anaerobic_lagoon_calc_abc"><code class="docutils literal notranslate"><span class="pre">test_anaerobic_lagoon_calc_abc()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_anaerobic_lagoon_calc_ammonia_emission"><code class="docutils literal notranslate"><span class="pre">test_anaerobic_lagoon_calc_ammonia_emission()</span></code></a></li>
@@ -704,6 +760,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_calc_modeled_lagoon_volume"><code class="docutils literal notranslate"><span class="pre">test_calc_modeled_lagoon_volume()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_calc_moisture_content"><code class="docutils literal notranslate"><span class="pre">test_calc_moisture_content()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_calc_specific_input_energy"><code class="docutils literal notranslate"><span class="pre">test_calc_specific_input_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_create_anaerobic_digestion_daily_output"><code class="docutils literal notranslate"><span class="pre">test_create_anaerobic_digestion_daily_output()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_daily_update"><code class="docutils literal notranslate"><span class="pre">test_daily_update()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_daily_update_helper"><code class="docutils literal notranslate"><span class="pre">test_daily_update_helper()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.test_manure_module.html#tests.test_manure_module.test_manure_treatments.test_default_manure_treatment_config_factory_get_instance"><code class="docutils literal notranslate"><span class="pre">test_default_manure_treatment_config_factory_get_instance()</span></code></a></li>
@@ -782,6 +839,32 @@
 File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;&#52;&#48;cornell&#46;edu">sh2235<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.cow_a">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">cow_a</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#tests.test_animal.cow_a" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.cow_b">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">cow_b</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#tests.test_animal.cow_b" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.cow_fixture">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">cow_fixture</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AnimalBase</span></span></span><a class="headerlink" href="#tests.test_animal.cow_fixture" title="Permalink to this definition"></a></dt>
+<dd><p>simple AnimalBase fixture for use in animal tests</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.heifer_a">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">heifer_a</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#tests.test_animal.heifer_a" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.heifer_b">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">heifer_b</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#tests.test_animal.heifer_b" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_DMI_constraint">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_DMI_constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_DMI_constraint" title="Permalink to this definition"></a></dt>
@@ -1060,7 +1143,7 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_add_event">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_add_event</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_add_event" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_add_event</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_add_event" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function add_event in file routines/animal/life_cycle/animal_events.py</p>
 </dd></dl>
 
@@ -1086,12 +1169,6 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_animal.test_calc_avg_nutrient_rqmts">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calc_avg_nutrient_rqmts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_calc_avg_nutrient_rqmts" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function calc_avg_nutrient_rqmts in file routines/animal/pen.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_animal.test_calc_avg_stats">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calc_avg_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_calc_avg_stats" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function calc_avg_stats in file routines/animal/pen.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1149,6 +1226,102 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_DMI">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_DMI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_DMI" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_DMI in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_calcium_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_calcium_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_calcium_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_calcium_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_energy_growth_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_energy_growth_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_energy_growth_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_energy_growth_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_energy_lactation_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_energy_lactation_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_energy_lactation_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_energy_lactation_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_energy_maintenance_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_energy_maintenance_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_energy_maintenance_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_energy_maintenance_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_energy_pregnancy_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_energy_pregnancy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_energy_pregnancy_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_energy_pregnancy_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_phosphorus_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_phosphorus_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_phosphorus_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_phosphorus_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NASEM_protein_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NASEM_protein_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NASEM_protein_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NASEM_protein_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_DMI">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_DMI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_DMI" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_DMI in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_calcium_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_calcium_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_calcium_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_calcium_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_energy_growth_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_energy_growth_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_energy_growth_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_energy_growth_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_energy_lactation_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_energy_lactation_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_energy_lactation_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_energy_lactation_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_energy_maintenance_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_energy_maintenance_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_energy_maintenance_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_energy_maintenance_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_energy_pregnancy_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_energy_pregnancy_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_energy_pregnancy_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_energy_pregnancy_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_phosphorus_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_phosphorus_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_phosphorus_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_phosophorus_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal.test_calculate_NRC_protein_requirements">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_NRC_protein_requirements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heifer_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_calculate_NRC_protein_requirements" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_NRC_protein_requirements in file routines/animal/ration/animal_requirements.py</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_calculate_rqmts">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_calculate_rqmts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_calculate_rqmts" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py</p>
@@ -1174,7 +1347,7 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_daily_p_update">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_daily_p_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_daily_p_update" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_daily_p_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dP_reserves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_intake</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cow_fixture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_daily_p_update" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py</p>
 </dd></dl>
 
@@ -1360,7 +1533,7 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_list_reconfig">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_list_reconfig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_list_reconfig" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_list_reconfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_list_reconfig" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py</p>
 </dd></dl>
 
@@ -1410,12 +1583,6 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_animal.test_phosphorus_constraint">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_phosphorus_constraint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_phosphorus_constraint" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function phosphorus_constraint in file routines/animal/ration/cow_ration_NLP.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_animal.test_phosphorus_excreted">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_phosphorus_excreted</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_phosphorus_excreted" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function phosphorus_excreted in file routines/animal/manure/general_manure.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1516,8 +1683,8 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_update_body_weight_history">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_update_body_weight_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_update_body_weight_history" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function update_body_weight_history in file routines/animal/life_cycle/animal_base.py</p>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_update_body_weight_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_fixture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_update_body_weight_history" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for update_body_weight_history in file routines/animal/life_cycle/animal_base.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1528,8 +1695,8 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal.test_update_pen_history">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_update_pen_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal.test_update_pen_history" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function update_pen_history in file routines/animal/life_cycle/animal_base.py</p>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal.</span></span><span class="sig-name descname"><span class="pre">test_update_pen_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_fixture</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnimalBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal.test_update_pen_history" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for update_pen_history in file routines/animal/life_cycle/animal_base.py</p>
 </dd></dl>
 
 </section>
@@ -1551,28 +1718,116 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.create_mock_object_list">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">create_mock_object_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.create_mock_object_list" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">create_mock_object_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute_dicts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.create_mock_object_list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_animal_management.mock_animals">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_animals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_animals" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tests.test_animal_management.mock_animals_small">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_animals_small</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_animals_small" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.mock_herd_data">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_herd_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_herd_data" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_herd_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_herd_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.mock_manure_management_scenarios">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_manure_management_scenarios</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_manure_management_scenarios" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.mock_pen_data">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_pen_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_pen_data" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_pen_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_pen_data" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.mock_pens">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">mock_pens</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.mock_pens" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.pens_test_data_dict">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">pens_test_data_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.pens_test_data_dict" title="Permalink to this definition"></a></dt>
+<dd><p>A list of dictionaries containing the data needed to create several Pen objects for testing purposes.</p>
+<p>Creates a list of data dictionaries holding the data required for several unit tests below, where each
+dictionary is a separate test case due to the parametrization of test functions.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Returns a list of dictionaries, where each dictionary contains the data needed for individual
+AnimalManagement test cases. The dictionaries include data needed to set up AnimalManagement
+instances for testing purposes, such as pen IDs and the animal IDs to be placed into pens. They also
+contain the expected results for various unit tests, such as the expected stocking density for a pen
+which is tested in test_remove_animals_from_herd()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.setup_dummy_animal">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">setup_dummy_animal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AnimalBase</span></span></span><a class="headerlink" href="#tests.test_animal_management.setup_dummy_animal" title="Permalink to this definition"></a></dt>
+<dd><p>Sets up a dummy AnimalBase object for testing purposes.</p>
+<p>Creates an AnimalBase object with filler required variables, except ‘id,’ which is passed in
+as an argument to the function.</p>
+<dl>
+<dt>Args:</dt><dd><p>animal_id: an integer animal ID number, uniquely signed to the AnimalBase object being made
+animal_type: the string type of the dummmy animal, ranging from a Calf, to one of three Heifer</p>
+<blockquote>
+<div><p>types, to lactating and dry cows</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>An AnimalBase object that has the ‘id’ variable specified by the animal_id argument and dummy
+values for all other required variables.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.setup_dummy_animal_management_with_pens">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">setup_dummy_animal_management_with_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_removals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_animal_management.setup_dummy_animal_management_with_pens" title="Permalink to this definition"></a></dt>
+<dd><p>Prepares a dummy AnimalManagement object for testing purposes.</p>
+<p>Using the data held within the information dictionary passed in as input, this function populates several
+of the AnimalManagement object’s variables. This is done by creating AnimalBase objects and placing them into
+Pen objects’ ‘animals_in_pen’ variables, as well as configuring the Pen’s ration variable before then
+appending individual Pen objects to the AnimalManagement object’s ‘all_pens’ variable.</p>
+<dl>
+<dt>Args:</dt><dd><p>animal_management: An AnimalManagement object
+info_dict: A dictionary containing the data needed to fully create the
+append_removals: A boolean that is set to True if a list of animals to be removed needs to be true,</p>
+<blockquote>
+<div><p>False otherwise</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>A dictionary containing the edited AnimalManagement object via the ‘animal_management_object’
+key, and a list of AnimalBase objects to be removed via the ‘animals_removed_list’ key</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.setup_dummy_pen">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">setup_dummy_pen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_stalls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">AnimalBase</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></span><a class="headerlink" href="#tests.test_animal_management.setup_dummy_pen" title="Permalink to this definition"></a></dt>
+<dd><p>Sets up a dummy Pen object for testing purposes.</p>
+<p>Creates a Pen object with filler required variables, except ‘id’ and ‘number_of_stalls,’ which are passed in
+as arguments to the function. The Pen’s ‘animals_in_pen’ variable gets set to the animal_list passed in as
+an argument.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>pen_id: an integer pen ID number, uniquely signed to the Pen object being made
+num_stalls: an integer pertaining to the number of stalls within the Pen being made
+animal_list: a list of AnimalBase objects that will be living inside the Pen</p>
+</dd>
+<dt>Returns:</dt><dd><p>A Pen object that has the ‘id’ and ‘number_of_stalls’ variable specified by the pen_id and num_stalls
+arguments and dummy values for all other required variables.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_add_animal_to_pen_and_id_map">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_add_animal_to_pen_and_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_add_animal_to_pen_and_id_map" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for the function _add_animal_to_pen_and_id_map() in file animal_management.py</p>
+<p>This test checks that the function correctly assigns an animal to a pen with the minimum stocking density,
+updates the pen’s animal count and stocking density, and updates the animal_to_pen_id_map.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.test_allocate_all_pens">
@@ -1624,7 +1879,7 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.test_calc_p_conc">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_calc_p_conc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_calc_p_conc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_calc_p_conc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_animals_small</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_calc_p_conc" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function _calc_p_conc in file routines/animal/animal_management.py</p>
 </dd></dl>
 
@@ -1638,6 +1893,12 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_animal_management.test_calc_ration">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_calc_ration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_calc_ration" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function calc_ration in file routines/animal/animal_management.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_calculate_pen_rations">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_calculate_pen_rations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_calculate_pen_rations" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function calculate_pen_rations in file routines/animal/animal_management.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1659,9 +1920,9 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_animal_management.test_daily_update_id_pen">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_daily_update_id_pen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_daily_update_id_pen" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function daily_update_id_pen in file routines/animal/animal_management.py</p>
+<dt class="sig sig-object py" id="tests.test_animal_management.test_daily_update_id_map">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_daily_update_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_daily_update_id_map" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function daily_update_id_map in file routines/animal/animal_management.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1677,9 +1938,9 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_animal_management.test_fully_update_id_pen">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_fully_update_id_pen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_fully_update_id_pen" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function fully_update_id_pen in file routines/animal/animal_management.py</p>
+<dt class="sig sig-object py" id="tests.test_animal_management.test_fully_update_animal_to_pen_id_map">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_fully_update_animal_to_pen_id_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_fully_update_animal_to_pen_id_map" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_management.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1695,6 +1956,14 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_get_animals_snapshot">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_get_animals_snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_get_animals_snapshot" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function _get_animals_snapshot() in file animal_management.py</p>
+<p>This test checks that the function correctly creates a snapshot of the current state of all animals
+in the system, and additionally finds and stores the combination each animal belongs to.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.test_get_initialize_db_summary">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_get_initialize_db_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_get_initialize_db_summary" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function get_initialize_db_summary in file routines/animal/animal_management.py</p>
@@ -1704,6 +1973,38 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_animal_management.test_get_life_cycle_output">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_get_life_cycle_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_get_life_cycle_output" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function get_life_cycle_output in file routines/animal/animal_management.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_handle_animals_with_unchanged_class_and_changed_combination">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_handle_animals_with_unchanged_class_and_changed_combination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_handle_animals_with_unchanged_class_and_changed_combination" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for the function _handle_animals_with_unchanged_class_and_changed_combination() in file animal_management.py</p>
+<p>This test checks that the function correctly identifies the animals that didn’t change their classes but changed their animal combination.
+It also verifies that the functions ‘_remove_animal_from_pen_and_id_map’ and ‘_add_animal_to_pen_and_id_map’ are called for these animals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_handle_graduated_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_handle_graduated_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_handle_graduated_animals" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for the function _handle_graduated_animals() in file animal_management.py</p>
+<p>This test checks that the function correctly identifies the animals that have graduated to the next class.
+It also verifies that the function ‘_add_animal_to_pen_and_id_map’ is called for these graduated animals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_handle_newly_added_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_handle_newly_added_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_handle_newly_added_animals" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for the function _handle_newly_added_animals() in file animal_management.py</p>
+<p>This test checks that the function correctly handles newly added animals and adds them to
+the appropriate data structures.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_handle_removed_animals_after_update">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_handle_removed_animals_after_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_handle_removed_animals_after_update" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for the function _handle_removed_animals_after_update() in file animal_management.py</p>
+<p>This test checks that the function correctly identifies the animals that have been removed after an update,
+and that it successfully calls the ‘_remove_animal_from_pen_and_id_map’ method for each of these animals.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1725,13 +2026,13 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.test_init_pens">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_init_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_pen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_init_pens" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_init_pens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_pen_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_herd_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_manure_management_scenarios</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_init_pens" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function init_pens in file routines/animal/animal_management.py</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_animal_management.test_print_animal_num_warnings">
-<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_print_animal_num_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_print_animal_num_warnings" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_print_animal_num_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_print_animal_num_warnings" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function _print_animal_num_warnings in file routines/animal/animal_management.py</p>
 </dd></dl>
 
@@ -1739,6 +2040,26 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_animal_management.test_record_pen_history">
 <span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_record_pen_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_record_pen_history" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function record_pen_history in file routines/animal/animal_management.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_remove_animal_from_pen_and_id_map">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_remove_animal_from_pen_and_id_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_animal_management.test_remove_animal_from_pen_and_id_map" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for the function _remove_animal_from_pen_and_id_map() in file animal_management.py</p>
+<p>This test checks that the function correctly removes the animal from the pen it is in and
+from the animal_to_pen_id_map.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_remove_animals_from_herd">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_remove_animals_from_herd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_remove_animals_from_herd" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function remove_animals_from_herd in file routines/animal/animal_management.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_animal_management.test_track_former_pen_population">
+<span class="sig-prename descclassname"><span class="pre">tests.test_animal_management.</span></span><span class="sig-name descname"><span class="pre">test_track_former_pen_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_management</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement" title="RUFAS.routines.animal.animal_management.AnimalManagement"><span class="pre">AnimalManagement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_animal_management.test_track_former_pen_population" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function track_former_pen_population in file routines/animal/animal_management.py</p>
 </dd></dl>
 
 </section>
@@ -3125,6 +3446,18 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 File name: test_misc.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;&#52;&#48;cornell&#46;edu">sh2235<span>&#64;</span>cornell<span>&#46;</span>edu</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_misc.DummyClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">DummyClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.DummyClass" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tests.test_misc.DummyNestedClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">DummyNestedClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.DummyNestedClass" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.mock_output_manager">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">mock_output_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></span><a class="headerlink" href="#tests.test_misc.mock_output_manager" title="Permalink to this definition"></a></dt>
@@ -3162,25 +3495,31 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_add_error">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_error" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_error" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function add_error in file output_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_add_log">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_log" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_log" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function add_log in file output_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_add_to_pool">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_to_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_to_pool" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function _add_to_pool in file output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_add_variable">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_variable" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_variable" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function add_variable in file output_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_add_warning">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_warning" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_add_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_add_warning" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function add_warning in file output_manager.py</p>
 </dd></dl>
 
@@ -3233,6 +3572,42 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_dump_all_pools">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_dump_all_pools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_dump_all_pools" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function dump_all_pools in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_dump_errors">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_dump_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_dump_errors" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function dump_errors in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_dump_logs">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_dump_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_dump_logs" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function dump_logs in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_dump_variable_names_and_contexts">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_dump_variable_names_and_contexts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_dump_variable_names_and_contexts" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function dump_variable_names_and_contexts in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_dump_variables">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_dump_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_dump_variables" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function dump_variables in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_dump_warnings">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_dump_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_dump_warnings" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function dump_warnings in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_end_simulation">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_end_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.test_end_simulation" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function end_simulation in file classes.py</p>
@@ -3242,6 +3617,18 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_misc.test_end_year">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_end_year</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.test_end_year" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function end_year in file classes.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_exclude_info_maps">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_exclude_info_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_exclude_info_maps" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function _exclude_info_maps in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_filter_variables_pool">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_filter_variables_pool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_filter_variables_pool" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function _filter_variables_pool in output_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -3287,12 +3674,6 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_get_time_based_suffix">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_get_time_based_suffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_get_time_based_suffix" title="Permalink to this definition"></a></dt>
-<dd><p>Unit test for function _get_suffix in file output_manager.py</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_init_simulation_engine">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_init_simulation_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_simulation_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.simulation_engine.SimulationEngine" title="RUFAS.simulation_engine.SimulationEngine"><span class="pre">SimulationEngine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_init_simulation_engine" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function __init__ in file RUFAS/simulation_engine.py</p>
@@ -3314,6 +3695,24 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_misc.test_is_leap_year">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_is_leap_year</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_misc.test_is_leap_year" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function is_leap_year in file classes.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_list_to_file_txt">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_list_to_file_txt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmpdir</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_list_to_file_txt" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function _list_to_file_text in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_load_txt_file_to_list">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_load_txt_file_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_load_txt_file_to_list" title="Permalink to this definition"></a></dt>
+<dd><p>Test case for function _load_txt_file_to_list in output_manager.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_misc.test_make_serializable_recursive">
+<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_make_serializable_recursive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_make_serializable_recursive" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function _make_serializable() in file util.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -3353,33 +3752,9 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_save_all_pools">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_save_all_pools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_save_all_pools" title="Permalink to this definition"></a></dt>
-<dd><p>Test case for function save_all_pools in output_manager.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_save_errors">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_save_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_save_errors" title="Permalink to this definition"></a></dt>
-<dd><p>Test case for function save_errors in output_manager.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_save_logs">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_save_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_save_logs" title="Permalink to this definition"></a></dt>
-<dd><p>Test case for function save_logs in output_manager.py</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_misc.test_save_variables">
 <span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_save_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_save_variables" title="Permalink to this definition"></a></dt>
 <dd><p>Test case for function save_variables in output_manager.py</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tests.test_misc.test_save_warnings">
-<span class="sig-prename descclassname"><span class="pre">tests.test_misc.</span></span><span class="sig-name descname"><span class="pre">test_save_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_output_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager" title="RUFAS.output_manager.OutputManager"><span class="pre">OutputManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_manager_original_method_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_misc.test_save_warnings" title="Permalink to this definition"></a></dt>
-<dd><p>Test case for function save_warnings in output_manager.py</p>
 </dd></dl>
 
 <dl class="py function">
@@ -3561,6 +3936,21 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.mock_animal_list">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">mock_animal_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_pen.mock_animal_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.mock_animal_list_combined">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">mock_animal_list_combined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_animal_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_animal_list_ii</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_pen.mock_animal_list_combined" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.mock_animal_list_ii">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">mock_animal_list_ii</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_pen.mock_animal_list_ii" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_pen.mock_calves_with_daily_growth">
 <span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">mock_calves_with_daily_growth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calf_daily_growth_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tests.test_pen.mock_calves_with_daily_growth" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -3569,6 +3959,17 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 <dt class="sig sig-object py" id="tests.test_pen.pen">
 <span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">pen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></span><a class="headerlink" href="#tests.test_pen.pen" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.pen_with_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">pen_with_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_animal_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">MagicMock</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></span><a class="headerlink" href="#tests.test_pen.pen_with_animals" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.test_add_new_animals">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_add_new_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_to_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_animal_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Calf</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Cow</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferI</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferII</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIII</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_animals_in_pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Calf</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Cow</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferI</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferII</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">HeiferIII</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_add_new_animals" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function add_new_animals in file routines/animal/pen.py</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_pen.test_calc_avg_growth">
@@ -3637,6 +4038,18 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.test_set_avg_nutrient_rqmts">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_set_avg_nutrient_rqmts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_set_avg_nutrient_rqmts" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function set_avg_nutrient_rqmts in file routines/animal/pen.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.test_set_milk_avgs">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_set_milk_avgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_set_milk_avgs" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function set_milk_avgs in file routines/animal/pen.py</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_pen.test_set_up_new_animal">
 <span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_set_up_new_animal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_set_up_new_animal" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function set_up_new_animal in file routines/animal/pen.py</p>
@@ -3649,9 +4062,27 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.test_update_animal_combination">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_update_animal_combination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_combination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.AnimalCombination" title="RUFAS.routines.animal.pen.Pen.AnimalCombination"><span class="pre">AnimalCombination</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_update_animal_combination" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function update_animal_combination in file routines/animal/pen.py</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tests.test_pen.test_update_animals">
-<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_update_animals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_update_animals" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_update_animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_update_animals" title="Permalink to this definition"></a></dt>
 <dd><p>Unit test for function update_animals in file routines/animal/pen.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.test_update_pen_populated">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_update_pen_populated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_to_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_pen_populated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_update_pen_populated" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function update_pen_populated in file routines/animal/pen.py</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tests.test_pen.test_update_stocking_density">
+<span class="sig-prename descclassname"><span class="pre">tests.test_pen.</span></span><span class="sig-name descname"><span class="pre">test_update_stocking_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pen_to_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen" title="RUFAS.routines.animal.pen.Pen"><span class="pre">Pen</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_stocking_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tests.test_pen.test_update_stocking_density" title="Permalink to this definition"></a></dt>
+<dd><p>Unit test for function update_stocking_density in file routines/animal/pen.py</p>
 </dd></dl>
 
 </section>
@@ -3701,7 +4132,7 @@ Author(s): Pooya Hekmati, <a class="reference external" href="mailto:sh2235&#37;
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tests.test_user_prompt.test_run_rufas">
-<span class="sig-prename descclassname"><span class="pre">tests.test_user_prompt.</span></span><span class="sig-name descname"><span class="pre">test_run_rufas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_graphs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_user_prompt.test_run_rufas" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">tests.test_user_prompt.</span></span><span class="sig-name descname"><span class="pre">test_run_rufas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_graphs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mocker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MockerFixture</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#tests.test_user_prompt.test_run_rufas" title="Permalink to this definition"></a></dt>
 <dd><p>Checks that run_rufas() calls the correct functions in the correct order</p>
 </dd></dl>
 

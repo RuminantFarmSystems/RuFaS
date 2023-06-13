@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -64,7 +65,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">GitHub</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
@@ -111,6 +112,7 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.classes.Time.advance"><code class="docutils literal notranslate"><span class="pre">Time.advance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.classes.Time.end_simulation"><code class="docutils literal notranslate"><span class="pre">Time.end_simulation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.classes.Time.end_year"><code class="docutils literal notranslate"><span class="pre">Time.end_year()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.classes.Time.is_last_day_of_simulation"><code class="docutils literal notranslate"><span class="pre">Time.is_last_day_of_simulation</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.classes.Time.to_str"><code class="docutils literal notranslate"><span class="pre">Time.to_str()</span></code></a></li>
 </ul>
 </li>
@@ -133,10 +135,14 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants"><code class="docutils literal notranslate"><span class="pre">GeneralConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.CUBIC_METERS_TO_LITERS"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.CUBIC_METERS_TO_LITERS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.DAYS_PER_YEAR"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.DAYS_PER_YEAR</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.GRAMS_TO_KG"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.GRAMS_TO_KG</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.KG_TO_CUBIC_METERS"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.KG_TO_CUBIC_METERS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.KG_TO_GRAMS"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.KG_TO_GRAMS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.LITERS_TO_CUBIC_METERS"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.LITERS_TO_CUBIC_METERS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.NITROGEN_TO_PROTEIN"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.NITROGEN_TO_PROTEIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.PROTEIN_TO_NITROGEN"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.PROTEIN_TO_NITROGEN</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.SECONDS_PER_DAY"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.SECONDS_PER_DAY</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.WATER_DENSITY_KG_PER_LITER"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.WATER_DENSITY_KG_PER_LITER</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.general_constants.GeneralConstants.WATER_DENSITY_KG_PER_M3"><code class="docutils literal notranslate"><span class="pre">GeneralConstants.WATER_DENSITY_KG_PER_M3</span></code></a></li>
@@ -150,13 +156,16 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.add_log"><code class="docutils literal notranslate"><span class="pre">OutputManager.add_log()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.add_variable"><code class="docutils literal notranslate"><span class="pre">OutputManager.add_variable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.add_warning"><code class="docutils literal notranslate"><span class="pre">OutputManager.add_warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.dump_all_pools"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_all_pools()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.dump_errors"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_errors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.dump_logs"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_variable_names_and_contexts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.dump_variables"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_variables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.dump_warnings"><code class="docutils literal notranslate"><span class="pre">OutputManager.dump_warnings()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.flush_pools"><code class="docutils literal notranslate"><span class="pre">OutputManager.flush_pools()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.instance"><code class="docutils literal notranslate"><span class="pre">OutputManager.instance</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.save_all_pools"><code class="docutils literal notranslate"><span class="pre">OutputManager.save_all_pools()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.save_errors"><code class="docutils literal notranslate"><span class="pre">OutputManager.save_errors()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.save_logs"><code class="docutils literal notranslate"><span class="pre">OutputManager.save_logs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.pool_element_type"><code class="docutils literal notranslate"><span class="pre">OutputManager.pool_element_type</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.save_variables"><code class="docutils literal notranslate"><span class="pre">OutputManager.save_variables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.output_manager.OutputManager.save_warnings"><code class="docutils literal notranslate"><span class="pre">OutputManager.save_warnings()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -180,7 +189,9 @@
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility"><code class="docutils literal notranslate"><span class="pre">Utility</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.calc_average"><code class="docutils literal notranslate"><span class="pre">Utility.calc_average()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.empty_dir"><code class="docutils literal notranslate"><span class="pre">Utility.empty_dir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.get_base_dir"><code class="docutils literal notranslate"><span class="pre">Utility.get_base_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.make_serializable"><code class="docutils literal notranslate"><span class="pre">Utility.make_serializable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.percent_calculator"><code class="docutils literal notranslate"><span class="pre">Utility.percent_calculator()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.read_json_file"><code class="docutils literal notranslate"><span class="pre">Utility.read_json_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.html#RUFAS.util.Utility.remove_items_from_list_by_indices"><code class="docutils literal notranslate"><span class="pre">Utility.remove_items_from_list_by_indices()</span></code></a></li>
@@ -225,6 +236,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests.test_animal">tests.test_animal module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.cow_a"><code class="docutils literal notranslate"><span class="pre">cow_a()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.cow_b"><code class="docutils literal notranslate"><span class="pre">cow_b()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.cow_fixture"><code class="docutils literal notranslate"><span class="pre">cow_fixture()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.heifer_a"><code class="docutils literal notranslate"><span class="pre">heifer_a()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.heifer_b"><code class="docutils literal notranslate"><span class="pre">heifer_b()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_DMI_constraint"><code class="docutils literal notranslate"><span class="pre">test_DMI_constraint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_NDF_constraint_1"><code class="docutils literal notranslate"><span class="pre">test_NDF_constraint_1()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_NDF_constraint_2"><code class="docutils literal notranslate"><span class="pre">test_NDF_constraint_2()</span></code></a></li>
@@ -276,7 +292,6 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_assign_heiferII_values"><code class="docutils literal notranslate"><span class="pre">test_assign_heiferII_values()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_growth()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_nutrient_rqmts()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_avg_stats"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_stats()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_base_manure"><code class="docutils literal notranslate"><span class="pre">test_calc_base_manure()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_daily_walking_dist"><code class="docutils literal notranslate"><span class="pre">test_calc_daily_walking_dist()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_manure"><code class="docutils literal notranslate"><span class="pre">test_calc_manure()</span></code></a></li>
@@ -286,6 +301,22 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_requirements"><code class="docutils literal notranslate"><span class="pre">test_calc_requirements()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calc_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calcium_constraint"><code class="docutils literal notranslate"><span class="pre">test_calcium_constraint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_DMI"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_DMI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_calcium_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_calcium_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_energy_growth_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_growth_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_energy_lactation_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_lactation_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_energy_maintenance_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_maintenance_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_energy_pregnancy_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_energy_pregnancy_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_phosphorus_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_phosphorus_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NASEM_protein_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NASEM_protein_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_DMI"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_DMI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_calcium_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_calcium_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_energy_growth_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_growth_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_energy_lactation_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_lactation_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_energy_maintenance_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_maintenance_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_energy_pregnancy_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_energy_pregnancy_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_phosphorus_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_phosphorus_requirements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_NRC_protein_requirements"><code class="docutils literal notranslate"><span class="pre">test_calculate_NRC_protein_requirements()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_calculate_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calculate_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_call_animal_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_call_animal_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_call_p_rqmts"><code class="docutils literal notranslate"><span class="pre">test_call_p_rqmts()</span></code></a></li>
@@ -330,7 +361,6 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_optimize"><code class="docutils literal notranslate"><span class="pre">test_optimize()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_percentile_list"><code class="docutils literal notranslate"><span class="pre">test_percentile_list()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_phosphorus_constraint"><code class="docutils literal notranslate"><span class="pre">test_phosphorus_constraint()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_phosphorus_excreted"><code class="docutils literal notranslate"><span class="pre">test_phosphorus_excreted()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_phosphorus_rqmts"><code class="docutils literal notranslate"><span class="pre">test_phosphorus_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_protien_constraint"><code class="docutils literal notranslate"><span class="pre">test_protien_constraint()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal.test_ration_formulation"><code class="docutils literal notranslate"><span class="pre">test_ration_formulation()</span></code></a></li>
@@ -356,10 +386,16 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.animal_management"><code class="docutils literal notranslate"><span class="pre">animal_management()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.animal_management_with_mock_pens"><code class="docutils literal notranslate"><span class="pre">animal_management_with_mock_pens()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.create_mock_object_list"><code class="docutils literal notranslate"><span class="pre">create_mock_object_list()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.mock_animals"><code class="docutils literal notranslate"><span class="pre">mock_animals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.mock_animals_small"><code class="docutils literal notranslate"><span class="pre">mock_animals_small()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.mock_herd_data"><code class="docutils literal notranslate"><span class="pre">mock_herd_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.mock_manure_management_scenarios"><code class="docutils literal notranslate"><span class="pre">mock_manure_management_scenarios()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.mock_pen_data"><code class="docutils literal notranslate"><span class="pre">mock_pen_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.mock_pens"><code class="docutils literal notranslate"><span class="pre">mock_pens()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.pens_test_data_dict"><code class="docutils literal notranslate"><span class="pre">pens_test_data_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.setup_dummy_animal"><code class="docutils literal notranslate"><span class="pre">setup_dummy_animal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.setup_dummy_animal_management_with_pens"><code class="docutils literal notranslate"><span class="pre">setup_dummy_animal_management_with_pens()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.setup_dummy_pen"><code class="docutils literal notranslate"><span class="pre">setup_dummy_pen()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_add_animal_to_pen_and_id_map"><code class="docutils literal notranslate"><span class="pre">test_add_animal_to_pen_and_id_map()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_allocate_all_pens"><code class="docutils literal notranslate"><span class="pre">test_allocate_all_pens()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_annual_reset"><code class="docutils literal notranslate"><span class="pre">test_annual_reset()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_avg_pen_dist"><code class="docutils literal notranslate"><span class="pre">test_avg_pen_dist()</span></code></a></li>
@@ -371,23 +407,32 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_calc_p_conc"><code class="docutils literal notranslate"><span class="pre">test_calc_p_conc()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_calc_p_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_p_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_calc_ration"><code class="docutils literal notranslate"><span class="pre">test_calc_ration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_calculate_pen_rations"><code class="docutils literal notranslate"><span class="pre">test_calculate_pen_rations()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_clear_pens"><code class="docutils literal notranslate"><span class="pre">test_clear_pens()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_daily_animal_routine"><code class="docutils literal notranslate"><span class="pre">test_daily_animal_routine()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_daily_p_update"><code class="docutils literal notranslate"><span class="pre">test_daily_p_update()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_daily_update_id_pen"><code class="docutils literal notranslate"><span class="pre">test_daily_update_id_pen()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_daily_update_id_map"><code class="docutils literal notranslate"><span class="pre">test_daily_update_id_map()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_daily_updates"><code class="docutils literal notranslate"><span class="pre">test_daily_updates()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_end_ration_interval"><code class="docutils literal notranslate"><span class="pre">test_end_ration_interval()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_fully_update_id_pen"><code class="docutils literal notranslate"><span class="pre">test_fully_update_id_pen()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_fully_update_animal_to_pen_id_map"><code class="docutils literal notranslate"><span class="pre">test_fully_update_animal_to_pen_id_map()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_generate_animal_output"><code class="docutils literal notranslate"><span class="pre">test_generate_animal_output()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_get_animal_config"><code class="docutils literal notranslate"><span class="pre">test_get_animal_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_get_animals_snapshot"><code class="docutils literal notranslate"><span class="pre">test_get_animals_snapshot()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_get_initialize_db_summary"><code class="docutils literal notranslate"><span class="pre">test_get_initialize_db_summary()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_get_life_cycle_output"><code class="docutils literal notranslate"><span class="pre">test_get_life_cycle_output()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_handle_animals_with_unchanged_class_and_changed_combination"><code class="docutils literal notranslate"><span class="pre">test_handle_animals_with_unchanged_class_and_changed_combination()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_handle_graduated_animals"><code class="docutils literal notranslate"><span class="pre">test_handle_graduated_animals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_handle_newly_added_animals"><code class="docutils literal notranslate"><span class="pre">test_handle_newly_added_animals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_handle_removed_animals_after_update"><code class="docutils literal notranslate"><span class="pre">test_handle_removed_animals_after_update()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_init_animals"><code class="docutils literal notranslate"><span class="pre">test_init_animals()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_init_default_pens"><code class="docutils literal notranslate"><span class="pre">test_init_default_pens()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_init_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_init_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_init_pens"><code class="docutils literal notranslate"><span class="pre">test_init_pens()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_print_animal_num_warnings"><code class="docutils literal notranslate"><span class="pre">test_print_animal_num_warnings()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_record_pen_history"><code class="docutils literal notranslate"><span class="pre">test_record_pen_history()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_remove_animal_from_pen_and_id_map"><code class="docutils literal notranslate"><span class="pre">test_remove_animal_from_pen_and_id_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_remove_animals_from_herd"><code class="docutils literal notranslate"><span class="pre">test_remove_animals_from_herd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_animal_management.test_track_former_pen_population"><code class="docutils literal notranslate"><span class="pre">test_track_former_pen_population()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests.test_feed">tests.test_feed module</a><ul>
@@ -626,6 +671,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests.test_misc">tests.test_misc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.DummyClass"><code class="docutils literal notranslate"><span class="pre">DummyClass</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.DummyNestedClass"><code class="docutils literal notranslate"><span class="pre">DummyNestedClass</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.mock_output_manager"><code class="docutils literal notranslate"><span class="pre">mock_output_manager()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.output_manager_original_method_states"><code class="docutils literal notranslate"><span class="pre">output_manager_original_method_states()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.patch_simulation_engine"><code class="docutils literal notranslate"><span class="pre">patch_simulation_engine()</span></code></a></li>
@@ -634,6 +681,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_add_LP_constraints"><code class="docutils literal notranslate"><span class="pre">test_add_LP_constraints()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_add_error"><code class="docutils literal notranslate"><span class="pre">test_add_error()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_add_log"><code class="docutils literal notranslate"><span class="pre">test_add_log()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_add_to_pool"><code class="docutils literal notranslate"><span class="pre">test_add_to_pool()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_add_variable"><code class="docutils literal notranslate"><span class="pre">test_add_variable()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_add_warning"><code class="docutils literal notranslate"><span class="pre">test_add_warning()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_advance"><code class="docutils literal notranslate"><span class="pre">test_advance()</span></code></a></li>
@@ -644,8 +692,16 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_calc_sim_length"><code class="docutils literal notranslate"><span class="pre">test_calc_sim_length()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_create_LP_problem"><code class="docutils literal notranslate"><span class="pre">test_create_LP_problem()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_daily_simulation"><code class="docutils literal notranslate"><span class="pre">test_daily_simulation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_dump_all_pools"><code class="docutils literal notranslate"><span class="pre">test_dump_all_pools()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_dump_errors"><code class="docutils literal notranslate"><span class="pre">test_dump_errors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_dump_logs"><code class="docutils literal notranslate"><span class="pre">test_dump_logs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_dump_variable_names_and_contexts"><code class="docutils literal notranslate"><span class="pre">test_dump_variable_names_and_contexts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_dump_variables"><code class="docutils literal notranslate"><span class="pre">test_dump_variables()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_dump_warnings"><code class="docutils literal notranslate"><span class="pre">test_dump_warnings()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_end_simulation"><code class="docutils literal notranslate"><span class="pre">test_end_simulation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_end_year"><code class="docutils literal notranslate"><span class="pre">test_end_year()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_exclude_info_maps"><code class="docutils literal notranslate"><span class="pre">test_exclude_info_maps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_filter_variables_pool"><code class="docutils literal notranslate"><span class="pre">test_filter_variables_pool()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_flush_pools"><code class="docutils literal notranslate"><span class="pre">test_flush_pools()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_general_constants"><code class="docutils literal notranslate"><span class="pre">test_general_constants()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_generate_LP_vars"><code class="docutils literal notranslate"><span class="pre">test_generate_LP_vars()</span></code></a></li>
@@ -653,22 +709,20 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_generate_key"><code class="docutils literal notranslate"><span class="pre">test_generate_key()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_get_base_dir"><code class="docutils literal notranslate"><span class="pre">test_get_base_dir()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_get_prefix"><code class="docutils literal notranslate"><span class="pre">test_get_prefix()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_get_time_based_suffix"><code class="docutils literal notranslate"><span class="pre">test_get_time_based_suffix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_init_simulation_engine"><code class="docutils literal notranslate"><span class="pre">test_init_simulation_engine()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_input_prompt"><code class="docutils literal notranslate"><span class="pre">test_input_prompt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_is_correct_structure"><code class="docutils literal notranslate"><span class="pre">test_is_correct_structure()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_is_leap_year"><code class="docutils literal notranslate"><span class="pre">test_is_leap_year()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_list_to_file_txt"><code class="docutils literal notranslate"><span class="pre">test_list_to_file_txt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_load_txt_file_to_list"><code class="docutils literal notranslate"><span class="pre">test_load_txt_file_to_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_make_serializable_recursive"><code class="docutils literal notranslate"><span class="pre">test_make_serializable_recursive()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_organize_results"><code class="docutils literal notranslate"><span class="pre">test_organize_results()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_output_manager_singleton"><code class="docutils literal notranslate"><span class="pre">test_output_manager_singleton()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_percent_calculator"><code class="docutils literal notranslate"><span class="pre">test_percent_calculator()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_query"><code class="docutils literal notranslate"><span class="pre">test_query()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_read_json_file"><code class="docutils literal notranslate"><span class="pre">test_read_json_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_remove_items_from_list_by_indices"><code class="docutils literal notranslate"><span class="pre">test_remove_items_from_list_by_indices()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_save_all_pools"><code class="docutils literal notranslate"><span class="pre">test_save_all_pools()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_save_errors"><code class="docutils literal notranslate"><span class="pre">test_save_errors()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_save_logs"><code class="docutils literal notranslate"><span class="pre">test_save_logs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_save_variables"><code class="docutils literal notranslate"><span class="pre">test_save_variables()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_save_warnings"><code class="docutils literal notranslate"><span class="pre">test_save_warnings()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_show_final_messages"><code class="docutils literal notranslate"><span class="pre">test_show_final_messages()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_simulate"><code class="docutils literal notranslate"><span class="pre">test_simulate()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_misc.test_solve_with_fastest_solver"><code class="docutils literal notranslate"><span class="pre">test_solve_with_fastest_solver()</span></code></a></li>
@@ -703,8 +757,13 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.calf_daily_growth_values"><code class="docutils literal notranslate"><span class="pre">calf_daily_growth_values()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.dict_to_tuple_list"><code class="docutils literal notranslate"><span class="pre">dict_to_tuple_list()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.feed_allocations"><code class="docutils literal notranslate"><span class="pre">feed_allocations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.mock_animal_list"><code class="docutils literal notranslate"><span class="pre">mock_animal_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.mock_animal_list_combined"><code class="docutils literal notranslate"><span class="pre">mock_animal_list_combined()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.mock_animal_list_ii"><code class="docutils literal notranslate"><span class="pre">mock_animal_list_ii()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.mock_calves_with_daily_growth"><code class="docutils literal notranslate"><span class="pre">mock_calves_with_daily_growth()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.pen"><code class="docutils literal notranslate"><span class="pre">pen()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.pen_with_animals"><code class="docutils literal notranslate"><span class="pre">pen_with_animals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_add_new_animals"><code class="docutils literal notranslate"><span class="pre">test_add_new_animals()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_growth()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_calc_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_calc_avg_stats"><code class="docutils literal notranslate"><span class="pre">test_calc_avg_stats()</span></code></a></li>
@@ -716,9 +775,14 @@
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_clear"><code class="docutils literal notranslate"><span class="pre">test_clear()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_daily_p_update"><code class="docutils literal notranslate"><span class="pre">test_daily_p_update()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_reset_manure"><code class="docutils literal notranslate"><span class="pre">test_reset_manure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_set_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">test_set_avg_nutrient_rqmts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_set_milk_avgs"><code class="docutils literal notranslate"><span class="pre">test_set_milk_avgs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_set_up_new_animal"><code class="docutils literal notranslate"><span class="pre">test_set_up_new_animal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_subset_class_feeds"><code class="docutils literal notranslate"><span class="pre">test_subset_class_feeds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_update_animal_combination"><code class="docutils literal notranslate"><span class="pre">test_update_animal_combination()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_update_animals"><code class="docutils literal notranslate"><span class="pre">test_update_animals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_update_pen_populated"><code class="docutils literal notranslate"><span class="pre">test_update_pen_populated()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests.html#tests.test_pen.test_update_stocking_density"><code class="docutils literal notranslate"><span class="pre">test_update_stocking_density()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tests.html#module-tests.test_user_prompt">tests.test_user_prompt module</a><ul>

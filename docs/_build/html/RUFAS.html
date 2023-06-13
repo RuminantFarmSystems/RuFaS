@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -116,7 +117,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
       <li class="breadcrumb-item active">RUFAS package</li>
       <li class="wy-breadcrumbs-aside">
@@ -315,6 +316,16 @@ Automatically detects end of months and years</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="RUFAS.classes.Time.is_last_day_of_simulation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_last_day_of_simulation</span></span><a class="headerlink" href="#RUFAS.classes.Time.is_last_day_of_simulation" title="Permalink to this definition"></a></dt>
+<dd><p>Checks whether the current day is the last day of the simulation.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if the current day is the last day of the simulation, false otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.classes.Time.to_str">
 <span class="sig-name descname"><span class="pre">to_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.classes.Time.to_str" title="Permalink to this definition"></a></dt>
@@ -462,8 +473,14 @@ KG_TO_CUBIC_METERS: The conversion factor from kilograms to cubic meters.</p>
 SECONDS_PER_DAY: The number of seconds in a day.</p>
 <p>WATER_DENSITY_KG_PER_LITER: The density of water in kilograms per liter.
 WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.</p>
+<p>PROTEIN_TO_NITROGEN: The nitrogen content of proteins is assumed to be 16%.</p>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.general_constants.GeneralConstants.CUBIC_METERS_TO_LITERS">
+<span class="sig-name descname"><span class="pre">CUBIC_METERS_TO_LITERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#RUFAS.general_constants.GeneralConstants.CUBIC_METERS_TO_LITERS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.general_constants.GeneralConstants.DAYS_PER_YEAR">
 <span class="sig-name descname"><span class="pre">DAYS_PER_YEAR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">365</span></em><a class="headerlink" href="#RUFAS.general_constants.GeneralConstants.DAYS_PER_YEAR" title="Permalink to this definition"></a></dt>
@@ -480,8 +497,23 @@ WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.general_constants.GeneralConstants.KG_TO_GRAMS">
+<span class="sig-name descname"><span class="pre">KG_TO_GRAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#RUFAS.general_constants.GeneralConstants.KG_TO_GRAMS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.general_constants.GeneralConstants.LITERS_TO_CUBIC_METERS">
 <span class="sig-name descname"><span class="pre">LITERS_TO_CUBIC_METERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#RUFAS.general_constants.GeneralConstants.LITERS_TO_CUBIC_METERS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.general_constants.GeneralConstants.NITROGEN_TO_PROTEIN">
+<span class="sig-name descname"><span class="pre">NITROGEN_TO_PROTEIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6.25</span></em><a class="headerlink" href="#RUFAS.general_constants.GeneralConstants.NITROGEN_TO_PROTEIN" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.general_constants.GeneralConstants.PROTEIN_TO_NITROGEN">
+<span class="sig-name descname"><span class="pre">PROTEIN_TO_NITROGEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.16</span></em><a class="headerlink" href="#RUFAS.general_constants.GeneralConstants.PROTEIN_TO_NITROGEN" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -512,18 +544,18 @@ WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.</p>
 logs, warnings, and errors into separate pools, and populates requested
 output channels from the pools once the simulation is done.</p>
 <p>OutputManager is singleton, i.e., only one instance of it can exist. After
-the first instance is created, future calls to the constructor method 
+the first instance is created, future calls to the constructor method
 returns the first instance. Also, the initializer method only works once.</p>
 <section id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading"></a></h3>
 <dl class="simple">
-<dt>variables_pool<span class="classifier">Dict[str, Any]</span></dt><dd><p>Contains variables reported to the output manager</p>
+<dt>variables_pool<span class="classifier">Dict[str, Dict[str, List[Dict[str, Any]]]</span></dt><dd><p>Contains variables reported to the output manager</p>
 </dd>
-<dt>warnings_pool<span class="classifier">Dict[str, Any]</span></dt><dd><p>Contains warnings reported to the output manager</p>
+<dt>warnings_pool<span class="classifier">Dict[str, Dict[str, List[Dict[str, Any]]]</span></dt><dd><p>Contains warnings reported to the output manager</p>
 </dd>
-<dt>errors_pool<span class="classifier">Dict[str, Any]</span></dt><dd><p>Contains errors reported to the output manager</p>
+<dt>errors_pool<span class="classifier">Dict[str, Dict[str, List[Dict[str, Any]]]</span></dt><dd><p>Contains errors reported to the output manager</p>
 </dd>
-<dt>logs_pool<span class="classifier">Dict[str, Any]</span></dt><dd><p>Contains logs reported to the output manager</p>
+<dt>logs_pool<span class="classifier">Dict[str, Dict[str, List[Dict[str, Any]]]</span></dt><dd><p>Contains logs reported to the output manager</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -542,6 +574,13 @@ returns the first instance. Also, the initializer method only works once.</p>
 <dt>info_map[“class”]<span class="classifier">str</span></dt><dd><p>The name of the class which called this function</p>
 </dd>
 <dt>info_map[“function”]<span class="classifier">str</span></dt><dd><p>The name of the function which called this function</p>
+</dd>
+<dt>info_map[“prefix”]<span class="classifier">str, optional</span></dt><dd><p>If present, overrides the automated prefix</p>
+</dd>
+<dt>info_map[“suppress_prefix”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, suppresses the automated prefix generation.
+Has no effect on manual prefix overrides.</p>
+</dd>
+<dt>info_map[“suffix”]<span class="classifier">str, optional</span></dt><dd><p>If present, gets appended to the key</p>
 </dd>
 </dl>
 </section>
@@ -564,13 +603,20 @@ returns the first instance. Also, the initializer method only works once.</p>
 </dd>
 <dt>info_map[“function”]<span class="classifier">str</span></dt><dd><p>The name of the function which called this function</p>
 </dd>
+<dt>info_map[“prefix”]<span class="classifier">str, optional</span></dt><dd><p>If present, overrides the automated prefix</p>
+</dd>
+<dt>info_map[“suppress_prefix”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, suppresses the automated prefix generation.
+Has no effect on manual prefix overrides.</p>
+</dd>
+<dt>info_map[“suffix”]<span class="classifier">str, optional</span></dt><dd><p>If present, gets appended to the key</p>
+</dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.add_variable">
-<span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.add_variable" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.add_variable" title="Permalink to this definition"></a></dt>
 <dd><p>Adds a variable to the pool.</p>
 <section id="id2">
 <h4>Parameters<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
@@ -579,7 +625,7 @@ returns the first instance. Also, the initializer method only works once.</p>
 </dd>
 <dt>value<span class="classifier">Any</span></dt><dd><p>The value of the variable</p>
 </dd>
-<dt>info_map<span class="classifier">Dict[str, Union[str,bool]]</span></dt><dd><p>Additional args, some are non-optional</p>
+<dt>info_map<span class="classifier">Dict[str, Any]</span></dt><dd><p>Additional args, some are non-optional</p>
 </dd>
 <dt>info_map[“class”]<span class="classifier">str</span></dt><dd><p>The name of the class which called this function</p>
 </dd>
@@ -587,28 +633,10 @@ returns the first instance. Also, the initializer method only works once.</p>
 </dd>
 <dt>info_map[“prefix”]<span class="classifier">str, optional</span></dt><dd><p>If present, overrides the automated prefix</p>
 </dd>
-<dt>info_map[“suffix”]<span class="classifier">str, optional</span></dt><dd><p>If present, overrides the automated suffix</p>
-</dd>
 <dt>info_map[“suppress_prefix”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, suppresses the automated prefix generation.
 Has no effect on manual prefix overrides.</p>
 </dd>
-<dt>info_map[“suppress_suffix”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, suppresses the automated suffix generation.
-Has no effect on manual suffix overrides.</p>
-</dd>
-<dt>info_map[“enforce_override”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, overrides the existing value in the pool if a
-key collision happens.</p>
-</dd>
-<dt>info_map[“fail_silently”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, suppresses raising error if a key collision
-happens.</p>
-</dd>
-</dl>
-</section>
-<section id="raises">
-<h4>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h4>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If a key collision happens in the pool and either
-info_map[“fail_silently”] or info_map[“enforce_override”] 
-are not set to True.</p>
+<dt>info_map[“suffix”]<span class="classifier">str, optional</span></dt><dd><p>If present, gets appended to the key</p>
 </dd>
 </dl>
 </section>
@@ -631,14 +659,97 @@ are not set to True.</p>
 </dd>
 <dt>info_map[“function”]<span class="classifier">str</span></dt><dd><p>The name of the function which called this function</p>
 </dd>
+<dt>info_map[“prefix”]<span class="classifier">str, optional</span></dt><dd><p>If present, overrides the automated prefix</p>
+</dd>
+<dt>info_map[“suppress_prefix”]<span class="classifier">bool, optional</span></dt><dd><p>If present and True, suppresses the automated prefix generation.
+Has no effect on manual prefix overrides.</p>
+</dd>
+<dt>info_map[“suffix”]<span class="classifier">str, optional</span></dt><dd><p>If present, gets appended to the key</p>
+</dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_all_pools">
+<span class="sig-name descname"><span class="pre">dump_all_pools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_all_pools" title="Permalink to this definition"></a></dt>
+<dd><p>dumps all pool into the given path to a directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_errors">
+<span class="sig-name descname"><span class="pre">dump_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_errors" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps errors_pool into a json file in the given path to a directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_logs">
+<span class="sig-name descname"><span class="pre">dump_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_logs" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps logs_pool into a json file in the given path to a directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts">
+<span class="sig-name descname"><span class="pre">dump_variable_names_and_contexts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'verbose'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_variable_names_and_contexts" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps names of all variables added to variables_pool along with the caller class
+and function contextual information into a txt file in the given path to a directory.</p>
+<section id="id4">
+<h4>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>path<span class="classifier">str</span></dt><dd><p>The path to the file to be dumped to.</p>
+</dd>
+<dt>exclude_info_maps<span class="classifier">bool</span></dt><dd><p>Flag to denote whether info_map data should be dumped with variable names.</p>
+</dd>
+<dt>format_option<span class="classifier">{“block”, “inline”, “verbose”}</span></dt><dd><p>The selection for the formatting option of the text written to the variables names text file.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h4>
+<p>format_option: str = “block”
+class_name.function_name.variable_name</p>
+<blockquote>
+<div><p>.values: variable1_name
+.values: variable2_name
+.info_maps: variable3_name
+.info_maps: variable4_name</p>
+</div></blockquote>
+<p>format_option: str = “inline”
+class_name.function_name.variable_name.values: [variable1_name, variable2_name]
+class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]</p>
+<p>format_option: str = “verbose”
+class_name.function_name.variable_name.values: variable1_name
+class_name.function_name.variable_name.values: variable2_name
+class_name.function_name.variable_name.info_maps: variable3_name
+class_name.function_name.variable_name.info_maps: variable4_name</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_variables">
+<span class="sig-name descname"><span class="pre">dump_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_variables" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps variables_pool into a json file in the given path to a directory.</p>
+<section id="id5">
+<h4>Parameters<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>path<span class="classifier">str</span></dt><dd><p>Path to the directory where the file will be saved.</p>
+</dd>
+<dt>exclude_info_maps<span class="classifier">bool</span></dt><dd><p>Flag for whether or not the user wants to inlcude info_maps data in their results files.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.dump_warnings">
+<span class="sig-name descname"><span class="pre">dump_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.dump_warnings" title="Permalink to this definition"></a></dt>
+<dd><p>Dumps warnings_pool into a json file in the given path to a directory.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.flush_pools">
 <span class="sig-name descname"><span class="pre">flush_pools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.flush_pools" title="Permalink to this definition"></a></dt>
-<dd><p>Sets all pools to an empty dictionary.</p>
+<dd><p>Sets each pool to an empty dictionary.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -646,34 +757,26 @@ are not set to True.</p>
 <span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;RUFAS.output_manager.OutputManager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.output_manager.OutputManager.instance" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.save_all_pools">
-<span class="sig-name descname"><span class="pre">save_all_pools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_all_pools" title="Permalink to this definition"></a></dt>
-<dd><p>Saves all pool into the given path to a directory.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.save_errors">
-<span class="sig-name descname"><span class="pre">save_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_errors" title="Permalink to this definition"></a></dt>
-<dd><p>Saves the errors_pool into a json file in the given path to a directory.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.save_logs">
-<span class="sig-name descname"><span class="pre">save_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_logs" title="Permalink to this definition"></a></dt>
-<dd><p>Saves the logs_pool into a json file in the given path to a directory.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.pool_element_type">
+<span class="sig-name descname"><span class="pre">pool_element_type</span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.pool_element_type" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>]]]</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.save_variables">
-<span class="sig-name descname"><span class="pre">save_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_variables" title="Permalink to this definition"></a></dt>
-<dd><p>Saves the variables_pool into a json file in the given path to a directory.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.output_manager.OutputManager.save_warnings">
-<span class="sig-name descname"><span class="pre">save_warnings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_warnings" title="Permalink to this definition"></a></dt>
-<dd><p>Saves the warnings_pool into a json file in the given path to a directory.</p>
+<span class="sig-name descname"><span class="pre">save_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys_file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.output_manager.OutputManager.save_variables" title="Permalink to this definition"></a></dt>
+<dd><p>Reads a text file containing a list of keys and filters the variables pool by those keys.
+Saves resulting data pool to a json file in the given path to a directory.</p>
+<section id="id6">
+<h4>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h4>
+<dl class="simple">
+<dt>save_path<span class="classifier">str</span></dt><dd><p>Path to the directory where the file will be saved.</p>
+</dd>
+<dt>keys_file_path<span class="classifier">str</span></dt><dd><p>Path of the input file containing the list of keys.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </section>
@@ -787,8 +890,8 @@ Author(s): Kass Chupongstimun, <a class="reference external" href="mailto:kass_c
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cur_avg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.calc_average" title="Permalink to this definition"></a></dt>
 <dd><p>Calculate the new average given the number of values,
 the current average, and the new value.</p>
-<section id="id4">
-<h3>Parameters<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
 <p>num_values: number of values for the current average
 cur_avg: the current average value
 new_value: the new value to be averaged</p>
@@ -801,14 +904,52 @@ new_avg: the new average value calculated</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility.empty_dir">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">empty_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.empty_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Empties the given directory, except for the files or subdirectories in the keep list.</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>dir_path<span class="classifier">Path</span></dt><dd><p>The path to the directory to be emptied.</p>
+</dd>
+<dt>keep<span class="classifier">List, optional</span></dt><dd><p>A list of file or subdirectory names to be kept.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<p>None</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.util.Utility.get_base_dir">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_base_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.util.Utility.get_base_dir" title="Permalink to this definition"></a></dt>
 <dd><p>Gets the base directory as reference for all relative paths.</p>
 <p>Unfrozen application - gets the project directory
 Frozen application - gets the executable directory</p>
-<section id="id5">
-<h3>Returns<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
 <p>Path: The reference directory for all paths in the program.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.util.Utility.make_serializable">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">make_serializable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.util.Utility.make_serializable" title="Permalink to this definition"></a></dt>
+<dd><p>Converts the given object into a serializable object.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>obj</dt><dd><p>The object to be serialized.</p>
+</dd>
+<dt>max_depth<span class="classifier">int, optional</span></dt><dd><p>The maximum depth of recursion.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
+<p>A serializable object.</p>
 </section>
 </dd></dl>
 
@@ -816,12 +957,12 @@ Frozen application - gets the executable directory</p>
 <dt class="sig sig-object py" id="RUFAS.util.Utility.percent_calculator">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">percent_calculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">denominator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.util.Utility.percent_calculator" title="Permalink to this definition"></a></dt>
 <dd><p>Return a percent calculator closure that already stores the value of the given denominator.</p>
-<section id="id6">
-<h3>Parameters<a class="headerlink" href="#id6" title="Permalink to this heading"></a></h3>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Permalink to this heading"></a></h3>
 <p>denominator: the denominator to</p>
 </section>
-<section id="id7">
-<h3>Returns<a class="headerlink" href="#id7" title="Permalink to this heading"></a></h3>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Permalink to this heading"></a></h3>
 <p>A closure function that already stores the denominator internally
 so the user only needs to pass in the numerator.</p>
 </section>
@@ -835,19 +976,19 @@ so the user only needs to pass in the numerator.</p>
 information into dictionaries used to instantiate simulation objects.</p>
 </dd>
 </dl>
-<section id="id8">
-<h3>Parameters<a class="headerlink" href="#id8" title="Permalink to this heading"></a></h3>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Permalink to this heading"></a></h3>
 <p>file_path (Path): Path to the input json file</p>
 </section>
-<section id="id9">
-<h3>Raises<a class="headerlink" href="#id9" title="Permalink to this heading"></a></h3>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>InvalidJSONFileError: If the json file at the given path does not</dt><dd><p>conform with the format required</p>
 </dd>
 </dl>
 </section>
-<section id="id10">
-<h3>Returns<a class="headerlink" href="#id10" title="Permalink to this heading"></a></h3>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Permalink to this heading"></a></h3>
 <p>data: the data read from the json file</p>
 </section>
 </dd></dl>
@@ -857,13 +998,13 @@ information into dictionaries used to instantiate simulation objects.</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remove_items_from_list_by_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.util.Utility.remove_items_from_list_by_indices" title="Permalink to this definition"></a></dt>
 <dd><p>Remove items from a list given a list of indices.
 The operation is done in-place.</p>
-<section id="id11">
-<h3>Parameters<a class="headerlink" href="#id11" title="Permalink to this heading"></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Permalink to this heading"></a></h3>
 <p>arr: a list of items
 removed_idx: a list that contains indices of the items to be removed</p>
 </section>
-<section id="id12">
-<h3>Returns<a class="headerlink" href="#id12" title="Permalink to this heading"></a></h3>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Permalink to this heading"></a></h3>
 <p>None</p>
 </section>
 </dd></dl>

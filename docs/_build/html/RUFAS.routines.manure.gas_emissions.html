@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.gas_emissions package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -81,7 +82,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.routines.html">RUFAS.routines package</a></li>
@@ -109,19 +110,67 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_emission">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_emission" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_ammonia_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_emission" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates NH3 storage emissions.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>num_animals: Number of animals in the pen.
-barn_area: surface area for treatment, m^2.
-manure_urine_total_ammoniacal_nitrogen: total ammoniacal nitrogen in manure urine, kg N.
-manure_urine: total amount of manure urine in exposed surface area, kg.
+barn_area: Surface area for treatment, m^2.
+total_ammoniacal_nitrogen: total ammoniacal nitrogen in urine or manure, kg N.
+mass: total amount of urine or manure in exposed surface area, kg.
 temperature_celsius: temperature, C.
 housing_specific_constant: housing specific constant, s/m.</p>
 </dd>
 <dt>Returns:</dt><dd><p>NH3 storage emissions, kg N/day.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_housing_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_ammonia_housing_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_housing_emission" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates ammonia housing emissions for manure handlers.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the pen.</p>
+</dd>
+<dt>barn_area<span class="classifier">float</span></dt><dd><p>Surface area per animal, m^2.</p>
+</dd>
+<dt>urine_total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>Total ammoniacal nitrogen in urine per animal, kg N.</p>
+</dd>
+<dt>urine<span class="classifier">float</span></dt><dd><p>Total urine per animal, kg.</p>
+</dd>
+<dt>temperature_celsius<span class="classifier">float</span></dt><dd><p>Current temperature, C.</p>
+</dd>
+<dt>housing_specific_constant<span class="classifier">float, optional</span></dt><dd><p>Housing specific constant, s/m.
+The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_storage_emission">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calc_ammonia_storage_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">barn_area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_total_ammoniacal_nitrogen</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manure_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature_celsius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">housing_specific_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">260.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_ammonia_storage_emission" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates ammonia storage emissions for manure treatments.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<dl class="simple">
+<dt>num_animals<span class="classifier">int</span></dt><dd><p>Number of animals in the pen.</p>
+</dd>
+<dt>barn_area<span class="classifier">float</span></dt><dd><p>Surface area per animal, m^2.</p>
+</dd>
+<dt>manure_total_ammoniacal_nitrogen<span class="classifier">float</span></dt><dd><p>Total ammoniacal nitrogen in manure per animal, kg N.</p>
+</dd>
+<dt>manure_mass<span class="classifier">float</span></dt><dd><p>Manure mass per animal, kg.</p>
+</dd>
+<dt>temperature_celsius<span class="classifier">float</span></dt><dd><p>Current temperature, C.</p>
+</dd>
+<dt>housing_specific_constant<span class="classifier">float, optional</span></dt><dd><p>Housing specific constant, s/m.
+The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">

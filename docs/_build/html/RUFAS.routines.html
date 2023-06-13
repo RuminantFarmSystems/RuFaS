@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
@@ -12,9 +12,6 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -29,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> Ruminant Farm Simulation (RuFaS)
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -81,7 +82,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="modules.html">GitHub</a></li>
           <li class="breadcrumb-item"><a href="RUFAS.html">RUFAS package</a></li>
       <li class="breadcrumb-item active">RUFAS.routines package</li>
@@ -104,7 +105,11 @@
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.animal_management">RUFAS.routines.animal.animal_management module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement"><code class="docutils literal notranslate"><span class="pre">AnimalManagement</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.allocate_all_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.ANIMAL_GROUPING_SCENARIO"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.ANIMAL_GROUPING_SCENARIO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.DEFAULT_NUM_STALLS_BY_COMBINATION"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.DEFAULT_NUM_STALLS_BY_COMBINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.allocate_animals_to_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.allocate_animals_to_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.allocate_animals_to_pens2"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.allocate_animals_to_pens2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.animals_by_type"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.animals_by_type</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.annual_reset"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.annual_reset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.avg_pen_dist"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.avg_pen_dist()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_all_p_conc"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.calc_all_p_conc()</span></code></a></li>
@@ -113,12 +118,15 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.calc_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_p_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.calc_p_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calc_ration"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.calc_ration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.calculate_pen_rations"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.calculate_pen_rations()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.clear_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.clear_pens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_p_update"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.daily_p_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_update_id_pen"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.daily_update_id_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_update_id_map"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.daily_update_id_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_updates"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.daily_updates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.daily_updates2"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.daily_updates2()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.end_ration_interval"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.end_ration_interval()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_id_pen"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.fully_update_id_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.execute_allocation_plan"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.execute_allocation_plan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_animal_to_pen_id_map"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.fully_update_animal_to_pen_id_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.gather_cow_class_history"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.gather_cow_class_history()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.generate_animal_output"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.generate_animal_output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.get_animal_config"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.get_animal_config()</span></code></a></li>
@@ -127,7 +135,11 @@
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.init_animals"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.init_animals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.init_nutrient_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.init_pens"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.init_pens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.plan_animal_allocation"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.plan_animal_allocation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.record_pen_history"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.record_pen_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.remove_animals_from_herd"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.remove_animals_from_herd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.set_animal_grouping_scenario"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.set_animal_grouping_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.AnimalManagement.track_former_pen_population"><code class="docutils literal notranslate"><span class="pre">AnimalManagement.track_former_pen_population()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.animal_management.daily_animal_routine"><code class="docutils literal notranslate"><span class="pre">daily_animal_routine()</span></code></a></li>
@@ -142,22 +154,31 @@
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.animal.html#module-RUFAS.routines.animal.pen">RUFAS.routines.animal.pen module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen"><code class="docutils literal notranslate"><span class="pre">Pen</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.AnimalCombination"><code class="docutils literal notranslate"><span class="pre">Pen.AnimalCombination</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.add_animal"><code class="docutils literal notranslate"><span class="pre">Pen.add_animal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.add_new_animals"><code class="docutils literal notranslate"><span class="pre">Pen.add_new_animals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_avg_growth"><code class="docutils literal notranslate"><span class="pre">Pen.calc_avg_growth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist"><code class="docutils literal notranslate"><span class="pre">Pen.calc_daily_walking_dist()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_manure"><code class="docutils literal notranslate"><span class="pre">Pen.calc_manure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_ration"><code class="docutils literal notranslate"><span class="pre">Pen.calc_ration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.calc_total_manure"><code class="docutils literal notranslate"><span class="pre">Pen.calc_total_manure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.call_p_rqmts"><code class="docutils literal notranslate"><span class="pre">Pen.call_p_rqmts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.clear"><code class="docutils literal notranslate"><span class="pre">Pen.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.current_pen_ration"><code class="docutils literal notranslate"><span class="pre">Pen.current_pen_ration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.current_stocking_density"><code class="docutils literal notranslate"><span class="pre">Pen.current_stocking_density</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.daily_p_update"><code class="docutils literal notranslate"><span class="pre">Pen.daily_p_update()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.get_id"><code class="docutils literal notranslate"><span class="pre">Pen.get_id()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.get_pen_type"><code class="docutils literal notranslate"><span class="pre">Pen.get_pen_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.is_populated"><code class="docutils literal notranslate"><span class="pre">Pen.is_populated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.remove_animal"><code class="docutils literal notranslate"><span class="pre">Pen.remove_animal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.remove_animals_by_ids"><code class="docutils literal notranslate"><span class="pre">Pen.remove_animals_by_ids()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.reset_manure"><code class="docutils literal notranslate"><span class="pre">Pen.reset_manure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_avg_nutrient_rqmts"><code class="docutils literal notranslate"><span class="pre">Pen.set_avg_nutrient_rqmts()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_id"><code class="docutils literal notranslate"><span class="pre">Pen.set_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_milk_avgs"><code class="docutils literal notranslate"><span class="pre">Pen.set_milk_avgs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.set_up_new_animal"><code class="docutils literal notranslate"><span class="pre">Pen.set_up_new_animal()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.subset_class_feeds"><code class="docutils literal notranslate"><span class="pre">Pen.subset_class_feeds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_animal_combination"><code class="docutils literal notranslate"><span class="pre">Pen.update_animal_combination()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_animals"><code class="docutils literal notranslate"><span class="pre">Pen.update_animals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_classes_in_pen"><code class="docutils literal notranslate"><span class="pre">Pen.update_classes_in_pen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_pen_populated"><code class="docutils literal notranslate"><span class="pre">Pen.update_pen_populated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.animal.html#RUFAS.routines.animal.pen.Pen.update_stocking_density"><code class="docutils literal notranslate"><span class="pre">Pen.update_stocking_density()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -393,7 +414,7 @@
 <li class="toctree-l2"><a class="reference internal" href="RUFAS.routines.manure.html#module-RUFAS.routines.manure.manure_management">RUFAS.routines.manure.manure_management module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement"><code class="docutils literal notranslate"><span class="pre">ManureManagement</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement.all_data"><code class="docutils literal notranslate"><span class="pre">ManureManagement.all_data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement.update"><code class="docutils literal notranslate"><span class="pre">ManureManagement.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.ManureManagement.daily_update"><code class="docutils literal notranslate"><span class="pre">ManureManagement.daily_update()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.routines.manure.html#RUFAS.routines.manure.manure_management.simulate_daily_manure_management"><code class="docutils literal notranslate"><span class="pre">simulate_daily_manure_management()</span></code></a></li>
