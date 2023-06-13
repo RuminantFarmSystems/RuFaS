@@ -127,17 +127,17 @@ class Schedule:
     @staticmethod
     def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
         """
-        Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
-        repetitions.
+        Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
+        repetitions, skipping over specified gaps between repetitions.
 
         Parameters
         ----------
         pattern : List[int]
             The pattern to be repeated.
         skip : int
-            Number of steps to skip between repeats.
+            Number of steps to skip between repeats (0 if no steps should be skipped).
         repeat : int
-            Number of times patter should be repeated.
+            Number of times pattern should be repeated.
 
         Returns
         -------
