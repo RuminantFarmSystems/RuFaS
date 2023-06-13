@@ -15,18 +15,24 @@ from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_exc
 from RUFAS.routines.animal.ration.ration_driver import ration_report
 
 
-def methane_mitigation(ration_formulation,
-                       feed,
+def methane_mitigation(NDF_concentration: float,
+                       EE_concentration: float,
+                       starch_concentration: float,
+                       CP_concentration: float,
                        methane_mitigation_method: str,
                        methane_mitigation_additive_amount: float) -> float:
     """Calculates reduction in methane yield (%) due to addition of certain methane mitigation feed additive.
 
     Parameters
     ----------
-    ration_formulation : Dict[str, float]
-        Dictionary that stores the calculated ration.
-    feed : Dict[str, float]
-        A Feed object that contains information about the available feeds.
+    NDF_concentration : float
+        Concentration of neutral detergent fiber (NDF) in the ration.
+    EE_concentration : float
+        Concentration of ether extract (EE) in the ration.
+    starch_concentration : float
+        Concentration of starch in the ration.
+    CP_concentration : float
+        Concentration of crude protein (CP) in the ration.
     methane_mitigation_method: str 
         Methane mitigation method used to reduce enteric methane emissions, including 3-NOP, monensin, essential oils, and seaweed. 
     methane_mitigation_additive_amount: float 
@@ -37,19 +43,13 @@ def methane_mitigation(ration_formulation,
     float 
         Reduction in methane yield (methane production/dry matter intake), %.   
     """
-    nutrient_amounts, nutrient_concentrations = ration_report(
-        ration_formulation, feed.available_feeds)
-    NDF_concentration = nutrient_concentrations['NDF']
-    EE_concentration = nutrient_concentrations["EE"]
-    starch_concentration = nutrient_concentrations['starch']
-    CP_concentration = nutrient_concentrations['CP']
 
     if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
     elif methane_mitigation_method == "Monensin":
-        methane_yield_reduction = 0.30054 - 0.00377 * \
-            methane_mitigation_additive_amount - 1.57832 * CP_concentration
+        methane_yield_reduction = (0.30054 - 0.00377 *
+                                   methane_mitigation_additive_amount - 1.57832 * CP_concentration/100) * 100
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
@@ -239,7 +239,7 @@ def manure_calculations(ration_formulation,
     if dry_matter_intake != 0:
         methane_yield = methane_emission/dry_matter_intake
         methane_yield_reduction = methane_mitigation(
-            ration_formulation, feed, methane_mitigation_method, methane_mitigation_additive_amount)
+            NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount)
 
     methane_emission = methane_yield * \
         (1 + methane_yield_reduction/100) * dry_matter_intake
