@@ -73,7 +73,7 @@ class TillageSchedule(Schedule):
             raise ValueError(error_header + f"expected all years to be > 0 and in non-descending order, received "
                                             f"'{self.years}'.")
 
-        valid_days = self._validate_days(self.days)
+        valid_days = self._validate_days(self.years, self.days)
         if not valid_days:
             raise ValueError(error_header + f"expected all planting days to be in range [1, 366], received "
                                             f"'{self.days}'.")
