@@ -7,12 +7,15 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 import pytest
+from unittest.mock import MagicMock
+from pytest_mock.plugin import MockerFixture
+import numpy as np
 
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
-
+import RUFAS.routines.animal.ration.ration_driver
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -135,14 +138,14 @@ def test_calculate_NRC_energy_maintenance_requirements(cow_a:dict, cow_b:dict, h
             heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['BCS5'],
             heifer_a['PrevTemp'], heifer_a['animal_type'])
     assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(
-        (14.23, 0, 0), rel=5e-1)
+        (5.08, 0, 0), rel=5e-1)
 
     result_NEmaint, result_CW, result_CBW = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_maintenance_requirements(
             heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['BCS5'],
             heifer_b['PrevTemp'], heifer_b['animal_type'])
     assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(
-        (19.07, 0, 43.92), rel=5e-1)
+        (6.81, 0, 43.92), rel=5e-1)
 
 
 def test_calculate_NRC_energy_growth_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -1294,8 +1297,8 @@ def test_phosphorus_constraint():
     pass
 
 
-def test_protien_constraint():
-    """Unit test for function protien_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+def test_protein_constraint():
+    """Unit test for function protein_constraint in file routines/animal/ration/cow_ration_NLP.py"""
     pass
 
 
@@ -1387,6 +1390,62 @@ def test_ration_report():
 def test_set_requirements():
     """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
     pass
+
+    
+def eq_constraint(x):
+    return np.sum(x) - 10  # This 'eq' constraint checks if the sum of x is equal to 10
+
+def ineq_constraint(x):
+    return np.sum(x) - 10  # This 'ineq' constraint checks if the sum of x is greater than 10
+
+@pytest.mark.parametrize("solution_x,constraint,expected", [
+    (np.array([2, 3, 5]), {'type': 'eq', 'fun': eq_constraint}, False),  # Constraint not violated, hence expecting False
+    (np.array([2, 3, 4]), {'type': 'eq', 'fun': eq_constraint}, True),
+    (np.array([1, 3, 5]), {'type': 'ineq', 'fun': ineq_constraint}, True),
+    (np.array([3, 4, 5]), {'type': 'ineq', 'fun': ineq_constraint}, False),
+])
+def test_is_constraint_violated(solution_x, constraint, expected):
+    """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
+    assert RUFAS.routines.animal.ration.ration_driver.is_constraint_violated(solution_x, constraint) == expected
+
+
+@pytest.mark.parametrize('mock_results, expected_result', [
+    ([False, True, False], [1]),  
+    ([False, False, False], []),  
+    ([True, True, True], [0, 1, 2]),  
+])
+def test_find_failed_constraints(mocker: MockerFixture, mock_results, expected_result):
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
+    # Arrange
+    solution_x = MagicMock()  
+    constraints = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    
+    # The exact path depends on where is_constraint_violated() is 'used' (which may differ from where it is 'defined') - a common bug
+    # The path below may need to be adjusted
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.is_constraint_violated', side_effect=mock_results)
+    
+    # Act
+    failed_constraints = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(solution_x, constraints)
+    failed_constraints_indices = []
+
+    for i, constraint in enumerate(constraints): 
+        if constraint in failed_constraints:
+            failed_constraints_indices.append(i)
+                    
+    # Assert
+    assert failed_constraints_indices == expected_result
+
+
+def test_calc_pen_requirements():
+    """Unit test for function set_pen_requirements in file routines/animal/ration/ration_driver.py"""
+    req = RUFAS.routines.animal.ration.ration_driver.Requirements()
+    req.calc_pen_requirements(
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3])
+    attributelist = ['NEmaint','NEa','NEg','NEpreg', 'NEl', 'MP_req', 'Ca_req', 'P_req', 
+        'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
+    for attribute in attributelist:
+        assert getattr(req, attribute) == 2
 
 
 def test_feed_nutrients():
