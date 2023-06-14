@@ -89,7 +89,7 @@ run of the simulation.
     - [ ] Add calls to `check_crop_planting_schedule()` and `check_crop_harvesting_schedule()` in `Field`s daily 
     routine. - 1 point
 - Tillage
-  - [x] Implement and test tillage application scheduler. - 3 points
+  - [ ] Implement and test tillage application scheduler. - 3 points
   - [ ] Implement and test `check_tillage_schedule()` which will iterate through a list of `TillageEvent`s and collect 
     and execute all the ones that happen on the current day. - 2 points
   - [ ] Add call to `check_tillage_schedule()` in `Field`s daily routine. - 1 point
@@ -99,7 +99,7 @@ run of the simulation.
   collect and execute all the ones that happen on the current day. - 2 points
   - [ ] Add call to `check_fertilizer_schedule()` in `Field`s daily routine. - 1 point
 - Manure
-  - [ ] Implement and test manure application scheduler. - 3 points
+  - [x] Implement and test manure application scheduler. - 3 points
   - [ ] Implement and test `check_manure_schedule()` which will iterate through a list of `ManureEvent`s and collect and 
   execute all the ones that happen on the current day. - 2 points
   - [ ] Add call to `check_manure_schedule()` in `Field`s daily routine. - 1 point
