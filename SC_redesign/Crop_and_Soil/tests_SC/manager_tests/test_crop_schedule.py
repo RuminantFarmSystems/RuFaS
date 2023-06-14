@@ -41,8 +41,8 @@ def test_crop_schedule_init(name: str, crop_ref: str, plant_years: List[int], pl
 @pytest.mark.parametrize("name,years,days,expected", [
     ("test_1", [1990, 1989], [], "'test_1': expected all years to be > 0 and in non-descending order, received "
                                  "'[1990, 1989]'."),
-    ("test_2", [1998], [200, 200, 367], "'test_2': expected all planting days to be in range [1, 366], received "
-                                        "'[200, 200, 367]'."),
+    ("test_2", [1998, 1999, 2000], [200, 200, 367], "'test_2': expected all planting days to be in range [1, 366], "
+                                                    "received '[200, 200, 367]'."),
     ("test_3", [1997, 1998], [90, 120, 90], "'test_3': expected number of planting years and days to be the same, "
                                             "received '[1997, 1998]' years and '[90, 120, 90]' days.")
 ])
@@ -57,8 +57,8 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
 @pytest.mark.parametrize("name,years,days,operations,expected", [
     ("test_1", [1996, 1993], [200], ["default"], "'test_1': expected all harvest years to be > 0 and in non-descending "
                                                  "order, received '[1996, 1993]'."),
-    ("test_2", [1999], [200, 0], ["default"], "'test_2': expected all harvest days to be in range [1, 366], received "
-                                              "'[200, 0]'."),
+    ("test_2", [1999, 2000], [200, 0], ["default"], "'test_2': expected all harvest days to be in range [1, 366], "
+                                                    "received '[200, 0]'."),
     ("test_3", [1998, 1999, 2000], [200, 200], ["no_kill", "default"], "'test_3': expected number of values for harvest"
                                                                        " years, days, and operations to be equal, "
                                                                        "received '[1998, 1999, 2000]' years, "
