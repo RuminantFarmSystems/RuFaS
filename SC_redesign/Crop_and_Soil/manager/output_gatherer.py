@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from RUFAS.output_manager import OutputManager
 from SC_redesign.Crop_and_Soil.field.field import Field
@@ -10,7 +10,7 @@ class OutputGatherer:
     def __init__(self, fields: List[Field]):
         self.fields = fields
 
-    def send_daily_variables(self, filter_specs: Optional[List] = None) -> None:
+    def send_daily_variables(self) -> None:
         """sends daily variables to the output manager"""
         info_map = {"class": self.__class__.__name__, "function": self.send_daily_variables.__name__}
         for field in self.fields:
@@ -240,6 +240,70 @@ class OutputGatherer:
                 om.add_variable("residue_nitrogen", crop.data.residue_nitrogen, info_map)
                 om.add_variable("residue_phosphorus", crop.data.residue_phosphorus, info_map)
 
-    def send_annual_variables(self):
+    def send_annual_variables(self) -> None:
         """sends annual variables to the output manager"""
-        pass
+        info_map = {"class": self.__class__.__name__, "function": self.send_annual_variables.__name__}
+        # adding field variable
+        for field in self.fields:
+            # Adding field data
+            info_map["prefix"] = "field:'" + field.field_data.name + "'"
+            om.add_variable("annual_irrigation_water_use_total",
+                            field.field_data.annual_irrigation_water_use_total, info_map)
+
+            # Adding soil data
+            water_content_change = field.soil.data.profile_soil_water_content - field.soil.data.initial_water_content
+            om.add_variable("annual_water_content_change", water_content_change, info_map)
+            nitrates_content_change = field.soil.data.profile_nitrates_total - field.soil.data.initial_nitrates_total
+            om.add_variable("annual_nitrates_content_change", nitrates_content_change, info_map)
+
+            om.add_variable("annual_soil_evaporation_total", field.soil.data.annual_soil_evaporation_total,
+                            info_map)
+            om.add_variable("annual_eroded_sediment_total", field.soil.data.annual_eroded_sediment_total,
+                            info_map)
+            om.add_variable("annual_surface_runoff_total", field.soil.data.annual_surface_runoff_total,
+                            info_map)
+            om.add_variable("annual_runoff_fertilizer_phosphorus",
+                            field.soil.data.annual_runoff_fertilizer_phosphorus,
+                            info_map)
+            om.add_variable("annual_runoff_machine_manure_inorganic_phosphorus",
+                            field.soil.data.annual_runoff_machine_manure_inorganic_phosphorus,
+                            info_map)
+            om.add_variable("annual_runoff_machine_manure_organic_phosphorus",
+                            field.soil.data.annual_runoff_machine_manure_organic_phosphorus,
+                            info_map)
+            om.add_variable("annual_runoff_grazing_manure_inorganic_phosphorus",
+                            field.soil.data.annual_runoff_grazing_manure_inorganic_phosphorus,
+                            info_map)
+            om.add_variable("annual_runoff_grazing_manure_organic_phosphorus",
+                            field.soil.data.annual_runoff_grazing_manure_organic_phosphorus,
+                            info_map)
+            om.add_variable("annual_soil_phosphorus_runoff",
+                            field.soil.data.annual_soil_phosphorus_runoff,
+                            info_map)
+            om.add_variable("annual_runoff_nitrates_total",
+                            field.soil.data.annual_runoff_nitrates_total,
+                            info_map)
+            om.add_variable("annual_runoff_ammonium_total",
+                            field.soil.data.annual_runoff_ammonium_total,
+                            info_map)
+            om.add_variable("annual_eroded_fresh_organic_nitrogen_total",
+                            field.soil.data.annual_eroded_fresh_organic_nitrogen_total,
+                            info_map)
+            om.add_variable("annual_eroded_stable_organic_nitrogen_total",
+                            field.soil.data.annual_eroded_stable_organic_nitrogen_total,
+                            info_map)
+            om.add_variable("annual_eroded_active_organic_nitrogen_total",
+                            field.soil.data.annual_eroded_active_organic_nitrogen_total,
+                            info_map)
+
+            # ----------------------------adding layer data
+            for index, layer in enumerate(field.soil.data.soil_layers):
+                info_map["prefix"] = "field:'" + field.field_data.name + "',layer_index:'" + str(index) + "'"
+
+                om.add_variable("annual_denitrified_nitrogen_total", layer.annual_denitrified_nitrogen_total,
+                                info_map)
+                om.add_variable("annual_volatilized_ammonium_total", layer.annual_volatilized_ammonium_total,
+                                info_map)
+                om.add_variable("annual_decomposition_carbon_CO2_lost", layer.annual_decomposition_carbon_CO2_lost,
+                                info_map)
+                om.add_variable("annual_carbon_CO2_lost", layer.annual_carbon_CO2_lost, info_map)
