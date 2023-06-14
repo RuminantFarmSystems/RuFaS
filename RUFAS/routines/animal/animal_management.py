@@ -1500,8 +1500,11 @@ class AnimalManagement:
                     counter += 1
                     if counter > 50:
                         raise Exception('Too many attempts at optimizing ration.')
-                # TODO add in proper methods to record these (and pen nutrient requirements) to output manager
-                # recording ration nutrition information in pen
+                # TODO add in sim_day to info_maps?
+                info_map = {"class": self.__class__.__name__,
+                    "function": self._calc_ration_at_interval.__name__,}
+                om.add_variable(f'avg_rqmts_for pen {pen.id}', pen.avg_nutrient_rqmts, info_map)
+                
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
