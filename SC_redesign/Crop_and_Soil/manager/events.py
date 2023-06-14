@@ -36,8 +36,15 @@ class Event:
     def __eq__(self, other):
         """Overrides the equality operator for Event objects."""
         correct_type = isinstance(other, Event)
-        equal_fields = other.year == self.year and other.day == self.day
-        return correct_type and equal_fields
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for Event objects."""
+        str_representation = str(self.year) + str(self.day)
+        return hash(str_representation)
 
     def occurs_today(self, time: Time) -> bool:
         """
@@ -75,6 +82,20 @@ class PlantingEvent(Event):
         self.crop_reference = crop_reference
         self.use_heat_scheduled_harvest = heat_scheduled_harvest
 
+    def __eq__(self, other):
+        """Overrides the equality operator for PlantingEvent objects."""
+        correct_type = isinstance(other, PlantingEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for PlantingEvent objects."""
+        str_representation = str(self.crop_reference) + str(self.year) + str(self.day) + \
+            str(self.use_heat_scheduled_harvest)
+        return hash(str_representation)
+
 
 class HarvestEvent(Event):
     def __init__(self, crop_reference: str, year: int = 1, day: int = 240, operation: str = "default"):
@@ -94,6 +115,19 @@ class HarvestEvent(Event):
         self.crop_reference = crop_reference
         self.operation = operation
 
+    def __eq__(self, other):
+        """Overrides the equality operator for HarvestEvent objects."""
+        correct_type = isinstance(other, HarvestEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for HarvestEvent objects."""
+        str_representation = str(self.crop_reference) + str(self.year) + str(self.day) + str(self.operation)
+        return hash(str_representation)
+
 
 class TillageEvent(Event):
     def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
@@ -101,7 +135,6 @@ class TillageEvent(Event):
         """
         Creates a new TillageEvent instance, which defines a tillage application to be applied on a specific day of a
         year.
-
         Parameters
         ----------
         tillage_depth : float
@@ -110,9 +143,69 @@ class TillageEvent(Event):
             Fraction of soil surface pool incorporated into the soil profile (unitless)
         mixing_fraction : float
             Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
-
         """
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
         self.incorporation_fraction = incorporation_fraction
         self.mixing_fraction = mixing_fraction
+
+    def __eq__(self, other):
+        """Overrides the equality operator for TillageEvent objects."""
+        correct_type = isinstance(other, TillageEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for TillageEvent objects."""
+        str_representation = str(self.year) + str(self.day) + str(self.tillage_depth) \
+            + str(self.incorporation_fraction) + str(self.mixing_fraction)
+        return hash(str_representation)
+
+
+class ManureEvent(Event):
+    def __init__(self, year: int, day: int, nitrogen_mass: float, phosphorus_mass: float, field_coverage: float,
+                 application_depth: float, surface_remainder_fraction: float):
+        """
+        Creates a new ManureEvent instance, which defines how manure much manure such be requested and applied to a
+        field.
+
+        Parameters
+        ----------
+        year : int
+            Year in which this manure application occurs.
+        day : int
+            Day in which this manure application occurs.
+        nitrogen_mass : float
+            Minimum mass of nitrogen that should be contained in this manure application (kg)
+        phosphorus_mass : float
+            Minimum mass of phosphorus that should be contained in this manure application (kg)
+        field_coverage : float
+            Fraction of the field covered by this manure application (unitless)
+        application_depth : float
+            Depth that manure is injected into the soil at (mm)
+        surface_remainder_fraction : float
+            Fraction of manure applied that remains on the soil surface (unitless)
+
+        """
+        super().__init__(year=year, day=day)
+        self.nitrogen_mass = nitrogen_mass
+        self.phosphorus_mass = phosphorus_mass
+        self.field_coverage = field_coverage
+        self.application_depth = application_depth
+        self.surface_remainder_fraction = surface_remainder_fraction
+
+    def __eq__(self, other):
+        """Overrides the equality operator for ManureEvent objects."""
+        correct_type = isinstance(other, ManureEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for ManureEvent objects."""
+        str_representation = str(self.year) + str(self.day) + str(self.nitrogen_mass) + str(self.phosphorus_mass) + \
+            str(self.field_coverage) + str(self.application_depth) + str(self.surface_remainder_fraction)
+        return hash(str_representation)

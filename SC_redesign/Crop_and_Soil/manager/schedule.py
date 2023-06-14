@@ -1,5 +1,6 @@
 from typing import List, Any
-from copy import deepcopy
+from copy import copy
+from RUFAS.classes import is_leap_year
 
 
 """
@@ -21,7 +22,7 @@ class Schedule:
         years : List[int]
             Year(s) in which this event will occur.
         days : List[int]
-            Day(s) in which this event will occur.
+            Julian day(s) in which this event will occur.
         pattern_skip : int, default=0
             Number of years to skip between cycles.
         pattern_repeat : int, default=0
@@ -82,14 +83,16 @@ class Schedule:
         return elongated_list
 
     @staticmethod
-    def _validate_days(days: List[int]) -> bool:
+    def _validate_days(years: List[int], days: List[int]) -> bool:
         """
         Checks that all values passed for days are in the correct range.
 
         Parameters
         ----------
+        years : List[int]
+            Calendar year(s) in which this event will occur.
         days : List[int]
-            Day(s) in which this event will occur.
+            Julian day(s) in which this event will occur.
 
         Returns
         -------
@@ -98,10 +101,16 @@ class Schedule:
 
         Notes
         -----
-        A day is 'valid' if it in the range [1, 366].
+        A day is 'valid' if it is in the range [1, 366] in leap years, and in the range [1, 365] in non-leap years.
 
         """
-        return all(0 < day <= 366 for day in days)
+        dates = list(zip(years, days))
+        for date in dates:
+            if not is_leap_year(date[0]) and not 0 < date[1] <= 365:
+                return False
+            if is_leap_year(date[0]) and not 0 < date[1] <= 366:
+                return False
+        return True
 
     @staticmethod
     def _validate_years(years: List[int]) -> bool:
@@ -127,17 +136,17 @@ class Schedule:
     @staticmethod
     def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
         """
-        Takes a pattern of numbers and repeats it a specified number of times, skipping over specified gaps between
-        repetitions.
+        Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
+        repetitions, skipping over specified gaps between repetitions.
 
         Parameters
         ----------
         pattern : List[int]
             The pattern to be repeated.
         skip : int
-            Number of steps to skip between repeats.
+            Number of steps to skip between repeats (0 if no steps should be skipped).
         repeat : int
-            Number of times patter should be repeated.
+            Number of times pattern should be repeated.
 
         Returns
         -------
@@ -161,7 +170,7 @@ class Schedule:
         for difference in in_pattern_differences:
             differences.append(pattern[difference] - pattern[difference - 1])
 
-        full_pattern = deepcopy(pattern)
+        full_pattern = copy(pattern)
         differences_index = 0
         number_of_new_values = range(repeat * len(pattern))
         for _new_value in number_of_new_values:
