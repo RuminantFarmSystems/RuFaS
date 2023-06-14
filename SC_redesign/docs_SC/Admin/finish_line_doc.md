@@ -76,7 +76,7 @@ nearly identical for both modules.
 Certain types of events, (Crop planting/harvesting, soil amendments) need to be scheduled by the user to occur over the
 run of the simulation.
 - Crop planting and harvesting.
-  - [ ] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
+  - [x] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
   - Integrate crop scheduler and execution of events into `Field` methods.
     - [ ] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
     all planting events that should happen call `plant_crop()` on them. - 1 point
