@@ -1502,6 +1502,18 @@ class AnimalManagement:
                         raise Exception('Too many attempts at optimizing ration.')
                 # TODO add in proper methods to record these (and pen nutrient requirements) to output manager
                 # recording ration nutrition information in pen
+                #pen.require
+                # setting average nutrient requirements pen class variable
+                ##### >>>>> pen_avg_nutrient_rqmts = {'NEmaint': pen.NEmaint, 'NEa': pen.NEa,
+                            #   'NEg': pen.NEg, 'NEpreg': pen.NEpreg, 'NEl': pen.NEl,
+                            #   'MP_req': pen.MP_req, 'Ca_req': pen.Ca_req, 'P_req': pen.P_req,
+                            #   'DMIest': pen.DMIest, 'avg_BW': pen.avg_BW,
+                            #   'avg_milk_production_reduction_pen': pen.avg_milk_production_reduction,}
+                
+                info_map = {"class": self.__class__.__name__,
+                    "function": self._calc_ration_at_interval.__name__,}
+                om.add_variable(f'avg_rqmts_for pen {pen.id}', pen.avg_nutrient_rqmts, info_map)
+                
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
