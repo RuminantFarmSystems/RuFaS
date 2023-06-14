@@ -613,7 +613,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
         mock_heiferIII.id = i
         mock_heiferIIIs.append(mock_heiferIII)
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
-    ids_removed = []
+    animals_removed = []
     life_cycle_manager.sold_heifers = []
     life_cycle_manager.sold_heifer_num = 0
 
@@ -622,14 +622,14 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     assert life_cycle_manager.sold_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, ids_removed)
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
 
     # Assert after
     assert len(mock_heiferIIIs) == 53
     assert len(mock_cows) == 50
     assert len(life_cycle_manager.sold_heifers) == 2
     assert life_cycle_manager.sold_heifer_num == 2
-    assert ids_removed == [54, 53]
+    assert len(animals_removed) == 2
     # ---------------------------------------------------------------
 
     # Case 2: len(heiferIIIs) + len(cows) <= herd_num * 1.03
@@ -641,7 +641,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
         mock_heiferIII.id = i
         mock_heiferIIIs.append(mock_heiferIII)
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 50
-    ids_removed = []
+    animals_removed = []
     life_cycle_manager.sold_heifers = []
     life_cycle_manager.sold_heifer_num = 0
 
@@ -650,14 +650,14 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     assert life_cycle_manager.sold_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, ids_removed)
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
 
     # Assert after
     assert len(mock_heiferIIIs) == 53
     assert len(mock_cows) == 50
     assert len(life_cycle_manager.sold_heifers) == 0
     assert life_cycle_manager.sold_heifer_num == 0
-    assert len(ids_removed) == 0
+    assert len(animals_removed) == 0
     # ---------------------------------------------------------------
 
     # Case 3: len(heiferIIIs) == 0
@@ -665,7 +665,7 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     life_cycle_manager.herd_num = 100
     mock_heiferIIIs: List[HeiferIII] = []
     mock_cows: List[Cow] = [mocker.MagicMock(autospec=Cow)] * 104
-    ids_removed = []
+    animals_removed = []
     life_cycle_manager.sold_heifers = []
     life_cycle_manager.sold_heifer_num = 0
 
@@ -674,14 +674,14 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture,
     assert life_cycle_manager.sold_heifer_num == 0
 
     # Act
-    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, ids_removed)
+    life_cycle_manager._check_if_heifers_need_to_be_sold(mock_heiferIIIs, mock_cows, animals_removed)
 
     # Assert after
     assert len(mock_heiferIIIs) == 0
     assert len(mock_cows) == 104
     assert len(life_cycle_manager.sold_heifers) == 0
     assert life_cycle_manager.sold_heifer_num == 0
-    assert len(ids_removed) == 0
+    assert len(animals_removed) == 0
 
 
 def test_check_if_replacement_heifers_needed(mocker: MockerFixture,
@@ -885,8 +885,6 @@ def test_handle_cow_milking(mocker: MockerFixture,
     }
     life_cycle_manager.dry_cow_num = 5
 
-    expected_new_daily_milk_production = (life_cycle_manager.daily_milk_production +
-                                          mock_cow.estimated_daily_milk_produced)
     expected_new_milking_cow_num = life_cycle_manager.milking_cow_num + 1
     expected_new_avg_days_in_milk = (life_cycle_manager.avg_days_in_milk * life_cycle_manager.milking_cow_num +
                                      mock_cow.days_in_milk) / expected_new_milking_cow_num
@@ -900,7 +898,6 @@ def test_handle_cow_milking(mocker: MockerFixture,
     # Assert
     spy_handle_cow_milking.assert_called_once_with(mock_cow)
     if is_cow_milking:
-        assert life_cycle_manager.daily_milk_production == expected_new_daily_milk_production
         assert life_cycle_manager.milking_cow_num == expected_new_milking_cow_num
         assert life_cycle_manager.avg_days_in_milk == approx(expected_new_avg_days_in_milk)
         assert life_cycle_manager.vwp_cow_num == expected_vwp_cow_num
@@ -1235,7 +1232,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
     mock_cows = []
     num_cows = 10
     calves_born = []
-    ids_removed = []
+    animals_removed = []
     removed_cows_idx = []
     total_animal_num_start = 0
     current_total_animal_num = total_animal_num_start
@@ -1250,7 +1247,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
         has_new_born = i % 3 == 0
         mock_cow.update.return_value = (None, None, None, is_culled, has_new_born)
         if is_culled:
-            ids_removed.append(i)
+            animals_removed.append(mock_cow)
             removed_cows_idx.append(i)
             num_cows_culled += 1
         else:
@@ -1298,7 +1295,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
 
     # Act
     actual_total_animal_num = life_cycle_manager._cull_cows_and_record_stats(sim_day, mock_cows,
-                                                                             calves_born, ids_removed,
+                                                                             calves_born, animals_removed,
                                                                              total_animal_num_start)
 
     # Assert
@@ -1306,7 +1303,7 @@ def test_cull_cows_and_record_stats(mocker: MockerFixture, life_cycle_manager: L
         cow.update.assert_called_once_with(sim_day, avg_CI)
         _, _, _, is_culled, has_new_born = cow.update.return_value
         if is_culled:
-            assert cow.id in ids_removed
+            assert cow in animals_removed
             assert cow.id in removed_cows_idx
         else:
             patch_for_handle_cow_body_weight_and_parity.assert_any_call(cow,

@@ -94,10 +94,11 @@ def test_set_milk_avgs(pen: Pen):
     """Unit test for function set_milk_avgs in file routines/animal/pen.py"""
     avg_milk = 40.362
     avg_CP_milk = 3.196
+    avg_milk_production_reduction = 1.5
 
-    pen.set_milk_avgs(avg_milk, avg_CP_milk)
+    pen.set_milk_avgs(avg_milk, avg_CP_milk, avg_milk_production_reduction)
 
-    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk
+    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk and pen.avg_milk_production_reduction == 1.5
 
 
 @pytest.mark.parametrize('pen_to_test, new_animals, expected_animals_in_pen',
@@ -131,7 +132,7 @@ def test_update_pen_populated(pen_to_test: Pen, expected_pen_populated: bool):
 @pytest.mark.parametrize('pen_to_test, expected_stocking_density',
                          [
                              (lazy_fixture('pen'), 0),
-                             (lazy_fixture('pen_with_animals'), 3),
+                             (lazy_fixture('pen_with_animals'), 0.03),
                          ])
 def test_update_stocking_density(pen_to_test: Pen, expected_stocking_density: float):
     """Unit test for function update_stocking_density in file routines/animal/pen.py"""
@@ -209,21 +210,21 @@ def test_reset_manure(pen: Pen) -> None:
     pen.lactating_total = {}
 
     expected = AnimalManureExcretions(
-            urea=0.0,
-            urine=0.0,
-            total_ammoniacal_nitrogen_concentration=0.0,
-            urine_nitrogen=0.0,
-            manure_nitrogen=0.0,
-            manure_mass=0.0,
-            total_solids=0.0,
-            degradable_volatile_solids=0.0,
-            non_degradable_volatile_solids=0.0,
-            inorganic_phosphorus_fraction=0.0,
-            organic_phosphorus_fraction=0.0,
-            phosphorus=0.0,
-            phosphorus_fraction=0.0,
-            potassium=0.0,
-            methane=0.0
+        urea=0.0,
+        urine=0.0,
+        total_ammoniacal_nitrogen_concentration=0.0,
+        urine_nitrogen=0.0,
+        manure_nitrogen=0.0,
+        manure_mass=0.0,
+        total_solids=0.0,
+        degradable_volatile_solids=0.0,
+        non_degradable_volatile_solids=0.0,
+        inorganic_phosphorus_fraction=0.0,
+        organic_phosphorus_fraction=0.0,
+        phosphorus=0.0,
+        phosphorus_fraction=0.0,
+        potassium=0.0,
+        methane=0.0
     )
 
     pen.reset_manure()

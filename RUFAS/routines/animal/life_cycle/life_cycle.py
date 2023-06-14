@@ -205,7 +205,8 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII, herd_data['heiferII_num'], herd_data['breed'])
         heiferIIIs = self._get_animals(HeiferIII, herd_data['heiferIII_num'], herd_data['breed'])
         cows = self._get_animals(Cow, herd_data['cow_num'], herd_data['breed'])
-        self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'], herd_data['breed'])
+        self.replacement_market = self.animal_initializer.get_replacement_cows(herd_data['replace_num'],
+                                                                               herd_data['breed'])
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
     def _set_avg_CI(self) -> None:
@@ -245,7 +246,7 @@ class LifeCycleManager:
                      heiferIIs: List[HeiferII],
                      heiferIIIs: List[HeiferIII],
                      cows: List[Cow]) \
-            -> Tuple[List[Cow], List[int], List[Calf], List[Calf],
+            -> Tuple[List[Cow], List[Cow], List[Calf], List[Calf],
             List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
         """
         Updates the status of the animals.
@@ -260,7 +261,7 @@ class LifeCycleManager:
 
         Returns:
             animals_added: list of animals added from replacement herd
-            ids_removed: list of animal ids that were removed during this day
+            animals_removed: list of animals that were removed during this day
             calves_born: list of calves that were born during this day
             calves: updated list of calves
             heiferIs: updated list of heiferIs
@@ -269,7 +270,7 @@ class LifeCycleManager:
             cows: updated list of cows
 
         """
-        ids_removed: List[int] = []
+        animals_removed: List[Cow] = []
         animals_added: List[Cow] = []
         calves_born: List[Calf] = []
         total_animal_num = 0
@@ -290,8 +291,8 @@ class LifeCycleManager:
                                                                                total_animal_num)
 
         total_animal_num = self._cull_cows_and_record_stats(sim_day, cows, calves_born,
-                                                            ids_removed, total_animal_num)
-        self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, ids_removed)
+                                                            animals_removed, total_animal_num)
+        self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed)
         self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
 
         self._calculate_herd_percentages(total_animal_num)
@@ -324,7 +325,7 @@ class LifeCycleManager:
 
         om.add_variable("life_cycle_daily_herd_update", life_cycle_daily_herd_update, info_map)
 
-        return (animals_added, ids_removed, calves_born, calves, heiferIs,
+        return (animals_added, animals_removed, calves_born, calves, heiferIs,
                 heiferIIs, heiferIIIs, cows)
 
     def _reset_daily_stats(self) -> None:
@@ -650,10 +651,12 @@ class LifeCycleManager:
         args.update(tai_method_c=AnimalBase.config['cow_TAI_protocol'])
         args.update(resynch_method=AnimalBase.config['cow_resynch_protocol'])
         new_cow = Cow(args)
+        if len(cows)>0:
+            new_cow.milk_production_reduction = cows[0].milk_production_reduction
         cows.append(new_cow)
 
     def _check_if_heifers_need_to_be_sold(self, heiferIIIs: List[HeiferIII], cows: List[Cow],
-                                          ids_removed: List[int]) -> None:
+                                          animals_removed: List[Cow]) -> None:
         """Checks if any heifers need to be sold.
 
         If the number of heifers exceeds what is needed for the herd,
@@ -662,15 +665,16 @@ class LifeCycleManager:
         Args:
             heiferIIIs: The list of heiferIIIs.
             cows: The list of cows.
-            ids_removed: The list of ids of animals removed from the herd.
+            animals_removed: The list of animals removed from the herd.
 
         """
         sell_threshold = 1.03
         while len(heiferIIIs) + len(cows) > self.herd_num * sell_threshold and len(heiferIIIs) > 0:
             removed_heiferIII = heiferIIIs.pop()
-            ids_removed.append(removed_heiferIII.id)
+            animals_removed.append(removed_heiferIII)
             self.sold_heifers.append(removed_heiferIII)
             self.sold_heifer_num += 1
+            self.heiferIII_num -= 1
 
     def _check_if_replacement_heifers_needed(self, sim_day: int, heiferIIIs: List[HeiferIII], cows: List[Cow],
                                              animals_added: List[Cow]) -> None:
@@ -689,6 +693,8 @@ class LifeCycleManager:
         buy_threshold = 1.01
         while len(cows) + len(heiferIIIs) + self.bought_heifer_num < self.herd_num * buy_threshold \
                 and sim_day > 1:
+            if len(self.replacement_market) == 0:
+                break
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
             replacement.set_p_purchased()
@@ -696,14 +702,14 @@ class LifeCycleManager:
             self.bought_heifer_num += 1
 
     def _cull_cows_and_record_stats(self, sim_day: int, cows: List[Cow], calves_born: List[Calf],
-                                    ids_removed: List[int], total_animal_num: int) -> int:
+                                    animals_removed: List[Cow], total_animal_num: int) -> int:
         """Culls cows and records stats.
 
         Args:
             sim_day: The current simulation day.
             cows: The list of cows.
             calves_born: The list of calves born.
-            ids_removed: The list of ids of animals removed from the herd.
+            animals_removed: The list of animals removed from the herd.
             total_animal_num: The current total number of animals in the herd.
 
         Returns:
@@ -732,7 +738,7 @@ class LifeCycleManager:
             # culled cows, calculate slaughter value and record culling reasons
             if culled:
                 self._cull_cow(cow)
-                ids_removed.append(cow.id)
+                animals_removed.append(cow)
                 removed_cows_idx.append(index)
             else:
                 total_animal_num = self._handle_cow_body_weight_and_parity(cow, total_animal_num)
@@ -792,7 +798,6 @@ class LifeCycleManager:
 
         """
         if cow.milking:
-            self.daily_milk_production += cow.estimated_daily_milk_produced
             self.milking_cow_num, self.avg_days_in_milk = \
                 Utility.calc_average(self.milking_cow_num, self.avg_days_in_milk, cow.days_in_milk)
 

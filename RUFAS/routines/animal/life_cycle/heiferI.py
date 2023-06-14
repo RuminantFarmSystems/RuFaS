@@ -18,7 +18,7 @@ from RUFAS.routines.animal.ration.animal_requirements import calc_rqmts
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 
 om = OutputManager()
-import csv
+
 
 class HeiferI(Calf):
     def __init__(self, args):
@@ -45,14 +45,14 @@ class HeiferI(Calf):
         """
         return self.get_calf_values()
 
-    def set_nutrient_rqmts(self, temp):
+    def set_nutrient_rqmts(self, temp, animal_grouping_scenario):
         """
         Calculates this heiferI's nutrient requirements.
         """
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=None,
-                         animal_type='heifer',
+                         animal_type=animal_grouping_scenario.get_animal_type(self),
                          body_condition_score_5=3,
                          previous_temperature=temp,
                          average_daily_gain_heifer=self.daily_growth)
@@ -65,35 +65,6 @@ class HeiferI(Calf):
         self.Ca_req = req['Ca_req']
         self.P_req = req['P_req']
         self.DMIest = req['DMIest']
-
-        csvline = [self.id,
-                'heiferi',
-                self.body_weight, 
-                self.mature_body_weight,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                self.NEmaint,
-                self.NEg,
-                self.NEpreg,
-                self.NEl,
-                self.MP_req,
-                self.Ca_req,
-                self.P_req,
-                self.DMIest,
-                0,
-                0,
-                ]
-        # with open('C:/Users/jw2574/Documents/data/vm1/MASM/output/NASEM_10yr.csv', 'a', newline='') as file:
-        # #with open('C:/Users/joecw/RUFAS/NRC_10yr.csv', 'a', newline='') as file:
-        #     csvout = csv.writer(file)
-        #     csvout.writerow(csvline)
 
     def calc_manure_excretion(self, feed, methane_model):
         """

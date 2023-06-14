@@ -11,15 +11,17 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
+from typing import Dict, List
 
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.ration.user_defined_ration import user_defined_ration_values as user_defined_ration_values
-udrv = user_defined_ration_values()
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
+udrv = UserDefinedRationManager()
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
                  is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_, cow_type_,
-                 animal_type_ = 'cow', DMIest_= None):
+                 DMIest_= None):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below. If the input described below is a list, it is a
@@ -56,12 +58,11 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
         CP_: A list of crude protein in each feed (% of DM)
         dRUP_: A list of RUP degradability in each feed (% of RUP)
         limit_: A list of the limiting upper bounds for each feed (kg)
-        animal_type: A string representing the type of the animal
         cow_type_: A boolean which is True if cow is lactating, False else
     """
     global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
         DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, animal_type, cow_type
+        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
 
     price = price_
     n = len(price)
@@ -90,7 +91,6 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     CP = CP_
     dRUP = dRUP_
     limit = limit_
-    animal_type = animal_type_
     cow_type = cow_type_
 
 
@@ -125,9 +125,6 @@ def objective(x):
     Args:
         x: The decision vector of the NLP
     """
-    chanchodebug = False
-    if chanchodebug:
-        print(np.multiply(x, price))
     return sum(np.multiply(x, price))
 
 
@@ -329,10 +326,10 @@ def phosphorus_constraint(x):
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
-def protien_constraint(x):
+def protein_constraint(x):
     """
-    Sets up the protien requirement constraint in the NLP. Because part of the
-    maintenance requirement for protien contains non-linearity properties, that
+    Sets up the protein requirement constraint in the NLP. Because part of the
+    maintenance requirement for protein contains non-linearity properties, that
     requirement will be calculated in this function. Each calculation has a
     reference to the respective calculation in the pseudocode.
 
@@ -391,7 +388,7 @@ def protien_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
-    # B: PROTIEN REQUIREMENTS:
+    # B: PROTEIN REQUIREMENTS:
     # Maintenance Requirement
     # ---------------------
     # [A.Cow.B.1]-[A.Heifer.B.1]
@@ -463,15 +460,27 @@ def fat_constraint(x):
         return -(sum(np.multiply(x, EE)) / DMI) + 7
 
 
-def DMI_constraint(x):
+def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    less than the DMI_est calculated in the requirements.
+    greater than the DMI_est + 20% calculated in the requirements
+    greater than the DMI_est + 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
     """
-    return -(sum(x)) + DMIest
+    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+
+
+def DMI_constraint_upper(x):
+    """
+    Constraint in place to make sure the sum of all the feeds in the ration is
+    less than the DMI_est + 20% calculated in the requirements.
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
 
 
 def energy_req_limit_constraint(x):
@@ -482,7 +491,7 @@ def energy_req_limit_constraint(x):
     Args:
         x: The decision vector of the NLP
     """
-    n = len(price) / 3
+    n = len(price) /    3
     list = []
     for i in range(int(n)):
         a = i * 3
@@ -490,23 +499,6 @@ def energy_req_limit_constraint(x):
         list.append(x[a] * x[a + 2])
         list.append(x[a + 1] * x[a + 2])
     return -sum(list)
-
-
-def get_ration_vals_null(x):
-    """
-    Deprecated use, possible
-    
-    Function that calculates and retrieves ration values used throughout the
-    ration.
-
-    Args:
-        x: the decision vector of the NLP (should be a completed ration)
-    """
-    #ration vals (subject to adding other ration vals)
-    ME_tot = sum(np.multiply(x, 0.0)) # TODO Import the actual MEact values
-    ration_vals = {'ME_tot': ME_tot}
-    return ration_vals
-
 
 def get_ration_vals(x):
     """
@@ -522,43 +514,78 @@ def get_ration_vals(x):
     return ration_vals
 
 
-def userbounds():
-    ration_calf = udrv.calf_ration
-    ration_all_heifers = udrv.heifer_ration
-    ration_cow_lactating = udrv.lactating_cow_ration
-    ration_cow_dry = udrv.lactating_cow_ration
-    if animal_type == 'cow':
-        if cow_type == True:
-            ration_percents = ration_cow_lactating
-            # print('çów')
-        else:
-            ration_percents = ration_cow_dry
-    elif animal_type == 'heifer':
-        ration_percents = ration_all_heifers
-    else: 
-        ration_percents = ration_calf
+def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
+    """
+    Calculates user bounds for optimize function
 
+    Uses udrv object to get tolerance, e.g. the +/- percentage allowed around those.
+    Returns a list of each key/value pair three times, but divided by three
+        This return in triplicate is necessary for the scipy.minimize function,
+         which requires the decision vector in this shape
+    
+    Parameters
+    ----------
+    ration_percents: Dict
+        keys are feed IDs, values are percent of DMI
+    DMIest: float
+        average estimated DMI for pen
+    Returns
+    -------
+    List
+        List of each bound, divided by three and reported in triplicate for scipy.minimize function
+    """
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
     for key in ration_percents.keys():
         target = ration_percents[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
         # target = ration_percents[key]
-        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
-        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
-        tribounds.append((target-target*udr_tolerance,target+target*udr_tolerance))
+        targetbounds = ((target-target*udr_tolerance)/3,(target+target*udr_tolerance)/3)
+        tribounds.append(targetbounds)
+        tribounds.append(targetbounds)
+        tribounds.append(targetbounds)
     return tribounds
 
 
-def optimize(user_defined_ration_select):
+
+# establishing the constraints of the NLP
+constraint_functions = [
+    NEmact_constraint,
+    NEl_constraint,
+    NEgact_constraint,
+    calcium_constraint,
+    phosphorus_constraint,
+    protein_constraint,
+    NDF_constraint_1,
+    NDF_constraint_2,
+    forage_NDF_constraint,
+    fat_constraint,
+    DMI_constraint_upper,
+    DMI_constraint_lower
+]
+
+cow_cons = [{'type': 'ineq', 'fun': func} for func in constraint_functions]
+
+heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [NEl_constraint, DMI_constraint_lower]]
+
+def optimize(animal_combination, available_feeds: Dict) -> None:
+
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
     as a dictionary with feed keys corresponding to their ration (kg).
 
-    Args:
-        *This function requires no inputs, but utilizes the functions created
-        above in this file*
+    Parameters
+    ----------
+    animal_combination : Pen.AnimalCombination
+        The animal combination to optimize the ration for.
+    
+    available_feeds: Dict 
+        a DefaultDict of the AvailableFeeds class attributes defined in ration_driver.py
+    
+    Returns
+    -------
+    OptimizeResult object from scipy package
 
     """
 
@@ -570,92 +597,28 @@ def optimize(user_defined_ration_select):
     # establishing the bounds of the NLP
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
-    if user_defined_ration_select:
-        bnds = userbounds()
+    if udrv.udr_or_not:
+        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
         bnds = tuple(bnds)
-        #print(bnds)
-
-    # establishing the constraints of the NLP
-    con1 = {'type': 'ineq', 'fun': NEmact_constraint}
-    con2 = {'type': 'ineq', 'fun': NEl_constraint}
-    con3 = {'type': 'ineq', 'fun': NEgact_constraint}
-    con4 = {'type': 'ineq', 'fun': calcium_constraint}
-    con5 = {'type': 'ineq', 'fun': phosphorus_constraint}
-    con6 = {'type': 'ineq', 'fun': protien_constraint}
-    con7 = {'type': 'ineq', 'fun': NDF_constraint_1}
-    con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
-    con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
-    con10 = {'type': 'ineq', 'fun': fat_constraint}
-    con11 = {'type': 'ineq', 'fun': DMI_constraint}
-    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11]
-    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10]
-    user_cons = [con1, con2, con3, con4, con5, con6, con7, con9, con10]
-
-    def is_constraint_violated(solution, constraint) -> bool:
-        result = constraint['fun'](solution)
-        if constraint['type'] == 'ineq' and result < 0:
-            return True
-        elif constraint['type'] == 'eq' and not np.isclose(result, 0):
-            return True
-        else:
-            return False
-
-    def find_failed_constraints(solution, constraints):
-        return list(filter(lambda c: is_constraint_violated(solution, c), constraints))
-
-    if user_defined_ration_select:
+    if udrv.udr_or_not:
         # accumulator = []
-        usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=user_cons)
-        # plt.plot(accumulator[:, 0], accumulator[:, 1])
-        # plt.show()
-        chanchodebug = False
-        if chanchodebug:
-            print(usermod)
-        if usermod.success == False:
-            # TODO figure out a better way to check which constraints are failing
-            if chanchodebug: print(animal_type)
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con1)
-            if chanchodebug: print('constraint 1 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con2)
-            if chanchodebug: print('constraint 2 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con3)
-            if chanchodebug: print('constraint 3 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con4)
-            if chanchodebug: print('constraint 4 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con5)
-            if chanchodebug: print('constraint 5 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con6)
-            if chanchodebug: print('constraint 6 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con7)
-            if chanchodebug: print('constraint 7 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con8)
-            if chanchodebug: print('constraint 8 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con9)
-            if chanchodebug: print('constraint 9 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con10)
-            if chanchodebug: print('constraint 10 ' + str(constraint_check_.success))
-            constraint_check_ = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=con11)
-            if chanchodebug: print('constraint 11 ' + str(constraint_check_.success))
-
+        if str(animal_combination) in ['AnimalCombination.LAC_COW']:
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
+        else:
+            usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
         # Uncomment to use
-        if not usermod.success:
-            failed_constraints = find_failed_constraints(usermod.x, user_cons)
-            if not failed_constraints:
-                print('No constraints violated')
-        
-            for constr in failed_constraints:
-                # add warnings to output manager
-                # or print out to console or both
-                #print(f'Constraint {constr} violated')
-                #print(f'Constraint value: {constr["fun"](usermod.x)}')
-                #print(f'Constraint type: {constr["type"]}')
-                print(f'Supplied ration could not meet the following: {constr["fun"].__name__}')
-
+        if usermod.success:
+            # print(animal_type)
+            print('No constraints violated')
         return usermod
-    elif animal_type == 'cow':
+    # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
+    elif str(animal_combination) in ['AnimalCombination.LAC_COW']:
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
-    elif animal_type == 'heifer':
+    elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
+                                     'AnimalCombination.GROWING_AND_CLOSE_UP']:
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
+    else:
+        raise ValueError("Invalid animal combination: " + str(animal_combination))

@@ -3,6 +3,9 @@
 # ignore text files
 *.txt
 *.txt#
+!example_list_of_keys.txt
+!example_list_of_keys_2.txt
+!example_excl_list_of_keys.txt
 !requirements.txt
 *.doc
 *.docx
@@ -43,3 +46,4 @@ venv/
 
 .pytest_cache/
 *.bak
+tests/__pycache__/test_user_prompt.cpython-311-pytest-7.2.2.pyc.27508
