@@ -82,6 +82,20 @@ class PlantingEvent(Event):
         self.crop_reference = crop_reference
         self.use_heat_scheduled_harvest = heat_scheduled_harvest
 
+    def __eq__(self, other):
+        """Overrides the equality operator for PlantingEvent objects."""
+        correct_type = isinstance(other, PlantingEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for PlantingEvent objects."""
+        str_representation = str(self.crop_reference) + str(self.year) + str(self.day) + \
+            str(self.use_heat_scheduled_harvest)
+        return hash(str_representation)
+
 
 class HarvestEvent(Event):
     def __init__(self, crop_reference: str, year: int = 1, day: int = 240, operation: str = "default"):
@@ -100,6 +114,54 @@ class HarvestEvent(Event):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.operation = operation
+
+    def __eq__(self, other):
+        """Overrides the equality operator for HarvestEvent objects."""
+        correct_type = isinstance(other, HarvestEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for HarvestEvent objects."""
+        str_representation = str(self.crop_reference) + str(self.year) + str(self.day) + str(self.operation)
+        return hash(str_representation)
+
+
+class TillageEvent(Event):
+    def __init__(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int = 1,
+                 day: int = 160):
+        """
+        Creates a new TillageEvent instance, which defines a tillage application to be applied on a specific day of a
+        year.
+        Parameters
+        ----------
+        tillage_depth : float
+            The lowest depth the tilling implement reaches (mm)
+        incorporation_fraction : float
+            Fraction of soil surface pool incorporated into the soil profile (unitless)
+        mixing_fraction : float
+            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
+        """
+        super().__init__(year=year, day=day)
+        self.tillage_depth = tillage_depth
+        self.incorporation_fraction = incorporation_fraction
+        self.mixing_fraction = mixing_fraction
+
+    def __eq__(self, other):
+        """Overrides the equality operator for TillageEvent objects."""
+        correct_type = isinstance(other, TillageEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for TillageEvent objects."""
+        str_representation = str(self.year) + str(self.day) + str(self.tillage_depth) \
+            + str(self.incorporation_fraction) + str(self.mixing_fraction)
+        return hash(str_representation)
 
 
 class ManureEvent(Event):
