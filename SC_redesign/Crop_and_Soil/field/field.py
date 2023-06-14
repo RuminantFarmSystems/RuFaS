@@ -12,6 +12,7 @@ from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 from RUFAS.classes import Time
+from RUFAS.output_manager import OutputManager
 
 # TODO: delete/replace the note block below once satisfied with the design
 """
@@ -21,6 +22,8 @@ in an agricultural field.
 
 Note that some of the field-level attributes will be tracked by the FieldData class
 """
+
+om = OutputManager()
 
 
 class Field:
@@ -170,8 +173,6 @@ class Field:
         self.fertilizer_applicator.apply_fertilizer(phosphorus_applied, total_mass_applied, inorganic_nitrogen_fraction,
                                                     ammonium_fraction, organic_nitrogen_fraction,
                                                     self.field_data.field_size)
-
-
 
     @staticmethod
     def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
