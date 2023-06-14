@@ -188,8 +188,13 @@ class Field:
         Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
 
         """
-        todays_events = [event for event in all_events if event.occurs_today(time)]
-        remaining_events = [event for event in all_events if event not in todays_events]
+        todays_events = []
+        remaining_events = []
+        for event in all_events:
+            if event.occurs_today(time):
+                todays_events.append(event)
+            else:
+                remaining_events.append(event)
         return remaining_events, todays_events
 
     # </editor-fold>
