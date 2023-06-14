@@ -38,16 +38,18 @@ def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -
     assert actual == expected
 
 
-@pytest.mark.parametrize("days,expected", [
-    ([140, 140, 367], False),
-    ([200, 0, 200], False),
-    ([100, -30, 100], False),
-    ([140, 200, 140], True),
-    ([], True)
+@pytest.mark.parametrize("years,days,expected", [
+    ([1991, 1992, 1992], [140, 140, 367], False),
+    ([1990, 1992, 1994], [200, 0, 200], False),
+    ([2000, 2002, 2004], [100, -30, 100], False),
+    ([2001, 2002, 2003], [140, 200, 140], True),
+    ([2000, 2001], [366, 365], True),
+    ([2002, 2003], [200, 366], False),
+    ([], [], True)
 ])
-def test_validate_days(days: List[int], expected: bool) -> None:
+def test_validate_days(years: List[int], days: List[int], expected: bool) -> None:
     """Tests that all days passed to be scheduled are valid."""
-    actual = Schedule._validate_days(days)
+    actual = Schedule._validate_days(years, days)
     assert actual == expected
 
 

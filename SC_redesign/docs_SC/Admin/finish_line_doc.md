@@ -130,8 +130,8 @@ run of the simulation.
 
 #### OutputGatherer
 - Implement an `OutputGatherer` module that will handle all output from the Crop and Soil modules
-  - [ ] Implement a method that will collect and pass values to the Output Manager daily. - 2 points
-  - [ ] Implement a method that will collect and pass values to the Output Manager annually. - 2 points
+  - [x] Implement a method that will collect and pass values to the Output Manager daily. - 2 points
+  - [x] Implement a method that will collect and pass values to the Output Manager annually. - 2 points
 - [ ] Integrate the `OutputGatherer` into the `FieldManager` module. - 2 points
 
 #### FieldInputManager
