@@ -516,11 +516,12 @@ def test_annual_reset() -> None:
     field.soil.data.do_annual_reset.assert_called_once()
     field.field_data.perform_annual_field_reset.assert_called_once()
 
+
 @pytest.mark.parametrize("events, day, year", [
-    ([TillageEvent(10, 0.5, 7, 1998),TillageEvent(10, 0.5, 7, 1999),TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
+    ([TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1999), TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
     ([], 7, 1998),
-    ([TillageEvent(10, 0.5, 7, 1997),TillageEvent(10, 0.5, 7, 1999),TillageEvent(10, 0.5, 7, 2023)], 7, 1998),
-    ([TillageEvent(10, 0.5, 7, 1998),TillageEvent(10, 0.5, 7, 1998),TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
+    ([TillageEvent(10, 0.5, 7, 1997), TillageEvent(10, 0.5, 7, 1999), TillageEvent(10, 0.5, 7, 2023)], 7, 1998),
+    ([TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
 ])
 def test_till_soil_event(events: List[TillageEvent], day: int, year: int) -> None:
     mocked_time = MagicMock(Time)
