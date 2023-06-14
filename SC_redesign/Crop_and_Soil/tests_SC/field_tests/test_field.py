@@ -537,6 +537,7 @@ def test_till_soil_event(events: List[TillageEvent], day: int, year: int) -> Non
 
 # TODO: All field methods need to be tested in future PRs.
 
+
 # --- Test FieldData methods ---
 @pytest.mark.parametrize("liters,area", [
     (100, 2.3),
