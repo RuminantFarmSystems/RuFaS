@@ -31,7 +31,7 @@ class Field:
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
                  fertilizer_events: Optional[List[FertilizerEvent]] = None,
-                 fertilizer_mixes: Optional[Dict[str, Dict]] = None):
+                 fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -52,6 +52,7 @@ class Field:
         """List of all fertilizer application events that will in this field."""
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
+        """List of all fertilizer mixes available for application to this field."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
@@ -183,7 +184,7 @@ class Field:
         potassium_applied = fertilizer_applied.get("potassium_mass")
 
         # TODO: specify these fractions in fertilizer mixes - issue #573
-        inorganic_nitrogen_fraction = total_mass_applied / nitrogen_applied
+        inorganic_nitrogen_fraction = nitrogen_applied / total_mass_applied
         ammonium_fraction = 0.0
         organic_nitrogen_fraction = 0.0
 
@@ -192,7 +193,7 @@ class Field:
                                                     self.field_data.field_size)
 
         info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
-                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day}}
         value = {"mass": total_mass_applied, "nitrogen": nitrogen_applied, "phosphorus": phosphorus_applied,
                  "potassium": potassium_applied}
         om.add_variable("fertilizer_application", value, info_map)
@@ -262,7 +263,7 @@ class Field:
         """
         self.fertilizer_events, todays_fertilizer_events = self._create_and_update_events(self.fertilizer_events, time)
         for event in todays_fertilizer_events:
-            self._execute_fertilizer_event(event)
+            self._execute_fertilizer_application(event)
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
