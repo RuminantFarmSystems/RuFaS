@@ -13,6 +13,8 @@ from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
+from RUFAS.classes import Time
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 
 
 @pytest.mark.parametrize("daylength,threshold_daylength", [
@@ -514,9 +516,26 @@ def test_annual_reset() -> None:
     field.soil.data.do_annual_reset.assert_called_once()
     field.field_data.perform_annual_field_reset.assert_called_once()
 
+@pytest.mark.parametrize("events, day, year", [
+    ([TillageEvent(10, 0.5, 7, 1998),TillageEvent(10, 0.5, 7, 1999),TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
+    ([], 7, 1998),
+    ([TillageEvent(10, 0.5, 7, 1997),TillageEvent(10, 0.5, 7, 1999),TillageEvent(10, 0.5, 7, 2023)], 7, 1998),
+    ([TillageEvent(10, 0.5, 7, 1998),TillageEvent(10, 0.5, 7, 1998),TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
+])
+def test_till_soil_event(events: List[TillageEvent], day: int, year: int) -> None:
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+
+    field = Field(events)
+    tillage_events, todays_events = field._create_and_update_events(events, mocked_time)
+    todays_count = len(todays_events)
+    field.tiller.till_soil = MagicMock()
+    field.till_soil_event(mocked_time)
+
+    assert field.tiller.till_soil.call_count == todays_count
 
 # TODO: All field methods need to be tested in future PRs.
-
 
 # --- Test FieldData methods ---
 @pytest.mark.parametrize("liters,area", [
