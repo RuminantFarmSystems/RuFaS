@@ -265,7 +265,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                          max_air_temperature=max_temp, mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
-        incorp = Field(field_data, soil)
+        incorp = Field(field_data=field_data, soil=soil)
         incorp.crops = [crop_1, crop_2]
 
         incorp.soil.infiltration.infiltrate = MagicMock()
