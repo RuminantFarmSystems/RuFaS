@@ -135,44 +135,67 @@ class Field:
         """till the soil"""
         pass
 
-    def _execute_fertilizer_event(self, event: FertilizerEvent) -> None:
+    def _execute_fertilizer_application(self, mix_name: str, requested_nitrogen: float, requested_phosphorus: float,
+                                        year: int, day: int) -> None:
         """
-        Executes a fertilizer application as defined in the FertilizerEvent passed.
+        Executes a fertilizer application based on the requested amounts of nutrients.
 
         Parameters
         ----------
-        event : FertilizerEvent
-            The fertilizer event containing all the necessary information to formulate a single fertilizer application.
+        mix_name : str
+            The name of the mix this fertilizer application should be composed of.
+        requested_nitrogen : float
+            Minimum amount of nitrogen to be included in this fertilizer application.
+        requested_phosphorus : float
+            Minimum amount of phosphorus to be included in this fertilizer application.
+        year : int
+            Calendar year in which the fertilizer application is occurring.
+        day : int
+            Julian day on which this fertilizer application is occurring.
+
+        Raises
+        ------
+        KeyError
+            If the specified fertilizer mix is not defined in the list of available fertilizers to this field.
 
         Notes
         -----
-        This method is responsible for translating all the information provided in the FertilizerEvent into data that
-        can be passed to the FertilizerApplication module.
+        This method is responsible for determining the exact amounts of fertilizer and nutrients added to the field,
+        passing those amount to the FertilizerApplication module, and recording the fertilizer application to the
+        OutputManager.
 
         """
         try:
-            fertilizer_mix = self.available_fertilizer_mixes.get(event.mix_name)
+            fertilizer_mix = self.available_fertilizer_mixes.get(mix_name)
         except KeyError:
-            raise KeyError(f"'{self.field_data.name}': expected to have fertilizer mix for '{event.mix_name}', "
+            raise KeyError(f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
                            f"received '{self.available_fertilizer_mixes}'.")
         nitrogen_fraction = fertilizer_mix.get("N")
         phosphorus_fraction = fertilizer_mix.get("P")
         potassium_fraction = fertilizer_mix.get("K")
 
         fertilizer_applied = self._formulate_fertilizer_required(nitrogen_fraction, phosphorus_fraction,
-                                                                 potassium_fraction, event.nitrogen_mass,
-                                                                 event.phosphorus_mass)
+                                                                 potassium_fraction, requested_nitrogen,
+                                                                 requested_phosphorus)
         total_mass_applied = fertilizer_applied.get("mass")
         phosphorus_applied = fertilizer_applied.get("phosphorus_mass")
+        nitrogen_applied = fertilizer_applied.get("nitrogen_mass")
+        potassium_applied = fertilizer_applied.get("potassium_mass")
 
         # TODO: specify these fractions in fertilizer mixes - issue #573
-        inorganic_nitrogen_fraction = total_mass_applied / fertilizer_applied.get("nitrogen_mass")
+        inorganic_nitrogen_fraction = total_mass_applied / nitrogen_applied
         ammonium_fraction = 0.0
         organic_nitrogen_fraction = 0.0
 
         self.fertilizer_applicator.apply_fertilizer(phosphorus_applied, total_mass_applied, inorganic_nitrogen_fraction,
                                                     ammonium_fraction, organic_nitrogen_fraction,
                                                     self.field_data.field_size)
+
+        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+        value = {"mass": total_mass_applied, "nitrogen": nitrogen_applied, "phosphorus": phosphorus_applied,
+                 "potassium": potassium_applied}
+        om.add_variable("fertilizer_application", value, info_map)
 
     @staticmethod
     def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
