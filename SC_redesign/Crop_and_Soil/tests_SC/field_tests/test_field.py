@@ -250,9 +250,6 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
     field.harvest_crop("test", "default", mocked_time)
 
     actual = om.warnings_pool["Field:'test'.harvest_warning"]
-    print(actual)
-    print(actual['values'])
-    print(expected_message)
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_message)
 
