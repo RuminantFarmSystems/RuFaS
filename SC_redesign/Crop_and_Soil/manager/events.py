@@ -35,11 +35,9 @@ class Event:
 
     def __eq__(self, other):
         """Overrides the equality operator for Event objects."""
-        correct_type = isinstance(other, Event)
-        hash_value = self.__hash__()
-        other_hash_value = other.__hash__()
-        equal_hash_values = hash_value == other_hash_value
-        return correct_type and equal_hash_values
+        if isinstance(other, Event):
+            return other.year == self.year and other.day == self.day
+        return False
 
     def __hash__(self):
         """Overrides the hash method for Event objects."""
@@ -83,11 +81,10 @@ class PlantingEvent(Event):
 
     def __eq__(self, other):
         """Overrides the equality operator for PlantingEvent objects."""
-        correct_type = isinstance(other, PlantingEvent)
-        hash_value = self.__hash__()
-        other_hash_value = other.__hash__()
-        equal_hash_values = hash_value == other_hash_value
-        return correct_type and equal_hash_values
+        if isinstance(other, PlantingEvent):
+            return super().__eq__(other) and other.crop_reference == self.crop_reference \
+                and other.use_heat_scheduled_harvest == self.use_heat_scheduled_harvest
+        return False
 
     def __hash__(self):
         """Overrides the hash method for PlantingEvent objects."""
@@ -114,11 +111,10 @@ class HarvestEvent(Event):
 
     def __eq__(self, other):
         """Overrides the equality operator for HarvestEvent objects."""
-        correct_type = isinstance(other, HarvestEvent)
-        hash_value = self.__hash__()
-        other_hash_value = other.__hash__()
-        equal_hash_values = hash_value == other_hash_value
-        return correct_type and equal_hash_values
+        if isinstance(other, HarvestEvent):
+            return super().__eq__(other) and other.crop_reference == self.crop_reference \
+                and other.operation == self.operation
+        return False
 
     def __hash__(self):
         """Overrides the hash method for HarvestEvent objects."""
@@ -147,11 +143,11 @@ class TillageEvent(Event):
 
     def __eq__(self, other):
         """Overrides the equality operator for TillageEvent objects."""
-        correct_type = isinstance(other, TillageEvent)
-        hash_value = self.__hash__()
-        other_hash_value = other.__hash__()
-        equal_hash_values = hash_value == other_hash_value
-        return correct_type and equal_hash_values
+        if isinstance(other, TillageEvent):
+            return super().__eq__(other) and other.tillage_depth == self.tillage_depth \
+                and other.incorporation_fraction == self.incorporation_fraction \
+                and other.mixing_fraction == self.mixing_fraction
+        return False
 
     def __hash__(self):
         """Overrides the hash method for TillageEvent objects."""
@@ -192,11 +188,13 @@ class ManureEvent(Event):
 
     def __eq__(self, other):
         """Overrides the equality operator for ManureEvent objects."""
-        correct_type = isinstance(other, ManureEvent)
-        hash_value = self.__hash__()
-        other_hash_value = other.__hash__()
-        equal_hash_values = hash_value == other_hash_value
-        return correct_type and equal_hash_values
+        if isinstance(other, ManureEvent):
+            return super().__eq__(other) and other.nitrogen_mass == self.nitrogen_mass \
+                and other.phosphorus_mass == self.phosphorus_mass \
+                and other.field_coverage == self.field_coverage \
+                and other.application_depth == self.application_depth \
+                and other.surface_remainder_fraction == self.surface_remainder_fraction
+        return False
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
@@ -237,11 +235,13 @@ class FertilizerEvent(Event):
 
     def __eq__(self, other):
         """Overrides the equality operator for FertilizerEvent objects."""
-        correct_type = isinstance(other, FertilizerEvent)
-        hash_value = self.__hash__()
-        other_hash_value = other.__hash__()
-        equal_hash_values = hash_value == other_hash_value
-        return correct_type and equal_hash_values
+        if isinstance(other, FertilizerEvent):
+            return super().__eq__(other) and other.mix_name == self.mix_name \
+                and other.nitrogen_mass == self.nitrogen_mass \
+                and other.phosphorus_mass == self.phosphorus_mass \
+                and other.depth == self.depth \
+                and other.surface_remainder_fraction == self.surface_remainder_fraction
+        return False
 
     def __hash__(self):
         """Overrides the hash method for FertilizerEvent objects."""
