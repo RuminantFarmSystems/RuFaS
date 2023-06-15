@@ -523,7 +523,7 @@ def test_annual_reset() -> None:
     ([TillageEvent(10, 0.5, 7, 1997), TillageEvent(10, 0.5, 7, 1999), TillageEvent(10, 0.5, 7, 2023)], 7, 1998),
     ([TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
 ])
-def test_till_soil_event(events: List[TillageEvent], day: int, year: int) -> None:
+def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int) -> None:
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
@@ -532,7 +532,7 @@ def test_till_soil_event(events: List[TillageEvent], day: int, year: int) -> Non
     tillage_events, todays_events = field._create_and_update_events(events, mocked_time)
     todays_count = len(todays_events)
     field.tiller.till_soil = MagicMock()
-    field.till_soil_event(mocked_time)
+    field.check_tillage_schedule(mocked_time)
 
     assert field.tiller.till_soil.call_count == todays_count
 

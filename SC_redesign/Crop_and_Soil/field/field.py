@@ -59,11 +59,10 @@ class Field:
         """main Field function, runs all field routines based on current attribute configuration
 
         Args:
-            day: the current (sequential) day of the simulation  - TODO: not yet implemented
-            year: the current (sequential) year of the simulation - TODO: not yet implemented
+            time: a time object that wil help indicate the year and day
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
-            time: a time object that wil help indicate the year and day
+
 
         Details: **All the logic (after setup) will go in this function**
         """
@@ -76,7 +75,7 @@ class Field:
             self.amend_soil()
 
         # tillage
-        self.till_soil_event()
+        self.check_tillage_schedule()
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -160,7 +159,7 @@ class Field:
         # </editor-fold>
 
     # <editor-fold desc="--- Soil Management Methods ---">
-    def till_soil_event(self, time: Time) -> None:
+    def check_tillage_schedule(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
