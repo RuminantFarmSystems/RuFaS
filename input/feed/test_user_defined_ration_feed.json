@@ -1,0 +1,84 @@
+{
+   "feed_database": "input/databases/feeds.sqlite",
+   "feeds_table": "user_feeds",
+   "feed_quality_table": "feed_quality",
+   "nutrient_table": "nutrients",
+   "calf_feeds": [
+      155,
+      157
+   ],
+   "growing_feeds": [
+      2,
+      51,
+      86,
+      136,
+      139
+   ],
+   "close_up_feeds": [
+      2,
+      27,
+      51,
+      118,
+      136,
+      139
+   ],
+   "lac_cow_feeds": [
+      4,
+      19,
+      23,
+      27,
+      34,
+      81,
+      118,
+      136,
+      139
+   ],
+   "purchased_feeds": [
+      2,
+      4,
+      19,
+      23,
+      27,
+      34,
+      45,
+      51,
+      81,
+      86,
+      118,
+      136,
+      139,
+      155,
+      157
+   ],
+   "purchased_feeds_costs": {
+      "2": 0.17,
+      "4": 0.01,
+      "19": 0.25,
+      "23": 0.16,
+      "27": 0.1,
+      "34": 0.09,
+      "45": 1.5,
+      "51": 0.09,
+      "81": 0.5,
+      "86": 0.09,
+      "118": 0.39,
+      "136": 0.1,
+      "139": 0.05,
+      "155": 0.82,
+      "157": 0.44
+   },
+   "farm_grown_feeds": [],
+   "storage_options": {
+      "storage_1": {
+         "storage_type": "bunker",
+         "moisture": "direct_cut",
+         "additive": "preservative",
+         "packing_density": 14,
+         "inoculation": "heterofermentative",
+         "bunk_type": "open_floor",
+         "ventilation": true,
+         "removal_rate": 6,
+         "initial_dry_matter": 0
+      }
+   }
+}
