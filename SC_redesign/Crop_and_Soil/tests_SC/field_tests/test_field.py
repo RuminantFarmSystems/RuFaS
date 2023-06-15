@@ -6,7 +6,7 @@ from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.field import Field
@@ -54,6 +54,38 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     field._create_and_update_events.assert_has_calls(expected_create_and_update_events_calls)
     assert field._plant_crop.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
+
+
+@pytest.mark.parametrize("events,remaining_events,current_events", [
+    ([FertilizerEvent("mix_1", 100, 20, 1993, 75, 0, 1.0), FertilizerEvent("mix_2", 20, 20, 1993, 75, 0, 1.0),
+      FertilizerEvent("mix_3", 15, 15, 1993, 75, 0, 1.0)], [], [FertilizerEvent("mix_1", 100, 20, 1993, 75, 0, 1.0),
+                                                                FertilizerEvent("mix_2", 20, 20, 1993, 75, 0, 1.0),
+                                                                FertilizerEvent("mix_3", 15, 15, 1993, 75, 0, 1.0)]),
+    ([FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0), FertilizerEvent("mix_1", 25, 5, 1992, 250, 0, 1.0),
+      FertilizerEvent("mix_1", 100, 50, 1993, 80, 0, 1.0)], [FertilizerEvent("mix_1", 25, 5, 1992, 250, 0, 1.0),
+                                                             FertilizerEvent("mix_1", 100, 50, 1993, 80, 0, 1.0)],
+                                                             [FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0)]),
+    ([FertilizerEvent("mix_1", 50, 10, 1998, 90, 0, 1.0), FertilizerEvent("mix_1", 50, 10, 1999, 90, 0, 1.0),
+      FertilizerEvent("mix_1", 50, 10, 2000, 90, 0, 1.0)], [FertilizerEvent("mix_1", 50, 10, 1998, 90, 0, 1.0),
+                                                            FertilizerEvent("mix_1", 50, 10, 1999, 90, 0, 1.0),
+                                                            FertilizerEvent("mix_1", 50, 10, 2000, 90, 0, 1.0)], [])
+])
+def test_check_fertilizer_application_schedule(events: List[FertilizerEvent], remaining_events: List[FertilizerEvent],
+                                               current_events: List[FertilizerEvent]) -> None:
+    """Tests that fertilizer events that occur on the current day are properly selected and executed."""
+    field = Field(fertilizer_events=events)
+    field._create_and_update_events = MagicMock(return_value=(remaining_events, current_events))
+    field._execute_fertilizer_application = MagicMock()
+    mocked_time = MagicMock(Time)
+
+    field.check_fertilizer_application_schedule(mocked_time)
+    
+    expected_execution_calls = []
+    for event in current_events:
+        expected_execution_calls.append(call(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
+                                             event.day))
+    field._create_and_update_events.assert_called_once_with(events, mocked_time)
+    field._execute_fertilizer_application.assert_has_calls(expected_execution_calls)
 
 
 @pytest.mark.parametrize("events,year,day,expected_remaining,expected_current", [
@@ -143,7 +175,7 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     ([Crop(), Crop(), Crop(), Crop()], 0.25),
     ([], None)
 ])
-def test_rest_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
+def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
     """Tests that crops in a field correctly have their proportion reset when there are other crops present."""
     field = Field()
     field.crops = crop_list

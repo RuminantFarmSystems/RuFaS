@@ -47,7 +47,7 @@ class Field:
         self.crops: List[Crop] = list()  # empty crop list
         """crops currently in the field"""
 
-        self.planting_events: List[PlantingEvent] = plantings
+        self.planting_events: List[PlantingEvent] = plantings or []
         """List of all planting events that will occur over the run of the simulation in this field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
@@ -119,18 +119,12 @@ class Field:
         return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
     # <editor-fold desc="--- Setup Methods ---">
-    def setup_field(self, soil_config, tillage_config, amendment_config):
+    def setup_field(self, tillage_config):
         """setup all the attributes that determine how the field will be managed"""
-        self.soil = Soil(soil_config)
         self.setup_tillage(tillage_config)
-        self.setup_amendments(amendment_config)
 
     def setup_tillage(self, tillage_config):
         """sets up the tillage details for this field"""
-        pass
-
-    def setup_amendments(self, amendment_config):
-        """sets up the nutrient amendment details (manure and fertilizer) for this field"""
         pass
         # </editor-fold>
 
@@ -267,7 +261,8 @@ class Field:
         """
         self.fertilizer_events, todays_fertilizer_events = self._create_and_update_events(self.fertilizer_events, time)
         for event in todays_fertilizer_events:
-            self._execute_fertilizer_application(event)
+            self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
+                                                 event.day)
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
