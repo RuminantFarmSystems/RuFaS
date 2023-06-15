@@ -153,7 +153,6 @@ def test_rest_crop_field_coverage_fractions(crop_list: List[Crop], expected_fiel
         assert crop.data.field_proportion == expected_field_proportion
 
 
-
 @pytest.mark.parametrize("daylength,threshold_daylength", [
     (14, 8),
     (17.20948239, 9.19183294),

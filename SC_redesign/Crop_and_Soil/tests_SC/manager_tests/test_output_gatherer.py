@@ -27,10 +27,10 @@ def test_send_daily_variables(runoff_values: List[float],
 
     field_1 = Field(field_data=field_data_1)
     field_2 = Field(field_data=field_data_2)
-    field_1.add_crop(crop_1)
-    field_1.add_crop(crop_2)
-    field_2.add_crop(crop_1)
-    field_2.add_crop(crop_2)
+    field_1.crops.append(crop_1)
+    field_1.crops.append(crop_2)
+    field_2.crops.append(crop_1)
+    field_2.crops.append(crop_2)
 
     og = OutputGatherer([field_1, field_2])
     for i in range(3):

@@ -11,7 +11,7 @@ from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
-from SC_redesign.Crop_and_Soil.manager.events import Event, TillageEvent
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
@@ -114,31 +114,6 @@ class Field:
             self.perform_annual_reset()
 
         pass
-
-    @staticmethod
-    def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
-        """
-        Filters out all events from a list that occur on the current day, and creates a new list with all the events
-        that were filtered out.
-        Parameters
-        ----------
-        all_events : List[Event]
-            List of all Events that will occur over the run of the simulation in this field.
-        time : Time
-            Object containing the current day and year of the simulation.
-        Returns
-        -------
-        Tuple
-            A tuple containing the list of all Events that will occur in this field after the current day, and a list of
-            Events that will occur on the current day.
-        Notes
-        -----
-        This method is written to work with generic Events so that it may be used on all the different child classes of
-        Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
-        """
-        todays_events = [event for event in all_events if event.occurs_today(time)]
-        remaining_events = [event for event in all_events if event not in todays_events]
-        return remaining_events, todays_events
 
     @property
     def _composition_sums_to_one(self) -> bool:
