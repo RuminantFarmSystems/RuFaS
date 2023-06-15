@@ -78,9 +78,9 @@ run of the simulation.
 - Crop planting and harvesting.
   - [x] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
   - Integrate crop scheduler and execution of events into `Field` methods.
-    - [ ] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
+    - [x] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
     all planting events that should happen call `plant_crop()` on them. - 1 point
-    - [ ] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
+    - [x] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
     attribute of `Field`. - 2 points
     - Implement and test `check_crop_harvesting_schedule()`, which will
       - [ ] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day. - 2 points
