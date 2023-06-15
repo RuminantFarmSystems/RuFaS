@@ -32,7 +32,7 @@ class Field:
     """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 tillage_events: Optional[TillageEvent] = None, plantings: Optional[List[PlantingEvent]] = None,
+                 tillage_events: Optional[List[TillageEvent]] = None, plantings: Optional[List[PlantingEvent]] = None,
                  custom_crop_specifications: Optional[Dict[str, Dict]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
@@ -149,7 +149,8 @@ class Field:
         """
         self.tillage_events, todays_events = self._create_and_update_events(self.tillage_events, time)
         for event in todays_events:
-            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction, time.year,
+            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
+                                  time.calendar_year,
                                   time.day)
 
     def amend_soil(self) -> None:

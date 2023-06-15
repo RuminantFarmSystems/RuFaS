@@ -72,7 +72,7 @@ class TillageApplication:
 
         """
         # TODO: increase functionality and features - issue #538
-        self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
+
         vadose_zone_tilled = tillage_depth > self.soil_data.soil_layers[-1].bottom_depth
         if vadose_zone_tilled:
             tillage_depth = self.soil_data.soil_layers[-1].bottom_depth
@@ -109,6 +109,7 @@ class TillageApplication:
                                  "fresh_organic_nitrogen_content"]
         for pool in pools_to_till_in_soil:
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
+        self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
