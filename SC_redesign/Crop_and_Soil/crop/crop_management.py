@@ -28,7 +28,7 @@ class CropManagement:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- Main Methods ----
-    def manage_harvest(self, harvest_op: HarvestOperation, field_name: str, year: int, day: int,
+    def manage_harvest(self, harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
                        soil_data: SoilData) -> None:
         """
         Executes the harvest operation passed on the crop that contains this module.
@@ -39,6 +39,8 @@ class CropManagement:
             The operation to be executed on this crop.
         field_name : str
             The name of the field that contains this crop.
+        field_size : float
+            Size of the field that contains this crop (ha)
         year : int
             The calendar year in which this harvest operation occurred.
         day : int
@@ -56,7 +58,7 @@ class CropManagement:
         if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
 
-        self._record_yield(field_name, year, day)
+        self._record_yield(field_name, field_size, year, day)
         self._transfer_residue(soil_data)
 
     def graze(self):  # TODO: implement grazing method (SWAT 6:1.3)
@@ -180,7 +182,7 @@ class CropManagement:
         # TODO: are above- and below-ground lignin residue (percent) needed?
         #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
 
-    def _record_yield(self, field_name: str, year: int, day: int) -> None:
+    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
@@ -188,6 +190,8 @@ class CropManagement:
         ----------
         field_name : str
             Name of the field that contains this crop.
+        field_size : float
+            Size of the field that contains this crop (ha)
         year : int
             Year in which this harvest occurred.
         day : int
@@ -198,8 +202,8 @@ class CropManagement:
         nitrogen_harvested = self.data.yield_nitrogen
         phosphorus_harvested = self.data.yield_phosphorus
         info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
-                    "prefix": f"field_name:'{field_name}'", "species": f"'{self.data.species}'", "date": {"year": year,
-                                                                                                          "day": day}}
+                    "prefix": f"field_name:'{field_name}'", "field_size": field_size,
+                    "species": f"'{self.data.species}'", "date": {"year": year, "day": day}}
         value = {"yield": mass_harvested, "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested}
         om.add_variable("harvest_yield", value, info_map)
 
