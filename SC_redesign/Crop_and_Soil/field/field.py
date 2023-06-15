@@ -12,6 +12,7 @@ from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 from RUFAS.classes import Time
+from RUFAS.output_manager import OutputManager
 from copy import copy
 
 # TODO: delete/replace the note block below once satisfied with the design
@@ -23,6 +24,7 @@ in an agricultural field.
 Note that some of the field-level attributes will be tracked by the FieldData class
 """
 
+om = OutputManager()
 
 class Field:
     """object representing an agricultural field"""
@@ -161,7 +163,7 @@ class Field:
         """
         self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
         for event in todays_planting_events:
-            self.plant_crop(event.crop_reference, event.use_heat_scheduled_harvest)
+            self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
     @staticmethod
     def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
@@ -200,7 +202,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
         Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
         list of current crops.
@@ -211,6 +213,8 @@ class Field:
             Name used to get the specifications for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
+        time : Time
+            Object containing the current year and day of the simulation.
 
         Raises
         ------
@@ -246,6 +250,12 @@ class Field:
 
         self.crops.append(crop)
         self._reset_crop_field_coverage_fractions()
+
+        info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'", "field_size": self.field_data.field_size,
+                    "date": {"year": time.calendar_year, "day": time.day}, "species": crop.data.species}
+        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": use_heat_scheduled_harvesting}
+        om.add_variable("crop_planting", value, info_map)
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """
