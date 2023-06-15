@@ -612,13 +612,20 @@ def test_annual_reset() -> None:
     field.field_data.perform_annual_field_reset.assert_called_once()
 
 
-@pytest.mark.parametrize("events, day, year", [
-    ([TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1999), TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
-    ([], 7, 1998),
-    ([TillageEvent(10, 0.5, 7, 1997), TillageEvent(10, 0.5, 7, 1999), TillageEvent(10, 0.5, 7, 2023)], 7, 1998),
-    ([TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1998), TillageEvent(10, 0.5, 7, 1998)], 7, 1998),
+@pytest.mark.parametrize("events, day, year, not_today, is_today", [
+    ([TillageEvent(10, 0.5, 0.3, 7, 1997), TillageEvent(10, 0.5, 0.3, 7, 1998), TillageEvent(10, 0.5, 0.3, 7, 1999)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 7, 1997), TillageEvent(10, 0.5, 0.3, 7, 1999)],
+     [TillageEvent(10, 0.5, 0.3, 7, 1998)]),
+    ([], 7, 1998, [], []),
+    ([TillageEvent(10, 0.5, 0.3, 7, 1997), TillageEvent(10, 0.5, 0.3, 7, 1999), TillageEvent(10, 0.5, 0.3, 7, 2023)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 7, 1997), TillageEvent(10, 0.5, 0.3, 7, 1999),
+               TillageEvent(10, 0.5, 0.3, 7, 2023)], []),
+    ([TillageEvent(7, 0.5, 0.3, 7, 1998), TillageEvent(10, 0.5, 0.4, 7, 1998), TillageEvent(5, 0.5, 0.3, 7, 1998)],
+     7, 1998, [], [TillageEvent(7, 0.5, 0.3, 7, 1998), TillageEvent(10, 0.5, 0.4, 7, 1998),
+                   TillageEvent(5, 0.5, 0.3, 7, 1998)])
 ])
-def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int) -> None:
+def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int,
+                                not_today: List[TillageEvent], is_today: List[TillageEvent]) -> None:
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
@@ -628,6 +635,8 @@ def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int)
     todays_count = len(todays_events)
     field.tiller.till_soil = MagicMock()
     field.check_tillage_schedule(mocked_time)
+    assert field.tillage_events == not_today
+
 
     assert field.tiller.till_soil.call_count == todays_count
 
