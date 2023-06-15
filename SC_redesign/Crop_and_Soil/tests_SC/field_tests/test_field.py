@@ -82,7 +82,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     setattr(mocked_time, "day", day)
     remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
     field._create_and_update_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
-    field.harvest_crop = MagicMock()
+    field._harvest_crop = MagicMock()
     field._harvest_heat_scheduled_crops = MagicMock()
     field._remove_dead_crops = MagicMock()
     field._reset_crop_field_coverage_fractions = MagicMock()
@@ -95,7 +95,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field.check_crop_harvest_schedule(mocked_time)
 
     field._create_and_update_events.assert_called_once_with(all_harvest_events, mocked_time)
-    field.harvest_crop.assert_has_calls(harvest_crop_calls)
+    field._harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
     field._remove_dead_crops.assert_called_once()
     field._reset_crop_field_coverage_fractions.assert_called_once()
@@ -231,20 +231,19 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOpe
     setattr(mocked_time, "day", 100)
     setattr(mocked_time, "calendar_year", 1995)
 
-    field.harvest_crop(crop_reference, harvest_op, mocked_time)
+    field._harvest_crop(crop_reference, harvest_op, mocked_time)
 
     for crop in field.crops:
         if crop.data.id == "not this crop":
             crop.crop_management.manage_harvest.assert_not_called()
         else:
-            print(crop.data.id)
             crop.crop_management.manage_harvest.assert_called_once_with(expected)
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
-    ([Crop(), Crop()], {"prefix": "Field:'test'", "date": {"Day": 200, "Year": 2000}},
+    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
      "Multiple crops to be harvested by single HarvestEvent."),
-    ([], {"prefix": "Field:'test'", "date": {"Day": 200, "Year": 2000}},
+    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
      "No crop found to be harvested by a HarvestEvent.")
 ])
 def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expected_message: str) -> None:
@@ -259,9 +258,11 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
     setattr(mocked_time, "day", 200)
     setattr(mocked_time, "calendar_year", 2000)
 
-    field.harvest_crop("test", "default", mocked_time)
+    field._harvest_crop("test", "default", mocked_time)
 
-    actual = om.warnings_pool["Field:'test'.harvest_warning"]
+    for crop in crops:
+        crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
+    actual = om.warnings_pool["field_name:'test'.harvest_warning"]
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_message)
 

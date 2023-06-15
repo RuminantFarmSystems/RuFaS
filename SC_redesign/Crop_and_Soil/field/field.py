@@ -45,10 +45,10 @@ class Field:
         self.crops: List[Crop] = list()  # empty crop list
         """crops currently in the field"""
 
-        self.planting_events: List[PlantingEvent] = plantings
+        self.planting_events: List[PlantingEvent] = plantings or []
         """List of all planting events that will occur over the run of the simulation in this field."""
 
-        self.harvest_events: List[HarvestEvent] = harvestings
+        self.harvest_events: List[HarvestEvent] = harvestings or []
         """List of all harvesting events that will occur over the run of the simulation in the field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
@@ -185,7 +185,7 @@ class Field:
         """
         self.harvest_events, todays_harvest_events = self._create_and_update_events(self.harvest_events, time)
         for event in todays_harvest_events:
-            self.harvest_crop(event.crop_reference, event.operation, time)
+            self._harvest_crop(event.crop_reference, event.operation, time)
 
         self._harvest_heat_scheduled_crops()
 
@@ -301,7 +301,7 @@ class Field:
         value = {"crop_reference": crop_reference, "heat_scheduled_harvest": use_heat_scheduled_harvesting}
         om.add_variable("crop_planting", value, info_map)
 
-    def harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:
+    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -333,8 +333,9 @@ class Field:
         """
         crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
 
-        info_map = {"class": self.__class__.__name__, "function": self.harvest_crop.__name__,
-                    "prefix": f"Field:'{self.field_data.name}'", "date": {"Day": time.day, "Year": time.calendar_year}}
+        info_map = {"class": self.__class__.__name__, "function": self._harvest_crop.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'",
+                    "date": {"day": time.day, "year": time.calendar_year}}
         if len(crops_to_be_harvested) > 1:
             om.add_warning("harvest_warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
         elif len(crops_to_be_harvested) < 1:
