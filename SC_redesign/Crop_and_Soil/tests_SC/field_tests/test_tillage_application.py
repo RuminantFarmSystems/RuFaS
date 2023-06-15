@@ -10,7 +10,6 @@ from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplicati
 from SC_redesign.Crop_and_Soil.field.tillage_application import om
 
 
-
 @pytest.mark.parametrize("data,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed", [
     (SoilData(field_size=1.5), "machine_water_extractable_inorganic_phosphorus", 23, 0.35, 14.95, 8.05),
     (FieldData(), "current_residue", 45, 0.22, 35.1, 9.9),
@@ -98,7 +97,7 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year:
     assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]["field_size"] == {1.5}
     assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['prefix'] == "field_name:'field1'"
     assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['date']['year'] == year
-    assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['date']['day'] ==day
+    assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['date']['day'] == day
     assert pool["field_name:'field1'.tillage_record"]['values'][0]['tillage_depth'] == till_depth
     assert pool["field_name:'field1'.tillage_record"]['values'][0]['incorporation_fraction'] == incorp_frac
     assert pool["field_name:'field1'.tillage_record"]['values'][0]['mixing_fraction'] == mix_frac

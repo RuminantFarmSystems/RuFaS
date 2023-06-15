@@ -216,7 +216,7 @@ class TillageApplication:
         setattr(data_container, attribute_name, remaining_amount_in_pool)
         return amount_removed
 
-    def _record_tillage(self,tillage_depth: float, incorporation_fraction: float, mixing_fraction: float,
+    def _record_tillage(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float,
                         year: int, day: int) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
@@ -233,7 +233,7 @@ class TillageApplication:
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_tillage.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
-                    "field_size" : {self.field_data.field_size}}
+                    "field_size": {self.field_data.field_size}}
         value = {"tillage_depth": tillage_depth, "incorporation_fraction": incorporation_fraction,
                  "mixing_fraction": mixing_fraction}
         om.add_variable("tillage_record", value, info_map)
