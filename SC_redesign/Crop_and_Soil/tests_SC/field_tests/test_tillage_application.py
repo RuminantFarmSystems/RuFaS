@@ -78,7 +78,7 @@ def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values
 ])
 def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
     """Tests that soil is tilled correctly."""
-    field_data_1 = FieldData(name = "field1", field_size = 1.5)
+    field_data_1 = FieldData(name="field1", field_size=1.5)
 
     till_app = TillageApplication(field_data=field_data_1)
 
