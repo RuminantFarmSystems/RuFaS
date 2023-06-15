@@ -26,6 +26,7 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 
 om = OutputManager()
 
+
 class Field:
     """object representing an agricultural field"""
 
@@ -117,12 +118,11 @@ class Field:
         return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
     # <editor-fold desc="--- Setup Methods ---">
-    def setup_field(self, soil_config, tillage_config, amendment_config, crop_config):
+    def setup_field(self, soil_config, tillage_config, amendment_config):
         """setup all the attributes that determine how the field will be managed"""
         self.soil = Soil(soil_config)
         self.setup_tillage(tillage_config)
         self.setup_amendments(amendment_config)
-        self.setup_crop_schedule(crop_config)
 
     def setup_tillage(self, tillage_config):
         """sets up the tillage details for this field"""
@@ -130,10 +130,6 @@ class Field:
 
     def setup_amendments(self, amendment_config):
         """sets up the nutrient amendment details (manure and fertilizer) for this field"""
-        pass
-
-    def setup_crop_schedule(self, crop_config):
-        """sets up the cropping schedule (species, planting/harvest dates, etc)"""
         pass
         # </editor-fold>
 
