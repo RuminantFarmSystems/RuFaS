@@ -194,7 +194,7 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     fixed_ration = False
     ration_percents =UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-    if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
+    if solution is None or str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
     failed_list = []
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
