@@ -26,12 +26,8 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 class Field:
     """object representing an agricultural field"""
 
-    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None, 
+    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
                  tillage_events: Optional[TillageEvent] = None):
-
-        # Tillage events
-        self.tillage_events: List[TillageEvent] = tillage_events
-        """List of all tillage events that will occur over the run of the simulation in this field."""
 
         # field-wide attributes
         self.field_data = field_data or FieldData()
@@ -50,6 +46,8 @@ class Field:
         """Provides interface for adding fertilizer to the field."""
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
+        self.tillage_events: List[TillageEvent] = tillage_events
+        """List of all tillage events that will occur over the run of the simulation in this field."""
 
         self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
         """is today the last day of the simulation year?"""

@@ -528,7 +528,7 @@ def test_till_soil_event(events: List[TillageEvent], day: int, year: int) -> Non
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
 
-    field = Field(events)
+    field = Field(tillage_events=events)
     tillage_events, todays_events = field._create_and_update_events(events, mocked_time)
     todays_count = len(todays_events)
     field.tiller.till_soil = MagicMock()
