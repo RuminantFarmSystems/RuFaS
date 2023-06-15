@@ -2,11 +2,14 @@ from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import FertilizerEvent
+from RUFAS.output_manager import OutputManager
 
 """
 This module contains `FertilizerSchedule`, a `Schedule` child class that defines when and how much fertilizer will be
 applied to a field.
 """
+
+om = OutputManager()
 
 
 class FertilizerSchedule(Schedule):

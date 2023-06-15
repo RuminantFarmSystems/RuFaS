@@ -43,8 +43,7 @@ class Event:
 
     def __hash__(self):
         """Overrides the hash method for Event objects."""
-        str_representation = str(self.year) + str(self.day)
-        return hash(str_representation)
+        return hash((self.year, self.day))
 
     def occurs_today(self, time: Time) -> bool:
         """
@@ -92,9 +91,7 @@ class PlantingEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for PlantingEvent objects."""
-        str_representation = str(self.crop_reference) + str(self.year) + str(self.day) + \
-            str(self.use_heat_scheduled_harvest)
-        return hash(str_representation)
+        return hash((self.crop_reference, self.year, self.day, self.use_heat_scheduled_harvest))
 
 
 class HarvestEvent(Event):
@@ -114,6 +111,18 @@ class HarvestEvent(Event):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.operation = operation
+
+    def __eq__(self, other):
+        """Overrides the equality operator for HarvestEvent objects."""
+        correct_type = isinstance(other, HarvestEvent)
+        hash_value = self.__hash__()
+        other_hash_value = other.__hash__()
+        equal_hash_values = hash_value == other_hash_value
+        return correct_type and equal_hash_values
+
+    def __hash__(self):
+        """Overrides the hash method for HarvestEvent objects."""
+        return hash((self.year, self.day, self.crop_reference, self.operation))
 
 
 class TillageEvent(Event):
@@ -146,9 +155,7 @@ class TillageEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for TillageEvent objects."""
-        str_representation = str(self.year) + str(self.day) + str(self.tillage_depth) \
-            + str(self.incorporation_fraction) + str(self.mixing_fraction)
-        return hash(str_representation)
+        return hash((self.year, self.day, self.tillage_depth, self.incorporation_fraction, self.mixing_fraction))
 
 
 class ManureEvent(Event):
@@ -193,9 +200,8 @@ class ManureEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for ManureEvent objects."""
-        str_representation = str(self.year) + str(self.day) + str(self.nitrogen_mass) + str(self.phosphorus_mass) + \
-            str(self.field_coverage) + str(self.application_depth) + str(self.surface_remainder_fraction)
-        return hash(str_representation)
+        return hash((self.year, self.day, self.nitrogen_mass, self.phosphorus_mass, self.field_coverage,
+                     self.application_depth, self.surface_remainder_fraction))
 
 
 class FertilizerEvent(Event):
@@ -239,6 +245,5 @@ class FertilizerEvent(Event):
 
     def __hash__(self):
         """Overrides the hash method for FertilizerEvent objects."""
-        str_representation = str(self.year) + str(self.day) + self.mix_name + str(self.nitrogen_mass) + \
-            str(self.phosphorus_mass) + str(self.depth) + str(self.surface_remainder_fraction)
-        return hash(str_representation)
+        return hash((self.year, self.day, self.mix_name, self.nitrogen_mass, self.phosphorus_mass, self.depth,
+                     self.surface_remainder_fraction))
