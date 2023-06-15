@@ -385,6 +385,8 @@ def protein_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
+    return (MP_supply - (MP_req / 1000))
+
     # TODO: Separate the DMI components from MPm requirements calculated by both NRC (2001) and NASEM (2021) and put them in this section because DMI gets reestimated during each iteration.
 
 
