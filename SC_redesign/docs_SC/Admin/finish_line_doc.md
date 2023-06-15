@@ -53,7 +53,7 @@ so there is a need to make sure all these processes are coordinated between Crop
 - [x] Refactor the old `tillage.py`.
   - The old module is relatively short and simple, so it will be refactored to meet the style standards of the new Crop
     and Soil module but will not be more complex or feature-rich than the old module.
-- [ ] Integrate the refactored module into `Field`.
+- [x] Integrate the refactored module into `Field`.
 
 #### Fertilizer
 Fertilizer application and update routines have already been implemented, but are contained in 
@@ -62,25 +62,25 @@ Fertilizer application and update routines have already been implemented, but ar
     - This module will, for now, be a wrapper for the existing fertilizer routines in `soil/phosphorus_cycling`, with 
     the understanding that the functionality will eventually be moved to the level of `Field` after delivery of v1 Crop 
     and Soil module.
-- [ ] Integrate the fertilizer module into `Field` so that it can be called when fertilizer is applied to the field.
+- [x] Integrate the fertilizer module into `Field` so that it can be called when fertilizer is applied to the field.
 
 #### Manure
 The Manure application and update routines are in same state as their fertilizer counterparts, and the requirements are
 nearly identical for both modules.
-- [ ] Write a manure module at the level of `Field`.
+- [x] Write a manure module at the level of `Field`.
   - This module will also have functionality moved here from the `soil/phosphorus_cycling` module at some point after 
     the delivery of the v1 Crop and Soil module.
-- [ ] Integrate the manure module into `Field`.
+- [x] Integrate the manure module into `Field`.
 
 #### Scheduling
 Certain types of events, (Crop planting/harvesting, soil amendments) need to be scheduled by the user to occur over the
 run of the simulation.
 - Crop planting and harvesting.
-  - [ ] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
+  - [x] Finish implementing and testing Crop planting/harvesting scheduler. - 3 points
   - Integrate crop scheduler and execution of events into `Field` methods.
-    - [ ] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
+    - [x] Implement and test `check_crop_planting_schedule()`, which iterates through list of `PlantingEvent`s, and for 
     all planting events that should happen call `plant_crop()` on them. - 1 point
-    - [ ] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
+    - [x] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
     attribute of `Field`. - 2 points
     - Implement and test `check_crop_harvesting_schedule()`, which will
       - [ ] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day. - 2 points
@@ -89,7 +89,7 @@ run of the simulation.
     - [ ] Add calls to `check_crop_planting_schedule()` and `check_crop_harvesting_schedule()` in `Field`s daily 
     routine. - 1 point
 - Tillage
-  - [ ] Implement and test tillage application scheduler. - 3 points
+  - [x] Implement and test tillage application scheduler. - 3 points
   - [ ] Implement and test `check_tillage_schedule()` which will iterate through a list of `TillageEvent`s and collect 
     and execute all the ones that happen on the current day. - 2 points
   - [ ] Add call to `check_tillage_schedule()` in `Field`s daily routine. - 1 point
@@ -99,7 +99,7 @@ run of the simulation.
   collect and execute all the ones that happen on the current day. - 2 points
   - [x] Add call to `check_fertilizer_schedule()` in `Field`s daily routine. - 1 point
 - Manure
-  - [ ] Implement and test manure application scheduler. - 3 points
+  - [x] Implement and test manure application scheduler. - 3 points
   - [ ] Implement and test `check_manure_schedule()` which will iterate through a list of `ManureEvent`s and collect and 
   execute all the ones that happen on the current day. - 2 points
   - [ ] Add call to `check_manure_schedule()` in `Field`s daily routine. - 1 point
@@ -130,8 +130,8 @@ run of the simulation.
 
 #### OutputGatherer
 - Implement an `OutputGatherer` module that will handle all output from the Crop and Soil modules
-  - [ ] Implement a method that will collect and pass values to the Output Manager daily. - 2 points
-  - [ ] Implement a method that will collect and pass values to the Output Manager annually. - 2 points
+  - [x] Implement a method that will collect and pass values to the Output Manager daily. - 2 points
+  - [x] Implement a method that will collect and pass values to the Output Manager annually. - 2 points
 - [ ] Integrate the `OutputGatherer` into the `FieldManager` module. - 2 points
 
 #### FieldInputManager

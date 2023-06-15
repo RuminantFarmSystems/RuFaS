@@ -2,11 +2,14 @@ from typing import List, Any
 
 from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
 from SC_redesign.Crop_and_Soil.manager.events import FertilizerEvent
+from RUFAS.output_manager import OutputManager
 
 """
 This module contains `FertilizerSchedule`, a `Schedule` child class that defines when and how much fertilizer will be
 applied to a field.
 """
+
+om = OutputManager()
 
 
 class FertilizerSchedule(Schedule):
@@ -89,7 +92,7 @@ class FertilizerSchedule(Schedule):
             raise ValueError(error_header + f"expected all years to be > 0 and in non-descending order, received "
                                             f"'{self.years}'.")
 
-        valid_days = self._validate_days(self.days)
+        valid_days = self._validate_days(self.years, self.days)
         if not valid_days:
             raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
 
