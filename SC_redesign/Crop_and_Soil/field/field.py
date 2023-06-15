@@ -189,11 +189,8 @@ class Field:
                                                     ammonium_fraction, organic_nitrogen_fraction,
                                                     self.field_data.field_size)
 
-        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
-                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day}}
-        value = {"mass": total_mass_applied, "nitrogen": nitrogen_applied, "phosphorus": phosphorus_applied,
-                 "potassium": potassium_applied}
-        om.add_variable("fertilizer_application", value, info_map)
+        self._record_fertilizer_application(mix_name, total_mass_applied, nitrogen_applied, phosphorus_applied,
+                                            potassium_applied, year, day)
 
     @staticmethod
     def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
@@ -231,6 +228,35 @@ class Field:
         return {"mass": total_mass, "nitrogen_mass": nitrogen_mass, "phosphorus_mass": phosphorus_mass,
                 "potassium_mass": potassium_mass}
 
+    def _record_fertilizer_application(self, mix_name: str, total_mass: float, nitrogen_mass: float,
+                                       phosphorus_mass: float, potassium_mass: float, year: int, day: int) -> None:
+        """
+        Records a fertilizer application and saves it to the Output manager.
+
+        Parameters
+        ----------
+        mix_name : str
+            The name of the mix this fertilizer application is composed of.
+        total_mass : float
+            The total mass of phosphorus applied.
+        nitrogen_mass : float
+            The mass of nitrogen applied.
+        phosphorus_mass : float
+            The mass of phosphorus applied.
+        potassium_mass : float
+            The mass of potassium applied.
+        year : int
+            Calendar year in which the fertilizer application is occurring.
+        day : int
+            Julian day on which this fertilizer application is occurring.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "mix_name": mix_name, "field_size": self.field_data.field_size}
+        value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
+                 "potassium": potassium_mass}
+        om.add_variable("fertilizer_application", value, info_map)
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
