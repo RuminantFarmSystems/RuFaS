@@ -171,7 +171,8 @@ class Field:
         """
         self.tillage_events, todays_events = self._create_and_update_events(self.tillage_events, time)
         for event in todays_events:
-            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction)
+            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction, time.year,
+                                  time.day)
 
     def amend_soil(self) -> None:
         """amend the soil with nutrients"""
