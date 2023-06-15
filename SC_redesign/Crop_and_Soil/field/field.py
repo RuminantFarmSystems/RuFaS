@@ -124,12 +124,11 @@ class Field:
         return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
     # <editor-fold desc="--- Setup Methods ---">
-    def setup_field(self, soil_config, tillage_config, amendment_config, crop_config):
+    def setup_field(self, soil_config, tillage_config, amendment_config):
         """setup all the attributes that determine how the field will be managed"""
         self.soil = Soil(soil_config)
         self.setup_tillage(tillage_config)
         self.setup_amendments(amendment_config)
-        self.setup_crop_schedule(crop_config)
 
     def setup_tillage(self, tillage_config):
         """sets up the tillage details for this field"""
@@ -137,10 +136,6 @@ class Field:
 
     def setup_amendments(self, amendment_config):
         """sets up the nutrient amendment details (manure and fertilizer) for this field"""
-        pass
-
-    def setup_crop_schedule(self, crop_config):
-        """sets up the cropping schedule (species, planting/harvest dates, etc)"""
         pass
         # </editor-fold>
 
@@ -170,7 +165,7 @@ class Field:
         """
         self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
         for event in todays_planting_events:
-            self.plant_crop(event.crop_reference, event.use_heat_scheduled_harvest)
+            self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
     def check_crop_harvest_schedule(self, time: Time) -> None:
         """
@@ -239,14 +234,19 @@ class Field:
         Event: PlantingEvent, HarvestEvent, ManureEvent, FertilizerEvent, and TillageEvent.
 
         """
-        todays_events = [event for event in all_events if event.occurs_today(time)]
-        remaining_events = [event for event in all_events if event not in todays_events]
+        todays_events = []
+        remaining_events = []
+        for event in all_events:
+            if event.occurs_today(time):
+                todays_events.append(event)
+            else:
+                remaining_events.append(event)
         return remaining_events, todays_events
 
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
         Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
         list of current crops.
@@ -257,6 +257,8 @@ class Field:
             Name used to get the specifications for the crop to be planted.
         use_heat_scheduled_harvesting : bool
             Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
+        time : Time
+            Object containing the current year and day of the simulation.
 
         Raises
         ------
@@ -292,6 +294,12 @@ class Field:
 
         self.crops.append(crop)
         self._reset_crop_field_coverage_fractions()
+
+        info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'", "field_size": self.field_data.field_size,
+                    "date": {"year": time.calendar_year, "day": time.day}, "species": crop.data.species}
+        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": use_heat_scheduled_harvesting}
+        om.add_variable("crop_planting", value, info_map)
 
     def harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:
         """

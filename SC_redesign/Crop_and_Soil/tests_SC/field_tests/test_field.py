@@ -46,14 +46,14 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     field = Field(plantings=all_events)
     field._create_and_update_events = MagicMock(return_value=(events_remaining, events_occurring_today))
 
-    field.plant_crop = MagicMock()
+    field._plant_crop = MagicMock()
     time = MagicMock(Time)
     expected_create_and_update_events_calls = [call(all_events, time)]
 
     field.check_crop_planting_schedule(time)
 
     field._create_and_update_events.assert_has_calls(expected_create_and_update_events_calls)
-    assert field.plant_crop.call_count == len(events_occurring_today)
+    assert field._plant_crop.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
 
 
@@ -155,17 +155,22 @@ def test_create_and_update_events(events: List[Event], year: int, day: int, expe
     assert actual[1] == expected_current
 
 
-@pytest.mark.parametrize("crop_reference,heat_scheduled,custom_crop_specs,is_supported", [
-    ("corn", False, None, True),
-    ("custom_alfalfa", False, {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}}, False),
+@pytest.mark.parametrize("crop_reference,heat_scheduled,custom_crop_specs,is_supported,year,day", [
+    ("corn", False, None, True, 1990, 120),
+    ("custom_alfalfa", False, {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}}, False, 1992, 115),
     ("alien_crop", True, {"custom_corn": {"species": "corn", "is_nitrogen_fixer": True},
-                          "alien_crop": {"species": "halo_alien_corn", "minimum_temperature": -60}}, False)
+                          "alien_crop": {"species": "halo_alien_corn", "minimum_temperature": -60}}, False, 2000, 110)
 ])
-def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs: Dict, is_supported: bool) -> None:
+def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs: Dict, is_supported: bool, year: int,
+                    day: int) -> None:
     """Tests that a new Crop instance is properly created and added to a field."""
-    field = Field(custom_crop_specifications=custom_crop_specs)
+    field_data = FieldData(name="test", field_size=1.3)
+    field = Field(field_data=field_data, custom_crop_specifications=custom_crop_specs)
     field._reset_crop_field_coverage_fractions = MagicMock()
-    field.plant_crop(crop_reference, heat_scheduled)
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+    field._plant_crop(crop_reference, heat_scheduled, mocked_time)
 
     if is_supported:
         expected_crop = field.make_supported_crop(crop_reference)
@@ -173,11 +178,17 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
         expected_crop = field.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
     expected_crop.data.use_heat_scheduling = heat_scheduled
     expected_crop.data.id = crop_reference
+    expected_info_map = {"prefix": "field_name:'test'", "field_size": 1.3, "date": {"year": year, "day": day},
+                         "species": expected_crop.data.species}
+    expected_value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled}
 
     field._reset_crop_field_coverage_fractions.assert_called_once()
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species
+    actual = om.variables_pool["field_name:'test'.crop_planting"]
+    assert actual["info_maps"].__contains__(expected_info_map)
+    assert actual["values"].__contains__(expected_value)
 
 
 @pytest.mark.parametrize("field_name,crop_reference,custom_crop_specs,expected", [
@@ -195,8 +206,9 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     """Tests that errors are correctly raised when a crop specification for a requested planting is not present."""
     field = Field(custom_crop_specifications=custom_crop_specs)
     field.field_data.name = field_name
+    mocked_time = MagicMock(Time)
     with pytest.raises(KeyError) as e:
-        field.plant_crop(crop_reference, True)
+        field._plant_crop(crop_reference, True, mocked_time)
     assert expected in str(e.value)
 
 
