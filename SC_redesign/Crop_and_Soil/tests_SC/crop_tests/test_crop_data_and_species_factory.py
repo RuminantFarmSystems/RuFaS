@@ -41,7 +41,7 @@ def test_species_factory_defaults():
     generic = CropSpeciesDataFactory.create_species_data()
     assert generic.species == "generic"
     assert generic.name == "default generic annual crop"
-    assert generic.id == 0
+    assert generic.id is None
     assert generic.plant_code is None
     assert generic.scientific_name is None
     assert generic.plant_category == PlantCategory("cool_annual")
