@@ -103,7 +103,7 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
         expected_crop = field.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
     expected_crop.data.use_heat_scheduling = heat_scheduled
     expected_crop.data.id = crop_reference
-    expected_info_map = {"prefix": f"field_name:'test'", "field_size": 1.3, "date": {"year": year, "day": day},
+    expected_info_map = {"prefix": "field_name:'test'", "field_size": 1.3, "date": {"year": year, "day": day},
                          "species": expected_crop.data.species}
     expected_value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled}
 
