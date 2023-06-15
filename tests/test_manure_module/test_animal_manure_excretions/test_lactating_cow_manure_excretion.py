@@ -17,7 +17,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import methane_
         (40.0, 4.0, 25.0, 18.0, "Monensin", 24.0, -7.40),
         (45.0, 3.0, 30.0, 10.0, "Essential Oils", 80.0, 0.0),
         (50.0, 2.0, 35.0, 8.0, "Seaweed", 90.0, 0.0),
-        (55.0, 1.0, 40.0, 6.0, "Unknown", 70.0, 0.0)
+        (55.0, 1.0, 40.0, 6.0, "None", 70.0, 0.0)
     ]
 )
 def test_methane_mitigation(NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount, expected_reduction):

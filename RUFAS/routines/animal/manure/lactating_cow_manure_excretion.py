@@ -5,6 +5,7 @@ Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
+           Haowen Hu, hh598@cornell.edu
 """
 import math
 from typing import Tuple
@@ -34,9 +35,9 @@ def methane_mitigation(NDF_concentration: float,
     CP_concentration : float
         Concentration of crude protein (CP) in the ration.
     methane_mitigation_method: str 
-        Methane mitigation method used to reduce enteric methane emissions, including 3-NOP, monensin, essential oils, and seaweed. 
+        Methane mitigation method used to reduce enteric methane emissions, including '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'. 
     methane_mitigation_additive_amount: float 
-        The amount of methane mitigation feed additive that is added, g/kg dry matter intake.
+        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake.
 
     Returns
     -------
@@ -44,7 +45,7 @@ def methane_mitigation(NDF_concentration: float,
         Reduction in methane yield (methane production/dry matter intake), %.   
     """
 
-    if methane_mitigation_method == "3-NOP":
+    if methane_mitigation_method == "3-NOP": 
         methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
     elif methane_mitigation_method == "Monensin":
