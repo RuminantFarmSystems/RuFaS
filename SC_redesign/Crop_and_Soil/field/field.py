@@ -26,8 +26,8 @@ Note that some of the field-level attributes will be tracked by the FieldData cl
 class Field:
     """object representing an agricultural field"""
 
-    def __init__(self, tillage_events: Optional[TillageEvent] = None, field_data: Optional[FieldData] = None,
-                 soil: Optional[Soil] = None, ):
+    def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None, 
+                 tillage_events: Optional[TillageEvent] = None):
 
         # Tillage events
         self.tillage_events: List[TillageEvent] = tillage_events
