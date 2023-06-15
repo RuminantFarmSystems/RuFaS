@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 
@@ -34,8 +34,8 @@ class CropData:
     """the species of the crop"""
     name: Optional[str] = "default generic annual crop"
     """the name of this specific crop instance"""
-    id: Optional[int] = 0
-    """the numeric identifier for this crop instance"""
+    id: Optional[Any] = None
+    """the unique identifier for this crop instance"""
     plant_code: Optional[str] = None
     """4-letter plant code (used by SWAT)"""
     scientific_name: Optional[str] = None
