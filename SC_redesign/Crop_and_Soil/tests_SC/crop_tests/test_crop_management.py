@@ -113,9 +113,7 @@ def test_check_harvest_schedule(heat_sched: bool, heat_frac: float, harv_day: in
     cm = CropManagement(data)
     cm.check_harvest_schedule(this_day, this_yr)
     scheduled_and_correct = (this_day == harv_day) & (this_yr == harv_yr) & (heat_sched is False)
-    print(scheduled_and_correct)
     heat_scheduled_and_correct = (heat_sched is True) & (heat_frac >= 1.10)
-    print(heat_scheduled_and_correct)
     if scheduled_and_correct or heat_scheduled_and_correct:
         assert data.is_harvest_day is True
     else:
@@ -151,11 +149,11 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
         assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
-@pytest.mark.parametrize("harvest_op,field_name,year,day,soil_data", [
-    (HarvestOperation.HARVEST, "test_1", 1995, 200, SoilData(field_size=1.3)),
-    (HarvestOperation.HARVEST_NOKILL, "test_2", 2010, 150, SoilData(field_size=2.4))
+@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data", [
+    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3)),
+    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4))
 ])
-def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, year: int, day: int,
+def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
                         soil_data: SoilData) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     # Setup
@@ -167,7 +165,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, year: int
     crop._transfer_residue = MagicMock()
 
     # Act
-    crop.manage_harvest(harvest_op, field_name, year, day, soil_data)
+    crop.manage_harvest(harvest_op, field_name, field_size, year, day, soil_data)
 
     # Assertions
     crop.determine_harvest_index.assert_called_once()
@@ -180,7 +178,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, year: int
         crop.cut_crop.assert_called_once()
         crop.kill.assert_not_called()
 
-    crop._record_yield.assert_called_once_with(field_name, year, day)
+    crop._record_yield.assert_called_once_with(field_name, field_size, year, day)
     crop._transfer_residue.assert_called_once_with(soil_data)
 
 
@@ -232,14 +230,14 @@ def cut_crop(efficiency: float, harvest: float, override: bool):
         assert data.residue_phosphorus == residue * 0.0092
 
 
-@pytest.mark.parametrize("field_name,species,year,day,mass,nitrogen,phosphorus", [
-    ("field_1", "alfalfa", 1993, 200, 100, 12.5, 5),
-    ("field_2", "corn", 1998, 216, 1500, 188, 24.5),
-    ("field_2", "corn", 1999, 218, 1550, 172, 22.3),
-    ("field_3", "soybeans", 2003, 245, 1200, 199, 89.3)
+@pytest.mark.parametrize("field_name,field_size,species,year,day,mass,nitrogen,phosphorus", [
+    ("field_1", 1.8, "alfalfa", 1993, 200, 100, 12.5, 5),
+    ("field_2", 2.33, "corn", 1998, 216, 1500, 188, 24.5),
+    ("field_2", 2.33, "corn", 1999, 218, 1550, 172, 22.3),
+    ("field_3", 0.98, "soybeans", 2003, 245, 1200, 199, 89.3)
 ])
-def test_record_yield(field_name: str, species: str, year: int, day: int, mass: float, nitrogen: float,
-                      phosphorus: float) -> None:
+def test_record_yield(field_name: str, field_size: float, species: str, year: int, day: int, mass: float,
+                      nitrogen: float, phosphorus: float) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
 
@@ -248,15 +246,13 @@ def test_record_yield(field_name: str, species: str, year: int, day: int, mass: 
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
 
-    crop_manager._record_yield(field_name, year, day)
+    crop_manager._record_yield(field_name, field_size, year, day)
 
-    expected_info_map = {"prefix": f"field_name:'{field_name}'", "species": f"'{species}'", "date":
-                         {"year": year, "day": day}}
+    expected_info_map = {"prefix": f"field_name:'{field_name}'", "field_size": field_size, "species": f"'{species}'",
+                         "date": {"year": year, "day": day}}
     expected_value = {"yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus}
 
     actual = om.variables_pool[f"field_name:'{field_name}'.harvest_yield"]
-    print(actual['info_maps'])
-    print(expected_info_map)
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_value)
 
