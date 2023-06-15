@@ -118,21 +118,7 @@ class Field:
         """ensure that the crop_proportions values sum to 1"""
         return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
-    # <editor-fold desc="--- Setup Methods ---">
-    def setup_field(self, tillage_config):
-        """setup all the attributes that determine how the field will be managed"""
-        self.setup_tillage(tillage_config)
-
-    def setup_tillage(self, tillage_config):
-        """sets up the tillage details for this field"""
-        pass
-        # </editor-fold>
-
     # <editor-fold desc="--- Soil Management Methods ---">
-    def till_soil(self) -> None:
-        """till the soil"""
-        pass
-
     def _execute_fertilizer_application(self, mix_name: str, requested_nitrogen: float, requested_phosphorus: float,
                                         year: int, day: int) -> None:
         """
