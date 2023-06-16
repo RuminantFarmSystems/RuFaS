@@ -1,7 +1,7 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, FertilizerEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
@@ -31,7 +31,7 @@ class Field:
     """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 plantings: Optional[List[PlantingEvent]] = None,
+                 plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
                  custom_crop_specifications: Optional[Dict[str, Dict]] = None,
                  fertilizer_events: Optional[List[FertilizerEvent]] = None,
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None):
@@ -49,6 +49,9 @@ class Field:
 
         self.planting_events: List[PlantingEvent] = plantings or []
         """List of all planting events that will occur over the run of the simulation in this field."""
+
+        self.harvest_events: List[HarvestEvent] = harvestings or []
+        """List of all harvesting events that will occur over the run of the simulation in the field."""
 
         self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
         """Dictionary where keys are crop references and values are dictionaries containing crop specifications."""
@@ -93,6 +96,12 @@ class Field:
         # --- Crop Management ---
         # planting
         self.check_crop_planting_schedule(time)
+
+        # Harvesting.
+        self.check_crop_harvest_schedule(time)
+
+        self._remove_dead_crops()
+        self._reset_crop_field_coverage_fractions()
 
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
@@ -257,7 +266,7 @@ class Field:
             Time object containing the current day and year of the simulation.
 
         """
-        self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
+        self.planting_events, todays_planting_events = self._filter_events(self.planting_events, time)
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
@@ -271,13 +280,50 @@ class Field:
             Object containing the current year and day of the simulation.
 
         """
-        self.fertilizer_events, todays_fertilizer_events = self._create_and_update_events(self.fertilizer_events, time)
+        self.fertilizer_events, todays_fertilizer_events = self._filter_events(self.fertilizer_events, time)
         for event in todays_fertilizer_events:
             self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
                                                  event.day)
 
+    def check_crop_harvest_schedule(self, time: Time) -> None:
+        """
+        Checks for all crops for potential harvests that may happen on the current day.
+
+        Parameters
+        ----------
+        time: Time
+            Time object containing the current day and year of the simulation.
+
+        Notes
+        -----
+        This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It calls the method that
+        checks if crops should be harvested based on their heat fraction.
+
+        """
+        self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
+        for event in todays_harvest_events:
+            self._harvest_crop(event.crop_reference, event.operation, time)
+
+        self._harvest_heat_scheduled_crops()
+
+    def _harvest_heat_scheduled_crops(self) -> None:
+        """
+        Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
+        them if they meet the heat threshold.
+
+        References
+        ----------
+        SWAT Theoretical documentation section 5:1.1.1 (Heat Scheduling)
+
+        """
+        for crop in self.crops:
+            execute_heat_scheduled_harvest = crop.data.use_heat_scheduling and \
+                                             crop.data.heat_fraction >= crop.data.harvest_heat_fraction
+            if execute_heat_scheduled_harvest:
+                crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
+
     @staticmethod
-    def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
+    def _filter_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -359,13 +405,77 @@ class Field:
         crop.data.id = crop_reference
 
         self.crops.append(crop)
-        self._reset_crop_field_coverage_fractions()
 
+        self._record_planting(crop_reference, use_heat_scheduled_harvesting, crop.data.species, time.calendar_year,
+                              time.day)
+
+    def _record_planting(self, crop_reference: str, heat_scheduled_harvest: bool, species: str, year: int,
+                         day: int) -> None:
+        """
+        Records a planting event to the OutputManager.
+
+        Parameters
+        ----------
+        crop_reference : str
+            Name used to get the specifications for the crop to be planted.
+        heat_scheduled_harvest : bool
+            Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
+        species : str
+            Name of the species of the crop being planted.
+        year : int
+            Year in which this crop planting occurs.
+        day : int
+            Julian day on which this crop planting occurs.
+
+        """
         info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "field_size": self.field_data.field_size,
-                    "date": {"year": time.calendar_year, "day": time.day}, "species": crop.data.species}
-        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": use_heat_scheduled_harvesting}
+                    "date": {"year": year, "day": day}, "species": species}
+        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest}
         om.add_variable("crop_planting", value, info_map)
+
+    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:
+        """
+        Performs the specified crop operation on the specified crop.
+
+        Parameters
+        ----------
+        crop_reference : str
+            Name used to get the specifications for the crop to be harvested.
+        harvest_operation : str
+            Name of the harvest operation to be performed on the referenced crop.
+        time : Time
+            Object containing the current day and year of the simulation.
+
+        Notes
+        -----
+        This method raises two different warnings, one if multiple active crops share the same id, and one if no active
+        crop is found with an id that matches the given crop reference. These are both raised as warnings and not errors
+        (which would stop the simulation run) because they could both plausibly happen in a simulation run. The first
+        scenario could happen if someone were to specify multiple plantings of the same crop in the same year and
+        schedule them to be harvested together, and the second could happen if there was a catastrophic weather event
+        that killed off a crop before it could be harvested.
+
+        """
+        crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
+
+        info_map = {"class": self.__class__.__name__, "function": self._harvest_crop.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'",
+                    "date": {"day": time.day, "year": time.calendar_year}}
+        if len(crops_to_be_harvested) > 1:
+            om.add_warning("harvest_warning", "Multiple crops to be harvested by single HarvestEvent.", info_map)
+        elif len(crops_to_be_harvested) < 1:
+            om.add_warning("harvest_warning", "No crop found to be harvested by a HarvestEvent.", info_map)
+
+        for crop in crops_to_be_harvested:
+            harvest_operation_enum = HarvestOperation(harvest_operation)
+            crop.crop_management.manage_harvest(harvest_operation_enum)
+
+    def _remove_dead_crops(self) -> None:
+        """
+        This method removes any crops from the field's list of active crops if they are no longer alive.
+        """
+        self.crops = [crop for crop in self.crops if crop.data.is_alive]
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """

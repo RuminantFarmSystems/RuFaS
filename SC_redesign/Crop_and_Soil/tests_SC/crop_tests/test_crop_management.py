@@ -6,6 +6,10 @@ from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
+
+om = OutputManager()
 
 
 # ---- Test Static Functions ----
@@ -109,9 +113,7 @@ def test_check_harvest_schedule(heat_sched: bool, heat_frac: float, harv_day: in
     cm = CropManagement(data)
     cm.check_harvest_schedule(this_day, this_yr)
     scheduled_and_correct = (this_day == harv_day) & (this_yr == harv_yr) & (heat_sched is False)
-    print(scheduled_and_correct)
     heat_scheduled_and_correct = (heat_sched is True) & (heat_frac >= 1.10)
-    print(heat_scheduled_and_correct)
     if scheduled_and_correct or heat_scheduled_and_correct:
         assert data.is_harvest_day is True
     else:
@@ -147,20 +149,23 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
         assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
-@pytest.mark.parametrize("harvest_op", [
-    HarvestOperation.HARVEST,
-    HarvestOperation.HARVEST_NOKILL
+@pytest.mark.parametrize("harvest_op,field_name,field_size,year,day,soil_data", [
+    (HarvestOperation.HARVEST, "test_1", 1.8, 1995, 200, SoilData(field_size=1.3)),
+    (HarvestOperation.HARVEST_NOKILL, "test_2", 4.5, 2010, 150, SoilData(field_size=2.4))
 ])
-def test_manage_harvest(harvest_op: HarvestOperation):
+def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
+                        soil_data: SoilData) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     # Setup
     crop = CropManagement()
     crop.determine_harvest_index = MagicMock()
     crop.kill = MagicMock()
     crop.cut_crop = MagicMock()
+    crop._record_yield = MagicMock()
+    crop._transfer_residue = MagicMock()
 
     # Act
-    crop.manage_harvest(harvest_op)
+    crop.manage_harvest(harvest_op, field_name, field_size, year, day, soil_data)
 
     # Assertions
     crop.determine_harvest_index.assert_called_once()
@@ -172,6 +177,9 @@ def test_manage_harvest(harvest_op: HarvestOperation):
     if harvest_op == HarvestOperation.HARVEST_NOKILL:
         crop.cut_crop.assert_called_once()
         crop.kill.assert_not_called()
+
+    crop._record_yield.assert_called_once_with(field_name, field_size, year, day)
+    crop._transfer_residue.assert_called_once_with(soil_data)
 
 
 @pytest.mark.parametrize("efficiency,harvest,override", [
@@ -220,3 +228,50 @@ def cut_crop(efficiency: float, harvest: float, override: bool):
         assert data.yield_phosphorus == collected * 0.0092
         assert data.residue_nitrogen == residue * 0.12
         assert data.residue_phosphorus == residue * 0.0092
+
+
+@pytest.mark.parametrize("field_name,field_size,species,year,day,mass,nitrogen,phosphorus", [
+    ("field_1", 1.8, "alfalfa", 1993, 200, 100, 12.5, 5),
+    ("field_2", 2.33, "corn", 1998, 216, 1500, 188, 24.5),
+    ("field_2", 2.33, "corn", 1999, 218, 1550, 172, 22.3),
+    ("field_3", 0.98, "soybeans", 2003, 245, 1200, 199, 89.3)
+])
+def test_record_yield(field_name: str, field_size: float, species: str, year: int, day: int, mass: float,
+                      nitrogen: float, phosphorus: float) -> None:
+    """Tests that harvest yields are correctly recorded to the OutputManager."""
+    crop_manager = CropManagement()
+
+    crop_manager.data.species = species
+    crop_manager.data.yield_collected = mass
+    crop_manager.data.yield_nitrogen = nitrogen
+    crop_manager.data.yield_phosphorus = phosphorus
+
+    crop_manager._record_yield(field_name, field_size, year, day)
+
+    expected_info_map = {"prefix": f"field_name:'{field_name}'", "field_size": field_size, "species": f"'{species}'",
+                         "date": {"year": year, "day": day}}
+    expected_value = {"yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus}
+
+    actual = om.variables_pool[f"field_name:'{field_name}'.harvest_yield"]
+    assert actual['info_maps'].__contains__(expected_info_map)
+    assert actual['values'].__contains__(expected_value)
+
+
+@pytest.mark.parametrize("residue,nitrogen", [
+    (100, 22),
+    (0, 0),
+    (200.23, 45.66)
+])
+def test_transfer_residue(residue: float, nitrogen: float) -> None:
+    """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
+        soil."""
+    soil_data = SoilData(field_size=1)
+    soil_data.plant_surface_residue = 0
+    soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
+    crop_data = CropData(yield_residue=residue, yield_nitrogen=nitrogen)
+    crop_manage = CropManagement(crop_data)
+
+    crop_manage._transfer_residue(soil_data)
+
+    assert soil_data.plant_surface_residue == residue
+    assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == nitrogen
