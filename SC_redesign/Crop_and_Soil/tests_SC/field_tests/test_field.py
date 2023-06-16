@@ -84,8 +84,6 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field._create_and_update_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
     field._harvest_crop = MagicMock()
     field._harvest_heat_scheduled_crops = MagicMock()
-    field._remove_dead_crops = MagicMock()
-    field._reset_crop_field_coverage_fractions = MagicMock()
 
     harvest_crop_calls = []
     for event in current_harvest_events:
@@ -97,8 +95,6 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     field._create_and_update_events.assert_called_once_with(all_harvest_events, mocked_time)
     field._harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
-    field._remove_dead_crops.assert_called_once()
-    field._reset_crop_field_coverage_fractions.assert_called_once()
 
 
 @pytest.mark.parametrize("crops,heat_scheduled,expected_harvested", [
@@ -166,7 +162,6 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
     """Tests that a new Crop instance is properly created and added to a field."""
     field_data = FieldData(name="test", field_size=1.3)
     field = Field(field_data=field_data, custom_crop_specifications=custom_crop_specs)
-    field._reset_crop_field_coverage_fractions = MagicMock()
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
@@ -182,7 +177,6 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
                          "species": expected_crop.data.species}
     expected_value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled}
 
-    field._reset_crop_field_coverage_fractions.assert_called_once()
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species

@@ -99,6 +99,9 @@ class Field:
         # Harvesting.
         self.check_crop_harvest_schedule(time)
 
+        self._remove_dead_crops()
+        self._reset_crop_field_coverage_fractions()
+
         # perform remaining tasks if crops currently in field
         if self.crops is not None:
 
@@ -178,9 +181,8 @@ class Field:
 
         Notes
         -----
-        This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It also checks if any of
-        the active crops are to be harvested using heat scheduling, and if so checks if they have met the harvesting
-        threshold.
+        This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It calls the method that
+        checks if crops should be harvested based on their heat fraction.
 
         """
         self.harvest_events, todays_harvest_events = self._create_and_update_events(self.harvest_events, time)
@@ -188,10 +190,6 @@ class Field:
             self._harvest_crop(event.crop_reference, event.operation, time)
 
         self._harvest_heat_scheduled_crops()
-
-        self._remove_dead_crops()
-
-        self._reset_crop_field_coverage_fractions()
 
     def _harvest_heat_scheduled_crops(self) -> None:
         """
@@ -293,7 +291,6 @@ class Field:
         crop.data.id = crop_reference
 
         self.crops.append(crop)
-        self._reset_crop_field_coverage_fractions()
 
         info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "field_size": self.field_data.field_size,
@@ -313,13 +310,6 @@ class Field:
             Name of the harvest operation to be performed on the referenced crop.
         time : Time
             Object containing the current day and year of the simulation.
-
-        Raises
-        ------
-        Warning
-            If multiple crops are found that will be harvested by a single harvest operation.
-        Warning
-            If no crop is found to be harvested from the field's currently active crops.
 
         Notes
         -----
