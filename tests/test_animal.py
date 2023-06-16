@@ -1533,7 +1533,7 @@ def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow:
     assert mock_holstein.breed == 'HO'
     assert mock_holstein.breed_index == 0
 
-    mock_holstein.set_breed_index()
+    mock_jersey.set_breed_index()
     assert mock_jersey.breed == 'JE'
     assert mock_jersey.breed_index == 1
 
