@@ -1,7 +1,7 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
@@ -34,7 +34,8 @@ class Field:
                  plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
                  custom_crop_specifications: Optional[Dict[str, Dict]] = None,
                  fertilizer_events: Optional[List[FertilizerEvent]] = None,
-                 fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None):
+                 fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
+                 manure_events: Optional[List[ManureEvent]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -61,7 +62,7 @@ class Field:
         """Provides interface for adding fertilizer to the field."""
 
         self.fertilizer_events = fertilizer_events or []
-        """List of all fertilizer application events that will in this field."""
+        """List of all fertilizer application events that will be applied to this field."""
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
         """List of all fertilizer mixes available for application to this field."""
@@ -69,11 +70,11 @@ class Field:
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
 
-        self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
-        """is today the last day of the simulation year?"""
-
         self.manure_applicator = ManureApplication(self.soil.data)
         """Manure application interface."""
+
+        self.manure_events: List[ManureEvent] = manure_events or []
+        """List of all manure applications that will be applied to this field."""
 
     def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
         """main Field function, runs all field routines based on current attribute configuration
@@ -87,6 +88,8 @@ class Field:
         """
         # --- Soil Management---
         self.check_fertilizer_application_schedule(time)
+
+        self.check_manure_application_schedule(time)
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -115,10 +118,6 @@ class Field:
                 self.graze_field()
 
             self.harvest_scheduled_crops()
-
-        # annual resets
-        if self.is_last_day_of_the_year:
-            self.perform_annual_reset()
 
         pass
 
@@ -285,6 +284,20 @@ class Field:
         for event in todays_fertilizer_events:
             self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
                                                  event.day)
+
+    def check_manure_application_schedule(self, time: Time) -> None:
+        """
+        Checks list of ManureEvents, sends all that occur today to another method to be executed.
+
+        Parameters
+        ----------
+        time : Time
+            Object containing the current year and day of the simulation.
+
+        """
+        self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
+        for event in todays_manure_events:
+            pass
 
     def check_crop_harvest_schedule(self, time: Time) -> None:
         """
