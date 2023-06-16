@@ -166,7 +166,7 @@ class Field:
             Time object containing the current day and year of the simulation.
 
         """
-        self.planting_events, todays_planting_events = self._create_and_update_events(self.planting_events, time)
+        self.planting_events, todays_planting_events = self._filter_events(self.planting_events, time)
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
@@ -185,7 +185,7 @@ class Field:
         checks if crops should be harvested based on their heat fraction.
 
         """
-        self.harvest_events, todays_harvest_events = self._create_and_update_events(self.harvest_events, time)
+        self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         for event in todays_harvest_events:
             self._harvest_crop(event.crop_reference, event.operation, time)
 
@@ -208,7 +208,7 @@ class Field:
                 crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
 
     @staticmethod
-    def _create_and_update_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
+    def _filter_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -292,10 +292,32 @@ class Field:
 
         self.crops.append(crop)
 
+        self._record_planting(crop_reference, use_heat_scheduled_harvesting, crop.data.species, time.calendar_year,
+                              time.day)
+
+    def _record_planting(self, crop_reference: str, heat_scheduled_harvest: bool, species: str, year: int,
+                         day: int) -> None:
+        """
+        Records a planting event to the OutputManager.
+
+        Parameters
+        ----------
+        crop_reference : str
+            Name used to get the specifications for the crop to be planted.
+        heat_scheduled_harvest : bool
+            Indicates if this crop should be harvested based on the fraction of potential heat units it has accumulated.
+        species : str
+            Name of the species of the crop being planted.
+        year : int
+            Year in which this crop planting occurs.
+        day : int
+            Julian day on which this crop planting occurs.
+
+        """
         info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "field_size": self.field_data.field_size,
-                    "date": {"year": time.calendar_year, "day": time.day}, "species": crop.data.species}
-        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": use_heat_scheduled_harvesting}
+                    "date": {"year": year, "day": day}, "species": species}
+        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest}
         om.add_variable("crop_planting", value, info_map)
 
     def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:

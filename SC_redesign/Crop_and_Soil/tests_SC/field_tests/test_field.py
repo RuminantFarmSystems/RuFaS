@@ -44,7 +44,7 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     no planting events occur on the current day, and no planting events left.
     """
     field = Field(plantings=all_events)
-    field._create_and_update_events = MagicMock(return_value=(events_remaining, events_occurring_today))
+    field._filter_events = MagicMock(return_value=(events_remaining, events_occurring_today))
 
     field._plant_crop = MagicMock()
     time = MagicMock(Time)
@@ -52,7 +52,7 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
 
     field.check_crop_planting_schedule(time)
 
-    field._create_and_update_events.assert_has_calls(expected_create_and_update_events_calls)
+    field._filter_events.assert_has_calls(expected_create_and_update_events_calls)
     assert field._plant_crop.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
 
@@ -81,7 +81,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
     remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
-    field._create_and_update_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
+    field._filter_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
     field._harvest_crop = MagicMock()
     field._harvest_heat_scheduled_crops = MagicMock()
 
@@ -92,7 +92,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
 
     field.check_crop_harvest_schedule(mocked_time)
 
-    field._create_and_update_events.assert_called_once_with(all_harvest_events, mocked_time)
+    field._filter_events.assert_called_once_with(all_harvest_events, mocked_time)
     field._harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
 
@@ -139,14 +139,14 @@ def test_harvest_heat_scheduled_crops(crops: List[Crop], heat_scheduled: List[bo
       HarvestEvent("alfalfa_2", 2001, 240, "default")], []),
     ([], 1993, 140, [], [])
 ])
-def test_create_and_update_events(events: List[Event], year: int, day: int, expected_remaining: List[Event],
-                                  expected_current: List[Event]) -> None:
+def test_filter_events(events: List[Event], year: int, day: int, expected_remaining: List[Event],
+                       expected_current: List[Event]) -> None:
     """Tests that list of events are properly checked and have current events correctly removed from them."""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
 
-    actual = Field._create_and_update_events(events, mocked_time)
+    actual = Field._filter_events(events, mocked_time)
     assert actual[0] == expected_remaining
     assert actual[1] == expected_current
 
@@ -165,6 +165,8 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
+    field._record_planting = MagicMock()
+
     field._plant_crop(crop_reference, heat_scheduled, mocked_time)
 
     if is_supported:
@@ -173,14 +175,42 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
         expected_crop = field.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
     expected_crop.data.use_heat_scheduling = heat_scheduled
     expected_crop.data.id = crop_reference
-    expected_info_map = {"prefix": "field_name:'test'", "field_size": 1.3, "date": {"year": year, "day": day},
-                         "species": expected_crop.data.species}
-    expected_value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled}
+    # expected_info_map = {"prefix": "field_name:'test'", "field_size": 1.3, "date": {"year": year, "day": day},
+    #                      "species": expected_crop.data.species}
+    # expected_value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled}
 
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species
-    actual = om.variables_pool["field_name:'test'.crop_planting"]
+    field._record_planting.assert_called_once_with(crop_reference, heat_scheduled, expected_crop.data.species,
+                                                   year, day)
+    # actual = om.variables_pool["field_name:'test'.crop_planting"]
+    # assert actual["info_maps"].__contains__(expected_info_map)
+    # assert actual["values"].__contains__(expected_value)
+
+
+@pytest.mark.parametrize("crop_reference,heat_scheduled,species,year,day,field_name,field_size,expected_info_map,"
+                         "expected_value", [
+                             ("ref_1", False, "species_1", 1993, 100, "name_1", 1.3,
+                              {"prefix": "field_name:'name_1'", "field_size": 1.3, "date": {"year": 1993, "day": 100},
+                               "species": "species_1"},
+                              {"crop_reference": "ref_1", "heat_scheduled_harvest": False}),
+                             ("ref_2", True, "custom_alien_species", 1996, 120, "name_2", 2.55,
+                              {"prefix": "field_name:'name_2'", "field_size": 2.55, "date": {"year": 1996, "day": 120},
+                               "species": "custom_alien_species"},
+                              {"crop_reference": "ref_2", "heat_scheduled_harvest": True}),
+                             ("ref_3", False, "custom_corn", 2008, 122, "name_3", 0.95,
+                              {"prefix": "field_name:'name_3'", "field_size": 0.95, "date": {"year": 2008, "day": 122},
+                               "species": "custom_corn"},
+                              {"crop_reference": "ref_3", "heat_scheduled_harvest": False})
+                         ])
+def test_record_planting(crop_reference: str, heat_scheduled: bool, species: str, year: int, day: int, field_name: str,
+                         field_size: float, expected_info_map: Dict, expected_value: Dict) -> None:
+    """Tests that crop plantings are correctly recorded to the OutputManager."""
+    field = Field(field_data=FieldData(name=field_name, field_size=field_size))
+    field._record_planting(crop_reference, heat_scheduled, species, year, day)
+
+    actual = om.variables_pool[f"field_name:'{field_name}'.crop_planting"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
