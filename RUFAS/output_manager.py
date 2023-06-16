@@ -312,6 +312,10 @@ class OutputManager(object):
             A copy of the given pool with info_maps removed from it.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._exclude_info_maps().__name__,
+                    }
+        OutputManager.add_log("info maps were excluded", info_map)
 
         pool_copy = pool.copy()
         for key, value in pool_copy.items():
@@ -353,7 +357,14 @@ class OutputManager(object):
         """
         try:
             with open(path) as text_file:
-                return text_file.read().splitlines()
+                list_of_elements = text_file.read().splitlines()
+                exclude_keyword_location = 0
+                exclude_keyword = "exclude"
+                if list_of_elements[exclude_keyword_location] == exclude_keyword:
+                    info_map = {"class": self.__class__.__name__,
+                                "function": self._load_txt_file_to_list().__name__, }
+                    OutputManager.add_log(f"{text_file} contains exclude keyword", info_map)
+                return list_of_elements
         except Exception as e:
             raise e
 
@@ -380,10 +391,14 @@ class OutputManager(object):
         as inclusionary.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._filter_variables_pool().__name__,
+                    }
         exclude_keyword_location = 0
         exclude_keyword = "exclude"
         filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
         if filter_by_exclusion:
+            OutputManager.add_log("")
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                     any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
