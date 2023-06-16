@@ -108,8 +108,38 @@ def parse_gnu_args():
     return parser.parse_args()
 
 
+def setup_feed_db_from_csv(input_path: str) -> None:
+    """
+    This function is temparory and will be deprecated once we decomission the feed db.
+    Creates feed db from csv files: feed_quality, nutrients, user_feeds under the feed directory.
+
+    """
+    import sqlite3
+    import os.path
+    import pandas
+
+    feed_dir = os.path.join(os.path.dirname(input_path), "feed")
+    tables = {
+        "feed_quality": "CREATE TABLE feed_quality(entry int,quality_id int,status varchar(15),differentiating_nutrient varchar(10),low_percent int,high_percent int)",
+        "nutrients": "CREATE TABLE nutrients(feed_id integer,type varchar(10),DM decimal(5,2),CP decimal(5,2),NDICP decimal(5,2),ADICP decimal(5,2),EE decimal(5,2),NDF decimal(5,2),ADF decimal(5,2),lignin decimal(5,2),ash decimal(5,2),non_fiber_carb decimal(5,2),PAF decimal(5,2),TDN decimal(5,2),N_A decimal(5,2),N_B decimal(5,2),N_C decimal(5,2),Kd decimal(5,2),dRUP decimal(5,2),calcium decimal(5,2),phosphorus decimal(5,2),magnesium decimal(5,2),potassium decimal(5,2),sodium decimal(5,2),chlorine decimal(5,2),sulfur decimal(5,2),DE decimal(5,2),is_fat integer,is_wetforage integer,units varchar(10) default 'kg','limit' int default 100, starch decimal(5,3))",
+        "user_feeds": "CREATE TABLE user_feeds(entry integer constraint user_feeds_pk primary key,feed_name varchar(100),description varchar(100),type varchar(10),units varchar(2) default 'kg')",
+    }
+    db_path = os.path.join(os.path.dirname(input_path), "databases", "feeds.sqlite")
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    for table in tables.keys():
+        csv_path = os.path.join(feed_dir, f"{table}.csv")
+        cur.execute(f"DROP TABLE IF EXISTS {table}")
+        cur.execute(tables[table])
+        df = pandas.read_csv(csv_path)
+        df.to_sql(table, conn, if_exists='replace', index=False)
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     cmd_arguments = parse_gnu_args()
+    setup_feed_db_from_csv(str(cmd_arguments.input_path))
     run_rufas(
         input_path=cmd_arguments.input_path,
         make_graphs=not cmd_arguments.no_graphics,
