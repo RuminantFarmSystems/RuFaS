@@ -1,3 +1,5 @@
+import math
+
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
@@ -64,7 +66,8 @@ class Field:
         self.fertilizer_events = fertilizer_events or []
         """List of all fertilizer application events that will be applied to this field."""
 
-        self.available_fertilizer_mixes = fertilizer_mixes or {}
+        self.available_fertilizer_mixes = fertilizer_mixes or {"100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
+                                                               "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}
         """List of all fertilizer mixes available for application to this field."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
@@ -187,6 +190,40 @@ class Field:
                                             potassium_applied, year, day)
 
     @staticmethod
+    def _determine_optimal_fertilizer_mix(requested_nitrogen: float, requested_phosphorus: float,
+                                          available_mixes: Dict[str, Dict[str, float]]) -> str:
+        """
+        Takes the requested nutrients of a fertilizer application and determines which fertilizer mix would fill them
+        the most efficiently..
+
+        Parameters
+        ----------
+        requested_nitrogen : float
+            Minimum amount of nitrogen to be included in this fertilizer application.
+        requested_phosphorus : float
+            Minimum amount of phosphorus to be included in this fertilizer application.
+        available_mixes : Dict[str, Dict[str, float]]
+            List of fertilizer mixes available for application to the field.
+
+        Returns
+        -------
+        str
+            Name of the fertilizer mix which requires the least mass of fertilizer to fill the nutrient requests.
+
+        """
+        optimal_mix = None
+        least_fertilizer_mix_required = math.inf
+        for mix_name, mix_values in available_mixes:
+            if mix_name == "100_0_0":
+                continue
+            fertilizer_application = Field._formulate_fertilizer_required(mix_values["N"], mix_values["P"],
+                                                                          mix_values["K"], requested_nitrogen,
+                                                                          requested_phosphorus)
+            if fertilizer_application["mass"] < least_fertilizer_mix_required:
+                optimal_mix = mix_name
+        return optimal_mix
+
+    @staticmethod
     def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
                                        potassium_fraction: float, requested_nitrogen: float,
                                        requested_phosphorus: float) -> Dict[str, float]:
@@ -251,6 +288,42 @@ class Field:
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass}
         om.add_variable("fertilizer_application", value, info_map)
+
+    def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
+                                    year: int, day: int) -> None:
+        """
+        Builds a manure application from the requested nutrient amounts and passes that application to the
+        ManureApplication module.
+
+        Parameters
+        ----------
+        requested_nitrogen : float
+            Mass of nitrogen requested to be in this manure application (kg)
+        requested_phosphorus : float
+            Mass of phosphorus requested to be in this manure application (kg)
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless)
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        """
+        # TODO: integrate the manure manager's request manure method here when it is finished.
+        manure_filled_by_request = {"nitrogen": 0.0, "phosphorus": 0.0}
+
+        self.manure_applicator.apply_machine_manure(0.0, 0.0, 0.0, field_coverage, 1.0, 0.0, 0.0, 0.0)
+
+        unmet_nitrogen_demand = min(0.0, requested_nitrogen - manure_filled_by_request["nitrogen"])
+        unmet_phosphorus_demand = min(0.0, requested_phosphorus - manure_filled_by_request["phosphorus"])
+        if not unmet_nitrogen_demand and not unmet_phosphorus_demand:
+            return
+        elif unmet_phosphorus_demand and not unmet_nitrogen_demand:
+            optimal_mix = "100_0_0"
+        else:
+            optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
+                                                                 self.available_fertilizer_mixes)
+        self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand, year, day)
 
     # </editor-fold>
 
@@ -369,6 +442,7 @@ class Field:
             else:
                 remaining_events.append(event)
         return remaining_events, todays_events
+
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
@@ -650,6 +724,7 @@ class Field:
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False
+
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
