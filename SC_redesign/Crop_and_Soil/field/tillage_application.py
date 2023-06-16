@@ -224,8 +224,12 @@ class TillageApplication:
 
         Parameters
         ----------
-        field_name : str
-            Name of the field that contains this crop.
+        tillage_depth : float
+            The lowest depth the tilling implement reaches (mm)
+        incorporation_fraction : float
+            Fraction of soil surface pool incorporated into the soil profile (unitless)
+        mixing_fraction : float
+            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
         year : int
             Year in which this harvest occurred.
         day : int
