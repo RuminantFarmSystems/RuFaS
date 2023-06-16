@@ -750,8 +750,6 @@ class LifeCycleManager:
 
             if new_born:
                 self._handle_new_born(sim_day, cow, calves_born)
-                cow.set_parity_index()
-                cow.set_lactation_curve_params()
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num
