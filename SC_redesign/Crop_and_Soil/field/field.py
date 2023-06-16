@@ -79,7 +79,7 @@ class Field:
         """main Field function, runs all field routines based on current attribute configuration
 
         Args:
-            time: Time object containing the current year and day of the simulation.
+            time : a Time object, containing the current year and day that the simulation is on.
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
@@ -291,7 +291,7 @@ class Field:
 
         Parameters
         ----------
-        time: Time
+        time : Time
             Time object containing the current day and year of the simulation.
 
         Notes
@@ -636,7 +636,6 @@ class Field:
         else:
             for crop in self.crops:
                 crop.data.is_dormant = False
-
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
