@@ -2,10 +2,14 @@ from math import exp
 from typing import Optional
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model
 """
+
+om = OutputManager()
 
 
 class CropManagement:
@@ -24,7 +28,27 @@ class CropManagement:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
     # ---- Main Methods ----
-    def manage_harvest(self, harvest_op: HarvestOperation):
+    def manage_harvest(self, harvest_op: HarvestOperation, field_name: str, field_size: float, year: int, day: int,
+                       soil_data: SoilData) -> None:
+        """
+        Executes the harvest operation passed on the crop that contains this module.
+
+        Parameters
+        ----------
+        harvest_op : HarvestOperation
+            The operation to be executed on this crop.
+        field_name : str
+            The name of the field that contains this crop.
+        field_size : float
+            Size of the field that contains this crop (ha)
+        year : int
+            The calendar year in which this harvest operation occurred.
+        day : int
+            The Julian day on which this harvest operation occurred.
+        soil_data : SoilData
+            The object tracking the attributes of the soil profile.
+
+        """
         self.determine_harvest_index()
 
         if harvest_op == HarvestOperation.HARVEST:
@@ -33,6 +57,9 @@ class CropManagement:
 
         if harvest_op == HarvestOperation.HARVEST_NOKILL:
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
+
+        self._record_yield(field_name, field_size, year, day)
+        self._transfer_residue(soil_data)
 
     def graze(self):  # TODO: implement grazing method (SWAT 6:1.3)
         pass
@@ -152,10 +179,48 @@ class CropManagement:
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
-        # TODO: residue needs to be accumulated in the soil (Soil class) - GitHub Issue #245
-
         # TODO: are above- and below-ground lignin residue (percent) needed?
         #   in the old version, they were both hard-coded to 17 - GitHub Issue #163
+
+    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
+        """
+        Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
+
+        Parameters
+        ----------
+        field_name : str
+            Name of the field that contains this crop.
+        field_size : float
+            Size of the field that contains this crop (ha)
+        year : int
+            Year in which this harvest occurred.
+        day : int
+            Julian day on which this harvest occurred.
+
+        """
+        mass_harvested = self.data.yield_collected
+        nitrogen_harvested = self.data.yield_nitrogen
+        phosphorus_harvested = self.data.yield_phosphorus
+        info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
+                    "prefix": f"field_name:'{field_name}'", "field_size": field_size,
+                    "species": f"'{self.data.species}'", "date": {"year": year, "day": day}}
+        value = {"yield": mass_harvested, "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested}
+        om.add_variable("harvest_yield", value, info_map)
+
+    def _transfer_residue(self, soil_data: SoilData) -> None:
+        """
+        Transfers residue from harvest to SoilData that tracks how that residue is degraded and assimilated into the
+        soil.
+
+        Parameters
+        ----------
+        soil_data : SoilData
+            Object that tracks the attributes of the soil profile that contains this crop.
+
+        """
+        soil_data.plant_surface_residue += self.data.yield_residue
+        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.yield_nitrogen
+        # TODO: Add organic phosphorus to correct pool in soil - GitHub issue #444
 
     # ---- Harvest Scheduling ----
 
