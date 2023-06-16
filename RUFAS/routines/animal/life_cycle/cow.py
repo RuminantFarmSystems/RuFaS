@@ -149,6 +149,8 @@ class Cow(HeiferIII):
             self.milking = self.days_in_milk != 0
             self.calves = args['parity']
             self.CI = args['calving_interval']
+            self.set_parity_index()
+            self.set_lactation_curve_params()
 
     @property
     def is_pregnant(self):
@@ -580,6 +582,8 @@ class Cow(HeiferIII):
             self.health_cull_update()
             self.death_update()
             new_born = True
+            self.set_parity_index()
+            self.set_lactation_curve_params()
 
             # restarting estrus
             if self.repro_program in ['ED', 'ED-TAI']:
@@ -587,7 +591,7 @@ class Cow(HeiferIII):
 
         # if self.milking:
         estimated_daily_milk_produced, fat_percent, \
-        daily_fat_correct_milk_production = self.milking_update(sim_day, calving_interval)
+            daily_fat_correct_milk_production = self.milking_update(sim_day, calving_interval)
 
         self.update_body_weight_history(sim_day)
         self.update_milk_production_history(sim_day)
