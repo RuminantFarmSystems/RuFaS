@@ -509,6 +509,13 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
 
 
+
+@pytest.mark.parametrize("nitrogen,phosphorus,mixes,expected", [
+    (100, 20, {"100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0}, "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}, "26_4_24"),
+    (50, 60, {"30_40_50": {"N": 0.3, "P": 0.4, "K": 0.5}}, "30_40_50"),
+    (22.5, 33, {})
+])
+
 @pytest.mark.parametrize("nitrogen_frac,phosphorus_frac,potassium_frac,requested_nitrogen,requested_phosphorus,"
                          "expected", [
                              (0.2, 0.1, 0.3, 100.0, 80.0, {"mass": 800.0, "nitrogen_mass": 160.0,
