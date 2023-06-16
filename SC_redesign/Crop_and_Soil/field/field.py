@@ -252,6 +252,7 @@ class Field:
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass}
         om.add_variable("fertilizer_application", value, info_map)
+
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
