@@ -157,7 +157,7 @@ class Field:
         time : Time
             Time object containing the current day and year of the simulation.
         """
-        self.tillage_events, todays_events = self._create_and_update_events(self.tillage_events, time)
+        self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
         for event in todays_events:
             self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
                                   time.calendar_year,
