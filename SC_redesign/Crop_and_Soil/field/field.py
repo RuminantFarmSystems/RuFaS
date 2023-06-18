@@ -1,3 +1,5 @@
+import heapq
+
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
@@ -62,6 +64,7 @@ class Field:
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
+        heapq.heapify(tillage_events)
         self.tillage_events: List[TillageEvent] = tillage_events
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
@@ -157,8 +160,8 @@ class Field:
         time : Time
             Time object containing the current day and year of the simulation.
         """
-        self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
-        for event in todays_events:
+        while self.tillage_events and self.tillage_events[0].occurs_today(time):
+            event = heapq.heappop(self.tillage_events)
             self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
                                   time.calendar_year,
                                   time.day)
