@@ -34,7 +34,7 @@ class Field:
     """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 tillage_events: Optional[List[TillageEvent]] = None, plantings: Optional[List[PlantingEvent]] = None,
+                 tillage_events: Optional[List[TillageEvent]] = [None], plantings: Optional[List[PlantingEvent]] = None,
                  harvestings: Optional[List[HarvestEvent]] = None,
                  custom_crop_specifications: Optional[Dict[str, Dict]] = None):
         # field-wide attributes
