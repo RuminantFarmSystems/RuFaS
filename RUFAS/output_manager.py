@@ -357,18 +357,20 @@ class OutputManager(object):
         """
         try:
             with open(path) as text_file:
+                info_map = {"class": self.__class__.__name__,
+                            "function": self._load_txt_file_to_list().__name__,
+                            }
                 list_of_elements = text_file.read().splitlines()
-                exclude_keyword_location = 0
-                exclude_keyword = "exclude"
-                if list_of_elements[exclude_keyword_location] == exclude_keyword:
-                    info_map = {"class": self.__class__.__name__,
-                                "function": self._load_txt_file_to_list().__name__, }
-                    OutputManager.add_log(f"{text_file} contains exclude keyword", info_map)
+                if not list_of_elements:
+                    OutputManager.add_log('filter pattern file load', f"{path} was empty", info_map)
+                else:
+                    OutputManager.add_log('filter pattern file load', f"{path} had {len(list_of_elements)} filter"
+                                          " patterns", info_map)
                 return list_of_elements
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, filter_patterns: List[str]) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_patterns: List[str], input_file: str) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -376,6 +378,9 @@ class OutputManager(object):
         ----------
         filter_patterns : List[str]
             A list of patterns the user has selected to filter the variables pool.
+
+        input_file : str
+            The filter patterns file name - necessary for logging purposes
 
         Returns
         -------
@@ -398,10 +403,13 @@ class OutputManager(object):
         exclude_keyword = "exclude"
         filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
         if filter_by_exclusion:
-            OutputManager.add_log("")
+            OutputManager.add_log("filtering log", f"{input_file} contains exclude-keyword '{exclude_keyword}'"
+                                  f" at position {exclude_keyword_location}", info_map)
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                     any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
+            OutputManager.add_log("filtering log", f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"
+                                  f" at position {exclude_keyword_location}", info_map)
             return {key: self.variables_pool[key] for key in self.variables_pool.keys() if
                     any(re.match(pattern, key) for pattern in filter_patterns)}
 
@@ -424,14 +432,13 @@ class OutputManager(object):
 
         """
         list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
-        for input_file in list_of_filter_files:
-            input_path = os.path.join(dir_path, input_file)
-            inclusion_keys = self._load_txt_file_to_list(input_path)
-            filtered_pool = self._filter_variables_pool(inclusion_keys)
-
+        for filter_file in list_of_filter_files:
+            input_path = os.path.join(dir_path, filter_file)
+            filter_patterns = self._load_txt_file_to_list(input_path)
+            filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
-            file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
+            file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
             self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
