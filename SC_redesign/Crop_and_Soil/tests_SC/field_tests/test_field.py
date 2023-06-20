@@ -488,35 +488,6 @@ def test_make_crop_from_config_dict(config: dict):
         Field.make_custom_crop.assert_called_once()
 
 
-def test_check_harvest_schedules():
-    """ensure that harvest schedules are checked for all crops"""
-    field = Field()
-    crop1, crop2, crop3 = Crop(), Crop(), Crop()
-    crop1.crop_management.check_harvest_schedule = MagicMock()
-    crop2.crop_management.check_harvest_schedule = MagicMock()
-    crop3.crop_management.check_harvest_schedule = MagicMock()
-    field.crops = [crop1, crop2, crop3]
-    field.check_harvest_schedules(100, 0)
-    crop1.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
-    crop2.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
-    crop3.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
-
-
-def test_harvest_scheduled_crops():
-    """ensure that crops are harvested when appropriate"""
-    field = Field()
-    crop1, crop2, crop3 = Crop(CropData(is_harvest_day=True)), Crop(CropData(is_harvest_day=False)), \
-        Crop(CropData(is_harvest_day=True))
-    crop1.crop_management.manage_harvest = MagicMock()
-    crop2.crop_management.manage_harvest = MagicMock()
-    crop3.crop_management.manage_harvest = MagicMock()
-    field.crops = [crop1, crop2, crop3]
-    field.harvest_scheduled_crops()
-    crop1.crop_management.manage_harvest.assert_called_once()
-    crop2.crop_management.manage_harvest.assert_not_called()
-    crop3.crop_management.manage_harvest.assert_called_once()
-
-
 @pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size", {
     ("test_mix_1", 80.0, 30.0, 1993, 100, 3.1),
     ("test_mix_2", 150.0, 89.0, 2001, 240, 1.3),
@@ -887,6 +858,23 @@ def test_evaporate_from_crop_canopies(demand: float, canopy_water_1: float, cano
     assert pytest.approx(actual_demand) == expected_demand
     assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
     assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
+
+
+@pytest.mark.parametrize("biomasses,expected", [
+    ([30, 20, 14], 64),
+    ([22.1], 22.1),
+    ([], 0.0)
+])
+def test_determine_total_above_ground_biomass(biomasses: List[float], expected: float) -> None:
+    """Tests that total above ground biomass on the field is correctly calculated."""
+    field = Field()
+    for biomass in biomasses:
+        crop = Crop()
+        crop.data.above_ground_biomass = biomass
+        field.crops.append(crop)
+
+    actual = field._determine_total_above_ground_biomass()
+    assert actual == expected
 
 
 @pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [

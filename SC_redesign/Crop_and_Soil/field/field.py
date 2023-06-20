@@ -80,9 +80,6 @@ class Field:
         self.tillage_events: List[TillageEvent] = tillage_events
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
-        self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
-        """is today the last day of the simulation year?"""
-
         self.manure_applicator = ManureApplication(self.soil.data)
         """Manure application interface."""
 
@@ -105,8 +102,7 @@ class Field:
 
         self.check_manure_application_schedule(time)
 
-        # tillage
-        self.check_tillage_schedule()
+        self.check_tillage_schedule(time)
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -114,30 +110,14 @@ class Field:
         # ... Other ...
 
         # --- Crop Management ---
-        # planting
+        self.assess_dormancy(current_weather.daylength)
+
         self.check_crop_planting_schedule(time)
 
-        # Harvesting.
         self.check_crop_harvest_schedule(time)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
-
-        # perform remaining tasks if crops currently in field
-        if self.crops is not None:
-
-            self.assess_dormancy(current_weather.daylength)
-
-            self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
-                            current_weather.mean_air_temperature, current_weather.max_air_temperature)
-
-            if self.field_data.grazers_present:
-                self.graze_field()
-
-            self.check_harvest_schedules(time.day, time.year)
-            self.harvest_scheduled_crops()
-
-        pass
 
     @property
     def _composition_sums_to_one(self) -> bool:
@@ -424,8 +404,7 @@ class Field:
         self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
         for event in todays_events:
             self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
-                                  time.calendar_year,
-                                  time.day)
+                                  time.calendar_year, time.day)
 
     def check_manure_application_schedule(self, time: Time) -> None:
         """
@@ -702,78 +681,6 @@ class Field:
         """
         crop_data = CropData(**specs)
         return Crop(crop_data)
-
-    def reset_perennial(self):
-        """resets some attributes for perennial crops at the start of the new growing season"""
-        pass
-
-    def _get_soil_layer_attributes_for_crop_growth(self) -> Dict[str, List[float]]:
-        """restructure soil layer data to be used for crop growth methods"""
-        layer_attr_dict = {"depths": [],
-                           "nitrates": [],
-                           "phosphates": []}
-        for layer in self.soil.data.soil_layers:
-            layer_attr_dict["depths"].append(layer.bottom_depth)
-            layer_attr_dict["nitrates"].append(layer.nitrate)
-            layer_attr_dict["phosphates"].append(layer.phosphate)
-
-        return layer_attr_dict
-
-        # NOTE: I had originally opted to have separate properties in the Soil class that made these lists,
-        # but, unless other classes need these variables in this format, this seems to be most efficient.
-        # i.e.,
-        #
-        # @property
-        # def layer_depths(self):
-        #     """Get a list of the lowest depth for each soil layer"""
-        #     return [layer.bottom_depth for layer in self.data.soil_layers]
-        #
-        # @property
-        # def layer_nitrates(self):
-        #     """Place the nitrate values from each soil layer into a list"""
-        #     return [layer.nitrate for layer in self.data.soil_layers]
-        #
-        # @property
-        # def layer_phosphates(self):
-        #     """Place the nitrate values from each soil layer into a list"""
-        #     return [layer.phosphate for layer in self.data.soil_layers]
-
-    def grow_crops(self, incoming_light, min_air_temperature, mean_air_temperature, max_air_temperature) -> None:
-        """allow the current crops to execute their daily growth routines"""
-        for this_crop in self.crops:
-            this_crop.grow_crop(soil_data=self.soil.data, incoming_light=incoming_light,
-                                mean_air_temperature=mean_air_temperature, min_air_temperature=min_air_temperature,
-                                max_air_temperature=max_air_temperature)
-
-    def check_harvest_schedules(self, day, year) -> None:
-        """executes the check_harvest_schedule method for each crop, passing the current day and year"""
-        for crop in self.crops:
-            crop.crop_management.check_harvest_schedule(current_day=day, current_year=year)
-
-    def harvest_scheduled_crops(self) -> None:
-        """perform the harvest operation on all crops in the field, depending on the harvest operation, if today is
-        the crop's harvest day.
-
-        After the harvest, this method adds any residue to the soil. Root residue is only added if the
-        harvest operation killed the crop.
-        """
-        for crop in self.crops:
-            if not crop.data.is_harvest_day:
-                continue  # move on to checking next crop
-
-            if crop.data.next_harvest_operation == HarvestOperation.HARVEST:
-                crop.crop_management.manage_harvest(cut=True, collect=True, kill=True)
-
-            if crop.data.next_harvest_operation == HarvestOperation.HARVEST_NOKILL:
-                crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
-
-            self.soil.data.plant_surface_residue += (crop.data.yield_residue or 0)
-            if not crop.data.is_alive:
-                self.soil.data.plant_root_residue += (crop.data.root_biomass or 0)
-
-    def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
-        """allow grazers to graze in the field during the current day"""
-        pass
 
     def assess_dormancy(self, daylength: float) -> None:
         """Transitions all crops to dormancy, that are capable of going dormant
