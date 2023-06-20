@@ -7,7 +7,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.field import Field
@@ -89,6 +89,41 @@ def test_check_fertilizer_application_schedule(events: List[FertilizerEvent], re
                                              event.day))
     field._filter_events.assert_called_once_with(events, mocked_time)
     field._execute_fertilizer_application.assert_has_calls(expected_execution_calls)
+
+
+@pytest.mark.parametrize("events,remaining_events,current_events", [
+    ([ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 120, 100, 20, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 120, 100, 20, 0.8, 0.0, 1.0)],
+     [ManureEvent(1992, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1993, 120, 100, 20, 0.8, 0.0, 1.0)],
+     [ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0)]),
+    ([ManureEvent(1991, 125, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 125, 100, 20, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 125, 100, 20, 0.8, 0.0, 1.0)],
+     [ManureEvent(1991, 125, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1992, 125, 100, 20, 0.8, 0.0, 1.0),
+      ManureEvent(1993, 125, 100, 20, 0.8, 0.0, 1.0)], []),
+    ([ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1991, 120, 90, 20, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 80, 40, 0.8, 0.0, 1.0)], [],
+     [ManureEvent(1991, 120, 100, 20, 0.8, 0.0, 1.0), ManureEvent(1991, 120, 90, 20, 0.8, 0.0, 1.0),
+      ManureEvent(1991, 120, 80, 40, 0.8, 0.0, 1.0)])
+])
+def test_check_manure_application_schedule(events: List[ManureEvent], remaining_events: List[ManureEvent],
+                                           current_events: List[ManureEvent]) -> None:
+    """Tests that ManureEvents are correctly checked for and executed when scheduled."""
+    field = Field(manure_events=events)
+    field._filter_events = MagicMock(return_value=(remaining_events, current_events))
+    field._execute_manure_application = MagicMock()
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", 1991)
+    setattr(mocked_time, "day", 120)
+
+    field.check_manure_application_schedule(mocked_time)
+
+    expected_execution_calls = []
+    for event in current_events:
+        expected_execution_calls.append(call(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
+                                             event.year, event.day))
+    field._filter_events.assert_called_once_with(events, mocked_time)
+    assert field.manure_events == remaining_events
+    field._execute_manure_application.assert_has_calls(expected_execution_calls)
 
 
 @pytest.mark.parametrize("year,day,all_harvest_events,current_harvest_events", [

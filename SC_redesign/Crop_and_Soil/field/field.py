@@ -1,5 +1,4 @@
 import math
-import pdb
 
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
@@ -409,7 +408,8 @@ class Field:
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
         for event in todays_manure_events:
-            pass
+            self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
+                                             event.year, event.day)
 
     def check_crop_harvest_schedule(self, time: Time) -> None:
         """
