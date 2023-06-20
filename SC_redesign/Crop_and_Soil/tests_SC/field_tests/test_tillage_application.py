@@ -7,6 +7,7 @@ from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
+from SC_redesign.Crop_and_Soil.field.tillage_application import om
 
 
 @pytest.mark.parametrize("data,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed", [
@@ -68,15 +69,44 @@ def test_mix_soil_layers(layers: List[LayerData], field_size: float, pool_values
     assert actual == expected
 
 
-@pytest.mark.parametrize("till_depth,incorp_frac,mix_frac", [
-    (30, 0.12, 0.33),
-    (57.8, 0.05, 0.2),
-    (150, 0.23, 0.19),
-    (5000, 0.44, 0.51)
+@pytest.mark.parametrize("till_depth,incorp_frac,mix_frac, year, day", [
+    (30, 0.12, 0.33, 1998, 7),
+    (57.8, 0.05, 0.2, 2001, 7),
+    (150, 0.23, 0.19, 2000, 9),
+    (5000, 0.44, 0.51, 2023, 31)
 ])
-def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float) -> None:
+def test_record_tillage(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
+    field_data_1 = FieldData(name="field1", field_size=1.5)
+    till_app = TillageApplication(field_data=field_data_1)
+    till_app.till_soil(till_depth, incorp_frac, mix_frac, year, day)
+    print(om.variables_pool)
+    pool = om.variables_pool
+    assert len(pool["field_name:'field1'.tillage_record"]['info_maps']) == 1
+    assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]["field_size"] == {1.5}
+    assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['prefix'] == "field_name:'field1'"
+    assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['date']['year'] == year
+    assert pool["field_name:'field1'.tillage_record"]['info_maps'][0]['date']['day'] == day
+    if till_depth > till_app.soil_data.soil_layers[-1].bottom_depth:
+        assert pool["field_name:'field1'.tillage_record"]['values'][0]['tillage_depth'] == \
+               till_app.soil_data.soil_layers[-1].bottom_depth
+    else:
+        assert pool["field_name:'field1'.tillage_record"]['values'][0]['tillage_depth'] == till_depth
+    assert pool["field_name:'field1'.tillage_record"]['values'][0]['incorporation_fraction'] == incorp_frac
+    assert pool["field_name:'field1'.tillage_record"]['values'][0]['mixing_fraction'] == mix_frac
+    om.flush_pools()
+
+
+@pytest.mark.parametrize("till_depth,incorp_frac,mix_frac, year, day", [
+    (30, 0.12, 0.33, 1998, 7),
+    (57.8, 0.05, 0.2, 2001, 7),
+    (150, 0.23, 0.19, 2000, 9),
+    (5000, 0.44, 0.51, 2023, 31)
+])
+def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float, year: int, day: int) -> None:
     """Tests that soil is tilled correctly."""
-    till_app = TillageApplication(field_size=1.5)
+    field_data_1 = FieldData(name="field1", field_size=1.5)
+
+    till_app = TillageApplication(field_data=field_data_1)
 
     till_app._remove_amount_incorporated = MagicMock(return_value=8)
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus = MagicMock()
@@ -87,7 +117,7 @@ def test_till_soil(till_depth: float, incorp_frac: float, mix_frac: float) -> No
     else:
         expected_till_depth = till_depth
 
-    till_app.till_soil(till_depth, incorp_frac, mix_frac)
+    till_app.till_soil(till_depth, incorp_frac, mix_frac, year, day)
 
     remove_calls = [call(till_app.soil_data, "available_phosphorus_pool", incorp_frac),
                     call(till_app.soil_data, "recalcitrant_phosphorus_pool", incorp_frac),
