@@ -7,9 +7,12 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 
 import numpy as np
 import pytest
+
+from RUFAS.routines.animal.life_cycle import cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.calf import Calf
+
 
 import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
@@ -37,7 +40,126 @@ def test_percentile_list():
 
 def test_grouping():
     """Unit test for function grouping in file routines/animal/clustering_pen_grouping.py"""
-    pass
+
+    # Test case 1: Single cow and pen, stocking density 0.5
+    args1 = {
+        'id': 1,
+        'breed': 'Holstein',
+        'birth_date': '2022-01-01',
+        'days_born': 365,
+        'tai_method_h': '5dCG2P',
+        'synch_ed_method_h': '2P',
+        'repro_program': 'ED',
+        'presynch_method': 'PreSynch',
+        'tai_method_c': 'OvSynch 56',
+        'resynch_method': 'TAIafterPD',
+        'birth_weight': 100,
+        'body_weight': 500,
+        'wean_weight': 400,
+        'mature_body_weight': 1200,
+        'events': [],
+        'estrus_count': 1,
+        'estrus_day': 365,
+        'tai_program_start_day_h': 365,
+        'synch_ed_program_start_day_h': 365,
+        'synch_ed_estrus_day': 365,
+        'synch_ed_stop_day': 365,
+        'conception_rate': 0.75,
+        'ai_day': 365,
+        'abortion_day': None,
+        'days_in_preg': None,
+        'gestation_length': None,
+        'p_gest_for_calf': None,
+        'days_in_milk': None,
+        'parity': None,
+        'calving_interval': None,
+
+    }
+    cow1 = cow.Cow(args1)
+
+    # Instance 2
+    args2 = {
+        'id': 2,
+        'breed': 'Jersey',
+        'birth_date': '2021-12-01',
+        'days_born': 400,
+        'tai_method_h': '5dCGP',
+        'synch_ed_method_h': 'CP',
+        'repro_program': 'TAI',
+        'presynch_method': 'Double OvSynch',
+        'tai_method_c': 'OvSynch 48',
+        'resynch_method': 'TAIbeforePD',
+        'birth_weight': 90,
+        'body_weight': 450,
+        'wean_weight': 350,
+        'mature_body_weight': 1000,
+        'events': [],
+        'estrus_count': 2,
+        'estrus_day': 380,
+        'tai_program_start_day_h': 365,
+        'synch_ed_program_start_day_h': 365,
+        'synch_ed_estrus_day': 365,
+        'synch_ed_stop_day': 365,
+        'conception_rate': 0.80,
+        'ai_day': 365,
+        'abortion_day': None,
+        'days_in_preg': None,
+        'gestation_length': None,
+        'p_gest_for_calf': None,
+        'days_in_milk': None,
+        'parity': None,
+        'calving_interval': None
+    }
+    cow2 = cow.Cow(args2)
+
+    # Instance 3
+    args3 = {
+        'id': 3,
+        'breed': 'Angus',
+        'birth_date': '2020-11-01',
+        'days_born': 500,
+        'tai_method_h': 'user-defined',
+        'synch_ed_method_h': 'user-defined',
+        'repro_program': 'ED-TAI',
+        'presynch_method': 'G6G',
+        'tai_method_c': '5d CoSynch',
+        'resynch_method': 'PGFatPD',
+        'birth_weight': 80,
+        }
+    cow3 = cow.Cow(args3)
+
+    pen1 = Pen(pen_id=1, vertical_dist_to_milking_parlor=1.5, horizontal_dist_to_milking_parlor=2.0,
+               number_of_stalls=50, housing_type="Freestall", bedding_type="Sand", pen_type="freestall",
+               manure_handling="Scraping", manure_separator="None", manure_storage="Lagoon",
+               animal_combination=Pen.AnimalCombination.CALF, max_stocking_density=2.5)
+
+    pen2 = Pen(pen_id=2, vertical_dist_to_milking_parlor=3.0, horizontal_dist_to_milking_parlor=1.0,
+               number_of_stalls=40, housing_type="Tiestall", bedding_type="Straw", pen_type="tiestall",
+               manure_handling="Pit", manure_separator="Screw Press", manure_storage="Concrete Pit",
+               animal_combination=Pen.AnimalCombination.LAC_COW, max_stocking_density=3.0)
+
+    pen3 = Pen(pen_id=3, vertical_dist_to_milking_parlor=2.5, horizontal_dist_to_milking_parlor=1.5,
+               number_of_stalls=30, housing_type="Freestall", bedding_type="Rubber Mat", pen_type="freestall",
+               manure_handling="Composting", manure_separator="Screen Separator", manure_storage="Compost Bedded Pack",
+               animal_combination=Pen.AnimalCombination.GROWING_AND_CLOSE_UP, max_stocking_density=2.0)
+    cow_list = [cow1]
+
+    pens = [pen1]
+    stocking_density = 0.5
+    result = RUFAS.routines.animal.clustering_pen_grouping.grouping(cow_list, pens, stocking_density)
+    assert len(result) == 1
+    assert result[0] == pen1
+
+    # Test case 2: Multiple cows and pens, stocking density 0.7
+
+    cow_list = [cow1, cow2, cow3]
+    pens = [pen1, pen2, pen3]
+    stocking_density = 0.7
+    result = RUFAS.routines.animal.clustering_pen_grouping.grouping(cow_list, pens, stocking_density)
+    assert len(result) == 3
+    assert result[0] == pen3
+    assert result[1] == pen2
+    assert result[2] == pen1
 
 
 def test_update_animals():
@@ -470,7 +592,7 @@ def test_get_heiferI_values():
     pass
 
 
-def test_calc_nutrient_rqmts():
+def test_heiferI_calc_nutrient_rqmts():
     """Unit test for function calc_nutrient_rqmts in file routines/animal/life_cycle/heiferI.py"""
     pass
 
@@ -515,117 +637,117 @@ def test_get_heiferII_values():
     pass
 
 
-def test_calc_nutrient_rqmts():
+def test_calc_heiferII_nutrient_rqmts():
     """Unit test for function calc_nutrient_rqmts in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test_calc_manure_excretion():
+def test_calc_heiferII_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test_phosphorus_rqmts():
+def test_heiferII_phosphorus_rqmts():
     """Unit test for function phosphorus_rqmts in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test_update():
+def test_heiferII_update():
     """Unit test for function update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_estrus_day():
+def test_heiferII_determine_estrus_day():
     """Unit test for function _determine_estrus_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__return_estrus():
+def test_heiferII_return_estrus():
     """Unit test for function _return_estrus in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__after_ai_estrus():
+def test_heiferII_after_ai_estrus():
     """Unit test for function _after_ai_estrus in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__after_abortion_estrus():
+def test_heiferII_after_abortion_estrus():
     """Unit test for function _after_abortion_estrus in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__ed_update():
+def test_heiferII_ed_update():
     """Unit test for function _ed_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_tai_program_day():
+def test_heiferII_determine_tai_program_day():
     """Unit test for function _determine_tai_program_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__tai_program_day_after_abortion():
+def test_heiferII_tai_program_day_after_abortion():
     """Unit test for function _tai_program_day_after_abortion in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__5dCG2P_update():
+def test_heiferII_5dCG2P_update():
     """Unit test for function _5dCG2P_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__5dCGP_update():
+def test_heiferII_5dCGP_update():
     """Unit test for function _5dCGP_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__user_defined_update():
+def test_heiferII_user_defined_update():
     """Unit test for function _user_defined_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__tai_update():
+def test_heiferII_tai_update():
     """Unit test for function _tai_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_synch_ed_program_day():
+def test_heiferII_determine_synch_ed_program_day():
     """Unit test for function _determine_synch_ed_program_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_synch_ed_estrus_day():
+def test_heiferII_determine_synch_ed_estrus_day():
     """Unit test for function _determine_synch_ed_estrus_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__synch_ed_program_day_after_abortion():
+def test_heiferII_synch_ed_program_day_after_abortion():
     """Unit test for function _synch_ed_program_day_after_abortion in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__2P_update():
+def test_heiferII_2P_update():
     """Unit test for function _2P_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__CP_update():
+def test_heiferII_CP_update():
     """Unit test for function _CP_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__synch_ed_update():
+def test_heiferII_synch_ed_update():
     """Unit test for function _synch_ed_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__open():
+def test_heiferII_open():
     """Unit test for function _open in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__preg_update():
+def test_heiferII_preg_update():
     """Unit test for function _preg_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
@@ -635,17 +757,17 @@ def test_get_heiferIII_values():
     pass
 
 
-def test_calc_nutrient_rqmts():
+def test_heiferIII_calc_nutrient_rqmts():
     """Unit test for function calc_nutrient_rqmts in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
 
-def test_calc_manure_excretion():
+def test_heiferIII_calc_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
 
-def test_update():
+def test_heiferIII_update():
     """Unit test for function update in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
@@ -780,7 +902,7 @@ def test_get_ration_vals():
     pass
 
 
-def test_optimize():
+def test_cow_ration_NLP_optimize():
     """Unit test for function optimize in file routines/animal/ration/cow_ration_NLP.py"""
     pass
 
@@ -795,7 +917,7 @@ def test_energy_activity_rqmts():
     pass
 
 
-def test_optimize():
+def test_growing_heifer_ration_optimize():
     """Unit test for function optimize in file routines/animal/ration/growing_heifer_ration.py"""
     pass
 

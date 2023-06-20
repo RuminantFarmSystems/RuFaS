@@ -29,7 +29,7 @@ class BodyWeightHistory:
 
 class AnimalBase(object):
     config = {}
-    nutrients = None
+    nutrients = {}
 
     @staticmethod
     def set_nutrient_list(nutrients):
@@ -58,8 +58,8 @@ class AnimalBase(object):
         self.breed = args['breed']
         self.birth_date = args['birth_date']
         self.days_born = args['days_born']
-        self.semen_used = self.config['semen_type']
-
+        #self.semen_used = self.config['semen_type']
+        self.semen_used = self.config.get('semen_type', 'default_semen_type')
         self.culled = False
         self.do_not_breed = False
         self.body_weight_history = []
@@ -72,7 +72,7 @@ class AnimalBase(object):
         self.manure_excretion = {}
         self.ration_formulation = {'objective': 0.00}
         self.DMIest = 0
-        # self.DBW = 0
+        self.DBW = 0
         self.p_animal = 0
         self.p_intake = 0
         self.p_conc_ration = 0
@@ -89,7 +89,6 @@ class AnimalBase(object):
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
         self.tissue_changed = 0
-
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
             self.pen_history = args['pen_history']
