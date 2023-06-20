@@ -31,14 +31,12 @@ class UserDefinedRationManager(object):
             with open('input/userdefinedration/user_defined_ration_input_percentages.json', 'r') as f:
                 ration_all = json.load(f)
             lactating_cow_ration = ration_all['cow_lactating']
-            dry_cow_ration = ration_all['cow_dry']
             heifer_ration = ration_all['growing_heifers']
             calf_ration = ration_all['calf']
             close_up_ration = ration_all['close_up']
             self.calf_ration: Dict[str, Any] = calf_ration
             self.heifer_ration: Dict[str, Any] = heifer_ration
             self.lactating_cow_ration: Dict[str, Any] = lactating_cow_ration
-            self.dry_cow_ration: Dict[str, Any] = dry_cow_ration
             self.ration_all: Dict[str, Any] = ration_all
             self.close_up_ration: Dict[str, Any] = close_up_ration
             self.tolerance = ration_all['tolerance']
@@ -98,7 +96,7 @@ class UserDefinedRationManager(object):
         elif group == 'GROWING':
             ration_percents = udrv.heifer_ration
         elif group == 'CLOSE_UP':
-            ration_percents = udrv.dry_cow_ration
+            ration_percents = udrv.close_up_ration
         else: 
             ration_percents = udrv.calf_ration
         return UserDefinedRationManager.feed_quality_fix(ration_percents, available_feeds)
