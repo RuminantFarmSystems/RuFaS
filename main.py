@@ -36,7 +36,8 @@ def run_rufas(
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
-        Utility.empty_dir(output_dir, keep=[".keep"])
+        keep_list = [".keep", "output_filters"]
+        Utility.empty_dir(output_dir, keep=keep_list)
 
     set_global_variables(make_graphs, verbose)
     if verbose:
