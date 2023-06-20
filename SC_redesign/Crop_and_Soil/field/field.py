@@ -68,8 +68,9 @@ class Field:
         self.fertilizer_events = fertilizer_events or []
         """List of all fertilizer application events that will be applied to this field."""
 
-        self.available_fertilizer_mixes = fertilizer_mixes or {"100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
-                                                               "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}
+        self.available_fertilizer_mixes = fertilizer_mixes or {}
+        self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
+        self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24}
         """List of all fertilizer mixes available for application to this field."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
