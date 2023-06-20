@@ -16,6 +16,7 @@ from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.classes import Time
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -548,7 +549,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                          max_air_temperature=max_temp, mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
-        incorp = Field(field_data, soil)
+        incorp = Field(field_data=field_data, soil=soil)
         incorp.crops = [crop_1, crop_2]
 
         incorp.soil.infiltration.infiltrate = MagicMock()
@@ -799,6 +800,32 @@ def test_annual_reset() -> None:
     field.soil.data.do_annual_reset.assert_called_once()
     field.field_data.perform_annual_field_reset.assert_called_once()
 
+
+@pytest.mark.parametrize("events, day, year, not_today, is_today", [
+    ([TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
+     [TillageEvent(10, 0.5, 0.3, 1998, 7)]),
+    ([], 7, 1998, [], []),
+    ([TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7), TillageEvent(10, 0.5, 0.3, 2023, 7)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7),
+               TillageEvent(10, 0.5, 0.3, 2023, 7)], []),
+    ([TillageEvent(7, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.4, 1998, 7), TillageEvent(5, 0.5, 0.3, 1998, 7)],
+     7, 1998, [], [TillageEvent(7, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.4, 1998, 7),
+                   TillageEvent(5, 0.5, 0.3, 1998, 7)])
+])
+def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int,
+                                not_today: List[TillageEvent], is_today: List[TillageEvent]) -> None:
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+
+    field = Field(tillage_events=events)
+    todays_count = len(is_today)
+    field.tiller.till_soil = MagicMock()
+    field.check_tillage_schedule(mocked_time)
+    assert field.tillage_events == not_today
+
+    assert field.tiller.till_soil.call_count == todays_count
 
 # TODO: All field methods need to be tested in future PRs.
 
