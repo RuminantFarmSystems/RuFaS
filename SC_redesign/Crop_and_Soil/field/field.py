@@ -170,7 +170,7 @@ class Field:
         fertilizer_applied = self._formulate_fertilizer_required(nitrogen_fraction, phosphorus_fraction,
                                                                  potassium_fraction, requested_nitrogen,
                                                                  requested_phosphorus)
-        total_mass_applied = fertilizer_applied.get("mass")
+        total_mass_applied = fertilizer_applied.get("total_mass")
         phosphorus_applied = fertilizer_applied.get("phosphorus_mass")
         nitrogen_applied = fertilizer_applied.get("nitrogen_mass")
         potassium_applied = fertilizer_applied.get("potassium_mass")
@@ -220,7 +220,7 @@ class Field:
         nitrogen_mass = total_mass * nitrogen_fraction
         phosphorus_mass = total_mass * phosphorus_fraction
         potassium_mass = total_mass * potassium_fraction
-        return {"mass": total_mass, "nitrogen_mass": nitrogen_mass, "phosphorus_mass": phosphorus_mass,
+        return {"total_mass": total_mass, "nitrogen_mass": nitrogen_mass, "phosphorus_mass": phosphorus_mass,
                 "potassium_mass": potassium_mass}
 
     def _record_fertilizer_application(self, mix_name: str, total_mass: float, nitrogen_mass: float,

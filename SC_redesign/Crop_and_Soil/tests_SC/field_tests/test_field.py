@@ -494,7 +494,7 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     """Tests that fertilizer applications are being correctly executed and recorded."""
     field_data = FieldData(name="test", field_size=field_size)
     field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}})
-    field._formulate_fertilizer_required = MagicMock(return_value={"mass": 100, "nitrogen_mass": 20,
+    field._formulate_fertilizer_required = MagicMock(return_value={"total_mass": 100, "nitrogen_mass": 20,
                                                                    "phosphorus_mass": 15,
                                                                    "potassium_mass": 10})
     field.fertilizer_applicator.apply_fertilizer = MagicMock()
@@ -511,13 +511,13 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
 
 @pytest.mark.parametrize("nitrogen_frac,phosphorus_frac,potassium_frac,requested_nitrogen,requested_phosphorus,"
                          "expected", [
-                             (0.2, 0.1, 0.3, 100.0, 80.0, {"mass": 800.0, "nitrogen_mass": 160.0,
+                             (0.2, 0.1, 0.3, 100.0, 80.0, {"total_mass": 800.0, "nitrogen_mass": 160.0,
                                                            "phosphorus_mass": 80.0, "potassium_mass": 240.0}),
-                             (0.82, 0.0, 0.0, 200.0, 50.0, {"mass": 243.90243902439025, "nitrogen_mass": 200.0,
+                             (0.82, 0.0, 0.0, 200.0, 50.0, {"total_mass": 243.90243902439025, "nitrogen_mass": 200.0,
                                                             "phosphorus_mass": 0.0, "potassium_mass": 0.0}),
-                             (0.4, 0.2, 0.1, 80.0, 40.0, {"mass": 200.0, "nitrogen_mass": 80.0,
+                             (0.4, 0.2, 0.1, 80.0, 40.0, {"total_mass": 200.0, "nitrogen_mass": 80.0,
                                                           "phosphorus_mass": 40.0, "potassium_mass": 20.0}),
-                             (0.05, 0.1, 0.3, 45.0, 100.0, {"mass": 1000.0, "nitrogen_mass": 50.0,
+                             (0.05, 0.1, 0.3, 45.0, 100.0, {"total_mass": 1000.0, "nitrogen_mass": 50.0,
                                                             "phosphorus_mass": 100.0, "potassium_mass": 300.0})
                          ])
 def test_formulate_fertilizer_required(nitrogen_frac: float, phosphorus_frac: float, potassium_frac: float,
