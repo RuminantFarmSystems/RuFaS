@@ -71,7 +71,8 @@ class Field:
         self.available_fertilizer_mixes = fertilizer_mixes or {}
         self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
         self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24}
-        """List of all fertilizer mixes available for application to this field."""
+        """List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
+            always be available as supplements to unfulfilled manure nutrient demands."""
 
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
