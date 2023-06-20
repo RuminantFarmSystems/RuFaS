@@ -43,9 +43,6 @@ class Event:
         """Overrides the hash method for Event objects."""
         return hash((self.year, self.day))
 
-    def __lt__(self, other):
-        return (self.year, self.day) < (other.year, other.day)
-
     def occurs_today(self, time: Time) -> bool:
         """
         Checks if the event occurs on the current day in the current year..

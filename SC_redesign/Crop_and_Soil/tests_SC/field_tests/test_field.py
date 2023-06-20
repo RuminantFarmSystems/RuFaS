@@ -803,7 +803,7 @@ def test_annual_reset() -> None:
 
 @pytest.mark.parametrize("events, day, year, not_today, is_today", [
     ([TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
-     7, 1997, [TillageEvent(10, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
      [TillageEvent(10, 0.5, 0.3, 1998, 7)]),
     ([], 7, 1998, [], []),
     ([TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7), TillageEvent(10, 0.5, 0.3, 2023, 7)],
@@ -824,6 +824,7 @@ def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int,
     field.tiller.till_soil = MagicMock()
     field.check_tillage_schedule(mocked_time)
     assert field.tillage_events == not_today
+
     assert field.tiller.till_soil.call_count == todays_count
 
 # TODO: All field methods need to be tested in future PRs.
