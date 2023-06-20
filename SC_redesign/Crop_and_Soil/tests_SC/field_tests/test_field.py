@@ -516,6 +516,24 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
 
 
+@pytest.mark.parametrize("field_name,mix_name,available_mixes,expected_message", [
+    ("test_field_1", "halo_alien_mix", {}, "\"'test_field_1': expected to have fertilizer mix for 'halo_alien_mix', "
+                                           "received '{'100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': "
+                                           "{'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\""),
+    ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12}},
+     "\"'test_field_2': expected to have fertilizer mix for '101_0_0', received '{'50_22_12': {'N': 0.5, 'P': 0.22, "
+     "'K': 0.12}, '100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': {'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"")
+])
+def test_execute_fertilizer_application_error(field_name: str, mix_name: str, available_mixes: Dict,
+                                              expected_message: str) -> None:
+    """Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available
+        mixes."""
+    field = Field(field_data=FieldData(name=field_name), fertilizer_mixes=available_mixes)
+    with pytest.raises(KeyError) as e:
+        field._execute_fertilizer_application(mix_name, 10.0, 10.0, 1994, 120)
+    assert str(e.value) == expected_message
+
+
 @pytest.mark.parametrize("nitrogen,phosphorus,mixes,expected", [
     (100, 20, {"100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0}, "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}, "26_4_24"),
     (50, 60, {"30_40_50": {"N": 0.3, "P": 0.4, "K": 0.5}}, "30_40_50"),

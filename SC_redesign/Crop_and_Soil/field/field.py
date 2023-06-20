@@ -156,7 +156,7 @@ class Field:
 
         """
         try:
-            fertilizer_mix = self.available_fertilizer_mixes.get(mix_name)
+            fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:
             raise KeyError(f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
                            f"received '{self.available_fertilizer_mixes}'.")
