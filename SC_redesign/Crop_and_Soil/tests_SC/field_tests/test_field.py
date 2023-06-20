@@ -16,6 +16,7 @@ from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
     HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.classes import Time
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
@@ -529,7 +530,7 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     """Tests that fertilizer applications are being correctly executed and recorded."""
     field_data = FieldData(name="test", field_size=field_size)
     field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}})
-    field._formulate_fertilizer_required = MagicMock(return_value={"mass": 100, "nitrogen_mass": 20,
+    field._formulate_fertilizer_required = MagicMock(return_value={"total_mass": 100, "nitrogen_mass": 20,
                                                                    "phosphorus_mass": 15,
                                                                    "potassium_mass": 10})
     field.fertilizer_applicator.apply_fertilizer = MagicMock()
@@ -559,13 +560,13 @@ def test_determine_optimal_fertilizer_mix(nitrogen: float, phosphorus: float, mi
 
 @pytest.mark.parametrize("nitrogen_frac,phosphorus_frac,potassium_frac,requested_nitrogen,requested_phosphorus,"
                          "expected", [
-                             (0.2, 0.1, 0.3, 100.0, 80.0, {"mass": 800.0, "nitrogen_mass": 160.0,
+                             (0.2, 0.1, 0.3, 100.0, 80.0, {"total_mass": 800.0, "nitrogen_mass": 160.0,
                                                            "phosphorus_mass": 80.0, "potassium_mass": 240.0}),
-                             (0.82, 0.0, 0.0, 200.0, 50.0, {"mass": 243.90243902439025, "nitrogen_mass": 200.0,
+                             (0.82, 0.0, 0.0, 200.0, 50.0, {"total_mass": 243.90243902439025, "nitrogen_mass": 200.0,
                                                             "phosphorus_mass": 0.0, "potassium_mass": 0.0}),
-                             (0.4, 0.2, 0.1, 80.0, 40.0, {"mass": 200.0, "nitrogen_mass": 80.0,
+                             (0.4, 0.2, 0.1, 80.0, 40.0, {"total_mass": 200.0, "nitrogen_mass": 80.0,
                                                           "phosphorus_mass": 40.0, "potassium_mass": 20.0}),
-                             (0.05, 0.1, 0.3, 45.0, 100.0, {"mass": 1000.0, "nitrogen_mass": 50.0,
+                             (0.05, 0.1, 0.3, 45.0, 100.0, {"total_mass": 1000.0, "nitrogen_mass": 50.0,
                                                             "phosphorus_mass": 100.0, "potassium_mass": 300.0})
                          ])
 def test_formulate_fertilizer_required(nitrogen_frac: float, phosphorus_frac: float, potassium_frac: float,
@@ -742,7 +743,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                                          max_air_temperature=max_temp, mean_air_temperature=mean_temp)
         field_data = FieldData(field_size=field_size, current_residue=residue,
                                seasonal_high_water_table=high_water_table)
-        incorp = Field(field_data, soil)
+        incorp = Field(field_data=field_data, soil=soil)
         incorp.crops = [crop_1, crop_2]
 
         incorp.soil.infiltration.infiltrate = MagicMock()
@@ -993,6 +994,32 @@ def test_annual_reset() -> None:
     field.soil.data.do_annual_reset.assert_called_once()
     field.field_data.perform_annual_field_reset.assert_called_once()
 
+
+@pytest.mark.parametrize("events, day, year, not_today, is_today", [
+    ([TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7)],
+     [TillageEvent(10, 0.5, 0.3, 1998, 7)]),
+    ([], 7, 1998, [], []),
+    ([TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7), TillageEvent(10, 0.5, 0.3, 2023, 7)],
+     7, 1998, [TillageEvent(10, 0.5, 0.3, 1997, 7), TillageEvent(10, 0.5, 0.3, 1999, 7),
+               TillageEvent(10, 0.5, 0.3, 2023, 7)], []),
+    ([TillageEvent(7, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.4, 1998, 7), TillageEvent(5, 0.5, 0.3, 1998, 7)],
+     7, 1998, [], [TillageEvent(7, 0.5, 0.3, 1998, 7), TillageEvent(10, 0.5, 0.4, 1998, 7),
+                   TillageEvent(5, 0.5, 0.3, 1998, 7)])
+])
+def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int,
+                                not_today: List[TillageEvent], is_today: List[TillageEvent]) -> None:
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+
+    field = Field(tillage_events=events)
+    todays_count = len(is_today)
+    field.tiller.till_soil = MagicMock()
+    field.check_tillage_schedule(mocked_time)
+    assert field.tillage_events == not_today
+
+    assert field.tiller.till_soil.call_count == todays_count
 
 # TODO: All field methods need to be tested in future PRs.
 
