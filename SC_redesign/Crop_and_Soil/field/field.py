@@ -194,7 +194,7 @@ class Field:
                                           available_mixes: Dict[str, Dict[str, float]]) -> str:
         """
         Takes the requested nutrients of a fertilizer application and determines which fertilizer mix would fill them
-        the most efficiently..
+        the most efficiently.
 
         Parameters
         ----------
@@ -210,10 +210,16 @@ class Field:
         str
             Name of the fertilizer mix which requires the least mass of fertilizer to fill the nutrient requests.
 
+        Notes
+        -----
+        The optimal fertilizer mix is currently the one that requires the least amount of fertilizer to meet the
+        demanded nutrients, but a more realistic definition of "optimal" may mean the mix that costs the least to fill
+        the requested nutrients with.
+
         """
         optimal_mix = None
         least_fertilizer_mix_required = math.inf
-        for mix_name, mix_values in available_mixes:
+        for mix_name, mix_values in available_mixes.items():
             if mix_name == "100_0_0":
                 continue
             fertilizer_application = Field._formulate_fertilizer_required(mix_values["N"], mix_values["P"],
@@ -221,6 +227,7 @@ class Field:
                                                                           requested_phosphorus)
             if fertilizer_application["mass"] < least_fertilizer_mix_required:
                 optimal_mix = mix_name
+                least_fertilizer_mix_required = fertilizer_application["mass"]
         return optimal_mix
 
     @staticmethod

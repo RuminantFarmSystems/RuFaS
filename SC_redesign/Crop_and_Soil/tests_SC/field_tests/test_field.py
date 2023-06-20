@@ -65,7 +65,7 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     ([FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0), FertilizerEvent("mix_1", 25, 5, 1992, 250, 0, 1.0),
       FertilizerEvent("mix_1", 100, 50, 1993, 80, 0, 1.0)], [FertilizerEvent("mix_1", 25, 5, 1992, 250, 0, 1.0),
                                                              FertilizerEvent("mix_1", 100, 50, 1993, 80, 0, 1.0)],
-                                                            [FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0)]),
+     [FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0)]),
     ([FertilizerEvent("mix_1", 50, 10, 1998, 90, 0, 1.0), FertilizerEvent("mix_1", 50, 10, 1999, 90, 0, 1.0),
       FertilizerEvent("mix_1", 50, 10, 2000, 90, 0, 1.0)], [FertilizerEvent("mix_1", 50, 10, 1998, 90, 0, 1.0),
                                                             FertilizerEvent("mix_1", 50, 10, 1999, 90, 0, 1.0),
@@ -509,12 +509,18 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
 
 
-
 @pytest.mark.parametrize("nitrogen,phosphorus,mixes,expected", [
     (100, 20, {"100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0}, "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}, "26_4_24"),
     (50, 60, {"30_40_50": {"N": 0.3, "P": 0.4, "K": 0.5}}, "30_40_50"),
-    (22.5, 33, {})
+    (22.5, 33, {"25_15_28": {"N": 0.25, "P": 0.15, "K": 0.28}, "33_40_3": {"N": 0.33, "P": 0.4, "K": 0.28},
+                "40_22_6": {"N": 0.4, "P": 0.22, "K": 0.06}}, "33_40_3")
 ])
+def test_determine_optimal_fertilizer_mix(nitrogen: float, phosphorus: float, mixes: Dict[str, Dict[str, float]],
+                                          expected: float) -> None:
+    """Tests that the optimal mix for meeting the requested nutrients is found correctly."""
+    actual = Field._determine_optimal_fertilizer_mix(nitrogen, phosphorus, mixes)
+    assert actual == expected
+
 
 @pytest.mark.parametrize("nitrogen_frac,phosphorus_frac,potassium_frac,requested_nitrogen,requested_phosphorus,"
                          "expected", [
@@ -538,9 +544,9 @@ def test_formulate_fertilizer_required(nitrogen_frac: float, phosphorus_frac: fl
 
 @pytest.mark.parametrize("mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,year,day,field_name,"
                          "field_size", [
-                                        ("mix_1", 100, 20, 20, 20, 1992, 90, "field_1", 1.4),
-                                        ("mix_2", 30, 10, 3, 3, 1994, 120, "field_2", 4.3)
-                                        ])
+                             ("mix_1", 100, 20, 20, 20, 1992, 90, "field_1", 1.4),
+                             ("mix_2", 30, 10, 3, 3, 1994, 120, "field_2", 4.3)
+                         ])
 def test_record_fertilizer_application(mix_name: str, total_mass: float, nitrogen_mass: float, phosphorus_mass: float,
                                        potassium_mass: float, year: int, day: int, field_name: str,
                                        field_size: float) -> None:
