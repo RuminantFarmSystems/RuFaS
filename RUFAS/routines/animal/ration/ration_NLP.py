@@ -537,10 +537,17 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
-    for key in ration_percents.keys():
-        target = ration_percents[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
+    DMIest_lower = DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    DMIest_upper = DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    ration_key_list = sorted([int(key) for key in ration_percents.keys()])
+    for key in ration_key_list:
+        # target = ration_percents[str(key)]/100*(DMIest_upper+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
         # target = ration_percents[key]
-        targetbounds = ((target-target*udr_tolerance)/3,(target+target*udr_tolerance)/3)
+        targetlower = ration_percents[str(key)]/100*(DMIest_lower+0.0001)
+        targetupper = ration_percents[str(key)]/100*(DMIest_upper+0.0001)
+        targetbounds = (targetupper, targetlower)
+        targetbounds = ((targetlower-targetlower*udr_tolerance)/3,
+                        (targetupper+targetupper*udr_tolerance)/3)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
@@ -610,7 +617,7 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
         # Uncomment to use
         if usermod.success:
-            # print(animal_type)
+            print(str(animal_combination))
             print('No constraints violated')
         return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
