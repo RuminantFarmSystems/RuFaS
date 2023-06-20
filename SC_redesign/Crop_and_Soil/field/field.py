@@ -197,11 +197,11 @@ class Field:
         Parameters
         ----------
         nitrogen_fraction : float
-            Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0]
+            Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0] (unitless)
         phosphorus_fraction : float
-            Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0]
+            Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0] (unitless)
         potassium_fraction : float
-            Fraction of fertilizer mix that is potassium, in range [0.0, 1.0]
+            Fraction of fertilizer mix that is potassium, in range [0.0, 1.0] (unitless)
         requested_nitrogen : float
             Minimum mass of nitrogen to be included in fertilizer application (kg)
         requested_phosphorus : float
