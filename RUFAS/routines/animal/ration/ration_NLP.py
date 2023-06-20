@@ -595,16 +595,15 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         x0.append(random.random() * 10)
     # OPTIMIZE:
     # establishing the bounds of the NLP
-    bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
         bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
     else:    
+        bnds = []
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
         bnds = tuple(bnds)
     if udrv.udr_or_not:
-        # accumulator = []
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
         else:

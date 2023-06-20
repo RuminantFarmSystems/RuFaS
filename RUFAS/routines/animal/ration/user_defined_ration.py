@@ -28,21 +28,16 @@ class UserDefinedRationManager(object):
     def __init__(self) -> None:
         if UserDefinedRationManager.__instance is None:
             UserDefinedRationManager.__instance = self
-            with open('input/userdefinedration/user_defined_ration_input_percentages.json', 'r') as f:
-                ration_all = json.load(f)
-            lactating_cow_ration = ration_all['cow_lactating']
-            heifer_ration = ration_all['growing_heifers']
-            calf_ration = ration_all['calf']
-            close_up_ration = ration_all['close_up']
-            self.calf_ration: Dict[str, Any] = calf_ration
-            self.heifer_ration: Dict[str, Any] = heifer_ration
-            self.lactating_cow_ration: Dict[str, Any] = lactating_cow_ration
-            self.ration_all: Dict[str, Any] = ration_all
-            self.close_up_ration: Dict[str, Any] = close_up_ration
-            self.tolerance = ration_all['tolerance']
-            self.milk_reduction_percent = ration_all['milk_reduction_percent']
+            
             self.udr_or_not = None
-    
+
+            self.lactating_cow_ration = []
+            self.heifer_ration = []
+            self.calf_ration = []
+            self.close_up_ration = []
+
+            self.tolerance = []
+            self.milk_reduction_percent = []
 
     def feed_quality_fix(ration_percents: Dict, available_feeds: Dict) -> Dict:
         """
