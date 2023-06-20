@@ -22,7 +22,8 @@
 			"repro_cull_time": 300,
 			"do_not_breed_time" : 300,
 			"cull_milk_production": 22,
-			"cow_times_milked_per_day": 1
+			"cow_times_milked_per_day": 1,
+			"energy_and_nutrient_calculation_method": "NASEM"
 		},
 		"farm_level": {
 			"calf": {
@@ -54,17 +55,14 @@
 					"cosynch5d_conception_rate": 0.4,
 					"cow_user_defined_tai_cr": 0.0,
 					"cow_resynch_protocol": "TAIafterPD",
-					"user_define_tai_length": 0
+					"user_define_tai_length": 0,
+					"tai_program_start_day": 72
 				},
 				"voluntary_waiting_period": 45,
-				"tai_program_start_day": 72,
 				"conception_rate_decrease": 0.026,
-				"avg_gestation_len": 278,
-				"std_gestation_len": 6,
 				"prefresh_day": 30,
-				"num_21_days_repro": 15,
 				"calving_interval": 400,
-				"use_input_calving_interval": false			
+				"use_input_calving_interval": false
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
@@ -80,6 +78,8 @@
 			"repro": {
 				"avg_estrus_cycle_heifer": 21,
 				"std_estrus_cycle_heifer": 3,
+				"avg_gestation_len": 278,
+				"std_gestation_len": 6,
 				"preg_check_day_1": 32,
 				"preg_loss_rate_1": 0.02,
 				"preg_check_day_2": 91,
@@ -90,8 +90,8 @@
 				"std_estrus_cycle_return": 11,
 				"avg_estrus_cycle_cow": 21,
 				"std_estrus_cycle_cow": 2.5,
-				"avg_estrus_cycle_p": 10,
-				"std_estrus_cycle_p": 2
+				"avg_estrus_cycle_after_pgf": 10,
+				"std_estrus_cycle_after_pgf": 2
 			},
 			"milking": {
 				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
@@ -110,7 +110,8 @@
 				"injury_cull_prob": [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90, 0.95, 1],
 				"disease_cull_prob": [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89, 0.95, 1],
 				"udder_cull_prob": [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89, 0.95, 1],
-				"unkown_cull_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
+				"unknown_cull_prob": [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45,
+					0.54, 0.62, 0.70, 0.77, 0.84, 0.92, 1],
 				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
 			},
 			"life_cycle": {
@@ -165,7 +166,7 @@
 			"animal_combination": "LAC_COW",
 			"vertical_dist_to_milking_parlor": 0.1,
 			"horizontal_dist_to_milking_parlor": 1.6,
-			"number_of_stalls": 850,
+			"number_of_stalls": 1000,
 			"housing_type": "open air barn",
 			"pen_type": "tiestall",
 			"max_stocking_density": 1.2,

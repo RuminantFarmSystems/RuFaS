@@ -97,19 +97,19 @@ class PenReport(BaseReportDriver):
             self.daily_variables = {'year': ['time.calendar_year', '', []],
                                     'j_day': ['time.day', '', []],
                                     'num_animals': ['len(pen.animals_in_pen)', '', []],
-                                    'manure': ['pen.manure[\'Mkg\']', 'kg', []],
-                                    'urea_conc': ['pen.manure[\'U\']', 'mol/L', []],
-                                    'ammoniacal_N_conc': ['pen.manure[\'TAN_s\']', 'mol/L', []],
-                                    'manure_N': ['pen.manure[\'MN\']', 'g', []],
-                                    'total_solids': ['pen.manure[\'TSd\']', 'kg', []],
-                                    'manure_VSd': ['pen.manure[\'VSd\']', 'g', []],
-                                    'manure_VSnond': ['pen.manure[\'VSnd\']', 'g', []],
-                                    'WIP_frac': ['pen.manure[\'WIP_frac\']', 'g/g total man', []],
-                                    'WOP_frac': ['pen.manure[\'WOP_frac\']', 'g/g total man', []],
-                                    'manure_P': ['pen.manure[\'p_excrt_manure\']', 'g', []],
-                                    'P_frac': ['pen.manure[\'p_frac\']', 'g/g total man', []],
-                                    'K_manure': ['pen.manure[\'K_manure\']', 'g', []],
-                                    'enteric_methane': ['pen.manure[\'CH4_manure\']', 'g', []]
+                                    'manure': ['pen.manure[\'manure_mass\']', 'kg', []],
+                                    'urea_conc': ['pen.manure[\'urea\']', 'g/L', []],
+                                    'ammoniacal_N_conc': ['pen.manure[\'total_ammoniacal_nitrogen_concentration\']', 'g/L', []],
+                                    'manure_N': ['pen.manure[\'manure_nitrogen\']', 'kg', []],
+                                    'total_solids': ['pen.manure[\'total_solids\']', 'kg', []],
+                                    'manure_VSd': ['pen.manure[\'degradable_volatile_solids\']', 'kg', []],
+                                    'manure_VSnd': ['pen.manure[\'non_degradable_volatile_solids\']', 'kg', []],
+                                    'WIP_frac': ['pen.manure[\'inorganic_phosphorus_fraction\']', 'g/g total man', []],
+                                    'WOP_frac': ['pen.manure[\'organic_phosphorus_fraction\']', 'g/g total man', []],
+                                    'manure_P': ['pen.manure[\'phosphorus\']', 'g', []],
+                                    'P_frac': ['pen.manure[\'phosphorus_fraction\']', 'g/g total man', []],
+                                    'K_manure': ['pen.manure[\'potassium\']', 'g', []],
+                                    'enteric_methane': ['pen.manure[\'methane\']', 'g', []]
                                     }
 
             self.annual_variables = {'year': ['time.calendar_year', '', 0]}
@@ -135,7 +135,7 @@ class PenReport(BaseReportDriver):
 
                 self.daily_variables[str(feed_id) + "(" + feed_name + ")"] = \
                     [
-                        'pen.ration[\'%s\'] if pen.pen_populated and \'%s\' in pen.ration.keys() else 0' % (
+                        'pen.ration[\'%s\'] if pen.populated and \'%s\' in pen.ration.keys() else 0' % (
                             feed_id, feed_id), units,
                         []]
 

@@ -9,15 +9,20 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
 import copy
-from RUFAS.routines.animal.ration import animal_requirements as req
-from RUFAS import util, errors
 from enum import Enum
-from typing import DefaultDict, Any
+from typing import List, Dict, Union, DefaultDict, Any
 
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.routines.animal.ration import animal_requirements as req
+from RUFAS.routines.animal.ration import ration_driver as ration_driver
+from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
 om = OutputManager()
 
@@ -86,7 +91,7 @@ class Pen:
     classes_in_pen : set
         The set (no repeats) of all the classes to which the animals in the pen belong.
 
-    pen_populated : bool
+    populated : bool
         True iff there is at least 1 animal in the pen, and false otherwise.
 
     avg_DBW : float
@@ -161,33 +166,47 @@ class Pen:
         """
         Enumeration that represents the valid combinations of animals in a pen.
         """
-        NONE = 0
-        CALF = 1
-        GROWING = 2
-        CLOSE_UP = 3
-        GROWING_AND_CLOSE_UP = 4
-        LAC_COW = 5
+        CALF = 0  # calves
+        GROWING = 1  # heiferIs, heiferIIs
+        CLOSE_UP = 2  # heiferIIIs, dry cows
+        LAC_COW = 3  # lactating cows
 
-    def __init__(self, pen_id, vertical_dist_to_milking_parlor, horizontal_dist_to_milking_parlor, number_of_stalls,
-                 housing_type,
-                 bedding_type, pen_type, manure_handling, manure_separator,
-                 manure_storage, animal_combination, max_stocking_density):
+        GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
+        NONE = 5  # TODO: Remove this option after fixing _init_default_pens() in AnimalManagement
+
+    def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
+                 number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
+                 manure_separator: str, manure_storage: str, animal_combination: AnimalCombination,
+                 max_stocking_density: float) -> None:
         """
         Initializes a pen with the given arguments.
 
-        Args:
-            pen_id: the unique id number of the pen
-            vertical_dist_to_milking_parlor: vertical distance to milking parlor, km
-            horizontal_dist_to_milking_parlor: horizontal distance to milking parlor, km
-            number_of_stalls: number of stalls in the pen
-            housing_type: housing type of the pen
-            bedding_type: bedding type of the pen
-            pen_type: freestall or tiestall
-            manure_handling: the manure handling method used to clean the pen
-            manure_separator: the manure separator that processes manure excreted in this pen
-            manure_storage: the manure storage receptacle that stores manure excreted in this pen
-            animal_combination: the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
-            max_stocking_density: maximum stocking density allowed for pen
+        Parameters
+        ----------
+            pen_id: int
+                the unique id number of the pen
+            vertical_dist_to_milking_parlor: float
+                vertical distance to milking parlor, km
+            horizontal_dist_to_milking_parlor: float
+                horizontal distance to milking parlor, km
+            number_of_stalls: int
+                number of stalls in the pen
+            housing_type: str
+                housing type of the pen
+            bedding_type: str
+                bedding type of the pen
+            pen_type: str
+                freestall or tiestall
+            manure_handling: str
+                the manure handling method used to clean the pen
+            manure_separator: str
+                the manure separator that processes manure excreted in this pen
+            manure_storage: str
+                the manure storage receptacle that stores manure excreted in this pen
+            animal_combination: AnimalCombination
+                the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
+            max_stocking_density: float
+                maximum stocking density allowed for pen
         """
         self.id = pen_id
 
@@ -208,7 +227,7 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = []
-        self.pen_populated = False
+        self.populated = False
 
         self.classes_in_pen = set()
         self.stocking_density = 0.0
@@ -234,21 +253,23 @@ class Pen:
         self.MEdiet = 0.0
 
         # template for manure, calf_total, etc.
-        self._manure_dict_template = {"U": 0,
-                                      "Urine": 0,
-                                      "TAN_s": 0,
-                                      "MN": 0,
-                                      "Mkg": 0,
-                                      "TSd": 0,
-                                      "VSd": 0,
-                                      "VSnd": 0,
-                                      "WIP_frac": 0,
-                                      "WOP_frac": 0,
-                                      "p_excrt_manure": 0,
-                                      "p_frac": 0,
-                                      "K_manure": 0,
-                                      "CH4_manure": 0
-                                      }
+        self._manure_dict_template = AnimalManureExcretions(
+            urea=0.0,
+            urine=0.0,
+            total_ammoniacal_nitrogen_concentration=0.0,
+            urine_nitrogen=0.0,
+            manure_nitrogen=0.0,
+            manure_mass=0.0,
+            total_solids=0.0,
+            degradable_volatile_solids=0.0,
+            non_degradable_volatile_solids=0.0,
+            inorganic_phosphorus_fraction=0.0,
+            organic_phosphorus_fraction=0.0,
+            phosphorus=0.0,
+            phosphorus_fraction=0.0,
+            potassium=0.0,
+            methane=0.0
+        )
 
         # manure attributes are initialized in the reset_manure method
         self.manure = None
@@ -265,60 +286,94 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
-    def get_id(self):
+    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
-        Returns:
-            int : the id, the unique id number of the pen.
-        """
-        return self.id
+        Sets the pen's average nutrient requirements
 
-    def get_pen_type(self):
+        Parameters
+        ----------
+        avg_nutrient_rqmts: Dict[str, float]
+            The new average nutrient requirements
         """
-        Returns:
-            string : the pen type: freestall or tiestall.
-        """
-        return self._pen_type
-
-    def set_id(self, pen_id):
-        """
-        Sets the pen's id to id.
-
-        Args:
-            pen_id: The pen's unique pen ID, obtained from the input file.
-        """
-        self.id = pen_id
-
-    def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts):
         self.avg_nutrient_rqmts = {key: value for (key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(self, avg_milk, avg_CP_milk):
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
+        """
+        Sets the pen's average milk and average CP milk
+
+        Parameters
+        ----------
+        avg_milk: float
+            The new average nutrient requirements
+        avg_CP_milk: float
+            The new average CP milk
+        """
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
 
-    def update_animals(self, new_animals, animal_combination):
+    def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """
-        Sets the list of animals to @new_animals and calculates the stocking
-        density and each animal's walking distance.
+        Adds all animals in new_animals to the pen.
 
-        Args:
-            new_animals: list of new animals in the pen
-            animal_combination: an AnimalCombination Enum representating the type of the new animals
+        Parameters
+        ----------
+            new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
+                list of new animals to be added to the pen
         """
+        self.animals_in_pen.extend(new_animals)
 
-        for animal in new_animals:
-            self.animals_in_pen.append(animal)
-        self.pen_populated = not (len(self.animals_in_pen) == 0)
-        self.stocking_density = len(
-            self.animals_in_pen) / self.num_stalls * 100
-        self.calc_daily_walking_dist()
+    def update_pen_populated(self) -> None:
+        """
+        Updates whether the pen is populated
+        """
+        self.populated = len(self.animals_in_pen) != 0
 
-        # sets the current animal classes in the pen
+    def update_stocking_density(self) -> None:
+        """
+        Updates the stocking density of the pen
+        """
+        self.stocking_density = len(self.animals_in_pen) / self.num_stalls
+
+    def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
+        """
+        Sets the pen's animal combination to animal_combination
+
+        Parameters
+        ----------
+            animal_combination: AnimalCombination
+                the new AnimalCombination
+        """
+        self.animal_combination = animal_combination
+
+    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum
+    def update_classes_in_pen(self) -> None:
+        """
+        Updates the classes contained within the pen
+        """
         self.classes_in_pen = set()
         for animal in self.animals_in_pen:
-            stage = type(animal).__name__
-            self.classes_in_pen.add(stage)
-        # updates the animal class this pen holds
-        self.animal_combination = animal_combination
+            life_cycle_stage = type(animal).__name__
+            self.classes_in_pen.add(life_cycle_stage)
+
+    def update_animals(self, new_animals: List[Any],
+                       animal_combination: AnimalCombination) -> None:
+        """
+        Calls functions that will add new animals to the pen and update associated attributes.
+
+        Parameters
+        ----------
+            new_animals: List[Calf | Cow | HeiferI | HeiferII | HeiferIII]
+                list of new animals to be added to the pen
+            animal_combination: AnimalCombination
+                an AnimalCombination Enum representing the type of the new animals
+        """
+
+        self.add_new_animals(new_animals)
+        self.update_pen_populated()
+        self.update_stocking_density()
+        self.calc_daily_walking_dist()
+        self.update_animal_combination(animal_combination)
+        self.update_classes_in_pen()
 
     def calc_ration(self, feed, available_feeds: DefaultDict[Any, Any]):
         """
@@ -336,21 +391,26 @@ class Pen:
             # TODO: Instead of checking if animal is in a class, check pen tag
             # an error may be caused as result of heifers and dry cows in same pen
             # if we only simulate with 3 pens
+
+            # AnimalCombination.CALF
             if 'Calf' in self.classes_in_pen:
                 ration_per_animal = calf_optimize()
                 ration_vals = {'ME_tot': 0}
 
+            # AnimalCombination.GROWING
             elif 'HeiferI' in self.classes_in_pen or \
                     'HeiferII' in self.classes_in_pen or \
                     'HeiferIII' in self.classes_in_pen:
                 ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, 'heifer', False)
 
+            # AnimalCombination.LAC_COW
             elif 'Cow' in self.classes_in_pen and \
                     self.animals_in_pen[0].milking:  # lactating cow
                 ration_per_animal, ration_vals = \
                     ration_driver.ration_formulation(self, available_feeds, 'cow', True)
 
+            # AnimalCombination.CLOSE_UP
             elif 'Cow' in self.classes_in_pen and \
                     not self.animals_in_pen[0].milking:  # dry cow
                 ration_per_animal, ration_vals = \
@@ -371,6 +431,14 @@ class Pen:
         self.MEdiet = ration_vals['ME_tot']
         self.dry_matter_intake = nutrient_amount['dm']
 
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.calc_ration.__name__,
+                    "available_feeds": available_feeds['feed_id'], }
+        om.add_variable("ration_nutrient_amount", nutrient_amount, info_map)
+        om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
+        om.add_variable("MEdiet", self.MEdiet, info_map)
+        om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
+
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],
@@ -385,12 +453,6 @@ class Pen:
 
             else:  # feeds and price
                 ration[key] = ration_per_animal[key] * num_animals
-                
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_ration.__name__, 
-                    "feed": vars(feed),
-                    "available_feeds": available_feeds, }
-        om.add_variable("pen_ration_data", ration, info_map)
 
         return ration
 
@@ -408,7 +470,7 @@ class Pen:
             if type(animal).__name__ == 'Cow':
                 animal.calc_manure_excretion(feed, methane_model, self.MEdiet)
             else:
-                animal.calc_manure_excretion(feed)
+                animal.calc_manure_excretion(feed, methane_model)
 
         manure = {}
         calf_total = {}
@@ -427,21 +489,22 @@ class Pen:
 
         # find sums of manure components for each animal in the pen for
         # total manure in pen and total manure by animal type
+        # TODO: Write an accumulator function
         for animal in self.animals_in_pen:
             curr_manure = animal.manure_excretion
-            if type(animal).__name__ == 'Calf':
+            if type(animal) == Calf:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     calf_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Heifer':
+            elif type(animal) in [HeiferI, HeiferII, HeiferIII]:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     heifer_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and not animal.milking:
+            elif type(animal) == Cow and not animal.milking:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     dry_total[key] += curr_manure[key]
-            elif type(animal).__name__ == 'Cow' and animal.milking:
+            elif type(animal) == Cow and animal.milking:
                 for key in manure.keys():
                     manure[key] += curr_manure[key]
                     lactating_total[key] += curr_manure[key]
@@ -451,9 +514,13 @@ class Pen:
         self.heifer_total = heifer_total
         self.dry_total = dry_total
         self.lactating_total = lactating_total
+
         info_map = {"class": self.__class__.__name__,
-                    "function": self.calc_manure.__name__, 
-                    "feed": vars(feed)}
+                    "function": self.calc_manure.__name__,
+                    "pen_id": self.id,
+                    "pen_animal_combination": self.animal_combination._name_,
+                    }
+
         om.add_variable("pen_manure_data", self.manure, info_map)
 
     def _copy_manure_template(self):
@@ -471,7 +538,7 @@ class Pen:
         Calculates the average growth of the animals in the pen.
         """
 
-        if not self.pen_populated:
+        if not self.populated:
             return
 
         total_growth = 0
@@ -536,17 +603,19 @@ class Pen:
             # TODO is there a better way?
             num_animals_before_additions = 1
 
+        # TODO: Question - is this necessary or can we assume that any newly
+        #   added animals will match the existing animal combination?
         class_name = type(animal).__name__
         self.classes_in_pen.add(class_name)
 
         if class_name == 'Cow':
-            requirements = req.calc_rqmts(animal.body_weight, animal.mature_body_weight,
-                                          animal.days_in_preg, 'cow', animal.calves,
-                                          animal.CI, animal.mPrt, animal.fat_percent,
-                                          animal.lactose_milk,
-                                          animal.estimated_daily_milk_produced,
-                                          animal.days_in_milk,
-                                          animal.milking)
+            requirements = req.calc_rqmts(body_weight=animal.body_weight, mature_body_weight=animal.mature_body_weight,
+                                          day_of_pregnancy=animal.days_in_preg, animal_type='cow',
+                                          parity=animal.calves, calving_interval=animal.CI,
+                                          milk_true_protein=animal.mPrt, milk_fat=animal.fat_percent,
+                                          milk_lactose=animal.lactose_milk,
+                                          milk_production=animal.estimated_daily_milk_produced,
+                                          days_in_milk=animal.days_in_milk, lactating=animal.milking)
             animal.NEmaint = requirements['NEmaint']
             animal.NEg = requirements['NEg']
             animal.NEpreg = requirements['NEpreg']
@@ -605,8 +674,27 @@ class Pen:
         animal.p_intake = self.avg_p_intake
 
         self.animals_in_pen.append(animal)
-        # updating stocking density
-        self.stocking_density = len(self.animals_in_pen) / self.num_stalls * 100
+
+    def remove_animals_by_ids(self, animal_ids: List[int]) -> None:
+        """
+        Removes animals from the pen by their ids.
+
+        Notes
+        -----
+        Because this method takes O(n) time, it is recommended that the caller of this method
+        should prepare a list of animal ids to be removed from the pen first, and then call this
+        method with that list once.
+
+        Parameters
+        ----------
+        animal_ids : List[int]
+            List of animals that match the given ids to be removed from the pen.
+
+        """
+        if not animal_ids:
+            return
+        animal_ids = set(animal_ids)
+        self.animals_in_pen = [animal for animal in self.animals_in_pen if animal.id not in animal_ids]
 
     def clear(self):
         """
@@ -616,7 +704,7 @@ class Pen:
         # and animals are to be added to it, there are previous initial values
         # that are non-zero.
         self.animals_in_pen = []
-        self.pen_populated = False
+        self.populated = False
         self.avg_p_animal = 0
 
     def subset_class_feeds(self, feed):
