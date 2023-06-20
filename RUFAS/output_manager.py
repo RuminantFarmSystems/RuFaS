@@ -315,7 +315,7 @@ class OutputManager(object):
         info_map = {"class": self.__class__.__name__,
                     "function": self._exclude_info_maps.__name__,
                     }
-        self.add_log("exclude info maps", "info maps were excluded", info_map)
+        self.add_log("exclude_info_maps", "info maps were excluded", info_map)
 
         pool_copy = pool.copy()
         for key, value in pool_copy.items():
@@ -362,10 +362,10 @@ class OutputManager(object):
                             }
                 list_of_elements = text_file.read().splitlines()
                 if not list_of_elements:
-                    self.add_log('filter pattern file load', f"{path} was empty", info_map)
+                    load_message = f"{path} was empty"
                 else:
-                    self.add_log('filter pattern file load', f"{path} had {len(list_of_elements)} filter"
-                                          " patterns", info_map)
+                    load_message = f"{path} had {len(list_of_elements)} filter"
+                self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements
         except Exception as e:
             raise e
@@ -403,17 +403,20 @@ class OutputManager(object):
         exclude_keyword = "exclude"
         filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
         if filter_by_exclusion:
-            self.add_log("filtering log", f"{input_file} contains exclude-keyword '{exclude_keyword}'"
-                                  f" at position {exclude_keyword_location}", info_map)
+            filter_log_message = f"{input_file} contains exclude-keyword '{exclude_keyword}' at position"
+            f" {exclude_keyword_location}"
+            self.add_log("filtering log", filter_log_message, info_map)
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
-            self.add_log("filtering log", f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"
-                                  f" at position {exclude_keyword_location}", info_map)
+            filter_log_message = f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"
+            f" at position {exclude_keyword_location}"
+            self.add_log("filtering log", filter_log_message, info_map)
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
-        self.add_log("num of filter pattern matches", f"There were {len(filter_pattern_matches)} matches"
-                              f" for {input_file} filter patterns", info_map)
+        filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns"
+        self.add_log("num of filter pattern matches", filter_log_count_msg, info_map)
+        print(f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns")
         return filter_pattern_matches
 
     def save_variables(self, save_path: str, dir_path: str,
