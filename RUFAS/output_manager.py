@@ -416,7 +416,6 @@ class OutputManager(object):
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns"
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
-        print(f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns")
         return filter_pattern_matches
 
     def save_variables(self, save_path: str, dir_path: str,
