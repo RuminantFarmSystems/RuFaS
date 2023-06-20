@@ -565,6 +565,32 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
     assert actual["values"].__contains__(expected_value)
 
 
+@pytest.mark.parametrize("field_name,field_size,dry_mass,dry_fraction,coverage,nitrogen,phosphorus,potassium,"
+                         "year,day,expected_info,expected_values", [
+                             ("test_1", 1.3, 100, 0.1, 0.8, 10, 15, 12.5, 1991, 75,
+                              {"prefix": "field_name:'test_1'", "date": {"year": 1991, "day": 75}, "field_size": 1.3},
+                              {"dry_matter_mass": 100, "dry_matter_fraction": 0.1, "field_coverage": 0.8,
+                               "nitrogen": 10, "phosphorus": 15,
+                               "potassium": 12.5}),
+                             ("test_2", 2.4, 144.6, 0.3, 0.92, 40, 43.1, 14.55, 1994, 200,
+                              {"prefix": "field_name:'test_2'", "date": {"year": 1994, "day": 200}, "field_size": 2.4},
+                              {"dry_matter_mass": 144.6, "dry_matter_fraction": 0.3, "field_coverage": 0.92,
+                               "nitrogen": 40, "phosphorus": 43.1,
+                               "potassium": 14.55})
+                         ])
+def test_record_manure_application(field_name: str, field_size: float, dry_mass: float, dry_fraction: float,
+                                   coverage: float, nitrogen: float, phosphorus: float, potassium: float, year: int,
+                                   day: int, expected_info: Dict, expected_values: Dict) -> None:
+    """Tests that manure applications are recorded correctly."""
+    field = Field(field_data=FieldData(name=field_name, field_size=field_size))
+
+    field._record_manure_application(dry_mass, dry_fraction, coverage, nitrogen, phosphorus, potassium, year, day)
+
+    actual = om.variables_pool[f"field_name:'{field_name}'.manure_application"]
+    assert actual["info_maps"].__contains__(expected_info)
+    assert actual["values"].__contains__(expected_values)
+
+
 @pytest.mark.parametrize("field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp,"
                          "transpiration", [
                              (1.5, False, 34.5, 128, 22.5, 18.9, 25.6, 19.22, 5.2),
