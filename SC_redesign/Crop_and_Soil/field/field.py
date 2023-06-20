@@ -1,4 +1,5 @@
 import math
+import pdb
 
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
@@ -321,11 +322,11 @@ class Field:
 
         self.manure_applicator.apply_machine_manure(0.0, 0.0, 0.0, field_coverage, 1.0, 0.0, 0.0, 0.0)
 
-        unmet_nitrogen_demand = min(0.0, requested_nitrogen - manure_filled_by_request["nitrogen"])
-        unmet_phosphorus_demand = min(0.0, requested_phosphorus - manure_filled_by_request["phosphorus"])
-        if not unmet_nitrogen_demand and not unmet_phosphorus_demand:
+        unmet_nitrogen_demand = max(0.0, requested_nitrogen - manure_filled_by_request["nitrogen"])
+        unmet_phosphorus_demand = max(0.0, requested_phosphorus - manure_filled_by_request["phosphorus"])
+        if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
-        elif unmet_phosphorus_demand and not unmet_nitrogen_demand:
+        elif not unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             optimal_mix = "100_0_0"
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
