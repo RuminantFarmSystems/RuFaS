@@ -98,11 +98,11 @@ class Field:
         Details: **All the logic (after setup) will go in this function**
         """
         # --- Soil Management---
-        self.check_fertilizer_application_schedule(time)
+        self._check_fertilizer_application_schedule(time)
 
-        self.check_manure_application_schedule(time)
+        self._check_manure_application_schedule(time)
 
-        self.check_tillage_schedule(time)
+        self._check_tillage_schedule(time)
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -110,19 +110,14 @@ class Field:
         # ... Other ...
 
         # --- Crop Management ---
-        self.assess_dormancy(current_weather.daylength)
+        self._assess_dormancy(current_weather.daylength)
 
-        self.check_crop_planting_schedule(time)
+        self._check_crop_planting_schedule(time)
 
-        self.check_crop_harvest_schedule(time)
+        self._check_crop_harvest_schedule(time)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
-
-    @property
-    def _composition_sums_to_one(self) -> bool:
-        """ensure that the crop_proportions values sum to 1"""
-        return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
     # <editor-fold desc="--- Soil Management Methods ---">
     def _execute_fertilizer_application(self, mix_name: str, requested_nitrogen: float, requested_phosphorus: float,
@@ -361,7 +356,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def check_crop_planting_schedule(self, time: Time) -> None:
+    def _check_crop_planting_schedule(self, time: Time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -376,7 +371,7 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def check_fertilizer_application_schedule(self, time: Time) -> None:
+    def _check_fertilizer_application_schedule(self, time: Time) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
@@ -391,7 +386,7 @@ class Field:
             self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
                                                  event.day)
 
-    def check_tillage_schedule(self, time: Time) -> None:
+    def _check_tillage_schedule(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -406,7 +401,7 @@ class Field:
             self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
                                   time.calendar_year, time.day)
 
-    def check_manure_application_schedule(self, time: Time) -> None:
+    def _check_manure_application_schedule(self, time: Time) -> None:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -421,7 +416,7 @@ class Field:
             self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
                                              event.year, event.day)
 
-    def check_crop_harvest_schedule(self, time: Time) -> None:
+    def _check_crop_harvest_schedule(self, time: Time) -> None:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -529,7 +524,7 @@ class Field:
         """
         supported_species = set(item.value for item in CropSpecies)
         if crop_reference in supported_species:
-            crop = self.make_supported_crop(crop_reference)
+            crop = self._make_supported_crop(crop_reference)
         else:
             try:
                 crop_specifications = copy(self.custom_crop_specifications[crop_reference])
@@ -537,7 +532,7 @@ class Field:
                 raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}', "
                                f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
                                f"types.")
-            crop = self.make_crop_from_config_dict(crop_specifications)
+            crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
 
@@ -627,7 +622,7 @@ class Field:
             crop.data.field_proportion = field_coverage_fraction
 
     @staticmethod
-    def make_crop_from_config_dict(config: Dict) -> Crop:
+    def _make_crop_from_config_dict(config: Dict) -> Crop:
         """Initializes a new crop from a configuration dictionary
 
         Args:
@@ -644,14 +639,14 @@ class Field:
             species = config.pop("species")
 
             if species in accepted_species:
-                return Field.make_supported_crop(species=species, **config)
+                return Field._make_supported_crop(species=species, **config)
             else:
                 config["species"] = "custom " + str(species)
 
-        return Field.make_custom_crop(**config)
+        return Field._make_custom_crop(**config)
 
     @staticmethod
-    def make_supported_crop(species: str, **specs) -> Crop:
+    def _make_supported_crop(species: str, **specs) -> Crop:
         """creates a crop instance with attributes determined by the species of the crop.
 
         Args:
@@ -670,7 +665,7 @@ class Field:
         return Crop(crop_data)
 
     @staticmethod
-    def make_custom_crop(**specs) -> Crop:
+    def _make_custom_crop(**specs) -> Crop:
         """creates a crop instance with customized attributes.
 
         Args:
@@ -682,7 +677,7 @@ class Field:
         crop_data = CropData(**specs)
         return Crop(crop_data)
 
-    def assess_dormancy(self, daylength: float) -> None:
+    def _assess_dormancy(self, daylength: float) -> None:
         """Transitions all crops to dormancy, that are capable of going dormant
 
         Args:
