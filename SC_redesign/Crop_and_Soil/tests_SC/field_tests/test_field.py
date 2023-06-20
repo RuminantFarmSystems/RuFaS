@@ -22,6 +22,35 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
 
+def test_manage_field() -> None:
+    """Tests that all subroutines are correctly called by the main routine in field."""
+    field = Field()
+    field._check_fertilizer_application_schedule = MagicMock()
+    field._check_manure_application_schedule = MagicMock()
+    field._check_tillage_schedule = MagicMock()
+    field._execute_daily_processes = MagicMock()
+    field._assess_dormancy = MagicMock()
+    field._check_crop_planting_schedule = MagicMock()
+    field._check_crop_harvest_schedule = MagicMock()
+    field._remove_dead_crops = MagicMock()
+    field._reset_crop_field_coverage_fractions = MagicMock()
+    mocked_time = MagicMock(Time)
+    mocked_weather = MagicMock(CurrentWeather)
+    setattr(mocked_weather, "daylength", 12)
+
+    field.manage_field(mocked_time, mocked_weather)
+
+    field._check_fertilizer_application_schedule.assert_called_once_with(mocked_time)
+    field._check_manure_application_schedule.assert_called_once_with(mocked_time)
+    field._check_tillage_schedule.assert_called_once_with(mocked_time)
+    field._execute_daily_processes.assert_called_once_with(mocked_weather)
+    field._assess_dormancy.assert_called_once_with(12)
+    field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
+    field._check_crop_harvest_schedule.assert_called_once_with(mocked_time)
+    field._remove_dead_crops.assert_called_once()
+    field._reset_crop_field_coverage_fractions.assert_called_once()
+
+
 @pytest.mark.parametrize("all_events,events_remaining,events_occurring_today", [
     ([PlantingEvent("test_1", 1996, 120, False), PlantingEvent("test_2", 1996, 120, False),
       PlantingEvent("test_3", 1996, 240, False), PlantingEvent("test_4", 1997, 125, False)],
