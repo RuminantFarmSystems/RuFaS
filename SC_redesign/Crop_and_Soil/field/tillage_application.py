@@ -2,6 +2,7 @@ from typing import Optional
 
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.output_manager import OutputManager
 
 """
 This module contains all necessary methods for executing tillage operations on a field, based on SWAT Theoretical
@@ -12,6 +13,8 @@ Notes
 This module was written to be as flexible as possible, because every attribute on the soil surface and in the soil
 profile gets incorporated and/or mixed with the same logic.
 """
+
+om = OutputManager()
 
 
 class TillageApplication:
@@ -38,7 +41,8 @@ class TillageApplication:
         self.field_data = field_data or FieldData(field_size=field_size or 1)
         self.soil_data = soil_data or SoilData(field_size=self.field_data.field_size)
 
-    def till_soil(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float) -> None:
+    def till_soil(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float, year: int,
+                  day: int) -> None:
         """
         Mixes nutrients, manure/fertilizer mass, and residue from the soil profile and soil surface together in the soil
         profile.
@@ -51,6 +55,10 @@ class TillageApplication:
             Fraction of soil surface pool incorporated into the soil profile (unitless)
         mixing_fraction : float
             Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
+        year : int
+            Year of the time object
+        day : int
+            Day of the time object
 
         References
         ----------
@@ -64,6 +72,7 @@ class TillageApplication:
 
         """
         # TODO: increase functionality and features - issue #538
+
         vadose_zone_tilled = tillage_depth > self.soil_data.soil_layers[-1].bottom_depth
         if vadose_zone_tilled:
             tillage_depth = self.soil_data.soil_layers[-1].bottom_depth
@@ -100,6 +109,7 @@ class TillageApplication:
                                  "fresh_organic_nitrogen_content"]
         for pool in pools_to_till_in_soil:
             self._mix_soil_layers(pool, tillage_depth, mixing_fraction)
+        self._record_tillage(tillage_depth, incorporation_fraction, mixing_fraction, year, day)
 
     def _mix_soil_layers(self, pool_name: str, tillage_depth: float, mixing_fraction: float) -> None:
         """
@@ -206,3 +216,29 @@ class TillageApplication:
         remaining_amount_in_pool = amount_in_pool - amount_removed
         setattr(data_container, attribute_name, remaining_amount_in_pool)
         return amount_removed
+
+    def _record_tillage(self, tillage_depth: float, incorporation_fraction: float, mixing_fraction: float,
+                        year: int, day: int) -> None:
+        """
+        Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
+
+        Parameters
+        ----------
+        tillage_depth : float
+            The lowest depth the tilling implement reaches (mm)
+        incorporation_fraction : float
+            Fraction of soil surface pool incorporated into the soil profile (unitless)
+        mixing_fraction : float
+            Fraction of pool in each layer mixed and redistributed back into the soil profile (unitless)
+        year : int
+            Year in which this harvest occurred.
+        day : int
+            Julian day on which this harvest occurred.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._record_tillage.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "field_size": {self.field_data.field_size}}
+        value = {"tillage_depth": tillage_depth, "incorporation_fraction": incorporation_fraction,
+                 "mixing_fraction": mixing_fraction}
+        om.add_variable("tillage_record", value, info_map)
