@@ -11,6 +11,7 @@ from typing import Optional, List, Dict, Tuple
 from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
+from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
@@ -33,6 +34,7 @@ class Field:
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
                  plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
                  custom_crop_specifications: Optional[Dict[str, Dict]] = None,
+                 tillage_events: Optional[List[TillageEvent]] = None,
                  fertilizer_events: Optional[List[FertilizerEvent]] = None,
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None):
         # field-wide attributes
@@ -69,6 +71,9 @@ class Field:
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
 
+        self.tillage_events: List[TillageEvent] = tillage_events
+        """List of all tillage events that will occur over the run of the simulation in this field."""
+
         self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
         """is today the last day of the simulation year?"""
 
@@ -83,10 +88,14 @@ class Field:
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
 
+
         Details: **All the logic (after setup) will go in this function**
         """
         # --- Soil Management---
         self.check_fertilizer_application_schedule(time)
+
+        # tillage
+        self.check_tillage_schedule()
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -114,6 +123,7 @@ class Field:
             if self.field_data.grazers_present:
                 self.graze_field()
 
+            self.check_harvest_schedules(time.day, time.year)
             self.harvest_scheduled_crops()
 
         # annual resets
@@ -285,6 +295,22 @@ class Field:
         for event in todays_fertilizer_events:
             self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
                                                  event.day)
+
+    def check_tillage_schedule(self, time: Time) -> None:
+        """
+        Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
+        executed.
+
+        Parameters
+        ----------
+        time : Time
+            Time object containing the current day and year of the simulation.
+        """
+        self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
+        for event in todays_events:
+            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
+                                  time.calendar_year,
+                                  time.day)
 
     def check_crop_harvest_schedule(self, time: Time) -> None:
         """
