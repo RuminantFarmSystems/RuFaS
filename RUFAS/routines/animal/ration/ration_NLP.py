@@ -537,10 +537,17 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
-    for key in ration_percents.keys():
-        target = ration_percents[key]/100*(DMIest+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
+    DMIest_lower = DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    DMIest_upper = DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    ration_key_list = sorted([int(key) for key in ration_percents.keys()])
+    for key in ration_key_list:
+        # target = ration_percents[str(key)]/100*(DMIest_upper+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
         # target = ration_percents[key]
-        targetbounds = ((target-target*udr_tolerance)/3,(target+target*udr_tolerance)/3)
+        targetlower = ration_percents[str(key)]/100*(DMIest_lower+0.0001)
+        targetupper = ration_percents[str(key)]/100*(DMIest_upper+0.0001)
+        targetbounds = (targetupper, targetlower)
+        targetbounds = ((targetlower-targetlower*udr_tolerance)/3,
+                        (targetupper+targetupper*udr_tolerance)/3)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
@@ -598,7 +605,7 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
     bnds = []
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
-        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
+        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
     else:    
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
