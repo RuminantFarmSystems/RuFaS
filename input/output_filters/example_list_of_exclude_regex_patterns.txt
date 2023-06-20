@@ -1,2 +1,6 @@
+exclude
+Feed.summarize_feed_storage.nutrients_summary
 ^LifeCycleManager.*update$
 .*milk.*update
+MilkingParlor.calc_wash_water_volume_used_in_holding_area.wash_water_volume_used_in_holding_area
+MilkingParlor.__init__.fresh_water_use_rate

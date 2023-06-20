@@ -312,11 +312,6 @@ class OutputManager(object):
             A copy of the given pool with info_maps removed from it.
 
         """
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._exclude_info_maps.__name__,
-                    }
-        self.add_log("exclude_info_maps", "info maps were excluded", info_map)
-
         pool_copy = pool.copy()
         for key, value in pool_copy.items():
             if isinstance(value, dict) and "info_maps" in value:
@@ -364,7 +359,7 @@ class OutputManager(object):
                 if not list_of_elements:
                     load_message = f"{path} was empty"
                 else:
-                    load_message = f"{path} had {len(list_of_elements)} filter"
+                    load_message = f"{path} had {len(list_of_elements)} filters"
                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements
         except Exception as e:
@@ -436,6 +431,10 @@ class OutputManager(object):
             Flag for whether or not the user wants to include info_maps data in their results files.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.save_variables.__name__,
+                    }
+        self.add_log("exclude_info_maps", f"exclude_info_maps flag set to {exclude_info_maps}", info_map)
         list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
