@@ -233,13 +233,13 @@ class Field:
         mix_name : str
             The name of the mix this fertilizer application is composed of.
         total_mass : float
-            The total mass of phosphorus applied.
+            The total mass of phosphorus applied (kg)
         nitrogen_mass : float
-            The mass of nitrogen applied.
+            The mass of nitrogen applied (kg)
         phosphorus_mass : float
-            The mass of phosphorus applied.
+            The mass of phosphorus applied (kg)
         potassium_mass : float
-            The mass of potassium applied.
+            The mass of potassium applied (kg)
         year : int
             Calendar year in which the fertilizer application is occurring.
         day : int
