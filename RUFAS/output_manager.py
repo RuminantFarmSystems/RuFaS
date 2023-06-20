@@ -405,17 +405,17 @@ class OutputManager(object):
         if filter_by_exclusion:
             filter_log_message = f"{input_file} contains exclude-keyword '{exclude_keyword}' at position"
             f" {exclude_keyword_location}"
-            self.add_log("filtering log", filter_log_message, info_map)
+            self.add_log("filtering_log", filter_log_message, info_map)
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
             filter_log_message = f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"
             f" at position {exclude_keyword_location}"
-            self.add_log("filtering log", filter_log_message, info_map)
+            self.add_log("filtering_log", filter_log_message, info_map)
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns"
-        self.add_log("num of filter pattern matches", filter_log_count_msg, info_map)
+        self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         print(f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns")
         return filter_pattern_matches
 
