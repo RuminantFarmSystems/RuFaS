@@ -61,7 +61,6 @@ class State:
         self.manure_management = ManureManagement(self.animal_management, weather, time, manure_management_config)
 
 
-
     def annual_reset(self):
         """
         Description:
