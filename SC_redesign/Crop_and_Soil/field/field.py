@@ -289,7 +289,7 @@ class Field:
             Julian day on which this fertilizer application is occurring.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
@@ -332,6 +332,37 @@ class Field:
                                                                  self.available_fertilizer_mixes)
         self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand, year, day)
 
+    def _record_manure_application(self, dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
+                                   nitrogen: float, phosphorus: float, potassium: float, year: int, day: int) -> None:
+        """
+        Records the amount of manure and related values for an individual manure application.
+
+        Parameters
+        ----------
+        dry_matter_mass : float
+            Dry weight equivalent of this application (kg)
+        dry_matter_fraction : float
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+        field_coverage : float
+            Fraction of the field this manure is applied to (unitless)
+        nitrogen : float
+            Mass of nitrogen in the manure applied (kg)
+        phosphorus : float
+            Mass of phosphorus in the manure applied (kg)
+        potassium : float
+            Mass of potassium in the manure applied (kg)
+        year : int
+            Calendar year in which this manure application occurs.
+        day : int
+            Julian day on which this manure application occurs.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "field_size": self.field_data.field_size}
+        value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
+                 field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
+        om.add_variable("manure_application", value, info_map)
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
