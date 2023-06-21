@@ -345,7 +345,8 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     # Arrange
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     mock_output_manager.flush_pools.return_value = None
-    mock_output_manager.save_all_pools.return_value = None
+    mock_output_manager.dump_all_pools.return_value = None
+    mock_output_manager.save_variables.return_value = None
     mocker.patch("main.OutputManager", return_value=mock_output_manager)
     file_path1 = Path("file1.json")
     file_path2 = Path("file2.json")
@@ -367,9 +368,13 @@ def test_execute_simulations_from_files(mocker: MockerFixture) -> None:
     ]
     assert mock_simulator.simulate.call_count == len(file_list)
     assert mock_output_manager.flush_pools.call_count == len(file_list)
-    assert mock_output_manager.save_all_pools.call_count == len(file_list)
-    assert mock_output_manager.save_all_pools.call_args_list == [
+    assert mock_output_manager.dump_all_pools.call_count == len(file_list)
+    assert mock_output_manager.dump_all_pools.call_args_list == [
         mocker.call("output", True)
+    ] * len(file_list)
+    assert mock_output_manager.save_variables.call_count == len(file_list)
+    assert mock_output_manager.save_variables.call_args_list == [
+        mocker.call("output", "input/output_filters/", True)
     ] * len(file_list)
 
 

@@ -8,6 +8,7 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 import os
 from typing import Callable
 from typing import Dict
+from mock import Mock, mock_open, patch
 
 import pytest
 from mock.mock import MagicMock
@@ -529,59 +530,65 @@ def output_manager_original_method_states(
         "_dict_to_file_json": mock_output_manager._dict_to_file_json,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_add_to_pool": mock_output_manager._add_to_pool,
+        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
+        "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
+        "_list_txt_file_names_in_dir": mock_output_manager._list_txt_file_names_in_dir,
+        "_filter_variables_pool": mock_output_manager._filter_variables_pool,
+        "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
         "add_log": mock_output_manager.add_log,
         "add_warning": mock_output_manager.add_warning,
-        "save_variables": mock_output_manager.save_variables,
-        "save_logs": mock_output_manager.save_logs,
-        "save_warnings": mock_output_manager.save_warnings,
-        "save_errors": mock_output_manager.save_errors,
-        "save_variable_names": mock_output_manager.save_variable_names,
+        "dump_variables": mock_output_manager.dump_variables,
+        "dump_logs": mock_output_manager.dump_logs,
+        "dump_warnings": mock_output_manager.dump_warnings,
+        "dump_errors": mock_output_manager.dump_errors,
+        "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
     }
 
 
-def test_save_all_pools(
+def test_dump_all_pools(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_all_pools in output_manager.py"""
+    """Test case for function dump_all_pools in output_manager.py"""
     path = "dummy_path"
-    mock_output_manager.save_errors = MagicMock()
-    mock_output_manager.save_warnings = MagicMock()
-    mock_output_manager.save_logs = MagicMock()
-    mock_output_manager.save_variables = MagicMock()
-    mock_output_manager.save_variable_names = MagicMock()
+    mock_output_manager.dump_errors = MagicMock()
+    mock_output_manager.dump_warnings = MagicMock()
+    mock_output_manager.dump_logs = MagicMock()
+    mock_output_manager.dump_variables = MagicMock()
+    mock_output_manager.dump_variable_names_and_contexts = MagicMock()
 
-    mock_output_manager.save_all_pools(path, exclude_info_maps=False)
+    mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
 
-    mock_output_manager.save_errors.assert_called_once_with(path)
-    mock_output_manager.save_warnings.assert_called_once_with(path)
-    mock_output_manager.save_logs.assert_called_once_with(path)
-    mock_output_manager.save_variables.assert_called_once_with(
-        path, exclude_info_maps=False
+    mock_output_manager.dump_errors.assert_called_once_with(path)
+    mock_output_manager.dump_warnings.assert_called_once_with(path)
+    mock_output_manager.dump_logs.assert_called_once_with(path)
+    mock_output_manager.dump_variables.assert_called_once_with(
+        path, False
     )
-    mock_output_manager.save_variable_names.assert_called_once_with(path)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
 
-    mock_output_manager.save_all_pools(path, exclude_info_maps=True)
-    mock_output_manager.save_variables.assert_called_with(path, exclude_info_maps=True)
-    assert mock_output_manager.save_logs.call_count == 2
-    assert mock_output_manager.save_warnings.call_count == 2
-    assert mock_output_manager.save_errors.call_count == 2
+    mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
+    mock_output_manager.dump_variables.assert_called_with(path, True)
+    mock_output_manager.dump_variable_names_and_contexts.assert_called_with(path, True)
+    assert mock_output_manager.dump_logs.call_count == 2
+    assert mock_output_manager.dump_warnings.call_count == 2
+    assert mock_output_manager.dump_errors.call_count == 2
 
     # Restore original methods
-    mock_output_manager.save_variables = output_manager_original_method_states[
-        "save_variables"
+    mock_output_manager.dump_variables = output_manager_original_method_states[
+        "dump_variables"
     ]
-    mock_output_manager.save_logs = output_manager_original_method_states["save_logs"]
-    mock_output_manager.save_warnings = output_manager_original_method_states[
-        "save_warnings"
+    mock_output_manager.dump_logs = output_manager_original_method_states["dump_logs"]
+    mock_output_manager.dump_warnings = output_manager_original_method_states[
+        "dump_warnings"
     ]
-    mock_output_manager.save_errors = output_manager_original_method_states[
-        "save_errors"
+    mock_output_manager.dump_errors = output_manager_original_method_states[
+        "dump_errors"
     ]
-    mock_output_manager.save_variable_names = output_manager_original_method_states[
-        "save_variable_names"
+    mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
+        "dump_variable_names_and_contexts"
     ]
 
 
@@ -598,17 +605,17 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
     )
 
 
-def test_save_variables(
+def test_dump_variables(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_variables in output_manager.py"""
+    """Test case for function dump_variables in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_variables("dummy_path")
+    mock_output_manager.dump_variables("dummy_path")
 
-    mock_output_manager._generate_file_name.assert_called_once_with("variables", "json")
+    mock_output_manager._generate_file_name.assert_called_once_with("all_variables", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
@@ -622,15 +629,15 @@ def test_save_variables(
     ]
 
 
-def test_save_logs(
+def test_dump_logs(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_logs in output_manager.py"""
+    """Test case for function dump_logs in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_logs("dummy_path")
+    mock_output_manager.dump_logs("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("logs", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -646,15 +653,15 @@ def test_save_logs(
     ]
 
 
-def test_save_warnings(
+def test_dump_warnings(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_warnings in output_manager.py"""
+    """Test case for function dump_warnings in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_warnings("dummy_path")
+    mock_output_manager.dump_warnings("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("warnings", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -670,15 +677,15 @@ def test_save_warnings(
     ]
 
 
-def test_save_errors(
+def test_dump_errors(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_errors in output_manager.py"""
+    """Test case for function dump_errors in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
 
-    mock_output_manager.save_errors("dummy_path")
+    mock_output_manager.dump_errors("dummy_path")
 
     mock_output_manager._generate_file_name.assert_called_once_with("errors", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
@@ -694,16 +701,16 @@ def test_save_errors(
     ]
 
 
-def test_save_variable_names(
+def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_variable_names in output_manager.py"""
-    dummy_list = []
+    """Test case for function dump_variable_names_and_contexts in output_manager.py"""
+    dummy_list = ['_exclude_info_maps=False, expect info_maps accordingly.\n']
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.save_variable_names("dummy_path")
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
@@ -725,19 +732,19 @@ def test_list_to_file_txt(
     tmpdir,
 ) -> None:
     """Test case for function _list_to_file_text in output_manager.py"""
-    dummy_file_path = tmpdir.join('dummy_file.txt')
-    dummy_list = ['apple', 'banana', 'cherry']
+    dummy_file_path = tmpdir.join("dummy_file.txt")
+    dummy_list = ["apple", "banana", "cherry"]
 
     mock_output_manager._list_to_file_txt(dummy_list, dummy_file_path)
     with open(dummy_file_path) as read_dummy_file:
-        dummy_file_content = read_dummy_file.read().strip().split('\n')
-    assert dummy_file_content == dummy_list
+        dummy_file_content = read_dummy_file.read()
+    assert "applebananacherry" in dummy_file_content
 
     with pytest.raises(TypeError) as e:
         mock_output_manager._list_to_file_txt(1234, dummy_file_path)
         assert "object is not iterable" in str(e.value)
 
-    dummy_broken_file_path = ''
+    dummy_broken_file_path = ""
 
     with pytest.raises(FileNotFoundError) as e:
         mock_output_manager._list_to_file_txt(dummy_list, dummy_broken_file_path)
@@ -746,6 +753,466 @@ def test_list_to_file_txt(
     # Restore original method
     mock_output_manager._list_to_file_txt = output_manager_original_method_states[
         "_list_to_file_txt"
+    ]
+
+
+def test_exclude_info_maps(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for function _exclude_info_maps in output_manager.py"""
+    # Test case 1: Empty pool
+    pool = {}
+    expected_result = {}
+    assert mock_output_manager._exclude_info_maps(pool) == expected_result
+
+    # Test case 2: Pools with info_maps
+    pool = {
+        "key1": {
+            "info_maps": "value1",
+            "other_key": "other_value"
+        },
+        "key2": {
+            "info_maps": "value1",
+            "other_key": "other_value"
+        }
+    }
+    expected_result = {
+        "key1": {
+            "other_key": "other_value"
+        },
+        "key2": {
+            "other_key": "other_value"
+        }
+    }
+    assert mock_output_manager._exclude_info_maps(pool) == expected_result
+
+    # Restore original method
+    mock_output_manager._exclude_info_maps = output_manager_original_method_states[
+        "_exclude_info_maps"
+    ]
+
+
+def test_load_txt_file_to_list(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    tmpdir
+) -> None:
+    """Test case for function _load_txt_file_to_list in output_manager.py"""
+    with patch("builtins.open", mock_open(read_data="apples\nbananas\ncherries")):
+        result = mock_output_manager._load_txt_file_to_list("path/to/file.txt")
+
+    assert result == ["apples", "bananas", "cherries"]
+
+    mock_open_func = Mock()
+    mock_open_func.side_effect = Exception("Error opening file")
+
+    with patch("builtins.open", mock_open_func):
+        with pytest.raises(Exception):
+            mock_output_manager._load_txt_file_to_list("path/to/file.txt")
+
+    # Restore original method
+    mock_output_manager._load_txt_file_to_list = output_manager_original_method_states[
+        "_load_txt_file_to_list"
+    ]
+
+
+def test_list_txt_file_names_in_dir(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    tmpdir
+) -> None:
+    """Test case for function _list_txt_file_names_in_dir in output_manager.py"""
+    tmpdir.join("file1.txt").write("File 1 content")
+    tmpdir.join("file2.txt").write("File 2 content")
+    tmpdir.join("file3.csv").write("File 3 content")
+
+    txt_files = mock_output_manager._list_txt_file_names_in_dir(tmpdir)
+
+    assert len(txt_files) == 2
+    assert "file1.txt" in txt_files
+    assert "file2.txt" in txt_files
+    assert "file3.csv" not in txt_files
+
+    with pytest.raises(NotADirectoryError):
+        mock_output_manager._list_txt_file_names_in_dir("nonexistent_directory")
+
+    # Restore original method
+    mock_output_manager._list_txt_file_names_in_dir = output_manager_original_method_states[
+        "_list_txt_file_names_in_dir"
+    ]
+
+
+def test_filter_variables_pool_include_empty_filter_pattern_pool(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for empty filter pattern pool with function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = []
+    expected_result = {}
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for exclude keyword in empty filter pattern pool with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["exclude"]
+    expected_result = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for matching pattern pool with function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["key1", "key2"]
+    expected_result = {
+        "key1": "value1",
+        "key2": "value2"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for exclude keyword in matching pattern pool with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["exclude", "key1", "key2"]
+    expected_result = {
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_non_matching_pattern(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for pattern pool with non-matching pattern with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["key1", "key4"]
+    expected_result = {
+        "key1": "value1"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_exclude_non_matching_pattern(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for pattern pool with exclude keyword and non-matching pattern with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["exclude", "key1", "key4"]
+    expected_result = {
+        "key2": "value2",
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+
+def test_filter_variables_pool_duplicate_patterns(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for pattern pool with duplicate patterns with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["key1", "key1"]
+    expected_result = {
+        "key1": "value1"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_exclude_duplicate_patterns(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for pattern pool with duplicate patterns and exclude keyword with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "key1": "value1",
+        "key2": "value2",
+        "key3": "value3"
+    }
+    filter_patterns = ["exclude", "key1", "key1"]
+    expected_result = {
+        "key2": "value2",
+        "key3": "value3"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_regex_patterns(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for pattern pool using regex patterns with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "DummyClass1.dummy_fun1.dummy_var1": "value1",
+        "DummyClass1.dummy_fun1.dummy_var2": "value2",  # same class as prev, same fun, different var
+        "DummyClass2.dummy_fun2.dummy_var3": "value3",  # new class, new fun, new var
+        "DummyClass2.dummy_fun3.dummy_var4": "value4",  # same class as prev, new fun, new var
+        "DummyClass2.dummy_fun4.dummy_var4": "value5",  # same class as prev, new fun, same var
+        "DummyClass3.dummy_fun4.dummy_var2": "value6",  # new class, new fun, same var name as 2nd entry
+        "DummyClass4.dummy_fun2.dummy_var5": "value7"   # new class, same fun name as 3rd entry, new var
+    }
+
+    # get all Class1 vars
+    filter_patterns = ["^DummyClass1.*"]
+    expected_result = {
+        "DummyClass1.dummy_fun1.dummy_var1": "value1",
+        "DummyClass1.dummy_fun1.dummy_var2": "value2"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # get only vars from fun2s
+    filter_patterns = [".*fun2.*"]
+    expected_result = {
+        "DummyClass2.dummy_fun2.dummy_var3": "value3",
+        "DummyClass4.dummy_fun2.dummy_var5": "value7"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # get Class2 with var4 but not Class2 with var3
+    filter_patterns = ["^DummyClass2.*var4$"]
+    expected_result = {
+        "DummyClass2.dummy_fun3.dummy_var4": "value4",
+        "DummyClass2.dummy_fun4.dummy_var4": "value5"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # get all var2s and var4s
+    filter_patterns = [".*var2$", ".*var4$"]
+    expected_result = {
+        "DummyClass1.dummy_fun1.dummy_var2": "value2",
+        "DummyClass2.dummy_fun3.dummy_var4": "value4",
+        "DummyClass2.dummy_fun4.dummy_var4": "value5",
+        "DummyClass3.dummy_fun4.dummy_var2": "value6"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_filter_variables_pool_exclude_regex_patterns(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for pattern pool with regex patterns and exclude keyword with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = {
+        "DummyClass1.dummy_fun1.dummy_var1": "value1",
+        "DummyClass1.dummy_fun1.dummy_var2": "value2",  # same class as prev, same fun, different var
+        "DummyClass2.dummy_fun2.dummy_var3": "value3",  # new class, new fun, new var
+        "DummyClass2.dummy_fun3.dummy_var4": "value4",  # same class as prev, new fun, new var
+        "DummyClass2.dummy_fun4.dummy_var4": "value5",  # same class as prev, new fun, same var
+        "DummyClass3.dummy_fun4.dummy_var2": "value6",  # new class, new fun, same var name as 2nd entry
+        "DummyClass4.dummy_fun2.dummy_var5": "value7"   # new class, same fun name as 3rd entry, new var
+    }
+
+    # get everything except Class1 vars
+    filter_patterns = ["exclude", "^DummyClass1.*"]
+    expected_result = {
+        "DummyClass2.dummy_fun2.dummy_var3": "value3",
+        "DummyClass2.dummy_fun3.dummy_var4": "value4",
+        "DummyClass2.dummy_fun4.dummy_var4": "value5",
+        "DummyClass3.dummy_fun4.dummy_var2": "value6",
+        "DummyClass4.dummy_fun2.dummy_var5": "value7"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # get everything except vars from fun2s
+    filter_patterns = ["exclude", ".*fun2.*"]
+    expected_result = {
+        "DummyClass1.dummy_fun1.dummy_var1": "value1",
+        "DummyClass1.dummy_fun1.dummy_var2": "value2",
+        "DummyClass2.dummy_fun3.dummy_var4": "value4",
+        "DummyClass2.dummy_fun4.dummy_var4": "value5",
+        "DummyClass3.dummy_fun4.dummy_var2": "value6"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # get everything without Class2 with var4
+    filter_patterns = ["exclude", "^DummyClass2.*var4$"]
+    expected_result = {
+        "DummyClass1.dummy_fun1.dummy_var1": "value1",
+        "DummyClass1.dummy_fun1.dummy_var2": "value2",
+        "DummyClass2.dummy_fun2.dummy_var3": "value3",
+        "DummyClass3.dummy_fun4.dummy_var2": "value6",
+        "DummyClass4.dummy_fun2.dummy_var5": "value7"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # get everything that doesn't have var2s and var4s
+    filter_patterns = ["exclude", ".*var2$", ".*var4$"]
+    expected_result = {
+        "DummyClass1.dummy_fun1.dummy_var1": "value1",
+        "DummyClass2.dummy_fun2.dummy_var3": "value3",
+        "DummyClass4.dummy_fun2.dummy_var5": "value7"
+    }
+
+    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+
+    # Restore original method
+    mock_output_manager._filter_variables_pool = output_manager_original_method_states[
+        "_filter_variables_pool"
+    ]
+    mock_output_manager.variables_pool = {}
+
+
+def test_save_variables(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for function save_variables in output_manager.py"""
+    mock_output_manager.variables_pool = {}
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+    mock_output_manager._load_txt_file_to_list = MagicMock()
+    mock_output_manager._exclude_info_maps = MagicMock()
+
+    # test case for when there are no filter keys txt files in output_inclusion_filters directory:
+    mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=[])
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
+    mock_output_manager._list_txt_file_names_in_dir.assert_called_once_with("dummy_dir_path/")
+    mock_output_manager._load_txt_file_to_list.assert_not_called()
+    mock_output_manager._generate_file_name.assert_not_called()
+    mock_output_manager._exclude_info_maps.assert_not_called()
+    mock_output_manager._dict_to_file_json.assert_not_called()
+
+    # test case for when exclude_info_maps flag set to False
+    mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=["dummy_input_filepath.txt"])
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
+    mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
+    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath.txt", "json")
+    mock_output_manager._exclude_info_maps.assert_not_called()
+    mock_output_manager._dict_to_file_json.assert_called_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
+
+    # test case for when exclude_info_maps flag set to True
+    mock_output_manager._exclude_info_maps = MagicMock(return_value={})
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
+    mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
+    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
+    mock_output_manager._generate_file_name.assert_called_with("saved_variables_dummy_input_filepath.txt", "json")
+    mock_output_manager._exclude_info_maps.assert_called_once_with({})
+    mock_output_manager._dict_to_file_json.assert_called_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
+
+    # Restore original method
+    mock_output_manager.save_variables = output_manager_original_method_states[
+        "save_variables"
     ]
 
 

@@ -1,5 +1,7 @@
 # !/usr/bin/env python3
 
+from pathlib import Path
+import re
 from typing import Any, Dict, List, Union
 import json
 import os
@@ -249,7 +251,7 @@ class OutputManager(object):
         Raises
         ------
         Exception
-            If an error occurs while saving the file
+            If an error occurs while saving to the file
 
         Notes
         -----
@@ -285,13 +287,12 @@ class OutputManager(object):
         Raises
         ------
         Exception
-            If an error occurs while saving the file
-        
+            If an error occurs while saving to the file
+
         """
         try:
-            with open(path, 'w') as var_names_file:
-                for variable_name in data_list:
-                    var_names_file.write(variable_name + '\n')
+            with open(path, "w") as var_names_file:
+                var_names_file.writelines(data_list)
         except Exception as e:
             raise e
 
@@ -302,67 +303,247 @@ class OutputManager(object):
         timestamp = time.strftime(r"%d-%b-%Y_%a_%H-%M-%S", time.localtime())
         return f"{base_name}_{timestamp}.{extension}"
 
-    def save_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
+        """ Makes a copy of the given pool and removes info_maps from it.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]
+            A copy of the given pool with info_maps removed from it.
+
         """
-        Saves variables_pool into a json file in the given path to a directory.
+
+        pool_copy = pool.copy()
+        for key, value in pool_copy.items():
+            if isinstance(value, dict) and "info_maps" in value:
+                value.pop("info_maps")
+        return pool_copy
+
+    def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
+        """ Returns the list of files in the given path"""
+        dir_path_check = Path(dir_path)
+        if dir_path_check.is_dir():
+            txt_files = []
+            all_files = os.listdir(dir_path)
+            for filename in all_files:
+                if filename.endswith(".txt"):
+                    txt_files.append(filename)
+            return txt_files
+        else:
+            raise NotADirectoryError("The specified path must be a directory")
+
+    def _load_txt_file_to_list(self, path: str) -> List[str]:
+        """ Reads a text file into a list.
+
+        Parameters
+        ----------
+        path : str
+            Path of the input file to be read.
+
+        Returns
+        -------
+        List[str]
+            A list of strings from a text file where each line of the file becomes a list element.
+
+        Raises
+        -------
+        Exception
+            If an error occurs while opening or reading the file.
+
         """
-        vars_pool = self.variables_pool.copy()
+        try:
+            with open(path) as text_file:
+                return text_file.read().splitlines()
+        except Exception as e:
+            raise e
+
+    def _filter_variables_pool(self, filter_patterns: List[str]) -> Dict[str, pool_element_type]:
+        """
+        Returns a filtered variables pool based on either inclusion or exclusion.
+
+        Parameters
+        ----------
+        filter_patterns : List[str]
+            A list of patterns the user has selected to filter the variables pool.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]
+            A filtered variables pool based on either inclusion or exclusion.
+
+        Notes
+        -----
+        The first item in the filter_patterns list will determine whether the patterns are treated as
+        exclusionary or inclusionary. If the first pattern matches the value of the exclude_keyword
+        variable defined in this function, it will treat the rest of the filter list as exclusionary
+        and filter the variables_pool accordingly. Otherwise, it will treat the list of filters
+        as inclusionary.
+
+        """
+        exclude_keyword_location = 0
+        exclude_keyword = "exclude"
+        filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
+        if filter_by_exclusion:
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
+                    any(re.match(pattern, key) for pattern in filter_patterns)}
+        else:
+            return {key: self.variables_pool[key] for key in self.variables_pool.keys() if
+                    any(re.match(pattern, key) for pattern in filter_patterns)}
+
+    def save_variables(self, save_path: str, dir_path: str,
+                       exclude_info_maps: bool = False) -> None:
+        """
+        Reads a text file containing a list of keys and filters the variables pool by those keys.
+        Saves resulting data pool to a json file in the given path to a directory.
+
+        Parameters
+        ----------
+        save_path : str
+            Path to the directory where the file will be saved.
+
+        dir_path : str
+            Path of the directory containing the files containing the keys for filtering.
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to include info_maps data in their results files.
+
+        """
+        list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
+        for input_file in list_of_filter_files:
+            input_path = os.path.join(dir_path, input_file)
+            inclusion_keys = self._load_txt_file_to_list(input_path)
+            filtered_pool = self._filter_variables_pool(inclusion_keys)
+
+            if exclude_info_maps:
+                filtered_pool = self._exclude_info_maps(filtered_pool)
+            file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{input_file}", "json"))
+            self._dict_to_file_json(filtered_pool, file_path)
+
+    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+        """
+        Dumps variables_pool into a json file in the given path to a directory.
+
+        Parameters
+        ----------
+        path : str
+            Path to the directory where the file will be saved.
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to inlcude info_maps data in their results files.
+
+        """
+        pool = self.variables_pool
         if exclude_info_maps:
-            for key, value in vars_pool.items():
-                if isinstance(value, dict) and "info_maps" in value:
-                    value.pop("info_maps")
+            pool = self._exclude_info_maps(self.variables_pool)
 
-        file_path = os.path.join(path, self._generate_file_name("variables", "json"))
-        self._dict_to_file_json(self.variables_pool, file_path)
+        file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        self._dict_to_file_json(pool, file_path)
 
-    def save_logs(self, path: str) -> None:
+    def dump_logs(self, path: str) -> None:
         """
-        Saves logs_pool into a json file in the given path to a directory.
+        Dumps logs_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("logs", "json"))
         self._dict_to_file_json(self.logs_pool, file_path)
 
-    def save_warnings(self, path: str) -> None:
+    def dump_warnings(self, path: str) -> None:
         """
-        Saves warnings_pool into a json file in the given path to a directory.
+        Dumps warnings_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("warnings", "json"))
         self._dict_to_file_json(self.warnings_pool, file_path)
 
-    def save_errors(self, path: str) -> None:
+    def dump_errors(self, path: str) -> None:
         """
-        Saves errors_pool into a json file in the given path to a directory.
+        Dumps errors_pool into a json file in the given path to a directory.
         """
         file_path = os.path.join(path, self._generate_file_name("errors", "json"))
         self._dict_to_file_json(self.errors_pool, file_path)
 
-    def save_variable_names(self, path: str) -> None:
+    def dump_variable_names_and_contexts(
+        self, path: str, exclude_info_maps: bool, format_option: str = "verbose"
+    ) -> None:
         """
-        Saves names of all variables added to variables_pool into a json file in the given path to a directory.
-        """
-        vars_pool = self.variables_pool.copy()
-        for key, value in vars_pool.items():
-            if isinstance(value, dict) and "info_maps" in value:
-                value.pop("info_maps")
-        file_path = os.path.join(path, self._generate_file_name("variable_names", "txt"))
-        var_set = set()
-        for key, value in vars_pool.items():
-            var_set.add(key)
-            var_set.update(f"{key}: {variable_name}" for values_list in value.values() for variable_dict in values_list
-                           if isinstance(variable_dict, dict) for variable_name in variable_dict.keys())
-        var_list = sorted(var_set)  # sorted(set) sorts and then converts set into a list
+        Dumps names of all variables added to variables_pool along with the caller class
+        and function contextual information into a txt file in the given path to a directory.
 
+        Parameters
+        ----------
+        path : str
+            The path to the file to be dumped to.
+
+        exclude_info_maps : bool
+            Flag to denote whether info_map data should be dumped with variable names.
+
+        format_option : {"block", "inline", "verbose"}
+            The selection for the formatting option of the text written to the variables names text file.
+
+        Examples
+        --------
+        format_option: str = "block"
+        class_name.function_name.variable_name
+                                            .values: variable1_name
+                                            .values: variable2_name
+                                            .info_maps: variable3_name
+                                            .info_maps: variable4_name
+
+        format_option: str = "inline"
+        class_name.function_name.variable_name.values: [variable1_name, variable2_name]
+        class_name.function_name.variable_name.info_maps: [variable3_name, variable4_name]
+
+        format_option: str = "verbose"
+        class_name.function_name.variable_name.values: variable1_name
+        class_name.function_name.variable_name.values: variable2_name
+        class_name.function_name.variable_name.info_maps: variable3_name
+        class_name.function_name.variable_name.info_maps: variable4_name
+        """
+
+        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
+        for name, variable_data in self.variables_pool.items():
+            if not variable_data["values"]:
+                var_list.append(f"{name}: **NO VARIABLES**\n")
+                continue
+
+            parsable_dicts = []
+
+            if not exclude_info_maps:
+                parsable_dicts.append("info_maps")
+
+            is_variable_nested = isinstance(variable_data["values"][0], Dict)
+            if is_variable_nested:
+                parsable_dicts.append("values")
+            else:
+                var_list.append(f"{name}\n")
+
+            if format_option == "block":
+                var_list.append(f"{name}\n")
+
+            prefix = name
+            if format_option == "block":
+                prefix = " " * len(name)
+
+            for parsable_dict in parsable_dicts:
+                keys = variable_data[parsable_dict][0].keys()
+                if format_option == "inline":
+                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}\n")
+                else:
+                    for key in keys:
+                        var_list.append(f"{prefix}.{parsable_dict}: {key}\n")
+
+        file_path = os.path.join(
+            path, self._generate_file_name("variable_names", "txt")
+        )
         self._list_to_file_txt(var_list, file_path)
 
-    def save_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        Saves all pool into the given path to a directory.
+        dumps all pool into the given path to a directory.
         """
-        self.save_variables(path, exclude_info_maps=exclude_info_maps)
-        self.save_variable_names(path)
-        self.save_errors(path)
-        self.save_logs(path)
-        self.save_warnings(path)
+        self.dump_variables(path, exclude_info_maps)
+        self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        self.dump_errors(path)
+        self.dump_logs(path)
+        self.dump_warnings(path)
 
     def flush_pools(self) -> None:
         """
