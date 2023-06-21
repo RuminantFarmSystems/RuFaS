@@ -1,11 +1,6 @@
 from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.classes import Time
 from RUFAS.util import Utility
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS, MEGAGRAMS_TO_KILOGRAMS
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
@@ -106,7 +101,7 @@ class FieldManager:
                                          surface_remainder_fractions=manure_config.get("surface_percent"),
                                          pattern_repeat=manure_config.get("repeat"))
 
-        tillage_config = manure_config.get("tillage")
+        tillage_config = management_config.get("tillage")
         tillage_schedule_name = field_name + "_tillage_schedule"
         tillage_schedule = TillageSchedule(name=tillage_schedule_name,
                                            years=tillage_config.get("year"),
