@@ -9,7 +9,6 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu,
 """
 
 import math
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.output_manager import OutputManager
@@ -18,8 +17,7 @@ from typing import Optional
 from typing import Dict
 from RUFAS.routines.animal.ration import ration_constants
 
-def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: int,
-               animal_type: AnimalType, parity: Optional[int] = 0,
+def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: int, animal_type: str, parity: Optional[int] = 0,
                calving_interval: Optional[int] = None, milk_true_protein: Optional[float] = 0.0,
                milk_fat: Optional[float] = 0.0, milk_lactose: Optional[float] = 0.0,
                milk_production: Optional[float] = 0.0, days_in_milk: Optional[int] = None,
@@ -41,8 +39,8 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
         Body weight (kg)
     mature_body_weight: float
         Mature body weight(kg)
-    animal_type: AnimalType
-        A type or subtype of animal specified in AnimalType enum
+    animal_type: str
+        the type of animal
     day_of_pregnancy: str, optional
         Day of pregnancy (d) (except Heifer Is)
     # parameters for just cow requirements)
@@ -134,10 +132,10 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
 def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_body_weight: float,
                                                   day_of_pregnancy: Optional[int], body_condition_score_5: int,
                                                   previous_temperature: Optional[float],
-                                                  animal_type: AnimalType) -> tuple[float, float, float]:
+                                                  animal_type: str) -> tuple[float, float, float]:
     """ Calculates energy requirement for maintenance, conceptus weight, and calf birth weight 
 
-    Calculates the estimated energy requirements for maintenance in megacalories per day,
+    Calculates the estimated energy requirements requirements for maintenance in megacalories per day,
     as well as conceptus weight (kg) and calf birth weight (kg), according to NRC (2001).
 
     Parameters
@@ -152,8 +150,9 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
         Body condition score (score from 1 to 5)
     previous_temperature : float
         Adjustment for previous temperature
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : strF
+        Animal type according to set categories in RuFaS model, 
+        currently only expecting either 'heifer' or 'cow' 
 
     Returns
     -------
@@ -179,13 +178,13 @@ def calculate_NRC_energy_maintenance_requirements(body_weight: float, mature_bod
     if day_of_pregnancy and day_of_pregnancy > 190:
         conceptus_weight = (18 + (day_of_pregnancy - 190)
                             * 0.665) * (calf_birth_weight / 45)
-    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+    if animal_type == 'cow':
         net_energy_maintenance = (
             0.08 * (body_weight - conceptus_weight) ** 0.75)
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+    elif animal_type == 'heifer':
         body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
         net_energy_maintenance = (body_weight-conceptus_weight)**(0.75) * \
-            (0.086*(0.8 + (body_condition_score_9 - 1) * 0.05)) + \
+            (0.086*(0.8 + (body_condition_score_9 - 1) * 0.5)) + \
             0.0007*(20-previous_temperature)
     return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
@@ -195,7 +194,7 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
         tuple[float, float, float]:
     """ Calculates energy requirement for maintenance and two measures of uterine weight
 
-    The estimated energy requirements for maintenance are calculated in megacalories per day,
+    The estimated energy requirements requirements for maintenance are calculated in megacalories per day,
     as well as gravid uterine weight and uterine weight in kg, according to NASEM (2021).
 
     Parameters
@@ -252,7 +251,7 @@ def calculate_NASEM_energy_maintenance_requirements(body_weight: float, mature_b
 
 
 def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_weight: float, conceptus_weight: float,
-                                             animal_type: AnimalType, parity: int, calving_interval: Optional[int],
+                                             animal_type: float, parity: int, calving_interval: Optional[int],
                                              average_daily_gain_heifer: Optional[float]) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth and associated weight gain parameters.
 
@@ -267,8 +266,8 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
         Mature body weight (kg)
     conceptus_weight : float
         Conceptus weight (kg)
-    animal_type : AnimalType
-        A type or subtype of animal specified in AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     parity : int
         Parity number (lactation 1, 2.. n)
     calving_interval : int
@@ -310,7 +309,7 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
     equivalent_shrunk_body_weight = (SBW - conceptus_weight) * (478 / MSBW)
     # [A.Cow.A.11]
     # Average Daily Gain (kg)
-    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+    if animal_type == 'cow':
         if parity == 1 and calving_interval != 0:
             average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
         elif parity == 2 and calving_interval != 0:
@@ -319,7 +318,7 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
             average_daily_gain = 0.0
     # [A.Heifer.A.12]
     # Average Daily Gain (kg)
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+    elif animal_type == 'heifer':
         average_daily_gain = max(average_daily_gain_heifer, 0.0)
     # [A.Cow.A.12]-[A.Heifer.A.13]
     # Equivalent empty weight gain (kg)
@@ -334,7 +333,7 @@ def calculate_NRC_energy_growth_requirements(body_weight: float, mature_body_wei
 
 
 def calculate_NASEM_energy_growth_requirements(
-    body_weight: float, mature_body_weight: float, average_daily_gain_heifer: Optional[float], animal_type: AnimalType,
+    body_weight: float, mature_body_weight: float, average_daily_gain_heifer: Optional[float], animal_type: str,
     parity: int, calving_interval: Optional[int]) -> tuple[float, float, float]:
     """ Calculates energy requirement for growth, and also growth metrics
 
@@ -349,8 +348,8 @@ def calculate_NASEM_energy_growth_requirements(
         Mature body weight (kilograms)
     average_daily_gain_heifer : float
         Average daily gain (grams per day)
-    animal_type : AnimalType
-        A type or subtype of animal specified in AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     parity : int
         Parity number (lactation 1, 2.. n)
     calving_interval : int
@@ -378,14 +377,14 @@ def calculate_NASEM_energy_growth_requirements(
 
     """
     MSBW = 0.96 * mature_body_weight
-    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
+    if animal_type == 'cow':
         if parity == 1 and calving_interval != 0:
             average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
         elif parity == 2 and calving_interval != 0:
             average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval
         else:
             average_daily_gain = 0.0
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+    elif animal_type == 'heifer':
         average_daily_gain = max(average_daily_gain_heifer, 0.0)
     else:
         average_daily_gain = 0.0
@@ -406,7 +405,7 @@ def calculate_NASEM_energy_growth_requirements(
 def calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy: Optional[int], calf_birth_weight: float) -> float:
     """ Calculates energy requirement for pregnancy according to NRC (2001).
 
-    Calculates the estimated energy requirements for pregnancy in megacalories per day
+    Calculates the estimated energy requirements requirements for pregnancy in megacalories per day
 
     Parameters
     ----------
@@ -499,16 +498,16 @@ def calculate_NASEM_energy_pregnancy_requirements(lactating: bool, day_of_pregna
     return net_energy_pregnancy, gravid_uterine_weight_gain
 
 
-def calculate_NRC_energy_lactation_requirements(animal_type: AnimalType, milk_fat: float, milk_true_protein: float,
+def calculate_NRC_energy_lactation_requirements(animal_type: str, milk_fat: float, milk_true_protein: float,
                                                 milk_lactose: float, milk_production: float) -> float:
     """ Calculates energy requirement for lactation according to NRC (2001).
 
-    Calculates the estimated energy requirements for lactation in megacalories per day
+    Calculates the estimated energy requirements requirements for lactation in megacalories per day
 
     Parameters
     ----------
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     milk_fat : float
         Fat contents in milk (%)
     milk_true_protein : float
@@ -531,7 +530,7 @@ def calculate_NRC_energy_lactation_requirements(animal_type: AnimalType, milk_fa
 
     # Lactation requirement
     # ---------------------
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         # [A.Cow.A.17]
         # Milk energy (Mcal/kg of milk production)
         milk_energy_Mcal_per_kg = 0.0929 * milk_fat + \
@@ -544,16 +543,16 @@ def calculate_NRC_energy_lactation_requirements(animal_type: AnimalType, milk_fa
     return net_energy_lactation
 
 
-def calculate_NASEM_energy_lactation_requirements(animal_type: AnimalType, milk_fat: float, milk_true_protein: float,
+def calculate_NASEM_energy_lactation_requirements(animal_type: str, milk_fat: float, milk_true_protein: float,
                                                   milk_lactose: float, milk_production: float) -> float:
     """ Calculates energy requirement for lactation according to NASEM (2021).
 
-    Calculates the estimated energy requirements for lactation in megacalories per day
+    Calculates the estimated energy requirements requirements for lactation in megacalories per day
 
     Parameters
     ----------
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     milk_fat : float
         Fat contents in milk (%)
     milk_true_protein : float
@@ -570,7 +569,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: AnimalType, milk_
 
     Notes
     -----
-    Same calculations as done in the NRC (2001). Requirements are based on milk yield and composition.
+    Same calculations as done in the NRC (2001). Requiremets are based on milk yield and composition.
 
     References
     ----------
@@ -578,7 +577,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: AnimalType, milk_
         National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
 
     """
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         milk_energy_Mcal_per_kg = 0.0929 * milk_fat + \
             (0.0547 / 0.93) * milk_true_protein + 0.0395 * milk_lactose
         net_energy_lactation = milk_energy_Mcal_per_kg * milk_production
@@ -588,7 +587,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: AnimalType, milk_
 
 
 def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: float, day_of_pregnancy: Optional[int],
-                                       animal_type: AnimalType, milk_production: float, milk_true_protein: float,
+                                       animal_type: str, milk_production: float, milk_true_protein: float,
                                        calf_birth_weight: float, net_energy_growth: float, average_daily_gain: float,
                                        equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float) -> float:
     """ Protein requirement for maintenance according to NRC (2001).
@@ -605,8 +604,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
         Conceptus weight (kilograms)
     day_of_pregnancy : int
         Day of pregnancy (days)
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     milk_production: float
         Milk yield (kg/d)
     milk_true_protein : float
@@ -693,16 +692,16 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
         MPpreg = 0.0
     # Lactation Requirement
     # ---------------------
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         # [A.Cow.B.6]
         MPlact = milk_production * \
             (milk_true_protein / 100) * (GeneralConstants.KG_TO_GRAMS / 0.67)
     # Total Protein Requirement  (g)
     # ---------------------
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         # [A.Cow.B.7]
         metabolizable_protein_requirement = MPm + MPg + MPpreg + MPlact
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type == 'heifer':
         # [A.Heifer.B.6]
         metabolizable_protein_requirement = MPm + MPg + MPpreg
     return metabolizable_protein_requirement
@@ -786,7 +785,7 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
 
 
 def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: float, day_of_pregnancy: Optional[int],
-                                       animal_type: AnimalType, lactating: bool, average_daily_gain: float, milk_production)\
+                                       animal_type: str, lactating: bool, average_daily_gain: float, milk_production)\
                                         -> float:
     """ Calculates total Calcium requirement according to NRC (2001).
 
@@ -800,8 +799,8 @@ def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: f
         Mature body weight (kilograms)
     day_of_pregnancy : int
         Day of pregnancy (days)
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     lactating : bool
         To emphasyze this physiological condition?
     average_daily_gain : float
@@ -826,14 +825,14 @@ def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: f
     # --------------------------------------------
     # Calcium Requirements
     # ----------------------
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         # [A.Cow.C.1]
         # Calcium maintenance requirement (g)
         if lactating:
             Ca_maint = 0.031 * body_weight + 0.08 * (body_weight / 100)
         else:
             Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type == 'heifer':
         # [A.Heifer.C.1]
         # Calcium maintenance requirement (g)
         Ca_main = 0.0154*body_weight + 0.08*(body_weight/100)
@@ -851,14 +850,14 @@ def calculate_NRC_calcium_requirements(body_weight: float, mature_body_weight: f
                      * (day_of_pregnancy - 1))
     else:
         Ca_preg = 0.0
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         # [A.Cow.C.4]
         # Calcium lactation requirement (g)
         Ca_lact = 1.22 * milk_production
         # [A.Cow.C.5]
         # Total calcium requirement (g)
         calcium_requirement = Ca_maint + Ca_growth + Ca_preg + Ca_lact
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type == 'heifer':
         # [A.Heifer.C.4]
         # Total calcium requirement (g)
         calcium_requirement = Ca_main + Ca_growth + Ca_preg
@@ -922,8 +921,8 @@ def calculate_NASEM_calcium_requirements(body_weight: float, mature_body_weight:
 
 
 def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight: float, 
-                                          day_of_pregnancy: Optional[int], milk_production: float,
-                                          animal_type: AnimalType, average_daily_gain: float) -> float:
+                                          day_of_pregnancy: Optional[int], milk_production: float, animal_type: str,
+                                          average_daily_gain: float) -> float:
     """ Calculates total Phosphorus requirement according to NRC (2001).
 
     Calculates the estimated the total phosphorus requirement (P) in grams per day
@@ -938,8 +937,8 @@ def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight
         Day of pregnancy (days)
     milk_production: float
         Milk yield (kg/d)
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     average_daily_gain : float
         Average daily gain (grams per day)
 
@@ -968,16 +967,16 @@ def calculate_NRC_phosphorus_requirements(body_weight: float, mature_body_weight
                      * (day_of_pregnancy - 1))
     else:
         P_preg = 0.0
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         P_lact = 0.9 * milk_production
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == 'cow':
         phosphorus_requirement = P_growth + P_preg + P_lact
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type == 'heifer':
         phosphorus_requirement = P_growth + P_preg
     return phosphorus_requirement
 
 
-def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weight: float, animal_type: AnimalType,
+def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weight: float, animal_type: str, 
                                             day_of_pregnancy: Optional[int], average_daily_gain: float, 
                                             dry_matter_intake_estimate: float, milk_true_protein: float,
                                             milk_production: float, parity: int) -> float:
@@ -991,8 +990,8 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
         Body weight (kilograms)
     mature_body_weight : float
         Mature body weight (kilograms)
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     day_of_pregnancy : int
         Day of pregnancy (days)
     average_daily_gain : float
@@ -1019,9 +1018,9 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
         National Academic Press, Chapter 7 "Minerals" pp. 112, 2021.
 
     """
-    if animal_type in [AnimalType.LAC_COW]:
+    if animal_type == "cow":
         P_Maint = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
-    elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+    elif animal_type == "heifer":
         P_Maint = 0.8 * dry_matter_intake_estimate + 0.0006 * body_weight
     else:
         P_Maint = 0.0
@@ -1030,13 +1029,13 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
                 body_weight ** -0.22) * average_daily_gain
     else:
         P_Growth = 0.0
-    if day_of_pregnancy is None:
+    if day_of_pregnancy == None:
         P_Preg = 0.0
     else:
         P_Preg = 0.02743 * math.exp(0.05527-0.000075*day_of_pregnancy)*day_of_pregnancy - 0.02743 * \
             math.exp((0.05527-0.000075*(day_of_pregnancy-1)) *
                      (day_of_pregnancy-1)*(body_weight / 715))
-    if milk_true_protein is None or milk_production is None:
+    if milk_true_protein == None or milk_production == None:
         P_Lact = 0.0
     else:
         P_Lact = milk_production * (0.49 + 0.13*milk_true_protein)
@@ -1044,7 +1043,7 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     return max(phosphorus_requirement, ration_constants.minimum_phosophorus)
 
 
-def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
+def calculate_NRC_DMI(animal_type: str, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
                       lactating: bool, milk_production: float, milk_fat: float) -> float:
     """ Calculates dry matter intake according to NRC (2001).
 
@@ -1052,8 +1051,8 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
 
     Parameters
     ----------
-    animal_type : AnimalType
-        A type or subtype of animal specified in the AnimalType enum
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     body_weight : float
         Body weight (kilograms)
     day_of_pregnancy : int
@@ -1083,8 +1082,7 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         pp. 4; and pp. 325, 2001 (Equations 1 and 2).
 
     """
-    if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
-        # TODO: Refactor this so lactating is not needed
+    if animal_type == 'cow':
         if lactating:
             fat_corrected_milk_kg = (
                 0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
@@ -1121,6 +1119,8 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
 
     Parameters
     ----------
+    animal_type : str
+        Animal type according to set categories at RuFaS model: 'Calf', 'Heifer I II III, 'Cow'
     body_weight : float
         Body weight (kilograms)
     mature_body_weight : float

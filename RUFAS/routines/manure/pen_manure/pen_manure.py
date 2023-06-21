@@ -102,9 +102,6 @@ class PenManure:
                                             * manure_volume  # L
                                     ) * GeneralConstants.GRAMS_TO_KG  # kg
 
-        if num_animals == 0:
-            return cls()
-
         return cls(
             urea=animal_manure['urea'] / num_animals,
             urine=animal_manure['urine'],

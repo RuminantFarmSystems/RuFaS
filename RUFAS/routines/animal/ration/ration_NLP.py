@@ -11,14 +11,13 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
-
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_req_,
                  TDN_, DE_, EE_, is_fat_, BW_, calcium_, phosphorus_, NDF_, type_,
                  is_wetforage_, Kd_, N_A_, N_B_, CP_, dRUP_, limit_, cow_type_,
-                 DMIest_= None):
+                 animal_type_ = 'cow', DMIest_= None):
     """
     Sets the global variables with the feed information to be used in the
     constraint functions below. If the input described below is a list, it is a
@@ -55,11 +54,12 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
         CP_: A list of crude protein in each feed (% of DM)
         dRUP_: A list of RUP degradability in each feed (% of RUP)
         limit_: A list of the limiting upper bounds for each feed (kg)
+        animal_type: A string representing the type of the animal
         cow_type_: A boolean which is True if cow is lactating, False else
     """
     global price, n, NEmaint, NEa, NEpreg, NEl, NEg, MP_req, C_req, P_req, \
         DMIest, TDN, DE, EE, is_fat, BW, calcium, phosphorus, NDF, type, \
-        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, cow_type
+        is_wetforage, Kd, N_A, N_B, CP, dRUP, limit, animal_type, cow_type
 
     price = price_
     n = len(price)
@@ -88,6 +88,7 @@ def set_globals(price_, NEmaint_, NEa_, NEpreg_, NEl_, NEg_, MP_req_, C_req_, P_
     CP = CP_
     dRUP = dRUP_
     limit = limit_
+    animal_type = animal_type_
     cow_type = cow_type_
 
 
@@ -323,10 +324,10 @@ def phosphorus_constraint(x):
     return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
 
 
-def protein_constraint(x):
+def protien_constraint(x):
     """
-    Sets up the protein requirement constraint in the NLP. Because part of the
-    maintenance requirement for protein contains non-linearity properties, that
+    Sets up the protien requirement constraint in the NLP. Because part of the
+    maintenance requirement for protien contains non-linearity properties, that
     requirement will be calculated in this function. Each calculation has a
     reference to the respective calculation in the pseudocode.
 
@@ -385,10 +386,8 @@ def protein_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
-
     
     return (MP_supply - (MP_req / 1000))
-
 
 
 def NDF_constraint_1(x):
@@ -505,36 +504,15 @@ def get_ration_vals(x):
     ration_vals = {'ME_tot': ME_tot}
     return ration_vals
 
-# establishing the constraints of the NLP
-constraint_functions = [
-    NEmact_constraint,
-    NEl_constraint,
-    NEgact_constraint,
-    calcium_constraint,
-    phosphorus_constraint,
-    protein_constraint,
-    NDF_constraint_1,
-    NDF_constraint_2,
-    forage_NDF_constraint,
-    fat_constraint,
-    DMI_constraint_upper,
-    DMI_constraint_lower
-]
-
-cow_cons = [{'type': 'ineq', 'fun': func} for func in constraint_functions]
-
-heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [NEl_constraint, DMI_constraint_lower]]
-
-def optimize(animal_combination):
+def optimize():
     """
     Calls the objective function and constraint functions and formulates
     the inputs for the minimization function. Returns the optimized solution
     as a dictionary with feed keys corresponding to their ration (kg).
 
-    Parameters
-    ----------
-    animal_combination : Pen.AnimalCombination
-        The animal combination to optimize the ration for.
+    Args:
+        *This function requires no inputs, but utilizes the functions created
+        above in this file*
 
     """
 
@@ -550,11 +528,23 @@ def optimize(animal_combination):
         bnds.append((0, (limit[i] / 3) + 0.0001))
     bnds = tuple(bnds)
 
-    # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
-    if str(animal_combination) in ['AnimalCombination.LAC_COW']:
+    # establishing the constraints of the NLP
+    con1 = {'type': 'ineq', 'fun': NEmact_constraint}
+    con2 = {'type': 'ineq', 'fun': NEl_constraint}
+    con3 = {'type': 'ineq', 'fun': NEgact_constraint}
+    con4 = {'type': 'ineq', 'fun': calcium_constraint}
+    con5 = {'type': 'ineq', 'fun': phosphorus_constraint}
+    con6 = {'type': 'ineq', 'fun': protien_constraint}
+    con7 = {'type': 'ineq', 'fun': NDF_constraint_1}
+    con8 = {'type': 'ineq', 'fun': NDF_constraint_2}
+    con9 = {'type': 'ineq', 'fun': forage_NDF_constraint}
+    con10 = {'type': 'ineq', 'fun': fat_constraint}
+    con11 = {'type': 'ineq', 'fun': DMI_constraint_upper}
+    con12 = {'type': 'ineq', 'fun': DMI_constraint_lower}
+    cow_cons = [con1, con2, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+    heifer_cons = [con1, con3, con4, con5, con6, con7, con8, con9, con10, con11, con12]
+
+    if animal_type ==  'cow':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=cow_cons)
-    elif str(animal_combination) in ['AnimalCombination.GROWING', 'AnimalCombination.CLOSE_UP',
-                                     'AnimalCombination.GROWING_AND_CLOSE_UP']:
+    elif animal_type == 'heifer':
         return minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
-    else:
-        raise ValueError("Invalid animal combination: " + str(animal_combination))

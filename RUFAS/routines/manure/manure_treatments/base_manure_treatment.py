@@ -163,10 +163,7 @@ class BaseManureTreatment(ABC):
         """
         self._initialize_private_attributes_during_update(sim_day, pen, manure_handler_daily_output,
                                                           manure_treatment_daily_input, manure_separator)
-        if pen.num_animals == 0:
-            daily_output = ManureTreatmentDailyOutput()
-        else:
-            daily_output = self._daily_update_helper()
+        daily_output = self._daily_update_helper()
         self._accumulated_output.simulation_day = sim_day
         self._accumulated_output.pen_id = pen.id
         return daily_output

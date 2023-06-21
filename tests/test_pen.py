@@ -94,11 +94,10 @@ def test_set_milk_avgs(pen: Pen):
     """Unit test for function set_milk_avgs in file routines/animal/pen.py"""
     avg_milk = 40.362
     avg_CP_milk = 3.196
-    avg_milk_production_reduction = 1.5
 
-    pen.set_milk_avgs(avg_milk, avg_CP_milk, avg_milk_production_reduction)
+    pen.set_milk_avgs(avg_milk, avg_CP_milk)
 
-    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk and pen.avg_milk_production_reduction == 1.5
+    assert pen.avg_milk == avg_milk and pen.avg_CP_milk == avg_CP_milk
 
 
 @pytest.mark.parametrize('pen_to_test, new_animals, expected_animals_in_pen',
