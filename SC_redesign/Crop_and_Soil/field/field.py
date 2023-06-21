@@ -20,7 +20,7 @@ from copy import copy
 
 
 """
-This is a high-level module that represents an simulates an entire field. It is responsible for executing the daily
+This is a high-level module that represents and simulates an entire field. It is responsible for executing the daily
 biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for the
 management of schedules, executing, and reporting of farm management events, including planting and harvesting crops,
 adding manure and fertilizer to the soil, and tilling the soil.
