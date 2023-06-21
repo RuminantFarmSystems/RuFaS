@@ -48,110 +48,19 @@ class FieldManager:
         """
         input_directory = Utility.get_base_dir() / 'input'
 
-        soil_config = Utility.read_json_file(input_directory / 'soil' / field_config['soil'])
+        _soil_config = Utility.read_json_file(input_directory / 'soil' / field_config['soil'])
         crops_config = Utility.read_json_file(input_directory / 'crop' / field_config['crop'])
         management_config = \
             Utility.read_json_file(input_directory / 'field_management' / field_config['field_management'])
 
         available_fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule = \
             FieldManager._setup_management(field_name, management_config)
+        fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
+        manure_events = manure_schedule.generate_manure_events()
+        tillage_events = tillage_schedule.generate_tillage_events()
 
-        return Field()
-
-    @staticmethod
-    def _setup_soil(soil_config: Dict[str]) -> Soil:
-        """
-        Sets up a Soil instance that will be used by the Field class.
-
-        Parameters
-        ----------
-        soil_config : Dict[str]
-            Contains all the data necessary to set up a SoilData object.
-
-        Returns
-        -------
-        Soil
-            Soil instance that contains a SoilData instance configured to the provided specifications.
-
-        """
-        field_size = soil_config["field_size"]
-
-        config_dictionary = {}
-
-        config_dictionary["second_moisture_condition_parameter"] = soil_config.get("CN2")
-        config_dictionary["average_subbasin_slope"] = soil_config.get("field_slope")
-        config_dictionary["slope_length"] = soil_config.get("slope_length")
-        config_dictionary["manning"] = soil_config.get("manning")
-        config_dictionary["albedo"] = soil_config.get("soil_albedo")
-        config_dictionary["cover_type"] = soil_config.get("soil_cover_type")
-
-        soil_layers_config = list(config_dictionary.get("soil_layers"))
-        pass
-
-    @staticmethod
-    def _setup_soil_layer(top_depth: float, sand: float, silt: float, initial_residue: float,
-                          layer_config: Dict) -> LayerData:
-        """
-        Initializes a LayerData instance to be added to a SoilData object.
-
-        Parameters
-        ----------
-        top_depth : float
-            Depth of top of the soil layer beneath the surface (mm)
-        sand : float
-            Sand content expressed as percent of soil in this layer (unitless)
-        silt : float
-            Silt content expressed as percent of soil in this layer (unitless)
-        initial_residue : float
-            Amount of residue on the soil surface when this soil layer is initialized (kg / ha)
-        layer_config
-
-        Returns
-        -------
-        LayerData
-            LayerData instance configured with provided data.
-
-        """
-        config_dictionary = {}
-
-        config_dictionary["top_depth"] = top_depth
-        config_dictionary["bottom_depth"] = layer_config["bottom_depth"]
-        config_dictionary["wilting_point_water_concentration"] = layer_config.get("wilting_point")
-        config_dictionary["field_capacity_water_concentration"] = layer_config.get("field_capacity")
-        config_dictionary["saturation_point_water_concentration"] = layer_config.get("saturation")
-        config_dictionary["saturated_hydraulic_conductivity"] = layer_config.get("K_sat")
-        config_dictionary["percent_clay_content"] = layer_config.get("clay")
-        config_dictionary["temperature"] = layer_config.get("initial_temperature")
-        config_dictionary["bulk_density"] = layer_config["bulk_density"]
-        config_dictionary["percent_organic_carbon_content"] = layer_config["org_C_percent"]
-        config_dictionary["initial_soil_nitrate_concentration"] = layer_config["NO3"]
-
-    @staticmethod
-    def convert_depth_to_kilograms(depth: float, area: float, density: float) -> float:
-        """
-        Converts a quantity expressed as a depth to kilograms.
-
-        Parameters
-        ----------
-        depth : float
-            Depth of the quantity being converted (mm)
-        area : float
-            Area over which the quantity is distributed (ha)
-        density : float
-            The mass per volume of the stuff over which the quantity is distributed (Megagrams / cubic meter)
-
-        Returns
-        -------
-        float
-            The quantity passed converted to kilograms.
-
-        """
-        area_in_mm = area * HECTARES_TO_SQUARE_MILLIMETERS
-        quantity_in_cubic_mm = depth * area_in_mm
-        quantity_in_cubic_meters = quantity_in_cubic_mm * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-        quantity_in_megagrams = quantity_in_cubic_meters * density
-        quantity_in_kilograms = quantity_in_megagrams * MEGAGRAMS_TO_KILOGRAMS
-        return quantity_in_kilograms
+        return Field(tillage_events=tillage_events, fertilizer_events=fertilizer_events,
+                     fertilizer_mixes=available_fertilizer_mixes)
 
     @staticmethod
     def _setup_management(field_name: str,
