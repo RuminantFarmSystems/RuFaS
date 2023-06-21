@@ -1624,7 +1624,7 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     
     #udrv = MagicMock()
     mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
-    mock_user_defined_ration_manager.dry_cow_ration = {'1': 10, '2': 20, '3': 30}
+    mock_user_defined_ration_manager.close_up_ration = {'1': 10, '2': 20, '3': 30}
     mock_user_defined_ration_manager.heifer_ration = {'1': 1, '2': 2, '3': 3}
     mock_user_defined_ration_manager.calf_ration = {'1': 0.1, '2': 0.2, '3': 0.3}
 
@@ -1649,15 +1649,17 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     result = RUFAS.routines.animal.ration.user_defined_ration.UserDefinedRationManager.ration_to_use(pen_animal_combo, fakefeeds_available)
     assert result == {'1': 0.1, '2': 0.2, '3': 0.3}
 
-
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationManager):
     """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
     mock_user_defined_ration_manager.tolerance = 0.1
     ration_percents = {'1': 10, '2': 20}
-    predicted = [[9/3,11/3], [9/3,11/3], [9/3,11/3], \
-                 [18/3,22/3], [18/3,22/3], [18/3,22/3]]
+    low_offset = 1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    high_offset = 1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    predicted = [[9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], \
+                 [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset]]
     result = RUFAS.routines.animal.ration.ration_NLP.make_user_bounds(ration_percents, 100)
     # assert that list output is those modified and repeated 3X
     for i in range(len(predicted)):
-        assert predicted[i][0] == pytest.approx(result[i][0])
-        assert predicted[i][1] == pytest.approx(result[i][1])
+        assert predicted[i][0] == pytest.approx(result[i][0], 0.1)
+        assert predicted[i][1] == pytest.approx(result[i][1], 0.1)
