@@ -1,7 +1,7 @@
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
@@ -32,9 +32,11 @@ class Field:
     """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
-                 tillage_events: Optional[List[TillageEvent]] = None, plantings: Optional[List[PlantingEvent]] = None,
-                 harvestings: Optional[List[HarvestEvent]] = None,
-                 custom_crop_specifications: Optional[Dict[str, Dict]] = None):
+                 plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
+                 custom_crop_specifications: Optional[Dict[str, Dict]] = None,
+                 tillage_events: Optional[List[TillageEvent]] = None,
+                 fertilizer_events: Optional[List[FertilizerEvent]] = None,
+                 fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -60,8 +62,15 @@ class Field:
         self.fertilizer_applicator = FertilizerApplication(self.soil)
         """Provides interface for adding fertilizer to the field."""
 
+        self.fertilizer_events = fertilizer_events or []
+        """List of all fertilizer application events that will in this field."""
+
+        self.available_fertilizer_mixes = fertilizer_mixes or {}
+        """List of all fertilizer mixes available for application to this field."""
+
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
+
         self.tillage_events: List[TillageEvent] = tillage_events
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
@@ -83,9 +92,7 @@ class Field:
         Details: **All the logic (after setup) will go in this function**
         """
         # --- Soil Management---
-        # nutrient amendments
-        if self.field_data.is_amendment_day:
-            self.amend_soil()
+        self.check_fertilizer_application_schedule(time)
 
         # tillage
         self.check_tillage_schedule()
@@ -130,43 +137,131 @@ class Field:
         """ensure that the crop_proportions values sum to 1"""
         return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
-    # <editor-fold desc="--- Setup Methods ---">
-    def setup_field(self, soil_config, tillage_config, amendment_config):
-        """setup all the attributes that determine how the field will be managed"""
-        self.soil = Soil(soil_config)
-        self.setup_tillage(tillage_config)
-        self.setup_amendments(amendment_config)
-
-    def setup_tillage(self, tillage_config):
-        """sets up the tillage details for this field"""
-        pass
-
-    def setup_amendments(self, amendment_config):
-        """sets up the nutrient amendment details (manure and fertilizer) for this field"""
-        pass
-        # </editor-fold>
-
     # <editor-fold desc="--- Soil Management Methods ---">
-    def check_tillage_schedule(self, time: Time) -> None:
+    def _execute_fertilizer_application(self, mix_name: str, requested_nitrogen: float, requested_phosphorus: float,
+                                        year: int, day: int) -> None:
         """
-        Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
-        executed.
+        Executes a fertilizer application based on the requested amounts of nutrients.
 
         Parameters
         ----------
-        time : Time
-            Time object containing the current day and year of the simulation.
-        """
-        self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
-        for event in todays_events:
-            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
-                                  time.calendar_year,
-                                  time.day)
+        mix_name : str
+            The name of the mix this fertilizer application should be composed of.
+        requested_nitrogen : float
+            Minimum amount of nitrogen to be included in this fertilizer application.
+        requested_phosphorus : float
+            Minimum amount of phosphorus to be included in this fertilizer application.
+        year : int
+            Calendar year in which the fertilizer application is occurring.
+        day : int
+            Julian day on which this fertilizer application is occurring.
 
-    def amend_soil(self) -> None:
-        """amend the soil with nutrients"""
-        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(0)
-        return
+        Raises
+        ------
+        KeyError
+            If the specified fertilizer mix is not defined in the list of available fertilizers to this field.
+
+        Notes
+        -----
+        This method is responsible for determining the exact amounts of fertilizer and nutrients added to the field,
+        passing those amount to the FertilizerApplication module, and recording the fertilizer application to the
+        OutputManager.
+
+        """
+        try:
+            fertilizer_mix = self.available_fertilizer_mixes.get(mix_name)
+        except KeyError:
+            raise KeyError(f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
+                           f"received '{self.available_fertilizer_mixes}'.")
+        nitrogen_fraction = fertilizer_mix.get("N")
+        phosphorus_fraction = fertilizer_mix.get("P")
+        potassium_fraction = fertilizer_mix.get("K")
+
+        fertilizer_applied = self._formulate_fertilizer_required(nitrogen_fraction, phosphorus_fraction,
+                                                                 potassium_fraction, requested_nitrogen,
+                                                                 requested_phosphorus)
+        total_mass_applied = fertilizer_applied.get("total_mass")
+        phosphorus_applied = fertilizer_applied.get("phosphorus_mass")
+        nitrogen_applied = fertilizer_applied.get("nitrogen_mass")
+        potassium_applied = fertilizer_applied.get("potassium_mass")
+
+        # TODO: specify these fractions in fertilizer mixes - issue #573
+        inorganic_nitrogen_fraction = nitrogen_applied / total_mass_applied
+        ammonium_fraction = 0.0
+        organic_nitrogen_fraction = 0.0
+
+        self.fertilizer_applicator.apply_fertilizer(phosphorus_applied, total_mass_applied, inorganic_nitrogen_fraction,
+                                                    ammonium_fraction, organic_nitrogen_fraction,
+                                                    self.field_data.field_size)
+
+        self._record_fertilizer_application(mix_name, total_mass_applied, nitrogen_applied, phosphorus_applied,
+                                            potassium_applied, year, day)
+
+    @staticmethod
+    def _formulate_fertilizer_required(nitrogen_fraction: float, phosphorus_fraction: float,
+                                       potassium_fraction: float, requested_nitrogen: float,
+                                       requested_phosphorus: float) -> Dict[str, float]:
+        """
+        Determines the total mass of a specific fertilizer mix needed to meet the specified nutrient requirements.
+
+        Parameters
+        ----------
+        nitrogen_fraction : float
+            Fraction of fertilizer mix that is nitrogen, in range [0.0, 1.0] (unitless)
+        phosphorus_fraction : float
+            Fraction of fertilizer mix that is phosphorus, in range [0.0, 1.0] (unitless)
+        potassium_fraction : float
+            Fraction of fertilizer mix that is potassium, in range [0.0, 1.0] (unitless)
+        requested_nitrogen : float
+            Minimum mass of nitrogen to be included in fertilizer application (kg)
+        requested_phosphorus : float
+            Minimum mass of phosphorus to be included in fertilizer application (kg)
+
+        Returns
+        -------
+        Dict[str, float]
+            The total mass of fertilizer, and the masses of nitrogen, phosphorus, and potassium in the fertilizer.
+
+        """
+        minimum_mass_for_nitrogen = (0 if nitrogen_fraction == 0 else (requested_nitrogen / nitrogen_fraction))
+        minimum_mass_for_phosphorus = (0 if phosphorus_fraction == 0 else (requested_phosphorus / phosphorus_fraction))
+
+        total_mass = max(minimum_mass_for_nitrogen, minimum_mass_for_phosphorus)
+        nitrogen_mass = total_mass * nitrogen_fraction
+        phosphorus_mass = total_mass * phosphorus_fraction
+        potassium_mass = total_mass * potassium_fraction
+        return {"total_mass": total_mass, "nitrogen_mass": nitrogen_mass, "phosphorus_mass": phosphorus_mass,
+                "potassium_mass": potassium_mass}
+
+    def _record_fertilizer_application(self, mix_name: str, total_mass: float, nitrogen_mass: float,
+                                       phosphorus_mass: float, potassium_mass: float, year: int, day: int) -> None:
+        """
+        Records a fertilizer application and saves it to the Output manager.
+
+        Parameters
+        ----------
+        mix_name : str
+            The name of the mix this fertilizer application is composed of.
+        total_mass : float
+            The total mass of phosphorus applied (kg)
+        nitrogen_mass : float
+            The mass of nitrogen applied (kg)
+        phosphorus_mass : float
+            The mass of phosphorus applied (kg)
+        potassium_mass : float
+            The mass of potassium applied (kg)
+        year : int
+            Calendar year in which the fertilizer application is occurring.
+        day : int
+            Julian day on which this fertilizer application is occurring.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "mix_name": mix_name, "field_size": self.field_data.field_size}
+        value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
+                 "potassium": potassium_mass}
+        om.add_variable("fertilizer_application", value, info_map)
 
     # </editor-fold>
 
@@ -185,6 +280,37 @@ class Field:
         self.planting_events, todays_planting_events = self._filter_events(self.planting_events, time)
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
+
+    def check_fertilizer_application_schedule(self, time: Time) -> None:
+        """
+        Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
+
+        Parameters
+        ----------
+        time : Time
+            Object containing the current year and day of the simulation.
+
+        """
+        self.fertilizer_events, todays_fertilizer_events = self._filter_events(self.fertilizer_events, time)
+        for event in todays_fertilizer_events:
+            self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
+                                                 event.day)
+
+    def check_tillage_schedule(self, time: Time) -> None:
+        """
+        Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
+        executed.
+
+        Parameters
+        ----------
+        time : Time
+            Time object containing the current day and year of the simulation.
+        """
+        self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
+        for event in todays_events:
+            self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
+                                  time.calendar_year,
+                                  time.day)
 
     def check_crop_harvest_schedule(self, time: Time) -> None:
         """
@@ -256,7 +382,6 @@ class Field:
             else:
                 remaining_events.append(event)
         return remaining_events, todays_events
-
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
