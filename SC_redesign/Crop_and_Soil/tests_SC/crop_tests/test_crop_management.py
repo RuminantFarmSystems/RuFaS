@@ -88,14 +88,6 @@ def test_dry_down():
     assert pytest.approx(crop.data.above_ground_biomass) == 10.2 * (1 - 0.18)
 
 
-def test_graze():
-    warnings.warn("no graze method implemented")
-
-
-def test_collect_cut_yields():
-    warnings.warn("no collect cut yields method implemented")
-
-
 @pytest.mark.parametrize("heat_sched,heat_frac,harv_day,harv_yr,this_day,this_yr", [
     (False, 1.20, 100, 0, 80, 0),  # scheduled, too early (conflicting heat)
     (False, 1.00, 100, 0, 100, 0),  # scheduled, exactly right (conflicting heat)
