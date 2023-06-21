@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
+
 
 from RUFAS.classes import Weather
 
@@ -26,7 +26,7 @@ class CurrentWeather:
     """amount of rainfall that occurs on the day (mm)"""
 
     @classmethod
-    def check_current_weather(cls, weather: Weather) -> CurrentWeather:  # NOTE: How to specify the correct return type?
+    def check_current_weather(cls, weather: Weather) -> 'CurrentWeather':# NOTE: How to specify the correct return type?
         """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
         object"""
         cls.incoming_light = weather.radiation
