@@ -264,6 +264,10 @@ class OutputManager(object):
         serialized dictionary using the max_depth parameter.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._dict_to_file_json.__name__,
+                    }
+        self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as json_file:
                 json.dump(
@@ -271,6 +275,7 @@ class OutputManager(object):
                     json_file,
                     indent=0,
                 )
+                self.add_log("save_dict_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
             raise e
 
@@ -290,9 +295,14 @@ class OutputManager(object):
             If an error occurs while saving to the file
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._list_to_file_txt.__name__,
+                    }
+        self.add_log("save_txt_file_try", f"Attempting to save to {path}.", info_map)
         try:
             with open(path, "w") as var_names_file:
                 var_names_file.writelines(data_list)
+                self.add_log("save_txt_file_success", f"Successfully saved to {path}.", info_map)
         except Exception as e:
             raise e
 
@@ -320,6 +330,10 @@ class OutputManager(object):
 
     def _list_txt_file_names_in_dir(self, dir_path: str) -> List[str]:
         """ Returns the list of files in the given path"""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._list_txt_file_names_in_dir.__name__,
+                    }
+        self.add_log("search_path_for_filenames_try", f"Attempting to search in {dir_path}.", info_map)
         dir_path_check = Path(dir_path)
         if dir_path_check.is_dir():
             txt_files = []
@@ -327,6 +341,8 @@ class OutputManager(object):
             for filename in all_files:
                 if filename.endswith(".txt"):
                     txt_files.append(filename)
+            self.add_log("search_path_for_filenames_success", f"Successfully searched in {dir_path}"
+                         f" and found {len(txt_files)} text files.", info_map)
             return txt_files
         else:
             raise NotADirectoryError("The specified path must be a directory")
@@ -350,16 +366,14 @@ class OutputManager(object):
             If an error occurs while opening or reading the file.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_txt_file_to_list.__name__,
+                    }
+        self.add_log("open_text_file", f"Attempting to open {path}.", info_map)
         try:
             with open(path) as text_file:
-                info_map = {"class": self.__class__.__name__,
-                            "function": self._load_txt_file_to_list.__name__,
-                            }
                 list_of_elements = text_file.read().splitlines()
-                if not list_of_elements:
-                    load_message = f"{path} was empty"
-                else:
-                    load_message = f"{path} had {len(list_of_elements)} filters"
+                load_message = f"Successfully opened {path}, it contained {len(list_of_elements)} filter patterns."
                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements
         except Exception as e:
@@ -398,18 +412,18 @@ class OutputManager(object):
         exclude_keyword = "exclude"
         filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
         if filter_by_exclusion:
-            filter_log_message = f"{input_file} contains exclude-keyword '{exclude_keyword}' at position"
-            f" {exclude_keyword_location}"
-            self.add_log("filtering_log", filter_log_message, info_map)
+            filter_vars_msg = f"{input_file} has exclude-keyword '{exclude_keyword}' at"\
+                f" position {exclude_keyword_location}."
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
-            filter_log_message = f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"
-            f" at position {exclude_keyword_location}"
-            self.add_log("filtering_log", filter_log_message, info_map)
+            filter_vars_msg = f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"\
+                f" at position {exclude_keyword_location}."
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
-        filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for {input_file} filter patterns"
+        self.add_log("filtering_log", filter_vars_msg, info_map)
+        filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)} filter"\
+            f" patterns in the {input_file} file."
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
