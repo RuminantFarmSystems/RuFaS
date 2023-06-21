@@ -1,5 +1,3 @@
-import warnings
-
 import pytest
 from mock.mock import MagicMock
 from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
