@@ -18,13 +18,12 @@ from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
 
-# TODO: delete/replace the note block below once satisfied with the design
-"""
-The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm
-manager classes. The field class, as laid out here, handles the management actions and scenarios that can be performed
-in an agricultural field.
 
-Note that some of the field-level attributes will be tracked by the FieldData class
+"""
+This is a high-level module that represents an simulates an entire field. It is responsible for executing the daily
+biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for the
+management of schedules, executing, and reporting of farm management events, including planting and harvesting crops,
+adding manure and fertilizer to the soil, and tilling the soil.
 """
 
 om = OutputManager()
@@ -87,15 +86,23 @@ class Field:
         """List of all manure applications that will be applied to this field."""
 
     def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
-        """main Field function, runs all field routines based on current attribute configuration
+        """
+        Main Field routine, runs all subroutines routines based on current attribute configuration.
 
-        Args:
-            time : a Time object, containing the current year and day that the simulation is on.
-            current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
-                for field processes.
+        Parameters
+        ----------
+        time : Time
+            Contains the current year and day that the simulation is on.
+        current_weather : CurrentWeather
+            Contains a collection of today's weather variables needed for field processes.
 
+        Notes
+        -----
+        This method starts by executing any soil amendments that may be scheduled for the day. Then it executes the
+        daily update routines for the soil profile and active crops in the field. It then plants and/or harvests crops,
+        checks if active crops need to go into dormancy, and resets crop attributes in both the crops and in the field's
+        data object.
 
-        Details: **All the logic (after setup) will go in this function**
         """
         # --- Soil Management---
         self._check_fertilizer_application_schedule(time)
