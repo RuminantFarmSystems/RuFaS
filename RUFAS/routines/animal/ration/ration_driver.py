@@ -191,15 +191,29 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     ration_vals : Dict
     
     """
+    info_map = {"class": "no_caller_class",
+                "function": get_user_defined_ration.__name__,
+                }
+    sim_day = pen.animals_in_pen[0].body_weight_history[-1].simulation_day
     fixed_ration = False
     ration_percents =UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
     if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
+        constraints_failed_list = []
+        failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+        if failed_constraints:
+            for constr in failed_constraints:
+                constraints_failed_list.append(constr["fun"].__name__)
+            fail_summary = {'simulation day' : sim_day,
+                                'reattempt number' : 0,
+                                'constraints_failed_dict': constraints_failed_list, 
+                                'ration_attempted': make_ration_from_solution(available_feeds, solution),
+                                'pen requirements' : pen.avg_nutrient_rqmts}
+            om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
     failed_list = []
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
         num_reattempts = 0
-        constraints_failed_dict = {}
         
         starting_milk_average = calc_starting_milk_average(pen)
         while not solution.success:
@@ -215,11 +229,9 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-            info_map = {"class": "no_caller_class",
-                "function": get_user_defined_ration.__name__,
-                }
+            
             # TODO: find a better way to get the current day! import Time from classes.py?
-            sim_day = pen.animals_in_pen[0].body_weight_history[-1].simulation_day
+            
             fail_summary = {'simulation day' : sim_day,
                             'reattempt number' : num_reattempts,
                             'constraints_failed_dict': constraints_failed_list, 
