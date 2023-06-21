@@ -7,7 +7,7 @@ from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.field import Field
@@ -56,6 +56,40 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     field._filter_events.assert_has_calls(expected_create_and_update_events_calls)
     assert field._plant_crop.call_count == len(events_occurring_today)
     assert field.planting_events == events_remaining
+
+
+@pytest.mark.parametrize("events,remaining_events,current_events", [
+    ([FertilizerEvent("mix_1", 100, 20, 1993, 75, 0, 1.0), FertilizerEvent("mix_2", 20, 20, 1993, 75, 0, 1.0),
+      FertilizerEvent("mix_3", 15, 15, 1993, 75, 0, 1.0)], [], [FertilizerEvent("mix_1", 100, 20, 1993, 75, 0, 1.0),
+                                                                FertilizerEvent("mix_2", 20, 20, 1993, 75, 0, 1.0),
+                                                                FertilizerEvent("mix_3", 15, 15, 1993, 75, 0, 1.0)]),
+    ([FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0), FertilizerEvent("mix_1", 25, 5, 1992, 250, 0, 1.0),
+      FertilizerEvent("mix_1", 100, 50, 1993, 80, 0, 1.0)], [FertilizerEvent("mix_1", 25, 5, 1992, 250, 0, 1.0),
+                                                             FertilizerEvent("mix_1", 100, 50, 1993, 80, 0, 1.0)],
+                                                            [FertilizerEvent("mix_1", 150, 20, 1992, 80, 0, 1.0)]),
+    ([FertilizerEvent("mix_1", 50, 10, 1998, 90, 0, 1.0), FertilizerEvent("mix_1", 50, 10, 1999, 90, 0, 1.0),
+      FertilizerEvent("mix_1", 50, 10, 2000, 90, 0, 1.0)], [FertilizerEvent("mix_1", 50, 10, 1998, 90, 0, 1.0),
+                                                            FertilizerEvent("mix_1", 50, 10, 1999, 90, 0, 1.0),
+                                                            FertilizerEvent("mix_1", 50, 10, 2000, 90, 0, 1.0)], [])
+])
+def test_check_fertilizer_application_schedule(events: List[FertilizerEvent], remaining_events: List[FertilizerEvent],
+                                               current_events: List[FertilizerEvent]) -> None:
+    """Tests that fertilizer events that occur on the current day are properly selected and executed."""
+    field = Field(fertilizer_events=events)
+    field._filter_events = MagicMock(return_value=(remaining_events, current_events))
+    field._execute_fertilizer_application = MagicMock()
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", 2000)
+    setattr(mocked_time, "day", 100)
+
+    field.check_fertilizer_application_schedule(mocked_time)
+
+    expected_execution_calls = []
+    for event in current_events:
+        expected_execution_calls.append(call(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
+                                             event.day))
+    field._filter_events.assert_called_once_with(events, mocked_time)
+    field._execute_fertilizer_application.assert_has_calls(expected_execution_calls)
 
 
 @pytest.mark.parametrize("year,day,all_harvest_events,current_harvest_events", [
@@ -176,18 +210,12 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
         expected_crop = field.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
     expected_crop.data.use_heat_scheduling = heat_scheduled
     expected_crop.data.id = crop_reference
-    # expected_info_map = {"prefix": "field_name:'test'", "field_size": 1.3, "date": {"year": year, "day": day},
-    #                      "species": expected_crop.data.species}
-    # expected_value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled}
 
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species
     field._record_planting.assert_called_once_with(crop_reference, heat_scheduled, expected_crop.data.species,
                                                    year, day)
-    # actual = om.variables_pool["field_name:'test'.crop_planting"]
-    # assert actual["info_maps"].__contains__(expected_info_map)
-    # assert actual["values"].__contains__(expected_value)
 
 
 @pytest.mark.parametrize("crop_reference,heat_scheduled,species,year,day,field_name,field_size,expected_info_map,"
@@ -454,12 +482,75 @@ def test_harvest_scheduled_crops():
     crop3.crop_management.manage_harvest.assert_called_once()
 
 
-def test_amend_soil() -> None:
-    """Tests that amend_soil() properly calls all the subroutines that add nutrients to the field"""
-    field = Field()
-    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
-    field.amend_soil()
-    field.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(0)
+@pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size", {
+    ("test_mix_1", 80.0, 30.0, 1993, 100, 3.1),
+    ("test_mix_2", 150.0, 89.0, 2001, 240, 1.3),
+    ("test_mix_3", 10.0, 90.33, 1992, 30, 2.44),
+    ("test_mix_4", 0.0, 50.0, 1996, 60, 1.45),
+    ("test_mix_5", 67.5, 0.0, 1998, 200, 2.3),
+    ("test_mix_6", 0.0, 0.0, 1988, 120, 0.5)
+})
+def test_execute_fertilizer_application(mix_name: str, requested_n: float, requested_p: float,
+                                        year: int, day: int, field_size: float) -> None:
+    """Tests that fertilizer applications are being correctly executed and recorded."""
+    field_data = FieldData(name="test", field_size=field_size)
+    field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}})
+    field._formulate_fertilizer_required = MagicMock(return_value={"total_mass": 100, "nitrogen_mass": 20,
+                                                                   "phosphorus_mass": 15,
+                                                                   "potassium_mass": 10})
+    field.fertilizer_applicator.apply_fertilizer = MagicMock()
+    field._record_fertilizer_application = MagicMock()
+
+    field._execute_fertilizer_application(mix_name, requested_n, requested_p, year, day)
+
+    expected_nitrogen_fraction = 0.2
+    field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
+    field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0, 0.0,
+                                                                         field_size)
+    field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
+
+
+@pytest.mark.parametrize("nitrogen_frac,phosphorus_frac,potassium_frac,requested_nitrogen,requested_phosphorus,"
+                         "expected", [
+                             (0.2, 0.1, 0.3, 100.0, 80.0, {"total_mass": 800.0, "nitrogen_mass": 160.0,
+                                                           "phosphorus_mass": 80.0, "potassium_mass": 240.0}),
+                             (0.82, 0.0, 0.0, 200.0, 50.0, {"total_mass": 243.90243902439025, "nitrogen_mass": 200.0,
+                                                            "phosphorus_mass": 0.0, "potassium_mass": 0.0}),
+                             (0.4, 0.2, 0.1, 80.0, 40.0, {"total_mass": 200.0, "nitrogen_mass": 80.0,
+                                                          "phosphorus_mass": 40.0, "potassium_mass": 20.0}),
+                             (0.05, 0.1, 0.3, 45.0, 100.0, {"total_mass": 1000.0, "nitrogen_mass": 50.0,
+                                                            "phosphorus_mass": 100.0, "potassium_mass": 300.0})
+                         ])
+def test_formulate_fertilizer_required(nitrogen_frac: float, phosphorus_frac: float, potassium_frac: float,
+                                       requested_nitrogen: float, requested_phosphorus: float,
+                                       expected: Dict[str, float]) -> None:
+    """Tests that fertilizer formulations are made correctly."""
+    actual = Field._formulate_fertilizer_required(nitrogen_frac, phosphorus_frac, potassium_frac, requested_nitrogen,
+                                                  requested_phosphorus)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,year,day,field_name,"
+                         "field_size", [
+                                        ("mix_1", 100, 20, 20, 20, 1992, 90, "field_1", 1.4),
+                                        ("mix_2", 30, 10, 3, 3, 1994, 120, "field_2", 4.3)
+                                        ])
+def test_record_fertilizer_application(mix_name: str, total_mass: float, nitrogen_mass: float, phosphorus_mass: float,
+                                       potassium_mass: float, year: int, day: int, field_name: str,
+                                       field_size: float) -> None:
+    """Tests that fertilizer applications are correctly recorded in the OutputManager."""
+    field = Field(field_data=FieldData(name=field_name, field_size=field_size))
+
+    field._record_fertilizer_application(mix_name, total_mass, nitrogen_mass, phosphorus_mass, potassium_mass, year,
+                                         day)
+
+    expected_info_map = {"prefix": f"field_name:'{field_name}'", "date": {"year": year, "day": day},
+                         "mix_name": mix_name, "field_size": field_size}
+    expected_value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
+                      "potassium": potassium_mass}
+    actual = om.variables_pool[f"field_name:'{field_name}'.fertilizer_application"]
+    assert actual["info_maps"].__contains__(expected_info_map)
+    assert actual["values"].__contains__(expected_value)
 
 
 @pytest.mark.parametrize("field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp,"
