@@ -10,7 +10,7 @@ class FieldManager:
         self.fields = fields
         self.om - OutputGatherer()
 
-    def daily_update_routine(self, weather: Weather, time: Time):
+    def daily_update_routine(self, weather: CurrentWeather, time: Time):
         for field in self.fields:
             field.manage_field(time, weather)
         self.om.send_daily_variables()
@@ -19,11 +19,3 @@ class FieldManager:
         for field in self.fields:
             field.perform_annual_reset()
         self.om.send_annual_variables()
-
-
-
-
-
-
-
-

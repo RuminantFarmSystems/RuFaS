@@ -35,5 +35,4 @@ class CurrentWeather:
         cls.max_air_temperature = weather.T_max
         cls.annual_mean_air_temperature = weather.T_avg_annual
         cls.rainfall = weather.rainfall
-        cls.daylength =
         return CurrentWeather()  # TODO: placeholder for typing, needs implementation
