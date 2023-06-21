@@ -14,12 +14,13 @@ from unittest.mock import MagicMock
      Field(field_data=FieldData(name="field3"))],
     []
 ])
-def test_daily_update_routine(fields: Field):
+def test_daily_update_routine(fields: List[Field]) -> None:
     mocked_time = MagicMock(Time)
     mocked_weather = MagicMock(CurrentWeather)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "day", 5)
     Field.manage_field = MagicMock()
-    fm = FieldManager(fields=fields)
+    fm = FieldManager()
+    fm.fields = fields
     fm.daily_update_routine(current_weather=mocked_weather, time=mocked_time)
     assert Field.manage_field.call_count == len(fields)
