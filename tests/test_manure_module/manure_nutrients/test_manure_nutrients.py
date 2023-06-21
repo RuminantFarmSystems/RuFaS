@@ -16,7 +16,7 @@ from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrie
 )
 def test_manure_nutrients_init(nitrogen, phosphorus, potassium, dry_matter, total_manure_mass,
                                expected_dry_matter_fraction, expected_nitrogen_composition,
-                               expected_phosphorus_composition):
+                               expected_phosphorus_composition) -> None:
     """
     Unit test for the ManureNutrients class in manure_nutrients.py.
 
@@ -53,7 +53,7 @@ def test_manure_nutrients_init(nitrogen, phosphorus, potassium, dry_matter, tota
         {"nitrogen": 1.0, "phosphorus": 2.0, "potassium": 3.0, "dry_matter": 4.0, "total_manure_mass": -5.0},
     ],
 )
-def test_manure_nutrients_invalid_init(nutrient_values: dict[str, float]):
+def test_manure_nutrients_invalid_init(nutrient_values: dict[str, float]) -> None:
     """
     Unit test for the __post_init__ method in the ManureNutrients class in manure_nutrients.py.
 
@@ -61,11 +61,14 @@ def test_manure_nutrients_invalid_init(nutrient_values: dict[str, float]):
     expecting it to raise an error when any of the attributes are negative.
 
     """
-    with pytest.raises(ValueError):
-        ManureNutrients(**nutrient_values)
+    for key in nutrient_values:
+        if nutrient_values[key] < 0:
+            with pytest.raises(ValueError, match=f'Field {key} must be non-negative.'):
+                ManureNutrients(**nutrient_values)
+            break
 
 
-def test_manure_nutrients_add_subtract():
+def test_manure_nutrients_add_subtract() -> None:
     """
     Unit test for the addition and subtraction operations (__add__, __sub__)
     in the ManureNutrients class in manure_nutrients.py.
@@ -108,8 +111,8 @@ def test_manure_nutrients_add_subtract():
     assert nutrients_subtracted.total_manure_mass == pytest.approx(1.0)
 
 
-@pytest.mark.parametrize("multiplier", [0, 2, 3.5, 1e10, -1])
-def test_manure_nutrients_multiplication(multiplier: int | float):
+@pytest.mark.parametrize("multiplier", [0, 2, 3.5, 1e10, -1, None])
+def test_manure_nutrients_multiplication(multiplier: int | float | None) -> None:
     """
     Unit test for the arithmetic operations (__mul__, __rmul__)
     in the ManureNutrients class in manure_nutrients.py.
@@ -128,7 +131,12 @@ def test_manure_nutrients_multiplication(multiplier: int | float):
     )
 
     # Act and Assert
-    if multiplier >= 0:
+    if type(multiplier) not in [int, float]:
+        with pytest.raises(TypeError, match=f'Cannot multiply {type(nutrients)} by {type(multiplier)}.'):
+            nutrients * multiplier
+        with pytest.raises(TypeError, match=f'Cannot multiply {type(nutrients)} by {type(multiplier)}.'):
+            multiplier * nutrients
+    elif multiplier >= 0:
         nutrients_multiplied = nutrients * multiplier
         nutrients_multiplied_2 = multiplier * nutrients
 
@@ -144,8 +152,8 @@ def test_manure_nutrients_multiplication(multiplier: int | float):
         assert nutrients_multiplied_2.dry_matter == pytest.approx(4.0 * multiplier)
         assert nutrients_multiplied_2.total_manure_mass == pytest.approx(5.0 * multiplier)
     else:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=f'Cannot multiply {type(nutrients)} by a negative scalar.'):
             nutrients * multiplier
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=f'Cannot multiply {type(nutrients)} by a negative scalar.'):
             multiplier * nutrients
