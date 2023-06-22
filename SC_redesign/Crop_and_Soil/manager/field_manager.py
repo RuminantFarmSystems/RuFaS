@@ -4,6 +4,7 @@ from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from typing import List, Dict, Optional
 
+
 class FieldManager:
     def __init__(self, _fields_config: Optional[List[Dict[str, str]]] = None):
         self.fields: List[Field] = []
@@ -13,8 +14,8 @@ class FieldManager:
         for field in self.fields:
             latitude = field.field_data.absolute_latitude
             year = time.calendar_year
-            day = FieldManager.date_conversion_day(time)
-            month = FieldManager.date_conversion_month(time)
+            day = FieldManager._date_conversion_day(time)
+            month = FieldManager._date_conversion_month(time)
             current_weather = CurrentWeather.check_current_weather(weather=weather, latitude=latitude, year=year,
                                                                    day=day, month=month)
             field.manage_field(time, current_weather=current_weather)
