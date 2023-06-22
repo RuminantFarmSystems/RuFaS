@@ -24,13 +24,13 @@ class NutrientRequestResults:
     """Fraction of nitrogen that is present in inorganic form, between 0 and 1 (unitless). Default to 0.6."""
 
     ammonium_nitrogen_fraction: float = 0.3
-    """Fraction of inorganic nitrogen that is present in ammonium form, between 0 and 1 (unitless). Default to 0.3."""
+    """Fraction of `inorganic` nitrogen that is present in ammonium form, between 0 and 1 (unitless). Default to 0.3."""
 
-    organic_phosphorus_fraction: float = 0.7
-    """Fraction of phosphorus that is present in organic form, between 0 and 1 (unitless). Default to 0.7."""
+    organic_phosphorus_fraction: float = 0.5
+    """Fraction of phosphorus that is present in organic form, between 0 and 1 (unitless). Default to 0.5."""
 
-    inorganic_phosphorus_fraction: float = 0.3
-    """Fraction of phosphorus that is present in inorganic form, between 0 and 1 (unitless). Default to 0.3."""
+    inorganic_phosphorus_fraction: float = 0.5
+    """Fraction of phosphorus that is present in inorganic form, between 0 and 1 (unitless). Default to 0.5."""
 
     dry_matter: float = 0.0
     """Amount of dry matter that can be fulfilled (kg). Default to 0."""

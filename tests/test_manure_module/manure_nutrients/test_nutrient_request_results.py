@@ -24,8 +24,8 @@ def test_nutrient_request_results_default_init() -> None:
     assert request_results.organic_nitrogen_fraction == approx(0.4)
     assert request_results.inorganic_nitrogen_fraction == approx(0.6)
     assert request_results.ammonium_nitrogen_fraction == approx(0.3)
-    assert request_results.organic_phosphorus_fraction == approx(0.7)
-    assert request_results.inorganic_phosphorus_fraction == approx(0.3)
+    assert request_results.organic_phosphorus_fraction == approx(0.5)
+    assert request_results.inorganic_phosphorus_fraction == approx(0.5)
     assert request_results.dry_matter == approx(0.0)
     assert request_results.dry_matter_fraction == approx(0.0)
 
