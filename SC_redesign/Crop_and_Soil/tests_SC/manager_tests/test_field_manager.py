@@ -2,6 +2,7 @@ from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from RUFAS.classes import Time
 from RUFAS.util import Utility
 import pytest
@@ -201,3 +202,38 @@ def test_correct_crop_schedule_setup(crop_schedule_config: Dict, expected: List[
     for index in range(len(expected)):
         assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
         assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+
+
+@pytest.mark.parametrize("field_size,top,sand,silt,residue,nitrogen_mineralization,config,expected", [
+    (1.3, 0.0, 15, 65, 0.0, 0.05,
+     {"bottom_depth": 279.4, "wilting_point": 0.1, "field_capacity": 0.29, "saturation": 0.58, "K_sat": 20.0,
+      "clay": 22.5, "initial_temperature": 0.0, "bulk_density": 1.34, "org_C_percent": 0.012, "NH4": 1,
+      "active_N_percent": 0.02, "labile_P": 23.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
+      "denitrification_rate": 0.1,  "soil_water_percent": 0.3,  "OM_percent": 0.019},
+     LayerData(field_size=1.3, top_depth=0.0, bottom_depth=279.4, wilting_point_water_concentration=0.1,
+               field_capacity_water_concentration=0.29, saturation_point_water_concentration=0.58,
+               saturated_hydraulic_conductivity=20.0, percent_clay_content=22.5, temperature=0.0, bulk_density=1.34,
+               percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1.0,
+               initial_soil_nitrate_concentration=None, initial_labile_inorganic_phosphorus_concentration=23.7,
+               humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
+               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
+               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05)),
+    (2.2, 279.4, 15, 65, 0.0, 0.05,
+     {"bottom_depth": 1041.4, "wilting_point": 0.163, "field_capacity": 0.306, "saturation": 0.5, "K_sat": 9.17,
+      "clay": 30, "initial_temperature": 14.50797297, "bulk_density": 1.42, "org_C_percent": 0.012, "NH4": 1, "N03": 1,
+      "active_N_percent": 0.02, "labile_P": 2.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
+      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.006},
+     LayerData(field_size=2.2, top_depth=279.4, bottom_depth=1041.4, wilting_point_water_concentration=0.163,
+               field_capacity_water_concentration=0.306, saturation_point_water_concentration=0.5,
+               saturated_hydraulic_conductivity=9.17, percent_clay_content=30, temperature=14.50797297,
+               bulk_density=1.42, percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1,
+               initial_soil_nitrate_concentration=1, initial_labile_inorganic_phosphorus_concentration=2.7,
+               humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
+               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
+               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05))
+])
+def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: float, residue: float,
+                          nitrogen_mineralization: float, config: Dict, expected: LayerData) -> None:
+    """Tests that LayerData instances are configured correctly with a given specification."""
+    actual = FieldManager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
+    assert actual == expected
