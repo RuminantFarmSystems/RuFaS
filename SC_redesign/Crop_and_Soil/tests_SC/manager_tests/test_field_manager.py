@@ -20,7 +20,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     mocked_weather = MagicMock(CurrentWeather)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "day", 5)
-    fm = FieldManager()
+    fm = FieldManager([])
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
@@ -29,6 +29,27 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     for field in fields:
         assert field.manage_field.call_count == 1
     assert fm.om.send_daily_variables.call_count == 1
+
+
+@pytest.mark.parametrize("fields", [
+    [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
+     Field(field_data=FieldData(name="field3"))],
+    []
+])
+def test_annual_update_routine(fields: List[Field]):
+    mocked_time = MagicMock(Time)
+    mocked_weather = MagicMock(CurrentWeather)
+    setattr(mocked_time, "calendar_year", 1998)
+    setattr(mocked_time, "day", 5)
+    for field in fields:
+        field.perform_annual_reset = MagicMock()
+    fm = FieldManager([])
+    fm.fields = fields
+    fm.om.send_annual_variables = MagicMock()
+    fm.annual_update_routine()
+    for field in fields:
+        assert field.perform_annual_reset.call_count == 1
+    assert fm.om.send_annual_variables.call_count == 1
 
 
 @pytest.mark.parametrize("field_name,config", [
@@ -90,22 +111,17 @@ def test_daily_update_routine(fields: List[Field]) -> None:
             "rotation_years": [],
             "repeat": 0,
             "year": [1989, 1989, 1992, 1993, 1993, 1993, 1994, 1997, 1997, 1997, 1998, 2000, 2001, 2001, 2001, 2001,
-                     2002,
-                     2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017, 2018,
-                     2018],
+                     2002, 2004, 2005, 2005, 2006, 2008, 2009, 2009, 2010, 2010, 2012, 2013, 2013, 2014, 2016, 2017,
+                     2018, 2018],
             "day": [305, 306, 335, 120, 121, 313, 108, 100, 114, 324, 98, 316, 114, 136, 142, 317, 175, 321, 118, 318,
-                    95,
-                    315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
+                    95, 315, 121, 327, 83, 88, 321, 126, 339, 112, 280, 125, 117, 120],
             "percent_incorporated": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
-                                     0.3,
                                      0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
-                                     0.3],
+                                     0.3, 0.3],
             "percent_mixed": [0.3, 0.55, 0.3, 0.85, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.1, 0.25, 0.3, 0.3,
-                              0.3,
-                              0.3, 0.3, 0.55, 0.55, 0.3, 0.3, 0.55, 0.3, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3],
+                              0.3, 0.3, 0.3, 0.55, 0.55, 0.3, 0.3, 0.55, 0.3, 0.55, 0.3, 0.55, 0.3, 0.3, 0.3, 0.3, 0.3],
             "depth": [150, 75, 150, 100, 75, 150, 75, 150, 100, 150, 100, 150, 100, 5, 25, 150, 100, 150, 100, 150, 75,
-                      150,
-                      100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100]
+                      150, 100, 100, 150, 100, 150, 100, 150, 100, 100, 100, 100, 100]
         }
     })
 ])
@@ -116,27 +132,6 @@ def test_setup_management(field_name: str, config: Dict) -> None:
     assert fert_sched.years == config.get("fertilizer").get("year")
     assert manure_sched.days == config.get("manure").get("day")
     assert till_sched.tillage_depths == config.get("tillage").get("depth")
-
-
-@pytest.mark.parametrize("fields", [
-    [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
-     Field(field_data=FieldData(name="field3"))],
-    []
-])
-def test_annual_update_routine(fields: List[Field]):
-    mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(CurrentWeather)
-    setattr(mocked_time, "calendar_year", 1998)
-    setattr(mocked_time, "day", 5)
-    for field in fields:
-        field.perform_annual_reset = MagicMock()
-    fm = FieldManager()
-    fm.fields = fields
-    fm.om.send_annual_variables = MagicMock()
-    fm.annual_update_routine()
-    for field in fields:
-        assert field.perform_annual_reset.call_count == 1
-    assert fm.om.send_annual_variables.call_count == 1
 
 
 @pytest.mark.parametrize("crop_input_file_name", [
