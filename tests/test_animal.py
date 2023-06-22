@@ -5,7 +5,6 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
-import math
 from typing import Any, Dict
 from unittest.mock import patch
 from mock import MagicMock
@@ -18,17 +17,14 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
-from pytest_mock.plugin import MockerFixture
 
 import RUFAS.routines.animal.ration.animal_requirements
 import RUFAS.routines.animal.ration.ration_NLP
 import RUFAS.routines.animal.ration.ration_NLP as NLP
 
-from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration import ration_driver
-from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
 
 import RUFAS.routines.animal.ration.user_defined_ration
 from RUFAS.routines.animal.ration.user_defined_ration import \
@@ -1687,7 +1683,7 @@ def test_calculate_daily_milk_produced(lactation_curve, wood_l, wood_m, wood_n, 
 
     daily_milk_produced = mock_cow.calculate_daily_milk_produced()
 
-    assert math.isclose(daily_milk_produced, expected_milk, rel_tol=1e-3)
+    assert np.isclose(daily_milk_produced, expected_milk, rtol=1e-3)
 
 
 def test_get_feed_data_from_feed_ids() -> None:

@@ -463,8 +463,7 @@ def fat_constraint(x):
 def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    greater than the DMI_est + 20% calculated in the requirements
-    greater than the DMI_est + 20% calculated in the requirements
+    greater than the DMI_est - 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
@@ -545,12 +544,12 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
         # target = ration_percents[key]
         targetlower = ration_percents[str(key)]/100*(DMIest_lower+0.0001)
         targetupper = ration_percents[str(key)]/100*(DMIest_upper+0.0001)
-        targetbounds = (targetupper, targetlower)
         targetbounds = ((targetlower-targetlower*udr_tolerance)/3,
                         (targetupper+targetupper*udr_tolerance)/3)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
+        # print((key, targetbounds))
     return tribounds
 
 
@@ -602,11 +601,12 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         x0.append(random.random() * 10)
     # OPTIMIZE:
     # establishing the bounds of the NLP
-    bnds = []
+    
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
-        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
+        bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
     else:    
+        bnds = []
         for i in range(len(limit)):
             bnds.append((0, (limit[i] / 3) + 0.0001))
         bnds = tuple(bnds)
@@ -618,7 +618,7 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
         # Uncomment to use
         if usermod.success:
-            # print(animal_type)
+            print(str(animal_combination))
             print('No constraints violated')
         return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import
