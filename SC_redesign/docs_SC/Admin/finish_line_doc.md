@@ -83,10 +83,10 @@ run of the simulation.
     - [x] Implement and test `plant_crop()` to take a crop specification, initialize a `Crop`, and add it to the `crops` 
     attribute of `Field`. - 2 points
     - Implement and test `check_crop_harvesting_schedule()`, which will
-      - [ ] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day. - 2 points
-      - [ ] Iterate through the `crops` attribute to check if any are harvested using optimal (a.k.a. heat scheduled 
+      - [x] Iterate through list of `HarvestEvent`s and execute all operations that it finds on the current day. - 2 points
+      - [x] Iterate through the `crops` attribute to check if any are harvested using optimal (a.k.a. heat scheduled 
       harvesting) and if so, harvest them if they have met the optimal harvesting threshold. - 2 points
-    - [ ] Add calls to `check_crop_planting_schedule()` and `check_crop_harvesting_schedule()` in `Field`s daily 
+    - [x] Add calls to `check_crop_planting_schedule()` and `check_crop_harvesting_schedule()` in `Field`s daily 
     routine. - 1 point
 - Tillage
   - [x] Implement and test tillage application scheduler. - 3 points
@@ -100,9 +100,9 @@ run of the simulation.
   - [x] Add call to `check_fertilizer_schedule()` in `Field`s daily routine. - 1 point
 - Manure
   - [x] Implement and test manure application scheduler. - 3 points
-  - [ ] Implement and test `check_manure_schedule()` which will iterate through a list of `ManureEvent`s and collect and 
+  - [x] Implement and test `check_manure_schedule()` which will iterate through a list of `ManureEvent`s and collect and 
   execute all the ones that happen on the current day. - 2 points
-  - [ ] Add call to `check_manure_schedule()` in `Field`s daily routine. - 1 point
+  - [x] Add call to `check_manure_schedule()` in `Field`s daily routine. - 1 point
 
 ### Field Manager
 - Implement and test methods to translate user input into configuration dictionary.
