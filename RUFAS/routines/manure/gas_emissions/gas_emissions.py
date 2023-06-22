@@ -133,28 +133,44 @@ class GasEmissions:
         return num_animals * max(0.0, 0.13 * barn_temp) * barn_area / 1000
 
     @classmethod
-    def calc_carbon_dioxide_housing_emission(cls,
-                                             num_animals: int,
-                                             barn_area: float,
-                                             hours=24,
-                                             temperature_min=20.0,
-                                             temperature_max=25.0) -> float:
-        """Calculates carbon dioxide housing emissions.
+    def calc_housing_carbon_dioxide_emission(cls, num_animals: int, barn_area: float, barn_temp: float) -> float:
+        """
+        Calculate carbon dioxide housing emission.
 
-        Args:
-            num_animals: Number of animals in the pen.
-            barn_area: Area of the barn based on housing type, m^2.
-            hours: hours of the day from 1 to 24.
-            temperature_min: Minimum barn temperature, C.
-            temperature_max: Maximum barn temperature, C.
+        Notes
+        -----
+        The equation used to calculate housing carbon dioxide emissions is:
 
-        Returns:
-            Carbon dioxide floor emissions, kg CO2/day.
+        .. math::
+
+            E_{CO_2} = num\_animals \\times max(0, 0.0065 + 0.0192 * T_{barn}) \\times barn\_area / 1000
+
+        where:
+
+            :math:`E_{CO_2}` is the carbon dioxide housing emission in kg :math:`CO_2/day`,
+
+            :math:`T_{barn}` is the barn temperature in :math:`^{\circ}C`,
+
+            :math:`barn\_area` is the barn area per animal based on housing type in :math:`m^2`, and
+
+            :math:`num\_animals` is the number of animals in the pen.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals in the pen.
+        barn_area : float
+            Barn area per animal based on housing type, :math:`m^2`.
+        barn_temp : float
+            Current barn temperature, :math:`^{\circ}C`.
+
+        Returns
+        -------
+        float
+            Carbon dioxide housing emission, kg :math:`CO_2`/day.
 
         """
-        t_ambient = cls._calc_ambient_temp(hours, temperature_min, temperature_max)
-        t = max(-5.0, 0.63 * t_ambient + 6.0)
-        return num_animals * max(0.0, 0.0065 + 0.0192 * t) * barn_area / 1000
+        return num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
 
     @classmethod
     def calc_ammonia_emission(cls,
