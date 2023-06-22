@@ -4,6 +4,16 @@ File name: test_animal.py
 Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
+
+import math
+from typing import Any, Dict
+from unittest.mock import patch
+from mock import MagicMock
+from pytest_mock import MockerFixture
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+import pytest
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -1526,6 +1536,158 @@ def test_calc_pen_requirements():
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     pass
+
+
+@pytest.fixture
+def mock_cow_args() -> Dict[str, Any]:
+    cow_args = {
+        "birth_date": 0,
+        "days_born": 0,
+        "p_init": 0,
+        "birth_weight": 0,
+        "id": 1,
+        "calf_birth_weight": 30,
+        "repro_program": "ED",
+        "presynch_method": "PreSynch",
+        "tai_method_c": "OvSynch 56",
+        "tai_method_h": "OvSynch 56",
+        "resynch_method": "TAIafterPD",
+        "synch_ed_method_h": "example",
+        "wean_day": 4,
+        "wood_l": 0,
+        "wood_m": 0,
+        "wood_n": 0
+    }
+    return cow_args
+
+
+@pytest.fixture
+def mock_AnimalBase_config() -> AnimalBase.config:
+    AnimalBase.config = MagicMock()
+    AnimalBase.config.update({'lactation_curve': 'wood'})
+    AnimalBase.config.update({
+        "wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
+        "wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
+        "wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
+        "wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
+        "wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
+        "wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
+        })
+    return AnimalBase.config
+
+
+@pytest.fixture
+def mock_holstein(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
+    mock_cow_args["breed"] = "HO"
+    mock_holstein_cow = Cow(mock_cow_args)
+    mock_holstein_cow.calves = 4
+    mock_holstein_cow.lactation_curve = 'wood'
+    return mock_holstein_cow
+
+
+@pytest.fixture
+def mock_jersey(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
+    mock_cow_args["breed"] = "JE"
+    mock_jersey_cow = Cow(mock_cow_args)
+    mock_jersey_cow.calves = 2
+    mock_jersey_cow.lactation_curve = 'wood'
+    return mock_jersey_cow
+
+
+@pytest.fixture
+def mock_generic_cow(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
+    mock_cow_args["breed"] = "Generic"
+    mock_generic = Cow(mock_cow_args)
+    mock_generic.calves = 1
+    mock_generic.lactation_curve = 'wood'
+    return mock_generic
+
+
+def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
+    """Unit test for function set_breed_index in file routines/animal/life_cycle/cow.py"""
+    mock_holstein.set_breed_index()
+    assert mock_holstein.breed == 'HO'
+    assert mock_holstein.breed_index == 0
+
+    mock_jersey.set_breed_index()
+    assert mock_jersey.breed == 'JE'
+    assert mock_jersey.breed_index == 1
+
+    mock_generic_cow.set_breed_index()
+    assert mock_generic_cow.breed != 'HO'
+    assert mock_generic_cow.breed != 'JE'
+    assert mock_generic_cow.breed_index == 0
+
+
+def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
+    """Unit test for function set_parity_index in file routines/animal/life_cycle/cow.py"""
+    mock_holstein.set_parity_index()
+    assert mock_holstein.calves == 4
+    assert mock_holstein.parity_index == 2
+
+    mock_jersey.set_parity_index()
+    assert mock_jersey.calves == 2
+    assert mock_jersey.parity_index == 1
+
+    mock_generic_cow.set_parity_index()
+    assert mock_generic_cow.calves == 1
+    assert mock_generic_cow.parity_index == 0
+
+
+@pytest.mark.parametrize('wood_l, wood_m, wood_n', [
+        (25.0, 0.24, 0.0035),
+    ])
+def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> None:
+    """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+
+    with patch('numpy.random.normal') as mock_normal:
+
+        mock_normal.side_effect = [wood_l, wood_m, wood_n]
+
+        mock_cow_args["breed"] = "HO"
+        mock_cow = Cow(mock_cow_args)
+        mock_cow.calves = 3
+        mock_cow.lactation_curve = "wood"
+
+        AnimalBase.config = {
+            'wood_l': [[1, 2], [3, 4]],
+            'wood_l_std': [[0.1, 0.2], [0.3, 0.4]],
+            'wood_m': [[5, 6], [7, 8]],
+            'wood_m_std': [[0.5, 0.6], [0.7, 0.8]],
+            'wood_n': [[9, 10], [11, 12]],
+            'wood_n_std': [[0.9, 1.0], [1.1, 1.2]],
+        }
+
+        mock_cow.set_lactation_curve_params()
+
+        assert mock_cow.wood_l == wood_l
+        assert mock_cow.wood_m == wood_m
+        assert mock_cow.wood_n == wood_n
+
+
+@pytest.mark.parametrize('lactation_curve, wood_l, wood_m, wood_n, days_in_milk, expected_milk', [
+        ('wood', 16.13, 0.235, 0.0019, 100, 39.366),
+        ('wood', 23.81, 0.244, 0.0036, 150, 47.120),
+    ])
+def test_calculate_daily_milk_produced(lactation_curve, wood_l, wood_m, wood_n, days_in_milk,
+                                       expected_milk, mock_cow_args) -> None:
+    """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+    AnimalBase.config = MagicMock()
+    mock_cow_args["breed"] = "HO"
+    mock_cow = Cow(mock_cow_args)
+    mock_cow.calves = 3
+    mock_cow.lactation_curve = lactation_curve
+    mock_cow.wood_l = wood_l
+    mock_cow.wood_m = wood_m
+    mock_cow.wood_n = wood_n
+    mock_cow.days_in_milk = days_in_milk
+
+    daily_milk_produced = mock_cow.calculate_daily_milk_produced()
+
+    assert math.isclose(daily_milk_produced, expected_milk, rel_tol=1e-3)
 
 
 def test_get_feed_data_from_feed_ids() -> None:
