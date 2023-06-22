@@ -7,12 +7,12 @@ import numpy
 from RUFAS.classes import Weather
 
 """
-The purpose of this class is to combine and covert infos from weather data and field data and creates a 
+The purpose of this class is to combine and covert infos from weather data and field data and creates a
 current weather class that have all the needed attributes to allow field and field manager to work properly.
 
 Notes
 -------
-_deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this will 
+_deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this will
 be revisited for a more accurate implementation post v1
 """
 
