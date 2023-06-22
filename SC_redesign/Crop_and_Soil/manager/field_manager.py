@@ -10,8 +10,11 @@ from typing import Dict, List, Tuple, Optional
 
 
 class FieldManager:
-    def __init__(self, _fields_config: Optional[List[Dict[str, str]]] = None):
+    def __init__(self, fields_config: List[Dict[str, str]]):
         self.fields: List[Field] = []
+        for field in fields_config:
+            field_name, field_config = field.items()
+            self.fields.append(self._setup_field(field_name, field_config))
         self.om = OutputGatherer(fields=self.fields)
 
     def daily_update_routine(self, current_weather: CurrentWeather, time: Time):
@@ -43,8 +46,6 @@ class FieldManager:
         """
         input_directory = Utility.get_base_dir() / 'input'
 
-        _soil_config = Utility.read_json_file(input_directory / 'soil' / field_config['soil'])
-        crops_config = Utility.read_json_file(input_directory / 'crop' / field_config['crop'])
         management_config = \
             Utility.read_json_file(input_directory / 'field_management' / field_config['field_management'])
 
@@ -55,7 +56,7 @@ class FieldManager:
         tillage_events = tillage_schedule.generate_tillage_events()
 
         return Field(tillage_events=tillage_events, fertilizer_events=fertilizer_events,
-                     fertilizer_mixes=available_fertilizer_mixes)
+                     fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events)
 
     @staticmethod
     def _setup_management(field_name: str,
