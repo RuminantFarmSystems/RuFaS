@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 
 import pytest
@@ -86,7 +88,22 @@ def test_calc_ambient_temp(mocker: MockerFixture) -> None:
     assert actual == expected
 
 
-def test_calc_housing_carbon_dioxide_emission() -> None:
+import pytest
+
+
+@pytest.mark.parametrize(
+    "num_animals, barn_area, barn_temp, expected",
+    [
+        (10, 100.0, 25.0, 10 * (0.0065 + 0.0192 * 25.0) * 100.0 / 1000),  # Standard case
+        (0, 100.0, 25.0, 0),  # Edge case: no animals
+        (10, 0.0, 25.0, 0),  # Edge case: no area
+        (10, 100.0, -20.0, 0),  # Edge case: negative barn_temp
+        (-1, 100.0, 25.0, ValueError),  # Exception case: negative animals
+        (10, -100.0, 25.0, ValueError),  # Exception case: negative area
+    ]
+)
+def test_calc_housing_carbon_dioxide_emission(num_animals: int, barn_area: float, barn_temp: float,
+                                              expected: float | Exception) -> None:
     """
     Unit test for calc_housing_carbon_dioxide_emission() method in gas_emissions.py.
 
@@ -94,18 +111,16 @@ def test_calc_housing_carbon_dioxide_emission() -> None:
     given the number of animals, the barn area, and the current barn temperature.
 
     """
-    # Arrange
-    num_animals = 10
-    barn_area = 100.0
-    barn_temp = 25.0
-
-    expected = num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
-
-    # Act
-    actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
-
-    # Assert
-    assert actual == expected
+    # Act and assert
+    if num_animals < 0:
+        with pytest.raises(expected, match='Number of animals must be greater than or equal to zero.'):  # type: ignore
+            GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+    elif barn_area < 0:
+        with pytest.raises(expected, match='Barn area must be greater than or equal to zero.'):  # type: ignore
+            GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+    else:
+        actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+        assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize('sign_of_RMQ', [-1, 1])
