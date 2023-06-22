@@ -129,7 +129,18 @@ class GasEmissions:
         float
             Housing methane emissions, in kg :math:`CH_4/day`.
 
+        Raises
+        ------
+        ValueError
+            If the number of animals or barn area is less than 0.
+
         """
+        if num_animals < 0:
+            raise ValueError('Number of animals must be greater than or equal to 0.')
+
+        if barn_area < 0:
+            raise ValueError('Barn area must be greater than or equal to 0.')
+
         return num_animals * max(0.0, 0.13 * barn_temp) * barn_area / 1000
 
     @classmethod
@@ -172,14 +183,14 @@ class GasEmissions:
         Raises
         ------
         ValueError
-            If the number of animals or barn area is less than zero.
+            If the number of animals or barn area is less than 0.
 
         """
         if num_animals < 0:
-            raise ValueError('Number of animals must be greater than or equal to zero.')
+            raise ValueError('Number of animals must be greater than or equal to 0.')
 
         if barn_area < 0:
-            raise ValueError('Barn area must be greater than or equal to zero.')
+            raise ValueError('Barn area must be greater than or equal to 0.')
 
         return num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
 
