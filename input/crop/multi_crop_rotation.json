@@ -16,7 +16,7 @@
 
         },
         "Alfalfa91": {
-            "crop_reference": "alfalfa"
+            "crop_reference": "alfalfa",
             "plant_years": [1991],
             "repeat": 0,
             "planting_day": [113],

@@ -14,7 +14,7 @@
             "planting_order": "1st",
             "extracted": true},
         "Corn11": {
-            "crop_reference": "corn"
+            "crop_reference": "corn",
             "plant_years": [2011],
             "repeat": 0,
             "planting_day": [121],

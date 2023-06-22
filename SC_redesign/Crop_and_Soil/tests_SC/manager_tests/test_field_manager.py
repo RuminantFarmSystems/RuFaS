@@ -2,6 +2,7 @@ from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.classes import Time
+from RUFAS.util import Utility
 import pytest
 from typing import List, Dict
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
@@ -135,3 +136,23 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         assert field.perform_annual_reset.call_count == 1
     assert fm.om.send_annual_variables.call_count == 1
+
+
+@pytest.mark.parametrize("crop_input_file_name", [
+    "ARL_rotation.json",
+    "corn_rotation.json",
+    "double_cropping_1yr_rotation.json",
+    "double_cropping_2yr_rotation.json",
+    "LT_rotation.json",
+    "multi_crop_rotation.json",
+    "swat_rotation.json",
+    "testing_rotation.json"
+])
+def test_setup_crop_schedules(crop_input_file_name: str) -> None:
+    """Tests that the crop schedule setup method is able to correctly parse all the currently available crop
+        datasets."""
+    input_directory = Utility.get_base_dir() / 'input'
+    crops_config = Utility.read_json_file(input_directory / 'crop' / crop_input_file_name)
+    crop_specifications = crops_config.get("crops")
+    FieldManager._setup_crop_schedules(crop_specifications)
+    assert True
