@@ -49,6 +49,7 @@ class FieldManager:
 
         management_config = \
             Utility.read_json_file(input_directory / 'field_management' / field_config['field_management'])
+        crops_config = Utility.read_json_file(input_directory / 'crop' / field_config['crop'])
 
         available_fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule = \
             FieldManager._setup_management(field_name, management_config)
