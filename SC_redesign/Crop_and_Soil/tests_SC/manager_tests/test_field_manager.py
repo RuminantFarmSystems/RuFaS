@@ -8,6 +8,32 @@ from unittest.mock import MagicMock
 from typing import List
 
 
+@pytest.mark.parametrize("year, day, expected_month", [
+    (2000, 366, 12),  # leap year
+    (2001, 365, 12),  # normal year
+    (2000, 60, 2),
+    (2001, 60, 3)
+])
+def test_date_conversion_month(year: int, day: int, expected_month: int):
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+    assert FieldManager._date_conversion_month(mocked_time) == expected_month
+
+
+@pytest.mark.parametrize("year, day, expected_day", [
+    (2000, 366, 31),  # leap year
+    (2001, 365, 31),  # normal year
+    (2000, 60, 29),
+    (2001, 60, 1)
+])
+def test_date_conversion_day(year: int, day: int, expected_day: int):
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+    assert FieldManager._date_conversion_day(mocked_time) == expected_day
+
+
 @pytest.mark.parametrize("fields", [
     [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
      Field(field_data=FieldData(name="field3"))],
@@ -42,7 +68,6 @@ def test_daily_update_routine(fields: List[Field]) -> None:
 ])
 def test_annual_update_routine(fields: Field):
     mocked_time = MagicMock(Time)
-    mocked_weather = MagicMock(CurrentWeather)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "day", 5)
     for field in fields:
@@ -54,4 +79,3 @@ def test_annual_update_routine(fields: Field):
     for field in fields:
         assert field.perform_annual_reset.call_count == 1
     assert fm.om.send_annual_variables.call_count == 1
-
