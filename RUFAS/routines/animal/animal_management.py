@@ -40,7 +40,6 @@ from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
-
 import random
 from statistics import mean
 from typing import Any, Dict, Tuple, List
@@ -62,7 +61,7 @@ def daily_animal_routine(animal_management, feed, weather, time):
         time: instance of the Time class as defined in classes.py
     """
 
-    animal_management.daily_updates2(feed, weather, time)
+    animal_management.daily_updates(feed, weather, time)
 
 
 class AnimalManagement:
@@ -82,6 +81,7 @@ class AnimalManagement:
     }
 
     ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
+
     # ANIMAL_GROUPING_SCENARIO = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
 
     @classmethod
@@ -208,7 +208,7 @@ class AnimalManagement:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens2()
+            self.allocate_animals_to_pens()
 
         self._print_animal_num_warnings(data['herd_information'])
 
@@ -414,11 +414,9 @@ class AnimalManagement:
 
         """
         for pen in self.all_pens:
-            if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name =='CLOSE_UP':
+            if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name == 'CLOSE_UP':
                 for animal in pen.animals_in_pen:
                     animal.milk_production_reduction = 0.0
-
-                    
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -493,7 +491,7 @@ class AnimalManagement:
         """
 
         all_animals_added = animals_added + calves_born
-        
+
         original_pen_populations = self.track_former_pen_population()
 
         self.remove_animals_from_herd(animals_removed)
@@ -821,23 +819,23 @@ class AnimalManagement:
 
         """
 
-        allocation_plan = cls.plan_animal_allocation(
+        allocation_plan = cls._plan_animal_allocation(
             num_animals=len(animals),
             max_spaces_in_pens=[cls._calc_max_animal_spaces_per_pen(pen.num_stalls, pen.max_stocking_density)
                                 for pen in pens]
         )
 
-        cls.execute_allocation_plan(
+        cls._execute_allocation_plan(
             allocation_plan=allocation_plan,
             animals=animals,
             animal_pens=pens,
         )
 
     @classmethod
-    def execute_allocation_plan(cls,
-                                allocation_plan: List[int],
-                                animals,
-                                animal_pens: List[Pen]) -> None:
+    def _execute_allocation_plan(cls,
+                                 allocation_plan: List[int],
+                                 animals,
+                                 animal_pens: List[Pen]) -> None:
         """
         Execute an allocation plan to distribute animals into pens according to the given plan.
 
@@ -880,7 +878,7 @@ class AnimalManagement:
             animals = animals[count:]
 
     @classmethod
-    def plan_animal_allocation(cls, num_animals: int, max_spaces_in_pens: List[int]) -> List[int]:
+    def _plan_animal_allocation(cls, num_animals: int, max_spaces_in_pens: List[int]) -> List[int]:
         """
         Make an allocation plan to move animals to pens and match pen density as closely as possible
          to the overall density.
@@ -933,13 +931,13 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> AnimalManagement.plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManagement._plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
         [45, 27, 18]
 
-        >>> AnimalManagement.plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManagement._plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
         [35, 21, 14]
 
-        >>> AnimalManagement.plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManagement._plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
         [22, 15, 10]
 
         """
@@ -964,42 +962,6 @@ class AnimalManagement:
         return num_animals_in_pens
 
     def allocate_animals_to_pens(self) -> None:
-        """
-        Allocate animals to pens based on the current animal population and the number of pens available.
-
-        New default pens will be created if necessary. This method distributes the animals among the pens,
-        ensuring that the animal density of each pen matches the overall density as closely as possible.
-
-        Returns
-        -------
-        None
-
-        """
-
-        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
-
-        # For now, we are only considering the following animal combinations:
-        animals_by_combination = {
-            Pen.AnimalCombination.CALF: self.calves,
-            Pen.AnimalCombination.GROWING: self.heiferIs + self.heiferIIs,
-            Pen.AnimalCombination.CLOSE_UP: self.heiferIIIs + self._get_dry_cows(self.cows),
-            Pen.AnimalCombination.LAC_COW: self._get_lactating_cows(self.cows),
-        }
-
-        for animal_combination, animals in animals_by_combination.items():
-            new_default_pens = self._create_default_pens_for_potential_space_shortage(
-                num_animals=len(animals),
-                pens=self.pens_by_animal_combination[animal_combination],
-                animal_combination=animal_combination,
-                start_pen_id=len(self.all_pens)
-            )
-            self.all_pens.extend(new_default_pens)
-            self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
-            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
-
-        self.fully_update_animal_to_pen_id_map()
-
-    def allocate_animals_to_pens2(self) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,    ensuring that the animal density of each pen matches the overall density as closely as possible.
@@ -1175,60 +1137,6 @@ class AnimalManagement:
         for pen in self.all_pens:
             if pen.populated:
                 pen.daily_p_update()
-
-    def daily_updates(self, feed, weather, time):
-        """
-        Executes the daily routines relating to Animals. All animals are
-        updated through the life_cycle_manager's daily_update() method. The
-        daily phosphorus calculations are also done. If it is the end of the
-        ration interval, the animals are allocated to new pens and the ration &
-        manure calculations are done.
-
-        Args:
-            feed: instance of the Feed class defined in feed.py
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
-        """
-        if self.simulate_animals:
-            for pen in self.all_pens:
-                pen.populated = len(pen.animals_in_pen) > 0
-
-            if self.end_ration_interval():
-                self.reset_milk_production_reduction()
-
-            animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
-                self.heiferIIs, self.heiferIIIs, self.cows = \
-                self.life_cycle_manager.daily_update(self.simulation_day,
-                                                     self.calves,
-                                                     self.heiferIs,
-                                                     self.heiferIIs,
-                                                     self.heiferIIIs, self.cows)
-            temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_map(animals_added, animals_removed, calves_born, feed, temp)
-
-            # phosphorus requirements for daily updates
-            self.calc_p_rqmts()  # per animal
-
-            if self.end_ration_interval():
-                self.calc_nutrient_rqmts(feed, temp)  # per animal
-                self.clear_pens()
-                self.allocate_animals_to_pens()
-                self.calc_ration(feed)  # per pen
-                self.calc_avg_growth()  # per pen
-                for pen in self.all_pens:
-                    if pen.animal_combination.name == 'LAC_COW':
-                        for animal in pen.animals_in_pen:
-                            animal.update_milk_production_history(self.simulation_day)
-
-            # manure excretion
-            self.calc_manure_excretion(feed, self.methane_model)  # per animal
-
-            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-            # phosphorus updates
-            self.daily_p_update()  # per animal
-            self.calc_all_p_conc()  # per animal
-
-            self.record_pen_history()
 
     def end_ration_interval(self):
         """
@@ -1699,6 +1607,23 @@ class AnimalManagement:
     def _handle_graduated_animals(self, animals_snapshot_before_update,
                                   animals_snapshot_after_update,
                                   feed, temp):
+        """
+        Handle animals that have graduated to a different class.
+
+        Graduated animals are those that are present in the 'after' snapshot but not
+        in the 'before' snapshot for each animal class. These animals are added to a pen and ID map.
+
+        Parameters
+        ----------
+        animals_snapshot_before_update: dict
+            A snapshot of the animals before they were updated.
+        animals_snapshot_after_update: dict
+            A snapshot of the animals after they were updated.
+        feed
+            The feed for the animals.
+        temp: Any
+            The temperature in the environment.
+        """
         graduated_animals = set()
         for animal_class_name in ['heiferIs', 'heiferIIs', 'heiferIIIs', 'cows']:
             graduated_animals.update(animals_snapshot_after_update[animal_class_name]
@@ -1706,17 +1631,65 @@ class AnimalManagement:
         for animal in graduated_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
 
-    def _handle_newly_added_animals(self, new_animals, feed, temp):
+    def _handle_newly_added_animals(self, new_animals, feed, temp) -> None:
+        """
+        Handle newly added animals by adding them to a pen and ID map and appending them to
+        the appropriate animal type list.
+
+        Parameters
+        ----------
+        new_animals
+            The animals that have been added recently.
+        feed
+            The feed for the animals
+        temp
+            The temperature in the environment.
+
+        Returns
+        -------
+        None
+
+        """
         for animal in new_animals:
             self._add_animal_to_pen_and_id_map(animal, feed, temp)
             self.animals_by_type[type(animal)].append(animal)
 
-    def _remove_animal_from_pen_and_id_map(self, animal):
+    def _remove_animal_from_pen_and_id_map(self, animal) -> None:
+        """
+        Remove an animal from its pen and the ID map.
+
+        Parameters
+        ----------
+        animal: object
+            The animal to be removed.
+
+        Returns
+        -------
+        None
+
+        """
         pen_id = self.animal_to_pen_id_map[animal.id]
         self.all_pens[pen_id].remove_animal(animal.id)
         del self.animal_to_pen_id_map[animal.id]
 
-    def _add_animal_to_pen_and_id_map(self, animal, feed, temp):
+    def _add_animal_to_pen_and_id_map(self, animal, feed, temp) -> None:
+        """
+        Add an animal to a pen with the lowest stocking density among all pens with the same animal combination.
+
+        Parameters
+        ----------
+        animal
+            The animal to be added.
+        feed
+            The feed for the animals.
+        temp: Any
+            The temperature in the environment.
+
+        Returns
+        -------
+        None
+
+        """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
         pen_with_min_stocking_density = min(self.pens_by_animal_combination[animal_combination],
                                             key=lambda p: p.current_stocking_density)
@@ -1725,9 +1698,9 @@ class AnimalManagement:
                                                  self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates2(self, feed, weather, time):
+    def daily_updates(self, feed, weather, time):
         """
-        Execute the daily routines relating to Animals. All animals are
+        Execute the daily routines relating to animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
         daily phosphorus calculations are also done. If it is the end of the
         ration interval, the animals are allocated to new pens and the ration &
@@ -1748,7 +1721,7 @@ class AnimalManagement:
         """
         if self.simulate_animals:
             if self.end_ration_interval():
-                self.reset_milk_production_reduction() 
+                self.reset_milk_production_reduction()
             temp = weather.T_avg[time.year - 1][time.day - 1]
             animals_snapshot_before_update = self._get_animals_snapshot()
 
@@ -1781,17 +1754,16 @@ class AnimalManagement:
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
 
-
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                self.allocate_animals_to_pens2()
+                self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)  # per pen
                 self.calc_avg_growth()  # per pen
                 for pen in self.all_pens:
                     if pen.animal_combination.name == 'LAC_COW':
                         for animal in pen.animals_in_pen:
                             animal.update_milk_production_history(self.simulation_day)
-                        
+
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
