@@ -67,10 +67,10 @@
         },
         "Corn95": {
             "crop_reference": "corn",
-            "plant_years": [1994],
+            "plant_years": [1995],
             "repeat": 0,
             "planting_day": [132],
-            "harvest_years": [1994],
+            "harvest_years": [1995],
             "harvest_day": [286],
             "harvest_operations": ["default"],
             "harvest_type": "scheduled",
