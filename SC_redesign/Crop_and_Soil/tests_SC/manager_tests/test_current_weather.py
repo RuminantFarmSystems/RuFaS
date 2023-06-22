@@ -1,7 +1,7 @@
 from unittest import mock
 from unittest.mock import MagicMock
 import pytest
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather, _determine_daylength
+from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from RUFAS.classes import Weather
 
 
@@ -20,7 +20,7 @@ def test_check_current_weather(radiation: float, T_min: float, T_avg: float, T_m
     setattr(mocked_weather, "T_avg_annual", T_avg_annual)
     setattr(mocked_weather, "rainfall", rainfall)
     CurrentWeather.check_current_weather(weather=mocked_weather, latitude=latitude, year=year,
-                                                           month=month, day=day)
+                                         month=month, day=day)
 
     assert CurrentWeather.rainfall == rainfall
     assert CurrentWeather.incoming_light == radiation
