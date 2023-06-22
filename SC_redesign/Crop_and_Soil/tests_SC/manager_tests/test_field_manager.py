@@ -14,6 +14,7 @@ from typing import List
     (2001, 60, 3)
 ])
 def test_date_conversion_month(year: int, day: int, expected_month: int):
+    """Tests that number of days were converted into months correctly"""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
@@ -27,6 +28,7 @@ def test_date_conversion_month(year: int, day: int, expected_month: int):
     (2001, 60, 1)
 ])
 def test_date_conversion_day(year: int, day: int, expected_day: int):
+    """Tests that number of days were converted into day of the month correctly"""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
     setattr(mocked_time, "day", day)
@@ -39,6 +41,7 @@ def test_date_conversion_day(year: int, day: int, expected_day: int):
     []
 ])
 def test_daily_update_routine(fields: List[Field]) -> None:
+    """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
     mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "calendar_year", 1998)
@@ -66,6 +69,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     []
 ])
 def test_annual_update_routine(fields: Field):
+    """Tests that the annual routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "day", 5)

@@ -10,7 +10,22 @@ class FieldManager:
         self.fields: List[Field] = []
         self.om = OutputGatherer(fields=self.fields)
 
-    def daily_update_routine(self, weather: Weather, time: Time):
+    def daily_update_routine(self, weather: Weather, time: Time) -> None:
+        """
+        This method will run the daily routine in the field, which will be calling the manage field method on each
+        field.
+        Parameters
+        ----------
+        weather: Weather
+            A weather object that contains infos to be transformed to current weather
+        time: Time
+            Object containing the current year and day of the simulation.
+
+
+        Returns
+        -------
+        None
+        """
         for field in self.fields:
             latitude = field.field_data.absolute_latitude
             year = time.calendar_year
@@ -21,13 +36,34 @@ class FieldManager:
             field.manage_field(time, current_weather=current_weather)
         self.om.send_daily_variables()
 
-    def annual_update_routine(self):
+    def annual_update_routine(self) -> None:
+        """
+        This method will run the annual routine in the field, which will be calling the perform_annual_reset() method
+        on each field.
+
+        Returns
+        -------
+         None
+        """
         for field in self.fields:
             field.perform_annual_reset()
         self.om.send_annual_variables()
 
     @staticmethod
     def _date_conversion_month(time: Time) -> int:
+        """
+        Converts the day number into the corresponding month of the year.
+        Parameters
+        ----------
+        time: Time
+            Object containing the current year and day of the simulation.
+
+        Returns
+        -------
+        int
+        the corresponding month of the year
+
+        """
         days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
         leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
         prev_month = 0
@@ -46,6 +82,19 @@ class FieldManager:
 
     @staticmethod
     def _date_conversion_day(time: Time) -> int:
+        """
+        Converts the day number into the corresponding day of the month.
+        Parameters
+        ----------
+        time:
+            Object containing the current year and day of the simulation.
+
+        Returns
+        -------
+        int
+        corresponding day of the month
+
+        """
         days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
         leap_days = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
 
