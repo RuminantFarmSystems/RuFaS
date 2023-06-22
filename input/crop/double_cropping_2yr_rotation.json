@@ -3,19 +3,25 @@
 
     "crops": {
         "Alfalfa": {
+            "crop_reference": "alfalfa",
             "plant_years": [2009,2010],
             "repeat": 0,
-            "planting_day": 160,
-            "harvest_day": 220,
+            "planting_day": [160],
+            "harvest_years": [2009,2010],
+            "harvest_day": [220],
+            "harvest_operations": ["default"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
         },
         "Corn": {
+            "crop_reference": "corn",
             "plant_years": [2010],
             "repeat": 0,
-            "planting_day": 80,
-            "harvest_day": 362,
+            "planting_day": [80],
+            "harvest_years": [2010],
+            "harvest_day": [362],
+            "harvest_operations": ["default"],
             "harvest_type": "scheduled",
             "planting_order": "1st",
             "extracted": true
