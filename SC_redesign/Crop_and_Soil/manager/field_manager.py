@@ -4,6 +4,11 @@ from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from typing import List, Dict, Optional
 
+"""
+This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to
+the `SimulationEngine` for executing daily and annual routines in the field module.
+"""
+
 
 class FieldManager:
     def __init__(self, _fields_config: Optional[List[Dict[str, str]]] = None):
@@ -14,6 +19,7 @@ class FieldManager:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
+
         Parameters
         ----------
         weather: Weather
@@ -21,10 +27,10 @@ class FieldManager:
         time: Time
             Object containing the current year and day of the simulation.
 
+        Notes
+        -----
+        Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
-        Returns
-        -------
-        None
         """
         for field in self.fields:
             latitude = field.field_data.absolute_latitude
@@ -40,10 +46,6 @@ class FieldManager:
         """
         This method will run the annual routine in the field, which will be calling the perform_annual_reset() method
         on each field.
-
-        Returns
-        -------
-         None
         """
         for field in self.fields:
             field.perform_annual_reset()
@@ -53,6 +55,7 @@ class FieldManager:
     def _date_conversion_month(time: Time) -> int:
         """
         Converts the day number into the corresponding month of the year.
+
         Parameters
         ----------
         time: Time
@@ -61,7 +64,7 @@ class FieldManager:
         Returns
         -------
         int
-        the corresponding month of the year
+            The corresponding month of the year.
 
         """
         days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
