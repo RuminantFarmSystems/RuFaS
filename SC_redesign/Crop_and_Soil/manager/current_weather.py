@@ -28,8 +28,8 @@ class CurrentWeather:
     """amount of rainfall that occurs on the day (mm)"""
 
     @classmethod
-    def check_current_weather(cls, weather: Weather, latitude: float, year: float,
-                              month: float, day: float) -> 'CurrentWeather':
+    def check_current_weather(cls, weather: Weather, latitude: float, year: int,
+                              month: int, day: int) -> 'CurrentWeather':
         """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
         object"""
         cls.incoming_light = weather.radiation
