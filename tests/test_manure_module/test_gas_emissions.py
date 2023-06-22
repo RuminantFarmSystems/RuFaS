@@ -86,27 +86,25 @@ def test_calc_ambient_temp(mocker: MockerFixture) -> None:
     assert actual == expected
 
 
-@pytest.mark.parametrize('ambient_temp', [temp for temp in range(-40, 40, 10)])
-def test_calc_carbon_dioxide_housing_emission(ambient_temp: float, mocker: MockerFixture) -> None:
-    """Tests calc_carbon_dioxide_housing_emission() in gas_emissions.py."""
+def test_calc_housing_carbon_dioxide_emission() -> None:
+    """
+    Unit test for calc_housing_carbon_dioxide_emission() method in gas_emissions.py.
 
+    This test verifies that the method correctly calculates the carbon dioxide housing emissions
+    given the number of animals, the barn area, and the current barn temperature.
+
+    """
     # Arrange
-    num_animals = 100
-    barn_area = 50.0
-    hours = 10
-    t_min = 20.0
-    t_max = 30.0
-    patch_for_calc_ambient_temp = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ambient_temp',
-        return_value=ambient_temp,
-    )
-    expected = num_animals * max(0.0, 0.0065 + 0.0192 * max(-5.0, 0.63 * ambient_temp + 6.0)) * barn_area / 1000
+    num_animals = 10
+    barn_area = 100.0
+    barn_temp = 25.0
+
+    expected = num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
 
     # Act
-    actual = GasEmissions.calc_carbon_dioxide_housing_emission(num_animals, barn_area, hours, t_min, t_max)
+    actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
 
     # Assert
-    patch_for_calc_ambient_temp.assert_called_once_with(hours, t_min, t_max)
     assert actual == expected
 
 
