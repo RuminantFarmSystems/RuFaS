@@ -1,4 +1,3 @@
-from unittest import mock
 from unittest.mock import MagicMock
 import pytest
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
