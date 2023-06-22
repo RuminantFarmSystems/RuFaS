@@ -97,6 +97,8 @@ class GasEmissions:
         """
         Calculate housing methane emissions from manure handlers.
 
+        Notes
+        -----
         The equation used to calculate housing methane emissions is:
 
         .. math::
