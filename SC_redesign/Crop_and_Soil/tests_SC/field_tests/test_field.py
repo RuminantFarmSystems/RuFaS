@@ -22,6 +22,35 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
 
+def test_manage_field() -> None:
+    """Tests that all subroutines are correctly called by the main routine in field."""
+    field = Field()
+    field._check_fertilizer_application_schedule = MagicMock()
+    field._check_manure_application_schedule = MagicMock()
+    field._check_tillage_schedule = MagicMock()
+    field._execute_daily_processes = MagicMock()
+    field._assess_dormancy = MagicMock()
+    field._check_crop_planting_schedule = MagicMock()
+    field._check_crop_harvest_schedule = MagicMock()
+    field._remove_dead_crops = MagicMock()
+    field._reset_crop_field_coverage_fractions = MagicMock()
+    mocked_time = MagicMock(Time)
+    mocked_weather = MagicMock(CurrentWeather)
+    setattr(mocked_weather, "daylength", 12)
+
+    field.manage_field(mocked_time, mocked_weather)
+
+    field._check_fertilizer_application_schedule.assert_called_once_with(mocked_time)
+    field._check_manure_application_schedule.assert_called_once_with(mocked_time)
+    field._check_tillage_schedule.assert_called_once_with(mocked_time)
+    field._execute_daily_processes.assert_called_once_with(mocked_weather)
+    field._assess_dormancy.assert_called_once_with(12)
+    field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
+    field._check_crop_harvest_schedule.assert_called_once_with(mocked_time)
+    field._remove_dead_crops.assert_called_once()
+    field._reset_crop_field_coverage_fractions.assert_called_once()
+
+
 @pytest.mark.parametrize("all_events,events_remaining,events_occurring_today", [
     ([PlantingEvent("test_1", 1996, 120, False), PlantingEvent("test_2", 1996, 120, False),
       PlantingEvent("test_3", 1996, 240, False), PlantingEvent("test_4", 1997, 125, False)],
@@ -51,7 +80,7 @@ def test_check_crop_planting_schedule(all_events: List[PlantingEvent], events_re
     time = MagicMock(Time)
     expected_create_and_update_events_calls = [call(all_events, time)]
 
-    field.check_crop_planting_schedule(time)
+    field._check_crop_planting_schedule(time)
 
     field._filter_events.assert_has_calls(expected_create_and_update_events_calls)
     assert field._plant_crop.call_count == len(events_occurring_today)
@@ -82,7 +111,7 @@ def test_check_fertilizer_application_schedule(events: List[FertilizerEvent], re
     setattr(mocked_time, "calendar_year", 2000)
     setattr(mocked_time, "day", 100)
 
-    field.check_fertilizer_application_schedule(mocked_time)
+    field._check_fertilizer_application_schedule(mocked_time)
 
     expected_execution_calls = []
     for event in current_events:
@@ -116,7 +145,7 @@ def test_check_manure_application_schedule(events: List[ManureEvent], remaining_
     setattr(mocked_time, "calendar_year", 1991)
     setattr(mocked_time, "day", 120)
 
-    field.check_manure_application_schedule(mocked_time)
+    field._check_manure_application_schedule(mocked_time)
 
     expected_execution_calls = []
     for event in current_events:
@@ -160,7 +189,7 @@ def test_check_crop_harvest_schedule(year: int, day: int, all_harvest_events: Li
         new_call = call(event.crop_reference, event.operation, mocked_time)
         harvest_crop_calls.append(new_call)
 
-    field.check_crop_harvest_schedule(mocked_time)
+    field._check_crop_harvest_schedule(mocked_time)
 
     field._filter_events.assert_called_once_with(all_harvest_events, mocked_time)
     field._harvest_crop.assert_has_calls(harvest_crop_calls)
@@ -240,9 +269,9 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
     field._plant_crop(crop_reference, heat_scheduled, mocked_time)
 
     if is_supported:
-        expected_crop = field.make_supported_crop(crop_reference)
+        expected_crop = field._make_supported_crop(crop_reference)
     else:
-        expected_crop = field.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
+        expected_crop = field._make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
     expected_crop.data.use_heat_scheduling = heat_scheduled
     expected_crop.data.id = crop_reference
 
@@ -422,7 +451,7 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     crop.dormancy.enter_dormancy = MagicMock()
 
     # Run method being tested
-    field.assess_dormancy(daylength)
+    field._assess_dormancy(daylength)
 
     # Check that subroutines were called correct number of times
     if daylength <= threshold_daylength:
@@ -436,7 +465,7 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
 def test_make_supported_crop(species: str, specs: dict):
     """ensure that supported crops are properly created."""
     # check that attributes are correct
-    crop = Field.make_supported_crop(species, **specs)
+    crop = Field._make_supported_crop(species, **specs)
     assert crop.data.species == species
     for key, val in specs.items():
         assert getattr(crop.data, key) == val
@@ -448,9 +477,9 @@ def test_make_supported_crop(species: str, specs: dict):
 
     # failing cases
     with pytest.raises(Exception):
-        Field.make_supported_crop("fake_crop")
+        Field._make_supported_crop("fake_crop")
     with pytest.raises(Exception):
-        Field.make_supported_crop("corn", bad_attr=17.35)
+        Field._make_supported_crop("corn", bad_attr=17.35)
 
 
 @pytest.mark.parametrize("config", [
@@ -460,7 +489,7 @@ def test_make_supported_crop(species: str, specs: dict):
 ])
 def test_make_custom_crop(config: dict):
     """checks that custom crop attributes are set correctly"""
-    crop = Field.make_custom_crop(**config)
+    crop = Field._make_custom_crop(**config)
     for key, val in config.items():
         assert getattr(crop.data, key) == val
 
@@ -475,46 +504,17 @@ def test_make_custom_crop(config: dict):
 def test_make_crop_from_config_dict(config: dict):
     supported_crops = set(item.value for item in CropSpecies)
     has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
-    Field.make_supported_crop = MagicMock()
-    Field.make_custom_crop = MagicMock()
+    Field._make_supported_crop = MagicMock()
+    Field._make_custom_crop = MagicMock()
 
-    Field.make_crop_from_config_dict(config)
+    Field._make_crop_from_config_dict(config)
 
     if has_supported_species:
-        Field.make_supported_crop.assert_called_once()
-        Field.make_custom_crop.assert_not_called()
+        Field._make_supported_crop.assert_called_once()
+        Field._make_custom_crop.assert_not_called()
     else:
-        Field.make_supported_crop.assert_not_called()
-        Field.make_custom_crop.assert_called_once()
-
-
-def test_check_harvest_schedules():
-    """ensure that harvest schedules are checked for all crops"""
-    field = Field()
-    crop1, crop2, crop3 = Crop(), Crop(), Crop()
-    crop1.crop_management.check_harvest_schedule = MagicMock()
-    crop2.crop_management.check_harvest_schedule = MagicMock()
-    crop3.crop_management.check_harvest_schedule = MagicMock()
-    field.crops = [crop1, crop2, crop3]
-    field.check_harvest_schedules(100, 0)
-    crop1.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
-    crop2.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
-    crop3.crop_management.check_harvest_schedule.assert_called_once_with(current_day=100, current_year=0)
-
-
-def test_harvest_scheduled_crops():
-    """ensure that crops are harvested when appropriate"""
-    field = Field()
-    crop1, crop2, crop3 = Crop(CropData(is_harvest_day=True)), Crop(CropData(is_harvest_day=False)), \
-        Crop(CropData(is_harvest_day=True))
-    crop1.crop_management.manage_harvest = MagicMock()
-    crop2.crop_management.manage_harvest = MagicMock()
-    crop3.crop_management.manage_harvest = MagicMock()
-    field.crops = [crop1, crop2, crop3]
-    field.harvest_scheduled_crops()
-    crop1.crop_management.manage_harvest.assert_called_once()
-    crop2.crop_management.manage_harvest.assert_not_called()
-    crop3.crop_management.manage_harvest.assert_called_once()
+        Field._make_supported_crop.assert_not_called()
+        Field._make_custom_crop.assert_called_once()
 
 
 @pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size", {
@@ -543,6 +543,24 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0, 0.0,
                                                                          field_size)
     field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
+
+
+@pytest.mark.parametrize("field_name,mix_name,available_mixes,expected_message", [
+    ("test_field_1", "halo_alien_mix", {}, "\"'test_field_1': expected to have fertilizer mix for 'halo_alien_mix', "
+                                           "received '{'100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': "
+                                           "{'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\""),
+    ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12}},
+     "\"'test_field_2': expected to have fertilizer mix for '101_0_0', received '{'50_22_12': {'N': 0.5, 'P': 0.22, "
+     "'K': 0.12}, '100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': {'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"")
+])
+def test_execute_fertilizer_application_error(field_name: str, mix_name: str, available_mixes: Dict,
+                                              expected_message: str) -> None:
+    """Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available
+        mixes."""
+    field = Field(field_data=FieldData(name=field_name), fertilizer_mixes=available_mixes)
+    with pytest.raises(KeyError) as e:
+        field._execute_fertilizer_application(mix_name, 10.0, 10.0, 1994, 120)
+    assert str(e.value) == expected_message
 
 
 @pytest.mark.parametrize("nitrogen,phosphorus,mixes,expected", [
@@ -889,6 +907,23 @@ def test_evaporate_from_crop_canopies(demand: float, canopy_water_1: float, cano
     assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
 
 
+@pytest.mark.parametrize("biomasses,expected", [
+    ([30, 20, 14], 64),
+    ([22.1], 22.1),
+    ([], 0.0)
+])
+def test_determine_total_above_ground_biomass(biomasses: List[float], expected: float) -> None:
+    """Tests that total above ground biomass on the field is correctly calculated."""
+    field = Field()
+    for biomass in biomasses:
+        crop = Crop()
+        crop.data.above_ground_biomass = biomass
+        field.crops.append(crop)
+
+    actual = field._determine_total_above_ground_biomass()
+    assert actual == expected
+
+
 @pytest.mark.parametrize("extraterrestrial_radiation,max_temp,min_temp,avg_temp", [
     (100, 28, 10, 14),
     (568, 20, 14, 18),
@@ -1016,7 +1051,7 @@ def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int,
     field = Field(tillage_events=events)
     todays_count = len(is_today)
     field.tiller.till_soil = MagicMock()
-    field.check_tillage_schedule(mocked_time)
+    field._check_tillage_schedule(mocked_time)
     assert field.tillage_events == not_today
 
     assert field.tiller.till_soil.call_count == todays_count

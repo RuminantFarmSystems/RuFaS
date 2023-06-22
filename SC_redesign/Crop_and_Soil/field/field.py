@@ -18,20 +18,18 @@ from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
 
-# TODO: delete/replace the note block below once satisfied with the design
-"""
-The current (Feb-2023) state of this module is to guide the development and provide structure for the field and farm
-manager classes. The field class, as laid out here, handles the management actions and scenarios that can be performed
-in an agricultural field.
 
-Note that some of the field-level attributes will be tracked by the FieldData class
+"""
+This is a high-level module that represents and simulates an entire field. It is responsible for executing the daily
+biophysical routines which take place in soil columns and in crops planted in the field. It is also responsible for the
+management of schedules, executing, and reporting of farm management events, including planting and harvesting crops,
+adding manure and fertilizer to the soil, and tilling the soil.
 """
 
 om = OutputManager()
 
 
 class Field:
-    """object representing an agricultural field"""
 
     def __init__(self, field_data: Optional[FieldData] = None, soil: Optional[Soil] = None,
                  plantings: Optional[List[PlantingEvent]] = None, harvestings: Optional[List[HarvestEvent]] = None,
@@ -80,9 +78,6 @@ class Field:
         self.tillage_events: List[TillageEvent] = tillage_events
         """List of all tillage events that will occur over the run of the simulation in this field."""
 
-        self.is_last_day_of_the_year = False  # TODO: This should be handled elsewhere
-        """is today the last day of the simulation year?"""
-
         self.manure_applicator = ManureApplication(self.soil.data)
         """Manure application interface."""
 
@@ -90,23 +85,30 @@ class Field:
         """List of all manure applications that will be applied to this field."""
 
     def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
-        """main Field function, runs all field routines based on current attribute configuration
+        """
+        Main Field routine, runs all subroutines routines based on current attribute configuration.
 
-        Args:
-            time : a Time object, containing the current year and day that the simulation is on.
-            current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
-                for field processes.
+        Parameters
+        ----------
+        time : Time
+            Contains the current year and day that the simulation is on.
+        current_weather : CurrentWeather
+            Contains a collection of today's weather variables needed for field processes.
 
+        Notes
+        -----
+        This method starts by executing any soil amendments that may be scheduled for the day. Then it executes the
+        daily update routines for the soil profile and active crops in the field. It then plants and/or harvests crops,
+        checks if active crops need to go into dormancy, and resets crop attributes in both the crops and in the field's
+        data object.
 
-        Details: **All the logic (after setup) will go in this function**
         """
         # --- Soil Management---
-        self.check_fertilizer_application_schedule(time)
+        self._check_fertilizer_application_schedule(time)
 
-        self.check_manure_application_schedule(time)
+        self._check_manure_application_schedule(time)
 
-        # tillage
-        self.check_tillage_schedule()
+        self._check_tillage_schedule(time)
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
@@ -114,35 +116,14 @@ class Field:
         # ... Other ...
 
         # --- Crop Management ---
-        # planting
-        self.check_crop_planting_schedule(time)
+        self._assess_dormancy(current_weather.daylength)
 
-        # Harvesting.
-        self.check_crop_harvest_schedule(time)
+        self._check_crop_planting_schedule(time)
+
+        self._check_crop_harvest_schedule(time)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
-
-        # perform remaining tasks if crops currently in field
-        if self.crops is not None:
-
-            self.assess_dormancy(current_weather.daylength)
-
-            self.grow_crops(current_weather.incoming_light, current_weather.min_air_temperature,
-                            current_weather.mean_air_temperature, current_weather.max_air_temperature)
-
-            if self.field_data.grazers_present:
-                self.graze_field()
-
-            self.check_harvest_schedules(time.day, time.year)
-            self.harvest_scheduled_crops()
-
-        pass
-
-    @property
-    def _composition_sums_to_one(self) -> bool:
-        """ensure that the crop_proportions values sum to 1"""
-        return sum([crop.data.field_proportion for crop in self.crops]) == 1.0
 
     # <editor-fold desc="--- Soil Management Methods ---">
     def _execute_fertilizer_application(self, mix_name: str, requested_nitrogen: float, requested_phosphorus: float,
@@ -176,7 +157,7 @@ class Field:
 
         """
         try:
-            fertilizer_mix = self.available_fertilizer_mixes.get(mix_name)
+            fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:
             raise KeyError(f"'{self.field_data.name}': expected to have fertilizer mix for '{mix_name}', "
                            f"received '{self.available_fertilizer_mixes}'.")
@@ -381,7 +362,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def check_crop_planting_schedule(self, time: Time) -> None:
+    def _check_crop_planting_schedule(self, time: Time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -396,7 +377,7 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def check_fertilizer_application_schedule(self, time: Time) -> None:
+    def _check_fertilizer_application_schedule(self, time: Time) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
@@ -411,7 +392,7 @@ class Field:
             self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
                                                  event.day)
 
-    def check_tillage_schedule(self, time: Time) -> None:
+    def _check_tillage_schedule(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -424,10 +405,9 @@ class Field:
         self.tillage_events, todays_events = self._filter_events(self.tillage_events, time)
         for event in todays_events:
             self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
-                                  time.calendar_year,
-                                  time.day)
+                                  time.calendar_year, time.day)
 
-    def check_manure_application_schedule(self, time: Time) -> None:
+    def _check_manure_application_schedule(self, time: Time) -> None:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -442,7 +422,7 @@ class Field:
             self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
                                              event.year, event.day)
 
-    def check_crop_harvest_schedule(self, time: Time) -> None:
+    def _check_crop_harvest_schedule(self, time: Time) -> None:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -550,7 +530,7 @@ class Field:
         """
         supported_species = set(item.value for item in CropSpecies)
         if crop_reference in supported_species:
-            crop = self.make_supported_crop(crop_reference)
+            crop = self._make_supported_crop(crop_reference)
         else:
             try:
                 crop_specifications = copy(self.custom_crop_specifications[crop_reference])
@@ -558,7 +538,7 @@ class Field:
                 raise KeyError(f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}', "
                                f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
                                f"types.")
-            crop = self.make_crop_from_config_dict(crop_specifications)
+            crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
 
@@ -648,7 +628,7 @@ class Field:
             crop.data.field_proportion = field_coverage_fraction
 
     @staticmethod
-    def make_crop_from_config_dict(config: Dict) -> Crop:
+    def _make_crop_from_config_dict(config: Dict) -> Crop:
         """Initializes a new crop from a configuration dictionary
 
         Args:
@@ -665,14 +645,14 @@ class Field:
             species = config.pop("species")
 
             if species in accepted_species:
-                return Field.make_supported_crop(species=species, **config)
+                return Field._make_supported_crop(species=species, **config)
             else:
                 config["species"] = "custom " + str(species)
 
-        return Field.make_custom_crop(**config)
+        return Field._make_custom_crop(**config)
 
     @staticmethod
-    def make_supported_crop(species: str, **specs) -> Crop:
+    def _make_supported_crop(species: str, **specs) -> Crop:
         """creates a crop instance with attributes determined by the species of the crop.
 
         Args:
@@ -691,7 +671,7 @@ class Field:
         return Crop(crop_data)
 
     @staticmethod
-    def make_custom_crop(**specs) -> Crop:
+    def _make_custom_crop(**specs) -> Crop:
         """creates a crop instance with customized attributes.
 
         Args:
@@ -703,79 +683,7 @@ class Field:
         crop_data = CropData(**specs)
         return Crop(crop_data)
 
-    def reset_perennial(self):
-        """resets some attributes for perennial crops at the start of the new growing season"""
-        pass
-
-    def _get_soil_layer_attributes_for_crop_growth(self) -> Dict[str, List[float]]:
-        """restructure soil layer data to be used for crop growth methods"""
-        layer_attr_dict = {"depths": [],
-                           "nitrates": [],
-                           "phosphates": []}
-        for layer in self.soil.data.soil_layers:
-            layer_attr_dict["depths"].append(layer.bottom_depth)
-            layer_attr_dict["nitrates"].append(layer.nitrate)
-            layer_attr_dict["phosphates"].append(layer.phosphate)
-
-        return layer_attr_dict
-
-        # NOTE: I had originally opted to have separate properties in the Soil class that made these lists,
-        # but, unless other classes need these variables in this format, this seems to be most efficient.
-        # i.e.,
-        #
-        # @property
-        # def layer_depths(self):
-        #     """Get a list of the lowest depth for each soil layer"""
-        #     return [layer.bottom_depth for layer in self.data.soil_layers]
-        #
-        # @property
-        # def layer_nitrates(self):
-        #     """Place the nitrate values from each soil layer into a list"""
-        #     return [layer.nitrate for layer in self.data.soil_layers]
-        #
-        # @property
-        # def layer_phosphates(self):
-        #     """Place the nitrate values from each soil layer into a list"""
-        #     return [layer.phosphate for layer in self.data.soil_layers]
-
-    def grow_crops(self, incoming_light, min_air_temperature, mean_air_temperature, max_air_temperature) -> None:
-        """allow the current crops to execute their daily growth routines"""
-        for this_crop in self.crops:
-            this_crop.grow_crop(soil_data=self.soil.data, incoming_light=incoming_light,
-                                mean_air_temperature=mean_air_temperature, min_air_temperature=min_air_temperature,
-                                max_air_temperature=max_air_temperature)
-
-    def check_harvest_schedules(self, day, year) -> None:
-        """executes the check_harvest_schedule method for each crop, passing the current day and year"""
-        for crop in self.crops:
-            crop.crop_management.check_harvest_schedule(current_day=day, current_year=year)
-
-    def harvest_scheduled_crops(self) -> None:
-        """perform the harvest operation on all crops in the field, depending on the harvest operation, if today is
-        the crop's harvest day.
-
-        After the harvest, this method adds any residue to the soil. Root residue is only added if the
-        harvest operation killed the crop.
-        """
-        for crop in self.crops:
-            if not crop.data.is_harvest_day:
-                continue  # move on to checking next crop
-
-            if crop.data.next_harvest_operation == HarvestOperation.HARVEST:
-                crop.crop_management.manage_harvest(cut=True, collect=True, kill=True)
-
-            if crop.data.next_harvest_operation == HarvestOperation.HARVEST_NOKILL:
-                crop.crop_management.manage_harvest(cut=True, collect_yield=True, kill=False)
-
-            self.soil.data.plant_surface_residue += (crop.data.yield_residue or 0)
-            if not crop.data.is_alive:
-                self.soil.data.plant_root_residue += (crop.data.root_biomass or 0)
-
-    def graze_field(self):  # TODO: placeholder; no grazing method currently implemented in RUFAS
-        """allow grazers to graze in the field during the current day"""
-        pass
-
-    def assess_dormancy(self, daylength: float) -> None:
+    def _assess_dormancy(self, daylength: float) -> None:
         """Transitions all crops to dormancy, that are capable of going dormant
 
         Args:
