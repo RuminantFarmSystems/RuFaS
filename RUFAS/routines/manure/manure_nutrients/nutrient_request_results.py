@@ -6,6 +6,8 @@ from dataclasses import dataclass, fields
 
 @dataclass(frozen=True)
 class NutrientRequestResults:
+    """A dataclass to store the results of the nutrient request calculations."""
+
     nitrogen: float = 0.0
     """Amount of manure nitrogen requested that can be fulfilled (kg). Default to 0."""
 
