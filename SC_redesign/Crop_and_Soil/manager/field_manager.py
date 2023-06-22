@@ -6,11 +6,11 @@ from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
 from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
 from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 
 class FieldManager:
-    def __init__(self, fields_config: List[Dict[str, str]]):
+    def __init__(self, _fields_config: Optional[List[Dict[str, str]]] = None):
         self.fields: List[Field] = []
         self.om = OutputGatherer(fields=self.fields)
 
