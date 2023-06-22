@@ -1,9 +1,9 @@
-import pdb
-
 from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.classes import Time
 from RUFAS.util import Utility
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
@@ -163,32 +163,54 @@ class FieldManager:
             schedules.append(new_schedule)
         return schedules
 
-    # @staticmethod
-    # def _setup_soil(soil_config: Dict[str]) -> Soil:
-    #     """
-    #     Sets up a Soil instance that will be used by the Field class.
-    #     Parameters
-    #     ----------
-    #     soil_config : Dict[str]
-    #         Contains all the data necessary to set up a SoilData object.
-    #     Returns
-    #     -------
-    #     Soil
-    #         Soil instance that contains a SoilData instance configured to the provided specifications.
-    #     """
-    #     field_size = soil_config["field_size"]
-    #
-    #     config_dictionary = {}
-    #
-    #     config_dictionary["second_moisture_condition_parameter"] = soil_config.get("CN2")
-    #     config_dictionary["average_subbasin_slope"] = soil_config.get("field_slope")
-    #     config_dictionary["slope_length"] = soil_config.get("slope_length")
-    #     config_dictionary["manning"] = soil_config.get("manning")
-    #     config_dictionary["albedo"] = soil_config.get("soil_albedo")
-    #     config_dictionary["cover_type"] = soil_config.get("soil_cover_type")
-    #
-    #     soil_layers_config = list(config_dictionary.get("soil_layers"))
-    #     pass
+    @staticmethod
+    def _setup_soil(soil_config: Dict[str]) -> Soil:
+        """
+        Sets up a Soil instance that will be used by the Field class.
+
+        Parameters
+        ----------
+        soil_config : Dict[str]
+            Contains all the data necessary to set up a SoilData object.
+
+        Returns
+        -------
+        Soil
+            Soil instance that contains a SoilData instance configured to the provided specifications.
+
+        """
+        field_size = soil_config["field_size"]
+        sand_content = soil_config["sand"]
+        silt_content = soil_config["silt"]
+        residue = soil_config["initial_residue"]
+        nitrogen_mineralization_rate = soil_config["fresh_N_mineral_rate"]
+
+        soil_layers_config = list(soil_config.get("soil_layers").values())
+        soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
+        soil_layers = []
+        for index, layer_config in enumerate(soil_layers_config):
+            if index == 0:
+                new_layer = FieldManager._setup_soil_layer(field_size, 0.0, sand_content, silt_content, residue,
+                                                           nitrogen_mineralization_rate, layer_config)
+            else:
+                new_layer = FieldManager._setup_soil_layer(field_size, soil_layers[-1].bottom_depth, sand_content,
+                                                           silt_content, residue, nitrogen_mineralization_rate,
+                                                           layer_config)
+            soil_layers.append(new_layer)
+
+        config_dictionary = {}
+
+        config_dictionary["second_moisture_condition_parameter"] = soil_config.get("CN2")
+        config_dictionary["average_subbasin_slope"] = soil_config.get("field_slope")
+        config_dictionary["slope_length"] = soil_config.get("slope_length")
+        config_dictionary["manning"] = soil_config.get("manning")
+        config_dictionary["field_size"] = field_size
+        config_dictionary["albedo"] = soil_config.get("soil_albedo")
+        config_dictionary["cover_type"] = soil_config.get("soil_cover_type")
+        config_dictionary["soil_layers"] = soil_layers
+
+        soil_data = SoilConfigFactory.create_soil_data(field_size, SoilConfiguration("generic"), **config_dictionary)
+        return Soil(soil_data=soil_data)
 
     @staticmethod
     def _setup_soil_layer(field_size: float, top_depth: float, sand: float, silt: float, initial_residue: float,
