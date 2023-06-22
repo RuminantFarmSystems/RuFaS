@@ -1,5 +1,3 @@
-import warnings
-
 import pytest
 from mock.mock import MagicMock
 from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
@@ -86,14 +84,6 @@ def test_dry_down():
     crop = CropManagement(CropData(above_ground_biomass=10.2, dry_down_fraction=0.18))
     crop.dry_down()
     assert pytest.approx(crop.data.above_ground_biomass) == 10.2 * (1 - 0.18)
-
-
-def test_graze():
-    warnings.warn("no graze method implemented")
-
-
-def test_collect_cut_yields():
-    warnings.warn("no collect cut yields method implemented")
 
 
 @pytest.mark.parametrize("heat_sched,heat_frac,harv_day,harv_yr,this_day,this_yr", [
