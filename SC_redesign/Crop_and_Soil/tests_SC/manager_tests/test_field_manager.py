@@ -3,7 +3,6 @@ from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.classes import Time, Weather
 import pytest
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from unittest.mock import MagicMock
 from typing import List
 

@@ -59,10 +59,10 @@ def _deg_trig(degree, fun=numpy.sin):
 
 
 def _determine_daylength(latitude: float, year: int, month: int, day: int, is_sea_horizon=False,
-                         longtitude=-89.401230, elevation = 266.09) -> float:
+                         longtitude=-89.401230, elevation=266.09) -> float:
     """Calculates the daylength"""
     # Step 1: Calculate days since 1/1/2000
-    year_zero = 1721060.5
+    #year_zero = 1721060.5
     y2k = 2451545.0
     jDate = juliandate.from_gregorian(year, month, day)  # Julian (Astronomical) Date
     # JDate = year_zero + (year * 365.2508) + day_of_year  # Julian Date - rudimentary method
@@ -101,6 +101,3 @@ def _determine_daylength(latitude: float, year: int, month: int, day: int, is_se
     length = juliandate.__h_m_s(JSet-JRise)
 
     return length[0]
-
-
-
