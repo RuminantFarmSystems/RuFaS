@@ -6,7 +6,7 @@ from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
 from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
 from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 
 
 class FieldManager:
