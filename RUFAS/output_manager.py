@@ -373,7 +373,7 @@ class OutputManager(object):
         try:
             with open(path) as text_file:
                 list_of_elements = text_file.read().splitlines()
-                load_message = f"Successfully opened {path}, it contained {len(list_of_elements)} filter patterns."
+                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements
         except Exception as e:
