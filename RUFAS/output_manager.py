@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import re
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 import json
 import os
 import time
@@ -373,13 +373,14 @@ class OutputManager(object):
         try:
             with open(path) as text_file:
                 list_of_elements = text_file.read().splitlines()
-                load_message = f"Successfully opened {path}, it contained {len(list_of_elements)} filter patterns."
+                load_message = f"Successfully opened {path} and read {len(list_of_elements)} lines."
                 self.add_log("filter_pattern_file_load_log", load_message, info_map)
                 return list_of_elements
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, filter_patterns: List[str], input_file: str) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_patterns: List[str], input_file_name: Optional[str]
+                               ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
@@ -388,7 +389,7 @@ class OutputManager(object):
         filter_patterns : List[str]
             A list of patterns the user has selected to filter the variables pool.
 
-        input_file : str
+        input_file_name : str, optional
             The filter patterns file name - necessary for logging purposes
 
         Returns
@@ -412,18 +413,18 @@ class OutputManager(object):
         exclude_keyword = "exclude"
         filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
         if filter_by_exclusion:
-            filter_vars_msg = f"{input_file} has exclude-keyword '{exclude_keyword}' at"\
-                f" position {exclude_keyword_location}."
+            filter_vars_msg = f"{input_file_name} has exclude-keyword '{exclude_keyword}' at"\
+                f" position {exclude_keyword_location}. Performing filtering by exclusion."
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
-            filter_vars_msg = f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"\
-                f" at position {exclude_keyword_location}."
+            filter_vars_msg = f"{input_file_name} does NOT contain exclude-keyword '{exclude_keyword}'"\
+                f" at position {exclude_keyword_location}. Performing filtering by inclusion."
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         self.add_log("filtering_log", filter_vars_msg, info_map)
-        filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)} filter"\
-            f" patterns in the {input_file} file."
+        filter_log_count_msg = f"There were {len(filter_pattern_matches)} matches for the {len(filter_patterns)}"\
+            f" filter patterns in the {input_file_name} file."
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
