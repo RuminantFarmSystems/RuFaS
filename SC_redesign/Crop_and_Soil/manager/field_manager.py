@@ -20,7 +20,7 @@ class FieldManager:
         for field in fields_config:
             field_name, field_config = field.items()
             self.fields.append(self._setup_field(field_name, field_config))
-        self.om = OutputGatherer(fields=self.fields)
+        self.output_gatherer = OutputGatherer(fields=self.fields)
 
     def daily_update_routine(self, weather: Weather, time: Time) -> None:
         """
@@ -40,14 +40,10 @@ class FieldManager:
 
         """
         for field in self.fields:
-            latitude = field.field_data.absolute_latitude
-            year = time.calendar_year
-            day = FieldManager._date_conversion_day(time)
             month = FieldManager._date_conversion_month(time)
-            current_weather = CurrentWeather.check_current_weather(weather=weather, latitude=latitude, year=year,
-                                                                   day=day, month=month)
+            current_weather = CurrentWeather.check_current_weather(weather=weather, month=month)
             field.manage_field(time, current_weather=current_weather)
-        self.om.send_daily_variables()
+        self.output_gatherer.send_daily_variables()
 
     def annual_update_routine(self) -> None:
         """
@@ -56,7 +52,7 @@ class FieldManager:
         """
         for field in self.fields:
             field.perform_annual_reset()
-        self.om.send_annual_variables()
+        self.output_gatherer.send_annual_variables()
 
     @staticmethod
     def _date_conversion_month(time: Time) -> int:
@@ -93,6 +89,7 @@ class FieldManager:
     @staticmethod
     def _date_conversion_day(time: Time) -> int:
         """
+
         Converts the day number into the corresponding day of the month.
         Parameters
         ----------
@@ -102,7 +99,7 @@ class FieldManager:
         Returns
         -------
         int
-        corresponding day of the month
+        Corresponding day of the month.
 
         """
         days = [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
