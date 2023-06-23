@@ -1,4 +1,5 @@
 from SC_redesign.Crop_and_Soil.field.field import Field
+from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from RUFAS.util import Utility
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
@@ -156,8 +157,12 @@ class FieldManager:
 
         soil_profile = FieldManager._setup_soil(soil_config)
 
-        return Field(soil=soil_profile, plantings=all_planting_events, harvestings=all_harvest_events,
-                     tillage_events=tillage_events, fertilizer_events=fertilizer_events,
+        field_data = FieldData(name=field_name, field_size=soil_config["field_size"],
+                               current_residue=soil_config["initial_residue"],
+                               absolute_latitude=abs(crops_config["latitude"]))
+
+        return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
+                     harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
                      fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events)
 
     @staticmethod

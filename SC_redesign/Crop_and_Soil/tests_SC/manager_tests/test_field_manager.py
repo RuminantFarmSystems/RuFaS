@@ -1,8 +1,12 @@
 from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
+from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
+from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
 import pytest
@@ -310,3 +314,32 @@ def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -
 
         assert FieldManager._setup_soil_layer.call_count == soil_layer_count
         mocked_soil_factory.assert_called_once()
+
+
+@pytest.mark.parametrize("field_name,field_config", [
+    ("field_1", {"soil": "ARL_soil.json", "crop": "ARL_rotation.json",
+                 "field_management": "ARL_field_management.json"}),
+    ("field_2", {"soil": "barnyard_soil.json", "crop": "corn_scheduled_rotation.json",
+                 "field_management": "barnyard_scheduled_field_management.json"})
+])
+def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
+    """Tests that a Field instance is correctly initialized with a given input configuration."""
+    Utility.get_base_dir = MagicMock()
+    Utility.read_json_file = MagicMock(return_value={"field_size": 1.0, "initial_residue": 0.0, "latitude": 40.0})
+    FieldManager._setup_management = MagicMock(return_value=({}, FertilizerSchedule("name", [], [], [], [], [], [], []),
+                                                             ManureSchedule("name", [], [], [], [], []),
+                                                             TillageSchedule("name", [], [], [], [], [])))
+    FieldManager._setup_crop_schedules = MagicMock(return_value=[CropSchedule("name", "crop", [1999], [100], [1999],
+                                                                              [240], ["default"])])
+    FieldManager._setup_soil = MagicMock(return_value=Soil(field_size=1.0))
+
+    actual = FieldManager._setup_field(field_name, field_config)
+
+    Utility.get_base_dir.assert_called_once()
+    assert Utility.read_json_file.call_count == 3
+    FieldManager._setup_management.assert_called_once()
+    FieldManager._setup_crop_schedules.assert_called_once()
+    FieldManager._setup_soil.assert_called_once()
+    assert actual.field_data.name == field_name
+    assert actual.field_data.current_residue == 0.0
+    assert actual.field_data.absolute_latitude == 40.0
