@@ -13,7 +13,6 @@ from .soil.soil import *
 from .field_management.field_management import *
 from ...util import Utility
 
-
 def daily_fields_routine(fields, manure_storage, weather, time):
     """execute field management, crop, and soil routines for each field and generate summaries.
     
@@ -29,12 +28,12 @@ def daily_fields_routine(fields, manure_storage, weather, time):
         croptime = field.croptime
         field_management = field.field_management
 
-
         # If the crop is not planted yet, determine whether it is planted today
         # Necessary here so that field management can be scheduled prior to planting
         
         # if not crop_type.planted and not crop_type.killed:
         #     calculate_start(soil, crop, field_management, weather, time)
+
         daily_field_management_routine(soil, manure_storage, field_management, weather, time)
         daily_soil_routine(soil, crop, field_management, weather, time)
         daily_crop_routine(soil, crop, field_management, weather, time, croptime)
