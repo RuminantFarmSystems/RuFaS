@@ -413,7 +413,7 @@ class OutputManager(object):
         filter_by_exclusion = filter_patterns and filter_patterns[exclude_keyword_location] == exclude_keyword
         if filter_by_exclusion:
             filter_vars_msg = f"{input_file} has exclude-keyword '{exclude_keyword}' at"\
-                f" position {exclude_keyword_location}."
+                f" position {exclude_keyword_location}. Performing filtering by exclusion."
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if not
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
