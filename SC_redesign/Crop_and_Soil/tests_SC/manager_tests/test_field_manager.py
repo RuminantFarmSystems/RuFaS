@@ -59,15 +59,16 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "T_max", 3)
     setattr(mocked_weather, "T_avg_annual", 3)
     setattr(mocked_weather, "rainfall", 3)
+    setattr(mocked_weather, "irrigation", 3)
     fm = FieldManager([])
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
-    fm.om.send_daily_variables = MagicMock()
+    fm.output_gatherer.send_daily_variables = MagicMock()
     fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
     for field in fields:
         assert field.manage_field.call_count == 1
-    assert fm.om.send_daily_variables.call_count == 1
+    assert fm.output_gatherer.send_daily_variables.call_count == 1
 
 
 @pytest.mark.parametrize("fields", [
@@ -77,18 +78,15 @@ def test_daily_update_routine(fields: List[Field]) -> None:
 ])
 def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", 1998)
-    setattr(mocked_time, "day", 5)
     for field in fields:
         field.perform_annual_reset = MagicMock()
     fm = FieldManager([])
     fm.fields = fields
-    fm.om.send_annual_variables = MagicMock()
+    fm.output_gatherer.send_annual_variables = MagicMock()
     fm.annual_update_routine()
     for field in fields:
         assert field.perform_annual_reset.call_count == 1
-    assert fm.om.send_annual_variables.call_count == 1
+    assert fm.output_gatherer.send_annual_variables.call_count == 1
 
 
 @pytest.mark.parametrize("field_name,config", [

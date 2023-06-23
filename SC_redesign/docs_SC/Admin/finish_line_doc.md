@@ -106,20 +106,20 @@ run of the simulation.
 
 ### Field Manager
 - Implement and test methods to translate user input into configuration dictionary.
-  - [ ] Schedules for crop plantings and harvestings. - 3 points
-  - [ ] Schedules for manure applications. - 2 points
-  - [ ] Schedules for fertilizer applications. - 2 points
-  - [ ] Schedules for tillage operations. - 2 points
+  - [x] Schedules for crop plantings and harvestings. - 3 points
+  - [x] Schedules for manure applications. - 2 points
+  - [x] Schedules for fertilizer applications. - 2 points
+  - [x] Schedules for tillage operations. - 2 points
   - [x] Soil profile configurations. - 4 points
   - [ ] Custom crop types. - 2 points
 - Implement methods that turn configurations dictionaries into object instances that will be used to run the simulation.
   - [x] Create `Soil` instances. - 3 points
-  - [ ] Create `FieldData` instances. - 2 point
+  - [x] Create `FieldData` instances. - 2 point
   - Load lists of `Event` objects into `Field` instances.
-    - [ ] Crop `PlantingEvent`s and `HarvestEvent`s. - 2 points
-    - [ ] `TillageEvent`s. - 2 points
-    - [ ] `FertilizerEvent`s. - 2 points
-    - [ ] `ManureEvent`s. - 2 points
+    - [x] Crop `PlantingEvent`s and `HarvestEvent`s. - 2 points
+    - [x] `TillageEvent`s. - 2 points
+    - [x] `FertilizerEvent`s. - 2 points
+    - [x] `ManureEvent`s. - 2 points
 - Implement and test methods that mirror the public facing methods of the old `Field` module.
   - [x] Daily update routine - 1 point
   - [x] Pre-annual routine - 1 point
@@ -132,7 +132,7 @@ run of the simulation.
 - Implement an `OutputGatherer` module that will handle all output from the Crop and Soil modules
   - [x] Implement a method that will collect and pass values to the Output Manager daily. - 2 points
   - [x] Implement a method that will collect and pass values to the Output Manager annually. - 2 points
-- [ ] Integrate the `OutputGatherer` into the `FieldManager` module. - 2 points
+- [x] Integrate the `OutputGatherer` into the `FieldManager` module. - 2 points
 
 #### FieldInputManager
 - Note: this `FieldInputManager` is dependent on being able to interface with the `InputManager`, so this task should 
