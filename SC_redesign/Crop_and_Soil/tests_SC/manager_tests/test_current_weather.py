@@ -23,10 +23,8 @@ def test_check_current_weather(radiation: float, T_min: float, T_avg: float, T_m
     setattr(mocked_weather, "T_avg_annual", T_avg_annual)
     setattr(mocked_weather, "rainfall", rainfall)
     setattr(mocked_weather, "irrigation", irrigation)
-    patch_determine_daylength = mocker.patch('SC_redesign.Crop_and_Soil.manager.current_weather._determine_daylength',
-                                             return_value=12.0)
-    CurrentWeather.check_current_weather(weather=mocked_weather, latitude=latitude, year=year,
-                                         month=month, day=day)
+    CurrentWeather._determine_daylength = MagicMock(return_value=12)
+    CurrentWeather.check_current_weather(weather=mocked_weather, month=month)
 
     assert CurrentWeather.rainfall == rainfall
     assert CurrentWeather.incoming_light == radiation
@@ -34,7 +32,7 @@ def test_check_current_weather(radiation: float, T_min: float, T_avg: float, T_m
     assert CurrentWeather.mean_air_temperature == T_avg
     assert CurrentWeather.max_air_temperature == T_max
     assert CurrentWeather.annual_mean_air_temperature == T_avg_annual
-    assert patch_determine_daylength.call_count == 1
+    assert CurrentWeather._determine_daylength.call_count == 1
     assert CurrentWeather.daylength == 12
     assert CurrentWeather.irrigation == irrigation
 

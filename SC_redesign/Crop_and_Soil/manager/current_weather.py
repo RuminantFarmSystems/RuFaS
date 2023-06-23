@@ -1,8 +1,5 @@
 from dataclasses import dataclass
 from typing import Optional
-from juliandate import juliandate
-import numpy
-
 
 from RUFAS.classes import Weather
 
@@ -71,6 +68,3 @@ class CurrentWeather:
         """
         daylength = [9, 10, 11, 13, 14, 15, 15, 15, 13, 12, 10, 9]
         return daylength[month-1]
-
-
-
