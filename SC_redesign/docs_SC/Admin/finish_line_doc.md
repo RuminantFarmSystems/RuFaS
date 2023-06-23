@@ -107,9 +107,9 @@ run of the simulation.
 ### Field Manager
 - Implement and test methods to translate user input into configuration dictionary.
   - [x] Schedules for crop plantings and harvestings. - 3 points
-  - [ ] Schedules for manure applications. - 2 points
-  - [ ] Schedules for fertilizer applications. - 2 points
-  - [ ] Schedules for tillage operations. - 2 points
+  - [x] Schedules for manure applications. - 2 points
+  - [x] Schedules for fertilizer applications. - 2 points
+  - [x] Schedules for tillage operations. - 2 points
   - [ ] Soil profile configurations. - 4 points
   - [ ] Custom crop types. - 2 points
 - Implement methods that turn configurations dictionaries into object instances that will be used to run the simulation.
@@ -117,9 +117,9 @@ run of the simulation.
   - [ ] Create `FieldData` instances. - 2 point
   - Load lists of `Event` objects into `Field` instances.
     - [x] Crop `PlantingEvent`s and `HarvestEvent`s. - 2 points
-    - [ ] `TillageEvent`s. - 2 points
-    - [ ] `FertilizerEvent`s. - 2 points
-    - [ ] `ManureEvent`s. - 2 points
+    - [x] `TillageEvent`s. - 2 points
+    - [x] `FertilizerEvent`s. - 2 points
+    - [x] `ManureEvent`s. - 2 points
 - Implement and test methods that mirror the public facing methods of the old `Field` module.
   - [x] Daily update routine - 1 point
   - [x] Pre-annual routine - 1 point
