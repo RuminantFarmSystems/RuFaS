@@ -388,7 +388,7 @@ class OutputManager(object):
         filter_patterns : List[str]
             A list of patterns the user has selected to filter the variables pool.
 
-        input_file : str
+        input_file_name : str, optional
             The filter patterns file name - necessary for logging purposes
 
         Returns
