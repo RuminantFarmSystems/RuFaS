@@ -3,11 +3,14 @@ from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
 import pytest
 from typing import List, Dict
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 
 @pytest.mark.parametrize("year, day, expected_month", [
@@ -271,3 +274,123 @@ def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: floa
     """Tests that LayerData instances are configured correctly with a given specification."""
     actual = FieldManager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
     assert actual == expected
+
+
+@pytest.mark.parametrize("soil_input_file_name", [
+    "ARL_soil.json",
+    "ARL_soil_tillage.json",
+    "barnyard_soil.json",
+    "base_case_soil.json",
+    "LT_soil.json",
+    "multi_crop_soil.json",
+    "swat_soil.json",
+    "testing_soil.json"
+])
+def test_setup_soil_with_full_inputs(soil_input_file_name: str) -> None:
+    """Tests that current soil inputs can be handled by the soil setup routine."""
+    input_directory = Utility.get_base_dir() / 'input'
+    soil_config = Utility.read_json_file(input_directory / 'soil' / soil_input_file_name)
+    FieldManager._setup_soil(soil_config)
+    assert True
+
+
+@pytest.mark.parametrize("soil_config,soil_layer_count", [
+    ({"CN2": 85.00, "field_slope": 0.02, "slope_length": 3, "manning": 0.4, "field_size": 1.0, "sand": 15, "silt": 65,
+     "soil_albedo": 0.16, "initial_residue": 0, "fresh_N_mineral_rate": 0.05, "soil_cover_type": "BARE", "soil_layers":
+        {
+            "layer_1":
+            {
+                "bottom_depth": 279.4,
+                "wilting_point": 0.23,
+                "field_capacity": 0.29,
+                "saturation": 0.58,
+                "K_sat": 9.17,
+                "clay": 22.5,
+                "initial_temperature": 15.77575,
+                "bulk_density": 1.34,
+                "org_C_percent": 0.012,
+                "NH4": 1,
+                "N03": 1,
+                "active_N_percent": 0.02,
+                "labile_P": 2.7,
+                "active_mineral_rate": 0.0003,
+                "volatile_exchange_factor": 0.15,
+                "denitrification_rate": 0.1,
+                "soil_water_percent": 0.3,
+                "OM_percent": 0.04
+            },
+            "layer_2":
+            {
+                "bottom_depth": 1041.4,
+                "wilting_point": 0.163,
+                "field_capacity": 0.306,
+                "saturation": 0.5,
+                "K_sat": 9.17,
+                "clay": 30,
+                "initial_temperature": 14.50797297,
+                "bulk_density": 1.42,
+                "org_C_percent": 0.012,
+                "NH4": 1,
+                "N03": 1,
+                "active_N_percent": 0.02,
+                "labile_P": 2.7,
+                "active_mineral_rate": 0.0003,
+                "volatile_exchange_factor": 0.15,
+                "denitrification_rate": 0.1,
+                "soil_water_percent": 0.3,
+                "OM_percent": 0.006
+            },
+            "layer_3":
+            {
+                "bottom_depth": 1168.4,
+                "wilting_point": 0.151,
+                "field_capacity": 0.298,
+                "saturation": 0.5,
+                "K_sat": 23.29,
+                "clay": 23,
+                "initial_temperature": 13.38623,
+                "bulk_density": 1.6,
+                "org_C_percent": 0.012,
+                "NH4": 1,
+                "N03": 1,
+                "active_N_percent": 0.02,
+                "labile_P": 2.7,
+                "active_mineral_rate": 0.0003,
+                "volatile_exchange_factor": 0.15,
+                "denitrification_rate": 0.1,
+                "soil_water_percent": 0.3,
+                "OM_percent": 0.0025
+            },
+            "layer_4":
+            {
+                "bottom_depth": 2006.6,
+                "wilting_point": 0.132,
+                "field_capacity": 0.211,
+                "saturation": 0.5,
+                "K_sat": 23.29,
+                "clay": 12,
+                "initial_temperature": 13.38623,
+                "bulk_density": 1.5,
+                "org_C_percent": 0.012,
+                "NH4": 1,
+                "N03": 1,
+                "active_N_percent": 0.02,
+                "labile_P": 2.7,
+                "active_mineral_rate": 0.0003,
+                "volatile_exchange_factor": 0.15,
+                "denitrification_rate": 0.1,
+                "soil_water_percent": 0.3,
+                "OM_percent": 0.0025
+            }
+        }}, 4)
+])
+def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -> None:
+    """Tests that soil setup routine correctly parses input and calls subroutine."""
+    FieldManager._setup_soil_layer = MagicMock(return_value=LayerData(top_depth=0.0, bottom_depth=1000.0,
+                                                                      field_size=1.0))
+    SoilConfigFactory.create_soil_data = MagicMock()
+
+    FieldManager._setup_soil(soil_config)
+
+    assert FieldManager._setup_soil_layer.call_count == soil_layer_count
+    SoilConfigFactory.create_soil_data.assert_called_once()

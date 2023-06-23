@@ -110,10 +110,10 @@ run of the simulation.
   - [ ] Schedules for manure applications. - 2 points
   - [ ] Schedules for fertilizer applications. - 2 points
   - [ ] Schedules for tillage operations. - 2 points
-  - [ ] Soil profile configurations. - 4 points
+  - [x] Soil profile configurations. - 4 points
   - [ ] Custom crop types. - 2 points
 - Implement methods that turn configurations dictionaries into object instances that will be used to run the simulation.
-  - [ ] Create `Soil` instances. - 3 points
+  - [x] Create `Soil` instances. - 3 points
   - [ ] Create `FieldData` instances. - 2 point
   - Load lists of `Event` objects into `Field` instances.
     - [ ] Crop `PlantingEvent`s and `HarvestEvent`s. - 2 points

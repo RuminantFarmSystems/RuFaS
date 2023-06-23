@@ -290,12 +290,12 @@ class FieldManager:
         config_dictionary["average_subbasin_slope"] = soil_config.get("field_slope")
         config_dictionary["slope_length"] = soil_config.get("slope_length")
         config_dictionary["manning"] = soil_config.get("manning")
-        config_dictionary["field_size"] = field_size
         config_dictionary["albedo"] = soil_config.get("soil_albedo")
         config_dictionary["cover_type"] = soil_config.get("soil_cover_type")
         config_dictionary["soil_layers"] = soil_layers
 
-        soil_data = SoilConfigFactory.create_soil_data(field_size, SoilConfiguration("generic"), **config_dictionary)
+        soil_data = SoilConfigFactory.create_soil_data(field_size=field_size, config=SoilConfiguration("generic"),
+                                                       **config_dictionary)
         return Soil(soil_data=soil_data)
 
     @staticmethod
