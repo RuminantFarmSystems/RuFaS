@@ -39,7 +39,7 @@ contribute get up to speed on the state of the module quickly.
 ## Requirements
 
 ### Field Requirements
-- [ ] Test that all the below processes have been correctly and cohesively integrated into the `Field` module.
+- [x] Test that all the below processes have been correctly and cohesively integrated into the `Field` module.
 
 #### Water
 Biophysical processes that involve the movement of water are often complex and intertwined with Crop and Soil processes,
