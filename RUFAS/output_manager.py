@@ -418,7 +418,7 @@ class OutputManager(object):
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         else:
             filter_vars_msg = f"{input_file} does NOT contain exclude-keyword '{exclude_keyword}'"\
-                f" at position {exclude_keyword_location}."
+                f" at position {exclude_keyword_location}. Performing filtering by inclusion."
             filter_pattern_matches = {key: self.variables_pool[key] for key in self.variables_pool.keys() if
                                       any(re.match(pattern, key) for pattern in filter_patterns)}
         self.add_log("filtering_log", filter_vars_msg, info_map)
