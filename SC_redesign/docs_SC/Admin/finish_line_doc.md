@@ -121,8 +121,8 @@ run of the simulation.
     - [ ] `FertilizerEvent`s. - 2 points
     - [ ] `ManureEvent`s. - 2 points
 - Implement and test methods that mirror the public facing methods of the old `Field` module.
-  - [ ] Daily update routine - 1 point
-  - [ ] Pre-annual routine - 1 point
+  - [x] Daily update routine - 1 point
+  - [x] Pre-annual routine - 1 point
 - Integrate `FieldManager` into `SimulationEngine` and `State`.
   - [ ] Replace calls to old daily fields routine with calls to new one in `SimulationEngine`. - 1 point
   - [ ] Replace calls to old annual fields routine with calls to new one in `SimulationEngine`. - 1 point
