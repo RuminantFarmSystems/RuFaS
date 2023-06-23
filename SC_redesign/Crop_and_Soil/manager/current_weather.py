@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from RUFAS.classes import Weather
 
 """
 The purpose of this class is to combine and covert infos from weather data and field data and creates a
@@ -36,7 +35,7 @@ class CurrentWeather:
     irrigation: float = 0
 
     @classmethod
-    def check_current_weather(cls, weather: Weather, month: int) -> 'CurrentWeather':
+    def check_current_weather(cls, weather, month: int) -> 'CurrentWeather':
         """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
         object"""
         cls.incoming_light = weather.radiation

@@ -1,7 +1,5 @@
 from typing import List, Any
 from copy import copy
-from RUFAS.classes import is_leap_year
-
 
 """
 This module contains `Schedule`, which acts as the base class for all the different schedule objects that are utilized
@@ -106,11 +104,30 @@ class Schedule:
         """
         dates = list(zip(years, days))
         for date in dates:
-            if not is_leap_year(date[0]) and not 0 < date[1] <= 365:
+            if not Schedule.is_leap_year(date[0]) and not 0 < date[1] <= 365:
                 return False
-            if is_leap_year(date[0]) and not 0 < date[1] <= 366:
+            if Schedule.is_leap_year(date[0]) and not 0 < date[1] <= 366:
                 return False
         return True
+
+    @staticmethod
+    def is_leap_year(year):
+        """
+        Description:
+            Helper method determines if the given year is a leap year
+        Args:
+            year: an int of the year
+        Returns:
+            bool: True if the year is a leap year
+        """
+        if year % 400 == 0:
+            return True
+        elif year % 100 == 0:
+            return False
+        elif year % 4 == 0:
+            return True
+        else:
+            return False
 
     @staticmethod
     def _validate_years(years: List[int]) -> bool:

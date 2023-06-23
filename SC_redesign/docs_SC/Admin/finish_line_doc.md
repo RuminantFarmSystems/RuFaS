@@ -124,9 +124,9 @@ run of the simulation.
   - [x] Daily update routine - 1 point
   - [x] Pre-annual routine - 1 point
 - Integrate `FieldManager` into `SimulationEngine` and `State`.
-  - [ ] Replace calls to old daily fields routine with calls to new one in `SimulationEngine`. - 1 point
-  - [ ] Replace calls to old annual fields routine with calls to new one in `SimulationEngine`. - 1 point
-  - [ ] Replace initialization of `Fields` with initialization of `FieldManager` in `State`. - 3 points
+  - [x] Replace calls to old daily fields routine with calls to new one in `SimulationEngine`. - 1 point
+  - [x] Replace calls to old annual fields routine with calls to new one in `SimulationEngine`. - 1 point
+  - [x] Replace initialization of `Fields` with initialization of `FieldManager` in `State`. - 3 points
 
 #### OutputGatherer
 - Implement an `OutputGatherer` module that will handle all output from the Crop and Soil modules
