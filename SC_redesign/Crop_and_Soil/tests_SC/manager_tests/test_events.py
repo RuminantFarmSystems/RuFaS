@@ -2,7 +2,6 @@ import pytest
 from unittest.mock import MagicMock
 
 from SC_redesign.Crop_and_Soil.manager.events import Event
-from RUFAS.classes import Time
 
 
 @pytest.mark.parametrize("year,day,current_year,current_day,expected", [
@@ -13,7 +12,7 @@ from RUFAS.classes import Time
 ])
 def test_occurs_today(year: int, day: int, current_year: int, current_day: int, expected: bool) -> None:
     """Tests that Event objects can correctly determine whether they run on a given day."""
-    mocked_time = MagicMock(Time)
+    mocked_time = MagicMock()
     setattr(mocked_time, "calendar_year", current_year)
     setattr(mocked_time, "day", current_day)
     event = Event(year, day)
@@ -23,7 +22,7 @@ def test_occurs_today(year: int, day: int, current_year: int, current_day: int, 
     assert actual == expected
 
 
-@pytest.mark.parametrize("year1,day1,,year2,day2,expected", [
+@pytest.mark.parametrize("year1,day1,year2,day2,expected", [
     (1, 240, 1, 240, True),
     (2, 120, 3, 120, False),
     (4, 220, 4, 240, False),

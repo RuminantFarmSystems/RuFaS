@@ -12,9 +12,10 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 import csv
 
+from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from RUFAS import errors
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines import Fields, Feed
+from RUFAS.routines import Feed
 from RUFAS.routines.animal.animal_management import AnimalManagement
 from RUFAS.routines.manure.manure_management import ManureManagement
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
@@ -49,7 +50,7 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        self.fields = Fields(data['fields'], time)
+        self.field_manager = FieldManager(data['fields'])
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(
             input_dir / 'feed' / data['feed']))
@@ -66,14 +67,11 @@ class State:
         Description:
             Resets all annual variables that require reset
         """
-
-        self.fields.annual_reset()
+        self.field_manager.annual_update_routine()
         self.animal_management.annual_reset()
         self.manure_storage.annual_reset()
 
     def annual_mass_balance(self, time):
-        for field in self.fields.fields.values():
-            field.soil.annual_mass_balance(field.field_management, time)
         self.manure_storage.annual_mass_balance()
 
 
@@ -493,7 +491,7 @@ class Time:
             config: instance of the Config class containing information necessary
                 to initialize time
         """
-        
+
         calendar_year = config.start_year
         # number of years
         years = config.years
@@ -512,7 +510,7 @@ class Time:
             else:
                 self.day = self.years[0][i]
                 break
-        self.index = 0 
+        self.index = 0
     def to_str(self):
         """
         Description:

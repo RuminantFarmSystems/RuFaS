@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from RUFAS.classes import Weather
 
 
 @pytest.mark.parametrize("months, expected", [
@@ -26,7 +25,7 @@ def test_check_current_weather(radiation: float, T_min: float, T_avg: float, T_m
                                mocker) -> None:
     """Tests that a weather object was successfully translated into a current weather object"""
 
-    mocked_weather = MagicMock(Weather)
+    mocked_weather = MagicMock()
     setattr(mocked_weather, "radiation", radiation)
     setattr(mocked_weather, "T_min", T_min)
     setattr(mocked_weather, "T_avg", T_avg)
