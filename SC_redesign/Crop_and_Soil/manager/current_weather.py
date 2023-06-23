@@ -6,6 +6,16 @@ import numpy
 
 from RUFAS.classes import Weather
 
+"""
+The purpose of this class is to combine and covert infos from weather data and field data and creates a
+current weather class that have all the needed attributes to allow field and field manager to work properly.
+
+Notes
+-------
+_deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this will
+be revisited for a more accurate implementation post v1
+"""
+
 
 @dataclass
 class CurrentWeather:
@@ -28,8 +38,8 @@ class CurrentWeather:
     """amount of rainfall that occurs on the day (mm)"""
 
     @classmethod
-    def check_current_weather(cls, weather: Weather, latitude: float, elevation: float, year: float,
-                              month: float, day: float) -> 'CurrentWeather':
+    def check_current_weather(cls, weather: Weather, latitude: float, year: int,
+                              month: int, day: int) -> 'CurrentWeather':
         """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
         object"""
         cls.incoming_light = weather.radiation
@@ -38,7 +48,7 @@ class CurrentWeather:
         cls.max_air_temperature = weather.T_max
         cls.annual_mean_air_temperature = weather.T_avg_annual
         cls.rainfall = weather.rainfall
-        cls.daylength = _determine_daylength(latitude=latitude, elevation=elevation, year=year, month=month, day=day)
+        cls.daylength = _determine_daylength(latitude=latitude, year=year, month=month, day=day)
         return CurrentWeather()  # TODO: placeholder for typing, needs implementation
 
 
@@ -58,11 +68,11 @@ def _deg_trig(degree, fun=numpy.sin):
     return fun(radian)
 
 
-def _determine_daylength(latitude: float, longtitude: -89.401230, elevation: float, year: int, month: int, day: int,
-                             is_sea_horizon=False) -> float:
+def _determine_daylength(latitude: float, year: int, month: int, day: int, is_sea_horizon=False,
+                         longtitude=-89.401230, elevation=266.09) -> float:
     """Calculates the daylength"""
     # Step 1: Calculate days since 1/1/2000
-    year_zero = 1721060.5
+    # year_zero = 1721060.5
     y2k = 2451545.0
     jDate = juliandate.from_gregorian(year, month, day)  # Julian (Astronomical) Date
     # JDate = year_zero + (year * 365.2508) + day_of_year  # Julian Date - rudimentary method
@@ -101,6 +111,3 @@ def _determine_daylength(latitude: float, longtitude: -89.401230, elevation: flo
     length = juliandate.__h_m_s(JSet-JRise)
 
     return length[0]
-
-
-
