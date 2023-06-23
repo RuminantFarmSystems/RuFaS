@@ -32,4 +32,3 @@ def test_check_current_weather(radiation: float, T_min: float, T_avg: float, T_m
     assert CurrentWeather.annual_mean_air_temperature == T_avg_annual
     assert patch_determine_daylength.call_count == 1
     assert CurrentWeather.daylength == 12
-
