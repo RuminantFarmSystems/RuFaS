@@ -379,7 +379,7 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _filter_variables_pool(self, filter_patterns: List[str], input_file: str) -> Dict[str, pool_element_type]:
+    def _filter_variables_pool(self, filter_patterns: List[str], input_file_name: Optional[str]) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on either inclusion or exclusion.
 
