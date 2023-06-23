@@ -2,7 +2,6 @@ from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.util import Utility
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from RUFAS.classes import Time, Weather, is_leap_year
@@ -155,9 +154,11 @@ class FieldManager:
             all_planting_events += schedule.generate_planting_events()
             all_harvest_events += schedule.generate_harvest_events()
 
-        return Field(plantings=all_planting_events, harvestings=all_harvest_events, tillage_events=tillage_events,
-                     fertilizer_events=fertilizer_events, fertilizer_mixes=available_fertilizer_mixes,
-                     manure_events=manure_events)
+        soil_profile = FieldManager._setup_soil(soil_config)
+
+        return Field(soil=soil_profile, plantings=all_planting_events, harvestings=all_harvest_events,
+                     tillage_events=tillage_events, fertilizer_events=fertilizer_events,
+                     fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events)
 
     @staticmethod
     def _setup_management(field_name: str,
