@@ -61,13 +61,10 @@ class CropManagement:
         self._record_yield(field_name, field_size, year, day)
         self._transfer_residue(soil_data)
 
-    def graze(self):  # TODO: implement grazing method (SWAT 6:1.3)
-        pass
+    # TODO: implement grazing feature - issue #590
 
     # ---- Sub Methods ----
-    def collect_cut_yield(self, collected_fraction):  # TODO: implement for in-field drying - needed? GitHub Issue #162
-        """collect yield that has been previously cut and left in the field"""
-        pass
+    # TODO: implement management practice for dry-down and collecting cut yields that have been left in the field - #353
 
     def kill(self) -> None:
         """kills the plant, preventing it from growing, and converts all biomass to residue

@@ -68,7 +68,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
      Field(field_data=FieldData(name="field3"))],
     []
 ])
-def test_annual_update_routine(fields: Field):
+def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", 1998)
