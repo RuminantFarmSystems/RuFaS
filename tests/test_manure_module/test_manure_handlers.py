@@ -297,7 +297,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     """
     Unit test for daily_update() of class BaseManureHandler in file manure_handler_classes.py
 
-
+    This tests verifies that the daily_update() method calls all the appropriate methods
+    and returns the correct values.
 
     """
     # Arrange
