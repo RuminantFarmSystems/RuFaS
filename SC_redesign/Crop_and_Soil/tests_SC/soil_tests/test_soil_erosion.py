@@ -1,6 +1,6 @@
 import pytest
 from math import exp, log, atan, sin
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
@@ -190,6 +190,22 @@ def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
     observe = SoilErosion._determine_coarse_fragment_factor(percent_rock)
     expect = exp((-0.053) * percent_rock)
     assert observe == expect
+
+
+@pytest.mark.parametrize("rainfall,length,manning,average,expected", [
+    (3.0, 60.0, 0.33, 18.2, 0.8),
+    (11.2, 71.22, 0.441, 24.55, 2.98666667)
+])
+def test_determine_rainfall_intensity(rainfall: float, length: float, manning: float, average: float,
+                                      expected: float) -> None:
+    """Tests that the rainfall intensity is calculated accurately."""
+    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_erosion.SoilErosion",
+                        _determine_time_of_concentration=MagicMock(return_value=1.5),
+                        _determine_half_hour_rainfall_fraction=MagicMock(return_value=0.3),
+                        _determine_fraction_rainfall_during_time_of_concentration=MagicMock(return_value=0.4)):
+        actual = SoilErosion._determine_rainfall_intensity(rainfall, length, manning, average)
+
+        assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize("slope,manning,average_slope", [

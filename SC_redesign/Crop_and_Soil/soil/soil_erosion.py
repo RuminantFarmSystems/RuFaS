@@ -270,6 +270,42 @@ class SoilErosion:
     #     """"""
 
     @staticmethod
+    def _determine_rainfall_intensity(rainfall: float, slope_length: float, manning: float,
+                                      average_subbasin_slope: float) -> float:
+        """
+        Determines the average rainfall rate during the time of concentration.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
+        slope_length : float
+            Length of the subbasin slope (m).
+        manning : float
+            Manning roughness coefficient for the subbasin (unitless).
+        average_subbasin_slope : float
+            Average slope length of the subbasin expressed as rise over run (m / m).
+
+        Returns
+        -------
+        float
+            Rainfall intensity (mm / hour).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.16
+
+        """
+        time_of_concentration = SoilErosion._determine_time_of_concentration(slope_length, manning,
+                                                                             average_subbasin_slope)
+        half_hour_rainfall_fraction = SoilErosion._determine_half_hour_rainfall_fraction(rainfall)
+        fraction_of_rain_during_time_of_concentration = \
+            SoilErosion._determine_fraction_rainfall_during_time_of_concentration(time_of_concentration,
+                                                                                  half_hour_rainfall_fraction)
+        rain_during_time_of_concentration = fraction_of_rain_during_time_of_concentration * rainfall
+        return rain_during_time_of_concentration / time_of_concentration
+
+    @staticmethod
     def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope) -> float:
         """
         Calculates the time of concentration for the subbasin.
