@@ -47,7 +47,6 @@ class OutputHandler:
                         'feed_storage_report': FeedStorageReport(data['feed_storage_report'], state),
                         'manure_storage_report': ManureStorageReport(data['manure_storage_report'], state),
                         'custom_report': CustomReport(data['custom_report']),
-                        'fields_report': FieldsReport(data['fields_report'], state),
                         'pens_report': PensReport(data['pens_report'], state),
                         'mass_balance': MassBalanceReport(data['mass_balance']),
                         'life_cycle_report': LifeCycleReport(data['life_cycle_report']),
