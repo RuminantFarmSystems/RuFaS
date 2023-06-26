@@ -192,6 +192,32 @@ def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
     assert observe == expect
 
 
+@pytest.mark.parametrize("runoff,rainfall,length,manning,average,area,expected", [
+    (4.3, 10.33, 58.9, 0.33, 34.5, 1.4, 0.00252778),
+    (3.66, 7.2, 78.4, 0.58, 28.9, 2.7, 0.004875),
+    (0.0, 0.0, 45.1, 0.488, 38.4, 0.9, 0.0)
+])
+def test_determine_peak_runoff_rate(runoff: float, rainfall: float, length: float, manning: float, average: float,
+                                    area: float, expected: float) -> None:
+    """Tests that the peak runoff rate is determined correctly."""
+    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_erosion.SoilErosion",
+                        _determine_runoff_coefficient=MagicMock(return_value=0.5),
+                        _determine_rainfall_intensity=MagicMock(return_value=1.3)):
+        actual = SoilErosion._determine_peak_runoff_rate(runoff, rainfall, length, manning, average, area)
+        assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("runoff,rainfall,expected", [
+    (10.3, 12.1, 0.85123967),
+    (5.5, 11.0, 0.5),
+    (3.0, 9.0, 0.333333333)
+])
+def test_determine_runoff_coefficient(runoff: float, rainfall: float, expected: float) -> None:
+    """Tests that the correct runoff coefficient is calculated."""
+    actual = SoilErosion._determine_runoff_coefficient(runoff, rainfall)
+    assert pytest.approx(actual) == expected
+
+
 @pytest.mark.parametrize("rainfall,length,manning,average,expected", [
     (3.0, 60.0, 0.33, 18.2, 0.8),
     (11.2, 71.22, 0.441, 24.55, 2.98666667)

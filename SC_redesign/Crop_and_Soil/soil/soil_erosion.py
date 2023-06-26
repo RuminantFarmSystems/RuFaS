@@ -1,6 +1,7 @@
 from typing import Optional
 from math import exp, log, atan, sin
 
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
@@ -265,9 +266,74 @@ class SoilErosion:
         """
         return exp(-0.053 * percent_rock_content)
 
-    # @staticmethod
-    # def _determine_peak_runoff_rate() -> float:
-    #     """"""
+    @staticmethod
+    def _determine_peak_runoff_rate(surface_runoff: float, rainfall: float, slope_length: float, manning: float,
+                                    average_subbasin_slope: float, field_size: float) -> float:
+        """
+        Determines the maximum runoff flow rate that occurs with a given rainfall event.
+
+        Parameters
+        ----------
+        surface_runoff : float
+            Amount of rainfall that did not infiltrate into the soil on the current day (mm).
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+        slope_length : float
+            Length of the subbasin slope (m).
+        manning : float
+            Manning roughness coefficient for the subbasin (unitless).
+        average_subbasin_slope : float
+            Average slope length of the subbasin expressed as rise over run (m / m).
+        field_size : float
+            Size of the field (ha)
+
+        Returns
+        -------
+        float
+            Peak runoff rate (cubic meters per second).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.1
+
+        Notes
+        -----
+        This equation actually demands the area of the subbasin, not the field, as a parameter. But the field area was
+        used in the old code, and is used here until the data for subbasin areas can be found.
+        TODO: find subbasin areas database and/or make it a parameter - issue #601
+
+        """
+        if rainfall == 0.0:
+            return 0.0
+        runoff_coefficient = SoilErosion._determine_runoff_coefficient(surface_runoff, rainfall)
+        rainfall_intensity = SoilErosion._determine_rainfall_intensity(rainfall, slope_length, manning,
+                                                                       average_subbasin_slope)
+        field_size_in_square_km = field_size * HECTARES_TO_SQUARE_KILOMETERS
+        return (runoff_coefficient * rainfall_intensity * field_size_in_square_km) / 3.6
+
+    @staticmethod
+    def _determine_runoff_coefficient(surface_runoff: float, rainfall: float) -> float:
+        """
+        Calculates the surface runoff coefficient for the current day.
+
+        Parameters
+        ----------
+        surface_runoff : float
+            Amount of rainfall that did not infiltrate into the soil on the current day (mm).
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+
+        Returns
+        -------
+        float
+            Ratio of runoff to rainfall on the current day (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.15
+
+        """
+        return surface_runoff / rainfall
 
     @staticmethod
     def _determine_rainfall_intensity(rainfall: float, slope_length: float, manning: float,
