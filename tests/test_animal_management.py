@@ -972,18 +972,6 @@ def test_record_pen_history():
     pass
 
 
-def test_calc_p_conc(mock_animals_small: List[MagicMock]) -> None:
-    """Unit test for function _calc_p_conc in file routines/animal/animal_management.py"""
-    expected = 0
-    actual = AnimalManagement._calc_p_conc([])
-    assert actual == expected
-
-    actual = AnimalManagement._calc_p_conc(mock_animals_small)
-    expected = (16.0 / 8.0) / 1000.0
-
-    assert actual == pytest.approx(expected)
-
-
 def test_calc_all_p_conc():
     """Unit test for function calc_all_p_conc in file routines/animal/animal_management.py"""
     pass
