@@ -47,3 +47,4 @@ class GasEmissionConstants:
     SPECIFIC_GROWTH_RATE = 0.637  # micrometers
 
     DEFAULT_HOUSING_SPECIFIC_CONSTANT = 260.0  # s/m
+    DEFAULT_PH_FOR_HOUSING_AMMONIA = 7.5

@@ -118,16 +118,16 @@ class GasEmissions:
         Parameters
         ----------
         num_animals : int
-            Number of animals in the pen, unitless.
+            Number of animals in the pen (unitless).
         barn_area : float
-            Barn area per animal based on housing type, in :math:`m^2`.
+            Barn area per animal based on housing type (:math:`m^2`).
         barn_temp : float
-            Current barn temperature, in :math:`^{\circ}C`.
+            Current barn temperature (:math:`^{\circ}C`).
 
         Returns
         -------
         float
-            Housing methane emissions, in kg :math:`CH_4/day`.
+            Housing methane emissions (kg :math:`CH_4/day`).
 
         Raises
         ------
@@ -169,16 +169,16 @@ class GasEmissions:
         Parameters
         ----------
         num_animals : int
-            Number of animals in the pen.
+            Number of animals in the pen (unitless).
         barn_area : float
-            Barn area per animal based on housing type, :math:`m^2`.
+            Barn area per animal based on housing type (:math:`m^2`).
         barn_temp : float
-            Current barn temperature, :math:`^{\circ}C`.
+            Current barn temperature (:math:`^{\circ}C`).
 
         Returns
         -------
         float
-            Carbon dioxide housing emission, kg :math:`CO_2`/day.
+            Carbon dioxide housing emission (kg :math:`CO_2`/day).
 
         Raises
         ------
@@ -193,6 +193,75 @@ class GasEmissions:
             raise ValueError('Barn area must be greater than or equal to 0.')
 
         return num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
+
+    @classmethod
+    def calc_housing_ammonia_emission(cls, num_animals: int, barn_area: float,
+                                      urine_total_ammoniacal_nitrogen: float,
+                                      urine: float, temp: float,
+                                      pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
+                                      hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+        """
+        Calculate housing ammonia emission.
+
+        Notes
+        -----
+        The calculation is based on several factors, including the number of animals,
+        the barn area, the total ammoniacal nitrogen in urine, the amount of urine,
+        temperature, and the pH and housing-specific constant values.
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals in the barn (unitless).
+        barn_area : float
+            Barn area per animal based on housing type (:math:`m^2`).
+        urine_total_ammoniacal_nitrogen : float
+            Total ammoniacal nitrogen in urine (kg).
+        urine : float
+            Amount of urine produced by animals in the barn (kg).
+        temp : float
+            Current barn temperature (:math:`^{\circ}C`).
+        pH : float, optional
+            pH value for housing ammonia emission (unitless). Default is set to
+                :attr:`DEFAULT_PH_FOR_HOUSING_AMMONIA` in :class:`GasEmissionConstants`.
+        hsc : float, optional
+            Housing-specific constant (unitless). Default is set to :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in
+                :class:`GasEmissionConstants`.
+
+        Returns
+        -------
+        float
+            Housing ammonia emission (kg :math:`NH_3/day`).
+
+        Raises
+        ------
+        ValueError
+            If the number of animals, barn area, urine total ammoniacal nitrogen, or urine is less than 0.
+
+        """
+        if num_animals < 0:
+            raise ValueError('Number of animals must be greater than or equal to 0.')
+
+        if barn_area < 0:
+            raise ValueError('Barn area must be greater than or equal to 0.')
+
+        if urine_total_ammoniacal_nitrogen < 0:
+            raise ValueError('Urine total ammoniacal nitrogen must be greater than or equal to 0.')
+
+        if urine < 0:
+            raise ValueError('Urine must be greater than or equal to 0.')
+
+        total_barn_area = num_animals * barn_area
+        TAN = urine_total_ammoniacal_nitrogen / total_barn_area
+        p = ManureConstants.MANURE_DENSITY  # kg/m^3
+        c = GeneralConstants.SECONDS_PER_DAY  # s/day
+        tempK = cls._convert_temperature_celsius_to_kelvin(temp)  # K
+        r = cls._calc_barn_resistance(temp, hsc)
+        M = urine / total_barn_area  # manure per area of exposed surface, kg/m^2
+        Q = cls._calc_Q(tempK, pH)
+        loss = (TAN * c * p) / (r * M * Q)
+        total_loss = loss * total_barn_area
+        return max(0.0, total_loss)
 
     @classmethod
     def calc_ammonia_emission(cls,
