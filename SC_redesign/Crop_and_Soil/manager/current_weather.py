@@ -35,21 +35,21 @@ class CurrentWeather:
     irrigation: float = 0
 
     @classmethod
-    def check_current_weather(cls, weather, month: int) -> 'CurrentWeather':
+    def check_current_weather(cls, weather, time, month: int) -> 'CurrentWeather':
         """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
         object"""
-        cls.incoming_light = weather.radiation
-        cls.min_air_temperature = weather.T_min
-        cls.mean_air_temperature = weather.T_avg
-        cls.max_air_temperature = weather.T_max
-        cls.annual_mean_air_temperature = weather.T_avg_annual
-        cls.rainfall = weather.rainfall
-        cls.irrigation = weather.irrigation
-        cls.daylength = CurrentWeather._determine_daylength(month=month)
+        cls.incoming_light = weather.radiation[time.year - 1][time.day - 1]
+        cls.min_air_temperature = weather.T_min[time.year - 1][time.day - 1]
+        cls.mean_air_temperature = weather.T_avg[time.year - 1][time.day - 1]
+        cls.max_air_temperature = weather.T_max[time.year - 1][time.day - 1]
+        cls.annual_mean_air_temperature = weather.T_avg_annual[time.year - 1]
+        cls.rainfall = weather.rainfall[time.year - 1][time.day - 1]
+        cls.irrigation = weather.irrigation[time.year - 1][time.day - 1]
+        cls.daylength = CurrentWeather.determine_daylength(month=month)
         return CurrentWeather()  # TODO: placeholder for typing, needs implementation
 
     @staticmethod
-    def _determine_daylength(month: int) -> int:
+    def determine_daylength(month: int) -> int:
         """
         Approximate day length of the month by using data from Madison, WI
         Parameters

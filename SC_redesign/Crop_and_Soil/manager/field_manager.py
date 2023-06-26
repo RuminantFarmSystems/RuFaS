@@ -45,7 +45,7 @@ class FieldManager:
         """
         for field in self.fields:
             month = FieldManager._date_conversion_month(time)
-            current_weather = CurrentWeather.check_current_weather(weather=weather, month=month)
+            current_weather = FieldManager._create_current_weather(weather=weather, time=time, month=month)
             field.manage_field(time, current_weather=current_weather)
         self.output_gatherer.send_daily_variables()
 
@@ -113,6 +113,36 @@ class FieldManager:
             return time.day - leap_days[FieldManager._date_conversion_month(time) - 2]
         else:
             return time.day - days[FieldManager._date_conversion_month(time) - 2]
+
+    @staticmethod
+    def _create_current_weather(weather, time, month: int) -> CurrentWeather:
+        """
+        Creates a CurrentWeather object containing all the weather conditions of the current day.
+
+        Parameters
+        ----------
+        weather : Weather
+            Object containing all the environmental conditions of the simulation.
+        time : Time
+            Object containing the current time and day of the simulation.
+        month : int
+            Number representing the current month of the simulation.
+
+        Returns
+        -------
+        CurrentWeather
+            Object containing the weather conditions of the current day.
+
+        """
+        daylength = CurrentWeather.determine_daylength(month)
+        return CurrentWeather(incoming_light=weather.radiation[time.year - 1][time.day - 1],
+                              min_air_temperature=weather.T_min[time.year - 1][time.day - 1],
+                              mean_air_temperature=weather.T_avg[time.year - 1][time.day - 1],
+                              max_air_temperature=weather.T_max[time.year - 1][time.day - 1],
+                              annual_mean_air_temperature=weather.T_avg_annual[time.year - 1],
+                              rainfall=weather.rainfall[time.year - 1][time.day - 1],
+                              irrigation=weather.irrigation[time.year - 1][time.day - 1],
+                              daylength=daylength)
 
     @staticmethod
     def _setup_field(field_name: str, field_config: Dict[str, str]) -> Field:
