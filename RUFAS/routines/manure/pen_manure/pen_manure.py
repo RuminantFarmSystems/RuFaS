@@ -79,7 +79,7 @@ class PenManure:
 
         # Zero out any negative field
         # TODO: This is a temporary fix. Need to find out why negative values are being generated
-        # from the animal module.
+        # from the animal module. Later, we should raise an exception if a negative value is found.
         for fld in fields(self):
             if getattr(self, fld.name) < 0:
                 setattr(self, fld.name, 0)
