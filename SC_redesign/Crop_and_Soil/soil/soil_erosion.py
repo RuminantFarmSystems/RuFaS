@@ -265,6 +265,78 @@ class SoilErosion:
         """
         return exp(-0.053 * percent_rock_content)
 
+    # @staticmethod
+    # def _determine_peak_runoff_rate() -> float:
+    #     """"""
+
+    @staticmethod
+    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope) -> float:
+        """
+        Calculates the time of concentration for the subbasin.
+
+        Parameters
+        ----------
+        slope_length : float
+            Length of the subbasin slope (m).
+        manning : float
+            Manning roughness coefficient for the subbasin (unitless).
+        average_subbasin_slope : float
+            Average slope length of the subbasin expressed as rise over run (m / m).
+
+        Returns
+        -------
+        float
+            Time of concentration (hour).
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:1.3.6
+
+        Notes
+        -----
+        According to the SWAT Theoretical documentation, "the time of concentration is the amount of time from the
+        beginning of a rainfall event until the entire subbasin area is contributing to flow at the outlet.". In SWAT,
+        this is calculated as the overland flow time of concentration plus the channel flow time of concentration, but
+        in this version of the RuFaS Field module as well as the previous one, it is only the overland flow time of
+        concentration. This equation in SWAT also assumes an average flow rate of 6.35 mm per hour.
+
+        """
+        adjusted_slope_length = slope_length ** 0.6
+        adjusted_manning = manning ** 0.6
+        adjusted_average_slope_length = average_subbasin_slope ** 0.3
+        return (adjusted_slope_length * adjusted_manning) / (18 * adjusted_average_slope_length)
+
+    @staticmethod
+    def _determine_maximum_half_hour_rainfall_fraction(rainfall: float) -> float:
+        """
+        Calculates the fraction of total rainfall that falls during the half-hour of most intense rainfall of this storm
+        event.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
+
+        Returns
+        -------
+        float
+            The fraction of total rainfall that fell during the half-hour of most intense rainfall on the current day
+            (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation section 1:3.2.2
+
+        Notes
+        -----
+        This method for calculating the maximum half-hour rainfall is from the old version of the Field module, and has
+        been significantly simplified from the method in SWAT.
+
+        """
+        upper_limit = 1 - exp(-125 / (rainfall + 5))
+        lower_limit = 0.02083
+        return (lower_limit + upper_limit) / 2
+
     @staticmethod
     def _determine_sediment_yield(surface_area_runoff: float, peak_runoff_rate: float, field_area: float,
                                   soil_erodibility_factor: float, cover_management_factor: float,

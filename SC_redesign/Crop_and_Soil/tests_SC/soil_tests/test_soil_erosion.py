@@ -192,6 +192,31 @@ def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
     assert observe == expect
 
 
+@pytest.mark.parametrize("slope,manning,average_slope", [
+    (60.0, 0.4, 33.55),
+    (15.66, 0.8, 14.5),
+    (45.1, 0.4451, 20.22)
+])
+def test_determine_time_of_concentration(slope: float, manning: float, average_slope: float) -> None:
+    """Tests that the time of concentration is determined correctly."""
+    expected = ((slope ** 0.6) * (manning ** 0.6)) / (18 * (average_slope ** 0.3))
+    actual = SoilErosion._determine_time_of_concentration(slope, manning, average_slope)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("rainfall", [
+    1.1,
+    10.66,
+    0.0,
+    4.8
+])
+def test_determine_maximum_half_hour_rainfall_fraction(rainfall: float) -> None:
+    """Tests that the maximum half-hour rainfall fraction is calculated correctly."""
+    expected = (0.02083 + (1 - exp(-125 / (rainfall + 5)))) / 2
+    actual = SoilErosion._determine_maximum_half_hour_rainfall_fraction(rainfall)
+    assert actual == expected
+
+
 @pytest.mark.parametrize("surface_runoff,peak_runoff_rate,field_area,erodibility_factor,cover_factor,practice_factor,"
                          "topographic_factor,fragment_factor", [
                              (10, 0.15, 1, 0.98, 0.79, 1, 0.88, 0.93),
