@@ -299,44 +299,6 @@ class GasEmissions:
         else:
             return 0.0
 
-    # TODO: Write unit tests for the following two functions and use them in handler and treatment classes
-    @classmethod
-    def calc_ammonia_housing_emission(cls,
-                                      num_animals: int,
-                                      barn_area: float,
-                                      urine_total_ammoniacal_nitrogen: float,
-                                      urine: float,
-                                      temperature_celsius: float,
-                                      housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT,
-                                      ) -> float:
-        """Calculates ammonia housing emissions for manure handlers.
-
-        Parameters
-        ----------
-        num_animals : int
-            Number of animals in the pen.
-        barn_area : float
-            Surface area per animal, m^2.
-        urine_total_ammoniacal_nitrogen : float
-            Total ammoniacal nitrogen in urine per animal, kg N.
-        urine : float
-            Total urine per animal, kg.
-        temperature_celsius : float
-            Current temperature, C.
-        housing_specific_constant : float, optional
-            Housing specific constant, s/m.
-            The default is GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT.
-
-        """
-        return cls.calc_ammonia_emission(
-            num_animals=num_animals,
-            barn_area=barn_area,
-            total_ammoniacal_nitrogen=urine_total_ammoniacal_nitrogen,
-            mass=urine,
-            temperature_celsius=temperature_celsius,
-            housing_specific_constant=housing_specific_constant
-        )
-
     @classmethod
     def calc_ammonia_storage_emission(cls,
                                       num_animals: int,
