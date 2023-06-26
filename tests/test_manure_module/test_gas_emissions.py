@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 
 import pytest
@@ -86,28 +88,35 @@ def test_calc_ambient_temp(mocker: MockerFixture) -> None:
     assert actual == expected
 
 
-@pytest.mark.parametrize('ambient_temp', [temp for temp in range(-40, 40, 10)])
-def test_calc_carbon_dioxide_housing_emission(ambient_temp: float, mocker: MockerFixture) -> None:
-    """Tests calc_carbon_dioxide_housing_emission() in gas_emissions.py."""
+@pytest.mark.parametrize(
+    'num_animals, barn_area, barn_temp, expected, error_message',
+    [
+        (10, 100.0, 25.0, 10 * (0.0065 + 0.0192 * 25.0) * 100.0 / 1000, None),  # Standard case
+        (0, 100.0, 25.0, 0, None),  # Edge case: no animals
+        (10, 0.0, 25.0, 0, None),  # Edge case: no area
+        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
+        (-1, 100.0, 25.0, ValueError, 'Number of animals must be greater than or equal to 0.'),
+        # Exception case: negative number of animals
+        (10, -100.0, 25.0, ValueError, 'Barn area must be greater than or equal to 0.'),
+        # Exception case: negative barn area
+    ]
+)
+def test_calc_housing_carbon_dioxide_emission(num_animals: int, barn_area: float, barn_temp: float,
+                                              expected: float | Exception, error_message: str | None) -> None:
+    """
+    Unit test for calc_housing_carbon_dioxide_emission() method in gas_emissions.py.
 
-    # Arrange
-    num_animals = 100
-    barn_area = 50.0
-    hours = 10
-    t_min = 20.0
-    t_max = 30.0
-    patch_for_calc_ambient_temp = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ambient_temp',
-        return_value=ambient_temp,
-    )
-    expected = num_animals * max(0.0, 0.0065 + 0.0192 * max(-5.0, 0.63 * ambient_temp + 6.0)) * barn_area / 1000
+    This test verifies that the method correctly calculates the carbon dioxide housing emissions
+    given the number of animals, the barn area, and the current barn temperature.
 
-    # Act
-    actual = GasEmissions.calc_carbon_dioxide_housing_emission(num_animals, barn_area, hours, t_min, t_max)
-
-    # Assert
-    patch_for_calc_ambient_temp.assert_called_once_with(hours, t_min, t_max)
-    assert actual == expected
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+    else:
+        actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+        assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize('sign_of_RMQ', [-1, 1])
@@ -290,23 +299,32 @@ def test_calc_methane_emission_for_anaerobic_lagoon() -> None:
     assert actual == expected
 
 
-def test_calc_housing_methane_emission() -> None:
+@pytest.mark.parametrize(
+    "num_animals, barn_area, barn_temp, expected, error_message",
+    [
+        (10, 100.0, 30.0, 10 * max(0.0, 0.13 * 30.0) * 100.0 / 1000, None),  # Standard case
+        (0, 100.0, 30.0, 0, None),  # Edge case: no animals
+        (10, 0.0, 30.0, 0, None),  # Edge case: no area
+        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
+        (-1, 100.0, 30.0, ValueError, 'Number of animals must be greater than or equal to 0.'),
+        # Exception case: negative number of animals
+        (10, -100.0, 30.0, ValueError, 'Barn area must be greater than or equal to 0.'),
+        # Exception case: negative barn area
+    ]
+)
+def test_calc_housing_methane_emission(num_animals: int, barn_area: float, barn_temp: float,
+                                       expected: float | Exception, error_message: str | None) -> None:
     """
-    Unit test for the calc_housing_methane_emission() method in the GasEmissions class.
+    Unit test for calc_housing_methane_emission() method in gas_emissions.py.
 
     This test verifies that the method correctly calculates the methane housing emissions
     given the number of animals, the barn area, and the current barn temperature.
 
     """
-    # Arrange
-    num_animals = 10
-    barn_area = 100.0
-    current_barn_temp = 30.0
-
-    expected = num_animals * max(0.0, 0.13 * current_barn_temp) * barn_area / 1000
-
-    # Act
-    actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, current_barn_temp)
-
-    # Assert
-    assert actual == expected
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_housing_methane_emission(num_animals, barn_area, barn_temp)
+    else:
+        actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, barn_temp)
+        assert actual == pytest.approx(expected)
