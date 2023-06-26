@@ -251,6 +251,10 @@ class GasEmissions:
         if urine < 0:
             raise ValueError('Urine must be greater than or equal to 0.')
 
+        # If any of the aforementioned values are 0, then the result is 0
+        if num_animals == 0 or barn_area == 0 or urine_total_ammoniacal_nitrogen == 0 or urine == 0:
+            return 0.0
+
         total_barn_area = num_animals * barn_area
         TAN = urine_total_ammoniacal_nitrogen / total_barn_area
         p = ManureConstants.MANURE_DENSITY  # kg/m^3
