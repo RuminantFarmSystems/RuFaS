@@ -5,6 +5,7 @@ import math
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.validators.general_validator import GeneralValidator
 
 
 class ManureNutrientManager:
@@ -49,7 +50,7 @@ class ManureNutrientManager:
             If the argument is not of type NutrientRequest.
 
         """
-        # Validator.check_type(request, NutrientRequest)
+        GeneralValidator.check_type(request, NutrientRequest)
 
         eval_results = self._evaluate_nutrient_request(request)
         if eval_results is not None:
@@ -80,7 +81,7 @@ class ManureNutrientManager:
             If the argument is not of type NutrientRequest.
 
         """
-        # Validator.check_type(request, NutrientRequest)
+        GeneralValidator.check_type(request, NutrientRequest)
 
         nitrogen_derived_manure_mass = self._calculate_projected_manure_mass(request.nitrogen,
                                                                              self._nutrients.nitrogen_composition)
@@ -185,7 +186,7 @@ class ManureNutrientManager:
             If the argument is not of type NutrientRequestResults.
 
         """
-        # Validator.check_type(results, NutrientRequestResults)
+        GeneralValidator.check_type(results, NutrientRequestResults)
 
         self._nutrients -= ManureNutrients(
             nitrogen=results.nitrogen,
