@@ -972,11 +972,6 @@ def test_record_pen_history():
     pass
 
 
-def test_calc_all_p_conc():
-    """Unit test for function calc_all_p_conc in file routines/animal/animal_management.py"""
-    pass
-
-
 def test_calc_p_rqmts():
     """Unit test for function calc_p_rqmts in file routines/animal/animal_management.py"""
     pass
