@@ -210,10 +210,22 @@ def test_determine_time_of_concentration(slope: float, manning: float, average_s
     0.0,
     4.8
 ])
-def test_determine_maximum_half_hour_rainfall_fraction(rainfall: float) -> None:
+def test_determine_half_hour_rainfall_fraction(rainfall: float) -> None:
     """Tests that the maximum half-hour rainfall fraction is calculated correctly."""
     expected = (0.02083 + (1 - exp(-125 / (rainfall + 5)))) / 2
-    actual = SoilErosion._determine_maximum_half_hour_rainfall_fraction(rainfall)
+    actual = SoilErosion._determine_half_hour_rainfall_fraction(rainfall)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("concentration,rainfall_frac", [
+    (3.5, 0.03),
+    (1.44, 0.334),
+    (8.67, 0.67)
+])
+def test_fraction_rainfall_during_time_of_concentration(concentration: float, rainfall_frac: float) -> None:
+    """Tests that the fraction of rainfall that fell during the time of concentration is calculated correctly."""
+    expected = 1 - exp(2 * concentration * log(1 - rainfall_frac))
+    actual = SoilErosion._determine_fraction_rainfall_during_time_of_concentration(concentration, rainfall_frac)
     assert actual == expected
 
 

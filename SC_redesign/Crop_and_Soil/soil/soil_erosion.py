@@ -307,7 +307,7 @@ class SoilErosion:
         return (adjusted_slope_length * adjusted_manning) / (18 * adjusted_average_slope_length)
 
     @staticmethod
-    def _determine_maximum_half_hour_rainfall_fraction(rainfall: float) -> float:
+    def _determine_half_hour_rainfall_fraction(rainfall: float) -> float:
         """
         Calculates the fraction of total rainfall that falls during the half-hour of most intense rainfall of this storm
         event.
@@ -336,6 +336,32 @@ class SoilErosion:
         upper_limit = 1 - exp(-125 / (rainfall + 5))
         lower_limit = 0.02083
         return (lower_limit + upper_limit) / 2
+
+    @staticmethod
+    def _determine_fraction_rainfall_during_time_of_concentration(time_of_concentration: float,
+                                                                  half_hour_rainfall_fraction: float) -> float:
+        """
+        Calculates the fraction of rainfall that occurs over the time of concentration.
+
+        Parameters
+        ----------
+        time_of_concentration : float
+            Time of concentration for this subbasin (hours).
+        half_hour_rainfall_fraction : float
+            Fraction of rainfall that falls during half-hour of highest rainfall intensity (unitless).
+
+        Returns
+        -------
+        float
+            Fraction of rainfall that occurs over the time of concentration (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.19
+
+        """
+        product = 2 * time_of_concentration * log(1 - half_hour_rainfall_fraction)
+        return 1 - exp(product)
 
     @staticmethod
     def _determine_sediment_yield(surface_area_runoff: float, peak_runoff_rate: float, field_area: float,
