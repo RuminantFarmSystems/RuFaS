@@ -27,7 +27,7 @@ class GasEmissionConstants:
     MCF = 0.79
     """Methane conversion factor (unitless)."""
 
-    MS = 1.0
+    MS = 0.9
     """#TODO"""
 
     METHANE_FACTOR = 0.67
