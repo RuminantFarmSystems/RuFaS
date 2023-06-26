@@ -24,7 +24,8 @@ class SoilErosion:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float) -> None:
+    def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float,
+              rainfall: float) -> None:
         """This is the main routine for SoilErosion. It is responsible for running all the necessary soil erosion
             methods and updating attributes as necessary.
 
@@ -33,6 +34,7 @@ class SoilErosion:
             minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
                 to land cover/plant (unitless)
             surface_residue: amount of residue on the soil surface (kg per hectare)
+            rainfall: amount of rain that fell on the field on the current day (mm).
 
         Details:
             This method calculates the mass of soil that gets eroded from the soil profile based on the content of the
@@ -50,14 +52,16 @@ class SoilErosion:
                                                                 self.data.average_subbasin_slope)
         fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
 
-        if self.data.peak_runoff_rate is None:
-            raise TypeError("SoilData peak_runoff_rate cannot be NoneType")
-        elif self.data.accumulated_runoff is None:
+        peak_runoff_rate = self._determine_peak_runoff_rate(self.data.accumulated_runoff, rainfall,
+                                                            self.data.slope_length, self.data.manning,
+                                                            self.data.average_subbasin_slope, field_size)
+
+        if self.data.accumulated_runoff is None:
             raise TypeError("SoilData accumulated_runoff cannot be NoneType")
         self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
-        sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, self.data.peak_runoff_rate,
-                                                        field_size, erodibility_factor, cover_factor,
-                                                        support_practice_factor, topographic_factor, fragment_factor)
+        sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, peak_runoff_rate, field_size,
+                                                        erodibility_factor, cover_factor, support_practice_factor,
+                                                        topographic_factor, fragment_factor)
         self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield,
                                                                             self.data.snow_cover_water_content)
 

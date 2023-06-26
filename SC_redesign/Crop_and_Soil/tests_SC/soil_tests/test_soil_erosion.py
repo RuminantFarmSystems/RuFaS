@@ -303,18 +303,18 @@ def test_determine_adjusted_sediment_yield(sediment_yield: float, snow_content: 
 
 
 # --- Integration tests ---
-@pytest.mark.parametrize("field_size,min_cover_factor,residue", [
-    (1, 0.2, 800),
-    (3, 0.001, 500),
-    (4.69, 0.003, 80),
-    (0.891, 0.01, 0),
-    (0.956, 0.05, 928.948569),
+@pytest.mark.parametrize("field_size,min_cover_factor,residue,rainfall", [
+    (1, 0.2, 800, 10.2),
+    (3, 0.001, 500, 3.6),
+    (4.69, 0.003, 80, 6.77),
+    (0.891, 0.01, 0, 0.0),
+    (0.956, 0.05, 928.948569, 15.9),
 ])
-def test_erode(field_size: float, min_cover_factor: float, residue: float) -> float:
+def test_erode(field_size: float, min_cover_factor: float, residue: float, rainfall: float) -> None:
     """Tests that erode() properly calls methods and stores values"""
 
     # Initialize objects
-    data = SoilData(accumulated_runoff=13, peak_runoff_rate=0.11, field_size=1.33)
+    data = SoilData(accumulated_runoff=13, field_size=1.33)
     incorp = SoilErosion(data)
 
     # Mock helper function
@@ -323,11 +323,12 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     incorp._determine_support_practice_factor = MagicMock(return_value=0.98)
     incorp._determine_topographic_factor = MagicMock(return_value=0.79)
     incorp._determine_coarse_fragment_factor = MagicMock(return_value=0.91)
+    incorp._determine_peak_runoff_rate = MagicMock(return_value=0.15)
     incorp._determine_sediment_yield = MagicMock(return_value=0.05)
     incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
 
     # Run method
-    incorp.erode(field_size, min_cover_factor, residue)
+    incorp.erode(field_size, min_cover_factor, residue, rainfall)
 
     # Check everything
     incorp._determine_soil_erodibility_factor.assert_called_once()
@@ -335,6 +336,7 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     incorp._determine_support_practice_factor.assert_called_once()
     incorp._determine_topographic_factor.assert_called_once()
     incorp._determine_coarse_fragment_factor.assert_called_once()
+    incorp._determine_peak_runoff_rate.assert_called_once()
     incorp._determine_sediment_yield.assert_called_once()
     incorp._determine_adjusted_sediment_yield.assert_called_once()
     assert incorp.data.eroded_sediment == 0.0498
