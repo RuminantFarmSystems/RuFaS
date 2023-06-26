@@ -1006,22 +1006,7 @@ class AnimalManagement:
         for pen in self.all_pens:
             pen.clear()
 
-    def calc_ration(self, feed):
-        """
-        Calls each pens's method to calculate the ration for that pen. This is
-        part of the routines that happen every ration interval.
-
-        Args:
-            feed: instance of the Feed class
-        """
-        available_feeds = ration_driver.AvailableFeeds()
-        available_feeds.feed_nutrients(feed)
-        for i, pen in enumerate(self.all_pens):
-            if pen.is_populated:
-                pen.subset_class_feeds(feed)
-                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
-                self.all_pens[i].ration = self.all_pens[i].calc_ration(feed, pen_specific_feed_data)
-
+    
     def calc_manure_excretion(self, feed, methane_model):
         """
         Calls each animal's method to calculate manure excretion to find the
@@ -1087,34 +1072,6 @@ class AnimalManagement:
         self.gather_cow_class_history(self.heiferIIIs)
         self.gather_cow_class_history(self.cows)
 
-    @staticmethod
-    def _calc_p_conc(animals):
-        """
-        Args:
-            animals: the list of animals for which the P concentration should be
-                calculated
-        Returns:
-            p_conc: the P concentration of @animals
-        """
-
-        if len(animals) == 0:
-            return 0
-        else:
-            return (sum(a.p_animal for a in animals) * GeneralConstants.GRAMS_TO_KG) / sum(
-                a.body_weight for a in animals)
-
-    def calc_all_p_conc(self):
-        """
-        Calculates each animal class's P concentration.
-        """
-
-        # TODO: see if there is a better way to do this using dictionary comprehension
-        self.p_conc['calf'] = self._calc_p_conc(self.calves)
-        self.p_conc['heiferI'] = self._calc_p_conc(self.heiferIs)
-        self.p_conc['heiferII'] = self._calc_p_conc(self.heiferIIs)
-        self.p_conc['cow'] = self._calc_p_conc(self.heiferIIIs)
-        # TODO check if this is set up correctly. Currently p_comp for the cow class is
-        # being set by calculating the p_comp for heiferIIIs (line 889 directly above)
 
     def calc_p_rqmts(self):
         """
@@ -1319,7 +1276,6 @@ class AnimalManagement:
 
     # Refactoring zone
     # =========================================================================
-    # New version of _calc_p_conc()
     @classmethod
     def _calc_phosphorus_concentration(cls, animals) -> float:
         """
@@ -1348,7 +1304,6 @@ class AnimalManagement:
 
         return total_phosphorus / total_body_weight
 
-    # New version of calc_all_p_conc()
     def _update_phosphorus_concentrations(self) -> None:
         """
         Update the phosphorus concentration for each animal type.
@@ -1364,7 +1319,6 @@ class AnimalManagement:
             self.phosphorus_concentration_by_animal_class[animal_type] = \
                 self._calc_phosphorus_concentration(animals)
 
-    # New version of calc_ration
     def _calc_ration_at_interval(self, feed):
         """
         Calculate the ration for each pen at the given interval and update the
