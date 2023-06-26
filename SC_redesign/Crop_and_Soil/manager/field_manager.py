@@ -20,10 +20,9 @@ the `SimulationEngine` for executing daily and annual routines in the field modu
 
 
 class FieldManager:
-    def __init__(self, fields_config: List[Dict[str, str]]):
+    def __init__(self, fields_config: Dict[str, Dict[str, str]]):
         self.fields: List[Field] = []
-        for field in fields_config:
-            field_name, field_config = field.items()
+        for field_name, field_config in fields_config.items():
             self.fields.append(self._setup_field(field_name, field_config))
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
