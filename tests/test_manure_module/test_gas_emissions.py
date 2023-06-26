@@ -306,10 +306,10 @@ def test_calc_methane_emission_for_anaerobic_lagoon() -> None:
         (0, 100.0, 30.0, 0, None),  # Edge case: no animals
         (10, 0.0, 30.0, 0, None),  # Edge case: no area
         (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
-        (-1, 100.0, 30.0, ValueError, 'Number of animals must be greater than or equal to 0.'),
         # Exception case: negative number of animals
-        (10, -100.0, 30.0, ValueError, 'Barn area must be greater than or equal to 0.'),
+        (-1, 100.0, 30.0, ValueError, 'Number of animals must be greater than or equal to 0.'),
         # Exception case: negative barn area
+        (10, -100.0, 30.0, ValueError, 'Barn area must be greater than or equal to 0.'),
     ]
 )
 def test_calc_housing_methane_emission(num_animals: int, barn_area: float, barn_temp: float,
@@ -327,4 +327,45 @@ def test_calc_housing_methane_emission(num_animals: int, barn_area: float, barn_
             GasEmissions.calc_housing_methane_emission(num_animals, barn_area, barn_temp)
     else:
         actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, barn_temp)
+        assert actual == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    'num_animals, barn_area, urine_tan, urine, temp, pH, hsc, expected, error_message',
+    [
+        # Standard case
+        (10, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 2372.453635832584, None),
+        # Edge cases: Zero input values for num_animals, barn_area, urine_tan, urine
+        (0, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
+        (10, 0.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
+        (10, 100.0, 0.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
+        (10, 100.0, 25.0, 0.0, 20.0, 7.7, 260.0, 0.0, None),
+        # Exception cases: Negative input values for num_animals, barn_area, urine_tan, urine
+        (-1, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, ValueError,
+         'Number of animals must be greater than or equal to 0.'),
+        (10, -100.0, 25.0, 30.0, 20.0, 7.7, 260.0, ValueError,
+         'Barn area must be greater than or equal to 0.'),
+        (10, 100.0, -25.0, 30.0, 20.0, 7.7, 260.0, ValueError,
+         'Urine total ammoniacal nitrogen must be greater than or equal to 0.'),
+        (10, 100.0, 25.0, -30.0, 20.0, 7.7, 260.0, ValueError,
+         'Urine must be greater than or equal to 0.'),
+    ]
+)
+def test_calc_housing_ammonia_emission(num_animals: int, barn_area: float, urine_tan: float, urine: float, temp: float,
+                                       pH: float, hsc: float, expected: float | Exception,
+                                       error_message: str | None) -> None:
+    """
+    Unit test for calc_housing_ammonia_emission() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the ammonia housing emissions
+    given the number of animals, the barn area, urine total ammoniacal nitrogen, urine, temperature,
+    pH and housing-specific constant.
+
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
+    else:
+        actual = GasEmissions.calc_housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
         assert actual == pytest.approx(expected)
