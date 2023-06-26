@@ -782,7 +782,8 @@ class Field:
         self.soil.infiltration.infiltrate(precipitation_reaching_soil, 1.0, full_evapotranspirative_demand)
         self.soil.percolation.percolate(self.field_data.seasonal_high_water_table)
         # TODO: find reasonable values/way to set minimum cover management factor - issue #520
-        self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue)
+        self.soil.soil_erosion.erode(self.field_data.field_size, 0.02, self.field_data.current_residue,
+                                     total_precipitation)
         self.soil.phosphorus_cycling.cycle_phosphorus(precipitation_reaching_soil, self.soil.data.accumulated_runoff,
                                                       self.field_data.field_size, current_weather.mean_air_temperature)
         self.soil.nitrogen_cycling.cycle_nitrogen(self.field_data.field_size)
