@@ -32,20 +32,6 @@ class CurrentWeather:
     """amount of rainfall that occurs on the day (mm)"""
     irrigation: float = 0.0
 
-    @classmethod
-    def check_current_weather(cls, weather, time, month: int) -> 'CurrentWeather':
-        """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
-        object"""
-        cls.incoming_light = weather.radiation[time.year - 1][time.day - 1]
-        cls.min_air_temperature = weather.T_min[time.year - 1][time.day - 1]
-        cls.mean_air_temperature = weather.T_avg[time.year - 1][time.day - 1]
-        cls.max_air_temperature = weather.T_max[time.year - 1][time.day - 1]
-        cls.annual_mean_air_temperature = weather.T_avg_annual[time.year - 1]
-        cls.rainfall = weather.rainfall[time.year - 1][time.day - 1]
-        cls.irrigation = weather.irrigation[time.year - 1][time.day - 1]
-        cls.daylength = CurrentWeather.determine_daylength(month=month)
-        return CurrentWeather()  # TODO: placeholder for typing, needs implementation
-
     @staticmethod
     def determine_daylength(month: int) -> int:
         """
