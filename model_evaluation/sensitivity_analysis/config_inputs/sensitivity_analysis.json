@@ -1,0 +1,30 @@
+{
+    "sensitivity_method" : "saltellisobol",
+    "saltelli_or_fast_num" : 1024,
+    "saltelli_skip" : 16,
+    "input_files_to_modify" : 
+    {
+        "animal/animal_management_animal.json" : 
+        [
+            ["breeding_start_day_h", 380, 38],
+            ["heifer_repro_cull_time", 140, 14],
+            ["estrus_detection_rate_h", 0.6, 0.22],
+            ["cull_milk_production", 17.0, 12],
+            ["cow_times_milked_per_day", 2, 1.5],
+            ["wean_day", 60, 30],
+            ["avg_estrus_cycle_heifer", 24, 10],
+            ["still_birth_rate", 0.065, 0.025],
+            ["horizontal_dist_to_milking_parlor", 1.6, 1],
+            ["mature_body_weight_avg", 740, 100],
+        ],
+        "manure/manure_management.json"
+    },
+    "steady_state_day" : 924,
+    "output_variables_of_interest" : [
+    "fresh_water_use_rate",
+    "milk_data_at_milk_update.values: estimated_daily_milk_produced",
+    "life_cycle_daily_herd_update.values: culled_cow_num",
+    "life_cycle_daily_herd_update.values: daily_milk_production",
+    ]
+
+}
