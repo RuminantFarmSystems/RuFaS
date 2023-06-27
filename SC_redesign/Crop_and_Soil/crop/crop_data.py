@@ -289,13 +289,13 @@ class CropData:
     """maximum depth of roots in the soil (mm)"""
 
     # ---- water dynamics
-    cumulative_evaporation: Optional[float] = None
+    cumulative_evaporation: float = 0.0
     """total water lost to evaporation by the plant during the growing season (mm)"""
-    cumulative_transpiration: Optional[float] = None
+    cumulative_transpiration: float = 0.0
     """total water lost to transpiration by the plant during the growing season (mm)"""
-    cumulative_evapotranspiration: Optional[float] = None
+    cumulative_evapotranspiration: float = 0.0
     """total water lost to evapotranspiration by the plant during the growing season (mm)"""
-    cumulative_potential_evapotranspiration: Optional[float] = None
+    cumulative_potential_evapotranspiration: float = 0.0
     """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
     """water deficiency factor for the plant (unitless)"""
