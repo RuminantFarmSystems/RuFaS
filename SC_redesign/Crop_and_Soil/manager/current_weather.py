@@ -12,8 +12,8 @@ class CurrentWeather:
 
     Notes
     -------
-    _deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this will
-    be revisited for a more accurate implementation post v1
+    _deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this
+    will be revisited for a more accurate implementation post v1
     """
     incoming_light: Optional[float] = None
     """incoming light radiation energy (MJ/m)"""
