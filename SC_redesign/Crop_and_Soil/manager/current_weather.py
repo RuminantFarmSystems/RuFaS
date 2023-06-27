@@ -3,20 +3,18 @@ from typing import Optional
 
 from RUFAS.classes import Weather
 
-"""
-The purpose of this class is to combine and covert infos from weather data and field data and creates a
-current weather class that have all the needed attributes to allow field and field manager to work properly.
-
-Notes
--------
-_deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this will
-be revisited for a more accurate implementation post v1
-"""
-
 
 @dataclass
 class CurrentWeather:
-    """class containing the current day's weather, used by the crop class"""  # TODO: useful for entire RUFAS model?
+    """
+    The purpose of this class is to combine and covert infos from weather data and field data and creates a
+    current weather class that have all the needed attributes to allow field and field manager to work properly.
+
+    Notes
+    -------
+    _deg_trig and _determine_daylength are more of temporary methods that approximately estimates the day length, this will
+    be revisited for a more accurate implementation post v1
+    """
     incoming_light: Optional[float] = None
     """incoming light radiation energy (MJ/m)"""
     min_air_temperature: Optional[float] = None
@@ -29,11 +27,11 @@ class CurrentWeather:
     """Length of time from sunup to sundown on the day (hours)"""
     annual_mean_air_temperature: Optional[float] = None
     """average annual air temperature for the year (C)"""
-    snow_fall: float = 0    # TODO: make this better integrated with Soil module
+    snow_fall: float = 0.0    # TODO: make this better integrated with Soil module
     """amount of snow that falls on the day (mm)"""
-    rainfall: float = 0
+    rainfall: float = 0.0
     """amount of rainfall that occurs on the day (mm)"""
-    irrigation: float = 0
+    irrigation: float = 0.0
 
     @classmethod
     def check_current_weather(cls, weather: Weather, month: int) -> 'CurrentWeather':
@@ -56,11 +54,11 @@ class CurrentWeather:
         Parameters
         ----------
         month: int
-            Month of the eyar
+            Month of the year
 
         Returns
         -------
-            day length of the month (hour)
+            Day length of the month (hour)
 
         References
         -------
