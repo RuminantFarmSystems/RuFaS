@@ -151,7 +151,7 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
     top_depths = [0] + depths[:2]
     soil.set_vectorized_layer_attribute("top_depth", top_depths)
     soil.set_vectorized_layer_attribute("bottom_depth", depths)
-    soil.set_vectorized_layer_attribute("phosphate", phosphates)
+    soil.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", phosphates)
     incorp = PhosphorusIncorporation(data)
 
     # mock intermediate functions

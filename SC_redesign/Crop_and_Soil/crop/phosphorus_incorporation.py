@@ -29,7 +29,7 @@ class PhosphorusIncorporation:
         added to plant biomass.
         """
         layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
-        layer_phosphates = soil_data.get_vectorized_layer_attribute("phosphate")
+        layer_phosphates = soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")
 
         self.shift_phosphorus_time()
         self.data.phosphorus_shapes = NitrogenIncorporation.determine_nutrient_shape_parameters(
@@ -52,7 +52,7 @@ class PhosphorusIncorporation:
                 self.data.biomass_growth_max
             )
         self.uptake_phosphorus(layer_phosphates, layer_depths)
-        soil_data.set_vectorized_layer_attribute("phosphate", layer_phosphates)
+        soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", layer_phosphates)
         # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         self.data.phosphorus = NitrogenIncorporation.determine_stored_nutrient(
             self.data.total_phosphorus_uptake, self.data.phosphorus, 0
