@@ -807,9 +807,9 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.evaporation.evaporate.assert_called_once_with(10.5)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 3.5)
         if crops_growing:
-            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil)
+            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
-            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil)
+            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_2.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
         else:
             assert crop_1.data.cumulative_evaporation == 0
