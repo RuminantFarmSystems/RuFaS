@@ -1346,7 +1346,6 @@ class AnimalManagement:
                 ration_per_animal = {}
                 ration_vals = {}
 
-                counter = 1
                 while 'status' not in ration_per_animal or ration_per_animal['status'].lower() != 'optimal':
                     if pen.animal_combination == Pen.AnimalCombination.CALF:
                         ration_per_animal = calf_optimize()
@@ -1354,11 +1353,6 @@ class AnimalManagement:
                     else:
                         ration_per_animal, ration_vals = \
                             ration_driver.ration_formulation(pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO)
-
-                    # TODO: Remove this check before merging to master
-                    counter += 1
-                    if counter > 50:
-                        raise Exception('Too many attempts at optimizing ration.')
 
                 # recording ration nutrition information in pen
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
