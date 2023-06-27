@@ -25,7 +25,7 @@ class NitrogenIncorporation:
         for any unmet demand. Nitrogen from extraction and fixation are added to plant biomass.
         """
         layer_depths = soil_data.get_vectorized_layer_attribute('bottom_depth')
-        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate")
+        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
         soil_water_factor = soil_data.soil_water_factor
         # TODO: soil_water_factor should be vectorized (methods need updating) instead of just using the average.
         #   That will require refactoring the subroutines. - GitHub Issue #450
@@ -51,7 +51,7 @@ class NitrogenIncorporation:
                 self.data.biomass_growth_max
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
-        soil_data.set_vectorized_layer_attribute("nitrate", layer_nitrates)
+        soil_data.set_vectorized_layer_attribute("nitrate_content", layer_nitrates)
         # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
