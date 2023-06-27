@@ -25,17 +25,26 @@ def test_calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection
 @pytest.mark.parametrize("water_factor", [
     15,  # lower values
     13,  # higher values
-    16.6,  # arbitrary
+    16.6  # arbitrary
 ])
 def test_calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float = 1.7,
                               c_term: float = -0.007, first_exponent=6.648115,
-                              second_exponent=3.22):
+                              second_exponent=3.22) -> None:
     """ensures that moisture effect was calculated according to the formula in "pseudocode_soil" S.6.A.2"""
-    base_1 = (water_factor - b_term) / (a_term - b_term)
-    base_2 = (water_factor - c_term) / (a_term - c_term)
-    expect = (base_1 ** first_exponent) * (base_2 ** second_exponent)
+    expected_base_1 = (water_factor - b_term) / (a_term - b_term)
+    expected_base_2 = (water_factor - c_term) / (a_term - c_term)
 
-    assert Decomposition._calc_moisture_factor(water_factor) == expect
+    if expected_base_1 < 0.0:
+        expected_term_1 = (-1) * ((-1 * expected_base_1) ** first_exponent)
+    else:
+        expected_term_1 = expected_base_1 ** first_exponent
+    if expected_base_2 < 0.0:
+        expected_term_2 = (-1) * ((-1 * expected_base_2) ** second_exponent)
+    else:
+        expected_term_2 = expected_base_2 ** second_exponent
+    expected = expected_term_1 * expected_term_2
+
+    assert Decomposition._calc_moisture_factor(water_factor) == expected
 
 
 @pytest.mark.parametrize("temp_average, layers", [
