@@ -154,7 +154,7 @@ class CropData:
     """biomass accumulated by the plant during the day (kg/ha)"""
     previous_biomass: Optional[float] = None
     """biomass accumulated by the plant on the previous day (kg/ha)"""
-    above_ground_biomass: Optional[float] = None
+    above_ground_biomass: float = 0.1
     """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     root_biomass: Optional[float] = None
     """biomass stored in roots (kg/ha)"""
@@ -396,6 +396,9 @@ class CropData:
                 self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
                 self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
             self.is_nitrogen_fixer = True
+
+        if self.heat_fraction is None:
+            self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
 
     @property
     def is_mature(self) -> bool:
