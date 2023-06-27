@@ -5,7 +5,6 @@ import math
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
-from RUFAS.routines.manure.validators.general_validator import GeneralValidator
 
 
 class ManureNutrientManager:
@@ -44,14 +43,7 @@ class ManureNutrientManager:
         NutrientRequestResults
             The results of the nutrient request. See :class:`NutrientsRequestResults` for details.
 
-        Raises
-        ------
-        TypeError
-            If the argument is not of type NutrientRequest.
-
         """
-        GeneralValidator.check_type(request, NutrientRequest)
-
         eval_results = self._evaluate_nutrient_request(request)
         if eval_results is not None:
             self._remove_nutrients(eval_results)
@@ -75,14 +67,7 @@ class ManureNutrientManager:
             If the request is not fulfillable, the method will return None. Otherwise, it will
             return a NutrientRequestResults object.
 
-        Raises
-        ------
-        TypeError
-            If the argument is not of type NutrientRequest.
-
         """
-        GeneralValidator.check_type(request, NutrientRequest)
-
         nitrogen_derived_manure_mass = self._calculate_projected_manure_mass(request.nitrogen,
                                                                              self._nutrients.nitrogen_composition)
         phosphorus_derived_manure_mass = self._calculate_projected_manure_mass(request.phosphorus,
@@ -180,14 +165,7 @@ class ManureNutrientManager:
         -------
         None
 
-        Raises
-        ------
-        TypeError
-            If the argument is not of type NutrientRequestResults.
-
         """
-        GeneralValidator.check_type(results, NutrientRequestResults)
-
         self._nutrients -= ManureNutrients(
             nitrogen=results.nitrogen,
             phosphorus=results.phosphorus,
