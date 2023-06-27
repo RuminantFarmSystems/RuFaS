@@ -71,4 +71,14 @@ class Decomposition:
         base_1 = (water_factor - b_term) / (a_term - b_term)
         base_2 = (water_factor - c_term) / (a_term - c_term)
 
-        return (base_1 ** first_exponent) * (base_2 ** second_exponent)
+        if base_1 < 0.0:
+            first_term = (-1) * ((-1 * base_1) ** first_exponent)
+        else:
+            first_term = base_1 ** first_exponent
+
+        if base_2 < 0.0:
+            second_term = (-1) * ((-1 * base_2) ** second_exponent)
+        else:
+            second_term = base_2 ** second_exponent
+
+        return first_term * second_term
