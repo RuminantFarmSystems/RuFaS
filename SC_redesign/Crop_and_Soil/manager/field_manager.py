@@ -90,7 +90,6 @@ class FieldManager:
     @staticmethod
     def _date_conversion_day(time: Time) -> int:
         """
-
         Converts the day number into the corresponding day of the month.
         Parameters
         ----------
@@ -171,39 +170,39 @@ class FieldManager:
             ManureSchedule instance, and a TillageSchedule instance.
 
         """
-        fertilizer_config = management_config.get("fertilizer")
-        fertilizer_mixes = fertilizer_config.get("mixes")
+        fertilizer_config = management_config["fertilizer"]
+        fertilizer_mixes = fertilizer_config["mixes"]
         fertilizer_schedule_name = field_name + "_fertilizer_schedule"
         fertilizer_schedule = FertilizerSchedule(name=fertilizer_schedule_name,
-                                                 mix_names=fertilizer_config.get("mix"),
-                                                 years=fertilizer_config.get("year"), days=fertilizer_config.get("day"),
-                                                 nitrogen_masses=fertilizer_config.get("N_mass"),
-                                                 phosphorus_masses=fertilizer_config.get("P_mass"),
-                                                 application_depths=fertilizer_config.get("depth"),
-                                                 surface_remainder_fractions=fertilizer_config.get("surface_percent"),
-                                                 pattern_repeat=fertilizer_config.get("repeat"))
+                                                 mix_names=fertilizer_config["mix"],
+                                                 years=fertilizer_config["year"], days=fertilizer_config["day"],
+                                                 nitrogen_masses=fertilizer_config["N_mass"],
+                                                 phosphorus_masses=fertilizer_config["P_mass"],
+                                                 application_depths=fertilizer_config["depth"],
+                                                 surface_remainder_fractions=fertilizer_config["surface_percent"],
+                                                 pattern_repeat=fertilizer_config["repeat"])
 
-        manure_config = management_config.get("manure")
+        manure_config = management_config["manure"]
         manure_schedule_name = field_name + "_manure_schedule"
         manure_schedule = ManureSchedule(name=manure_schedule_name,
-                                         years=manure_config.get("year"),
-                                         days=manure_config.get("day"),
-                                         nitrogen_masses=manure_config.get("N_mass"),
-                                         phosphorus_masses=manure_config.get("P_mass"),
-                                         field_coverages=manure_config.get("cover_percent"),
-                                         application_depths=manure_config.get("depth"),
-                                         surface_remainder_fractions=manure_config.get("surface_percent"),
-                                         pattern_repeat=manure_config.get("repeat"))
+                                         years=manure_config["year"],
+                                         days=manure_config["day"],
+                                         nitrogen_masses=manure_config["N_mass"],
+                                         phosphorus_masses=manure_config["P_mass"],
+                                         field_coverages=manure_config["cover_percent"],
+                                         application_depths=manure_config["depth"],
+                                         surface_remainder_fractions=manure_config["surface_percent"],
+                                         pattern_repeat=manure_config["repeat"])
 
-        tillage_config = management_config.get("tillage")
+        tillage_config = management_config["tillage"]
         tillage_schedule_name = field_name + "_tillage_schedule"
         tillage_schedule = TillageSchedule(name=tillage_schedule_name,
-                                           years=tillage_config.get("year"),
-                                           days=tillage_config.get("day"),
-                                           tillage_depths=tillage_config.get("depth"),
-                                           incorporation_fractions=tillage_config.get("percent_incorporated"),
-                                           mixing_fractions=tillage_config.get("percent_mixed"),
-                                           pattern_repeat=tillage_config.get("repeat"))
+                                           years=tillage_config["year"],
+                                           days=tillage_config["day"],
+                                           tillage_depths=tillage_config["depth"],
+                                           incorporation_fractions=tillage_config["percent_incorporated"],
+                                           mixing_fractions=tillage_config["percent_mixed"],
+                                           pattern_repeat=tillage_config["repeat"])
 
         return fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule
 
