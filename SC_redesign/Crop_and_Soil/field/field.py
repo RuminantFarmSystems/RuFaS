@@ -796,7 +796,11 @@ class Field:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
             weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
             weights_sum += crop.data.field_proportion
-        weighted_average_transpiration = weighted_transpiration_total / weights_sum
+
+        if weights_sum == 0.0:
+            weighted_average_transpiration = 0.0
+        else:
+            weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
         # TODO: Implement snow (melting and sublimation) - issue #317
         snow_water_content = 0.0
