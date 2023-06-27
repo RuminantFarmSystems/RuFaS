@@ -1,5 +1,5 @@
 from typing import Optional
-from math import exp
+from math import exp, inf
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
@@ -186,7 +186,10 @@ class SolublePhosphorus:
             what the units are, amend this notes section after talking with Pete - issue #448
 
         """
-        dissolved_reactive_phosphorus_leachate = exp((soil_phosphorus * 1.5 - isotherm_intercept) / isotherm_slope)
+        try:
+            dissolved_reactive_phosphorus_leachate = exp((soil_phosphorus * 1.5 - isotherm_intercept) / isotherm_slope)
+        except OverflowError:
+            dissolved_reactive_phosphorus_leachate = inf
         return min(20.0, dissolved_reactive_phosphorus_leachate)
 
     @staticmethod
