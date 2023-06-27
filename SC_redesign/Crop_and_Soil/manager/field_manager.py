@@ -89,7 +89,6 @@ class FieldManager:
     @staticmethod
     def _date_conversion_day(time: Time) -> int:
         """
-
         Converts the day number into the corresponding day of the month.
         Parameters
         ----------
