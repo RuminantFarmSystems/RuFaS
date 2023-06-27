@@ -11,7 +11,7 @@ from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
 import pytest
 from typing import List, Dict
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 
 @pytest.mark.parametrize("year, day, expected_month", [
@@ -275,22 +275,22 @@ def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: floa
     assert actual == expected
 
 
-@pytest.mark.parametrize("soil_input_file_name", [
-    "ARL_soil.json",
-    "ARL_soil_tillage.json",
-    "barnyard_soil.json",
-    "base_case_soil.json",
-    "LT_soil.json",
-    "multi_crop_soil.json",
-    "swat_soil.json",
-    "testing_soil.json"
+@pytest.mark.parametrize("soil_input_file_name,expected_soil_layer_count", [
+    ("ARL_soil.json", 5),
+    ("ARL_soil_tillage.json", 5),
+    ("barnyard_soil.json", 4),
+    ("base_case_soil.json", 5),
+    ("LT_soil.json", 3),
+    ("multi_crop_soil.json", 5),
+    ("swat_soil.json", 5),
+    ("testing_soil.json", 5)
 ])
-def test_setup_soil_with_full_inputs(soil_input_file_name: str) -> None:
+def test_setup_soil_with_full_inputs(soil_input_file_name: str, expected_soil_layer_count: int) -> None:
     """Tests that current soil inputs can be handled by the soil setup routine."""
     input_directory = Utility.get_base_dir() / 'input'
     soil_config = Utility.read_json_file(input_directory / 'soil' / soil_input_file_name)
-    FieldManager._setup_soil(soil_config)
-    assert True
+    actual = FieldManager._setup_soil(soil_config)
+    assert len(actual.data.soil_layers) == expected_soil_layer_count
 
 
 @pytest.mark.parametrize("soil_config,soil_layer_count", [
@@ -306,12 +306,9 @@ def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -
     """Tests that soil setup routine correctly parses input and calls subroutine."""
     FieldManager._setup_soil_layer = MagicMock(return_value=LayerData(top_depth=0.0, bottom_depth=1000.0,
                                                                       field_size=1.0))
-    with patch("SC_redesign.Crop_and_Soil.soil.soil_config_factory.SoilConfigFactory.create_soil_data",
-               new_callable=MagicMock()) as mocked_soil_factory:
-        FieldManager._setup_soil(soil_config)
+    FieldManager._setup_soil(soil_config)
 
-        assert FieldManager._setup_soil_layer.call_count == soil_layer_count
-        mocked_soil_factory.assert_called_once()
+    assert FieldManager._setup_soil_layer.call_count == soil_layer_count
 
 
 @pytest.mark.parametrize("field_name,field_config", [

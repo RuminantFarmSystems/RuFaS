@@ -2,7 +2,7 @@ from SC_redesign.Crop_and_Soil.field.field import Field
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from RUFAS.util import Utility
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
-from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfigFactory, SoilConfiguration
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from RUFAS.classes import Time, Weather, is_leap_year
@@ -297,8 +297,7 @@ class FieldManager:
         config_dictionary["cover_type"] = soil_config.get("soil_cover_type")
         config_dictionary["soil_layers"] = soil_layers
 
-        soil_data = SoilConfigFactory.create_soil_data(field_size=field_size, config=SoilConfiguration("generic"),
-                                                       **config_dictionary)
+        soil_data = SoilData(field_size=field_size, **config_dictionary)
         return Soil(soil_data=soil_data)
 
     @staticmethod
