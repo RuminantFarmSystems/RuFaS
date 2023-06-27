@@ -1,5 +1,6 @@
 from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
 from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
 from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
@@ -42,6 +43,35 @@ def test_date_conversion_day(year: int, day: int, expected_day: int):
     assert FieldManager._date_conversion_day(mocked_time) == expected_day
 
 
+@pytest.mark.parametrize("year,day,expected", [
+    (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
+                          annual_mean_air_temperature=1, rainfall=3, irrigation=3, daylength=15.5)),
+    (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
+                          annual_mean_air_temperature=2, rainfall=4, irrigation=4, daylength=15.5)),
+    (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
+                          annual_mean_air_temperature=3, rainfall=8, irrigation=8, daylength=15.5))
+])
+def test_create_current_weather(year: int, day: int, expected) -> None:
+    """Tests that current weather objects are correctly created from a time and weather object."""
+    weather = MagicMock()
+    setattr(weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_avg_annual", [1, 2, 3])
+    setattr(weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    CurrentWeather.determine_daylength = MagicMock(return_value=15.5)
+    time = MagicMock()
+    setattr(time, "year", year)
+    setattr(time, "day", day)
+
+    actual = FieldManager._create_current_weather(weather, time, 4)
+
+    assert actual == expected
+    CurrentWeather.determine_daylength.assert_called_once()
+
+
 @pytest.mark.parametrize("fields", [
     [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
      Field(field_data=FieldData(name="field3"))],
@@ -51,6 +81,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
     mocked_weather = MagicMock(Weather)
+    setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "day", 5)
     setattr(mocked_weather, "radiation", 3)
@@ -60,14 +91,16 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "T_avg_annual", 3)
     setattr(mocked_weather, "rainfall", 3)
     setattr(mocked_weather, "irrigation", 3)
-    fm = FieldManager([])
+    fm = FieldManager({})
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
     fm.output_gatherer.send_daily_variables = MagicMock()
+    FieldManager._create_current_weather = MagicMock()
     fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
     for field in fields:
         assert field.manage_field.call_count == 1
+    assert FieldManager._create_current_weather.call_count == len(fields)
     assert fm.output_gatherer.send_daily_variables.call_count == 1
 
 
@@ -80,7 +113,7 @@ def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    fm = FieldManager([])
+    fm = FieldManager({})
     fm.fields = fields
     fm.output_gatherer.send_annual_variables = MagicMock()
     fm.annual_update_routine()
