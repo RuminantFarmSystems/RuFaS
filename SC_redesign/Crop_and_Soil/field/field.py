@@ -606,7 +606,9 @@ class Field:
 
         for crop in crops_to_be_harvested:
             harvest_operation_enum = HarvestOperation(harvest_operation)
-            crop.crop_management.manage_harvest(harvest_operation_enum)
+            crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
+                                                self.field_data.field_size, time.calendar_year, time.day,
+                                                self.soil.data)
 
     def _remove_dead_crops(self) -> None:
         """

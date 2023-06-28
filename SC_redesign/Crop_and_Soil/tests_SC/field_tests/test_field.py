@@ -329,18 +329,20 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     assert expected in str(e.value)
 
 
-@pytest.mark.parametrize("crop_reference,harvest_op,expected", [
-    ("test_1", "default", HarvestOperation.HARVEST),
-    ("test_2", "no_kill", HarvestOperation.HARVEST_NOKILL),
+@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,expected_operation", [
+    ("test_1", "default", "field_1", 1.4, HarvestOperation.HARVEST),
+    ("test_2", "no_kill", "field_2", 2.33, HarvestOperation.HARVEST_NOKILL),
 ])
-def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOperation) -> None:
+def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float,
+                      expected_operation: HarvestOperation) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
     harvest_crop.data.id = crop_reference
     other_crop_1 = Crop()
     other_crop_2 = Crop()
     other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
-    field = Field()
+    field_data = FieldData(name=field_name, field_size=field_size)
+    field = Field(field_data=field_data)
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
     for crop in field.crops:
         crop.crop_management.manage_harvest = MagicMock()
@@ -354,7 +356,8 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOpe
         if crop.data.id == "not this crop":
             crop.crop_management.manage_harvest.assert_not_called()
         else:
-            crop.crop_management.manage_harvest.assert_called_once_with(expected)
+            crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
+                                                                        1995, 100, field.soil.data)
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
@@ -368,8 +371,8 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
     for crop in crops:
         crop.data.id = "test"
         crop.crop_management.manage_harvest = MagicMock()
-    field = Field()
-    field.field_data.name = "test"
+    field_data = FieldData(name="test", field_size=0.87)
+    field = Field(field_data=field_data)
     field.crops = crops
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "day", 200)
@@ -378,7 +381,8 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
     field._harvest_crop("test", "default", mocked_time)
 
     for crop in crops:
-        crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
+        crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 0.87, 2000, 200,
+                                                                    field.soil.data)
     actual = om.warnings_pool["field_name:'test'.harvest_warning"]
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_message)
