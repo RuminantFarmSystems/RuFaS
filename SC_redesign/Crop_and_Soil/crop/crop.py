@@ -74,14 +74,11 @@ class Crop:
             is alive and growing in the simulation
         """
         # don't perform growth if the plant can't grow
-        if not self.data.in_growing_season:
-            return
-
-        # grow otherwise
-        self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
-        self.root_development.develop_roots()
-        self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
-        self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
-        self.growth_constraints.constrain_growth(self.data.max_transpiration, mean_air_temperature)
-        self.leaf_area_index.grow_canopy()
-        self.biomass_allocation.allocate_biomass(incoming_light)
+        if self.data.in_growing_season:
+            self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
+            self.root_development.develop_roots()
+            self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
+            self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
+            self.growth_constraints.constrain_growth(self.data.max_transpiration, mean_air_temperature)
+            self.leaf_area_index.grow_canopy()
+            self.biomass_allocation.allocate_biomass(incoming_light)
