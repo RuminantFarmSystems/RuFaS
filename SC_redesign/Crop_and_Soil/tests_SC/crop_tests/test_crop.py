@@ -12,7 +12,7 @@ from unittest.mock import MagicMock
 def test_grow_crop(in_growing_system: bool) -> None:
     mocked_soil_data = MagicMock(SoilData)
     mocked_crop_data = MagicMock(CropData)
-    CropData.in_growing_season = MagicMock(return_value=in_growing_system)
+    mocked_crop_data.in_growing_system = MagicMock(return_value=in_growing_system)
     crop = Crop(crop_data=mocked_crop_data)
     crop.heat_units.absorb_heat_units = MagicMock()
     crop.root_development.develop_roots = MagicMock()
@@ -38,4 +38,3 @@ def test_grow_crop(in_growing_system: bool) -> None:
         assert crop.growth_constraints.constrain_growth.call_count == 1
         assert crop.leaf_area_index.grow_canopy.call_count == 1
         assert crop.biomass_allocation.allocate_biomass.call_count == 1
-
