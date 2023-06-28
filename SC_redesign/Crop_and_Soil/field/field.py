@@ -220,9 +220,12 @@ class Field:
             fertilizer_application = Field._formulate_fertilizer_required(mix_values["N"], mix_values["P"],
                                                                           mix_values["K"], requested_nitrogen,
                                                                           requested_phosphorus)
-            if fertilizer_application["total_mass"] < least_fertilizer_mix_required:
+            total_mass = fertilizer_application["total_mass"]
+            if total_mass == 0.0:
+                continue
+            elif total_mass < least_fertilizer_mix_required:
                 optimal_mix = mix_name
-                least_fertilizer_mix_required = fertilizer_application["total_mass"]
+                least_fertilizer_mix_required = total_mass
         return optimal_mix
 
     @staticmethod
