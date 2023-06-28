@@ -35,7 +35,7 @@ class PhosphorusIncorporation:
         self.data.phosphorus_shapes = NitrogenIncorporation.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction, self.data.mature_heat_fraction,
             self.data.emergence_phosphorus_fraction, self.data.half_mature_phosphorus_fraction,
-            self.data.near_mature_phosphorus_fraction, self.data.mature_phosphorus_fraction
+            self.data.mature_phosphorus_fraction
         )
         self.data.optimal_phosphorus_fraction = NitrogenIncorporation.determine_optimal_nutrient_fraction(
             self.data.heat_fraction, self.data.emergence_phosphorus_fraction, self.data.mature_phosphorus_fraction,
