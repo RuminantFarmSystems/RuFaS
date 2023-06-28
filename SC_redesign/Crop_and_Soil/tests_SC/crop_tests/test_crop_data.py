@@ -1,6 +1,6 @@
 import pytest
-from unittest.mock import patch, PropertyMock
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from unittest.mock import patch, PropertyMock, MagicMock
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
 
 
 @pytest.mark.parametrize("frac,expect", [
@@ -54,3 +54,11 @@ def test_water_canopy_storage_capacity(max_capacity: float, lai: float, max_lai:
     actual = data.water_canopy_storage_capacity
     expected = max_capacity * lai / max_lai
     assert pytest.approx(actual) == expected
+
+
+def test_tree_dormacy_loss() -> None:
+    """A seperate test to check the dormacy loss for future use of TREE"""
+    crop_data = CropData(plant_category=PlantCategory("tree"))
+    print(crop_data.plant_category)
+    print(crop_data.dormancy_loss_fraction)
+

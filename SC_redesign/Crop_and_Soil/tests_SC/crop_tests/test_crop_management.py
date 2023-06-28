@@ -180,12 +180,12 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
     (0, 0, True),  # harvest override
     (0.9, 0.85, True),  # harvest override
 ])
-def cut_crop(efficiency: float, harvest: float, override: bool):
+def test_cut_crop(efficiency: float, harvest: float, override: bool):
     """ensure that the crop cutting routines are properly executed"""
     # setup
     data = CropData(harvest_index=harvest, biomass=100, leaf_area_index=2.3, accumulated_heat_units=1.1,
                     optimal_nitrogen_fraction=0.09, optimal_phosphorus_fraction=0.02,
-                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092)
+                    yield_nitrogen_fraction=0.12, yield_phosphorus_fraction=0.0092, above_ground_biomass=0.37)
     if override:
         data.user_harvest_index = harvest
     crop = CropManagement(data)
@@ -197,7 +197,7 @@ def cut_crop(efficiency: float, harvest: float, override: bool):
     if harvest > 1:
         cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
     else:
-        cut_biomass = 100 * harvest
+        cut_biomass = data.above_ground_biomass * harvest
 
     assert data.cut_biomass == cut_biomass
     assert data.biomass == 100 - cut_biomass

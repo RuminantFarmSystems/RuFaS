@@ -383,6 +383,8 @@ class CropData:
         # Set dormancy loss
         if self.plant_category == PlantCategory.PERENNIAL or PlantCategory.PERENNIAL_LEGUME:
             self.dormancy_loss_fraction = 0.1
+        elif self.plant_category == PlantCategory.TREE:
+            self.dormancy_loss_fraction = 0.3
 
         # Set perennial status
         if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME or \
