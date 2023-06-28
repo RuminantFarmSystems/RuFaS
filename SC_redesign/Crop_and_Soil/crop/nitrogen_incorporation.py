@@ -33,8 +33,7 @@ class NitrogenIncorporation:
         self.shift_nitrogen_time()
         self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction, self.data.mature_heat_fraction, self.data.emergence_nitrogen_fraction,
-            self.data.half_mature_nitrogen_fraction, self.data.near_mature_nitrogen_fraction,
-            self.data.mature_nitrogen_fraction
+            self.data.half_mature_nitrogen_fraction, self.data.mature_nitrogen_fraction
         )
         self.data.optimal_nitrogen_fraction = self.determine_optimal_nutrient_fraction(
             self.data.heat_fraction, self.data.emergence_nitrogen_fraction, self.data.mature_nitrogen_fraction,
@@ -182,7 +181,6 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_nutrient_shape_parameters(half_mature_heat_fraction: float, mature_heat_fraction: float,
                                             emergence_nutrient_fraction: float, half_mature_nutrient_fraction: float,
-                                            near_mature_nutrient_fraction: float,
                                             mature_nutrient_fraction: float) -> List[float]:
         # pseudocode: C.5.A.1, C.5.A.2
         """
@@ -193,12 +191,15 @@ class NitrogenIncorporation:
             mature_heat_fraction: PHU fraction at full-maturity
             emergence_nutrient_fraction: nitrogen fraction at emergence
             half_mature_nutrient_fraction: nitrogen fraction at half-maturity
-            near_mature_nutrient_fraction: nitrogen fraction *near* maturity
             mature_nutrient_fraction: nitrogen fraction *at* maturity
 
         SWAT Reference: Equations 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
         Returns: list of the first and second shape coefficients, respectively
+
+        Notes: SWAT assumes that the fraction of nutrients near maturity minus the fraction of nutrients at maturity in
+            the crop is equal to 0.00001 (see theoretical documentation pages 331 and 336, top paragraphs of both), so
+            the near mature nutrient fraction is set to meet that assumption here.
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
@@ -207,8 +208,10 @@ class NitrogenIncorporation:
             heat_fraction=half_mature_heat_fraction, nitrogen_fraction=half_mature_nutrient_fraction,
             mature_nitrogen_fraction=mature_nutrient_fraction, emergence_nitrogen_fraction=emergence_nutrient_fraction
         )
+
+        adjusted_near_mature_nutrient_fraction = mature_nutrient_fraction + 0.00001
         log_full = NitrogenIncorporation._determine_shape_log(
-            heat_fraction=mature_heat_fraction, nitrogen_fraction=near_mature_nutrient_fraction,
+            heat_fraction=mature_heat_fraction, nitrogen_fraction=adjusted_near_mature_nutrient_fraction,
             mature_nitrogen_fraction=mature_nutrient_fraction, emergence_nitrogen_fraction=emergence_nutrient_fraction
         )
         s2 = (log_half - log_full) / (mature_heat_fraction - half_mature_heat_fraction)
