@@ -967,7 +967,7 @@ def test_determine_latent_heat_vaporization(avg_temp):
     assert expect == observe
 
 
-@pytest.mark.parametrize("above_ground_biomass,residue,snow_water,potential_evapotrans_adj, transpiration", [
+@pytest.mark.parametrize("above_ground_biomass,residue,snow_water,potential_evapotrans_adj,transpiration", [
     (800, 40, 0.3, 1.6, 0.9),  # arbitrary
     (1200, 300, 0.433, 2.4, 1.8),  # arbitrary
     (0, 800, 0.03, 0, 3.6),  # after harvest
@@ -975,6 +975,7 @@ def test_determine_latent_heat_vaporization(avg_temp):
     (0, 0, 0.22, 0.69, 0.45),  # empty field
     (400, 150, 0, 0.01, 0),  # dry conditions
     (500, 200, 0, 6.3, 4.5),  # wet conditions
+    (300, 40, 2.33, 0.0, 0.0)
 ])
 def test_determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass: float, residue: float,
                                                              snow_water: float, potential_evapotrans_adj: float,
@@ -984,11 +985,16 @@ def test_determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomas
                return_value=1.3) as mocked_soil_cover_index:
         actual = Field._determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass, residue, snow_water,
                                                                             potential_evapotrans_adj, transpiration)
-        soil_evaporation = potential_evapotrans_adj * 1.3
-        reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / (soil_evaporation + transpiration)
-        expected = min(soil_evaporation, reduced_soil_evaporation)
+        if potential_evapotrans_adj == transpiration == 0.0:
+            expected = 0.0
+            mocked_soil_cover_index.assert_not_called()
+        else:
+            soil_evaporation = potential_evapotrans_adj * 1.3
+            reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / \
+                                       (soil_evaporation + transpiration)
+            expected = min(soil_evaporation, reduced_soil_evaporation)
+            mocked_soil_cover_index.assert_called_once_with(above_ground_biomass, residue, snow_water)
 
-        mocked_soil_cover_index.assert_called_once_with(above_ground_biomass, residue, snow_water)
         assert actual == expected
 
 
