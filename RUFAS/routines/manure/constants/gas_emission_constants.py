@@ -22,16 +22,16 @@ class GasEmissionConstants:
     """
 
     Bo = 0.24
-    """Achievable emission of :math:`CH_4` during anaerobic digestion (#TODO: units?)."""
+    """Achievable emission of methane (:math:`CH_4`) during anaerobic digestion (kg :math:`CH_4`/kg VS)."""
 
-    MCF = 0.79
+    METHANE_CONVERSION_FACTOR = 0.79
     """Methane conversion factor (unitless)."""
 
-    MS = 0.9
-    """#TODO"""
+    FRACTION_OF_HANDLED_MANURE = 0.9
+    """Fraction of manure handled by the manure management system (unitless)."""
 
     METHANE_FACTOR = 0.67
-    """#TODO"""
+    """Unit conversion factor for methane from :math:`m^3` to kg (unitless)."""
 
     METHANE_ENERGY_DENSITY = 55.0
     """
@@ -76,7 +76,7 @@ class GasEmissionConstants:
     DEFAULT_HOUSING_SPECIFIC_CONSTANT = 260.0  # s/m
     """
     Default housing specific constant (s/m). This constant may be used in calculations 
-    related to the housing conditions for animals. Default is set to 260.0.
+    related to the housing conditions for animals. Default is set to 260.0 s/m.
     """
 
     DEFAULT_PH_FOR_HOUSING_AMMONIA = 7.7

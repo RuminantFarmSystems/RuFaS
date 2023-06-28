@@ -4,6 +4,7 @@ import math
 
 import pytest
 from pytest_mock import MockerFixture
+from pytest import approx
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
@@ -138,14 +139,14 @@ def test_calc_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
     hsc = 200.0
     r = sign_of_RMQ * 42.0
     patch_for_calc_r_barn = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_barn_resistance',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ammonia_barn_resistance',
         return_value=r,
     )
     p = ManureConstants.MANURE_DENSITY
     pH = 7.5
     Q = 2.0
     patch_for_calc_Q = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Q',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_equilibrium_coefficient',
         return_value=Q,
     )
     M = manure_urine / barn_area
@@ -174,7 +175,7 @@ def test_calc_barn_resistance() -> None:
     expected = hsc * (1 - 0.027 * (20.0 - tempC))
 
     # Act
-    actual = GasEmissions._calc_barn_resistance(tempC)
+    actual = GasEmissions._calc_ammonia_barn_resistance(tempC)
 
     # Assert
     assert actual == expected
@@ -188,7 +189,7 @@ def test_calc_Kh() -> None:
     expected = 10 ** (1478 / tempK - 1.69)
 
     # Act
-    actual = GasEmissions._calc_Kh(tempK)
+    actual = GasEmissions._calc_henry_law_coefficient_of_ammonia(tempK)
 
     # Assert
     assert actual == expected
@@ -203,7 +204,7 @@ def test_calc_Ka() -> None:
     expected = 1 + 10 ** (0.09018 + 2729.9 / tempK - pH)
 
     # Act
-    actual = GasEmissions._calc_Ka(tempK, pH)
+    actual = GasEmissions._calc_dissociation_coefficient_of_ammonium(tempK, pH)
 
     # Assert
     assert actual == expected
@@ -217,18 +218,18 @@ def test_calc_Q(mocker: MockerFixture) -> None:
     pH = 9.0
     Kh = 10.0
     patch_for_calc_Kh = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Kh',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_henry_law_coefficient_of_ammonia',
         return_value=Kh,
     )
     Ka = 20.0
     patch_for_calc_Ka = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Ka',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_dissociation_coefficient_of_ammonium',
         return_value=Ka,
     )
     expected = Kh * Ka
 
     # Act
-    actual = GasEmissions._calc_Q(tempK, pH)
+    actual = GasEmissions._calc_equilibrium_coefficient(tempK, pH)
 
     # Assert
     assert actual == expected
@@ -289,14 +290,17 @@ def test_calc_methane_emission_for_anaerobic_lagoon() -> None:
 
     # Arrange
     manure_volatile_solids = 10.0
-    expected = (manure_volatile_solids * GasEmissionConstants.Bo *
-                GasEmissionConstants.MCF * GasEmissionConstants.MS * GasEmissionConstants.METHANE_FACTOR)
+    expected = (manure_volatile_solids
+                * GasEmissionConstants.Bo
+                * GasEmissionConstants.METHANE_CONVERSION_FACTOR
+                * GasEmissionConstants.FRACTION_OF_HANDLED_MANURE
+                * GasEmissionConstants.METHANE_FACTOR)
 
     # Act
-    actual = GasEmissions.calc_methane_emission_for_anaerobic_lagoon(manure_volatile_solids)
+    actual = GasEmissions.calc_methane_emission_from_anaerobic_lagoon(manure_volatile_solids)
 
     # Assert
-    assert actual == expected
+    assert actual == approx(expected)
 
 
 @pytest.mark.parametrize(

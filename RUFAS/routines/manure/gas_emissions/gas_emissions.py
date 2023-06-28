@@ -195,7 +195,7 @@ class GasEmissions:
         return num_animals * max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
 
     @classmethod
-    def calc_housing_ammonia_emission(cls, num_animals: int, barn_area: float,
+    def calc_housing_ammonia_emission(cls, num_animals: int, barn_area_per_animal: float,
                                       urine_total_ammoniacal_nitrogen: float,
                                       urine: float, temp: float,
                                       pH=GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
@@ -205,15 +205,89 @@ class GasEmissions:
 
         Notes
         -----
-        The calculation is based on several factors, including the number of animals,
-        the barn area, the total ammoniacal nitrogen in urine, the amount of urine,
-        temperature, and the pH and housing-specific constant values.
+        The equation used to calculate housing ammonia emission is:
+
+        .. math::
+
+            E_{NH_3} = total\_barn\_area \\times \\frac{TAN \\times c \\times \gamma}{r \\times M \\times Q}
+
+        where:
+
+            :math:`E_{NH_3}` is the housing ammonia emission in kg :math:`NH_3`/day,
+
+            :math:`total\_barn\_area` is the total barn area in :math:`m^2`, calculated as :math:`num\_animals \\times barn\_area\_per\_animal`,
+
+            :math:`TAN` is the total ammoniacal nitrogen in urine in kg, calculated as :math:`urine\_total\_ammoniacal\_nitrogen  / total\_barn\_area`,
+
+            :math:`c` is the number of seconds in a day (86400 s),
+
+            :math:`\gamma` is the manure density in kg/:math:`m^3`,
+
+            :math:`r` is the resistance of :math:`NH_3` transport to the atmosphere in s/m,
+
+            :math:`M` is the manure urine per area of exposed surface in kg/:math:`m^2`, calculated as :math:`urine / total\_barn\_area`,
+
+            :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
+
+        The value of :math:`r` is calculated as:
+
+        .. math::
+
+            r_{barn} = HSC \\times [1 - 0.027 \\times (20 - T)]
+
+        where:
+
+            :math:`r_{barn}` is the resistance of :math:`NH_3` transport to the atmosphere (s/m),
+
+            :math:`HSC` is the housing-specific constant (s/m, default is 260 s/m),
+
+            :math:`T` is the barn temperature (:math:`^{\circ}C`).
+
+        The value of :math:`Q` is calculated as:
+
+        .. math::
+
+            Q = K_h \\times K_a
+
+        where:
+
+            :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless),
+
+            :math:`K_h` is the Henry's law coefficient of :math:`NH_3` (unitless),
+
+            :math:`K_a` is the dissociation coefficient of ammonium ion (unitless).
+
+        The value of :math:`K_h` is calculated as:
+
+        .. math::
+
+            K_h = 10^{1478 / T - 1.69}
+
+        where:
+
+            :math:`K_h` is the Henry's law coefficient of :math:`NH_3` (unitless),
+
+            :math:`T` is the barn temperature (:math:`^{\circ}C`).
+
+        The value of :math:`K_a` is calculated as:
+
+        .. math::
+
+            K_a = 1 + 10^{0.09018 + 2729.9 / T - pH}
+
+        where:
+
+            :math:`K_a` is the dissociation coefficient of ammonium ion (unitless),
+
+            :math:`T` is the barn temperature (:math:`^{\circ}C`),
+
+            :math:`pH` is the manure solution acidity (unitless).
 
         Parameters
         ----------
         num_animals : int
             Number of animals in the barn (unitless).
-        barn_area : float
+        barn_area_per_animal : float
             Barn area per animal based on housing type (:math:`m^2`).
         urine_total_ammoniacal_nitrogen : float
             Total ammoniacal nitrogen in urine (kg).
@@ -222,16 +296,16 @@ class GasEmissions:
         temp : float
             Current barn temperature (:math:`^{\circ}C`).
         pH : float, optional
-            pH value for housing ammonia emission (unitless). Default is set to
+            pH value for housing ammonia emission (unitless). Default is set to 7.7. This value is listed as
                 :attr:`DEFAULT_PH_FOR_HOUSING_AMMONIA` in :class:`GasEmissionConstants`.
         hsc : float, optional
-            Housing-specific constant (unitless). Default is set to :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in
-                :class:`GasEmissionConstants`.
+            Housing-specific constant (unitless). Default is set to 260 s/m. This value is listed as
+                :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in :class:`GasEmissionConstants`.
 
         Returns
         -------
         float
-            Housing ammonia emission (kg :math:`NH_3/day`).
+            Housing ammonia emission (kg :math:`NH_3`/day).
 
         Raises
         ------
@@ -242,7 +316,7 @@ class GasEmissions:
         if num_animals < 0:
             raise ValueError('Number of animals must be greater than or equal to 0.')
 
-        if barn_area < 0:
+        if barn_area_per_animal < 0:
             raise ValueError('Barn area must be greater than or equal to 0.')
 
         if urine_total_ammoniacal_nitrogen < 0:
@@ -251,21 +325,22 @@ class GasEmissions:
         if urine < 0:
             raise ValueError('Urine must be greater than or equal to 0.')
 
-        # If any of the aforementioned values are 0, then the result is 0
-        if num_animals == 0 or barn_area == 0 or urine_total_ammoniacal_nitrogen == 0 or urine == 0:
+        # If any of the aforementioned values is 0, then the result will be 0.
+        if num_animals == 0 or barn_area_per_animal == 0 or urine_total_ammoniacal_nitrogen == 0 or urine == 0:
             return 0.0
 
-        total_barn_area = num_animals * barn_area
-        TAN = urine_total_ammoniacal_nitrogen / total_barn_area
-        p = ManureConstants.MANURE_DENSITY  # kg/m^3
-        c = GeneralConstants.SECONDS_PER_DAY  # s/day
-        tempK = cls._convert_temperature_celsius_to_kelvin(temp)  # K
-        r = cls._calc_barn_resistance(temp, hsc)
-        M = urine / total_barn_area  # manure per area of exposed surface, kg/m^2
-        Q = cls._calc_Q(tempK, pH)
-        loss = (TAN * c * p) / (r * M * Q)
-        total_loss = loss * total_barn_area
-        return max(0.0, total_loss)
+        total_barn_area = num_animals * barn_area_per_animal
+        total_ammoniacal_nitrogen = urine_total_ammoniacal_nitrogen / total_barn_area
+        manure_density = ManureConstants.MANURE_DENSITY  # kg/m^3
+        seconds_per_day = GeneralConstants.SECONDS_PER_DAY
+        temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
+        ammonia_barn_resistance = cls._calc_ammonia_barn_resistance(temp, hsc)
+        manure_urine_per_area = urine / total_barn_area  # kg/m^2
+        equilibrium_coefficient = cls._calc_equilibrium_coefficient(temperature_kelvin, pH)
+        ammonia_loss = (total_ammoniacal_nitrogen * seconds_per_day * manure_density) / \
+                       (ammonia_barn_resistance * manure_urine_per_area * equilibrium_coefficient)
+        total_ammonia_loss = ammonia_loss * total_barn_area
+        return max(0.0, total_ammonia_loss)
 
     @classmethod
     def calc_ammonia_emission(cls,
@@ -294,9 +369,9 @@ class GasEmissions:
         pH = 7.5
         c = GeneralConstants.SECONDS_PER_DAY  # s/day
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)  # K
-        r = cls._calc_barn_resistance(temperature_celsius, housing_specific_constant)
+        r = cls._calc_ammonia_barn_resistance(temperature_celsius, housing_specific_constant)
         M = mass / barn_area  # manure per area of exposed surface, kg/m^2
-        Q = cls._calc_Q(tempK, pH)
+        Q = cls._calc_equilibrium_coefficient(tempK, pH)
         if r * M * Q > 0:
             return num_animals * barn_area * ((total_ammoniacal_nitrogen / barn_area) * c * p) / (
                     r * M * Q)
@@ -340,68 +415,148 @@ class GasEmissions:
             housing_specific_constant=housing_specific_constant
         )
 
-    # TODO: Be more descriptive
     @classmethod
-    def _calc_barn_resistance(cls, temperature_celsius: float,
-                              housing_specific_constant=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> \
-            float:
-        """Calculates barn resistance.
+    def _calc_ammonia_barn_resistance(cls, temp: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+        """
+        Calculate resistance of :math:`NH_3` transport to the atmosphere in a barn.
 
-        Args:
-            temperature_celsius: temperature in Celsius, C.
-            housing_specific_constant: housing specific constant, s/m.
+        Notes
+        -----
+        The equation used to calculate resistance of :math:`NH_3` transport to the atmosphere in a barn is:
 
-        Returns:
-            Barn resistance, s/m.
+        .. math::
+
+            r_{barn} = HSC \\times [1 - 0.027 \\times (20 - T)]
+
+        where:
+
+            :math:`r_{barn}` is resistance of :math:`NH_3` transport to the atmosphere in a barn (s/m),
+
+            :math:`HSC` is housing specific constant (s/m, default is 260 s/m),
+
+            :math:`T` is barn temperature (:math:`^{\circ}C`).
+
+        Parameters
+        ----------
+        temp : float
+            Temperature in Celsius (:math:`^{\circ}C`).
+        hsc : float, optional
+            Housing specific constant, s/m. Default is set to 260 s/m. This value is listed as
+                :attr:`DEFAULT_HOUSING_SPECIFIC_CONSTANT` in :class:`GasEmissionConstants`.
+
+        Returns
+        -------
+        float
+            Resistance of :math:`NH_3` transport to the atmosphere in a barn, s/m.
 
         """
-        return housing_specific_constant * (1 - 0.027 * (20.0 - temperature_celsius))
+        return hsc * (1 - 0.027 * (20.0 - temp))
 
     @classmethod
-    def _calc_Kh(cls, temperature_kelvin: float) -> float:
-        """Calculates Henry's constant.
+    def _calc_henry_law_coefficient_of_ammonia(cls, temp: float) -> float:
+        """
+        Calculate Henry's law coefficient of ammonia.
 
-        Args:
-            temperature_kelvin: temperature in Kelvin, K.
+        Notes
+        -----
+        The equation used to calculate Henry's law coefficient of ammonia is:
 
-        Returns:
-            Henry's constant, M/atm.
+        .. math::
+
+            K_h = 10^{1478/T - 1.69}
+
+        where:
+
+            :math:`K_h` is Henry's law coefficient (unitless),
+
+            :math:`T` is temperature (K).
+
+        Parameters
+        ----------
+        temp : float
+            Temperature in Kelvin (K).
+
+        Returns
+        -------
+        float
+            Henry's law coefficient of ammonia (unitless).
 
         """
-
-        return 10 ** (1478 / temperature_kelvin - 1.69)
+        return 10 ** (1478 / temp - 1.69)
 
     @classmethod
-    def _calc_Ka(cls, temperature_kelvin: float, pH: float) -> float:
-        """Calculates acid dissociation constant.
+    def _calc_dissociation_coefficient_of_ammonium(cls, temp: float, pH: float) -> float:
+        """
+        Calculate dissociation coefficient of ammonium.
 
-        Args:
-            temperature_kelvin: temperature in Kelvin, K.
-            pH: manure acidity, dimensionless.
+        Notes
+        -----
+        The equation used to calculate the dissociation coefficient of ammonium is:
 
-        Returns:
-            Acid dissociation constant, dimensionless.
+        .. math::
+
+            K_a = 1 + 10^{0.09018 + 2729.9/T - pH}
+
+        where:
+
+            :math:`K_a` is the dissociation coefficient of ammonium (unitless),
+
+            :math:`T` is temperature (K),
+
+            :math:`pH` is the manure solution acidity (unitless).
+
+        Parameters
+        ----------
+        temp : float
+            Temperature in Kelvin (K).
+        pH : float
+            Manure solution acidity (unitless).
+
+        Returns
+        -------
+        float
+            Dissociation coefficient of ammonium (unitless).
 
         """
-
-        return 1 + 10 ** (0.09018 + 2729.9 / temperature_kelvin - pH)
+        return 1 + 10 ** (0.09018 + 2729.9 / temp - pH)
 
     @classmethod
-    def _calc_Q(cls, temperature_kelvin: float, pH: float) -> float:
-        """Calculates Q, the equilibrium coefficient for the NH3 gas in the air.
+    def _calc_equilibrium_coefficient(cls, temp: float, pH: float) -> float:
+        """
+        Calculate Q, the equilibrium coefficient for the :math:`NH_3` gas in the air for a given
+        concentration of total ammoniacal nitrogen in the solution.
 
-        This is calculated based on a given concentration of total ammoniacal nitrogen in the solution.
+        Notes
+        -----
+        The equation used to calculate Q is:
 
-        Args:
-            temperature_kelvin: temperature in Kelvin, K.
-            pH: manure acidity, dimensionless.
+        .. math::
 
-        Returns:
-            Q, the equilibrium coefficient for the NH3 gas in the air, dimensionless.
+            Q = K_h * K_a
+
+        where:
+
+            :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless),
+
+            :math:`K_h` is Henry's law coefficient of ammonia (unitless), and
+
+            :math:`K_a` is the dissociation coefficient of ammonium (unitless).
+
+        Parameters
+        ----------
+        temp : float
+            Manure solution temperature in Kelvin (K).
+        pH : float
+            Manure solution acidity (unitless).
+
+        Returns
+        -------
+        float
+            Equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
 
         """
-        Kh = cls._calc_Kh(temperature_kelvin)
-        Ka = cls._calc_Ka(temperature_kelvin, pH)
+        Kh = cls._calc_henry_law_coefficient_of_ammonia(temp)
+        Ka = cls._calc_dissociation_coefficient_of_ammonium(temp, pH)
         return Kh * Ka
 
     @classmethod
@@ -450,19 +605,45 @@ class GasEmissions:
         return methane_volume * GasEmissionConstants.METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
-    def calc_methane_emission_for_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
-        """Calculates methane emissions from anaerobic lagoon.
+    def calc_methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
+        """
+        Calculate methane emission from anaerobic lagoon.
 
-        Args:
-            manure_volatile_solids: volatile solids, kg.
+        Notes
+        -----
+        The equation used to calculate methane emission from anaerobic lagoon is:
 
-        Returns:
-            Methane emissions from anaerobic lagoon, kg CH4-N /day.
+        .. math::
+
+            E_{CH_4} = Bo \cdot MCF \cdot MS \cdot MF \cdot VS
+
+        where:
+
+            :math:`E_{CH_4}` is methane emissions from anaerobic lagoon (kg :math:`CH_4`-N/day),
+
+            :math:`Bo` is the achievable emission of methane during anaerobic digestion (kg :math:`CH_4`/kg VS),
+
+            :math:`MCF` is the methane conversion factor (unitless),
+
+            :math:`MS` is the fraction of manure handled by the anaerobic lagoon (unitless),
+
+            :math:`MF` is the unit conversion factor for methane from :math:`m^3` to kg (unitless),
+
+            :math:`VS` is the amount of volatile solids in manure (kg).
+
+        Parameters
+        ----------
+        manure_volatile_solids : float
+            Amount of volatile solids in manure (kg).
+
+        Returns
+        -------
+        float
+            Methane emission from anaerobic lagoon (kg :math:`CH_4`-N/day).
 
         """
-        constants = GasEmissionConstants
-        Bo = constants.Bo
-        MCF = constants.MCF
-        MS = constants.MS
-        METHANE_FACTOR = constants.METHANE_FACTOR
-        return manure_volatile_solids * Bo * MCF * MS * METHANE_FACTOR
+        Bo = GasEmissionConstants.Bo
+        MCF = GasEmissionConstants.METHANE_CONVERSION_FACTOR
+        MS = GasEmissionConstants.FRACTION_OF_HANDLED_MANURE
+        MF = GasEmissionConstants.METHANE_FACTOR
+        return Bo * MCF * MS * MF * manure_volatile_solids
