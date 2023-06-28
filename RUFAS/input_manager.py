@@ -7,7 +7,7 @@ class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
     """
-    __instance = Optional['InputManager'] = None
+    __instance = None
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
@@ -17,5 +17,3 @@ class InputManager:
     def __init__(self) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
-        self.__pool: Dict[str, Any] = {}
-        self.__metadata: Dict[str, Any] = {}
