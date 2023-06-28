@@ -314,7 +314,7 @@ class Field:
         # TODO: integrate the manure manager's request manure method here when it is finished.
         manure_filled_by_request = {"nitrogen": 0.0, "phosphorus": 0.0}
 
-        self.manure_applicator.apply_machine_manure(0.0, 0.0, 0.0, field_coverage, 1.0, 0.0, 0.0, 0.0)
+        self.manure_applicator.apply_machine_manure(0.0, 0.0, 0.0, field_coverage, 1.0, 0.0, 0.0, 0.0, 0.5)
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - manure_filled_by_request["nitrogen"])
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - manure_filled_by_request["phosphorus"])

@@ -638,7 +638,8 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
 
     field._execute_manure_application(nitrogen, phosphorus, coverage, year, day)
 
-    field.manure_applicator.apply_machine_manure.assert_called_once_with(0.0, 0.0, 0.0, coverage, 1.0, 0.0, 0.0, 0.0)
+    field.manure_applicator.apply_machine_manure.assert_called_once_with(0.0, 0.0, 0.0, coverage, 1.0, 0.0, 0.0, 0.0,
+                                                                         0.5)
     if fertilizer_applied and only_nitrogen_unmet:
         field._determine_optimal_fertilizer_mix.assert_not_called()
         field._execute_fertilizer_application.assert_called_once_with("100_0_0", nitrogen, phosphorus, year, day)
