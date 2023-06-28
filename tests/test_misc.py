@@ -368,6 +368,8 @@ def test_add_error(
     mock_output_manager.add_error(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map["timestamp"] is not None
     mock_output_manager._add_to_pool(
         mock_output_manager.errors_pool, key, value, info_map
     )
@@ -378,7 +380,6 @@ def test_add_error(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-
 
 def test_add_warning(
     mock_output_manager: OutputManager,
@@ -395,6 +396,8 @@ def test_add_warning(
     mock_output_manager.add_warning(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map["timestamp"] is not None
     mock_output_manager._add_to_pool(
         mock_output_manager.warnings_pool, key, value, info_map
     )
@@ -405,7 +408,6 @@ def test_add_warning(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-
 
 def test_add_log(
     mock_output_manager: OutputManager,
@@ -422,6 +424,8 @@ def test_add_log(
     mock_output_manager.add_log(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map["timestamp"] is not None
     mock_output_manager._add_to_pool(
         mock_output_manager.logs_pool, key, value, info_map
     )
@@ -432,7 +436,6 @@ def test_add_log(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-
 
 def test_add_variable(
     mock_output_manager: OutputManager,
