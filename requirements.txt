@@ -10,3 +10,4 @@ argparse
 typing_extensions
 sphinx
 sphinx-rtd-theme
+juliandate
