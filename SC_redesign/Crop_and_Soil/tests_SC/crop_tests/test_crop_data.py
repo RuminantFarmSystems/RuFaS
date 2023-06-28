@@ -27,7 +27,7 @@ def test_in_growing_season_property(mature: bool, dormant: bool, alive: bool, gr
     """Tests that crop's growth status is correctly determined."""
     with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_mature", new_callable=PropertyMock,
                return_value=mature):
-        data = CropData(is_dormant=dormant, is_alive=alive)
+        data = CropData(is_dormant=dormant, is_alive=alive, is_growing=growing)
         assert data.in_growing_season == expected
 
 
