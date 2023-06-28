@@ -19,17 +19,17 @@
         "fields": {
             "field_1": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_rotation.json",
+                "crop": "no_crop.json",
                 "field_management": "barnyard_field_management.json"
             },
             "field_2": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_scheduled_rotation.json",
+                "crop": "no_crop.json",
                 "field_management": "barnyard_scheduled_field_management.json"
             },
             "field_3": {
                 "soil": "barnyard_soil.json",
-                "crop": "corn_alfalfa_rotation.json",
+                "crop": "no_crop.json",
                 "field_management": "barnyard_field_management.json"
             }
         },
