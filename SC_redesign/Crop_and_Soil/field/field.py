@@ -1017,6 +1017,7 @@ class Field:
                                                              potential_evapotranspiration_adjusted: float,
                                                              transpiration: float) -> float:
         """Calculate the amount of sublimation and soil evaporation for this day, adjusted for plant use.
+
         Parameters
         ----------
         above_ground_biomass : float
@@ -1029,14 +1030,26 @@ class Field:
             Potential evapotranspiration adjusted for evaporation of free water in canopy (mm)
         transpiration : float
             Maximum transpiration for a given day (mm)
+
         Returns
         -------
         float
             Soil evaporation and sublimation, adjusted for plant water use (mm)
+
         References
         ----------
         SWAT Theoretical documentation eqn. 2:2.3.7, 9
+
+        Notes
+        -----
+        If both the adjusted potential evapotranspiration and transpiration are 0, then it is assumed that all
+        evapotranspirative demands have been met for the current day and no sublimation or evaporation from the soil
+        will occur.
+
         """
+        if potential_evapotranspiration_adjusted == transpiration == 0.0:
+            return 0.0
+
         soil_cover_index = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water_content)
         max_soil_evaporation_sublimation = potential_evapotranspiration_adjusted * soil_cover_index
         adjusted_soil_evaporation_sublimation = \
