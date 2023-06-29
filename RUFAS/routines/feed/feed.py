@@ -684,62 +684,64 @@ class Feed:
                 can be added to output.
         """
         # aggregate crop yield across fields
-        # for field in fields.fields.values():
-        #     name = list(field.crop.current_crop.keys())[0]
-        #     crop = field.crop.current_crop[name]
-        #     # there is forage to be stored
-        #     if crop.yield_actual != 0:
-        #         stored = False
-        #         # search for matching storage profile
-        #         for storage in self.available_storage.values():
-        #             if storage.feed_id == crop.feed_id and storage.storage is True \
-        #                     and storage.storage_quality == crop.harvest_quality \
-        #                     and not stored:
-        #                 storage.store_crop(self, crop)
-        #                 if storage not in self.new_forages:
-        #                     self.new_forages.append(storage)
-        #                 stored = True
-        #
-        #         # search for available, empty storage
-        #         if not stored:
-        #             for storage in self.available_storage.values():
-        #                 if storage.DM == 0 and not stored:
-        #                     storage.calibrate_storage(crop)
-        #                     storage.store_crop(self, crop)
-        #                     if storage not in self.new_forages:
-        #                         self.new_forages.append(storage)
-        #                     stored = True
-        #
-        #         # generate standard storage
-        #         if not stored:
-        #             if len(self.available_storage) == 0:
-        #                 standard_data = {
-        #                     "storage_type": "bag",
-        #                     "moisture": "direct_cut",
-        #                     "additive": "preservative",
-        #                     "packing_density": 14,
-        #                     "inoculation": "heterofermentative",
-        #                     "bunk_type": "open_floor",
-        #                     "ventilation": True,
-        #                     "removal_rate": 6,
-        #                     "initial_dry_matter": 0
-        #                 }
-        #                 standard_name = 'standard_storage_' + str(self.standard_storage_count)
-        #                 self.available_storage[standard_name] = self.Storage(standard_data)
-        #                 self.storage_options[standard_name] = self.available_storage[standard_name]
-        #                 report = feed_report.reports[standard_name] = StorageReport(feed_report.storage_report_data,
-        #                                                                             standard_name)
-        #                 report.initialize_dir(feed_report.csv_dir, feed_report.graphic_dir)
-        #
-        #                 report.initialize()
-        #
-        #                 self.standard_storage_count += 1
-        #
-        #             storage_name, storage = self.available_storage.popitem()
-        #             self.storage_options[storage_name].calibrate_storage(crop)
-        #             self.storage_options[storage_name].store_crop(self, crop)
-        #             if storage not in self.new_forages:
-        #                 self.new_forages.append(storage)
+        return
+
+        for field in fields.fields.values():
+            name = list(field.crop.current_crop.keys())[0]
+            crop = field.crop.current_crop[name]
+            # there is forage to be stored
+            if crop.yield_actual != 0:
+                stored = False
+                # search for matching storage profile
+                for storage in self.available_storage.values():
+                    if storage.feed_id == crop.feed_id and storage.storage is True \
+                            and storage.storage_quality == crop.harvest_quality \
+                            and not stored:
+                        storage.store_crop(self, crop)
+                        if storage not in self.new_forages:
+                            self.new_forages.append(storage)
+                        stored = True
+
+                # search for available, empty storage
+                if not stored:
+                    for storage in self.available_storage.values():
+                        if storage.DM == 0 and not stored:
+                            storage.calibrate_storage(crop)
+                            storage.store_crop(self, crop)
+                            if storage not in self.new_forages:
+                                self.new_forages.append(storage)
+                            stored = True
+
+                # generate standard storage
+                if not stored:
+                    if len(self.available_storage) == 0:
+                        standard_data = {
+                            "storage_type": "bag",
+                            "moisture": "direct_cut",
+                            "additive": "preservative",
+                            "packing_density": 14,
+                            "inoculation": "heterofermentative",
+                            "bunk_type": "open_floor",
+                            "ventilation": True,
+                            "removal_rate": 6,
+                            "initial_dry_matter": 0
+                        }
+                        standard_name = 'standard_storage_' + str(self.standard_storage_count)
+                        self.available_storage[standard_name] = self.Storage(standard_data)
+                        self.storage_options[standard_name] = self.available_storage[standard_name]
+                        report = feed_report.reports[standard_name] = StorageReport(feed_report.storage_report_data,
+                                                                                    standard_name)
+                        report.initialize_dir(feed_report.csv_dir, feed_report.graphic_dir)
+
+                        report.initialize()
+
+                        self.standard_storage_count += 1
+
+                    storage_name, storage = self.available_storage.popitem()
+                    self.storage_options[storage_name].calibrate_storage(crop)
+                    self.storage_options[storage_name].store_crop(self, crop)
+                    if storage not in self.new_forages:
+                        self.new_forages.append(storage)
 
         # calculate losses and update storage options after crop allocation
         for storage_name, storage in self.storage_options.items():
