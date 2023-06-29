@@ -1,0 +1,68 @@
+{
+    "config": {
+      "start_date": "2009:1",
+      "end_date": "2009:100",
+      "graphic_dir": "output/graphics/",
+      "output_dir": "output/",
+      "random_seed": 42,
+      "simulate_animals": true
+    },
+    "animal": {
+      "title": "Animal data",
+      "description": "Moo Moo!",
+      "path": "animal/barnyard_animal.json",
+      "type": "json",
+      "properties": {}
+    },
+    "crop": {
+      "title": "Crop data",
+      "description": "Alfafa is fun!",
+      "path": "crop/alfalfa_rotation.json",
+      "type": "json",
+      "properties": {}
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Time is money!",
+      "path": "EEE/costs.csv",
+      "type": "csv",
+      "properties": {}
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "Let's think about global warming",
+      "path": "EEE/emissions.json",
+      "type": "json",
+      "properties": {}
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Those cows need to eat!",
+      "path": "feed/user_feeds.csv",
+      "type": "csv",
+      "properties": {}
+    },
+    "manure": {
+      "title": "Manure data",
+      "description": "You thought it's a waste, but those crops need to eat as well",
+      "path": "manure/manure_management.json",
+      "type": "json",
+      "properties": {}
+    },
+    "soil": {
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
+      "path": "soil/LT_soil.json",
+      "type": "json",
+      "properties": {}
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Let's turn on the AC",
+      "path": "weather/ARL_weather.csv",
+      "type": "csv",
+      "properties": {}
+    },
+    "cross-validation": {}
+  }
+  
