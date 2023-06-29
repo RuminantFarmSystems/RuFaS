@@ -80,3 +80,4 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
     with patch("builtins.open", mock_open_func):
         with pytest.raises(Exception):
             mock_input_manager._load_data("bad/path.csv")
+

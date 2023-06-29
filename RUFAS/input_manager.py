@@ -26,6 +26,7 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
 
+
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
         Loads metadata from json file to IM metadata object
