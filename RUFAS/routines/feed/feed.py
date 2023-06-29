@@ -447,7 +447,7 @@ class Feed:
 
         Args:
             storage: a storage object that contains forage being assessed
-            animal_manager: the class object Animal Management which tracks
+            animal_manager: the class object Animal Manager which tracks
             the state of the animals
         """
         # animals = dictionary with animals as keys and animal objects as values

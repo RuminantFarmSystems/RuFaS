@@ -21,7 +21,7 @@ from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 
 
 om = OutputManager()
@@ -91,7 +91,7 @@ class BaseManureHandler:
         return avg_temp
 
     def daily_update(self,
-                     pen: ManureManagementPen,
+                     pen: ManureManagerPen,
                      bedding: BaseBedding,
                      sim_day: int) -> ManureHandlerDailyOutput:
         """Calculates and stores the daily output of the manure handler.
@@ -100,7 +100,7 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3
 
         Args:
-            pen: A ManureManagementPen object.
+            pen: A ManureManagerPen object.
             bedding: A BaseBedding object that specifies the type of bedding used.
             sim_day: The current simulation day.
 

@@ -16,7 +16,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureH
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
@@ -312,7 +312,7 @@ def test_get_current_day_avg_temperature_celsius(mocker: MockerFixture) -> None:
 #     mock_manure.potassium = K = 28.0
 #     mock_manure.manure_volume = manure_volume = 29.0
 #
-#     mock_pen = mocker.MagicMock(autospec=ManureManagementPen)
+#     mock_pen = mocker.MagicMock(autospec=ManureManagerPen)
 #     mock_pen.id = pen_id = 1
 #     mock_pen.num_animals = num_animals = 100
 #     mock_pen.num_lactating_cows = num_lactating_cows = 100
