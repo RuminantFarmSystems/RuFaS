@@ -27,3 +27,8 @@ class AnimalModuleConstants:
 
     DAILY_MILK_VARIATION_MEAN = 0
     DAILY_MILK_VARIATION_STD_DEV = 1.0
+
+    MINIMUM_DMI = 1.0 # kg/day minimum instituted for all animals
+    MINIMUM_DMI_PERCENTAGE = 0.01 # as a percentage of body_weight in kg
+    MINIMUM_PHOSPHORUS = 0.0
+    MINIMUM_CALCIUM = 0.0
