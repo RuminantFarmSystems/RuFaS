@@ -61,4 +61,3 @@ def test_tree_dormacy_loss() -> None:
     crop_data = CropData(plant_category=PlantCategory("tree"))
     print(crop_data.plant_category)
     assert crop_data.dormancy_loss_fraction == 0.3
-
