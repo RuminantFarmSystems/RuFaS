@@ -133,7 +133,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        self._add_timestamp_to_info_map(info_map)
+        info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.logs_pool, key, msg, info_map)
 
@@ -161,7 +161,7 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        self._add_timestamp_to_info_map(info_map)
+        info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
 
@@ -189,20 +189,24 @@ class OutputManager(object):
         info_map["suffix"] : str, optional
             If present, gets appended to the key
         """
-        self._add_timestamp_to_info_map(info_map)
+        info_map["timestamp"] = self._get_timestamp(include_millis=True)
         key = self._generate_key(name, info_map)
         self._add_to_pool(self.errors_pool, key, msg, info_map)
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
-        """Produce the current system time as a timestamp string."""
+        """
+        Produces the current system time as a timestamp string.
+
+        Example
+        ------
+            >>> self._get_timestamp(include_millis=True)
+            28-Jun-2023_Wed_15-48-21.406585
+            >>> self._get_timestamp(include_millis=False)
+            28-Jun-2023_Wed_15-48-21
+        """
         base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
         timestamp_format_string: str = f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
         return datetime.datetime.now().strftime(timestamp_format_string)
-
-    def _add_timestamp_to_info_map(self, info_map: Dict[str, Union[str, bool]]) -> None:
-        """Add the current system time to the info_map."""
-        timestamp_str: str = self._get_timestamp(include_millis=True)
-        info_map["timestamp"] = timestamp_str
 
     def _generate_key(self, name: str, info_map: Dict[str, Union[str, bool]]) -> str:
         """
@@ -324,7 +328,7 @@ class OutputManager(object):
         """
         Returns a file name using the given base_name and timestamp.
         """
-        timestamp: str = self._get_timestamp()
+        timestamp: str = self._get_timestamp(include_millis=False)
         return f"{base_name}_{timestamp}.{extension}"
 
     def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
