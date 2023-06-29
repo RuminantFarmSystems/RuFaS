@@ -738,7 +738,7 @@ class Field:
         self._cycle_water(current_weather)
 
         for crop in self.crops:
-            if not crop.data.in_growing_season:
+            if crop.data.is_mature or crop.data.is_dormant:
                 continue
 
             crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,
