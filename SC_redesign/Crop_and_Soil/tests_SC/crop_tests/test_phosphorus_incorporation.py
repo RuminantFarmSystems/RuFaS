@@ -90,6 +90,20 @@ def test_tally_total_phosphorus_uptake(uptakes):
     assert data.total_phosphorus_uptake == sum(uptakes)
 
 
+@pytest.mark.parametrize("layers", (0, 3))
+def test_extend_phosphate_uptakes_to_full_profile(layers: int) -> None:
+    data = CropData(actual_phosphorus_uptakes=[1.0, 2.0, 3.0], inaccessible_soil_layers=layers)
+    incorp = PhosphorusIncorporation(data)
+    pre_actual_phosphorus = data.actual_phosphorus_uptakes
+    incorp.extend_phosphate_uptakes_to_full_profile()
+
+    if layers > 0:
+        pre_actual_phosphorus += [0] * layers
+        assert data.actual_phosphorus_uptakes == pre_actual_phosphorus
+    else:
+        assert data.actual_phosphorus_uptakes == pre_actual_phosphorus
+
+
 @pytest.mark.parametrize("depths,phosphates", [
     ([.5, 1, 10, 20], [0.5, 0.8, 5, 10])
 ])
