@@ -18,7 +18,7 @@ class InputManager:
     def __init__(self) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
-            self.metadata: Dict[str, Any] = {}
+        self.__metadata: Dict[str, Any] = {}
 
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
@@ -31,7 +31,7 @@ class InputManager:
         """
         try:
             with open(metadata_path) as metadata_file:
-                self.metadata = json.load(metadata_file)
+                self.__metadata = json.load(metadata_file)
 
         except Exception as e:
             raise e
