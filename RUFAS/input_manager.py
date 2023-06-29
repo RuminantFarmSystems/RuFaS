@@ -17,3 +17,8 @@ class InputManager:
     def __init__(self) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
+        self.__metadata: Dict[str, Any] = {}
+    
+    def load_metadata(self, metadata_path: str) -> None:
+        
+
