@@ -22,7 +22,8 @@ class Dormancy:
             to residue, and the leaf area index is reset (if the current leaf area index is greater than the minimum
             leaf area index during dormancy for this crop).
         """
-        if self.data.plant_category == PlantCategory.WARM_ANNUAL or PlantCategory.WARM_ANNUAL_LEGUME:
+        if self.data.plant_category == PlantCategory.WARM_ANNUAL or self.data.plant_category ==\
+                PlantCategory.WARM_ANNUAL_LEGUME:
             # These types of plants do not go into dormancy
             return
 
