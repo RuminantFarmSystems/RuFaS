@@ -30,11 +30,53 @@ def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
         mock_input_manager._load_metadata("path/dummy_metadata.json")
-        assert mock_input_manager.metadata == {"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}
+        assert mock_input_manager._InputManager__metadata == {"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}
 
+
+def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> None:
     mock_open_func = Mock()
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
         with pytest.raises(Exception):
             mock_input_manager._load_metadata("path/dummy_metadata.json")
+
+
+def test_load_data_json(mock_input_manager: InputManager) -> None:
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "dummy_data_file": {
+                "path": "dummy_data.json",
+                "type": "json"
+            }
+        }
+    }
+
+    with patch("builtins.open", mock_open(read_data='{"key": "value"}')):
+        mock_input_manager._load_data()
+    assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key": "value"}}
+
+
+def test_load_data_csv(mock_input_manager: InputManager) -> None:
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "dummy_data_file": {
+                "path": "dummy_data.csv",
+                "type": "csv"
+            }
+        }
+    }
+
+    with patch("builtins.open", mock_open(read_data="key,value\na,1\nb,2\n")):
+        mock_input_manager._load_data()
+    assert mock_input_manager._InputManager__pool == {"dummy_data_file": [{"key": "a", "value": "1"},
+                                                                          {"key": "b", "value": "2"}]}
+
+
+def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
+    mock_open_func = Mock()
+    mock_open_func.side_effect = Exception("Error opening file")
+
+    with patch("builtins.open", mock_open_func):
+        with pytest.raises(Exception):
+            mock_input_manager._load_data("bad/path.csv")
