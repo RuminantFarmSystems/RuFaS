@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+import json
 from typing import Any, Dict, Optional
 
 
@@ -18,7 +19,16 @@ class InputManager:
         if InputManager.__instance is None:
             InputManager.__instance = self
         self.__metadata: Dict[str, Any] = {}
-    
+
     def load_metadata(self, metadata_path: str) -> None:
-        
+        """
+        Loads metadata from json file to IM metadata object
+
+        Parameters
+        ----------
+            metadata_path : str
+                The path to the metadata file
+        """
+        with open(metadata_path) as metadata_file:
+            self.__metadata = json.load(metadata_file)
 
