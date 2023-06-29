@@ -18,9 +18,9 @@ class InputManager:
     def __init__(self) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
-        self.__metadata: Dict[str, Any] = {}
+            self.metadata: Dict[str, Any] = {}
 
-    def load_metadata(self, metadata_path: str) -> None:
+    def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
         Loads metadata from json file to IM metadata object
 
@@ -29,6 +29,9 @@ class InputManager:
             metadata_path : str
                 The path to the metadata file
         """
-        with open(metadata_path) as metadata_file:
-            self.__metadata = json.load(metadata_file)
+        try:
+            with open(metadata_path) as metadata_file:
+                self.metadata = json.load(metadata_file)
 
+        except Exception as e:
+            raise e
