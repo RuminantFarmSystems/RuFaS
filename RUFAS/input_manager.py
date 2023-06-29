@@ -19,6 +19,7 @@ class InputManager:
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.metadata: Dict[str, Any] = {}
+            self.data: Dict[str, Any] = {}
 
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
@@ -35,3 +36,24 @@ class InputManager:
 
         except Exception as e:
             raise e
+
+    def _load_data(self) -> None:
+        """Loads data from JSON or CSV file"""
+        metadata_files_key = "files"
+        data_files = self.metadata[metadata_files_key]
+        path_key = "path"
+        for key, value in data_files.items():
+            file_path = value[path_key]
+            try:
+                with open(file_path) as file:
+                    if value["type"] == "json":
+                        data = json.load(file)  
+                        self.__pool[key] = data
+                    if value["type"] == "csv":
+                        # TODO handle csv as well
+                        pass
+                    else:
+                        pass
+                        # TODO add error or log?
+            except Exception as e:
+                raise e
