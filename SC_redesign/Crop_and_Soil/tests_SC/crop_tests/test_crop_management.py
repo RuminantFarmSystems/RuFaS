@@ -178,7 +178,7 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
     (0.9, 0, False),  # collect from no harvest
     (0.9, 0.85, False),  # harvest and collect
     (0, 0, True),  # harvest override
-    (0.9, 0.85, True), # harvest override
+    (0.9, 0.85, True),  # harvest override
     (-1, 0.85, True),
     (0, 1.5, True)
 ])
@@ -200,8 +200,6 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool):
         assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
         return
 
-
-    # expect/assert
     if harvest > 1:
         cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
     else:
