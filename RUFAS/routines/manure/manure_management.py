@@ -13,7 +13,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.input_handler.manure_management_config_handler import ManureManagementConfigHandler
@@ -53,16 +53,16 @@ class ManureManagement:
     """
 
     def __init__(self,
-                 animal_management: AnimalManagement,
+                 animal_manager: AnimalManager,
                  weather,
                  time,
                  manure_management_config):
         """Initializes a ManureManagement object by setting up the appropriate manure
-        management components as specified by the data in the animal_management object.
+        management components as specified by the data in the animal_manager object.
 
         Parameters
         ----------
-        animal_management : AnimalManagement
+        animal_manager : AnimalManager
             A reference to the AnimalManagement object that is one of the attributes
             of the simulation engine object.
         weather : Weather
@@ -86,7 +86,7 @@ class ManureManagement:
         self._all_data = collections.defaultdict(list)
 
         # Set up the manure management components for each animal pen.
-        self._configure_manure_management_components(animal_management)
+        self._configure_manure_management_components(animal_manager)
 
     @property
     def all_data(self) -> Dict[int, List[Tuple]]:
@@ -108,7 +108,7 @@ class ManureManagement:
         """
         return self._all_data
 
-    def _configure_manure_management_components(self, animal_management: AnimalManagement) -> None:
+    def _configure_manure_management_components(self, animal_manager: AnimalManager) -> None:
         """Configures the manure management components for each animal pen.
 
         Each pen is associated with the following components - bedding, manure handler,
@@ -116,11 +116,11 @@ class ManureManagement:
 
         Parameters
         ----------
-        animal_management : AnimalManagement
-            An AnimalManagement object obtained from the animal module.
+        animal_manager : AnimalManager
+            An AnimalManager object obtained from the animal module.
 
         """
-        for pen in animal_management.all_pens:
+        for pen in animal_manager.all_pens:
             mm_pen = ManureManagementPen(pen)
 
             custom_bedding_config = self.manure_management_config_handler.get_custom_bedding_config(mm_pen.bedding_type)
@@ -159,7 +159,7 @@ class ManureManagement:
                 custom_manure_treatment_config=custom_manure_treatment_config  # type: ignore
             )
 
-    def daily_update(self, animal_management: AnimalManagement) -> None:
+    def daily_update(self, animal_managemr: AnimalManager) -> None:
         """Calculates daily output data for each manure management component for each animal pen.
 
         On the last day of the simulation, all the data generated daily by the manure management
@@ -167,12 +167,12 @@ class ManureManagement:
 
         Parameters
         ----------
-        animal_management : AnimalManagement
-            The current state of the AnimalManagement object.
+        animal_managemr : AnimalManager
+            The current state of the AnimalManager object.
 
         """
-        for pen in animal_management.all_pens:
-            self._pen_daily_update(animal_management.simulation_day, pen)
+        for pen in animal_managemr.all_pens:
+            self._pen_daily_update(animal_managemr.simulation_day, pen)
 
         if self.time.is_last_day_of_simulation:
             self.manure_management_output_handler.sort_by_pen_id_and_simulation_day()
@@ -377,7 +377,7 @@ class ManureManagement:
         return manure_separator_daily_output, manure_treatment_daily_output
 
 
-def simulate_daily_manure_management(manure_management: ManureManagement, animal_management: AnimalManagement) -> None:
+def simulate_daily_manure_management(manure_management: ManureManagement, animal_manager: AnimalManager) -> None:
     """A wrapper function for the daily_update method of the ManureManagement class.
 
     There is no strict reason why this function is needed. It is simply to make the code
@@ -388,9 +388,9 @@ def simulate_daily_manure_management(manure_management: ManureManagement, animal
     ----------
     manure_management : ManureManagement
         A reference to the ManureManagement object stored in the SimulationEngine.
-    animal_management : AnimalManagement
-        A reference to the AnimalManagement object stored in the SimulationEngine
+    animal_manager : AnimalManager
+        A reference to the AnimalManager object stored in the SimulationEngine
         so the latest data can be passed to the ManureManagement object.
 
     """
-    manure_management.daily_update(animal_management)
+    manure_management.daily_update(animal_manager)

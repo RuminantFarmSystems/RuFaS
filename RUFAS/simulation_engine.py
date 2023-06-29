@@ -81,14 +81,14 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
 
         routines.daily_animal_routine(
-            self.state.animal_management, self.state.feed, self.weather, self.time)
+            self.state.animal_manager, self.state.feed, self.weather, self.time)
         routines.daily_manure_storage_routine(
-            self.state.manure_storage, self.state.animal_management)
+            self.state.manure_storage, self.state.animal_manager)
         simulate_daily_manure_management(
-            self.state.manure_management, self.state.animal_management)
+            self.state.manure_management, self.state.animal_manager)
         routines.daily_fields_routine(
             self.state.fields, self.state.manure_storage, self.weather, self.time)
-        routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_management,
+        routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_manager,
                                     self.output.reports['feed_storage_report'])
 
         self.output.daily_update(self.state, self.weather, self.time)
@@ -108,7 +108,7 @@ class SimulationEngine:
                        simulating_day_log,
                        info_map)
         self.time.advance()
-        self.state.animal_management.simulation_day += 1
+        self.state.animal_manager.simulation_day += 1
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""

@@ -47,7 +47,7 @@ def test_manure_management_init(mocker: MockFixture) -> None:
 
     # Act
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -86,7 +86,7 @@ def test_all_data_property(mocker: MockFixture) -> None:
     )
 
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -137,7 +137,7 @@ def test_configure_manure_management_components(manure_separator: str,
     )
 
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -300,7 +300,7 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
         return_value=None,
     )
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -372,7 +372,7 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
         return_value=None,
     )
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -464,7 +464,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         return_value=None,
     )
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -554,7 +554,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         return_value=None,
     )
     manure_management = ManureManagement(
-            animal_management=mock_animal_management,
+            animal_manager=mock_animal_management,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,
@@ -624,7 +624,7 @@ def test_manure_management_daily_update(is_last_day_of_simulation: bool,
         return_value=None,
     )
     manure_management = ManureManagement(
-            animal_management=mock_animal_management_init,
+            animal_manager=mock_animal_management_init,
             weather=mock_weather,
             time=mock_time,
             manure_management_config=mock_manure_management_config,

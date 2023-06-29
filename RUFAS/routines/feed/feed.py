@@ -26,7 +26,7 @@ from typing import Dict, List, Union
 om = OutputManager()
 
 
-def daily_feed_routine(feed, fields, animal_management, feed_report):
+def daily_feed_routine(feed, fields, animal_manager, feed_report):
     """
     Description:
         Executes the functions that run the daily feed routines for both storage
@@ -35,7 +35,7 @@ def daily_feed_routine(feed, fields, animal_management, feed_report):
     Args:
         feed: an instance of the Feed object
         fields: an instance of the Field object (contains harvest information)
-        animal_management: an instance of the AnimalManagement object
+        animal_manager: an instance of the AnimalManager object
         feed_report: an instance of the FeedStorageReport class defined in
             RUFAS.output_handler.reports.feed_storage_report.py. Included here
             in order to add generated storage receptacles to the feed storage report.
@@ -45,7 +45,7 @@ def daily_feed_routine(feed, fields, animal_management, feed_report):
     feed.daily_feed_storage(fields, feed_report)
 
     # feed management routines to be run daily
-    feed.daily_feed_management(animal_management)
+    feed.daily_feed_management(animal_manager)
 
 
 def annual_feed_routine(feed):
@@ -435,7 +435,7 @@ class Feed:
             self.__init__(reset_data)
 
     @staticmethod
-    def required_inventory(storage, animal_management):
+    def required_inventory(storage, animal_manager):
         """
         Description:
             Computes the required inventory necessary across all animals for a
@@ -447,18 +447,18 @@ class Feed:
 
         Args:
             storage: a storage object that contains forage being assessed
-            animal_management: the class object Animal Management which tracks
+            animal_manager: the class object Animal Management which tracks
             the state of the animals
         """
         # animals = dictionary with animals as keys and animal objects as values
-        animals = {'calves': animal_management.calves,
-                   'heiferIs': animal_management.heiferIs,
-                   'heiferIIs': animal_management.heiferIIs,
-                   'heiferIIIs': animal_management.heiferIIIs
+        animals = {'calves': animal_manager.calves,
+                   'heiferIs': animal_manager.heiferIs,
+                   'heiferIIs': animal_manager.heiferIIs,
+                   'heiferIIIs': animal_manager.heiferIIIs
                    }
         lactating_cows = []
         dry_cows = []
-        for cow in animal_management.cows:
+        for cow in animal_manager.cows:
             if cow.milking:
                 lactating_cows.append(cow)
             else:
@@ -750,7 +750,7 @@ class Feed:
             
 
 
-    def daily_feed_management(self, animal_management):
+    def daily_feed_management(self, animal_manager):
         """
         Description:
             Executes daily routines relating to feed management, specifically a
@@ -760,14 +760,14 @@ class Feed:
             called.
 
         Args:
-            animal_management: The state of the AnimalManagement class object
+            animal_manager: The state of the AnimalManager class object
         """
         # Daily feedout for silos with farm grown forages in them per pen based
         # on ration formulated
         feeds_fed = []
         for key, silo in self.storage_options.items():
             if silo.days_since_feedout >= 0 and silo.DM > 0:
-                for pen in animal_management.all_pens:
+                for pen in animal_manager.all_pens:
                     if silo.feed_key in pen.ration and silo.feed_key not in \
                             feeds_fed:
                         if (silo.DM - pen.ration[silo.feed_key]) > 0:
@@ -783,14 +783,14 @@ class Feed:
                 silo.days_since_feedout += 1
         # inventory plan for new forages
         # if it is the day before the ration interval will be calculated
-        ration_interval = ((animal_management.simulation_day + 1) %
-                           animal_management.formulation_interval) == 1 or \
-                          animal_management.formulation_interval == 1
+        ration_interval = ((animal_manager.simulation_day + 1) %
+                           animal_manager.formulation_interval) == 1 or \
+                          animal_manager.formulation_interval == 1
         for silo in self.new_forages:
             if silo.days_since_feedout >= -1 and ration_interval and \
                     silo.feed_id != 'null':
                 silo.forage_quality_assessment(self)
-                self.required_inventory(silo, animal_management)
+                self.required_inventory(silo, animal_manager)
                 self.forage_inventory_plan(silo)
                 self.add_to_available_feeds([silo.feed_id], [silo.DM_percent],
                                             [silo.NDF_percent])
