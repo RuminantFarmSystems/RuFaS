@@ -116,7 +116,8 @@ def test_determine_potential_nitrogen_uptake(optimal, previous, mature, max_grow
     (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
     (2.7, [0, 1, 2, 3], 4),  # 4th layer
     (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
-    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
+    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4),  # arbitrary
+    (0.0, [20, 50, 350, 1000], 0)
 ])
 def test_determine_deepest_accessible_layer(root, depths, expect):
     assert NitrogenIncorporation.determine_deepest_accessible_layer(root, depths) == expect
@@ -124,7 +125,7 @@ def test_determine_deepest_accessible_layer(root, depths, expect):
 
 @pytest.mark.parametrize("root,depths", [
     (-1, [0, 1, 2, 3]),  # root < 0
-    (0, [0, 1, 2, 3]),  # root = 0
+    (-0.5, [0, 1, 2, 3]),  # root = 0
 ])
 def test_error_determine_deepest_accessible_layer(root, depths):
     with pytest.raises(ValueError):
