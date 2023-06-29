@@ -794,7 +794,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
         incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
-        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue)
+        incorp.soil.soil_erosion.erode.assert_called_once_with(field_size, 0.02, residue, rainfall)
         incorp.soil.phosphorus_cycling.cycle_phosphorus.assert_called_once_with(2.0, runoff, field_size, mean_temp)
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
         incorp.soil.carbon_cycling.cycle_carbon.assert_called_once_with(2.0, mean_temp, field_size)
