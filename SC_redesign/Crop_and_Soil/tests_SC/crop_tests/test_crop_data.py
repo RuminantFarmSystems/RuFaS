@@ -60,5 +60,5 @@ def test_tree_dormacy_loss() -> None:
     """A seperate test to check the dormacy loss for future use of TREE"""
     crop_data = CropData(plant_category=PlantCategory("tree"))
     print(crop_data.plant_category)
-    print(crop_data.dormancy_loss_fraction)
+    assert crop_data.dormancy_loss_fraction == 0.3
 
