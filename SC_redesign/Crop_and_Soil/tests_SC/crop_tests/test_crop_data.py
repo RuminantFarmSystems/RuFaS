@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, PropertyMock, MagicMock
+from unittest.mock import patch, PropertyMock
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
 
 
