@@ -13,6 +13,19 @@ class ManureNutrientManager:
 
         self._nutrients = ManureNutrients()
 
+    @property
+    def values(self) -> ManureNutrients:
+        """
+        Get the current nutrient values stored in the manager.
+
+        Returns
+        -------
+        ManureNutrients
+            The current nutrient values stored in the manager.
+
+        """
+        return self._nutrients
+
     def add_nutrients(self, nutrients: ManureNutrients) -> None:
         """
         Add nutrients to the manager from the manure module.
@@ -102,8 +115,18 @@ class ManureNutrientManager:
         float
             The projected manure mass.
 
+        Raises
+        ------
+        ValueError
+            If the request for a nutrient or the nutrient composition is negative.
+
         """
-        if nutrient_composition > 0.0:
+        if request_nutrient < 0.0:
+            raise ValueError(f"Request for nutrient cannot be negative: {request_nutrient}")
+
+        if nutrient_composition < 0.0:
+            raise ValueError(f"Nutrient composition cannot be negative: {nutrient_composition}")
+        elif nutrient_composition > 0.0:
             return request_nutrient / nutrient_composition
         else:
             return 0.0
@@ -111,7 +134,11 @@ class ManureNutrientManager:
     @staticmethod
     def _select_projected_manure_mass(projected_manure_masses: list[float]) -> float:
         """
-        Select the projected manure mass from a list of projected manure masses.
+        Select the smallest positive projected manure mass from the given list of projected manure masses.
+
+        This method works by first checking if any of the projected manure masses are negative and raises
+        a ValueError if this is the case. However, if all values are zero, it returns zero. Otherwise,
+        it returns the smallest positive value.
 
         Parameters
         ----------
@@ -123,15 +150,29 @@ class ManureNutrientManager:
         float
             The projected manure mass.
 
+        Raises
+        ------
+        ValueError
+            If any of the projected manure masses is negative.
+
         """
-        if all(mass > 0 for mass in projected_manure_masses):
-            return min(projected_manure_masses)
-        else:
-            return max(projected_manure_masses)
+        min_positive = math.inf
+        for mass in projected_manure_masses:
+            if mass < 0:
+                raise ValueError(f'Projected manure mass cannot be negative: {mass}')
+            elif 0 < mass < min_positive:
+                min_positive = mass
+
+        return min_positive if min_positive != math.inf else 0
 
     def _create_nutrient_request_results(self, projected_manure_mass: float) -> NutrientRequestResults:
         """
         Create a NutrientRequestResults object based on the given projected manure mass.
+
+        Note that this method does not check if what is currently available in the manager is enough
+        to fulfill the projected manure mass. It simply creates a NutrientRequestResults object
+        based on the projected manure mass by multiplying the projected manure mass with the
+        nutrient compositions.
 
         Parameters
         ----------
@@ -143,7 +184,15 @@ class ManureNutrientManager:
         NutrientRequestResults
             The results of the nutrient request. See :class:`NutrientsRequestResults` for details.
 
+        Raises
+        ------
+        ValueError
+            If the projected manure mass is negative.
+
         """
+        if projected_manure_mass < 0.0:
+            raise ValueError(f'Projected manure mass cannot be negative: {projected_manure_mass}')
+
         return NutrientRequestResults(
             nitrogen=projected_manure_mass * self._nutrients.nitrogen_composition,
             phosphorus=projected_manure_mass * self._nutrients.phosphorus_composition,
@@ -165,7 +214,16 @@ class ManureNutrientManager:
         -------
         None
 
+        Raises
+        ------
+        ValueError
+            If any of the nutrients in the results is greater than what is currently available in the manager.
+
         """
+        for attr in ['nitrogen', 'phosphorus', 'total_manure_mass', 'dry_matter']:
+            if getattr(self._nutrients, attr) < getattr(results, attr):
+                raise ValueError(f'Remove more nutrients than available: {attr}')
+
         self._nutrients -= ManureNutrients(
             nitrogen=results.nitrogen,
             phosphorus=results.phosphorus,
