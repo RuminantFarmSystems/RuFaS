@@ -3,9 +3,10 @@
 # ignore text files
 *.txt
 *.txt#
-!example_list_of_keys.txt
-!example_list_of_keys_2.txt
-!example_excl_list_of_keys.txt
+!example_list_of_filter_patterns.txt
+!example_list_of_regex_patterns.txt
+!example_list_of_exclude_regex_patterns.txt
+!example_list_of_exclude_filter_patterns.txt
 !requirements.txt
 *.doc
 *.docx
