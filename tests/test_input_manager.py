@@ -19,6 +19,7 @@ def mock_input_manager(mocker) -> InputManager:
 
 
 def test_input_manager_singleton(mocker: MockerFixture) -> None:
+    """Unit test to ensure InputManager is a singleton"""
     im1 = InputManager()
     im2 = InputManager()
 
@@ -26,13 +27,14 @@ def test_input_manager_singleton(mocker: MockerFixture) -> None:
 
 
 def test_load_metadata(mock_input_manager: InputManager) -> None:
-    with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1"}')):
-        mock_input_manager._load_metadata("input/example_metadata.json")
-        assert mock_input_manager.metadata == {"dummy_key1": "dummy_value1"}
+    """Unit test for function _load_metadata in file input_manager.py"""
+    with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
+        mock_input_manager._load_metadata("path/dummy_metadata.json")
+        assert mock_input_manager.metadata == {"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}
 
     mock_open_func = Mock()
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
         with pytest.raises(Exception):
-            mock_input_manager._load_metadata("input/example_metadata.json")
+            mock_input_manager._load_metadata("path/dummy_metadata.json")
