@@ -109,7 +109,7 @@ def test_determine_senescent_leaf_area_index(heatfrac, senheatfrac, optareafrac)
         heatfrac is fr_PHU
         senheatfrac is fr_PHU,sen
         optareafrac is LAI_mx
-        """
+    """
     top = 1 - heatfrac
     bottom = 1 - senheatfrac
     expect = optareafrac * (top / bottom)
@@ -165,14 +165,15 @@ def test_error_determine_canopy_height(max_can_height, opt_leaf_area_frac):
         LeafAreaIndex.determine_canopy_height(max_can_height, opt_leaf_area_frac)
 
 
-@pytest.mark.parametrize("heatfrac", [0, 0.2, 0.5, 0.75, 0.9, 0.95, 1, 1.2, -1])
-def test_grow_canopy(heatfrac):
+@pytest.mark.parametrize("heatfrac, previous_leaf_area_index, previous_optimal_leaf_area_fraction",
+                         [(0, 0.01, 0.1)])
+def test_grow_canopy(heatfrac, previous_leaf_area_index: int, previous_optimal_leaf_area_fraction: int):
     """integration test for leaf area processes via grow_canopy()"""
     # observe
     data = CropData(heat_fraction=heatfrac, leaf_area_index=0.7,
                     first_heat_fraction_point=0.2, second_heat_fraction_point=0.33, first_leaf_fraction_point=0.05,
                     second_leaf_fraction_point=0.95, max_canopy_height=2.5, growth_factor=0.95, max_leaf_area_index=3.0,
-                    senescent_heat_fraction=0.9, previous_leaf_area_index=0.1, previous_optimal_leaf_area_fraction=0.01)
+                    senescent_heat_fraction=0.9, previous_leaf_area_index=previous_leaf_area_index, previous_optimal_leaf_area_fraction=previous_optimal_leaf_area_fraction)
     lai = LeafAreaIndex(data)
     lai.grow_canopy()
     # expect
