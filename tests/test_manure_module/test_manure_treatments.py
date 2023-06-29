@@ -1459,7 +1459,7 @@ def test_anaerobic_lagoon_calc_methane_emission(mocker: MockFixture) -> None:
     expected_methane_loss = 2.0
     patch_for_calc_methane_emission_for_anaerobic_lagoon = mocker.patch(
             'RUFAS.routines.manure.manure_treatments.anaerobic_lagoon.'
-            'GasEmissions.calc_methane_emission_for_anaerobic_lagoon',
+            'GasEmissions.calc_methane_emission_from_anaerobic_lagoon',
             return_value=expected_methane_loss
     )
     accumulated_liquid_manure_total_solids = 20.0
