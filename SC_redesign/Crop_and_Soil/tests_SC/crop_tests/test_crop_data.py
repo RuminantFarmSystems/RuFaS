@@ -56,8 +56,8 @@ def test_water_canopy_storage_capacity(max_capacity: float, lai: float, max_lai:
     assert pytest.approx(actual) == expected
 
 
-def test_tree_dormacy_loss() -> None:
-    """A seperate test to check the dormacy loss for future use of TREE"""
+def test_tree_dormancy_loss() -> None:
+    """A saperate test to check the dormancy loss for future use of TREE"""
     crop_data = CropData(plant_category=PlantCategory("tree"))
     print(crop_data.plant_category)
     assert crop_data.dormancy_loss_fraction == 0.3

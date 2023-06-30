@@ -92,6 +92,8 @@ def test_tally_total_phosphorus_uptake(uptakes):
 
 @pytest.mark.parametrize("layers", (0, 3))
 def test_extend_phosphate_uptakes_to_full_profile(layers: int) -> None:
+    """Checks that the helper method extend_phosphate_uptakes_to_full_profile() does correctly updates the list to the
+    right length"""
     data = CropData(actual_phosphorus_uptakes=[1.0, 2.0, 3.0], inaccessible_soil_layers=layers)
     incorp = PhosphorusIncorporation(data)
     pre_actual_phosphorus = data.actual_phosphorus_uptakes

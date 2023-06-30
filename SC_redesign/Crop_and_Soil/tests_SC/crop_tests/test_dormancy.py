@@ -59,7 +59,7 @@ def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: f
 
     incorp.enter_dormancy()
 
-    if incorp.data.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or\
+    if incorp.data.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
             incorp.data.plant_category == PlantCategory.WARM_ANNUAL:
         assert incorp.data.biomass == pre_biomass
         assert incorp.data.yield_residue == pre_yield_residue
@@ -70,7 +70,7 @@ def test_go_into_dormancy(biomass: float, residue: float, lai: float, min_lai: f
         assert incorp.data.leaf_area_index == pre_leaf_area_index
     else:
         assert incorp.data.is_dormant is True
-        if incorp.data.plant_category == PlantCategory.PERENNIAL or\
+        if incorp.data.plant_category == PlantCategory.PERENNIAL or \
                 incorp.data.plant_category == PlantCategory.PERENNIAL_LEGUME or \
                 incorp.data.plant_category == PlantCategory.TREE:
             assert incorp.data.biomass == (biomass * (1 - loss_frac))

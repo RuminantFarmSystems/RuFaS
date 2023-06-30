@@ -168,7 +168,7 @@ def test_error_determine_canopy_height(max_can_height, opt_leaf_area_frac):
 @pytest.mark.parametrize("heatfrac, previous_leaf_area_index, previous_optimal_leaf_area_fraction",
                          [(0, 0.1, 0.01), (0.2, 0.1, 0.01), (0.95, 0.1, 0.01), (1.2, 0.1, 0.01), (-1, 0.1, 0.01),
                           (0.2, None, 0.01), (0.2, 0.1, None)])
-def test_grow_canopy(heatfrac, previous_leaf_area_index: int, previous_optimal_leaf_area_fraction: int):
+def test_grow_canopy(heatfrac: float, previous_leaf_area_index: int, previous_optimal_leaf_area_fraction: int) -> None:
     """integration test for leaf area processes via grow_canopy()"""
     # observe
     data = CropData(heat_fraction=heatfrac, leaf_area_index=0.7,
@@ -178,7 +178,6 @@ def test_grow_canopy(heatfrac, previous_leaf_area_index: int, previous_optimal_l
                     previous_optimal_leaf_area_fraction=previous_optimal_leaf_area_fraction)
     lai = LeafAreaIndex(data)
     lai.grow_canopy()
-    print(lai.data.previous_leaf_area_index)
     # expect
     shapes = LeafAreaIndex._determine_lai_shapes(0.2, 0.33, 0.05, 0.95)
     assert data._lai_shapes == shapes
@@ -201,9 +200,8 @@ def test_grow_canopy(heatfrac, previous_leaf_area_index: int, previous_optimal_l
         if max_change < added:  # when heatfrac = 0, no growth occurs
             added = max_change
         assert data.leaf_area_added == added
-        print(str(data.previous_leaf_area_index) + "a")
         if previous_leaf_area_index is None:
-            assert data.leaf_area_index == 0 + added
+            assert data.leaf_area_index == added
         else:
             assert data.leaf_area_index == 0.1 + added
         assert data.previous_leaf_area_index == data.leaf_area_index

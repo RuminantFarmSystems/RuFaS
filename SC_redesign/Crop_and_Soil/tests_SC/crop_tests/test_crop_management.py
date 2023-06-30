@@ -172,18 +172,18 @@ def test_manage_harvest(harvest_op: HarvestOperation, field_name: str, field_siz
     crop._transfer_residue.assert_called_once_with(soil_data)
 
 
-@pytest.mark.parametrize("efficiency,harvest,override", [
-    (0, 0, False),  # no harvest and not collection
-    (0, 0.85, False),  # harvest but don't collect
-    (0.9, 0, False),  # collect from no harvest
-    (0.9, 0.85, False),  # harvest and collect
-    (0, 0, True),  # harvest override
-    (0.9, 0.85, True),  # harvest override
-    (-1, 0.85, True),
-    (0, 1.5, True)
+@pytest.mark.parametrize("efficiency,harvest,override,should_fail", [
+    (0, 0, False, False),  # no harvest and not collection
+    (0, 0.85, False, False),  # harvest but don't collect
+    (0.9, 0, False, False),  # collect from no harvest
+    (0.9, 0.85, False, False),  # harvest and collect
+    (0, 0, True, False),  # harvest override
+    (0.9, 0.85, True, False),  # harvest override
+    (-1, 0.85, True, True),
+    (0, 1.5, True, False)
 ])
-def test_cut_crop(efficiency: float, harvest: float, override: bool):
-    """ensure that the crop cutting routines are properly executed"""
+def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail: bool):
+    """ensure that the crop cutting routines are properly executed and that errors are raised properly"""
     # setup
     data = CropData(harvest_index=harvest, biomass=100, leaf_area_index=2.3, accumulated_heat_units=1.1,
                     optimal_nitrogen_fraction=0.09, optimal_phosphorus_fraction=0.02,
@@ -193,37 +193,38 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool):
     crop = CropManagement(data)
 
     # act
-    try:
+    if should_fail:
+        try:
+            crop.cut_crop(efficiency)
+        except ValueError as e:
+            assert not 0 <= efficiency <= 1.0
+            assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
+    else:
         crop.cut_crop(efficiency)
-    except ValueError as e:
-        assert not 0 <= efficiency <= 1.0
-        assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
-        return
+        if harvest > 1:
+            cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
+        else:
+            cut_biomass = data.above_ground_biomass * harvest
 
-    if harvest > 1:
-        cut_biomass = CropManagement.determine_biomass_cut_from_whole_plant(100, harvest)
-    else:
-        cut_biomass = data.above_ground_biomass * harvest
+        assert data.cut_biomass == cut_biomass
+        assert data.biomass == 100 - cut_biomass
+        assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
+        assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
+        collected = cut_biomass * efficiency
+        residue = cut_biomass * (1 - efficiency)
+        assert data.yield_collected == collected
+        assert data.yield_residue == residue
 
-    assert data.cut_biomass == cut_biomass
-    assert data.biomass == 100 - cut_biomass
-    assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
-    assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
-    collected = cut_biomass * efficiency
-    residue = cut_biomass * (1 - efficiency)
-    assert data.yield_collected == collected
-    assert data.yield_residue == residue
-
-    if override:
-        assert data.yield_nitrogen == collected * 0.09
-        assert data.yield_phosphorus == collected * 0.02
-        assert data.residue_nitrogen == residue * 0.09
-        assert data.residue_phosphorus == residue * 0.02
-    else:
-        assert data.yield_nitrogen == collected * 0.12
-        assert data.yield_phosphorus == collected * 0.0092
-        assert data.residue_nitrogen == residue * 0.12
-        assert data.residue_phosphorus == residue * 0.0092
+        if override:
+            assert data.yield_nitrogen == collected * 0.09
+            assert data.yield_phosphorus == collected * 0.02
+            assert data.residue_nitrogen == residue * 0.09
+            assert data.residue_phosphorus == residue * 0.02
+        else:
+            assert data.yield_nitrogen == collected * 0.12
+            assert data.yield_phosphorus == collected * 0.0092
+            assert data.residue_nitrogen == residue * 0.12
+            assert data.residue_phosphorus == residue * 0.0092
 
 
 @pytest.mark.parametrize("field_name,field_size,species,year,day,mass,nitrogen,phosphorus", [
