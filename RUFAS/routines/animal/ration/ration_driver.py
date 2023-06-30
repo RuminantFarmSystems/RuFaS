@@ -164,6 +164,23 @@ def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.Op
     ration['objective'] = NLP.objective(solution.x)
     return ration
 
+def make_solution_from_fixed_ration(ration: Dict) -> List:
+    """
+    makes solution object from returned fixed ration for use in get_ration_vals function in ration_NLP.py
+    Simply puts the value in triplicate, and multiplies by the MEact defined in the set_globals function
+
+    Parameters
+    ----------
+    ration: dictionary
+    """
+    solution_from_ration = []
+    for value in ration.keys():
+        solution_from_ration.append(value/3)
+        solution_from_ration.append(value/3)
+        solution_from_ration.append(value/3)
+    return solution_from_ration
+
+
 #TODO how should we handle type hints for classes that aren't imported already? Import just for type hint?
 def get_user_defined_ration(req: animal_requirements, pen, available_feeds, animal_grouping_scenario) \
     -> tuple[Dict[str, float], Dict[str, float]]:
@@ -235,8 +252,10 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
             
     if fixed_ration:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
+        ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
     elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         ration = make_ration_from_solution(available_feeds, solution)
+        ration_vals = NLP.get_ration_vals(solution)
     else:
         print('ERROR') #TODO output to error log? Or force a fixed ration?
     return ration, ration_vals
