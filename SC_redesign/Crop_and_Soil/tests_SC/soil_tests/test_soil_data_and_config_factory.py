@@ -58,7 +58,6 @@ def test_config_factory_defaults():
     assert generic.previous_temperature_effect == 0.8
     assert generic.slope_length == 3
     assert generic.manning == 0.4
-    assert generic.peak_runoff_rate is None
     assert generic.snow_cover_water_content == 0
     assert generic.eroded_sediment == 0
 
@@ -181,7 +180,7 @@ def test_error_manual_soil_data_configuration() -> None:
 
 def test_annual_reset() -> None:
     """Test that annual_reset() actually resets the values it should"""
-    soil_data = SoilData(name="test", peak_runoff_rate=0.95, field_size=2.11)
+    soil_data = SoilData(name="test", field_size=2.11)
 
     soil_data.initial_water_content = 1.5
     soil_data.initial_nitrates_total = 2.5
