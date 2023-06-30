@@ -83,5 +83,33 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
             mock_input_manager._load_data("bad/path.csv")
 
 
-def test_validate_data(mock_input_manager: InputManager) -> None:
-    
+def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager) -> None:
+    """Unit test for valid data for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__pool = {"dummykey1": "dummyvalue1", "dummykey2": "dummyvalue2"}
+    mocker.patch.object(mock_input_manager, "_validate", return_value=True)
+
+    result = mock_input_manager._validate_data()
+
+    assert result is True
+
+
+def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_input_manager: InputManager) -> None:
+    """Unit test for invalid unfixable data for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__pool = {"dummykey1": "dummyinvalidvalue1", "dummykey2": "dummyvalue2"}
+    mocker.patch.object(mock_input_manager, "_validate", return_value=False)
+    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
+
+    result = mock_input_manager._validate_data()
+
+    assert result is False
+
+
+def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input_manager: InputManager) -> None:
+    """Unit test for invalid fixable data for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__pool = {"dummykey1": "dummyinvalidvalue1", "dummykey2": "dummyvalue2"}
+    mocker.patch.object(mock_input_manager, "_validate", return_value=False)
+    mocker.patch.object(mock_input_manager, "_fix_data", return_value=True)
+
+    result = mock_input_manager._validate_data()
+
+    assert result is True
