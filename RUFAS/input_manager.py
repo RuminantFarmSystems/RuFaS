@@ -26,8 +26,8 @@ class InputManager:
 
         Parameters
         ----------
-            metadata_path : str
-                The path to the metadata file
+        metadata_path : str
+            The path to the metadata file
         """
         try:
             with open(metadata_path) as metadata_file:
