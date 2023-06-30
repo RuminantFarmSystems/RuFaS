@@ -6,8 +6,7 @@ Description: Tools for accessing and providing user-defined ration  variables
 Author: Joseph C. Waddell, jw2574@cornell.edu
 """
 
-from typing import Any, Dict
-import json
+from typing import Dict
 
 class UserDefinedRationManager(object):
     """

@@ -11,7 +11,7 @@ Author(s): Chris VanKerkhove, cjv47@cornell.edu
 import collections
 import math
 import scipy
-from typing import Any, Dict, List, Set, Union, Callable
+from typing import Dict, List, Set,  Callable
 import numpy as np
 import numpy.typing as npt
 from RUFAS.output_manager import OutputManager
