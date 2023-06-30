@@ -76,16 +76,79 @@ class InputManager:
                         data_reader = csv.DictReader(csv_file)
                         self.__pool[key] = list(data_reader)
                 else:
-                    om.add_warning("InputManager load data file not csv/json", f"{file_path} not csv nor json and not"
-                                   f" added to data pool", info_map)
+                    om.add_warning("InputManager load data file not csv/json.", f"{file_path} not csv nor json and not"
+                                   f" added to data pool.", info_map)
             except Exception as e:
                 raise e
 
-    def _validate_data(self, eager_termination: bool = True) -> None:
+    def _validate_data(self, eager_termination: bool = True) -> bool:
         """
         Validates input data
 
         Args
         ----
-            eager_termination (bool, optional): _description_. Defaults to True.
+        eager_termination : bool, optional
+            Flag to determine if the process should terminate upon finding invalid data.
+
+        Returns
+        -------
+        bool
+            True if all data is valid; False otherwise.
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_data.__name__,
+                    }
+        for key, value in self.__pool.items():
+            if not self.validate(key, value):
+                if eager_termination:
+                    om.add_error("Invalid data.", f"Invalid data found: {key} - {value}", info_map)
+                    if not self.fix_data(key, value):
+                        om.add_error("Data not fixable.", "Unable to fix the invalid data. Terminating the process.",
+                                     info_map)
+                        return False
+                    else:
+                        om.add_warning("Data was fixable.", f"Invalid data found: {key} - {value}", info_map)
+        return True
+
+    def validate(self, key: str, value: Any) -> bool:
+        """
+        Perform data validation checks.
+
+        Args
+        ----
+        key : str
+            The key of the data to validate.
+
+        value : Any
+            The value of the data to validate.
+
+
+        Returns
+        -------
+        bool
+            True if the data is valid, False otherwise.
+        """
+        # Perform data validation checks
+        # Return True if the data is valid, False otherwise
+        pass
+
+    def fix_data(self, key: str, value: Any) -> bool:
+        """
+        Attempt to fix the invalid data.
+
+        Args
+        ----
+        key : str
+            The key of the data to fix.
+
+        value : Any
+            The value of the data to fix.
+
+        Returns
+        -------
+        bool 
+            True if the data is fixed, False otherwise.
+        """
+        # Attempt to fix the invalid data
+        # Return True if the data is fixed, False otherwise
+        pass
