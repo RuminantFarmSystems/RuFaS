@@ -27,15 +27,20 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
 
-
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
         Loads metadata from json file to IM metadata object
 
         Parameters
         ----------
-            metadata_path : str
-                The path to the metadata file
+        metadata_path : str
+            The path to the metadata file.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading the metadata_path file.
+
         """
         try:
             with open(metadata_path) as metadata_file:
@@ -45,7 +50,14 @@ class InputManager:
             raise e
 
     def _load_data(self) -> None:
-        """Loads data from JSON or CSV file"""
+        """Loads data from JSON or CSV fileRaises
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading a data file.
+
+        """
         metadata_files_key = "files"
         data_files = self.__metadata[metadata_files_key]
         path_key = "path"
@@ -66,6 +78,5 @@ class InputManager:
                 else:
                     om.add_warning("InputManager load data file not csv/json", f"{file_path} not csv nor json and not"
                                    f" added to data pool", info_map)
-                    pass
             except Exception as e:
                 raise e
