@@ -113,3 +113,13 @@ def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input
     result = mock_input_manager._validate_data()
 
     assert result is True
+
+
+def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker, mock_input_manager: InputManager) -> None:
+    """Unit test for no eager termination with invalid data for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__pool = {"dummykey1": "dummyinvalidvalue1", "dummykey2": "dummyvalue2"}
+    mocker.patch.object(mock_input_manager, "_validate", return_value=False)
+
+    result = mock_input_manager._validate_data(eager_termination=False)
+
+    assert result is True
