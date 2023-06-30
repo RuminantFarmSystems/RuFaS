@@ -50,7 +50,14 @@ class InputManager:
             raise e
 
     def _load_data(self) -> None:
-        """Loads data from JSON or CSV file"""
+        """Loads data from JSON or CSV fileRaises
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading a data file.
+
+        """
         metadata_files_key = "files"
         data_files = self.__metadata[metadata_files_key]
         path_key = "path"
@@ -71,7 +78,6 @@ class InputManager:
                 else:
                     om.add_warning("InputManager load data file not csv/json", f"{file_path} not csv nor json and not"
                                    f" added to data pool", info_map)
-                    pass
             except Exception as e:
                 raise e
 
