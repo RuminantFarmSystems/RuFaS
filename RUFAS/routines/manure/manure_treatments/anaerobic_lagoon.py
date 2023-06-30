@@ -55,7 +55,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             new_accumulated_liquid_manure_total_solids: The new accumulated total solids in the lagoon, kg.
 
         """
-        methane_loss = GasEmissions.calc_methane_emission_for_anaerobic_lagoon(
+        methane_loss = GasEmissions.calc_methane_emission_from_anaerobic_lagoon(
                 manure_volatile_solids=accumulated_liquid_manure_total_volatile_solids)
         new_accumulated_liquid_manure_total_solids = max(accumulated_liquid_manure_total_solids - methane_loss, 0.0)
         return methane_loss, new_accumulated_liquid_manure_total_solids
