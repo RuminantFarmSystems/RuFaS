@@ -1525,7 +1525,7 @@ class AnimalManagement:
                 # TODO add in sim_day or other information to info_maps?
                 info_map = {"class": self.__class__.__name__,
                     "function": self._calc_ration_at_interval.__name__,
-                    "available_feeds": available_feeds['feed_id'], }
+                    "available_feeds": available_feeds.feed_id, }
                 om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
                 om.add_variable(f'ration_nutrient_conc_pen_{pen.id}', nutrient_conc, info_map)
                 om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)

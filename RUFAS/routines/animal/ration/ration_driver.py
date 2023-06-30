@@ -171,13 +171,19 @@ def make_solution_from_fixed_ration(ration: Dict) -> List:
 
     Parameters
     ----------
-    ration: dictionary
+    ration: Dict
+
+    Returns
+    -------
+    List
+
     """
     solution_from_ration = []
-    for value in ration.keys():
-        solution_from_ration.append(value/3)
-        solution_from_ration.append(value/3)
-        solution_from_ration.append(value/3)
+    for key in ration.keys():
+        if key != 'status' and key != 'objective':
+            solution_from_ration.append(ration[key]/3)
+            solution_from_ration.append(ration[key]/3)
+            solution_from_ration.append(ration[key]/3)
     return solution_from_ration
 
 
@@ -255,7 +261,7 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
         ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
     elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         ration = make_ration_from_solution(available_feeds, solution)
-        ration_vals = NLP.get_ration_vals(solution)
+        ration_vals = NLP.get_ration_vals(solution.x)
     else:
         print('ERROR') #TODO output to error log? Or force a fixed ration?
     return ration, ration_vals

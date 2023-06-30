@@ -1453,6 +1453,21 @@ def test_make_ration_from_solution():
     result = ration_driver.make_ration_from_solution(mock_avail_feeds, mock_solution)
     assert result == predicted
 
+@pytest.mark.parametrize("test_ration, expected", [
+    ({'2' : 3, '4' : 6, 'status' : True, 'objective' : False},[1, 1, 1, 2, 2, 2]),
+    ({'2' : 3, 'status' : True, 'objective' : False},[1, 1, 1, ]),
+    ({'2' : 3, '4' : 6, },[1, 1, 1, 2, 2, 2]),
+    ({'2' : 3, '4' : 12, },[1, 1, 1, 4, 4, 4])
+    ])
+def test_make_solution_from_fixed_ration(test_ration: Dict, expected: list):
+    """Unit test for function make_solution_from_fixed_ration in file routines/animal/ration/ration_driver.py
+    """
+    # test_ration = {'2' : 3, '4' : 6, 'status' : True, 'objective' : False}
+    # expected = [1, 1, 1, 2, 2, 2]
+    result = ration_driver.make_solution_from_fixed_ration(test_ration)
+    assert result == expected
+
+
 def test_get_user_defined_ration():
     """Unit test for function get_user_defined_ration in file routines/animal/ration/ration_driver.py"""
     pass
