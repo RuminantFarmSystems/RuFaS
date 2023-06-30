@@ -1,6 +1,7 @@
 from typing import Optional
 from math import exp, log, atan, sin
 
+from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 """
@@ -23,7 +24,8 @@ class SoilErosion:
         """
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float) -> None:
+    def erode(self, field_size: float, minimum_cover_management_factor: float, surface_residue: float,
+              rainfall: float) -> None:
         """This is the main routine for SoilErosion. It is responsible for running all the necessary soil erosion
             methods and updating attributes as necessary.
 
@@ -32,6 +34,7 @@ class SoilErosion:
             minimum_cover_management_factor: minimum value for cover and management factor for water erosion applicable
                 to land cover/plant (unitless)
             surface_residue: amount of residue on the soil surface (kg per hectare)
+            rainfall: amount of rain that fell on the field on the current day (mm).
 
         Details:
             This method calculates the mass of soil that gets eroded from the soil profile based on the content of the
@@ -49,14 +52,16 @@ class SoilErosion:
                                                                 self.data.average_subbasin_slope)
         fragment_factor = self._determine_coarse_fragment_factor(self.data.soil_layers[0].percent_rock_content)
 
-        if self.data.peak_runoff_rate is None:
-            raise TypeError("SoilData peak_runoff_rate cannot be NoneType")
-        elif self.data.accumulated_runoff is None:
+        peak_runoff_rate = self._determine_peak_runoff_rate(self.data.accumulated_runoff, rainfall,
+                                                            self.data.slope_length, self.data.manning,
+                                                            self.data.average_subbasin_slope, field_size)
+
+        if self.data.accumulated_runoff is None:
             raise TypeError("SoilData accumulated_runoff cannot be NoneType")
         self.data.surface_runoff_volume = self.data.accumulated_runoff / field_size
-        sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, self.data.peak_runoff_rate,
-                                                        field_size, erodibility_factor, cover_factor,
-                                                        support_practice_factor, topographic_factor, fragment_factor)
+        sediment_yield = self._determine_sediment_yield(self.data.surface_runoff_volume, peak_runoff_rate, field_size,
+                                                        erodibility_factor, cover_factor, support_practice_factor,
+                                                        topographic_factor, fragment_factor)
         self.data.eroded_sediment = self._determine_adjusted_sediment_yield(sediment_yield,
                                                                             self.data.snow_cover_water_content)
 
@@ -264,6 +269,205 @@ class SoilErosion:
         SWAT Reference: 4:1.1.15
         """
         return exp(-0.053 * percent_rock_content)
+
+    @staticmethod
+    def _determine_peak_runoff_rate(surface_runoff: float, rainfall: float, slope_length: float, manning: float,
+                                    average_subbasin_slope: float, field_size: float) -> float:
+        """
+        Determines the maximum runoff flow rate that occurs with a given rainfall event.
+
+        Parameters
+        ----------
+        surface_runoff : float
+            Amount of rainfall that did not infiltrate into the soil on the current day (mm).
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+        slope_length : float
+            Length of the subbasin slope (m).
+        manning : float
+            Manning roughness coefficient for the subbasin (unitless).
+        average_subbasin_slope : float
+            Average slope length of the subbasin expressed as rise over run (meters / meters).
+        field_size : float
+            Size of the field (ha)
+
+        Returns
+        -------
+        float
+            Peak runoff rate (cubic meters per second).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.1
+
+        Notes
+        -----
+        This equation actually demands the area of the subbasin, not the field, as a parameter. But the field area was
+        used in the old code, and is used here until the data for subbasin areas can be found.
+        TODO: find subbasin areas database and/or make it a parameter - issue #601
+
+        """
+        if rainfall == 0.0:
+            return 0.0
+        runoff_coefficient = SoilErosion._determine_runoff_coefficient(surface_runoff, rainfall)
+        rainfall_intensity = SoilErosion._determine_rainfall_intensity(rainfall, slope_length, manning,
+                                                                       average_subbasin_slope)
+        field_size_in_square_km = field_size * HECTARES_TO_SQUARE_KILOMETERS
+        return (runoff_coefficient * rainfall_intensity * field_size_in_square_km) / 3.6
+
+    @staticmethod
+    def _determine_runoff_coefficient(surface_runoff: float, rainfall: float) -> float:
+        """
+        Calculates the surface runoff coefficient for the current day.
+
+        Parameters
+        ----------
+        surface_runoff : float
+            Amount of rainfall that did not infiltrate into the soil on the current day (mm).
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+
+        Returns
+        -------
+        float
+            Ratio of runoff to rainfall on the current day (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.15
+
+        """
+        return surface_runoff / rainfall
+
+    @staticmethod
+    def _determine_rainfall_intensity(rainfall: float, slope_length: float, manning: float,
+                                      average_subbasin_slope: float) -> float:
+        """
+        Determines the average rainfall rate during the time of concentration.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
+        slope_length : float
+            Length of the subbasin slope (m).
+        manning : float
+            Manning roughness coefficient for the subbasin (unitless).
+        average_subbasin_slope : float
+            Average slope length of the subbasin expressed as rise over run (meters / meters).
+
+        Returns
+        -------
+        float
+            Rainfall intensity (mm / hour).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.16
+
+        """
+        time_of_concentration = SoilErosion._determine_time_of_concentration(slope_length, manning,
+                                                                             average_subbasin_slope)
+        half_hour_rainfall_fraction = SoilErosion._determine_half_hour_rainfall_fraction(rainfall)
+        fraction_of_rain_during_time_of_concentration = \
+            SoilErosion._determine_fraction_rainfall_during_time_of_concentration(time_of_concentration,
+                                                                                  half_hour_rainfall_fraction)
+        rain_during_time_of_concentration = fraction_of_rain_during_time_of_concentration * rainfall
+        return rain_during_time_of_concentration / time_of_concentration
+
+    @staticmethod
+    def _determine_time_of_concentration(slope_length: float, manning: float, average_subbasin_slope) -> float:
+        """
+        Calculates the time of concentration for the subbasin.
+
+        Parameters
+        ----------
+        slope_length : float
+            Length of the subbasin slope (m).
+        manning : float
+            Manning roughness coefficient for the subbasin (unitless).
+        average_subbasin_slope : float
+            Average slope length of the subbasin expressed as rise over run (m / m).
+
+        Returns
+        -------
+        float
+            Time of concentration (hour).
+
+        References
+        ----------
+        SWAT Theoretical documentation section 2:1.3.6
+
+        Notes
+        -----
+        According to the SWAT Theoretical documentation, "the time of concentration is the amount of time from the
+        beginning of a rainfall event until the entire subbasin area is contributing to flow at the outlet.". In SWAT,
+        this is calculated as the overland flow time of concentration plus the channel flow time of concentration, but
+        in this version of the RuFaS Field module as well as the previous one, it is only the overland flow time of
+        concentration. This equation in SWAT also assumes an average flow rate of 6.35 mm per hour.
+
+        """
+        adjusted_slope_length = slope_length ** 0.6
+        adjusted_manning = manning ** 0.6
+        adjusted_average_slope_length = average_subbasin_slope ** 0.3
+        return (adjusted_slope_length * adjusted_manning) / (18 * adjusted_average_slope_length)
+
+    @staticmethod
+    def _determine_half_hour_rainfall_fraction(rainfall: float) -> float:
+        """
+        Calculates the fraction of total rainfall that falls during the half-hour of most intense rainfall of this storm
+        event.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
+
+        Returns
+        -------
+        float
+            The fraction of total rainfall that fell during the half-hour of most intense rainfall on the current day
+            (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation section 1:3.2.2
+
+        Notes
+        -----
+        This method for calculating the maximum half-hour rainfall is from the old version of the Field module, and has
+        been significantly simplified from the method in SWAT.
+
+        """
+        upper_limit = 1 - exp(-125 / (rainfall + 5))
+        lower_limit = 0.02083
+        return (lower_limit + upper_limit) / 2
+
+    @staticmethod
+    def _determine_fraction_rainfall_during_time_of_concentration(time_of_concentration: float,
+                                                                  half_hour_rainfall_fraction: float) -> float:
+        """
+        Calculates the fraction of rainfall that occurs over the time of concentration.
+
+        Parameters
+        ----------
+        time_of_concentration : float
+            Time of concentration for this subbasin (hours).
+        half_hour_rainfall_fraction : float
+            Fraction of rainfall that falls during half-hour of highest rainfall intensity (unitless).
+
+        Returns
+        -------
+        float
+            Fraction of rainfall that occurs over the time of concentration (unitless).
+
+        References
+        ----------
+        SWAT Theoretical documentation equation 2:1.3.19
+
+        """
+        product = 2 * time_of_concentration * log(1 - half_hour_rainfall_fraction)
+        return 1 - exp(product)
 
     @staticmethod
     def _determine_sediment_yield(surface_area_runoff: float, peak_runoff_rate: float, field_area: float,
