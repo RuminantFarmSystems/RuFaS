@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -181,10 +183,13 @@ def test_calculate_projected_manure_mass(request_nutrient: float, nutrient_compo
         (-2.0, 0.5, ValueError, 'Request for nutrient cannot be negative: -2.0'),
 
         # Scenario when nutrient composition is negative
-        (2.0, -1.0, ValueError, 'Nutrient composition cannot be negative: -1.0'),
+        (2.0, -1.0, ValueError, 'Nutrient composition must be between 0 and 1 (inclusive): -1.0'),
 
         # Scenario when nutrient composition and request are both negative
-        (-2.0, -1.0, ValueError, 'Request for nutrient cannot be negative: -2.0')
+        (-2.0, -1.0, ValueError, 'Request for nutrient cannot be negative: -2.0'),
+
+        # Scenario when nutrient composition is above 1
+        (2.0, 1.5, ValueError, 'Nutrient composition must be between 0 and 1 (inclusive): 1.5'),
     ]
 )
 def test_calculate_projected_manure_mass_exceptions(request_nutrient: float, nutrient_composition: float,
@@ -195,11 +200,11 @@ def test_calculate_projected_manure_mass_exceptions(request_nutrient: float, nut
     manure_nutrient_manager.py file.
 
     This test verifies that the _calculate_projected_manure_mass() method raises appropriate exceptions
-    with correct messages for negative values.
+    with correct messages for negative values and for nutrient composition values not in the range [0, 1].
 
     """
     # Act & Assert
-    with pytest.raises(expected_exception, match=expected_error_msg):
+    with pytest.raises(expected_exception, match=re.escape(expected_error_msg)):
         ManureNutrientManager._calculate_projected_manure_mass(request_nutrient, nutrient_composition)
 
 

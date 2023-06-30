@@ -44,17 +44,28 @@ class ManureNutrientManager:
 
     def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults | None:
         """
-        Request nutrients from the crop and soil module.
+        Handle the request for specific nutrients from the crop and soil module.
+
+        This method evaluates the nutrient request made by considering both nitrogen and phosphorus
+        quantities desired. It calculates the projected manure mass that would satisfy the request
+        and checks against the nutrients available in the manager.
+
+        If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
+        which detail the amounts of nutrients that can be provided to fulfill the request. If the request
+        cannot be fulfilled at all, the method will return None.
 
         Parameters
         ----------
         request : NutrientRequest
-            The request for nutrients.
+            The specific nutrient request, including quantities of nitrogen and phosphorus.
 
         Returns
         -------
-        NutrientRequestResults
-            The results of the nutrient request. See :class:`NutrientsRequestResults` for details.
+        NutrientRequestResults | None
+            The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
+            Returns None if the request cannot be fulfilled.
 
         """
         eval_results = self._evaluate_nutrient_request(request)
@@ -101,31 +112,35 @@ class ManureNutrientManager:
     @staticmethod
     def _calculate_projected_manure_mass(request_nutrient: float, nutrient_composition: float) -> float:
         """
-        Calculate the projected manure mass based on the request for a nutrient and the nutrient composition.
+        Calculate the projected manure mass based on the nutrient requested and the nutrient's composition in the manure.
+
+        The projected manure mass is calculated by dividing the nutrient request by the nutrient composition.
+        This represents the total manure mass needed to fulfill the nutrient request.
 
         Parameters
         ----------
         request_nutrient : float
-            The request for a nutrient.
+            The quantity of nutrient requested. Must be a non-negative value.
         nutrient_composition : float
-            The nutrient composition.
+            The proportion of the nutrient in the manure, represented as a fraction in the range [0, 1].
 
         Returns
         -------
         float
-            The projected manure mass.
+            The projected manure mass needed to fulfill the nutrient request. Returns 0.0 if the nutrient
+            composition is zero (indicating that the nutrient is not present in the manure).
 
         Raises
         ------
         ValueError
-            If the request for a nutrient or the nutrient composition is negative.
+            If the request for nutrient is negative, or if the nutrient composition is not in the range [0, 1].
 
         """
         if request_nutrient < 0.0:
-            raise ValueError(f"Request for nutrient cannot be negative: {request_nutrient}")
+            raise ValueError(f'Request for nutrient cannot be negative: {request_nutrient}')
 
-        if nutrient_composition < 0.0:
-            raise ValueError(f"Nutrient composition cannot be negative: {nutrient_composition}")
+        if nutrient_composition < 0.0 or nutrient_composition > 1.0:
+            raise ValueError(f'Nutrient composition must be between 0 and 1 (inclusive): {nutrient_composition}')
         elif nutrient_composition > 0.0:
             return request_nutrient / nutrient_composition
         else:
@@ -163,7 +178,7 @@ class ManureNutrientManager:
             elif 0 < mass < min_positive:
                 min_positive = mass
 
-        return min_positive if min_positive != math.inf else 0
+        return min_positive if min_positive != math.inf else 0.0
 
     def _create_nutrient_request_results(self, projected_manure_mass: float) -> NutrientRequestResults:
         """
