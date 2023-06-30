@@ -1500,10 +1500,6 @@ class AnimalManagement:
                     counter += 1
                     if counter > 50:
                         raise Exception('Too many attempts at optimizing ration.')
-                # TODO add in sim_day to info_maps?
-                info_map = {"class": self.__class__.__name__,
-                    "function": self._calc_ration_at_interval.__name__,}
-                om.add_variable(f'avg_rqmts_for pen {pen.id}', pen.avg_nutrient_rqmts, info_map)
                 
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
@@ -1525,6 +1521,16 @@ class AnimalManagement:
 
                 pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
+
+                # TODO add in sim_day or other information to info_maps?
+                info_map = {"class": self.__class__.__name__,
+                    "function": self._calc_ration_at_interval.__name__,
+                    "available_feeds": available_feeds['feed_id'], }
+                om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
+                om.add_variable(f'ration_nutrient_conc_pen_{pen.id}', nutrient_conc, info_map)
+                om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
+                om.add_variable(f'dry_matter_intake_pen_{pen.id}', pen.dry_matter_intake, info_map)
+                om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
