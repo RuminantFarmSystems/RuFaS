@@ -107,8 +107,6 @@ class SoilData:
     """length of the slope (meters)"""
     manning: float = 0.4
     """the Manning roughness coefficient for this subbasin (unitless)"""
-    peak_runoff_rate: Optional[float] = None
-    """the peak runoff rate (meters cubed per second)"""
     snow_cover_water_content: float = 0
     """water content of the snow cover (mm)"""
     eroded_sediment: float = 0
