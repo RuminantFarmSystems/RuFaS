@@ -287,7 +287,7 @@ class SoilErosion:
         manning : float
             Manning roughness coefficient for the subbasin (unitless).
         average_subbasin_slope : float
-            Average slope length of the subbasin expressed as rise over run (m / m).
+            Average slope length of the subbasin expressed as rise over run (meters / meters).
         field_size : float
             Size of the field (ha)
 
@@ -354,7 +354,7 @@ class SoilErosion:
         manning : float
             Manning roughness coefficient for the subbasin (unitless).
         average_subbasin_slope : float
-            Average slope length of the subbasin expressed as rise over run (m / m).
+            Average slope length of the subbasin expressed as rise over run (meters / meters).
 
         Returns
         -------
