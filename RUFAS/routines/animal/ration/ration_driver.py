@@ -214,14 +214,14 @@ def ration_report(ration, available_feeds):
     """
     nutrient_amount = {'dm': 0, 'as_fed': 0, 'CP': 0, 'ADF': 0, 'NDF': 0,
                        'lignin': 0, 'ash': 0, 'phosphorus': 0, 'potassium': 0,
-                       'N': 0, "EE": 0, "starch": 0}
+                       'N': 0, "EE": 0, "starch": 0, "TDN": 0, "DE" : 0}
     nutrient_conc = {}
     ration = ration.copy()
     for non_numeric_key in ['status', 'objective']:
         if non_numeric_key in ration:
             del ration[non_numeric_key]
     nutrients = ['DM', 'CP', 'ADF', 'NDF', 'lignin', 'ash', 'phosphorus',
-                 'potassium', 'N', 'EE', 'starch']
+                 'potassium', 'N', 'EE', 'starch', 'TDN', 'DE']
 
     # feed nutrient amounts
     for key, val in ration.items():

@@ -1094,12 +1094,12 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
             dry_matter_intake_estimate = (
                 (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
     else:
-        net_energy_maintenance_diet = 1 # TODO update this method to retrieve values from nutrient composition of 
+        net_energy_diet_concentration = 1 # TODO update this method to retrieve values from nutrient composition of 
                                         # ration from previous formulation.
                                         # Currently using magic value set by Edward and Haowen
-        dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_maintenance_diet 
-                                                          - 0.0466*net_energy_maintenance_diet**2 
-                                                          - 0.1128) / net_energy_maintenance_diet
+        dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_diet_concentration 
+                                                          - 0.0466*net_energy_diet_concentration**2 
+                                                          - 0.1128) / net_energy_diet_concentration
         if day_of_pregnancy and day_of_pregnancy >= 210:
             adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
             dry_matter_intake_estimate -= adjustment_factor
