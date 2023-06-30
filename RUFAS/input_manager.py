@@ -27,15 +27,20 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
 
-
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
         Loads metadata from json file to IM metadata object
 
         Parameters
         ----------
-            metadata_path : str
-                The path to the metadata file
+        metadata_path : str
+            The path to the metadata file.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading the metadata_path file.
+
         """
         try:
             with open(metadata_path) as metadata_file:
@@ -69,3 +74,12 @@ class InputManager:
                     pass
             except Exception as e:
                 raise e
+
+    def _validate_data(self, eager_termination: bool = True) -> None:
+        """
+        Validates input data
+
+        Args
+        ----
+            eager_termination (bool, optional): _description_. Defaults to True.
+        """
