@@ -9,6 +9,7 @@ from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
 
+
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
@@ -55,16 +56,16 @@ class InputManager:
             file_path = value[path_key]
             try:
                 if value["type"] == "json":
-                    with open(file_path) as json_file:                
-                        data = json.load(json_file)  
+                    with open(file_path) as json_file:
+                        data = json.load(json_file)
                         self.__pool[key] = data
                 if value["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
                         self.__pool[key] = list(data_reader)
                 else:
-                    om.add_log("InputManager load data file not csv/json", f"{file_path} not csv nor json and not"
-                               f" added to data pool", info_map)
+                    om.add_warning("InputManager load data file not csv/json", f"{file_path} not csv nor json and not"
+                                   f" added to data pool", info_map)
                     pass
             except Exception as e:
                 raise e
