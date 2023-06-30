@@ -653,7 +653,7 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
 
     TDN_estimate = 0.7  
     # communication with Dr. Edward Garcia
-    # TODO: Calculate TDN from the previous rations, when formulated. Using this constant as a placeholder value for the first formulation.
+    # TODO: Calculate TDN from the previous rations, when formulated. Using this constant as a placeholder value for the first formulation. See Issue #531
     MP_bactria_estimate = dry_matter_intake_estimate * \
         GeneralConstants.KG_TO_GRAMS * TDN_estimate * 0.13
     # communication with Dr. Edward Garcia, to calculate a placeholder MP bacteria value for the first formulation.
@@ -764,7 +764,7 @@ def calculate_NASEM_protein_requirements(lactating: bool, body_weight: float, fr
     NPscurf = 0.20 * body_weight**(0.60) * 0.85
     NPEndUrin = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
     NDF_conc = 0.3
-    # TODO get the current NDF_conc
+    # TODO get the current NDF_conc See Issue #531
     # hardcoded '0.3' is a general value that works for initial simulation purposes
     # In pen.py, cow.py, heiferI, II, III, ration_driver. add the variable to the calc_rqmts call each time
     # something like:
@@ -1097,15 +1097,13 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         net_energy_maintenance_diet = 1 # TODO update this method to retrieve values from nutrient composition of 
                                         # ration from previous formulation.
                                         # Currently using magic value set by Edward and Haowen
+                                        # see Issue #531
         dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_maintenance_diet 
                                                           - 0.0466*net_energy_maintenance_diet**2 
                                                           - 0.1128) / net_energy_maintenance_diet
         if day_of_pregnancy and day_of_pregnancy >= 210:
             adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
             dry_matter_intake_estimate -= adjustment_factor
-        # this comment is a holdover from the previous version
-    # TODO: below (and in the NASEM calculation) we use a flat minimum DMI value, but...
-    #   should we also consider a % value as a proportion of their current body weight?
     dry_matter_intake_estimate_minimum_flat = AnimalModuleConstants.MINIMUM_DMI
     dry_matter_intake_estimate_minimum_percentage = AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight
     return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
@@ -1164,7 +1162,7 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
         dry_matter_intake_estimate = 0.022*mature_body_weight * \
             (1-math.exp(-1.54*(body_weight/mature_body_weight)))
         """
-        # TODO: implement this by getting NDF_concentration_percentage
+        # TODO: implement this by getting NDF_concentration_percentage See Issue #531
             (neutral detergent fiber) from the feeds
         dry_matter_intake_estimate = (0.0226*mature_body_weight*(1-math.exp(-1.47*(body_weight/mature_body_weight))))\
             -(0.082*(NDF_concentration_percentage\
@@ -1228,7 +1226,7 @@ def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[f
             net_energy_activity = distance * 0.00035 * \
                 body_weight
         elif housing == 'Grazing':
-            # TODO This will be the DMI supplemented after grazing - requires grazing module implementation
+            # TODO This will be the DMI supplemented after grazing - requires grazing module implementation: See Issue #590
             nonpasturekgDMI = 1
             net_energy_activity = distance * body_weight * \
                 0.75 * ((600-12*nonpasturekgDMI))/600
