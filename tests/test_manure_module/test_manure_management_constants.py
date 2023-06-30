@@ -2,6 +2,8 @@ from pytest import approx
 
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
+
+
 def test_manure_constants() -> None:
     """Tests the manure constants in file manure_constants.py."""
     constants = ManureConstants
@@ -23,8 +25,8 @@ def test_gas_emission_constants() -> None:
     assert constants.R == approx(8.314)
 
     assert constants.Bo == approx(0.24)
-    assert constants.MCF == approx(0.79)
-    assert constants.MS == approx(0.9)
+    assert constants.METHANE_CONVERSION_FACTOR == approx(0.79)
+    assert constants.FRACTION_OF_HANDLED_MANURE == approx(0.9)
     assert constants.METHANE_FACTOR == approx(0.67)
 
     assert constants.METHANE_ENERGY_DENSITY == approx(55)
@@ -37,3 +39,5 @@ def test_gas_emission_constants() -> None:
     assert constants.SPECIFIC_GROWTH_RATE == approx(0.637)
 
     assert constants.DEFAULT_HOUSING_SPECIFIC_CONSTANT == approx(260.0)
+    assert constants.DEFAULT_PH_FOR_HOUSING_AMMONIA == approx(7.7)
+    assert constants.DEFAULT_PH_FOR_STORAGE_AMMONIA == approx(7.5)
