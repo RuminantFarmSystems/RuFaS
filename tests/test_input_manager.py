@@ -82,3 +82,6 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
         with pytest.raises(Exception):
             mock_input_manager._load_data("bad/path.csv")
 
+
+def test_validate_data(mock_input_manager: InputManager) -> None:
+    
