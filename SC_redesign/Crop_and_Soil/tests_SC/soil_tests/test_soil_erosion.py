@@ -1,6 +1,6 @@
 import pytest
 from math import exp, log, atan, sin
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
@@ -192,6 +192,85 @@ def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
     assert observe == expect
 
 
+@pytest.mark.parametrize("runoff,rainfall,length,manning,average,area,expected", [
+    (4.3, 10.33, 58.9, 0.33, 34.5, 1.4, 0.00252778),
+    (3.66, 7.2, 78.4, 0.58, 28.9, 2.7, 0.004875),
+    (0.0, 0.0, 45.1, 0.488, 38.4, 0.9, 0.0)
+])
+def test_determine_peak_runoff_rate(runoff: float, rainfall: float, length: float, manning: float, average: float,
+                                    area: float, expected: float) -> None:
+    """Tests that the peak runoff rate is determined correctly."""
+    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_erosion.SoilErosion",
+                        _determine_runoff_coefficient=MagicMock(return_value=0.5),
+                        _determine_rainfall_intensity=MagicMock(return_value=1.3)):
+        actual = SoilErosion._determine_peak_runoff_rate(runoff, rainfall, length, manning, average, area)
+        assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("runoff,rainfall,expected", [
+    (10.3, 12.1, 0.85123967),
+    (5.5, 11.0, 0.5),
+    (3.0, 9.0, 0.333333333)
+])
+def test_determine_runoff_coefficient(runoff: float, rainfall: float, expected: float) -> None:
+    """Tests that the correct runoff coefficient is calculated."""
+    actual = SoilErosion._determine_runoff_coefficient(runoff, rainfall)
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("rainfall,length,manning,average,expected", [
+    (3.0, 60.0, 0.33, 18.2, 0.8),
+    (11.2, 71.22, 0.441, 24.55, 2.98666667)
+])
+def test_determine_rainfall_intensity(rainfall: float, length: float, manning: float, average: float,
+                                      expected: float) -> None:
+    """Tests that the rainfall intensity is calculated accurately."""
+    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_erosion.SoilErosion",
+                        _determine_time_of_concentration=MagicMock(return_value=1.5),
+                        _determine_half_hour_rainfall_fraction=MagicMock(return_value=0.3),
+                        _determine_fraction_rainfall_during_time_of_concentration=MagicMock(return_value=0.4)):
+        actual = SoilErosion._determine_rainfall_intensity(rainfall, length, manning, average)
+
+        assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("slope,manning,average_slope", [
+    (60.0, 0.4, 33.55),
+    (15.66, 0.8, 14.5),
+    (45.1, 0.4451, 20.22)
+])
+def test_determine_time_of_concentration(slope: float, manning: float, average_slope: float) -> None:
+    """Tests that the time of concentration is determined correctly."""
+    expected = ((slope ** 0.6) * (manning ** 0.6)) / (18 * (average_slope ** 0.3))
+    actual = SoilErosion._determine_time_of_concentration(slope, manning, average_slope)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("rainfall", [
+    1.1,
+    10.66,
+    0.0,
+    4.8
+])
+def test_determine_half_hour_rainfall_fraction(rainfall: float) -> None:
+    """Tests that the maximum half-hour rainfall fraction is calculated correctly."""
+    expected = (0.02083 + (1 - exp(-125 / (rainfall + 5)))) / 2
+    actual = SoilErosion._determine_half_hour_rainfall_fraction(rainfall)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("concentration,rainfall_frac", [
+    (3.5, 0.03),
+    (1.44, 0.334),
+    (8.67, 0.67)
+])
+def test_fraction_rainfall_during_time_of_concentration(concentration: float, rainfall_frac: float) -> None:
+    """Tests that the fraction of rainfall that fell during the time of concentration is calculated correctly."""
+    expected = 1 - exp(2 * concentration * log(1 - rainfall_frac))
+    actual = SoilErosion._determine_fraction_rainfall_during_time_of_concentration(concentration, rainfall_frac)
+    assert actual == expected
+
+
 @pytest.mark.parametrize("surface_runoff,peak_runoff_rate,field_area,erodibility_factor,cover_factor,practice_factor,"
                          "topographic_factor,fragment_factor", [
                              (10, 0.15, 1, 0.98, 0.79, 1, 0.88, 0.93),
@@ -224,18 +303,18 @@ def test_determine_adjusted_sediment_yield(sediment_yield: float, snow_content: 
 
 
 # --- Integration tests ---
-@pytest.mark.parametrize("field_size,min_cover_factor,residue", [
-    (1, 0.2, 800),
-    (3, 0.001, 500),
-    (4.69, 0.003, 80),
-    (0.891, 0.01, 0),
-    (0.956, 0.05, 928.948569),
+@pytest.mark.parametrize("field_size,min_cover_factor,residue,rainfall", [
+    (1, 0.2, 800, 10.2),
+    (3, 0.001, 500, 3.6),
+    (4.69, 0.003, 80, 6.77),
+    (0.891, 0.01, 0, 0.0),
+    (0.956, 0.05, 928.948569, 15.9),
 ])
-def test_erode(field_size: float, min_cover_factor: float, residue: float) -> float:
+def test_erode(field_size: float, min_cover_factor: float, residue: float, rainfall: float) -> None:
     """Tests that erode() properly calls methods and stores values"""
 
     # Initialize objects
-    data = SoilData(accumulated_runoff=13, peak_runoff_rate=0.11, field_size=1.33)
+    data = SoilData(accumulated_runoff=13, field_size=1.33)
     incorp = SoilErosion(data)
 
     # Mock helper function
@@ -244,11 +323,12 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     incorp._determine_support_practice_factor = MagicMock(return_value=0.98)
     incorp._determine_topographic_factor = MagicMock(return_value=0.79)
     incorp._determine_coarse_fragment_factor = MagicMock(return_value=0.91)
+    incorp._determine_peak_runoff_rate = MagicMock(return_value=0.15)
     incorp._determine_sediment_yield = MagicMock(return_value=0.05)
     incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
 
     # Run method
-    incorp.erode(field_size, min_cover_factor, residue)
+    incorp.erode(field_size, min_cover_factor, residue, rainfall)
 
     # Check everything
     incorp._determine_soil_erodibility_factor.assert_called_once()
@@ -256,6 +336,7 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float) -> fl
     incorp._determine_support_practice_factor.assert_called_once()
     incorp._determine_topographic_factor.assert_called_once()
     incorp._determine_coarse_fragment_factor.assert_called_once()
+    incorp._determine_peak_runoff_rate.assert_called_once()
     incorp._determine_sediment_yield.assert_called_once()
     incorp._determine_adjusted_sediment_yield.assert_called_once()
     assert incorp.data.eroded_sediment == 0.0498
