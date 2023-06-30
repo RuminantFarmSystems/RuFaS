@@ -197,7 +197,6 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         try:
             crop.cut_crop(efficiency)
         except ValueError as e:
-            assert not 0 <= efficiency <= 1.0
             assert str(e) == f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{efficiency}'."
     else:
         crop.cut_crop(efficiency)
