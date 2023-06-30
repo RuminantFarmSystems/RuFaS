@@ -1,27 +1,30 @@
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
 
-    b1 = 1.0
-    """Rate correcting factor (unitless)."""
+    METHANE_EMISSION_COEFFICIENT = 24
+    """Methane emission coefficient, used in calculation of slurry storage methane emission (unitless)."""
 
-    b2 = 0.01
-    """Rate correcting factor (unitless)."""
+    DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR = 1.0
+    """Rate correcting factor for degradable volatile solids, used in calculation of slurry storage methane emission (unitless)."""
 
-    lnA = 43.33
-    """Natural log of Arrhenius constant (unitless)."""
+    NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR = 0.01
+    """Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage methane emission (unitless)."""
 
-    E = 112700.0
+    NATURAL_LOG_ARRHENIUS_CONSTANT = 43.33
+    """Natural log of the Arrhenius constant (unitless)."""
+
+    ACTIVATION_ENERGY = 112700.0
     """
     Activation energy (joules per mole, J/mol). The activation energy is the 
     minimum energy that must be available to molecules for a reaction to occur.
     """
 
-    R = 8.314
+    GAS_CONSTANT = 8.314
     """
     The ideal gas constant (J/mol :math:`\cdot` K).
     """
 
-    Bo = 0.24
+    ACHIEVABLE_METHANE_EMISSION = 0.24
     """Achievable emission of methane (:math:`CH_4`) during anaerobic digestion (kg :math:`CH_4`/kg VS)."""
 
     METHANE_CONVERSION_FACTOR = 0.79
@@ -84,3 +87,9 @@ class GasEmissionConstants:
 
     DEFAULT_PH_FOR_STORAGE_AMMONIA = 7.5
     """Default pH for storage ammonia (unitless). Default is set to 7.5."""
+
+    GENERAL_LOWER_BOUND_TEMPERATURE = -40.0
+    """General temperature lower bound (:math:`^{\circ}C`). Default is set to -40.0."""
+
+    GENERAL_UPPER_BOUND_TEMPERATURE = 60.0
+    """General temperature upper bound (:math:`^{\circ}C`). Default is set to 60.0."""
