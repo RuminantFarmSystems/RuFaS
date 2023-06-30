@@ -35,9 +35,9 @@ def methane_mitigation(NDF_concentration: float,
     CP_concentration : float
         Concentration of crude protein (CP) in the ration.
     methane_mitigation_method: str 
-        Methane mitigation method used to reduce enteric methane emissions, including '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'. 
+        Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin", "Essential Oils", and "Seaweed". 
     methane_mitigation_additive_amount: float 
-        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake.
+        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake. The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI. 
 
     Returns
     -------
@@ -45,11 +45,13 @@ def methane_mitigation(NDF_concentration: float,
         Reduction in methane yield (methane production/dry matter intake), %.   
     """
 
-    if methane_mitigation_method == "3-NOP": 
-        methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
+    if methane_mitigation_method == "3-NOP":
+        if methane_mitigation_additive_amount >= 40 or methane_mitigation_additive_amount <= 100:
+            methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
     elif methane_mitigation_method == "Monensin":
-        methane_yield_reduction = (0.30054 - 0.00377 *
+        if methane_mitigation_additive_amount > 16 or methane_mitigation_additive_amount <= 36:
+            methane_yield_reduction = (0.30054 - 0.00377 *
                                    methane_mitigation_additive_amount - 1.57832 * CP_concentration/100) * 100
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
@@ -95,7 +97,7 @@ def manure_calculations(ration_formulation,
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
     methane_model : str
-        Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
+        Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
     milk_fat : float
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
