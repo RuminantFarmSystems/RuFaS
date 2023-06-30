@@ -27,7 +27,13 @@ class InputManager:
         Parameters
         ----------
         metadata_path : str
-            The path to the metadata file
+            The path to the metadata file.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while opening or reading the metadata_path file.
+
         """
         try:
             with open(metadata_path) as metadata_file:
