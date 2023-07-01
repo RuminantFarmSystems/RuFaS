@@ -37,27 +37,25 @@ def methane_mitigation(NDF_concentration: float,
     methane_mitigation_method: str 
         Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin", "Essential Oils", and "Seaweed". 
     methane_mitigation_additive_amount: float 
-        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake. The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI. 
+        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI). The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI. 
 
     Returns
     -------
     float 
-        Reduction in methane yield (methane production/dry matter intake), %.   
+        Reduction in methane yield (methane production/DMI), %.   
     """
 
-    if methane_mitigation_method == "3-NOP":
-        if methane_mitigation_additive_amount >= 40 or methane_mitigation_additive_amount <= 100:
-            methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
+    methane_yield_reduction = 0.0
+
+    if methane_mitigation_method == "3-NOP" and 40 <= methane_mitigation_additive_amount <= 100:
+        methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
-    elif methane_mitigation_method == "Monensin":
-        if methane_mitigation_additive_amount > 16 or methane_mitigation_additive_amount <= 36:
-            methane_yield_reduction = (0.30054 - 0.00377 *
+    elif methane_mitigation_method == "Monensin" and 16 < methane_mitigation_additive_amount <= 36:
+        methane_yield_reduction = (0.30054 - 0.00377 *
                                    methane_mitigation_additive_amount - 1.57832 * CP_concentration/100) * 100
     elif methane_mitigation_method == "Essential Oils":
         methane_yield_reduction = 0.0
     elif methane_mitigation_method == "Seaweed":
-        methane_yield_reduction = 0.0
-    else:
         methane_yield_reduction = 0.0
     return methane_yield_reduction
 
