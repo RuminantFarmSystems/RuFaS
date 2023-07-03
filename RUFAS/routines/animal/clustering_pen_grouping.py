@@ -5,7 +5,7 @@ File name: clustering_pen_grouping.py
 Description: This file's main function is grouping(list, pens) (line 44) which
     returns a Dictionary of lists of cows, with the key being the pen those cows
     are assigned to based on nutritional requirements. This function is called
-    in animal_management.py for each ration cycle if there are more than 7 pens
+    in animal_manager.py for each ration cycle if there are more than 7 pens
     in the input (>=2 pens for lactating cows). Based on algorithm developed by
     Jorge Barrientos (jab924@cornell.edu).
 Author(s): Chris VanKerkhove, cjv47@cornell.edu

@@ -1,0 +1,95 @@
+%% Update as we go along
+classDiagram
+    AnimalManager *-- AnimalGroupingScenario  : has
+    AnimalManager *-- LifeCycleManager : has
+    AnimalManager *-- Pen : has
+    Pen *-- AnimalBase : has
+    AnimalBase <|-- Calf
+%%    AnimalBase <|-- HeiferI
+    AnimalBase <|-- HeiferII
+%%    AnimalBase <|-- HeiferIII
+    AnimalBase <|-- Cow
+    class AnimalGroupingScenario {
+        <<Enumeration>>
+        CALF__GROWING__CLOSE_UP__LACCOW : Dict[AnimalCombination, List[str]]
+        CALF__GROWING_AND_CLOSE_UP__LACCOW : Dict[AnimalCombination, List[str]]
+        -type_name_by_scenario : Dict[AnimalGroupingScenario, str]
+        +get_animal_type(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) str
+        +find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) AnimalCombination
+    }
+
+    class AnimalManager {
+        +ANIMAL_GROUPING_SCENARIO$ : AnimalGroupingScenario
+        +life_cycle_manager: LifeCycleManager
+        +all_pens: List[Pen]
+        +animal_to_pen_id_map: Dict %% make this private
+        +pens_by_animal_combination: Dict[AnimalCombination, List[Pen]]  %% make this private
+        +animals_by_type: property Dict[Type[AnimalBase], Lisst[AnimalBase]]
+        +simulate_animals: bool
+        +calves: List[Calf]
+        +heifersI: List[HeiferI]
+        +heifersII: List[HeiferII]
+        +heifersIII: List[HeiferIII]
+        +cows: List[Cow]
+        +set_animal_grouping_scenario(cls, AnimalGroupingScenario)$ None
+        +record_pen_history(self) None
+        +end_ration_interval(self) bool
+        +calc_nutrient_rqmts(self, feed, temp) None
+        +clear_pens(self) None
+        +allocate_animals_to_pens2(self) None  %% replace the main version
+        +calc_avg_growth(self)
+        +daily_updates2(self, feed, weather, time) None  %% replace the main version
+        -_get_classes_in_pen(cls, pen: Pen)$ Set[str]
+        -_calc_phosphorus_concentration(cls, animals)$ float
+        -_update_phosphorus_concentrations(self) None
+        -_calc_ration_at_interval(self, feed) None
+    }
+
+    class LifeCycleManager {
+
+    }
+
+    class Pen {
+        +ration_per_animal: Dict
+        +ration: Dict
+        +ration_nutrient_amount: Dict
+        +ration_nutrient_conc: Dict
+        +avg_nutrient_rqmts: Dict
+        +avg_calf_nutrient_rqmts: Dict
+        +classes_in_pen: Set[str]
+        +manure: AnimalManureExcretions
+        +is_populated: property bool
+        +MEdiet: float
+        +update_animals(self, new_animals, animal_combination: AnimalCombination) None
+        +calc_total_manure(self, feed, methane_model: str) None
+        +call_p_rqmts(self) None
+        +daily_p_update(self) None
+        +add_animal(self, animal, feed, temp, phosphorus_concentration: float) None
+        +remove_animal(self, animal_id: int) None
+        -_set_animal_nutrient_values(self, animal, feed, temp, phosphorus_concentration: float) None
+        -calc_new_ration(self, num_animals: int) Dict
+    }
+
+    class AnimalBase {
+        +calc_manure_base(self) None
+    }
+
+    class Calf {
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+%%    class HeiferI {
+%%        +calc_manure_excretion(self, feed, methane_model: str) None
+%%    }
+
+    class HeiferII {
+        +calc_manure_excretion(self, feed, methane_model: str) None
+    }
+
+%%    class HeiferIII {
+%%        +calc_manure_excretion(self, feed, methane_model: str) None
+%%    }
+
+    class Cow {
+        +calc_manure_excretion(self, feed, methane_model: str, ME_intake) None
+    }
