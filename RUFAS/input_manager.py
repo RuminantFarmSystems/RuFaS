@@ -73,9 +73,9 @@ class InputManager:
                 if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
+                        self.__pool[key] = data
                         om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
                                    info_map)
-                        self.__pool[key] = data
                 elif details["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
