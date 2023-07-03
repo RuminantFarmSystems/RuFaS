@@ -77,6 +77,22 @@ def test_load_data_csv(mock_input_manager: InputManager) -> None:
                                                                           {"key": "b", "value": "2"}]}
 
 
+def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_data with a file that's neither a csv nor json in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = {
+        "files": {
+            "dummy_data_file": {
+                "path": "dummy_data.txt",
+                "type": "txt"
+            }
+        }
+    }
+
+    with patch("builtins.open", mock_open(read_data="key_and_value")):
+        mock_input_manager._load_data()
+    assert mock_input_manager._InputManager__pool == {}
+
+
 def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_data raising an exception in file input_manager.py"""
     mock_open_func = Mock()
