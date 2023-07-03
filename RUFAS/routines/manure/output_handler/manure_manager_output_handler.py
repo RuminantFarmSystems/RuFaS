@@ -18,12 +18,12 @@ from pandas import DataFrame
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 from RUFAS.routines.manure.units.units import Units
 
-PenDailyUpdateDataType = Tuple[ManureManagementPen,
+PenDailyUpdateDataType = Tuple[ManureManagerPen,
                                ManureHandlerDailyOutput,
                                ReceptionPitDailyOutput,
                                ManureSeparatorDailyOutput,
@@ -31,9 +31,9 @@ PenDailyUpdateDataType = Tuple[ManureManagementPen,
                                ManureTreatmentDailyOutput]
 
 
-class ManureManagementOutputHandler:
+class ManureManagerOutputHandler:
     HEADER_PREFIXES = {
-        ManureManagementPen: 'pen',
+        ManureManagerPen: 'pen',
         PenManure: 'manure',
         ManureHandlerDailyOutput: 'handler',
         ReceptionPitDailyOutput: 'rp',
@@ -45,7 +45,7 @@ class ManureManagementOutputHandler:
 
     # TODO: Add an overwrite=True option
     def __init__(self) -> None:
-        """Initializes a ManureManagementOutputHandler object."""
+        """Initializes a ManureManagerOutputHandler object."""
         self._df: Optional[DataFrame] = None
         self.empty_main_output_directory()
 
@@ -100,12 +100,12 @@ class ManureManagementOutputHandler:
             dataframe_dict[key_name].append(round(value, 6))
         return dataframe_dict
 
-    def _process_pen(self, pen: ManureManagementPen) -> Dict[str, List[Any]]:
+    def _process_pen(self, pen: ManureManagerPen) -> Dict[str, List[Any]]:
         """Returns a properly formatted dictionary of important pen attributes to be converted to dataframe.
 
         Parameters
         ----------
-        pen : ManureManagementPen
+        pen : ManureManagerPen
             A ManureManagementPen object to be processed.
 
         Returns
@@ -114,7 +114,7 @@ class ManureManagementOutputHandler:
             A dictionary of important pen attributes that is properly formatted to be converted to dataframe.
 
         """
-        prefix = self.HEADER_PREFIXES.get(ManureManagementPen, '')
+        prefix = self.HEADER_PREFIXES.get(ManureManagerPen, '')
         pen_data = {
             'pen_id': [pen.id],
             'num_animals': [pen.num_animals],
@@ -320,7 +320,7 @@ class ManureManagementOutputHandler:
             The path of the csv output file.
 
         """
-        file_name = f'manure_management_output_{self._get_formatted_current_time()}'
+        file_name = f'manure_manager_output_{self._get_formatted_current_time()}'
         file_extension = '.csv'
         return self.get_csv_output_directory_path() / (file_name + file_extension)
 
