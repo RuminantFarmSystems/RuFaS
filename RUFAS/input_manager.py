@@ -53,7 +53,8 @@ class InputManager:
             raise e
 
     def _load_data(self) -> None:
-        """Loads data from JSON or CSV fileRaises
+        """
+        Loads data from JSON or CSV file.
 
         Raises
         ------
