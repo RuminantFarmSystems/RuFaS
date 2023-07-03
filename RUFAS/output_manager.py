@@ -194,15 +194,25 @@ class OutputManager(object):
         self._add_to_pool(self.errors_pool, key, msg, info_map)
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
-        """
+                """
         Produces the current system time as a timestamp string.
 
+        Parameters
+        ----------
+        include_millis : bool
+            If True, adds milliseconds to the timestamp.
+
+        Returns
+        -------
+        str
+            The current time's timestamp string in the form.
+
         Example
-        ------
-            >>> self._get_timestamp(include_millis=True)
-            28-Jun-2023_Wed_15-48-21.406585
-            >>> self._get_timestamp(include_millis=False)
-            28-Jun-2023_Wed_15-48-21
+        --------
+        >>> self._get_timestamp(include_millis=True)
+        28-Jun-2023_Wed_15-48-21.406585
+        >>> self._get_timestamp(include_millis=False)
+        28-Jun-2023_Wed_15-48-21
         """
         base_timestamp_str: str = "%d-%b-%Y_%a_%H-%M-%S"
         timestamp_format_string: str = f"{base_timestamp_str}.%f" if include_millis else base_timestamp_str
