@@ -124,7 +124,7 @@ class Schedule:
         -------
         bool
             True if the year is a leap year
-            
+
         """
         if year % 400 == 0:
             return True
