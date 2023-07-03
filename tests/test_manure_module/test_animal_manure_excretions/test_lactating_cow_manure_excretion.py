@@ -15,6 +15,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import methane_
     [
         (35.0, 5.0, 20.0, 15.0, "3-NOP", 70.0, -25.3169),
         (40.0, 4.0, 25.0, 18.0, "Monensin", 24.0, -7.40),
+        (40.0, 4.0, 25.0, 14.0, "Monensin", 24.0, -6.617),
         (45.0, 3.0, 30.0, 10.0, "Essential Oils", 80.0, 0.0),
         (50.0, 2.0, 35.0, 8.0, "Seaweed", 90.0, 0.0),
         (55.0, 1.0, 40.0, 6.0, "None", 70.0, 0.0)
