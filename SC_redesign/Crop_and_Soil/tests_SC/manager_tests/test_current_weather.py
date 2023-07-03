@@ -21,8 +21,8 @@ def test_determine_daylength(months: List[int], expected: List[int]):
                              (1, 2, 3, 4, 5, 6, 7, 10.5, 2018, 9, 10)
                          ])
 def test_check_current_weather(radiation: float, T_min: float, T_avg: float, T_max: float, T_avg_annual: float,
-                               irrigation: float, rainfall: float, latitude: float, year: int, day: int, month: int,
-                               mocker) -> None:
+                               irrigation: float, rainfall: float, latitude: float, year: int, day: int, month: int)\
+        -> None:
     """Tests that a weather object was successfully translated into a current weather object"""
 
     mocked_weather = MagicMock()
