@@ -11,9 +11,6 @@ from RUFAS.output_manager import OutputManager
 om = OutputManager()
 
 
-om = OutputManager()
-
-
 class InputManager:
     """
     Input Manager class responsible for loading, validating, and providing access to input data.
