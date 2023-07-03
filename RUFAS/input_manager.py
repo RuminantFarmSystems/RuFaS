@@ -63,8 +63,8 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data.__name__,
                     }
-        for key, value in data_files.items():
-            file_path = value[path_key]
+        for key, details in files_details.items():
+            file_path = details[path_key]
             try:
                 if value["type"] == "json":
                     with open(file_path) as json_file:
