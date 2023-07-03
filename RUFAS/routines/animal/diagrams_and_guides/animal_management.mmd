@@ -1,8 +1,8 @@
 %% Update as we go along
 classDiagram
-    AnimalManagement *-- AnimalGroupingScenario  : has
-    AnimalManagement *-- LifeCycleManager : has
-    AnimalManagement *-- Pen : has
+    AnimalManager *-- AnimalGroupingScenario  : has
+    AnimalManager *-- LifeCycleManager : has
+    AnimalManager *-- Pen : has
     Pen *-- AnimalBase : has
     AnimalBase <|-- Calf
 %%    AnimalBase <|-- HeiferI
@@ -18,7 +18,7 @@ classDiagram
         +find_animal_combination(self, animal: Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]) AnimalCombination
     }
 
-    class AnimalManagement {
+    class AnimalManager {
         +ANIMAL_GROUPING_SCENARIO$ : AnimalGroupingScenario
         +life_cycle_manager: LifeCycleManager
         +all_pens: List[Pen]

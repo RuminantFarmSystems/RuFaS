@@ -690,8 +690,9 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
                                  min_temp: float, max_temp: float, annual_mean_temp: float,
                                  transpiration: float) -> None:
     """Tests that all component processes and subroutines are correctly called in Field."""
-    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
-               return_value=crops_growing):
+    with patch.multiple("SC_redesign.Crop_and_Soil.crop.crop_data.CropData",
+                        is_mature=PropertyMock(return_value=not crops_growing),
+                        is_dormant=PropertyMock(return_value=not crops_growing)):
         field_data = FieldData(field_size=field_size, current_residue=residue)
         incorp = Field(field_data=field_data)
         crop_1 = Crop()

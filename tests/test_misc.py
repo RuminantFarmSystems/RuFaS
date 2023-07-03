@@ -14,7 +14,6 @@ import pytest
 from mock.mock import MagicMock
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
-from RUFAS.input_manager import InputManager
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -139,12 +138,12 @@ def test_advance_time(
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.classes.Time.to_str")
     mocker.patch("RUFAS.classes.Time.advance")
-    patch_simulation_engine.state.animal_management.simulation_day = 1
+    patch_simulation_engine.state.animal_manager.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
     assert patch_simulation_engine.time.advance.call_count == 2
     assert patch_simulation_engine.time.to_str.call_count == 1
-    assert patch_simulation_engine.state.animal_management.simulation_day == 3
+    assert patch_simulation_engine.state.animal_manager.simulation_day == 3
 
 
 def test_input_prompt():
@@ -1224,19 +1223,6 @@ def test_save_variables(
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
     ]
-
-
-@pytest.fixture
-def mock_input_manager(mocker) -> InputManager:
-    input_manager = InputManager()
-    return input_manager
-
-
-def test_input_manager_singleton(mocker: MockerFixture) -> None:
-    im1 = InputManager()
-    im2 = InputManager()
-
-    assert im1 is im2
 
 
 class DummyClass:
