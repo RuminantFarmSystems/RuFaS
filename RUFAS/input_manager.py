@@ -70,7 +70,7 @@ class InputManager:
                     with open(file_path) as json_file:
                         data = json.load(json_file)
                         self.__pool[key] = data
-                if value["type"] == "csv":
+                elif value["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
                         self.__pool[key] = list(data_reader)
