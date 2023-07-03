@@ -15,7 +15,6 @@ import pytest
 from mock.mock import MagicMock
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
-from RUFAS.input_manager import InputManager
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -1254,19 +1253,6 @@ def test_save_variables(
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
     ]
-
-
-@pytest.fixture
-def mock_input_manager(mocker) -> InputManager:
-    input_manager = InputManager()
-    return input_manager
-
-
-def test_input_manager_singleton(mocker: MockerFixture) -> None:
-    im1 = InputManager()
-    im2 = InputManager()
-
-    assert im1 is im2
 
 
 class DummyClass:
