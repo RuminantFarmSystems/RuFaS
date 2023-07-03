@@ -1,26 +1,26 @@
 {
     "pens_report": {
-        "produce_csv": true,
-        "produce_graphics": true,
+        "produce_csv": false,
+        "produce_graphics": false,
         "report_name": "pen_report",
         "ration_report": {
-            "produce_csv": true,
-            "produce_graphics": true,
+            "produce_csv": false,
+            "produce_graphics": false,
             "report_name": "ration_report",
             "ration_interval": 7
         },
         "manure_report": {
-            "produce_csv": true,
-            "produce_graphics": true,
+            "produce_csv": false,
+            "produce_graphics": false,
             "report_name": "manure_report"
         },
         "growth_report": {
-            "produce_csv": true,
-            "produce_graphics": true,
+            "produce_csv": false,
+            "produce_graphics": false,
             "report_name": "growth_report"
         },
         "pens_summary": {
-            "produce_csv": true,
+            "produce_csv": false,
             "produce_graphics": false,
             "report_name": "pens_summary"
         }

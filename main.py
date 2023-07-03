@@ -42,7 +42,7 @@ def run_rufas(
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
     file_list = obtain_file_list(input_path, verbose)
-    execute_simulations_from_files(file_list, exclude_info_maps)
+    execute_simulations_from_files(file_list, input_path, exclude_info_maps)
 
 
 def set_global_variables(make_graphs: bool, verbose: bool) -> None:
@@ -54,7 +54,7 @@ def set_global_variables(make_graphs: bool, verbose: bool) -> None:
 
 
 def execute_simulations_from_files(
-    files: List[Path], exclude_info_maps: bool = True
+    files: List[Path], input_path, exclude_info_maps: bool = True
 ) -> None:
     """Execute simulations for each file"""
     output_manager = OutputManager()
@@ -64,7 +64,7 @@ def execute_simulations_from_files(
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
         output_manager.save_variables(r"output", r"input/output_filters/", exclude_info_maps)
-        output_manager.dump_all_pools(r"output", exclude_info_maps)
+        output_manager.dump_all_pools(r"output", input_path, exclude_info_maps)
 
 
 def parse_gnu_args():

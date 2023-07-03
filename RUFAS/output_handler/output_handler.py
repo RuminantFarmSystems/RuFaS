@@ -71,10 +71,10 @@ class OutputHandler:
         base_graphic_dir = Utility.get_base_dir() / graphic_dir
 
         # Delete directory if previously exists
-        if base_csv_dir.exists():
-            shutil.rmtree(base_csv_dir)
-        if base_graphic_dir.exists():
-            shutil.rmtree(base_graphic_dir)
+        # if base_csv_dir.exists():
+        #     shutil.rmtree(base_csv_dir)
+        # if base_graphic_dir.exists():
+        #     shutil.rmtree(base_graphic_dir)
 
         base_csv_dir.mkdir(exist_ok=True, parents=False)
         base_graphic_dir.mkdir(exist_ok=True, parents=False)
