@@ -15,7 +15,7 @@ from typing import Any, Dict
 class PensReport(BaseReportDriver):
     def __init__(self, data: Dict[Any, Any], state) -> None:
         super().__init__(data)
-        for pen in state.animal_management.all_pens:
+        for pen in state.animal_manager.all_pens:
             self.reports[f'pen_{pen.id}'] = PenReport(data, state.feed, pen.id)
 
         self.reports['pens_summary'] = PensSummary(data['pens_summary'])
@@ -52,9 +52,9 @@ class PenReport(BaseReportDriver):
             self.pen_id = pen_id
 
         def daily_update(self, state, weather, time) -> None:
-            animal_management = state.animal_management
+            animal_manager = state.animal_manager
             feed = state.feed
-            pen = state.animal_management.all_pens[self.pen_id]
+            pen = state.animal_manager.all_pens[self.pen_id]
 
             for variable in self.daily_variables:
                 # index 2 is the accumulator for the evauated variables
@@ -63,9 +63,9 @@ class PenReport(BaseReportDriver):
                     eval(self.daily_variables[variable][0], globals(), locals()))
 
         def annual_update(self, state, weather, time) -> None:
-            animal_management = state.animal_management
+            animal_manager = state.animal_manager
             feed = state.feed
-            pen = state.animal_management.all_pens[self.pen_id]
+            pen = state.animal_manager.all_pens[self.pen_id]
 
             for variable in self.annual_variables:
                 # index 2 is the accumulator for the evauated variables

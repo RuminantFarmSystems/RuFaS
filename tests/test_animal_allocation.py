@@ -6,14 +6,14 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.routines import AnimalManagement
+from RUFAS.routines import AnimalManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 
 
 def test_get_dry_cows(mocker: MockerFixture) -> None:
-    """Unit test for function _get_dry_cows in file animal_management.py"""
+    """Unit test for function _get_dry_cows in file animal_manager.py"""
     # Arrange
     num_cows = 10
     num_dry_cows = 5
@@ -24,7 +24,7 @@ def test_get_dry_cows(mocker: MockerFixture) -> None:
         cows.append(cow)
 
     # Act
-    dry_cows = AnimalManagement._get_dry_cows(cows)
+    dry_cows = AnimalManager._get_dry_cows(cows)
 
     # Assert
     assert len(dry_cows) == num_dry_cows
@@ -33,7 +33,7 @@ def test_get_dry_cows(mocker: MockerFixture) -> None:
 
 
 def test_get_lactating_cows(mocker: MockerFixture) -> None:
-    """Unit test for function _get_lactating_cows in file animal_management.py"""
+    """Unit test for function _get_lactating_cows in file animal_manager.py"""
     # Arrange
     num_cows = 10
     num_lactating_cows = 5
@@ -44,7 +44,7 @@ def test_get_lactating_cows(mocker: MockerFixture) -> None:
         cows.append(cow)
 
     # Act
-    lactating_cows = AnimalManagement._get_lactating_cows(cows)
+    lactating_cows = AnimalManager._get_lactating_cows(cows)
 
     # Assert
     assert len(lactating_cows) == num_lactating_cows
@@ -53,7 +53,7 @@ def test_get_lactating_cows(mocker: MockerFixture) -> None:
 
 
 def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
-    """Unit test for function group_pens_by_animal_combination in file routines/animal/animal_management.py"""
+    """Unit test for function group_pens_by_animal_combination in file routines/animal/animal_manager.py"""
     # Arrange
     pens: List[Pen] = []
     animal_combinations = [
@@ -73,7 +73,7 @@ def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
         pens.append(pen)
 
     # Act
-    pen_groups = AnimalManagement._group_pens_by_animal_combination(pens)
+    pen_groups = AnimalManager._group_pens_by_animal_combination(pens)
 
     # Assert
     assert len(pen_groups) == num_groups
@@ -99,21 +99,21 @@ def test_calc_max_animal_spaces_per_pen(num_stalls: int,
                                         max_stocking_density: float,
                                         expected_max_animal_spaces: int
                                         ) -> None:
-    """Unit test for function _calc_max_animal_spaces_per_pen() in file animal_management.py"""
+    """Unit test for function _calc_max_animal_spaces_per_pen() in file animal_manager.py"""
 
     if num_stalls < 0 or max_stocking_density < 0:
         with pytest.raises(ValueError):
-            AnimalManagement._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+            AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
     else:
         # Act
-        max_animal_spaces = AnimalManagement._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
+        max_animal_spaces = AnimalManager._calc_max_animal_spaces_per_pen(num_stalls, max_stocking_density)
 
         # Assert
         assert max_animal_spaces == expected_max_animal_spaces
 
 
 def test_calc_animal_space_shortage(mocker: MockerFixture) -> None:
-    """Unit test for function _calc_animal_space_shortage() in file animal_management.py"""
+    """Unit test for function _calc_animal_space_shortage() in file animal_manager.py"""
     # Arrange
     num_animals = 70
     num_pens = 10
@@ -127,14 +127,14 @@ def test_calc_animal_space_shortage(mocker: MockerFixture) -> None:
         pen.max_stocking_density = max_stocking_density_per_pen
         pens.append(pen)
     patch_for_calc_max_animal_spaces_per_pen = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         '_calc_max_animal_spaces_per_pen',
         return_value=max_animal_spaces_per_pen
     )
     expected_shortage = num_animals - num_pens * max_animal_spaces_per_pen
 
     # Act
-    shortage = AnimalManagement._calc_animal_space_shortage(num_animals, pens)
+    shortage = AnimalManager._calc_animal_space_shortage(num_animals, pens)
 
     # Assert
     assert shortage == expected_shortage
@@ -155,7 +155,7 @@ def test_calc_animal_space_shortage(mocker: MockerFixture) -> None:
 )
 def test_create_default_pen(animal_combination: Pen.AnimalCombination,
                             mocker: MockerFixture) -> None:
-    """Unit test for function _create_default_pen() in file animal_management.py"""
+    """Unit test for function _create_default_pen() in file animal_manager.py"""
     # Arrange
     num_stalls = 10
     max_stocking_density = 1.2
@@ -163,12 +163,12 @@ def test_create_default_pen(animal_combination: Pen.AnimalCombination,
 
     mock_pen = mocker.MagicMock(spec=Pen)
     patch_for_pen_init = mocker.patch(
-        'RUFAS.routines.animal.animal_management.Pen',
+        'RUFAS.routines.animal.animal_manager.Pen',
         return_value=mock_pen
     )
 
     # Act
-    pen = AnimalManagement._create_default_pen(
+    pen = AnimalManager._create_default_pen(
         pen_id=pen_id,
         animal_combination=animal_combination,
         num_stalls=num_stalls,
@@ -204,21 +204,21 @@ def test_create_default_pen(animal_combination: Pen.AnimalCombination,
 )
 def test_create_default_pens_for_potential_space_shortage(animal_combination: Pen.AnimalCombination,
                                                           mocker: MockerFixture) -> None:
-    """Unit test for function _create_default_pens_for_potential_space_shortage() in file animal_management.py"""
+    """Unit test for function _create_default_pens_for_potential_space_shortage() in file animal_manager.py"""
     # Arrange
     num_animals = 100
     mock_pens = mocker.MagicMock(spec=List[Pen])
     space_shortage = 24
     patch_for_calc_animal_space_shortage = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         '_calc_animal_space_shortage',
         return_value=space_shortage
     )
     num_stalls_per_pen = 5
     max_stocking_density_per_pen = 1.2
 
-    num_stalls_per_pen_before = AnimalManagement.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
-    AnimalManagement.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination] = num_stalls_per_pen
+    num_stalls_per_pen_before = AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination]
+    AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination] = num_stalls_per_pen
     max_stocking_density_per_pen_before = AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY
     AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY = max_stocking_density_per_pen
 
@@ -229,22 +229,22 @@ def test_create_default_pens_for_potential_space_shortage(animal_combination: Pe
         new_default_pen = mocker.MagicMock(spec=Pen)
         mock_new_default_pens.append(new_default_pen)
     patch_for_create_default_pen = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         '_create_default_pen',
         side_effect=mock_new_default_pens
     )
 
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__',
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__',
                  return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(),
-                                         config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(),
-                                         weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock()
-                                         )
+    animal_manager = AnimalManager(data=mocker.MagicMock(),
+                                      config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(),
+                                      weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock()
+                                      )
 
     # Act
-    new_default_pens = animal_management._create_default_pens_for_potential_space_shortage(
+    new_default_pens = animal_manager._create_default_pens_for_potential_space_shortage(
         num_animals=num_animals,
         pens=mock_pens,
         animal_combination=animal_combination,
@@ -270,7 +270,7 @@ def test_create_default_pens_for_potential_space_shortage(animal_combination: Pe
     )
 
     # Clean up
-    AnimalManagement.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination] = num_stalls_per_pen_before
+    AnimalManager.DEFAULT_NUM_STALLS_BY_COMBINATION[animal_combination] = num_stalls_per_pen_before
     AnimalModuleConstants.DEFAULT_MAX_STOCKING_DENSITY = max_stocking_density_per_pen_before
 
 
@@ -287,14 +287,14 @@ def test_create_default_pens_for_potential_space_shortage(animal_combination: Pe
     ]
 )
 def test_calc_density(num_animals: int, num_spaces: int) -> None:
-    """Unit test for _calc_density() in animal_management.py"""
+    """Unit test for _calc_density() in animal_manager.py"""
     if num_animals < 0 or num_spaces <= 0:
         # Act and Assert
         with pytest.raises(ValueError):
-            AnimalManagement._calc_density(num_animals, num_spaces)
+            AnimalManager._calc_density(num_animals, num_spaces)
     else:
         # Act
-        density = AnimalManagement._calc_density(num_animals, num_spaces)
+        density = AnimalManager._calc_density(num_animals, num_spaces)
 
         # Assert
         assert density == approx(num_animals / num_spaces)
@@ -317,7 +317,7 @@ def test_plan_animal_allocation(num_animals: int,
     # Arrange
 
     # Act
-    allocation_result = AnimalManagement.plan_animal_allocation(num_animals, max_spaces_in_pens)
+    allocation_result = AnimalManager.plan_animal_allocation(num_animals, max_spaces_in_pens)
 
     # Assert
     assert allocation_result == expected_allocation
@@ -348,7 +348,7 @@ def test_execute_allocation_plan(num_animals: int, allocation_plan: List[int],
         mock_pens.append(pen)
 
     # Act
-    AnimalManagement.execute_allocation_plan(
+    AnimalManager.execute_allocation_plan(
         allocation_plan=allocation_plan,
         animals=animals,
         animal_pens=mock_pens
@@ -374,14 +374,14 @@ def test_execute_allocation_plan_error_cases(allocation_plan: List[int],
                                              num_animals: int,
                                              num_pens: int,
                                              mocker: MockerFixture) -> None:
-    """Unit test for function execute_allocation_plan() in file animal_management.py."""
+    """Unit test for function execute_allocation_plan() in file animal_manager.py."""
     # Arrange
     mock_animals = [mocker.MagicMock() for _ in range(num_animals)]
     mock_pens = [mocker.MagicMock() for _ in range(num_pens)]
 
     # Act and Assert
     with pytest.raises(ValueError):
-        AnimalManagement.execute_allocation_plan(
+        AnimalManager.execute_allocation_plan(
             allocation_plan=allocation_plan,
             animals=mock_animals,
             animal_pens=mock_pens
@@ -412,23 +412,23 @@ def test_allocate_animals_to_pens_helper(num_animals: int,
         mock_pens.append(mock_pen)
     max_animal_spaces = int(num_stalls_per_pen * max_stocking_density_per_pen)
     patch_for_calc_max_animal_spaces_per_pen = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         '_calc_max_animal_spaces_per_pen',
         return_value=max_animal_spaces
     )
     dummy_allocation_plan = [-1] * num_pens
     patch_for_plan_animal_allocation = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         'plan_animal_allocation',
         return_value=dummy_allocation_plan
     )
     patch_for_execute_allocation_plan = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         'execute_allocation_plan'
     )
 
     # Act
-    AnimalManagement._allocate_animals_to_pens_helper(
+    AnimalManager._allocate_animals_to_pens_helper(
         animals=mock_animals,
         pens=mock_pens
     )
@@ -447,7 +447,7 @@ def test_allocate_animals_to_pens_helper(num_animals: int,
 
 
 def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
-    """Unit test for function allocate_animals_to_pens() in file animal_management.py."""
+    """Unit test for function allocate_animals_to_pens() in file animal_manager.py."""
     mock_pens = []
     pens_by_animal_combination = {}
     num_calves = 20
@@ -475,62 +475,62 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         mock_pens.append(mock_pen)
         pens_by_animal_combination[animal_combination] = [mock_pen]
     patch_for_group_pens_by_animal_combination = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement._group_pens_by_animal_combination',
+        'RUFAS.routines.animal.animal_manager.AnimalManager._group_pens_by_animal_combination',
         return_value=pens_by_animal_combination
     )
 
     patch_for_get_dry_cows = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement._get_dry_cows',
+        'RUFAS.routines.animal.animal_manager.AnimalManager._get_dry_cows',
         return_value=dry_cows
     )
     patch_for_get_lactating_cows = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement._get_lactating_cows',
+        'RUFAS.routines.animal.animal_manager.AnimalManager._get_lactating_cows',
         return_value=lac_cows
     )
 
     num_new_default_pens = 10
     dummy_new_default_pens = [mocker.MagicMock() for _ in range(num_new_default_pens)]
     mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement'
+        'RUFAS.routines.animal.animal_manager.AnimalManager'
         '._create_default_pens_for_potential_space_shortage',
         return_value=dummy_new_default_pens
     )
     patch_for_allocate_animals_to_pens_helper = mocker.patch.object(
-        AnimalManagement,
+        AnimalManager,
         '_allocate_animals_to_pens_helper',
         return_value=None
     )
     patch_for_fully_update_animal_to_pen_id_map = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_animal_to_pen_id_map',
+        'RUFAS.routines.animal.animal_manager.AnimalManager.fully_update_animal_to_pen_id_map',
         return_value=None
     )
     mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement.__init__',
+        'RUFAS.routines.animal.animal_manager.AnimalManager.__init__',
         return_value=None
     )
-    animal_management = AnimalManagement(
+    animal_manager = AnimalManager(
         data=mocker.MagicMock(),
         config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
     )
-    animal_management.calves = calves
-    animal_management.heiferIs = heiferIs
-    animal_management.heiferIIs = heiferIIs
-    animal_management.heiferIIIs = heiferIIIs
-    animal_management.cows = cows
-    animal_management.all_pens = mock_pens
+    animal_manager.calves = calves
+    animal_manager.heiferIs = heiferIs
+    animal_manager.heiferIIs = heiferIIs
+    animal_manager.heiferIIIs = heiferIIIs
+    animal_manager.cows = cows
+    animal_manager.all_pens = mock_pens
 
     # Act
-    animal_management.allocate_animals_to_pens()
+    animal_manager.allocate_animals_to_pens()
 
     # Assert
     patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)
     patch_for_get_dry_cows.assert_called_once_with(cows)
     patch_for_get_lactating_cows.assert_called_once_with(cows)
 
-    assert animal_management.all_pens[-(num_new_default_pens * len(animals_by_combination)):] == \
+    assert animal_manager.all_pens[-(num_new_default_pens * len(animals_by_combination)):] == \
            dummy_new_default_pens * len(animals_by_combination)
     for animal_combination in animals_by_combination:
         assert pens_by_animal_combination[animal_combination][-num_new_default_pens:] == dummy_new_default_pens
