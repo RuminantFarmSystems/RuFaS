@@ -260,7 +260,7 @@ def json_populater_duplicate(params, problem_x, json_to_modify, json_to_print, )
             This is because the json is opened and replaced
     """
     # begin with default values
-    file = open(json_to_modify)
+    file = open('input/'+json_to_modify)
     json_object = json.load(file)
     file.close()
     potential_inputs = find_json_terminal_variables1(json_object)
@@ -516,7 +516,7 @@ def rewrite_sobol_analysis(analysis, p):
 
 
 
-def anim_manag_modifier(anim_manag_tomodify, json_to_print, lifecyclereport_tomodify):
+def anim_manag_modifier(inputJSONs_to_modify, s):
     """
     This function will modify the animal_management.json file
     It takes the json_to_print argument as the new value "inside" the json for where to look for the animal_management_animal.json
@@ -532,20 +532,26 @@ def anim_manag_modifier(anim_manag_tomodify, json_to_print, lifecyclereport_tomo
     """
     import os
     import json
+    
+    
     file = open(os.getcwd() + '\\input\\animal_management.json')
     json_object = json.load(file)
     file.close()
-    
 
-    cutoff = json_to_print.rfind('\\')
-    jsonname = json_to_print[cutoff+1:]
-
-    json_object['farm']['animal'] = jsonname
-
-    cutoff2 = lifecyclereport_tomodify.rfind('\\')
-    LCname = lifecyclereport_tomodify[cutoff2+1:]
-
-    json_object['output'] = LCname
+    for inputJSON in inputJSONs_to_modify:
+        json_to_print = inputJSON[:-5] + '_' +  str(s).zfill(5) + '.json'
+        cutoff = json_to_print.find('/')
+        jsonname = json_to_print[cutoff+1:]
+        if inputJSON == 'animal/animal_management_animal.json':
+            json_object['farm']['animal'] = jsonname
+        elif jsonname == 'feed/purchased_feed.json':
+            json_object['farm']['feed'] = jsonname
+        elif jsonname == 'manure/manure_management.json':
+            json_object['farm']['manure'] = jsonname
+        else:
+            pass
+    json_object['output'] = 'life_cycle_report_' + str(s).zfill(5) + '.json'
+    anim_manag_tomodify = str(os.getcwd() + '\input\\' + 'animal_management' + '_' +  str(s).zfill(5) + '.json')
 
     file = open(anim_manag_tomodify, 'w')
     json.dump(json_object, file, indent=4) # remove , indent=4 if causes problems!

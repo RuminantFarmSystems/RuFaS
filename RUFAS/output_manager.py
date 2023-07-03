@@ -460,7 +460,7 @@ class OutputManager(object):
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
             self._dict_to_file_json(filtered_pool, file_path)
 
-    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_variables(self, path: str, input_path_num, exclude_info_maps: bool = False) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
 
@@ -477,7 +477,7 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        file_path = os.path.join(path, self._generate_file_name(str(input_path_num), "json"))
         self._dict_to_file_json(pool, file_path)
 
     def dump_logs(self, path: str) -> None:
@@ -576,11 +576,12 @@ class OutputManager(object):
         )
         self._list_to_file_txt(var_list, file_path)
 
-    def dump_all_pools(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_all_pools(self, path: str, input_path, exclude_info_maps: bool = False) -> None:
         """
         dumps all pool into the given path to a directory.
         """
-        self.dump_variables(path, exclude_info_maps)
+        input_path_num = input_path[-10:-5]
+        self.dump_variables(path, input_path_num, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)

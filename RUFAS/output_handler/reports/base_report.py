@@ -140,8 +140,9 @@ class BaseReport:
             self.annual_variables[variable][2] = 0
 
     def produce_report_graphics(self):
-        graphics.annual_graphics(self)
-        graphics.daily_graphics(self)
+        #graphics.annual_graphics(self)
+        #graphics.daily_graphics(self)
+        pass
 
     def finalize(self, state, weather, time):
         pass
