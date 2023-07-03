@@ -73,17 +73,22 @@ class InputManager:
                     }
         for key, details in files_details.items():
             file_path = details[path_key]
+            om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
             try:
                 if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
+                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
+                                   info_map)
                         self.__pool[key] = data
                 elif details["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
+                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
+                                   info_map)
                         self.__pool[key] = list(data_reader)
                 else:
-                    om.add_warning("InputManager load data file is not csv/json", f"File for {key} data was not a csv"
-                                   f" nor json file and was not added to data pool", info_map)
+                    om.add_warning("InputManager load data file is not csv/json", f"File for {key} data in path"
+                                   f" {file_path} was not a csv nor json file and was not added to data pool", info_map)
             except Exception as e:
                 raise e
