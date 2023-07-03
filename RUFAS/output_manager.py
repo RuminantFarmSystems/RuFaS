@@ -194,7 +194,7 @@ class OutputManager(object):
         self._add_to_pool(self.errors_pool, key, msg, info_map)
 
     def _get_timestamp(self, include_millis: bool = False) -> str:
-                """
+        """
         Produces the current system time as a timestamp string.
 
         Parameters
@@ -205,7 +205,7 @@ class OutputManager(object):
         Returns
         -------
         str
-            The current time's timestamp string in the form.
+            The current time's timestamp string.
 
         Example
         --------
