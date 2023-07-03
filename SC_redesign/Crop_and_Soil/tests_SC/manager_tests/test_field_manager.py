@@ -83,6 +83,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
+    setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
     setattr(mocked_weather, "radiation", 3)
     setattr(mocked_weather, "T_min", 3)
