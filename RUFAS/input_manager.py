@@ -22,7 +22,7 @@ class InputManager:
 
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
-        Loads metadata from json file to IM metadata object
+        Loads metadata from json file to IM metadata dict.
 
         Parameters
         ----------
