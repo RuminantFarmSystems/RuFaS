@@ -7,7 +7,7 @@ from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
-class ManureManagementPen:
+class ManureManagerPen:
     """
     A modified version of the Pen class in the animal module. This class extracts
     some relevant information from the  original Pen class and then adds some

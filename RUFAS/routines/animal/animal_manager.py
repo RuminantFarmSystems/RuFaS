@@ -1,11 +1,11 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: animal_management.py
+File name: animal_manager.py
 
 Description: The class which manages all of the animal routines and keeps track of
     all animals and pens. All operations are as described in the Animal Module
     Information Flow document on Basecamp (such as daily animal updates and
-    pen allocation). Method calls cascade through from the animal management
+    pen allocation). Method calls cascade through from the animal manager
     class to pen to each individual animal in that pen. The life cycle of each animal
     is controlled by an instance of the LifeCycleManager class, and this instance
     updates the animals daily.
@@ -48,24 +48,24 @@ from typing import Any, Dict, Tuple, List
 om = OutputManager()
 
 
-def daily_animal_routine(animal_management, feed, weather, time):
+def daily_animal_routine(animal_manager, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
-    in the simulation and calls @animal_management's daily_updates() method
+    in the simulation and calls @animal_manager's daily_updates() method
     with @feed and @time as arguments. [Note that currently, @weather and
     @ time are not used in animal updates.]
 
     Args:
-        animal_management: instance of the AnimalManagement class
+        animal_manager: instance of the AnimalManager class
         feed: instance of the Feed class
         weather: instance of the Weather class as defined in classes.py
         time: instance of the Time class as defined in classes.py
     """
 
-    animal_management.daily_updates2(feed, weather, time)
+    animal_manager.daily_updates2(feed, weather, time)
 
 
-class AnimalManagement:
+class AnimalManager:
     """
     Manages all animal routines (i.e. calling daily updates, allocating animals
     to pens, etc). Stores a list of all animals and pens in the simulation as
@@ -623,9 +623,9 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> AnimalManagement._calc_max_animal_spaces_per_pen(num_stalls=10, max_stocking_density=1.5)
+        >>> AnimalManager._calc_max_animal_spaces_per_pen(num_stalls=10, max_stocking_density=1.5)
         15
-        >>> AnimalManagement._calc_max_animal_spaces_per_pen(num_stalls=5, max_stocking_density=2.0)
+        >>> AnimalManager._calc_max_animal_spaces_per_pen(num_stalls=5, max_stocking_density=2.0)
         10
 
         """
@@ -686,7 +686,7 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> pen = AnimalManagement._create_default_pen(pen_id=1, \
+        >>> pen = AnimalManager._create_default_pen(pen_id=1, \
         animal_combination=Pen.AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
         >>> pen.id
         1
@@ -933,13 +933,13 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> AnimalManagement.plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManager.plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
         [45, 27, 18]
 
-        >>> AnimalManagement.plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManager.plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
         [35, 21, 14]
 
-        >>> AnimalManagement.plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManager.plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
         [22, 15, 10]
 
         """
@@ -1093,7 +1093,7 @@ class AnimalManagement:
         Parameters
         ----------
         cows: List
-            the list of cows in the animal management class
+            the list of cows in the animal manager class
 
         Returns
         -------
