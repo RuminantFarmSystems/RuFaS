@@ -111,14 +111,20 @@ class Schedule:
         return True
 
     @staticmethod
-    def is_leap_year(year):
+    def is_leap_year(year: int) -> bool:
         """
-        Description:
-            Helper method determines if the given year is a leap year
-        Args:
-            year: an int of the year
-        Returns:
-            bool: True if the year is a leap year
+        Determines if the given year is a leap year.
+
+        Parameters
+        ----------
+        year: int
+            A calendar year.
+
+        Returns
+        -------
+        bool
+            True if the year is a leap year
+            
         """
         if year % 400 == 0:
             return True
