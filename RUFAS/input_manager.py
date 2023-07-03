@@ -53,7 +53,8 @@ class InputManager:
             raise e
 
     def _load_data(self) -> None:
-        """Loads data from JSON or CSV fileRaises
+        """
+        Loads data from JSON or CSV file.
 
         Raises
         ------
@@ -74,15 +75,15 @@ class InputManager:
                 if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
+                        self.__pool[key] = data
                         om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
                                    info_map)
-                        self.__pool[key] = data
                 elif details["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
+                        self.__pool[key] = list(data_reader)
                         om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
                                    info_map)
-                        self.__pool[key] = list(data_reader)
                 else:
                     om.add_warning("InputManager load data file is not csv/json", f"File for {key} data in path"
                                    f" {file_path} was not a csv nor json file and was not added to data pool", info_map)

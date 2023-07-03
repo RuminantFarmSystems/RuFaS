@@ -89,8 +89,14 @@ def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manage
     }
 
     with patch("builtins.open", mock_open(read_data="key_and_value")):
-        mock_input_manager._load_data()
-    assert mock_input_manager._InputManager__pool == {}
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            mock_input_manager._load_data()
+        assert mock_input_manager._InputManager__pool == {}
+        add_warning.assert_called_once_with(
+            "InputManager load data file is not csv/json",
+            "File for dummy_data_file data in path dummy_data.txt was not a csv nor json file and was not added to data pool",
+            {"class": "InputManager", "function": "_load_data"}
+            )
 
 
 def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
