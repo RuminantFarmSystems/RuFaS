@@ -1,7 +1,11 @@
 # !/usr/bin/env python3
 
 import json
+from RUFAS.output_manager import OutputManager
 from typing import Any, Dict
+
+
+om = OutputManager()
 
 
 class InputManager:
@@ -35,9 +39,13 @@ class InputManager:
             If an error occurs while opening or reading the metadata_path file.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_metadata.__name__,
+                    }
+        om.add_log("load_metadata_attempt", f"Attempting to load metadata from {metadata_path}.", info_map)
         try:
             with open(metadata_path) as metadata_file:
                 self.__metadata = json.load(metadata_file)
-
+                om.add_log("load_metadata_success", f"Successfully loaded metadata from {metadata_path}", info_map)
         except Exception as e:
             raise e
