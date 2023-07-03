@@ -1,5 +1,6 @@
 from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
 from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
 from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
@@ -52,6 +53,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     mocked_time = MagicMock(Time)
     mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "calendar_year", 1998)
+    setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
     setattr(mocked_weather, "radiation", 3)
     setattr(mocked_weather, "T_min", 3)
@@ -60,11 +62,12 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "T_avg_annual", 3)
     setattr(mocked_weather, "rainfall", 3)
     setattr(mocked_weather, "irrigation", 3)
-    fm = FieldManager([])
+    fm = FieldManager({})
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
     fm.output_gatherer.send_daily_variables = MagicMock()
+    FieldManager._create_current_weather = MagicMock(return_value=CurrentWeather())
     fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
     for field in fields:
         assert field.manage_field.call_count == 1
@@ -80,7 +83,7 @@ def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    fm = FieldManager([])
+    fm = FieldManager({})
     fm.fields = fields
     fm.output_gatherer.send_annual_variables = MagicMock()
     fm.annual_update_routine()
