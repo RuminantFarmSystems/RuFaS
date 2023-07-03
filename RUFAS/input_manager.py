@@ -58,8 +58,7 @@ class InputManager:
             If an error occurs while opening or reading a data file.
 
         """
-        metadata_files_key = "files"
-        data_files = self.__metadata[metadata_files_key]
+        files_details = self.__metadata["files"]
         path_key = "path"
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data.__name__,
