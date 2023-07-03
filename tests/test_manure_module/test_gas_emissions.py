@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import math
 
 import pytest
 from pytest_mock import MockerFixture
+from pytest import approx
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
@@ -86,28 +89,35 @@ def test_calc_ambient_temp(mocker: MockerFixture) -> None:
     assert actual == expected
 
 
-@pytest.mark.parametrize('ambient_temp', [temp for temp in range(-40, 40, 10)])
-def test_calc_carbon_dioxide_housing_emission(ambient_temp: float, mocker: MockerFixture) -> None:
-    """Tests calc_carbon_dioxide_housing_emission() in gas_emissions.py."""
+@pytest.mark.parametrize(
+    'num_animals, barn_area, barn_temp, expected, error_message',
+    [
+        (10, 100.0, 25.0, 10 * (0.0065 + 0.0192 * 25.0) * 100.0 / 1000, None),  # Standard case
+        (0, 100.0, 25.0, 0, None),  # Edge case: no animals
+        (10, 0.0, 25.0, 0, None),  # Edge case: no area
+        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
+        (-1, 100.0, 25.0, ValueError, 'Number of animals must be greater than or equal to 0.'),
+        # Exception case: negative number of animals
+        (10, -100.0, 25.0, ValueError, 'Barn area must be greater than or equal to 0.'),
+        # Exception case: negative barn area
+    ]
+)
+def test_calc_housing_carbon_dioxide_emission(num_animals: int, barn_area: float, barn_temp: float,
+                                              expected: float | Exception, error_message: str | None) -> None:
+    """
+    Unit test for calc_housing_carbon_dioxide_emission() method in gas_emissions.py.
 
-    # Arrange
-    num_animals = 100
-    barn_area = 50.0
-    hours = 10
-    t_min = 20.0
-    t_max = 30.0
-    patch_for_calc_ambient_temp = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ambient_temp',
-        return_value=ambient_temp,
-    )
-    expected = num_animals * max(0.0, 0.0065 + 0.0192 * max(-5.0, 0.63 * ambient_temp + 6.0)) * barn_area / 1000
+    This test verifies that the method correctly calculates the carbon dioxide housing emissions
+    given the number of animals, the barn area, and the current barn temperature.
 
-    # Act
-    actual = GasEmissions.calc_carbon_dioxide_housing_emission(num_animals, barn_area, hours, t_min, t_max)
-
-    # Assert
-    patch_for_calc_ambient_temp.assert_called_once_with(hours, t_min, t_max)
-    assert actual == expected
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+    else:
+        actual = GasEmissions.calc_housing_carbon_dioxide_emission(num_animals, barn_area, barn_temp)
+        assert actual == pytest.approx(expected)
 
 
 @pytest.mark.parametrize('sign_of_RMQ', [-1, 1])
@@ -129,14 +139,14 @@ def test_calc_ammonia_emission(sign_of_RMQ: int, mocker: MockerFixture) -> None:
     hsc = 200.0
     r = sign_of_RMQ * 42.0
     patch_for_calc_r_barn = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_barn_resistance',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_ammonia_barn_resistance',
         return_value=r,
     )
     p = ManureConstants.MANURE_DENSITY
     pH = 7.5
     Q = 2.0
     patch_for_calc_Q = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Q',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_equilibrium_coefficient',
         return_value=Q,
     )
     M = manure_urine / barn_area
@@ -165,7 +175,7 @@ def test_calc_barn_resistance() -> None:
     expected = hsc * (1 - 0.027 * (20.0 - tempC))
 
     # Act
-    actual = GasEmissions._calc_barn_resistance(tempC)
+    actual = GasEmissions._calc_ammonia_barn_resistance(tempC)
 
     # Assert
     assert actual == expected
@@ -179,7 +189,7 @@ def test_calc_Kh() -> None:
     expected = 10 ** (1478 / tempK - 1.69)
 
     # Act
-    actual = GasEmissions._calc_Kh(tempK)
+    actual = GasEmissions._calc_henry_law_coefficient_of_ammonia(tempK)
 
     # Assert
     assert actual == expected
@@ -194,7 +204,7 @@ def test_calc_Ka() -> None:
     expected = 1 + 10 ** (0.09018 + 2729.9 / tempK - pH)
 
     # Act
-    actual = GasEmissions._calc_Ka(tempK, pH)
+    actual = GasEmissions._calc_dissociation_coefficient_of_ammonium(tempK, pH)
 
     # Assert
     assert actual == expected
@@ -208,18 +218,18 @@ def test_calc_Q(mocker: MockerFixture) -> None:
     pH = 9.0
     Kh = 10.0
     patch_for_calc_Kh = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Kh',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_henry_law_coefficient_of_ammonia',
         return_value=Kh,
     )
     Ka = 20.0
     patch_for_calc_Ka = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_Ka',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_dissociation_coefficient_of_ammonium',
         return_value=Ka,
     )
     expected = Kh * Ka
 
     # Act
-    actual = GasEmissions._calc_Q(tempK, pH)
+    actual = GasEmissions._calc_equilibrium_coefficient(tempK, pH)
 
     # Assert
     assert actual == expected
@@ -280,33 +290,86 @@ def test_calc_methane_emission_for_anaerobic_lagoon() -> None:
 
     # Arrange
     manure_volatile_solids = 10.0
-    expected = (manure_volatile_solids * GasEmissionConstants.Bo *
-                GasEmissionConstants.MCF * GasEmissionConstants.MS * GasEmissionConstants.METHANE_FACTOR)
+    expected = (manure_volatile_solids
+                * GasEmissionConstants.Bo
+                * GasEmissionConstants.METHANE_CONVERSION_FACTOR
+                * GasEmissionConstants.FRACTION_OF_HANDLED_MANURE
+                * GasEmissionConstants.METHANE_FACTOR)
 
     # Act
-    actual = GasEmissions.calc_methane_emission_for_anaerobic_lagoon(manure_volatile_solids)
+    actual = GasEmissions.calc_methane_emission_from_anaerobic_lagoon(manure_volatile_solids)
 
     # Assert
-    assert actual == expected
+    assert actual == approx(expected)
 
 
-def test_calc_housing_methane_emission() -> None:
+@pytest.mark.parametrize(
+    "num_animals, barn_area, barn_temp, expected, error_message",
+    [
+        (10, 100.0, 30.0, 10 * max(0.0, 0.13 * 30.0) * 100.0 / 1000, None),  # Standard case
+        (0, 100.0, 30.0, 0, None),  # Edge case: no animals
+        (10, 0.0, 30.0, 0, None),  # Edge case: no area
+        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
+        # Exception case: negative number of animals
+        (-1, 100.0, 30.0, ValueError, 'Number of animals must be greater than or equal to 0.'),
+        # Exception case: negative barn area
+        (10, -100.0, 30.0, ValueError, 'Barn area must be greater than or equal to 0.'),
+    ]
+)
+def test_calc_housing_methane_emission(num_animals: int, barn_area: float, barn_temp: float,
+                                       expected: float | Exception, error_message: str | None) -> None:
     """
-    Unit test for the calc_housing_methane_emission() method in the GasEmissions class.
+    Unit test for calc_housing_methane_emission() method in gas_emissions.py.
 
     This test verifies that the method correctly calculates the methane housing emissions
     given the number of animals, the barn area, and the current barn temperature.
 
     """
-    # Arrange
-    num_animals = 10
-    barn_area = 100.0
-    current_barn_temp = 30.0
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_housing_methane_emission(num_animals, barn_area, barn_temp)
+    else:
+        actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, barn_temp)
+        assert actual == pytest.approx(expected)
 
-    expected = num_animals * max(0.0, 0.13 * current_barn_temp) * barn_area / 1000
 
-    # Act
-    actual = GasEmissions.calc_housing_methane_emission(num_animals, barn_area, current_barn_temp)
+@pytest.mark.parametrize(
+    'num_animals, barn_area, urine_tan, urine, temp, pH, hsc, expected, error_message',
+    [
+        # Standard case
+        (10, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 2372.453635832584, None),
+        # Edge cases: Zero input values for num_animals, barn_area, urine_tan, urine
+        (0, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
+        (10, 0.0, 25.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
+        (10, 100.0, 0.0, 30.0, 20.0, 7.7, 260.0, 0.0, None),
+        (10, 100.0, 25.0, 0.0, 20.0, 7.7, 260.0, 0.0, None),
+        # Exception cases: Negative input values for num_animals, barn_area, urine_tan, urine
+        (-1, 100.0, 25.0, 30.0, 20.0, 7.7, 260.0, ValueError,
+         'Number of animals must be greater than or equal to 0.'),
+        (10, -100.0, 25.0, 30.0, 20.0, 7.7, 260.0, ValueError,
+         'Barn area must be greater than or equal to 0.'),
+        (10, 100.0, -25.0, 30.0, 20.0, 7.7, 260.0, ValueError,
+         'Urine total ammoniacal nitrogen must be greater than or equal to 0.'),
+        (10, 100.0, 25.0, -30.0, 20.0, 7.7, 260.0, ValueError,
+         'Urine must be greater than or equal to 0.'),
+    ]
+)
+def test_calc_housing_ammonia_emission(num_animals: int, barn_area: float, urine_tan: float, urine: float, temp: float,
+                                       pH: float, hsc: float, expected: float | Exception,
+                                       error_message: str | None) -> None:
+    """
+    Unit test for calc_housing_ammonia_emission() method in gas_emissions.py.
 
-    # Assert
-    assert actual == expected
+    This test verifies that the method correctly calculates the ammonia housing emissions
+    given the number of animals, the barn area, urine total ammoniacal nitrogen, urine, temperature,
+    pH and housing-specific constant.
+
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
+    else:
+        actual = GasEmissions.calc_housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
+        assert actual == pytest.approx(expected)
