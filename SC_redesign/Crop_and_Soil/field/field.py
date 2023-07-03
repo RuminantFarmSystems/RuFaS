@@ -152,9 +152,14 @@ class Field:
         -----
         This method is responsible for determining the exact amounts of fertilizer and nutrients added to the field,
         passing those amount to the FertilizerApplication module, and recording the fertilizer application to the
-        OutputManager.
+        OutputManager. Because potassium requests are still not accounted for when determining the amount of fertilizer
+        applied, the method checks that there is at least some nitrogen or phosphorus requested, if not it returns
+        without applying any fertilizer.
 
         """
+        if requested_nitrogen == requested_phosphorus == 0.0:
+            return
+
         try:
             fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:
@@ -738,7 +743,7 @@ class Field:
         self._cycle_water(current_weather)
 
         for crop in self.crops:
-            if not crop.data.in_growing_season:
+            if crop.data.is_mature or crop.data.is_dormant:
                 continue
 
             crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,

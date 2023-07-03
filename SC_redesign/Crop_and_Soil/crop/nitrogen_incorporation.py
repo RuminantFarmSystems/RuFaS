@@ -343,9 +343,16 @@ class NitrogenIncorporation:
 
             example: return of 1 means only the first layer is accessible (i.e., accessible_depths[:1]) and a return of
             2 means the first and second layers are accessible (i.e., accessible_depths[:2])
+
+        Notes:
+            This method assumes that if there are no roots, then none of the soil layers are accessible for nutrient
+            uptake by the crop.
+
         """
-        if root_depth <= 0:  # handle no roots
+        if root_depth < 0.0:
             raise ValueError("root_depth cannot be less than zero")
+        elif root_depth == 0.0:
+            return 0
         else:
             insert_position = bisect(layer_bounds, root_depth)
             deepest_layer = len(layer_bounds)
