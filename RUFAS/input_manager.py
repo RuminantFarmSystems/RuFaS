@@ -2,9 +2,8 @@
 
 import csv
 import json
-from typing import Any, Dict
-
 from RUFAS.output_manager import OutputManager
+from typing import Any, Dict
 
 
 om = OutputManager()
@@ -29,7 +28,7 @@ class InputManager:
 
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
-        Loads metadata from json file to IM metadata object
+        Loads metadata from json file to IM metadata dict.
 
         Parameters
         ----------
@@ -42,10 +41,14 @@ class InputManager:
             If an error occurs while opening or reading the metadata_path file.
 
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_metadata.__name__,
+                    }
+        om.add_log("load_metadata_attempt", f"Attempting to load metadata from {metadata_path}.", info_map)
         try:
             with open(metadata_path) as metadata_file:
                 self.__metadata = json.load(metadata_file)
-
+                om.add_log("load_metadata_success", f"Successfully loaded metadata from {metadata_path}", info_map)
         except Exception as e:
             raise e
 
@@ -58,26 +61,31 @@ class InputManager:
             If an error occurs while opening or reading a data file.
 
         """
-        metadata_files_key = "files"
-        data_files = self.__metadata[metadata_files_key]
+
+        files_details = self.__metadata["files"]
         path_key = "path"
         info_map = {"class": self.__class__.__name__,
                     "function": self._load_data.__name__,
                     }
-        for key, value in data_files.items():
-            file_path = value[path_key]
+        for key, details in files_details.items():
+            file_path = details[path_key]
+            om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
             try:
-                if value["type"] == "json":
+                if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
+                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
+                                   info_map)
                         self.__pool[key] = data
-                if value["type"] == "csv":
+                elif details["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
+                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
+                                   info_map)
                         self.__pool[key] = list(data_reader)
                 else:
-                    om.add_warning("InputManager load data file not csv/json.", f"{file_path} not csv nor json and not"
-                                   f" added to data pool.", info_map)
+                    om.add_warning("InputManager load data file is not csv/json", f"File for {key} data in path"
+                                   f" {file_path} was not a csv nor json file and was not added to data pool", info_map)
             except Exception as e:
                 raise e
 

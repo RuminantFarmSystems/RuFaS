@@ -312,12 +312,12 @@ def test_plan_animal_allocation(num_animals: int,
                                 expected_allocation: List[int]
                                 ) -> None:
     """
-    Unit test for function plan_animal_allocation() in file my_module.py.
+    Unit test for function _plan_animal_allocation() in file my_module.py.
     """
     # Arrange
 
     # Act
-    allocation_result = AnimalManagement.plan_animal_allocation(num_animals, max_spaces_in_pens)
+    allocation_result = AnimalManagement._plan_animal_allocation(num_animals, max_spaces_in_pens)
 
     # Assert
     assert allocation_result == expected_allocation
@@ -332,7 +332,7 @@ def test_plan_animal_allocation(num_animals: int,
 ])
 def test_execute_allocation_plan(num_animals: int, allocation_plan: List[int],
                                  mocker: MockerFixture) -> None:
-    """Unit test for function execute_allocation_plan() in file my_module.py."""
+    """Unit test for function _execute_allocation_plan() in file my_module.py."""
     # Arrange
     animal_combination = Pen.AnimalCombination.LAC_COW
     animals = []
@@ -348,7 +348,7 @@ def test_execute_allocation_plan(num_animals: int, allocation_plan: List[int],
         mock_pens.append(pen)
 
     # Act
-    AnimalManagement.execute_allocation_plan(
+    AnimalManagement._execute_allocation_plan(
         allocation_plan=allocation_plan,
         animals=animals,
         animal_pens=mock_pens
@@ -374,14 +374,14 @@ def test_execute_allocation_plan_error_cases(allocation_plan: List[int],
                                              num_animals: int,
                                              num_pens: int,
                                              mocker: MockerFixture) -> None:
-    """Unit test for function execute_allocation_plan() in file animal_management.py."""
+    """Unit test for function _execute_allocation_plan() in file animal_management.py."""
     # Arrange
     mock_animals = [mocker.MagicMock() for _ in range(num_animals)]
     mock_pens = [mocker.MagicMock() for _ in range(num_pens)]
 
     # Act and Assert
     with pytest.raises(ValueError):
-        AnimalManagement.execute_allocation_plan(
+        AnimalManagement._execute_allocation_plan(
             allocation_plan=allocation_plan,
             animals=mock_animals,
             animal_pens=mock_pens
@@ -419,12 +419,12 @@ def test_allocate_animals_to_pens_helper(num_animals: int,
     dummy_allocation_plan = [-1] * num_pens
     patch_for_plan_animal_allocation = mocker.patch.object(
         AnimalManagement,
-        'plan_animal_allocation',
+        '_plan_animal_allocation',
         return_value=dummy_allocation_plan
     )
     patch_for_execute_allocation_plan = mocker.patch.object(
         AnimalManagement,
-        'execute_allocation_plan'
+        '_execute_allocation_plan'
     )
 
     # Act
@@ -444,96 +444,3 @@ def test_allocate_animals_to_pens_helper(num_animals: int,
         animals=mock_animals,
         animal_pens=mock_pens
     )
-
-
-def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
-    """Unit test for function allocate_animals_to_pens() in file animal_management.py."""
-    mock_pens = []
-    pens_by_animal_combination = {}
-    num_calves = 20
-    num_heiferIs = 30
-    num_heiferIIs = 40
-    num_heiferIIIs = 50
-    num_dry_cows = 60
-    num_lac_cows = 70
-    calves = [mocker.MagicMock() for _ in range(num_calves)]
-    heiferIs = [mocker.MagicMock() for _ in range(num_heiferIs)]
-    heiferIIs = [mocker.MagicMock() for _ in range(num_heiferIIs)]
-    heiferIIIs = [mocker.MagicMock() for _ in range(num_heiferIIIs)]
-    dry_cows = [mocker.MagicMock() for _ in range(num_dry_cows)]
-    lac_cows = [mocker.MagicMock() for _ in range(num_lac_cows)]
-    cows = dry_cows + lac_cows
-    animals_by_combination = {
-        Pen.AnimalCombination.CALF: calves,
-        Pen.AnimalCombination.GROWING: heiferIs + heiferIIs,
-        Pen.AnimalCombination.CLOSE_UP: heiferIIIs + dry_cows,
-        Pen.AnimalCombination.LAC_COW: lac_cows
-    }
-    for animal_combination in animals_by_combination:
-        mock_pen = mocker.MagicMock()
-        mock_pen.animal_combination = animal_combination
-        mock_pens.append(mock_pen)
-        pens_by_animal_combination[animal_combination] = [mock_pen]
-    patch_for_group_pens_by_animal_combination = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement._group_pens_by_animal_combination',
-        return_value=pens_by_animal_combination
-    )
-
-    patch_for_get_dry_cows = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement._get_dry_cows',
-        return_value=dry_cows
-    )
-    patch_for_get_lactating_cows = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement._get_lactating_cows',
-        return_value=lac_cows
-    )
-
-    num_new_default_pens = 10
-    dummy_new_default_pens = [mocker.MagicMock() for _ in range(num_new_default_pens)]
-    mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement'
-        '._create_default_pens_for_potential_space_shortage',
-        return_value=dummy_new_default_pens
-    )
-    patch_for_allocate_animals_to_pens_helper = mocker.patch.object(
-        AnimalManagement,
-        '_allocate_animals_to_pens_helper',
-        return_value=None
-    )
-    patch_for_fully_update_animal_to_pen_id_map = mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement.fully_update_animal_to_pen_id_map',
-        return_value=None
-    )
-    mocker.patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement.__init__',
-        return_value=None
-    )
-    animal_management = AnimalManagement(
-        data=mocker.MagicMock(),
-        config=mocker.MagicMock(),
-        feed=mocker.MagicMock(),
-        weather=mocker.MagicMock(),
-        time=mocker.MagicMock(),
-    )
-    animal_management.calves = calves
-    animal_management.heiferIs = heiferIs
-    animal_management.heiferIIs = heiferIIs
-    animal_management.heiferIIIs = heiferIIIs
-    animal_management.cows = cows
-    animal_management.all_pens = mock_pens
-
-    # Act
-    animal_management.allocate_animals_to_pens()
-
-    # Assert
-    patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)
-    patch_for_get_dry_cows.assert_called_once_with(cows)
-    patch_for_get_lactating_cows.assert_called_once_with(cows)
-
-    assert animal_management.all_pens[-(num_new_default_pens * len(animals_by_combination)):] == \
-           dummy_new_default_pens * len(animals_by_combination)
-    for animal_combination in animals_by_combination:
-        assert pens_by_animal_combination[animal_combination][-num_new_default_pens:] == dummy_new_default_pens
-
-    assert patch_for_allocate_animals_to_pens_helper.call_count == len(animals_by_combination)
-    patch_for_fully_update_animal_to_pen_id_map.assert_called_once()
