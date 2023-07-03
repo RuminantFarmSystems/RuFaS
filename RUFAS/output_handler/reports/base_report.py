@@ -79,7 +79,6 @@ class BaseReport:
         animal_management = state.animal_management
         feed = state.feed
         manure_storage = state.manure_storage
-        fields = state.fields
         life_cycle_manager = animal_management.life_cycle_manager
 
         for variable in self.daily_variables:
@@ -91,7 +90,6 @@ class BaseReport:
         animal_management = state.animal_management
         feed = state.feed
         manure_storage = state.manure_storage
-        fields = state.fields
 
         for variable in self.annual_variables:
             self.annual_variables[variable][2] = \
