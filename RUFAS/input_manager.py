@@ -95,7 +95,7 @@ class InputManager:
 
     def _validate_data(self, eager_termination: bool = True) -> bool:
         """
-        Validates input data
+        Validates input data.
 
         Args
         ----
