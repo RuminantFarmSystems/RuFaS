@@ -5,8 +5,6 @@ import json
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict
 
-from RUFAS.output_manager import OutputManager
-
 
 om = OutputManager()
 
