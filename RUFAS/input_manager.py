@@ -74,16 +74,16 @@ class InputManager:
         for key, details in files_details.items():
             file_path = details[path_key]
             try:
-                if value["type"] == "json":
+                if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
                         self.__pool[key] = data
-                elif value["type"] == "csv":
+                elif details["type"] == "csv":
                     with open(file_path, "r") as csv_file:
                         data_reader = csv.DictReader(csv_file)
                         self.__pool[key] = list(data_reader)
                 else:
-                    om.add_warning("InputManager load data file not csv/json", f"{file_path} not csv nor json and not"
-                                   f" added to data pool", info_map)
+                    om.add_warning("InputManager load data file is not csv/json", f"File for {key} data was not a csv"
+                                   f" nor json file and was not added to data pool", info_map)
             except Exception as e:
                 raise e
