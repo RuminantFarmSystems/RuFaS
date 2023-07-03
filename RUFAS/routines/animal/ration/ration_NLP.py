@@ -387,8 +387,6 @@ def protein_constraint(x):
 
     return (MP_supply - (MP_req / 1000))
 
-    # TODO: Separate the DMI components from MPm requirements calculated by both NRC (2001) and NASEM (2021) and put them in this section because DMI gets reestimated during each iteration.
-
 
 def NDF_constraint_1(x):
     """
