@@ -67,7 +67,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     for field in fields:
         field.manage_field = MagicMock()
     fm.output_gatherer.send_daily_variables = MagicMock()
-    FieldManager._create_current_weather = MagicMock(return_value=CurrentWeather())
+    FieldManager._create_current_weather = MagicMock()
     fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
     for field in fields:
         assert field.manage_field.call_count == 1
