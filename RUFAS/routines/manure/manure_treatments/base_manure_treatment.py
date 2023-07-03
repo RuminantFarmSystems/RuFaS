@@ -11,7 +11,7 @@ from RUFAS.routines.manure.manure_separators.manure_separator_classes import Bas
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
@@ -53,7 +53,7 @@ class BaseManureTreatment(ABC):
         self.config = manure_treatment_config
 
         self._sim_day = -1
-        self._current_pen: Optional[ManureManagementPen] = None
+        self._current_pen: Optional[ManureManagerPen] = None
         self._manure_handler_daily_output = None
         self._current_manure_treatment_daily_input: Optional[LiquidManurePortionProtocol] = None
         self._manure_separator: Optional[BaseManureSeparator] = None
@@ -72,7 +72,7 @@ class BaseManureTreatment(ABC):
         return self._manure_separator_daily_output
 
     def _initialize_private_attributes_during_update(self, sim_day: int,
-                                                     current_pen: ManureManagementPen,
+                                                     current_pen: ManureManagerPen,
                                                      manure_handler_daily_output: ManureHandlerDailyOutput,
                                                      manure_treatment_daily_input: LiquidManurePortionProtocol,
                                                      manure_separator: BaseManureSeparator) -> None:
@@ -140,7 +140,7 @@ class BaseManureTreatment(ABC):
     def daily_update(self,
                      manure_handler_daily_output: ManureHandlerDailyOutput,
                      manure_treatment_daily_input: LiquidManurePortionProtocol,
-                     pen: ManureManagementPen,
+                     pen: ManureManagerPen,
                      sim_day: int,
                      manure_separator: Optional[BaseManureSeparator] = None
                      ) -> ManureTreatmentDailyOutput:
@@ -151,7 +151,7 @@ class BaseManureTreatment(ABC):
                 daily output of the manure handler.
             manure_treatment_daily_input: A LiquidManurePortionProtocol object containing
                 the daily input of the manure treatment.
-            pen: A ManureManagementPen object.
+            pen: A ManureManagerPen object.
             sim_day: The current simulation day.
             manure_separator: A optional BaseManureSeparator object meant to be used in the special
                 case of digester-separator-lagoon configuration triple.

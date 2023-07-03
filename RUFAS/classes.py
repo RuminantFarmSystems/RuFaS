@@ -16,8 +16,8 @@ from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from RUFAS import errors
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
-from RUFAS.routines.animal.animal_management import AnimalManagement
-from RUFAS.routines.manure.manure_management import ManureManagement
+from RUFAS.routines.animal.animal_manager import AnimalManager
+from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
 from RUFAS.util import Utility
 from typing import Any, Dict
@@ -54,12 +54,12 @@ class State:
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(
             input_dir / 'feed' / data['feed']))
-        manure_management_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
+        manure_manager_config = Utility.read_json_file(input_dir / 'manure' / data['manure'])
         animal_config = Utility.read_json_file(input_dir / 'animal' / data['animal'])
-        animal_config['manure_management_scenarios'] = manure_management_config['manure_management_scenarios']
-        self.animal_management = AnimalManagement(animal_config, config, self.feed, weather, time)
-        self.manure_storage = ManureStorage(self.animal_management)
-        self.manure_management = ManureManagement(self.animal_management, weather, time, manure_management_config)
+        animal_config['manure_management_scenarios'] = manure_manager_config['manure_management_scenarios']
+        self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
+        self.manure_storage = ManureStorage(self.animal_manager)
+        self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
 
 
     def annual_reset(self):
@@ -68,7 +68,7 @@ class State:
             Resets all annual variables that require reset
         """
         self.field_manager.annual_update_routine()
-        self.animal_management.annual_reset()
+        self.animal_manager.annual_reset()
         self.manure_storage.annual_reset()
 
     def annual_mass_balance(self, time):
