@@ -9,7 +9,11 @@ from SALib.sample import ff as ff_s
 from SALib.sample import saltelli
 from SALib.analyze import sobol
 from SALib.sample import fast_sampler
-import model_evaluation.sensitivity_analysis.sensitivity_analysis_helpers as SAH
+
+# running as script
+import sensitivity_analysis_helpers as SAH
+# running in window
+# import model_evaluation.sensitivity_analysis.sensitivity_analysis_helpers as SAH
 
 with open('model_evaluation\sensitivity_analysis\config_inputs\sensitivity_analysis.json', 'r') as j:
      config_json = json.loads(j.read())
