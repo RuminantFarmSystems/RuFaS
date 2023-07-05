@@ -1,4 +1,5 @@
 from math import exp
+from typing import List
 
 import pytest
 from unittest.mock import MagicMock, patch
@@ -25,7 +26,8 @@ def test_determine_actual_layer_uptake(pot, avail, wilt):
 
 
 @pytest.mark.parametrize("pot,avail,cap", [
-    (1, 2, 3)
+    (1, 2, 3),
+    (1, 1, 8)
 ])
 def test_correct_layer_for_efficiency(pot, avail, cap):
     """checks that layer efficiency is corrected properly"""
@@ -68,3 +70,42 @@ def test_extract_water_from_soil(layers, uptakes) -> None:
     except Exception as e:
         assert len(soil_data.soil_layers) != len(uptake.crop_data.actual_water_uptakes)
         assert str(e) == "actual_water_uptakes should be the same length as the number of soil layers"
+
+
+@pytest.mark.parametrize("potential_uptakes,water_availabilities,available_capacities,should_fail",
+                         [([0.1, 0.2, 0.3], [9.24, 7.7, 1.31], [2.0, 3.5, 4.2], False),
+                          ([0.1, 0.2], [9.24, 7.7, 1.31], [2.0, 3.5, 4.2], True),
+                          ([0.1, 0.2, 0.4], [9.24, 7.7], [2.0, 3.5, 4.2], True),
+                          ([0.1, 0.2, 0.4], [9.24, 7.7, 1.31], [2.0, 3.5], True)])
+def test_reduce_efficiency_of_uptake(potential_uptakes: List[float], water_availabilities: List[float],
+                                     available_capacities: List[float], should_fail: bool) -> None:
+    if should_fail:
+        try:
+            WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
+        except Exception as e:
+            assert str(e) == "potential_uptakes, water_availabilities, and available_capacities must be of equal length"
+    else:
+        zipped = zip(potential_uptakes, water_availabilities, available_capacities)
+        expected = [WaterUptake._correct_layer_for_efficiency(pot, avail, cap) for pot, avail, cap in zipped]
+        assert expected == WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities,
+                                                                    available_capacities)
+
+
+@pytest.mark.parametrize("potential_uptakes,water_availabilities,unmet_demands,uptake_compensation,should_fail",
+                         [([0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], 2.3, False),
+                          ([0.1, 0.2], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], 2.5, True)])
+def test_adjust_water_uptakes(potential_uptakes: List[float], water_availabilities: List[float],
+                              unmet_demands: List[float], uptake_compensation: float, should_fail: bool) -> None:
+    if should_fail:
+        try:
+            WaterUptake._adjust_water_uptakes(potential_uptakes, water_availabilities, unmet_demands,
+                                              uptake_compensation)
+        except Exception as e:
+            assert str(e) == "potential_uptakes and unmet_demands must be the same length."
+    else:
+        expected = [uptake + (demand * uptake_compensation) for uptake, demand in zip(potential_uptakes, unmet_demands)]
+        assert WaterUptake._adjust_water_uptakes(potential_uptakes, water_availabilities, unmet_demands,
+                                                 uptake_compensation) == expected
+
+
+
