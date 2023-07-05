@@ -2,6 +2,7 @@ from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.util import Utility
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from RUFAS.classes import Time, Weather, is_leap_year
+from RUFAS.routines.manure.manure_manager import ManureManager
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
@@ -16,11 +17,11 @@ the `SimulationEngine` for executing daily and annual routines in the field modu
 
 
 class FieldManager:
-    def __init__(self, fields_config: List[Dict[str, str]]):
+    def __init__(self, fields_config: List[Dict[str, str]], manure_manager: ManureManager):
         self.fields: List[Field] = []
         for field in fields_config:
             field_name, field_config = field.items()
-            self.fields.append(self._setup_field(field_name, field_config))
+            self.fields.append(self._setup_field(field_name, field_config, manure_manager))
         self.output_gatherer = OutputGatherer(fields=self.fields)
 
     def daily_update_routine(self, weather: Weather, time: Time) -> None:
@@ -111,7 +112,7 @@ class FieldManager:
             return time.day - days[FieldManager._date_conversion_month(time) - 2]
 
     @staticmethod
-    def _setup_field(field_name: str, field_config: Dict[str, str]) -> Field:
+    def _setup_field(field_name: str, field_config: Dict[str, str], manure_manager: ManureManager) -> Field:
         """
 
         Parameters
@@ -120,6 +121,8 @@ class FieldManager:
             The name of the field being initialized.
         field_config : Dict[str, str]
             Contains the paths to input data files for soil profile, crop management, and farm management.
+        manure_manager: ManureManager
+            Instance of the ManureManager class.
 
         Returns
         -------
@@ -148,7 +151,7 @@ class FieldManager:
 
         return Field(plantings=all_planting_events, harvestings=all_harvest_events, tillage_events=tillage_events,
                      fertilizer_events=fertilizer_events, fertilizer_mixes=available_fertilizer_mixes,
-                     manure_events=manure_events)
+                     manure_events=manure_events, manure_manager=manure_manager)
 
     @staticmethod
     def _setup_management(field_name: str,

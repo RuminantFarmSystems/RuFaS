@@ -4,6 +4,7 @@ from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
+from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
 from typing import List, Dict
 from unittest.mock import MagicMock
@@ -55,7 +56,8 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "T_avg_annual", 3)
     setattr(mocked_weather, "rainfall", 3)
     setattr(mocked_weather, "irrigation", 3)
-    fm = FieldManager([])
+    mocked_manure_manager = MagicMock(ManureManager)
+    fm = FieldManager([], mocked_manure_manager)
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
@@ -75,7 +77,8 @@ def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    fm = FieldManager([])
+    mocked_field_manager = MagicMock(ManureManager)
+    fm = FieldManager([], mocked_field_manager)
     fm.fields = fields
     fm.output_gatherer.send_annual_variables = MagicMock()
     fm.annual_update_routine()
