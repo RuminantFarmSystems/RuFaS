@@ -84,7 +84,8 @@ class InputManager:
                         om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
                                    info_map)
                 else:
-                    om.add_warning("InputManager load data file is not csv/json", f"File for {key} data in path"
-                                   f" {file_path} was not a csv nor json file and was not added to data pool", info_map)
+                    om.add_warning("InputManager load data file is not csv/json",
+                                   f"{key} data must be available in either csv or json file type.",
+                                   info_map)
             except Exception as e:
                 raise e
