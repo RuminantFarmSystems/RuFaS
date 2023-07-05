@@ -39,10 +39,10 @@ def create_mock_object_list(attribute_dicts: List[Dict[str, Any]]) -> List[Magic
 
 @pytest.fixture
 def pens_with_mock_animals() -> List[MagicMock]:
-    mock_animal_1=MagicMock()
-    mock_animal_2=MagicMock()
-    mock_animal_3=MagicMock()
-    mock_animal_4=MagicMock()
+    mock_animal_1 = MagicMock()
+    mock_animal_2 = MagicMock()
+    mock_animal_3 = MagicMock()
+    mock_animal_4 = MagicMock()
     mock_animals_in_pens = [
         {
             "id": 0,
@@ -279,7 +279,7 @@ def animal_manager() -> AnimalManager:
 
 @pytest.fixture
 def animal_manager_with_mock_pens(animal_manager: AnimalManager,
-                                     mock_pens: List[MagicMock]) -> AnimalManager:
+                                  mock_pens: List[MagicMock]) -> AnimalManager:
     animal_manager.all_pens = mock_pens
     return animal_manager
 
@@ -788,7 +788,7 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
 
 
 def setup_dummy_animal_manager_with_pens(animal_manager: AnimalManager, info_dict: dict[Any],
-                                            append_removals: bool = False) -> dict[Any]:
+                                         append_removals: bool = False) -> dict[Any]:
     """
     Prepares a dummy AnimalManager object for testing purposes.
 
@@ -905,7 +905,7 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager
 
     with patch("RUFAS.routines.animal.pen.Pen.set_up_new_animal") as set_up_new_animal:
         dummy_animal_manager.daily_update_id_map(animal_addition_list, dummy_removal_list, calf_addition_list,
-                                                    dummy_feed, 20.0)
+                                                 dummy_feed, 20.0)
         assert set_up_new_animal.call_count == len(info_dict["new_calf_dict"]) + len(info_dict["new_cow_dict"])
 
     assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
@@ -1048,12 +1048,14 @@ def test_get_initialize_db_summary():
     """Unit test for function get_initialize_db_summary in file routines/animal/animal_manager.py"""
     pass
 
+
 @pytest.fixture
 def cowlist():
     cowlist = [MagicMock(),
-        MagicMock(),
-        MagicMock()]
+               MagicMock(),
+               MagicMock()]
     return cowlist
+
 
 def test_sum_daily_milk(animal_manager, cowlist):
     """Unit test for function sum_daily_milk in file routines/animal/animal_manager.py"""
@@ -1061,6 +1063,7 @@ def test_sum_daily_milk(animal_manager, cowlist):
         cow.estimated_daily_milk_produced = 50.0
     result = AnimalManager.sum_daily_milk(animal_manager, cowlist)
     assert result == 150
+
 
 def test_get_animals_snapshot(mocker: MockerFixture):
     """
@@ -1158,8 +1161,8 @@ def test_handle_removed_animals_after_update(mocker: MockerFixture):
     # Arrange
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock())
+                                   feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock())
 
     num_animals_of_each_type = 10
     mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
@@ -1206,7 +1209,7 @@ def test_handle_removed_animals_after_update(mocker: MockerFixture):
 
     # Act
     animal_manager._handle_removed_animals_after_update(animals_snapshot_before_update,
-                                                           animals_snapshot_after_update)
+                                                        animals_snapshot_after_update)
 
     # Assert
     assert patch_remove_animal_from_pen_and_id_map.call_count == len(removed_animals)
@@ -1225,8 +1228,8 @@ def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: Moc
     # Arrange
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock())
+                                   feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock())
 
     num_animals_of_each_type = 10
     mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
@@ -1263,8 +1266,8 @@ def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: Moc
 
     # Act
     animal_manager._handle_animals_with_unchanged_class_and_changed_combination(animals_snapshot_before_update,
-                                                                                   animals_snapshot_after_update,
-                                                                                   mock_feed, mock_temp)
+                                                                                animals_snapshot_after_update,
+                                                                                mock_feed, mock_temp)
 
     # Assert
     assert patch_remove_animal.call_count == len(animals)
@@ -1288,8 +1291,8 @@ def test_handle_graduated_animals(mocker: MockerFixture):
 
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock())
+                                   feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock())
 
     num_animals_of_each_type = 30  # To make easier to select a third of each class
     mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
@@ -1329,8 +1332,8 @@ def test_handle_graduated_animals(mocker: MockerFixture):
 
     # Act
     animal_manager._handle_graduated_animals(animals_snapshot_before_update,
-                                                animals_snapshot_after_update,
-                                                mock_feed, mock_temp)
+                                             animals_snapshot_after_update,
+                                             mock_feed, mock_temp)
 
     # Assert
     all_graduated_animals = graduated_heifer_Is + graduated_heifer_IIs + graduated_heifer_IIIs + graduated_cows
@@ -1350,8 +1353,8 @@ def test_handle_newly_added_animals(mocker: MockerFixture):
     # Arrange
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock())
+                                   feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock())
 
     # MockAnimal class
     class MockAnimal:
@@ -1393,8 +1396,8 @@ def test_remove_animal_from_pen_and_id_map(mocker: MockerFixture):
     # Arrange
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock())
+                                   feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock())
 
     mock_animal = mocker.MagicMock()
     mock_animal.id = 1
@@ -1427,8 +1430,8 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
     # Arrange
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock())
+                                   feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock())
 
     mock_animal = mocker.MagicMock()
     mock_animal.id = 1
@@ -1472,3 +1475,155 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
 
     # Reset ANIMAL_GROUPING_SCENARIO
     AnimalManager.ANIMAL_GROUPING_SCENARIO = original_ANIMAL_GROUPING_SCENARIO
+
+
+@pytest.mark.parametrize(
+    'is_end_ration_interval',
+    [True, False]
+)
+def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> None:
+    """
+    Unit test for the function daily_updates() in file animal_manager.py
+
+    Test that the daily_updates() method of the AnimalManager class correctly calls all required methods
+    with correct parameters.
+
+    """
+    # Arrange
+    mock_feed = mocker.MagicMock()
+    mock_weather = mocker.MagicMock()
+    temp = 25
+    mock_weather.T_avg.__getitem__.return_value = [temp for _ in range(365)]
+    mock_time = mocker.MagicMock()
+    mock_time.year = 2023
+    mock_time.day = 1
+
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    mock_animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                        feed=mock_feed, weather=mock_weather,
+                                        time=mock_time)
+
+    mock_animal_manager.simulate_animals = True
+    mock_animal_manager.simulation_day = 90
+    mock_animal_manager.calves = mock_calves = mocker.MagicMock()
+    mock_animal_manager.heiferIs = mock_heiferIs = mocker.MagicMock()
+    mock_animal_manager.heiferIIs = mock_heiferIIs = mocker.MagicMock()
+    mock_animal_manager.heiferIIIs = mock_heiferIIIs = mocker.MagicMock()
+    mock_animal_manager.cows = mock_cows = mocker.MagicMock()
+    mock_animal_manager.methane_model = mock_methane_model = mocker.MagicMock()
+    patch_for_end_ration_interval = mocker.patch.object(
+        AnimalManager, 'end_ration_interval', return_value=is_end_ration_interval)
+    patch_for_reset_milk_production_reduction = mocker.patch.object(
+        AnimalManager, 'reset_milk_production_reduction', return_value=None)
+    mock_animal_snapshot_before_update = mocker.MagicMock()
+    mock_animal_snapshot_after_update = mocker.MagicMock()
+    patch_for_get_animals_snapshot = mocker.patch.object(
+        AnimalManager, '_get_animals_snapshot', side_effect=[mock_animal_snapshot_before_update,
+                                                             mock_animal_snapshot_after_update])
+    mock_animals_added = mocker.MagicMock()
+    mock_animals_removed = mocker.MagicMock()
+    mock_calves_born = mocker.MagicMock()
+    mock_life_cycle_manager = mocker.MagicMock()
+    mock_life_cycle_manager.daily_update.return_value = [mock_animals_added, mock_animals_removed,
+                                                         mock_calves_born, []]
+    mock_animal_manager.life_cycle_manager = mock_life_cycle_manager
+
+    patch_for_handle_removed_animals_after_update = mocker.patch.object(
+        AnimalManager, '_handle_removed_animals_after_update', return_value=None)
+    patch_for_handle_unchanged_animals = mocker.patch.object(
+        AnimalManager, '_handle_animals_with_unchanged_class_and_changed_combination', return_value=None)
+    patch_for_handle_graduated_animals = mocker.patch.object(
+        AnimalManager, '_handle_graduated_animals', return_value=None)
+    patch_for_handle_newly_added_animals = mocker.patch.object(
+        AnimalManager, '_handle_newly_added_animals', return_value=None)
+
+    patch_for_update_phosphorus_concentrations = mocker.patch.object(
+        AnimalManager, '_update_phosphorus_concentrations', return_value=None)
+    patch_for_record_pen_history = mocker.patch.object(
+        AnimalManager, 'record_pen_history', return_value=None)
+
+    num_pens = 5
+    num_animals_per_pen = 10
+    mock_all_pens = []
+    for i in range(num_pens):
+        mock_pen = mocker.MagicMock()
+        mock_pen.animal_combination.name = 'LAC_COW'
+        mock_pen.animals_in_pen = []
+        for j in range(num_animals_per_pen):
+            mock_animal = mocker.MagicMock()
+            mock_animal.update_milk_production_history.return_value = None
+            mock_pen.animals_in_pen.append(mock_animal)
+        mock_all_pens.append(mock_pen)
+    mock_animal_manager.all_pens = mock_all_pens
+
+    mock_classes_in_pen = mocker.MagicMock()
+    patch_for_get_classes_in_pen = mocker.patch.object(
+        AnimalManager, '_get_classes_in_pen', return_value=mock_classes_in_pen)
+
+    patch_for_calc_nutrient_rqmts = mocker.patch.object(
+        AnimalManager, 'calc_nutrient_rqmts', return_value=None)
+    patch_for_clear_pens = mocker.patch.object(
+        AnimalManager, 'clear_pens', return_value=None)
+    patch_for_allocate_animals_to_pens = mocker.patch.object(
+        AnimalManager, 'allocate_animals_to_pens', return_value=None)
+    patch_for_calc_ration_at_interval = mocker.patch.object(
+        AnimalManager, '_calc_ration_at_interval', return_value=None)
+    patch_for_calc_avg_growth = mocker.patch.object(
+        AnimalManager, 'calc_avg_growth', return_value=None)
+
+    sum_daily_milk = 1000.0
+    patch_for_sum_daily_milk = mocker.patch.object(
+        AnimalManager, 'sum_daily_milk', return_value=sum_daily_milk)
+
+    # Act
+    mock_animal_manager.daily_updates(mock_feed, mock_weather, mock_time)
+
+    # Assert
+    assert patch_for_end_ration_interval.call_count == 2
+    if is_end_ration_interval:
+        patch_for_reset_milk_production_reduction.assert_called()
+
+    mock_weather.T_avg.__getitem__.assert_called_with(mock_time.year - 1)
+
+    patch_for_get_animals_snapshot.assert_has_calls([mocker.call(), mocker.call()])
+
+    mock_life_cycle_manager.daily_update.assert_called_once_with(
+        mock_animal_manager.simulation_day, mock_calves, mock_heiferIs, mock_heiferIIs, mock_heiferIIIs, mock_cows)
+
+    patch_for_handle_removed_animals_after_update.assert_called_once_with(
+        mock_animal_snapshot_before_update, mock_animal_snapshot_after_update)
+
+    patch_for_handle_unchanged_animals.assert_called_once_with(
+        mock_animal_snapshot_before_update, mock_animal_snapshot_after_update, mock_feed, temp)
+
+    patch_for_handle_graduated_animals.assert_called_once_with(
+        mock_animal_snapshot_before_update, mock_animal_snapshot_after_update, mock_feed, temp)
+
+    patch_for_handle_newly_added_animals.assert_called_once_with(
+        list(mock_animals_added) + list(mock_calves_born), mock_feed, temp)
+
+    patch_for_get_classes_in_pen.assert_has_calls([mocker.call(mock_pen) for mock_pen in mock_all_pens])
+
+    for mock_pen in mock_all_pens:
+        mock_pen.calc_total_manure.assert_called_once_with(mock_feed, mock_methane_model)
+        mock_pen.call_p_rqmts.assert_called_once()
+        mock_pen.daily_p_update.assert_called_once()
+
+    patch_for_update_phosphorus_concentrations.assert_called_once()
+
+    patch_for_record_pen_history.assert_called_once()
+
+    if is_end_ration_interval:
+        patch_for_reset_milk_production_reduction.assert_called()
+        patch_for_calc_nutrient_rqmts.assert_called_once_with(mock_feed, temp)
+        patch_for_clear_pens.assert_called_once()
+        patch_for_allocate_animals_to_pens.assert_called_once()
+        patch_for_calc_ration_at_interval.assert_called_once_with(mock_feed)
+        patch_for_calc_avg_growth.assert_called_once()
+        for mock_pen in mock_all_pens:
+            for mock_animal in mock_pen.animals_in_pen:
+                mock_animal.update_milk_production_history.assert_called_once_with(
+                    mock_animal_manager.simulation_day)
+
+    patch_for_sum_daily_milk.assert_called_once_with(mock_cows)
+    assert mock_animal_manager.life_cycle_manager.daily_milk_production == sum_daily_milk
