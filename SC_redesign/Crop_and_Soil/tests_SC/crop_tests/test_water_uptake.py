@@ -75,9 +75,10 @@ def test_extract_water_from_soil(layers, uptakes, should_fail: bool) -> None:
         except Exception as e:
             assert str(e) == "actual_water_uptakes should be the same length as the number of soil layers"
     else:
-        uptake.extract_water_from_soil(soil_data)
+
         soil_data.get_vectorized_layer_attribute = MagicMock()
         soil_data.set_vectorized_layer_attribute = MagicMock()
+        uptake.extract_water_from_soil(soil_data)
         assert soil_data.get_vectorized_layer_attribute.call_count == 1
         assert soil_data.set_vectorized_layer_attribute.call_count == 1
 
