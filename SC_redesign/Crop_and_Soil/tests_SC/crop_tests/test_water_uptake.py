@@ -135,3 +135,20 @@ def test_find_stratified_max_water_uptakes(root_depth: float, max_transpiration:
         assert expected == WaterUptake._find_stratified_max_water_uptakes(root_depth, max_transpiration,
                                                                           water_distro_parameter,
                                                                           upper_depths, lower_depths)
+
+
+@pytest.mark.parametrize("root_depth,depth,max_transpiration,water_distro_parameter",
+                         [(69.4, 25.7, 33.4, 69.4),
+                          (0, 25.7, 33.4, 42.3)])
+def test_determine_max_water_uptake_to_depth(root_depth: float, depth: float, max_transpiration: float,
+                                             water_distro_parameter: float) -> None:
+    """Tests that the stratified max water uptake to depth are calculated correctly and correct exceptions are thrown"""
+    if root_depth == 0:
+        expected = 0
+    else:
+        term1 = max_transpiration / (1 - exp(-water_distro_parameter))
+        term2 = 1 - exp(-water_distro_parameter * depth / root_depth)
+        expected = term1 * term2
+
+    assert expected == WaterUptake._determine_max_water_uptake_to_depth(root_depth, depth, max_transpiration,
+                                                                        water_distro_parameter)
