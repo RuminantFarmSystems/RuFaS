@@ -129,6 +129,7 @@ def test_daily_simulation(
     assert patch_simulation_engine.output.daily_update.call_count == 1
     for mocked in mocker._patches_and_mocks:
         assert mocked[1].call_count == 1
+    patch_simulation_engine.state.field_manager.daily_update_routine.assert_called_once()
 
 
 def test_advance_time(
