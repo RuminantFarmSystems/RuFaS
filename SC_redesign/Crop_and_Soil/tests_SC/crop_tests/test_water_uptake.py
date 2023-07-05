@@ -79,6 +79,7 @@ def test_extract_water_from_soil(layers, uptakes) -> None:
                           ([0.1, 0.2, 0.4], [9.24, 7.7, 1.31], [2.0, 3.5], True)])
 def test_reduce_efficiency_of_uptake(potential_uptakes: List[float], water_availabilities: List[float],
                                      available_capacities: List[float], should_fail: bool) -> None:
+    """Tests that the reduced efficiency of uptake is calculated correctly and correct exceptions are thrown"""
     if should_fail:
         try:
             WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
@@ -96,6 +97,7 @@ def test_reduce_efficiency_of_uptake(potential_uptakes: List[float], water_avail
                           ([0.1, 0.2], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], 2.5, True)])
 def test_adjust_water_uptakes(potential_uptakes: List[float], water_availabilities: List[float],
                               unmet_demands: List[float], uptake_compensation: float, should_fail: bool) -> None:
+    """Tests that the adjusted water uptakes are calculated correctly and correct exceptions are thrown"""
     if should_fail:
         try:
             WaterUptake._adjust_water_uptakes(potential_uptakes, water_availabilities, unmet_demands,
@@ -108,4 +110,28 @@ def test_adjust_water_uptakes(potential_uptakes: List[float], water_availabiliti
                                                  uptake_compensation) == expected
 
 
+@pytest.mark.parametrize("root_depth,max_transpiration,water_distro_parameter,upper_depths,lower_depths,should_fail",
+                         [(69.4, 25.7, 33.4, [23.5, 24.6], [24.5, 41.6], False),
+                          (69.4, 25.7, 33.4, [23.5], [24.5, 41.6], True)])
+def test_find_stratified_max_water_uptakes(root_depth: float, max_transpiration: float, water_distro_parameter: float,
+                                           upper_depths: List[float],
+                                           lower_depths: List[float], should_fail: bool) -> None:
+    """Tests that the stratified max water uptakes are calculated correctly and correct exceptions are thrown"""
+    if should_fail:
+        try:
+            WaterUptake._find_stratified_max_water_uptakes(root_depth, max_transpiration, water_distro_parameter,
+                                                           upper_depths, lower_depths)
+        except Exception as e:
+            assert str(e) == "upper_depths and lower_depths must be the same length"
+    else:
+        expected = []
+        for upper, lower in zip(upper_depths, lower_depths):
+            top_potential = WaterUptake._determine_max_water_uptake_to_depth(root_depth, upper, max_transpiration,
+                                                                             water_distro_parameter)
+            bottom_potential = WaterUptake._determine_max_water_uptake_to_depth(root_depth, lower, max_transpiration,
+                                                                                water_distro_parameter)
+            expected.append(bottom_potential - top_potential)
 
+        assert expected == WaterUptake._find_stratified_max_water_uptakes(root_depth, max_transpiration,
+                                                                          water_distro_parameter,
+                                                                          upper_depths, lower_depths)
