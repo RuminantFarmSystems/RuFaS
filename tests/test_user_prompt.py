@@ -12,7 +12,7 @@ from main import parse_gnu_args
 from main import run_rufas
 from main import set_global_variables
 from RUFAS import errors
-from RUFAS import SimulationEngine
+from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.output_manager import OutputManager
 from RUFAS.user_prompt import convert_json_path_to_list
 from RUFAS.user_prompt import convert_path_string_to_list

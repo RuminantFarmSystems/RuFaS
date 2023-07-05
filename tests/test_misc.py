@@ -123,7 +123,6 @@ def test_daily_simulation(
     """Unit test for function _daily_simulation in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.routines.daily_animal_routine")
     mocker.patch("RUFAS.routines.daily_manure_storage_routine")
-    mocker.patch("RUFAS.routines.daily_fields_routine")
     mocker.patch("RUFAS.routines.daily_feed_routine")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
     patch_simulation_engine._daily_simulation()
