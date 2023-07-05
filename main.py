@@ -41,6 +41,7 @@ def run_rufas(
     set_global_variables(make_graphs, verbose)
     if verbose:
         print("RuFaS: Ruminant Farm Systems Model 2023")
+    print(input_path)
     file_list = obtain_file_list(input_path, verbose)
     execute_simulations_from_files(file_list, exclude_info_maps)
 
