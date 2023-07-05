@@ -18,16 +18,6 @@ from typing import Optional
 from typing import Dict
 from RUFAS.routines.animal.ration import ration_constants
 
-# pen.ration_nutrient_amount
-# pen.ration_nutrient_conc
-# pen.MEdiet
-
-# TODO get the current NDF_conc
-# hardcoded '0.3' is a general value that works for initial simulation purposes
-# In pen.py, cow.py, heiferI, II, III, ration_driver. add the variable to the calc_rqmts call each time
-# something like:
-# NDF_conc = conc['NDF']
-# amount, conc = ration_report(self.ration, feed.available_feeds)
 
 def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: int,
                animal_type: AnimalType, parity: Optional[int] = 0,
@@ -36,7 +26,9 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
                milk_production: Optional[float] = 0.0, days_in_milk: Optional[int] = None,
                lactating: Optional[bool] = False, body_condition_score_5: Optional[int] = 3,
                previous_temperature: Optional[float] = None, average_daily_gain_heifer: Optional[float] = None,
-               NDF_conc: Optional[float] = 0.3, metabolizable_energy:Optional[float] = 1.0)\
+               NDF_conc: Optional[float] = 0.3, 
+               TDN_conc: Optional[float] = 0.7,
+               metabolizable_energy:Optional[float] = 1.0)\
                 -> Dict[str, float]:
     """
     Calculates the dietary requirements of a single animal.
@@ -101,7 +93,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
             animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat, metabolizable_energy)
         metabolizable_protein_requirement = calculate_NRC_protein_requirements(
             body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
-            calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate)
+            calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate, TDN_conc)
         calcium_requirement = calculate_NRC_calcium_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, animal_type, lactating, average_daily_gain,
             milk_production)
@@ -602,7 +594,7 @@ def calculate_NASEM_energy_lactation_requirements(animal_type: AnimalType, milk_
 def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: float, day_of_pregnancy: Optional[int],
                                        animal_type: AnimalType, milk_production: float, milk_true_protein: float,
                                        calf_birth_weight: float, net_energy_growth: float, average_daily_gain: float,
-                                       equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float) -> float:
+                                       equivalent_shrunk_body_weight: float, dry_matter_intake_estimate: float, TDN_conc:Optional[float] = 0.7 ) -> float:
     """ Protein requirement for maintenance according to NRC (2001).
 
     Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
@@ -663,11 +655,8 @@ def calculate_NRC_protein_requirements(body_weight: float, conceptus_weight: flo
     # [A.Cow.B.1]-[A.Heifer.B.1]
     # Metabolizable protein requirement for maintenance (g)
 
-    TDN_estimate = 0.7  
-    # communication with Dr. Edward Garcia
-    # TODO: Calculate TDN from the previous rations, when formulated. Using this constant as a placeholder value for the first formulation.
     MP_bactria_estimate = dry_matter_intake_estimate * \
-        GeneralConstants.KG_TO_GRAMS * TDN_estimate * 0.13
+        GeneralConstants.KG_TO_GRAMS * TDN_conc * 0.13
     # communication with Dr. Edward Garcia, to calculate a placeholder MP bacteria value for the first formulation.
 
     MPm = 0.3 * (body_weight - conceptus_weight) ** 0.6 + \

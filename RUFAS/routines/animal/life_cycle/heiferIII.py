@@ -71,17 +71,26 @@ class HeiferIII(HeiferII):
         """
         return self.get_heiferII_values()
 
-    def set_nutrient_rqmts(self, temp, animal_grouping_scenario):
+    def set_nutrient_rqmts(self, temp, animal_grouping_scenario, nutrient_conc: dict = {}, metabolizable_energy: float = 1.0):
         """
         Calculates this heiferIII's nutrient requirements.
         """
+        if nutrient_conc and nutrient_conc['dm'] != 0.0:
+            NDF_conc = nutrient_conc['NDF']
+            TDN_conc = nutrient_conc['TDN']
+        else:
+            NDF_conc = 0.3
+            TDN_conc = 0.7
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=self.days_in_preg,
                          animal_type=animal_grouping_scenario.get_animal_type(self),
                          body_condition_score_5=3,
                          previous_temperature=temp,
-                         average_daily_gain_heifer=self.daily_growth)
+                         average_daily_gain_heifer=self.daily_growth,
+                         NDF_conc=NDF_conc,
+                         TDN_conc=TDN_conc,
+                         metabolizable_energy = metabolizable_energy)
         self.NEmaint = req['NEmaint']
         self.NEg = req['NEg']
         self.NEpreg = req['NEpreg']
