@@ -28,7 +28,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
                previous_temperature: Optional[float] = None, average_daily_gain_heifer: Optional[float] = None,
                NDF_conc: Optional[float] = 0.3, 
                TDN_conc: Optional[float] = 0.7,
-               metabolizable_energy:Optional[float] = 1.0)\
+               net_energy_diet_concentration:Optional[float] = 1.0)\
                 -> Dict[str, float]:
     """
     Calculates the dietary requirements of a single animal.
@@ -90,7 +90,7 @@ def calc_rqmts(body_weight: float, mature_body_weight: float, day_of_pregnancy: 
         net_energy_lactation = calculate_NRC_energy_lactation_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production)
         dry_matter_intake_estimate = calculate_NRC_DMI(
-            animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat, metabolizable_energy)
+            animal_type, body_weight, day_of_pregnancy, days_in_milk, lactating, milk_production, milk_fat, net_energy_diet_concentration)
         metabolizable_protein_requirement = calculate_NRC_protein_requirements(
             body_weight, conceptus_weight, day_of_pregnancy, animal_type, milk_production, milk_true_protein,
             calf_birth_weight, net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight, dry_matter_intake_estimate, TDN_conc)
@@ -1039,7 +1039,7 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
 
 
 def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
-                      lactating: bool, milk_production: float, milk_fat: float, metabolizable_energy: float) -> float:
+                      lactating: bool, milk_production: float, milk_fat: float, net_energy_diet_concentration: float) -> float:
     """ Calculates dry matter intake according to NRC (2001).
 
     Calculates the estimated total dry matter intake in kilograms per day
@@ -1086,7 +1086,6 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         dry_matter_intake_estimate = (
             (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
     else:
-        net_energy_diet_concentration = metabolizable_energy * 0.64
         dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_diet_concentration 
                                                           - 0.0466*net_energy_diet_concentration**2 
                                                           - 0.1128) / net_energy_diet_concentration
