@@ -1,7 +1,7 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: test_animal_management.py
-Description: Implements test cases for the AnimalManagement class
+File name: test_animal_manager.py
+Description: Implements test cases for the AnimalManager class
 Author(s): Pooya Hekmati, sh2235@cornell.edu, Anchey Peng, ap724@cornell.edu
 """
 
@@ -12,7 +12,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -245,13 +245,13 @@ def mock_herd_data() -> Dict[str, Union[str, int, bool]]:
 
 
 @pytest.fixture
-def animal_management() -> AnimalManagement:
-    init_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_pens')
-    init_animals_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_animals')
-    init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.init_nutrient_rqmts')
-    # init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_management.AnimalManagement.allocate_all_pens')
+def animal_manager() -> AnimalManager:
+    init_pens_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_pens')
+    init_animals_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_animals')
+    init_nutrient_rqmts_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.init_nutrient_rqmts')
+    # init_allocate_all_pens_patch = patch('RUFAS.routines.animal.animal_manager.AnimalManager.allocate_all_pens')
     allocate_animals_to_pens_patch = patch(
-        'RUFAS.routines.animal.animal_management.AnimalManagement.allocate_animals_to_pens'
+        'RUFAS.routines.animal.animal_manager.AnimalManager.allocate_animals_to_pens'
     )
 
     init_pens_patch.start()
@@ -266,7 +266,7 @@ def animal_management() -> AnimalManagement:
     weather = MagicMock()
     time = MagicMock()
 
-    animal_management = AnimalManagement(data, config, feed, weather, time)
+    animal_manager = AnimalManager(data, config, feed, weather, time)
 
     init_pens_patch.stop()
     init_animals_patch.stop()
@@ -274,39 +274,39 @@ def animal_management() -> AnimalManagement:
     # init_allocate_all_pens_patch.stop()
     allocate_animals_to_pens_patch.stop()
 
-    return animal_management
+    return animal_manager
 
 
 @pytest.fixture
-def animal_management_with_mock_pens(animal_management: AnimalManagement,
-                                     mock_pens: List[MagicMock]) -> AnimalManagement:
-    animal_management.all_pens = mock_pens
-    return animal_management
+def animal_manager_with_mock_pens(animal_manager: AnimalManager,
+                                     mock_pens: List[MagicMock]) -> AnimalManager:
+    animal_manager.all_pens = mock_pens
+    return animal_manager
 
 
 def test_daily_animal_routine():
-    """Unit test for function daily_animal_routine in file routines/animal/animal_management.py"""
+    """Unit test for function daily_animal_routine in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_get_animal_config():
-    """Unit test for function get_animal_config in file routines/animal/animal_management.py"""
+    """Unit test for function get_animal_config in file routines/animal/animal_manager.py"""
     pass
 
 
-def test_init_pens(animal_management: AnimalManagement, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
+def test_init_pens(animal_manager: AnimalManager, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
                    mock_herd_data: Dict[str, Union[str, int, bool]],
                    mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
                    mocker: MockerFixture) -> None:
-    """Unit test for function init_pens in file routines/animal/animal_management.py"""
+    """Unit test for function init_pens in file routines/animal/animal_manager.py"""
     # Arrange
-    patch_for_init_default_pens = mocker.patch.object(animal_management, '_init_default_pens')
+    patch_for_init_default_pens = mocker.patch.object(animal_manager, '_init_default_pens')
 
     # Act
     # More than the minimum num of pens - 4 pens
-    animal_management.init_pens(mock_pen_data, mock_herd_data, mock_manure_management_scenarios)
+    animal_manager.init_pens(mock_pen_data, mock_herd_data, mock_manure_management_scenarios)
 
-    actual = len(animal_management.all_pens)
+    actual = len(animal_manager.all_pens)
     expected = 4
 
     # Assert
@@ -314,35 +314,35 @@ def test_init_pens(animal_management: AnimalManagement, mock_pen_data: Dict[str,
     patch_for_init_default_pens.assert_called_once_with(mock_herd_data['herd_num'])
 
 
-def test_init_default_pens(animal_management: AnimalManagement) -> None:
+def test_init_default_pens(animal_manager: AnimalManager) -> None:
     # Less than the minimum num of pens - 0 pens
     # MIN_NUM_PENS default pens should be created
 
-    animal_management.all_pens = []
-    animal_management._init_default_pens(1)
+    animal_manager.all_pens = []
+    animal_manager._init_default_pens(1)
 
-    actual = len(animal_management.all_pens)
-    expected = animal_management.MIN_NUM_PENS
+    actual = len(animal_manager.all_pens)
+    expected = animal_manager.MIN_NUM_PENS
     assert actual == expected
 
 
-def test_init_animals(animal_management: AnimalManagement, mocker: MockerFixture):
-    """Unit test for function init_animals in file routines/animal/animal_management.py"""
+def test_init_animals(animal_manager: AnimalManager, mocker: MockerFixture):
+    """Unit test for function init_animals in file routines/animal/animal_manager.py"""
 
     mocker.patch('RUFAS.routines.animal.life_cycle.life_cycle.LifeCycleManager.initialize_herd',
                  return_value=[None, None, None, None, None])
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement._print_animal_num_warnings')
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager._print_animal_num_warnings')
 
     herd_data = MagicMock()
     config = MagicMock()
 
-    animal_management.init_animals(herd_data, config)
+    animal_manager.init_animals(herd_data, config)
 
-    animal_management.life_cycle_manager.initialize_herd.assert_called_once()
+    animal_manager.life_cycle_manager.initialize_herd.assert_called_once()
 
 
-def test_print_animal_num_warnings(animal_management: AnimalManagement):
-    """Unit test for function _print_animal_num_warnings in file routines/animal/animal_management.py"""
+def test_print_animal_num_warnings(animal_manager: AnimalManager):
+    """Unit test for function _print_animal_num_warnings in file routines/animal/animal_manager.py"""
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log, \
             patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
@@ -356,7 +356,7 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement):
         }
 
         expected_info_map = {
-            "class": "AnimalManagement",
+            "class": "AnimalManager",
             "function": "_print_animal_num_warnings",
             "herd_data_animal_nums": {
                 "calf_num": 0,
@@ -369,21 +369,21 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement):
         }
 
         # test for simulate_animals = True
-        animal_management.simulate_animals = True
-        animal_management._print_animal_num_warnings(herd_data)
+        animal_manager.simulate_animals = True
+        animal_manager._print_animal_num_warnings(herd_data)
         add_log.assert_called_once_with("simulate_animals_flag",
                                         "simulate_animals is true",
                                         expected_info_map)
 
         # test for warnings for every animal key and simulate_animals = False
-        animal_management.simulate_animals = False
+        animal_manager.simulate_animals = False
 
         for key in animal_keys:
             herd_data[key] = 1
             expected_info_map['herd_data_animal_nums'][key] = 1
         expected_info_map['simulate_animals'] = False
 
-        animal_management._print_animal_num_warnings(herd_data)
+        animal_manager._print_animal_num_warnings(herd_data)
 
         for key in animal_keys:
             add_warning.assert_any_call(f"invalid_{key}_warning",
@@ -399,26 +399,26 @@ def test_print_animal_num_warnings(animal_management: AnimalManagement):
 
 
 def test_init_nutrient_rqmts():
-    """Unit test for function init_nutrient_rqmts in file routines/animal/animal_management.py"""
+    """Unit test for function init_nutrient_rqmts in file routines/animal/animal_manager.py"""
     pass
 
 
-def test_avg_pen_dist(animal_management_with_mock_pens: AnimalManagement) -> None:
-    """Unit test for function avg_pen_dist in file routines/animal/animal_management.py"""
+def test_avg_pen_dist(animal_manager_with_mock_pens: AnimalManager) -> None:
+    """Unit test for function avg_pen_dist in file routines/animal/animal_manager.py"""
 
-    actual = animal_management_with_mock_pens.avg_pen_dist()
+    actual = animal_manager_with_mock_pens.avg_pen_dist()
     expected = (12 / 4, 24 / 4)
 
     assert actual == pytest.approx(expected)
 
 
 def test_calc_nutrient_rqmts():
-    """Unit test for function calc_nutrient_rqmts in file routines/animal/animal_management.py"""
+    """Unit test for function calc_nutrient_rqmts in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_fully_update_animal_to_pen_id_map():
-    """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_management.py"""
+    """Unit test for function fully_update_animal_to_pen_id_map in file routines/animal/animal_manager.py"""
     pass
 
 
@@ -431,7 +431,7 @@ def pens_test_data_dict() -> List[dict[Any]]:
 
     Returns:
         Returns a list of dictionaries, where each dictionary contains the data needed for individual
-        AnimalManagement test cases. The dictionaries include data needed to set up AnimalManagement
+        AnimalManager test cases. The dictionaries include data needed to set up AnimalManager
         instances for testing purposes, such as pen IDs and the animal IDs to be placed into pens. They also
         contain the expected results for various unit tests, such as the expected stocking density for a pen
         which is tested in test_remove_animals_from_herd()
@@ -804,25 +804,25 @@ def setup_dummy_pen(pen_id: int, num_stalls: int, animal_list: List[AnimalBase])
     return dummy_pen
 
 
-def setup_dummy_animal_management_with_pens(animal_management: AnimalManagement, info_dict: dict[Any],
+def setup_dummy_animal_manager_with_pens(animal_manager: AnimalManager, info_dict: dict[Any],
                                             append_removals: bool = False) -> dict[Any]:
     """
-    Prepares a dummy AnimalManagement object for testing purposes.
+    Prepares a dummy AnimalManager object for testing purposes.
 
     Using the data held within the information dictionary passed in as input, this function populates several
-    of the AnimalManagement object's variables. This is done by creating AnimalBase objects and placing them into
+    of the AnimalManager object's variables. This is done by creating AnimalBase objects and placing them into
     Pen objects' 'animals_in_pen' variables, as well as configuring the Pen's ration variable before then
-    appending individual Pen objects to the AnimalManagement object's 'all_pens' variable.
+    appending individual Pen objects to the AnimalManager object's 'all_pens' variable.
 
 
     Args:
-        animal_management: An AnimalManagement object
+        animal_manager: An AnimalManager object
         info_dict: A dictionary containing the data needed to fully create the
         append_removals: A boolean that is set to True if a list of animals to be removed needs to be true,
             False otherwise
 
     Returns:
-        A dictionary containing the edited AnimalManagement object via the 'animal_management_object'
+        A dictionary containing the edited AnimalManager object via the 'animal_manager_object'
         key, and a list of AnimalBase objects to be removed via the 'animals_removed_list' key
     """
 
@@ -836,7 +836,7 @@ def setup_dummy_animal_management_with_pens(animal_management: AnimalManagement,
 
                 animal_list.append(dummy_animal)
 
-                animal_management.animal_to_pen_id_map[dummy_animal.id] = pen_dict['pen_id']
+                animal_manager.animal_to_pen_id_map[dummy_animal.id] = pen_dict['pen_id']
                 if append_removals and dummy_animal.id in info_dict['animals_to_be_removed']:
                     animals_removed.append(dummy_animal)
 
@@ -846,60 +846,60 @@ def setup_dummy_animal_management_with_pens(animal_management: AnimalManagement,
 
         dummy_pen.animals_in_pen = animal_list
 
-        animal_management.pens_by_animal_combination[pen_dict['pen_animal_combination']].append(dummy_pen)
+        animal_manager.pens_by_animal_combination[pen_dict['pen_animal_combination']].append(dummy_pen)
 
         pen_list.append(dummy_pen)
 
-    animal_management.all_pens = pen_list
+    animal_manager.all_pens = pen_list
 
-    return {'animal_management_object': animal_management, 'animals_removed_list': animals_removed}
+    return {'animal_manager_object': animal_manager, 'animals_removed_list': animals_removed}
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_remove_animals_from_herd(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
-    """Unit test for function remove_animals_from_herd in file routines/animal/animal_management.py"""
+def test_remove_animals_from_herd(info_dict: dict[Any], animal_manager: AnimalManager) -> None:
+    """Unit test for function remove_animals_from_herd in file routines/animal/animal_manager.py"""
 
-    dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
-        'animal_management_object']
-    animals_removed = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)[
+    dummy_animal_manager = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, True)[
+        'animal_manager_object']
+    animals_removed = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, True)[
         'animals_removed_list']
 
-    dummy_animal_management.remove_animals_from_herd(animals_removed)
+    dummy_animal_manager.remove_animals_from_herd(animals_removed)
 
-    assert dummy_animal_management.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_removals']
+    assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_removals']
     for idx, pen_dict in enumerate(info_dict['pen_data'].values()):
-        assert dummy_animal_management.all_pens[idx].stocking_density == pen_dict['post_removal_stocking_density']
-        assert set(dummy_animal_management.all_pens[idx].animals_in_pen) & set(animals_removed) == set()
+        assert dummy_animal_manager.all_pens[idx].stocking_density == pen_dict['post_removal_stocking_density']
+        assert set(dummy_animal_manager.all_pens[idx].animals_in_pen) & set(animals_removed) == set()
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_track_former_pen_population(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
-    """Unit test for function track_former_pen_population in file routines/animal/animal_management.py"""
+def test_track_former_pen_population(info_dict: dict[Any], animal_manager: AnimalManager) -> None:
+    """Unit test for function track_former_pen_population in file routines/animal/animal_manager.py"""
 
-    dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
-        'animal_management_object']
+    dummy_animal_manager = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, False)[
+        'animal_manager_object']
 
-    former_population_dictionary = dummy_animal_management.track_former_pen_population()
+    former_population_dictionary = dummy_animal_manager.track_former_pen_population()
 
     assert former_population_dictionary == info_dict['tracked_pen_population_list']
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_calculate_pen_rations(info_dict: dict[Any], animal_management: AnimalManagement) -> None:
-    """Unit test for function calculate_pen_rations in file routines/animal/animal_management.py"""
+def test_calculate_pen_rations(info_dict: dict[Any], animal_manager: AnimalManager) -> None:
+    """Unit test for function calculate_pen_rations in file routines/animal/animal_manager.py"""
 
-    dummy_animal_management = setup_dummy_animal_management_with_pens(animal_management, info_dict, False)[
-        'animal_management_object']
+    dummy_animal_manager = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, False)[
+        'animal_manager_object']
 
-    dummy_animal_management.calculate_pen_rations(info_dict['former_pen_populations'])
+    dummy_animal_manager.calculate_pen_rations(info_dict['former_pen_populations'])
 
-    for idx, pen in enumerate(dummy_animal_management.all_pens):
+    for idx, pen in enumerate(dummy_animal_manager.all_pens):
         assert pen.ration == info_dict['updated_pen_rations'][idx]
 
 
 @pytest.mark.parametrize("info_dict", pens_test_data_dict())
-def test_daily_update_id_map(info_dict: dict[Any], animal_management: AnimalManagement, mocker: MockerFixture):
-    """Unit test for function daily_update_id_map in file routines/animal/animal_management.py"""
+def test_daily_update_id_map(info_dict: dict[Any], animal_manager: AnimalManager, mocker: MockerFixture):
+    """Unit test for function daily_update_id_map in file routines/animal/animal_manager.py"""
 
     mocker.patch("RUFAS.routines.feed.Feed.__init__", return_value=None)
 
@@ -908,8 +908,8 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_management: AnimalMana
 
     dummy_feed = Feed(data=mocker.MagicMock())
 
-    dummy_object_and_removals = setup_dummy_animal_management_with_pens(animal_management, info_dict, True)
-    dummy_animal_management = dummy_object_and_removals['animal_management_object']
+    dummy_object_and_removals = setup_dummy_animal_manager_with_pens(animal_manager, info_dict, True)
+    dummy_animal_manager = dummy_object_and_removals['animal_manager_object']
     dummy_removal_list = dummy_object_and_removals['animals_removed_list']
 
     for animal_id, animal_type in info_dict["new_cow_dict"].items():
@@ -921,93 +921,93 @@ def test_daily_update_id_map(info_dict: dict[Any], animal_management: AnimalMana
         calf_addition_list.append(new_calf)
 
     with patch("RUFAS.routines.animal.pen.Pen.set_up_new_animal") as set_up_new_animal:
-        dummy_animal_management.daily_update_id_map(animal_addition_list, dummy_removal_list, calf_addition_list,
+        dummy_animal_manager.daily_update_id_map(animal_addition_list, dummy_removal_list, calf_addition_list,
                                                     dummy_feed, 20.0)
         assert set_up_new_animal.call_count == len(info_dict["new_calf_dict"]) + len(info_dict["new_cow_dict"])
 
-    assert dummy_animal_management.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
+    assert dummy_animal_manager.animal_to_pen_id_map == info_dict['animal_to_pen_id_map_after_daily_update']
 
 
 def test_allocate_all_pens():
-    """Unit test for function allocate_all_pens in file routines/animal/animal_management.py"""
+    """Unit test for function allocate_all_pens in file routines/animal/animal_manager.py"""
     pass
 
 
-def test_clear_pens(animal_management_with_mock_pens: AnimalManagement) -> None:
-    """Unit test for function clear_pens in file routines/animal/animal_management.py"""
-    animal_management_with_mock_pens.clear_pens()
+def test_clear_pens(animal_manager_with_mock_pens: AnimalManager) -> None:
+    """Unit test for function clear_pens in file routines/animal/animal_manager.py"""
+    animal_manager_with_mock_pens.clear_pens()
 
-    for pen in animal_management_with_mock_pens.all_pens:
+    for pen in animal_manager_with_mock_pens.all_pens:
         pen.clear.assert_called_once()
 
 
 def test_calc_avg_nutrient_rqmts():
-    """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/animal_management.py"""
+    """Unit test for function calc_avg_nutrient_rqmts in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_calc_ration():
-    """Unit test for function calc_ration in file routines/animal/animal_management.py"""
+    """Unit test for function calc_ration in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_calc_manure_excretion():
-    """Unit test for function calc_manure_excretion in file routines/animal/animal_management.py"""
+    """Unit test for function calc_manure_excretion in file routines/animal/animal_manager.py"""
     pass
 
 
-def test_calc_avg_growth(animal_management_with_mock_pens: AnimalManagement) -> None:
-    """Unit test for function calc_avg_growth in file routines/animal/animal_management.py"""
+def test_calc_avg_growth(animal_manager_with_mock_pens: AnimalManager) -> None:
+    """Unit test for function calc_avg_growth in file routines/animal/animal_manager.py"""
 
-    animal_management_with_mock_pens.calc_avg_growth()
+    animal_manager_with_mock_pens.calc_avg_growth()
 
-    for pen in animal_management_with_mock_pens.all_pens:
+    for pen in animal_manager_with_mock_pens.all_pens:
         pen.calc_avg_growth.assert_called_once()
 
     pass
 
 
 def test_record_pen_history():
-    """Unit test for function record_pen_history in file routines/animal/animal_management.py"""
+    """Unit test for function record_pen_history in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_calc_p_conc(mock_animals_small: List[MagicMock]) -> None:
-    """Unit test for function _calc_p_conc in file routines/animal/animal_management.py"""
+    """Unit test for function _calc_p_conc in file routines/animal/animal_manager.py"""
     expected = 0
-    actual = AnimalManagement._calc_p_conc([])
+    actual = AnimalManager._calc_p_conc([])
     assert actual == expected
 
-    actual = AnimalManagement._calc_p_conc(mock_animals_small)
+    actual = AnimalManager._calc_p_conc(mock_animals_small)
     expected = (16.0 / 8.0) / 1000.0
 
     assert actual == pytest.approx(expected)
 
 
 def test_calc_all_p_conc():
-    """Unit test for function calc_all_p_conc in file routines/animal/animal_management.py"""
+    """Unit test for function calc_all_p_conc in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_calc_p_rqmts():
-    """Unit test for function calc_p_rqmts in file routines/animal/animal_management.py"""
+    """Unit test for function calc_p_rqmts in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_daily_p_update():
-    """Unit test for function daily_p_update in file routines/animal/animal_management.py"""
+    """Unit test for function daily_p_update in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
-    """Unit test for function reset_milk_production_reduction in file routines/animal/animal_management.py"""
+    """Unit test for function reset_milk_production_reduction in file routines/animal/animal_manager.py"""
 
     # Set milk_production_reduction to some value
     for pen in pens_with_mock_animals:
         for animal in pen.animals_in_pen:
             animal.milk_production_reduction = 100.1
 
-    # mock an animal_management object, but specifically so it returns a list of pens
+    # mock an animal_manager object, but specifically so it returns a list of pens
     penlist = MagicMock()
     penlist.all_pens = pens_with_mock_animals
     for pen in penlist.all_pens:
@@ -1016,7 +1016,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
             assert animal.milk_production_reduction == 100.1
 
     # call the function once on the list of pens
-    AnimalManagement.reset_milk_production_reduction(penlist)
+    AnimalManager.reset_milk_production_reduction(penlist)
 
     # then assert that all animals in all pens are still 100.1
     for pen in penlist.all_pens:
@@ -1028,7 +1028,7 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
         pen.animal_combination.name = "LAC_COW"
 
     # call the function again on the list of pens
-    AnimalManagement.reset_milk_production_reduction(penlist)
+    AnimalManager.reset_milk_production_reduction(penlist)
 
     # then assert that all animals in all pens are now 0.0
     for pen in penlist.all_pens:
@@ -1037,32 +1037,32 @@ def test_reset_milk_production_reduction(pens_with_mock_animals) -> None:
 
 
 def test_daily_updates():
-    """Unit test for function daily_updates in file routines/animal/animal_management.py"""
+    """Unit test for function daily_updates in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_end_ration_interval():
-    """Unit test for function end_ration_interval in file routines/animal/animal_management.py"""
+    """Unit test for function end_ration_interval in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_annual_reset():
-    """Unit test for function annual_reset in file routines/animal/animal_management.py"""
+    """Unit test for function annual_reset in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_generate_animal_output():
-    """Unit test for function generate_animal_output in file routines/animal/animal_management.py"""
+    """Unit test for function generate_animal_output in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_get_life_cycle_output():
-    """Unit test for function get_life_cycle_output in file routines/animal/animal_management.py"""
+    """Unit test for function get_life_cycle_output in file routines/animal/animal_manager.py"""
     pass
 
 
 def test_get_initialize_db_summary():
-    """Unit test for function get_initialize_db_summary in file routines/animal/animal_management.py"""
+    """Unit test for function get_initialize_db_summary in file routines/animal/animal_manager.py"""
     pass
 
 @pytest.fixture
@@ -1072,31 +1072,31 @@ def cowlist():
         MagicMock()]
     return cowlist
 
-def test_sum_daily_milk(animal_management, cowlist):
-    """Unit test for function sum_daily_milk in file routines/animal/animal_management.py"""
+def test_sum_daily_milk(animal_manager, cowlist):
+    """Unit test for function sum_daily_milk in file routines/animal/animal_manager.py"""
     for cow in cowlist:
         cow.estimated_daily_milk_produced = 50.0
-    result = AnimalManagement.sum_daily_milk(animal_management, cowlist)
+    result = AnimalManager.sum_daily_milk(animal_manager, cowlist)
     assert result == 150
 
 def test_get_animals_snapshot(mocker: MockerFixture):
     """
-    Unit test for function _get_animals_snapshot() in file animal_management.py
+    Unit test for function _get_animals_snapshot() in file animal_manager.py
 
     This test checks that the function correctly creates a snapshot of the current state of all animals
     in the system, and additionally finds and stores the combination each animal belongs to.
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(
         data=mocker.MagicMock(),
         config=mocker.MagicMock(),
         feed=mocker.MagicMock(),
         weather=mocker.MagicMock(),
         time=mocker.MagicMock()
     )
-    old_animal_grouping_scenario = AnimalManagement.ANIMAL_GROUPING_SCENARIO
+    old_animal_grouping_scenario = AnimalManager.ANIMAL_GROUPING_SCENARIO
     mock_animal_grouping_scenario = mocker.MagicMock()
     num_animal_classes = 5
     num_animals_of_each_type = 10
@@ -1136,12 +1136,12 @@ def test_get_animals_snapshot(mocker: MockerFixture):
     mock_animal_grouping_scenario.find_animal_combination = \
         mocker.MagicMock(side_effect=lambda animal: animal_combination_by_id[animal.id])
 
-    animal_management.calves = mock_calves
-    animal_management.heiferIs = mock_heifer_Is
-    animal_management.heiferIIs = mock_heifer_IIs
-    animal_management.heiferIIIs = mock_heifer_IIIs
-    animal_management.cows = mock_cows
-    AnimalManagement.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
+    animal_manager.calves = mock_calves
+    animal_manager.heiferIs = mock_heifer_Is
+    animal_manager.heiferIIs = mock_heifer_IIs
+    animal_manager.heiferIIIs = mock_heifer_IIIs
+    animal_manager.cows = mock_cows
+    AnimalManager.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
 
     expected_snapshot = {
         'calves': set(mock_calves),
@@ -1153,7 +1153,7 @@ def test_get_animals_snapshot(mocker: MockerFixture):
     }
 
     # Act
-    actual_snapshot = animal_management._get_animals_snapshot()
+    actual_snapshot = animal_manager._get_animals_snapshot()
 
     # Assert
     assert actual_snapshot == expected_snapshot
@@ -1161,22 +1161,22 @@ def test_get_animals_snapshot(mocker: MockerFixture):
            num_animal_classes * num_animals_of_each_type
 
     # Reset
-    AnimalManagement.ANIMAL_GROUPING_SCENARIO = old_animal_grouping_scenario
+    AnimalManager.ANIMAL_GROUPING_SCENARIO = old_animal_grouping_scenario
 
 
 def test_handle_removed_animals_after_update(mocker: MockerFixture):
     """
-    Unit test for the function _handle_removed_animals_after_update() in file animal_management.py
+    Unit test for the function _handle_removed_animals_after_update() in file animal_manager.py
 
     This test checks that the function correctly identifies the animals that have been removed after an update,
     and that it successfully calls the '_remove_animal_from_pen_and_id_map' method for each of these animals.
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock())
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock())
 
     num_animals_of_each_type = 10
     mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
@@ -1218,11 +1218,11 @@ def test_handle_removed_animals_after_update(mocker: MockerFixture):
     removed_animals = set(mock_calves_at_even_indices + mock_heifer_Is_at_even_indices +
                           mock_heifer_IIs_at_even_indices + mock_heifer_IIIs_at_even_indices +
                           mock_cows_at_even_indices)
-    patch_remove_animal_from_pen_and_id_map = mocker.patch.object(animal_management,
+    patch_remove_animal_from_pen_and_id_map = mocker.patch.object(animal_manager,
                                                                   '_remove_animal_from_pen_and_id_map')
 
     # Act
-    animal_management._handle_removed_animals_after_update(animals_snapshot_before_update,
+    animal_manager._handle_removed_animals_after_update(animals_snapshot_before_update,
                                                            animals_snapshot_after_update)
 
     # Assert
@@ -1233,17 +1233,17 @@ def test_handle_removed_animals_after_update(mocker: MockerFixture):
 
 def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: MockerFixture):
     """
-    Unit test for the function _handle_animals_with_unchanged_class_and_changed_combination() in file animal_management.py
+    Unit test for the function _handle_animals_with_unchanged_class_and_changed_combination() in file animal_manager.py
 
     This test checks that the function correctly identifies the animals that didn't change their classes but changed their animal combination.
     It also verifies that the functions '_remove_animal_from_pen_and_id_map' and '_add_animal_to_pen_and_id_map' are called for these animals.
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock())
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock())
 
     num_animals_of_each_type = 10
     mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
@@ -1275,11 +1275,11 @@ def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: Moc
     mock_feed = mocker.MagicMock()
     mock_temp = mocker.MagicMock()
 
-    patch_remove_animal = mocker.patch.object(animal_management, '_remove_animal_from_pen_and_id_map')
-    patch_add_animal = mocker.patch.object(animal_management, '_add_animal_to_pen_and_id_map')
+    patch_remove_animal = mocker.patch.object(animal_manager, '_remove_animal_from_pen_and_id_map')
+    patch_add_animal = mocker.patch.object(animal_manager, '_add_animal_to_pen_and_id_map')
 
     # Act
-    animal_management._handle_animals_with_unchanged_class_and_changed_combination(animals_snapshot_before_update,
+    animal_manager._handle_animals_with_unchanged_class_and_changed_combination(animals_snapshot_before_update,
                                                                                    animals_snapshot_after_update,
                                                                                    mock_feed, mock_temp)
 
@@ -1293,7 +1293,7 @@ def test_handle_animals_with_unchanged_class_and_changed_combination(mocker: Moc
 
 def test_handle_graduated_animals(mocker: MockerFixture):
     """
-    Unit test for the function _handle_graduated_animals() in file animal_management.py
+    Unit test for the function _handle_graduated_animals() in file animal_manager.py
 
     This test checks that the function correctly identifies the animals that have graduated to the next class.
     It also verifies that the function '_add_animal_to_pen_and_id_map' is called for these graduated animals.
@@ -1303,10 +1303,10 @@ def test_handle_graduated_animals(mocker: MockerFixture):
     import random
     random.seed(42)  # Set seed to make test reproducible
 
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock())
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock())
 
     num_animals_of_each_type = 30  # To make easier to select a third of each class
     mock_calves = [mocker.MagicMock() for _ in range(num_animals_of_each_type)]
@@ -1342,10 +1342,10 @@ def test_handle_graduated_animals(mocker: MockerFixture):
     mock_feed = mocker.MagicMock()
     mock_temp = mocker.MagicMock()
 
-    patch_add_animal = mocker.patch.object(animal_management, '_add_animal_to_pen_and_id_map')
+    patch_add_animal = mocker.patch.object(animal_manager, '_add_animal_to_pen_and_id_map')
 
     # Act
-    animal_management._handle_graduated_animals(animals_snapshot_before_update,
+    animal_manager._handle_graduated_animals(animals_snapshot_before_update,
                                                 animals_snapshot_after_update,
                                                 mock_feed, mock_temp)
 
@@ -1358,17 +1358,17 @@ def test_handle_graduated_animals(mocker: MockerFixture):
 
 def test_handle_newly_added_animals(mocker: MockerFixture):
     """
-    Unit test for the function _handle_newly_added_animals() in file animal_management.py
+    Unit test for the function _handle_newly_added_animals() in file animal_manager.py
 
     This test checks that the function correctly handles newly added animals and adds them to
     the appropriate data structures.
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock())
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock())
 
     # MockAnimal class
     class MockAnimal:
@@ -1381,37 +1381,37 @@ def test_handle_newly_added_animals(mocker: MockerFixture):
     mock_feed = mocker.MagicMock()
     mock_temp = mocker.MagicMock()
 
-    patch_add_animal = mocker.patch.object(animal_management, '_add_animal_to_pen_and_id_map')
+    patch_add_animal = mocker.patch.object(animal_manager, '_add_animal_to_pen_and_id_map')
 
     # Set up property mock for animals_by_type
     mock_animals_by_type = {MockAnimal: []}
-    mock_animals_by_type_property = mocker.patch.object(AnimalManagement, 'animals_by_type',
+    mock_animals_by_type_property = mocker.patch.object(AnimalManager, 'animals_by_type',
                                                         new_callable=mocker.PropertyMock)
     mock_animals_by_type_property.return_value = mock_animals_by_type
 
     # Act
-    animal_management._handle_newly_added_animals(new_mock_animals, mock_feed, mock_temp)
+    animal_manager._handle_newly_added_animals(new_mock_animals, mock_feed, mock_temp)
 
     # Assert
     assert patch_add_animal.call_count == num_new_animals
     for animal in new_mock_animals:
         patch_add_animal.assert_any_call(animal, mock_feed, mock_temp)
-        assert animal in animal_management.animals_by_type[MockAnimal]
+        assert animal in animal_manager.animals_by_type[MockAnimal]
 
 
 def test_remove_animal_from_pen_and_id_map(mocker: MockerFixture):
     """
-    Unit test for the function _remove_animal_from_pen_and_id_map() in file animal_management.py
+    Unit test for the function _remove_animal_from_pen_and_id_map() in file animal_manager.py
 
     This test checks that the function correctly removes the animal from the pen it is in and
     from the animal_to_pen_id_map.
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock())
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock())
 
     mock_animal = mocker.MagicMock()
     mock_animal.id = 1
@@ -1422,30 +1422,30 @@ def test_remove_animal_from_pen_and_id_map(mocker: MockerFixture):
     mock_animal_to_pen_id_map = {mock_animal.id: 0}
     mock_all_pens = [mock_pen]
 
-    animal_management.animal_to_pen_id_map = mock_animal_to_pen_id_map
-    animal_management.all_pens = mock_all_pens
+    animal_manager.animal_to_pen_id_map = mock_animal_to_pen_id_map
+    animal_manager.all_pens = mock_all_pens
 
     # Act
-    animal_management._remove_animal_from_pen_and_id_map(mock_animal)
+    animal_manager._remove_animal_from_pen_and_id_map(mock_animal)
 
     # Assert
     mock_pen.remove_animal.assert_called_once_with(mock_animal.id)
-    assert mock_animal.id not in animal_management.animal_to_pen_id_map
+    assert mock_animal.id not in animal_manager.animal_to_pen_id_map
 
 
 def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
     """
-    Unit test for the function _add_animal_to_pen_and_id_map() in file animal_management.py
+    Unit test for the function _add_animal_to_pen_and_id_map() in file animal_manager.py
 
     This test checks that the function correctly assigns an animal to a pen with the minimum stocking density,
     updates the pen's animal count and stocking density, and updates the animal_to_pen_id_map.
 
     """
     # Arrange
-    mocker.patch('RUFAS.routines.animal.animal_management.AnimalManagement.__init__', return_value=None)
-    animal_management = AnimalManagement(data=mocker.MagicMock(), config=mocker.MagicMock(),
-                                         feed=mocker.MagicMock(), weather=mocker.MagicMock(),
-                                         time=mocker.MagicMock())
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__', return_value=None)
+    animal_manager = AnimalManager(data=mocker.MagicMock(), config=mocker.MagicMock(),
+                                      feed=mocker.MagicMock(), weather=mocker.MagicMock(),
+                                      time=mocker.MagicMock())
 
     mock_animal = mocker.MagicMock()
     mock_animal.id = 1
@@ -1469,14 +1469,14 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
 
     mock_pens_by_animal_combination = {mock_animal_combination: [mock_pen_1, mock_pen_2]}
 
-    original_ANIMAL_GROUPING_SCENARIO = AnimalManagement.ANIMAL_GROUPING_SCENARIO
-    AnimalManagement.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
-    animal_management.pens_by_animal_combination = mock_pens_by_animal_combination
-    animal_management.phosphorus_concentration_by_animal_class = {type(mock_animal): 0.0}
-    animal_management.animal_to_pen_id_map = {}
+    original_ANIMAL_GROUPING_SCENARIO = AnimalManager.ANIMAL_GROUPING_SCENARIO
+    AnimalManager.ANIMAL_GROUPING_SCENARIO = mock_animal_grouping_scenario
+    animal_manager.pens_by_animal_combination = mock_pens_by_animal_combination
+    animal_manager.phosphorus_concentration_by_animal_class = {type(mock_animal): 0.0}
+    animal_manager.animal_to_pen_id_map = {}
 
     # Act
-    animal_management._add_animal_to_pen_and_id_map(mock_animal, mock_feed, mock_temp)
+    animal_manager._add_animal_to_pen_and_id_map(mock_animal, mock_feed, mock_temp)
 
     # Assert
     mock_pen_1.add_animal.assert_not_called()
@@ -1485,7 +1485,7 @@ def test_add_animal_to_pen_and_id_map(mocker: MockerFixture):
                                                   mock_feed,
                                                   mock_temp,
                                                   0.0)
-    assert animal_management.animal_to_pen_id_map[mock_animal.id] == mock_pen_2.id
+    assert animal_manager.animal_to_pen_id_map[mock_animal.id] == mock_pen_2.id
 
     # Reset ANIMAL_GROUPING_SCENARIO
-    AnimalManagement.ANIMAL_GROUPING_SCENARIO = original_ANIMAL_GROUPING_SCENARIO
+    AnimalManager.ANIMAL_GROUPING_SCENARIO = original_ANIMAL_GROUPING_SCENARIO

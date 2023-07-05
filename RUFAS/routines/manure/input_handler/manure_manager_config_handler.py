@@ -14,25 +14,25 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import Man
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
-class ManureManagementConfigHandler:
-    """A class that manages the custom manure management configs."""
+class ManureManagerConfigHandler:
+    """A class that manages the custom manure manager configs."""
     
-    def __init__(self, manure_management_config):
-        """Initializes the ManureManagementConfigHandler class.
+    def __init__(self, manure_manager_config):
+        """Initializes the ManureManagerConfigHandler class.
 
         Parameters
         ----------
-        manure_management_config : Dict
-            The manure management config dictionary that contains all the manure management config information.
+        manure_manager_config : Dict
+            The manure manager config dictionary that contains all the manure manager config information.
 
         """
-        self.custom_bedding_configs = self._process_bedding_configs(manure_management_config['bedding_configs'])
+        self.custom_bedding_configs = self._process_bedding_configs(manure_manager_config['bedding_configs'])
         self.custom_manure_handler_configs = \
-            self._process_manure_handler_configs(manure_management_config['manure_handler_configs'])
+            self._process_manure_handler_configs(manure_manager_config['manure_handler_configs'])
         self.custom_manure_separator_configs = \
-            self._process_manure_separator_configs(manure_management_config['manure_separator_configs'])
+            self._process_manure_separator_configs(manure_manager_config['manure_separator_configs'])
         self.custom_manure_treatment_configs = \
-            self._process_manure_treatment_configs(manure_management_config['manure_treatment_configs'])
+            self._process_manure_treatment_configs(manure_manager_config['manure_treatment_configs'])
 
     # TODO: For the following getters, pass in an enum member instead of a string
 
