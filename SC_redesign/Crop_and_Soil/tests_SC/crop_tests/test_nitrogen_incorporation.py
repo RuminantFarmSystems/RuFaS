@@ -26,7 +26,7 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
     (0.5, 0.5, 0.530, 0.101, 0.057, 0.013, True)
 ])
 def test_determine_nitrogen_shape_parameters(halfheat: float, heatfrac: float, emerge: float, half: float,
-                                             near: float, mature: float, should_fail: bool):
+                                             near: float, mature: float, should_fail: bool) -> None:
     """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
      correctly"""
     if should_fail:
@@ -49,7 +49,8 @@ def test_determine_nitrogen_shape_parameters(halfheat: float, heatfrac: float, e
     (0.32, .5, .25, .75, False),  # arbitrary
     (0.32, .5, .75, .75, True)  # throw error
 ])
-def test_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float, should_fail: bool):
+def test_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float, should_fail: bool) \
+        -> None:
     """check that determine_shape_log() calculates correct output and make sure that errors were raised correctly"""
     if should_fail:
         try:
@@ -260,7 +261,7 @@ def test_determine_layer_nitrogen_demands(pots, avails):
     ([25, 8.33, 2.05, 12.99], [22.5, 15.98, 2.22, 35.4, 0.001, 0.2], [15.5, 5.5, 0.1], True)
 ])
 def test_determine_layer_nitrogen_uptake(demand: List[float], potential: List[float], nitrate: List[float],
-                                         should_fail: bool):
+                                         should_fail: bool) -> None:
     """test that actual nitrogen uptake from each layer is properly calculated by determine_layer_nitrogen_uptake() and
      make sure that errors were raised correctly"""
     if should_fail:
