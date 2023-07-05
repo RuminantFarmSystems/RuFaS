@@ -5,6 +5,7 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
+import re
 import os
 from typing import Callable
 from typing import Dict
@@ -14,7 +15,6 @@ import pytest
 from mock.mock import MagicMock
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
-from RUFAS.input_manager import InputManager
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -139,12 +139,12 @@ def test_advance_time(
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.classes.Time.to_str")
     mocker.patch("RUFAS.classes.Time.advance")
-    patch_simulation_engine.state.animal_management.simulation_day = 1
+    patch_simulation_engine.state.animal_manager.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
     assert patch_simulation_engine.time.advance.call_count == 2
     assert patch_simulation_engine.time.to_str.call_count == 1
-    assert patch_simulation_engine.state.animal_management.simulation_day == 3
+    assert patch_simulation_engine.state.animal_manager.simulation_day == 3
 
 
 def test_input_prompt():
@@ -353,6 +353,16 @@ def test_generate_key(mocker: MockerFixture) -> None:
     key = om._generate_key("key_name", info_map)
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
+def test_get_timestamp(mocker: MockerFixture) -> None:
+    """Unit test for the function _get_timestamp in file output_manager.py"""
+    om = OutputManager()
+    # match 28-Jun-2023_Wed_15-48-21.406585
+    timestamp_with_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
+    # match 28-Jun-2023_Wed_15-48-21
+    timestamp_without_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
+
+    assert re.match(timestamp_with_millis_pattern, om._get_timestamp(include_millis=True))
+    assert re.match(timestamp_without_millis_pattern, om._get_timestamp(include_millis=False))
 
 def test_add_error(
     mock_output_manager: OutputManager,
@@ -362,13 +372,17 @@ def test_add_error(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
+    timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
 
     mock_output_manager.add_error(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map.get("timestamp") == timestamp
     mock_output_manager._add_to_pool(
         mock_output_manager.errors_pool, key, value, info_map
     )
@@ -379,7 +393,9 @@ def test_add_error(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-
+    mock_output_manager._get_timestamp = output_manager_original_method_states[
+        "_get_timestamp"
+    ]
 
 def test_add_warning(
     mock_output_manager: OutputManager,
@@ -389,13 +405,17 @@ def test_add_warning(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
+    timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
 
     mock_output_manager.add_warning(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map.get("timestamp") == timestamp
     mock_output_manager._add_to_pool(
         mock_output_manager.warnings_pool, key, value, info_map
     )
@@ -406,7 +426,9 @@ def test_add_warning(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-
+    mock_output_manager._get_timestamp = output_manager_original_method_states[
+        "_get_timestamp"
+    ]
 
 def test_add_log(
     mock_output_manager: OutputManager,
@@ -416,13 +438,17 @@ def test_add_log(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
+    timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
 
     mock_output_manager.add_log(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map.get("timestamp") == timestamp
     mock_output_manager._add_to_pool(
         mock_output_manager.logs_pool, key, value, info_map
     )
@@ -433,7 +459,9 @@ def test_add_log(
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
     ]
-
+    mock_output_manager._get_timestamp = output_manager_original_method_states[
+        "_get_timestamp"
+    ]
 
 def test_add_variable(
     mock_output_manager: OutputManager,
@@ -526,6 +554,7 @@ def output_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
+        "_get_timestamp": mock_output_manager._get_timestamp,
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_dict_to_file_json": mock_output_manager._dict_to_file_json,
@@ -592,19 +621,19 @@ def test_dump_all_pools(
         "dump_variable_names_and_contexts"
     ]
 
-
 def test_generate_file_name(mocker: MockerFixture) -> None:
     """Unit test for function _generate_file_name in file output_manager.py"""
     timestamp = "18-Jan-2023_Wed_22-38-14"
-    mocker.patch("time.strftime", return_value=timestamp)
     base_name = "dummy_name"
     extension = "ext"
     om = OutputManager()
-    assert (
-        om._generate_file_name(base_name, extension)
-        == f"{base_name}_{timestamp}.{extension}"
-    )
 
+    with patch.object(om, "_get_timestamp") as mock_method:
+        mock_method.return_value = timestamp
+        assert (
+            om._generate_file_name(base_name, extension)
+            == f"{base_name}_{timestamp}.{extension}"
+        )
 
 def test_dump_variables(
     mock_output_manager: OutputManager,
@@ -1224,19 +1253,6 @@ def test_save_variables(
     mock_output_manager.save_variables = output_manager_original_method_states[
         "save_variables"
     ]
-
-
-@pytest.fixture
-def mock_input_manager(mocker) -> InputManager:
-    input_manager = InputManager()
-    return input_manager
-
-
-def test_input_manager_singleton(mocker: MockerFixture) -> None:
-    im1 = InputManager()
-    im2 = InputManager()
-
-    assert im1 is im2
 
 
 class DummyClass:

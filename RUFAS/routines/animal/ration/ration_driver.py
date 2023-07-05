@@ -140,7 +140,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
         pen: an object of class Pen
         available_feeds: an object of class AvailableFeeds
         animal_grouping_scenario: A grouping scenario of animals used in the current simulation, specified in
-            AnimalGroupingScenario enum and AnimalManagement class
+            AnimalGroupingScenario enum and AnimalManager class
 
     """
 
@@ -370,7 +370,7 @@ class Requirements:
 
         Args:
             pen: an instance of an object of class Pen
-            animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManagement
+            animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManager
             recalc: boolean to see if requirements need to be recalculated since grouping
         """
         NEmaint = []
