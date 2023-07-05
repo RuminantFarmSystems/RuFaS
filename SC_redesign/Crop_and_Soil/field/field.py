@@ -16,8 +16,10 @@ from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from copy import copy
-
 
 """
 This is a high-level module that represents and simulates an entire field. It is responsible for executing the daily
@@ -37,7 +39,8 @@ class Field:
                  tillage_events: Optional[List[TillageEvent]] = None,
                  fertilizer_events: Optional[List[FertilizerEvent]] = None,
                  fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
-                 manure_events: Optional[List[ManureEvent]] = None):
+                 manure_events: Optional[List[ManureEvent]] = None,
+                 manure_manager: Optional[ManureManager] = None):
         # field-wide attributes
         self.field_data = field_data or FieldData()
         """field data component"""
@@ -83,6 +86,11 @@ class Field:
 
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
+
+        self.manure_manager: ManureManager = manure_manager
+        """:class:`ManureManager` instance from which manure is requested for application to the field."""
+        # HELPME: not sure how to deal with the manure manager being None. If it were a different class I would just
+        # instantiate a new one, but ManureManager is pretty involved.
 
     def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
         """
@@ -312,13 +320,36 @@ class Field:
             Julian day on which this manure application occurs.
 
         """
-        # TODO: integrate the manure manager's request manure method here when it is finished.
-        manure_filled_by_request = {"nitrogen": 0.0, "phosphorus": 0.0}
+        _manure_nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
+        # TODO: call request_nutrients() on ManureManager when finished
+        manure_filled_by_request = NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, total_manure_mass=500.0,
+                                                          dry_matter=150.0, dry_matter_fraction=0.3)
 
-        self.manure_applicator.apply_machine_manure(0.0, 0.0, 0.0, field_coverage, 1.0, 0.0, 0.0, 0.0)
+        self.manure_applicator.apply_machine_manure(dry_matter_mass=manure_filled_by_request.dry_matter,
+                                                    dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
+                                                    total_phosphorus_mass=manure_filled_by_request.phosphorus,
+                                                    field_coverage=field_coverage,
+                                                    field_size=self.field_data.field_size,
+                                                    inorganic_nitrogen_fraction=
+                                                    manure_filled_by_request.inorganic_nitrogen_fraction,
+                                                    ammonium_fraction=
+                                                    manure_filled_by_request.ammonium_nitrogen_fraction,
+                                                    organic_nitrogen_fraction=
+                                                    manure_filled_by_request.organic_nitrogen_fraction,
+                                                    water_extractable_inorganic_phosphorus_fraction=
+                                                    manure_filled_by_request.inorganic_phosphorus_fraction)
 
-        unmet_nitrogen_demand = max(0.0, requested_nitrogen - manure_filled_by_request["nitrogen"])
-        unmet_phosphorus_demand = max(0.0, requested_phosphorus - manure_filled_by_request["phosphorus"])
+        self._record_manure_application(dry_matter_mass=manure_filled_by_request.dry_matter,
+                                        dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
+                                        field_coverage=field_coverage,
+                                        nitrogen=manure_filled_by_request.nitrogen,
+                                        phosphorus=manure_filled_by_request.phosphorus,
+                                        potassium=None,
+                                        year=year,
+                                        day=day)
+
+        unmet_nitrogen_demand = max(0.0, requested_nitrogen - manure_filled_by_request.nitrogen)
+        unmet_phosphorus_demand = max(0.0, requested_phosphorus - manure_filled_by_request.phosphorus)
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
         elif not unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
@@ -357,8 +388,9 @@ class Field:
                     "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
-                 field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
+            field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
+
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
