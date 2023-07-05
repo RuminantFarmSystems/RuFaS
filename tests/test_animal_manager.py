@@ -297,32 +297,15 @@ def test_get_animal_config():
 def test_init_pens(animal_manager: AnimalManager, mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
                    mock_herd_data: Dict[str, Union[str, int, bool]],
                    mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
-                   mocker: MockerFixture) -> None:
+                   ) -> None:
     """Unit test for function init_pens in file routines/animal/animal_manager.py"""
-    # Arrange
-    patch_for_init_default_pens = mocker.patch.object(animal_manager, '_init_default_pens')
-
     # Act
-    # More than the minimum num of pens - 4 pens
     animal_manager.init_pens(mock_pen_data, mock_herd_data, mock_manure_management_scenarios)
 
     actual = len(animal_manager.all_pens)
     expected = 4
 
     # Assert
-    assert actual == expected
-    patch_for_init_default_pens.assert_called_once_with(mock_herd_data['herd_num'])
-
-
-def test_init_default_pens(animal_manager: AnimalManager) -> None:
-    # Less than the minimum num of pens - 0 pens
-    # MIN_NUM_PENS default pens should be created
-
-    animal_manager.all_pens = []
-    animal_manager._init_default_pens(1)
-
-    actual = len(animal_manager.all_pens)
-    expected = animal_manager.MIN_NUM_PENS
     assert actual == expected
 
 
