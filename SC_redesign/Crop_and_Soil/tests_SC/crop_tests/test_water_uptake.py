@@ -56,20 +56,30 @@ def test_uptake_water(max_trans):
         wu.uptake_water(soil_data)
 
 
-@pytest.mark.parametrize("layers,uptakes", [
+@pytest.mark.parametrize("layers,uptakes,should_fail", [
     ([LayerData(bottom_depth=20, top_depth=1, field_size=3), LayerData(bottom_depth=3, top_depth=1, field_size=3),
-      LayerData(bottom_depth=2, top_depth=1, field_size=3)], [LayerData(bottom_depth=4, top_depth=1, field_size=3)])
+      LayerData(bottom_depth=2, top_depth=1, field_size=3)],
+     [LayerData(bottom_depth=4, top_depth=1, field_size=3)], True),
+    ([LayerData(bottom_depth=20, top_depth=1, field_size=3)],
+     [LayerData(bottom_depth=4, top_depth=1, field_size=3)], False)
+
 ])
-def test_extract_water_from_soil(layers, uptakes) -> None:
+def test_extract_water_from_soil(layers, uptakes, should_fail: bool) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
     crop_data = CropData(actual_water_uptakes=uptakes)
     soil_data = SoilData(soil_layers=layers, field_size=3)
     uptake = WaterUptake(crop_data=crop_data)
-    try:
+    if should_fail:
+        try:
+            uptake.extract_water_from_soil(soil_data)
+        except Exception as e:
+            assert str(e) == "actual_water_uptakes should be the same length as the number of soil layers"
+    else:
         uptake.extract_water_from_soil(soil_data)
-    except Exception as e:
-        assert len(soil_data.soil_layers) != len(uptake.crop_data.actual_water_uptakes)
-        assert str(e) == "actual_water_uptakes should be the same length as the number of soil layers"
+        soil_data.get_vectorized_layer_attribute = MagicMock()
+        soil_data.set_vectorized_layer_attribute = MagicMock()
+        assert soil_data.get_vectorized_layer_attribute.call_count == 1
+        assert soil_data.set_vectorized_layer_attribute.call_count == 1
 
 
 @pytest.mark.parametrize("potential_uptakes,water_availabilities,available_capacities,should_fail",
@@ -152,3 +162,23 @@ def test_determine_max_water_uptake_to_depth(root_depth: float, depth: float, ma
 
     assert expected == WaterUptake._determine_max_water_uptake_to_depth(root_depth, depth, max_transpiration,
                                                                         water_distro_parameter)
+
+
+@pytest.mark.parametrize("potential_uptakes,water_availabilities,wilting_points,should_fail",
+                         [([0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], False),
+                          ([0.1, 0.2], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9], True),
+                          ([0.1, 0.2, 0.3], [0.4, 0.5], [0.7, 0.8, 0.9], True),
+                          ([0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8], True)])
+def test_take_up_water(potential_uptakes: List[float], water_availabilities: List[float],
+                       wilting_points: List[float], should_fail: bool) -> None:
+    """Tests that he actual water taken up by the plant for each soil layer is calculated correctly and that errors were
+     raised correctly"""
+    if should_fail:
+        try:
+            WaterUptake._take_up_water(potential_uptakes,  water_availabilities, wilting_points)
+        except Exception as e:
+            assert str(e) == "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
+    else:
+        zipped = zip(potential_uptakes, water_availabilities, wilting_points)
+        expected = [WaterUptake._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
+        assert expected == WaterUptake._take_up_water(potential_uptakes,  water_availabilities, wilting_points)
