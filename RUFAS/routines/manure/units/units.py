@@ -1,5 +1,5 @@
 class Units:
-    """Units for quantities in manure management output objects."""
+    """Units for quantities in manure manager output objects."""
 
     urea = 'g_per_L'
     manure_urea = 'g_per_L'

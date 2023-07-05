@@ -29,7 +29,7 @@ class LifeCycleReport(BaseReportDriver):
 
         def finalize(self, state, weather, time):
             initialize_db_summary = \
-                state.animal_management.get_initialize_db_summary()
+                state.animal_manager.get_initialize_db_summary()
             with open(str(self.csv_dir) + '/' + self.report_name + '.json',
                       'w') as outfile:
                 json.dump(initialize_db_summary, outfile, sort_keys=True, indent=4)
@@ -56,7 +56,7 @@ class LifeCycleReport(BaseReportDriver):
             self.animals = []
 
         def finalize(self, state, weather, time):
-            self.animals, output = state.animal_management.get_life_cycle_output(
+            self.animals, output = state.animal_manager.get_life_cycle_output(
                 self.num_animals)
             with open(str(self.csv_dir) + '/' + self.report_name + '.json',
                       'w') as outfile:

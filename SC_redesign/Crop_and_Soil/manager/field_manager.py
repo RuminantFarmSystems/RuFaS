@@ -1,5 +1,6 @@
 from SC_redesign.Crop_and_Soil.field.field import Field
 from RUFAS.util import Utility
+from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from RUFAS.classes import Time, Weather, is_leap_year
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
@@ -130,6 +131,7 @@ class FieldManager:
 
         management_config = \
             Utility.read_json_file(input_directory / 'field_management' / field_config['field_management'])
+        crops_config = Utility.read_json_file(input_directory / 'crop' / field_config['crop'])
 
         available_fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule = \
             FieldManager._setup_management(field_name, management_config)
@@ -137,8 +139,16 @@ class FieldManager:
         manure_events = manure_schedule.generate_manure_events()
         tillage_events = tillage_schedule.generate_tillage_events()
 
-        return Field(tillage_events=tillage_events, fertilizer_events=fertilizer_events,
-                     fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events)
+        crop_schedules = FieldManager._setup_crop_schedules(crops_config.get("crops"))
+        all_planting_events = []
+        all_harvest_events = []
+        for schedule in crop_schedules:
+            all_planting_events += schedule.generate_planting_events()
+            all_harvest_events += schedule.generate_harvest_events()
+
+        return Field(plantings=all_planting_events, harvestings=all_harvest_events, tillage_events=tillage_events,
+                     fertilizer_events=fertilizer_events, fertilizer_mixes=available_fertilizer_mixes,
+                     manure_events=manure_events)
 
     @staticmethod
     def _setup_management(field_name: str,
@@ -195,3 +205,37 @@ class FieldManager:
                                            pattern_repeat=tillage_config["repeat"])
 
         return fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule
+
+    @staticmethod
+    def _setup_crop_schedules(crop_config: Dict) -> List[CropSchedule]:
+        """
+        Creates CropSchedules as dictated by the input specifications.
+
+        Parameters
+        ----------
+        crop_config : Dict
+            Contains all specifications for when crops should be planted and harvested.
+
+        Returns
+        -------
+        List[CropSchedule]
+            List of all crop schedules that have been created from the input specifications.
+
+        """
+        schedules = []
+        for schedule_name, specifications in crop_config.items():
+            if specifications.get("harvest_type") == "scheduled":
+                heat_scheduled_harvest = False
+            else:
+                heat_scheduled_harvest = True
+            new_schedule = CropSchedule(name=schedule_name,
+                                        crop_reference=specifications.get("crop_reference"),
+                                        planting_years=specifications.get("plant_years"),
+                                        planting_days=specifications.get("planting_day"),
+                                        harvest_years=specifications.get("harvest_years"),
+                                        harvest_days=specifications.get("harvest_day"),
+                                        harvest_operations=specifications.get("harvest_operations"),
+                                        use_heat_scheduling=heat_scheduled_harvest,
+                                        pattern_repeat=specifications.get("repeat"))
+            schedules.append(new_schedule)
+        return schedules
