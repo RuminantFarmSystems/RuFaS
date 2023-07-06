@@ -361,31 +361,34 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
-    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
+    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000},
+                        "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Multiple crops to be harvested by single HarvestEvent."),
-    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
+    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "No crop found to be harvested by a HarvestEvent.")
 ])
 def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expected_message: str) -> None:
     """Tests that warnings are raised correctly to the OutputManager."""
-    for crop in crops:
-        crop.data.id = "test"
-        crop.crop_management.manage_harvest = MagicMock()
-    field_data = FieldData(name="test", field_size=0.87)
-    field = Field(field_data=field_data)
-    field.crops = crops
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "day", 200)
-    setattr(mocked_time, "calendar_year", 2000)
+    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
+               return_value="00-Jan-1970_Thu_00-00-00"):
+        for crop in crops:
+            crop.data.id = "test"
+            crop.crop_management.manage_harvest = MagicMock()
+        field = Field()
+        field.field_data.name = "test"
+        field.crops = crops
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "day", 200)
+        setattr(mocked_time, "calendar_year", 2000)
 
-    field._harvest_crop("test", "default", mocked_time)
+        field._harvest_crop("test", "default", mocked_time)
 
-    for crop in crops:
-        crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 0.87, 2000, 200,
-                                                                    field.soil.data)
-    actual = om.warnings_pool["field_name:'test'.harvest_warning"]
-    assert actual['info_maps'].__contains__(expected_info_map)
-    assert actual['values'].__contains__(expected_message)
+        for crop in crops:
+            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 1.0, 2000,
+                                                                        200, field.soil.data)
+        actual = om.warnings_pool["field_name:'test'.harvest_warning"]
+        assert actual['info_maps'].__contains__(expected_info_map)
+        assert actual['values'].__contains__(expected_message)
 
 
 def test_remove_dead_crops() -> None:
@@ -521,16 +524,16 @@ def test_make_crop_from_config_dict(config: dict):
         Field._make_custom_crop.assert_called_once()
 
 
-@pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size", {
-    ("test_mix_1", 80.0, 30.0, 1993, 100, 3.1),
-    ("test_mix_2", 150.0, 89.0, 2001, 240, 1.3),
-    ("test_mix_3", 10.0, 90.33, 1992, 30, 2.44),
-    ("test_mix_4", 0.0, 50.0, 1996, 60, 1.45),
-    ("test_mix_5", 67.5, 0.0, 1998, 200, 2.3),
-    ("test_mix_6", 0.0, 0.0, 1988, 120, 0.5)
+@pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size,fertilizer_applied", {
+    ("test_mix_1", 80.0, 30.0, 1993, 100, 3.1, True),
+    ("test_mix_2", 150.0, 89.0, 2001, 240, 1.3, True),
+    ("test_mix_3", 10.0, 90.33, 1992, 30, 2.44, True),
+    ("test_mix_4", 0.0, 50.0, 1996, 60, 1.45, True),
+    ("test_mix_5", 67.5, 0.0, 1998, 200, 2.3, True),
+    ("test_mix_6", 0.0, 0.0, 1988, 120, 0.5, False)
 })
 def test_execute_fertilizer_application(mix_name: str, requested_n: float, requested_p: float,
-                                        year: int, day: int, field_size: float) -> None:
+                                        year: int, day: int, field_size: float, fertilizer_applied: bool) -> None:
     """Tests that fertilizer applications are being correctly executed and recorded."""
     field_data = FieldData(name="test", field_size=field_size)
     field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}})
@@ -542,11 +545,16 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
 
     field._execute_fertilizer_application(mix_name, requested_n, requested_p, year, day)
 
-    expected_nitrogen_fraction = 0.2
-    field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
-    field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0, 0.0,
-                                                                         field_size)
-    field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
+    if fertilizer_applied:
+        expected_nitrogen_fraction = 0.2
+        field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
+        field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0,
+                                                                             0.0, field_size)
+        field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
+    else:
+        field._formulate_fertilizer_required.assert_not_called()
+        field.fertilizer_applicator.apply_fertilizer.assert_not_called()
+        field._record_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize("field_name,mix_name,available_mixes,expected_message", [
