@@ -18,6 +18,9 @@ from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MI
 from RUFAS.classes import Time
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 
 om = OutputManager()
 
@@ -619,16 +622,40 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
     assert actual["values"].__contains__(expected_value)
 
 
-@pytest.mark.parametrize("nitrogen,phosphorus,coverage,year,day,fertilizer_applied,only_nitrogen_unmet", [
-    (75, 75, 0.9, 1993, 175, True, False),
-    (100, 0, 0.88, 2003, 200, True, True),
-    (50, 50, 0.91, 1998, 155, False, False),
-    (0, 0, 0.5, 1996, 155, False, False)
-])
+@pytest.mark.parametrize("nitrogen,phosphorus,coverage,year,day,fertilizer_applied,only_nitrogen_unmet,"
+                         "supplied_manure,expected_request", [
+                             (75.0, 75.0, 0.9, 1993, 175, True, False,
+                              NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
+                                                     dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
+                                                     inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
+                                                     organic_phosphorus_fraction=0.5,
+                                                     inorganic_phosphorus_fraction=0.5),
+                              NutrientRequest(75, 75)),
+                             (100.0, 0.0, 0.88, 2003, 200, True, True,
+                              NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
+                                                     dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
+                                                     inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
+                                                     organic_phosphorus_fraction=0.5,
+                                                     inorganic_phosphorus_fraction=0.5),
+                              NutrientRequest(100, 0)),
+                             (50.0, 50.0, 0.91, 1998, 155, False, False,
+                              NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
+                                                     dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
+                                                     inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
+                                                     organic_phosphorus_fraction=0.5,
+                                                     inorganic_phosphorus_fraction=0.5),
+
+                              NutrientRequest(50.0, 50.0)),
+                             (65.0, 40.0, 0.77, 1999, 160, True, False, None, NutrientRequest(65.0, 40.0)),
+                             (0, 0, 0.5, 1996, 155, False, False, None, None)
+                         ])
 def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage: float, year: int, day: int,
-                                    fertilizer_applied: bool, only_nitrogen_unmet: bool) -> None:
+                                    fertilizer_applied: bool, only_nitrogen_unmet: bool,
+                                    supplied_manure: NutrientRequestResults, expected_request: NutrientRequest) -> None:
     """Tests that manure is applied to the soil correctly."""
-    field = Field(field_data=FieldData(field_size=1.4))
+    mocked_manure_manager = MagicMock(ManureManager)
+    mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_manure)
+    field = Field(field_data=FieldData(field_size=1.4), manure_manager=mocked_manure_manager)
     field.manure_applicator.apply_machine_manure = MagicMock()
     field._record_manure_application = MagicMock()
     field._determine_optimal_fertilizer_mix = MagicMock(return_value="expected_optimal_mix")
@@ -637,26 +664,31 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
     field._execute_manure_application(nitrogen, phosphorus, coverage, year, day)
 
     if nitrogen == phosphorus == 0.0:
+        mocked_manure_manager.request_nutrients.assert_not_called()
         field.manure_applicator.apply_machine_manure.assert_not_called()
         field._record_manure_application.assert_not_called()
         field._determine_optimal_fertilizer_mix.assert_not_called()
         field._execute_fertilizer_application.assert_not_called()
     else:
+        expected_total_inorganic_fraction = 0.14    # equal to (50.0 / 250.0) * 0.7
+        expected_total_organic_fraction = 0.06      # equal to (50.0 / 250.0) * 0.3
+
+        mocked_manure_manager.request_nutrients.assert_called_once_with(expected_request)
         field.manure_applicator.apply_machine_manure.assert_called_once_with(
-            dry_matter_mass=150.0,
-            dry_matter_fraction=0.3,
+            dry_matter_mass=250.0,
+            dry_matter_fraction=0.33,
             total_phosphorus_mass=50.0,
             field_coverage=coverage,
             field_size=1.4,
-            inorganic_nitrogen_fraction=0.6,
-            ammonium_fraction=0.3,
-            organic_nitrogen_fraction=0.4,
+            inorganic_nitrogen_fraction=expected_total_inorganic_fraction,
+            ammonium_fraction=0.25,
+            organic_nitrogen_fraction=expected_total_organic_fraction,
             water_extractable_inorganic_phosphorus_fraction=0.5)
         field._record_manure_application.assert_called_once_with(
-            dry_matter_mass=150.0,
-            dry_matter_fraction=0.3,
+            dry_matter_mass=250.0,
+            dry_matter_fraction=0.33,
             field_coverage=coverage,
-            nitrogen=50,
+            nitrogen=50.0,
             phosphorus=50.0,
             potassium=None,
             year=year,
@@ -1084,6 +1116,7 @@ def test_check_tillage_schedule(events: List[TillageEvent], day: int, year: int,
     assert field.tillage_events == not_today
 
     assert field.tiller.till_soil.call_count == todays_count
+
 
 # TODO: All field methods need to be tested in future PRs.
 

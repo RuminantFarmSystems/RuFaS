@@ -17,7 +17,7 @@ from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from copy import copy
 
 """
@@ -326,32 +326,44 @@ class Field:
         if requested_nitrogen == requested_phosphorus == 0.0:
             return
 
-        # TODO: call request_nutrients() on ManureManager when finished
-        manure_filled_by_request = NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, total_manure_mass=500.0,
-                                                          dry_matter=150.0, dry_matter_fraction=0.3)
+        nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
 
-        self.manure_applicator.apply_machine_manure(
-            dry_matter_mass=manure_filled_by_request.dry_matter,
-            dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
-            total_phosphorus_mass=manure_filled_by_request.phosphorus,
-            field_coverage=field_coverage,
-            field_size=self.field_data.field_size,
-            inorganic_nitrogen_fraction=manure_filled_by_request.inorganic_nitrogen_fraction,
-            ammonium_fraction=manure_filled_by_request.ammonium_nitrogen_fraction,
-            organic_nitrogen_fraction=manure_filled_by_request.organic_nitrogen_fraction,
-            water_extractable_inorganic_phosphorus_fraction=manure_filled_by_request.inorganic_phosphorus_fraction)
+        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
-        self._record_manure_application(dry_matter_mass=manure_filled_by_request.dry_matter,
-                                        dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
-                                        field_coverage=field_coverage,
-                                        nitrogen=manure_filled_by_request.nitrogen,
-                                        phosphorus=manure_filled_by_request.phosphorus,
-                                        potassium=None,
-                                        year=year,
-                                        day=day)
+        if manure_supplied is not None:
+            supplied_nitrogen = manure_supplied.nitrogen
+            supplied_phosphorus = manure_supplied.phosphorus
 
-        unmet_nitrogen_demand = max(0.0, requested_nitrogen - manure_filled_by_request.nitrogen)
-        unmet_phosphorus_demand = max(0.0, requested_phosphorus - manure_filled_by_request.phosphorus)
+            total_inorganic_nitrogen_fraction = \
+                (manure_supplied.nitrogen / manure_supplied.dry_matter) * manure_supplied.inorganic_nitrogen_fraction
+            total_organic_nitrogen_fraction = \
+                (manure_supplied.nitrogen / manure_supplied.dry_matter) * manure_supplied.organic_nitrogen_fraction
+
+            self.manure_applicator.apply_machine_manure(
+                dry_matter_mass=manure_supplied.dry_matter,
+                dry_matter_fraction=manure_supplied.dry_matter_fraction,
+                total_phosphorus_mass=manure_supplied.phosphorus,
+                field_coverage=field_coverage,
+                field_size=self.field_data.field_size,
+                inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
+                ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
+                organic_nitrogen_fraction=total_organic_nitrogen_fraction,
+                water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction)
+
+            self._record_manure_application(dry_matter_mass=manure_supplied.dry_matter,
+                                            dry_matter_fraction=manure_supplied.dry_matter_fraction,
+                                            field_coverage=field_coverage,
+                                            nitrogen=manure_supplied.nitrogen,
+                                            phosphorus=manure_supplied.phosphorus,
+                                            potassium=None,
+                                            year=year,
+                                            day=day)
+        else:
+            supplied_nitrogen = 0.0
+            supplied_phosphorus = 0.0
+
+        unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
+        unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
         elif not unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
