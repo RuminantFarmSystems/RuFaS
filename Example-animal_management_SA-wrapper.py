@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Tuple, Any
 
 from RUFAS.classes import Config, Feed, Weather, Time
-from RUFAS.routines.animal.animal_management import AnimalManagement
+from RUFAS.routines.animal.animal_manager import AnimalManager
 
 """
 This module is an example of how to apply the SensitivityAnalysis module (generalized_sensitivity.py) to RuFas
@@ -13,7 +13,7 @@ components.
 Here are the basic steps needed to apply SA:
 1) First, decide which component(s) of the model on which you would like to conduct SA. For this example, I chose to
 evaluate the effects of feed composition on phosphorus requirements and manure production (for a given set of animals)
-over the course of a single day. Within RuFaS, `AnimalManagement.daily_updates()` simulates the animals over the course
+over the course of a single day. Within RuFaS, `AnimalManager.daily_updates()` simulates the animals over the course
 of a day, so this will be the basis for our objective function.
 2) Then, ensure that the method of interest can be called from an objective function that meets the requirements of the
 SAlib. 
@@ -21,7 +21,7 @@ SAlib.
     must return a :math`N \\times K` numpy array as output. Here, :math:`P` is the number of input parameters, :math:`K`
     is the number of responses, and :math:`N` is the number of samples. The model will be run :math:`N` times, once for 
     each row of `X`. 
-    * In this example, an objective function was created by wrapping `AnimalManagement.daily_updates()` (and its setup 
+    * In this example, an objective function was created by wrapping `AnimalManager.daily_updates()` (and its setup 
     methods) into a function (`@staticmethod`) that accepts the parameters of interest as arguments (as floats) and 
     returns the outputs of interest (as a tuple). The objective function is then 'vectorized' into the desired format.
 3) Then we pass our objective function to the `SensitivityAnalysis` module to perform SA. 
@@ -34,7 +34,7 @@ python Example-animal_management_SA.wrapper.py
 ```
 
 Note that the specific structure of this module (and any for conducting SA) was largely determined by how the source
-`AnimalManagement` module is written. If modules had a more consistent structure (in the future), it would be much 
+`AnimalManager` module is written. If modules had a more consistent structure (in the future), it would be much 
 easier to apply SA universally. For now, though, users will need to design their own objective functions based on how 
 their module functions is designed. It should also be noted that objective functions of the form in this module are 
 perfectly suited for both model validation and mathematical optimization, in addition to SA. This means that writing 
@@ -70,7 +70,7 @@ class ExampleAnimalSA:
         an instance of the Time class
     animal_management_dict : dict
         a dictionary containing the full animal management data necessary to create an AnimalManagement instance
-    animal_management_instance : AnimalManagement
+    animal_management_instance : AnimalManager
         an instance of the AnimalManagement class; the main object containing the method of interest.
     """
     def __init__(self):
@@ -152,7 +152,7 @@ class ExampleAnimalSA:
         example_class.feed_instance.NDF = feed_detergent_fiber
 
         # initialize the class of interest, with altered configurations
-        example_class.animal_management_instance = AnimalManagement(
+        example_class.animal_management_instance = AnimalManager(
             example_class.animal_management_dict, example_class.config_instance, example_class.feed_instance,
             example_class.weather_instance, example_class.time_instance
         )
@@ -256,7 +256,7 @@ class ExampleAnimalSA:
         self.weather_path = self.main_input_dict["weather"]
 
     def _setup_main_object(self):
-        """Creates an instance the main AnimalManagement class, after creating instances of the objects needed to
+        """Creates an instance the main AnimalManager class, after creating instances of the objects needed to
         initialize this class"""
         self.config_instance = Config(self.config_dict, self.weather_path)
         self.feed_instance = Feed(self.make_data_dict_from_json(self.feed_path))
