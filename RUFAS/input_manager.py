@@ -96,8 +96,8 @@ class InputManager:
         """
         Validates input data.
 
-        Args
-        ----
+        Parameters
+        ----------
         eager_termination : bool, optional
             Flag to determine if the process should terminate upon finding invalid data.
 
