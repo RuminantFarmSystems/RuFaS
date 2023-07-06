@@ -31,10 +31,17 @@ class ReceptionPit:
             The daily output of the reception pit.
 
         """
+        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                        "bedding_density": bedding.bedding_density,
+                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                        "bedding_type": bedding.bedding_type._name_,
+                        }
+
         info_map = {"class": cls.__name__,
                     "function": cls.daily_update.__name__,
                     "manure_handler_daily_output": vars(manure_handler_daily_output),
-                    "bedding": vars(bedding),
+                    "bedding": bedding_data,
                     }
 
         mh = manure_handler_daily_output
