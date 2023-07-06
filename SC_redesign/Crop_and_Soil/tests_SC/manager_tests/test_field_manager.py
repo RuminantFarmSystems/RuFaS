@@ -346,8 +346,9 @@ def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
             FieldManager._setup_crop_schedules = MagicMock(return_value=[CropSchedule("name", "crop", [1999], [100],
                                                                                       [1999], [240], ["default"])])
             FieldManager._setup_soil = MagicMock(return_value=Soil(field_size=1.0))
+            mocked_manure_manager = MagicMock(ManureManager)
 
-            actual = FieldManager._setup_field(field_name, field_config)
+            actual = FieldManager._setup_field(field_name, field_config, mocked_manure_manager)
 
             mocked_base_dir.assert_called_once()
             assert mocked_json_dir.call_count == 3
