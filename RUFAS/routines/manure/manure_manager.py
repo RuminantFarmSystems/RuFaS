@@ -190,17 +190,21 @@ class ManureManager:
     def _get_manure_type(treatment_type: ManureTreatmentType) -> ManureType:
         """
         Look up the type of manure produced by a given manure treatment system.
+
         This method is used to map the type of treatment system to the type of manure it produces.
         This mapping is based on a predefined relationship between the treatment types and manure types.
+
         Parameters
         ----------
         treatment_type : ManureTreatmentType
             The type of manure treatment system.
+
         Returns
         -------
         ManureType
             The type of manure produced by the given manure treatment system. The possible values are
             specified in the definition of the enum class :class:`ManureType`.
+
         """
         manure_type_by_treatment_type = {
             ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.SLURRY,
@@ -218,16 +222,19 @@ class ManureManager:
         Look up the density of manure produced by a given pen.
         This method determines the manure density based on the type of manure treatment system of a given pen.
         Each manure type (SLURRY, LIQUID, SOLID) has a predefined density, which is specified in the class :class:`ManureConstants`.
+
         Parameters
         ----------
         pen : ManureManagerPen
             An instance of the ManureManagerPen class representing a specific pen.
             The pen object should have a manure_treatment attribute that indicates the type of manure treatment system.
+
         Returns
         -------
         float
             The density of manure produced by the given pen, in units consistent with the densities
             defined in ManureConstants. This value depends on the type of manure treatment system of the pen.
+
         """
         treatment_type = ManureTreatmentType.get_type(pen.manure_treatment)
         manure_type = ManureManager._get_manure_type(treatment_type)
@@ -242,15 +249,18 @@ class ManureManager:
                               manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
         """
         Add the nutrients in the manure produced by a given pen to the manure nutrient manager.
+
         Parameters
         ----------
         pen : ManureManagerPen
             A pen object to look up the type of its manure treatment system.
-        manure_treatment_daily_output
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
             The daily output data of the manure treatment system.
+
         Returns
         -------
         None
+
         """
         # TODO: With the introduction of different manure types, we should rename attributes in ManureTreatmentDailyOutput
         # to make it more generic and not specific to any manure type.
@@ -271,10 +281,16 @@ class ManureManager:
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
         quantities desired. It calculates the projected manure mass that would satisfy the request
         and checks against the nutrients available in the manager.
+
         If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
         is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
         which detail the amounts of nutrients that can be provided to fulfill the request. If the request
         cannot be fulfilled at all, the method will return None.
+
+        Notes
+        -----
+        This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.
+
         Parameters
         ----------
         request : NutrientRequest
@@ -285,8 +301,8 @@ class ManureManager:
             The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
             the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
             Returns None if the request cannot be fulfilled.
+
         """
-        # This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.
         return self._manure_nutrient_manager.request_nutrients(request)
 
     def _pen_daily_update(self, simulation_day: int, pen) -> None:
