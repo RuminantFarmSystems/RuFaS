@@ -1,5 +1,9 @@
 from SC_redesign.Crop_and_Soil.field.field import Field
+from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from RUFAS.util import Utility
+from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
 from RUFAS.classes import Time, Weather, is_leap_year
 from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
@@ -7,7 +11,7 @@ from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
 from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
 from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 
 """
 This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to
@@ -132,6 +136,7 @@ class FieldManager:
         management_config = \
             Utility.read_json_file(input_directory / 'field_management' / field_config['field_management'])
         crops_config = Utility.read_json_file(input_directory / 'crop' / field_config['crop'])
+        soil_config = Utility.read_json_file(input_directory / 'soil' / field_config['soil'])
 
         available_fertilizer_mixes, fertilizer_schedule, manure_schedule, tillage_schedule = \
             FieldManager._setup_management(field_name, management_config)
@@ -146,9 +151,15 @@ class FieldManager:
             all_planting_events += schedule.generate_planting_events()
             all_harvest_events += schedule.generate_harvest_events()
 
-        return Field(plantings=all_planting_events, harvestings=all_harvest_events, tillage_events=tillage_events,
-                     fertilizer_events=fertilizer_events, fertilizer_mixes=available_fertilizer_mixes,
-                     manure_events=manure_events)
+        soil_profile = FieldManager._setup_soil(soil_config)
+
+        field_data = FieldData(name=field_name, field_size=soil_config["field_size"],
+                               current_residue=soil_config["initial_residue"],
+                               absolute_latitude=abs(crops_config["latitude"]))
+
+        return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
+                     harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
+                     fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events)
 
     @staticmethod
     def _setup_management(field_name: str,
@@ -239,3 +250,115 @@ class FieldManager:
                                         pattern_repeat=specifications.get("repeat"))
             schedules.append(new_schedule)
         return schedules
+
+    @staticmethod
+    def _setup_soil(soil_config: Dict[str, Any]) -> Soil:
+        """
+        Sets up a Soil instance that will be used by the Field class.
+
+        Parameters
+        ----------
+        soil_config : Dict[str]
+            Contains all the data necessary to set up a SoilData object.
+
+        Returns
+        -------
+        Soil
+            Soil instance that contains a SoilData instance configured to the provided specifications.
+
+        """
+        field_size = soil_config["field_size"]
+        sand_content = soil_config["sand"]
+        silt_content = soil_config["silt"]
+        residue = soil_config["initial_residue"]
+        nitrogen_mineralization_rate = soil_config["fresh_N_mineral_rate"]
+
+        soil_layers_config = list(soil_config.get("soil_layers").values())
+        soil_layers_config.sort(key=lambda x: x.get("bottom_depth"))
+        soil_layers = []
+        for index, layer_config in enumerate(soil_layers_config):
+            if index == 0:
+                top_depth = 0.0
+            else:
+                top_depth = soil_layers[-1].bottom_depth
+            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, sand_content,
+                                                       silt_content, residue, nitrogen_mineralization_rate,
+                                                       layer_config)
+            soil_layers.append(new_layer)
+
+        config_dictionary = {"second_moisture_condition_parameter": soil_config.get("CN2"),
+                             "average_subbasin_slope": soil_config.get("field_slope"),
+                             "slope_length": soil_config.get("slope_length"), "manning": soil_config.get("manning"),
+                             "albedo": soil_config.get("soil_albedo"), "cover_type": soil_config.get("soil_cover_type"),
+                             "soil_layers": soil_layers}
+
+        soil_data = SoilData(field_size=field_size, **config_dictionary)
+        return Soil(soil_data=soil_data)
+
+    @staticmethod
+    def _setup_soil_layer(field_size: float, top_depth: float, sand: float, silt: float, initial_residue: float,
+                          fresh_nitrogen_mineralization_rate: float, layer_config: Dict) -> LayerData:
+        """
+        Initializes a LayerData instance to be added to a SoilData object.
+
+        Parameters
+        ----------
+        field_size : float
+            Size of the field that contains the soil layer being created (ha)
+        top_depth : float
+            Depth of top of the soil layer beneath the surface (mm)
+        sand : float
+            Sand content expressed as percent of soil in this layer (unitless)
+        silt : float
+            Silt content expressed as percent of soil in this layer (unitless)
+        initial_residue : float
+            Amount of residue on the soil surface when this soil layer is initialized (kg / ha)
+        fresh_nitrogen_mineralization_rate : float
+            Rate at which fresh organic nitrogen mineralizes (unitless)
+        layer_config : Dict
+            Contains all the specifications for a layer of soil.
+
+        Returns
+        -------
+        LayerData
+            LayerData instance configured with provided data.
+
+        Notes
+        -----
+        Whoever wrote the JSON's for soil profile inputs wrote "N03" (the digit zero) instead of "NO3" (the letter 'O'),
+        and that is why it is written with a zero and not the letter here.
+
+        """
+        config_dictionary = {}
+
+        try:
+            config_dictionary["bottom_depth"] = layer_config["bottom_depth"]
+        except KeyError:
+            raise ValueError("Bottom depth is required for each soil layer.")
+
+        config_dictionary["wilting_point_water_concentration"] = layer_config.get("wilting_point")
+        config_dictionary["field_capacity_water_concentration"] = layer_config.get("field_capacity")
+        config_dictionary["saturation_point_water_concentration"] = layer_config.get("saturation")
+        config_dictionary["saturated_hydraulic_conductivity"] = layer_config.get("K_sat")
+        config_dictionary["percent_clay_content"] = layer_config.get("clay")
+        config_dictionary["temperature"] = layer_config.get("initial_temperature")
+        config_dictionary["bulk_density"] = layer_config["bulk_density"]
+        config_dictionary["percent_organic_carbon_content"] = layer_config.get("org_C_percent")
+        config_dictionary["initial_soil_ammonium_concentration"] = layer_config.get("NH4")
+        config_dictionary["initial_soil_nitrate_concentration"] = layer_config.get("N03")
+        config_dictionary["initial_labile_inorganic_phosphorus_concentration"] = layer_config.get("labile_P")
+        config_dictionary["humus_mineralization_rate_factor"] = layer_config.get("active_mineral_rate")
+        config_dictionary["ammonium_volatilization_cation_exchange_factor"] = \
+            layer_config.get("volatile_exchange_factor")
+        config_dictionary["denitrification_rate_coefficient"] = layer_config.get("denitrification_rate")
+        config_dictionary["soil_water_concentration"] = layer_config.get("soil_water_percent")
+
+        config_dictionary["field_size"] = field_size
+        config_dictionary["top_depth"] = top_depth
+        config_dictionary["percent_sand_content"] = sand
+        config_dictionary["percent_silt_content"] = silt
+        config_dictionary["residue"] = initial_residue
+        config_dictionary["residue_fresh_organic_mineralization_rate"] = fresh_nitrogen_mineralization_rate
+
+        layer = LayerData(**config_dictionary)
+        return layer
