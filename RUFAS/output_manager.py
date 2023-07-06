@@ -321,7 +321,6 @@ class OutputManager(object):
         ------
         Exception
             If an error occurs while saving to the file
-
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._list_to_file_txt.__name__,
