@@ -119,10 +119,13 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_in
     mock_input_manager._InputManager__pool = {"dummykey1": "dummyinvalidvalue1", "dummykey2": "dummyvalue2"}
     mocker.patch.object(mock_input_manager, "_validate", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
-
-    result = mock_input_manager._validate_data()
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            result = mock_input_manager._validate_data()
 
     assert result is False
+    assert add_error.call_count == 2  # 1 for invalid data, 1 for unfixable data (returns false before 2nd key check)
+    assert add_warning.call_count == 0
 
 
 def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input_manager: InputManager) -> None:
@@ -131,9 +134,13 @@ def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input
     mocker.patch.object(mock_input_manager, "_validate", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=True)
 
-    result = mock_input_manager._validate_data()
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            result = mock_input_manager._validate_data()
 
     assert result is True
+    assert add_error.call_count == 2  # 1 for each key in dummy pool
+    assert add_warning.call_count == 2  # 1 for each key in dummy pool
 
 
 def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker, mock_input_manager: InputManager) -> None:
@@ -141,6 +148,10 @@ def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocke
     mock_input_manager._InputManager__pool = {"dummykey1": "dummyinvalidvalue1", "dummykey2": "dummyvalue2"}
     mocker.patch.object(mock_input_manager, "_validate", return_value=False)
 
-    result = mock_input_manager._validate_data(eager_termination=False)
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            result = mock_input_manager._validate_data(eager_termination=False)
 
     assert result is True
+    assert add_error.call_count == 0
+    assert add_warning.call_count == 0
