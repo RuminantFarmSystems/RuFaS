@@ -54,6 +54,69 @@ class AnimalManureExcretions(TypedDict):
     """Amount of methane emissions, g/day."""
 
 
+def get_default_animal_manure_excretions() -> AnimalManureExcretions:
+    """
+    Get a default AnimalManureExcretions object.
+
+    Returns
+    -------
+    AnimalManureExcretions
+        Default AnimalManureExcretions object.
+
+    """
+
+    return AnimalManureExcretions(
+        urea=0.0,
+        urine=0.0,
+        total_ammoniacal_nitrogen_concentration=0.0,
+        urine_nitrogen=0.0,
+        manure_nitrogen=0.0,
+        manure_mass=0.0,
+        total_solids=0.0,
+        degradable_volatile_solids=0.0,
+        non_degradable_volatile_solids=0.0,
+        inorganic_phosphorus_fraction=0.0,
+        organic_phosphorus_fraction=0.0,
+        phosphorus=0.0,
+        phosphorus_fraction=0.0,
+        potassium=0.0,
+        methane=0.0
+    )
+
+
+def add_animal_manure_excretions(first: AnimalManureExcretions, second: AnimalManureExcretions) \
+        -> AnimalManureExcretions:
+    """
+    Add two AnimalManureExcretions objects together.
+
+    Parameters
+    ----------
+    first : AnimalManureExcretions
+        First AnimalManureExcretions object.
+    second : AnimalManureExcretions
+        Second AnimalManureExcretions object.
+
+    Returns
+    -------
+    AnimalManureExcretions
+        Sum of the two AnimalManureExcretions objects.
+
+    """
+
+    data = {}
+    for key in first:
+        data[key] = first[key] + second[key]
+    return AnimalManureExcretions(**data)
+
+
+def scalar_mult_animal_manure_excretions(manure: AnimalManureExcretions, scalar: float) \
+        -> AnimalManureExcretions:
+    data = {}
+    for key in manure:
+        data[key] = manure[key] * scalar
+    return AnimalManureExcretions(**data)
+
+
 def calculate_phosphorus_excretion_values(daily_milk_production: float,
                                           total_manure_excreted: float,
                                           fecal_phosphorus: float,
@@ -88,8 +151,11 @@ def calculate_phosphorus_excretion_values(daily_milk_production: float,
 
     """
     # P fraction of manure (A.3.A.1)
-    manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
-            total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
+    if total_manure_excreted > 0:
+        manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
+                total_manure_excreted * GeneralConstants.KG_TO_GRAMS)
+    else:
+        manure_phosphorus_fraction = 0.0
 
     # Water extractable Inorganic P (WIP) fraction - fraction of manure
     # compromised of inorganic water extractable P [A.3.A.2]

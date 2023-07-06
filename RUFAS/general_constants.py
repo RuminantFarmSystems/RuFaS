@@ -34,3 +34,4 @@ class GeneralConstants:
 
     # Biochemistry-related
     PROTEIN_TO_NITROGEN = 0.16
+    NITROGEN_TO_PROTEIN = 6.25 
