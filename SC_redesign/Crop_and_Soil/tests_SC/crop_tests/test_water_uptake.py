@@ -3,6 +3,7 @@ from typing import List
 
 import pytest
 from unittest.mock import MagicMock, patch
+from mock import call
 import math
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
@@ -96,14 +97,15 @@ def test_reduce_efficiency_of_uptake(potential_uptakes: List[float], water_avail
         assert str(e.value) == "potential_uptakes, water_availabilities, and available_capacities must be of equal" \
                                " length"
     else:
-
-        zipped = zip(potential_uptakes, water_availabilities, available_capacities)
         WaterUptake._correct_layer_for_efficiency = MagicMock()
+        result = WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities, available_capacities)
+        expected_calls = []
+        for i in range(len(potential_uptakes)):
+            expected_calls.append(call(potential_uptakes[i], water_availabilities[i], available_capacities[i]))
+        WaterUptake._correct_layer_for_efficiency.assert_has_calls(expected_calls)
+        zipped = zip(potential_uptakes, water_availabilities, available_capacities)
         expected = [WaterUptake._correct_layer_for_efficiency(pot, avail, cap) for pot, avail, cap in zipped]
-        for pot, avail, cap in zipped:
-            WaterUptake._correct_layer_for_efficiency.assert_called_with(pot, avail, cap)
-        assert expected == WaterUptake._reduce_efficiency_of_uptake(potential_uptakes, water_availabilities,
-                                                                    available_capacities)
+        assert expected == result
 
 
 @pytest.mark.parametrize("potential_uptakes,unmet_demands,uptake_compensation,should_fail,expected",
@@ -148,8 +150,8 @@ def test_determine_max_water_uptake_to_depth(root_depth: float, depth: float, ma
     if root_depth == 0:
         expected = 0
     else:
-        expected = math.floor(1-exp(-water_distribution_parameter*(depth/root_depth))) * \
-                    (max_plant_transpiration / (1 - exp(-water_distribution_parameter)))
+        expected = math.floor(1 - exp(-water_distribution_parameter * (depth / root_depth))) * \
+                   (max_plant_transpiration / (1 - exp(-water_distribution_parameter)))
 
     assert expected == WaterUptake._determine_max_water_uptake_to_depth(root_depth, depth, max_plant_transpiration,
                                                                         water_distribution_parameter)
@@ -165,11 +167,17 @@ def test_take_up_water(potential_uptakes: List[float], water_availabilities: Lis
     """Tests that he actual water taken up by the plant for each soil layer is calculated correctly and that errors were
      raised correctly"""
     if should_fail:
-        try:
+        with pytest.raises(Exception) as e:
             WaterUptake._take_up_water(potential_uptakes, water_availabilities, wilting_points)
-        except Exception as e:
-            assert str(e) == "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
+        assert str(e.value) == "potential_uptakes, water_availabilities, and wilting_points must be of equal length"
     else:
+        WaterUptake._determine_actual_layer_uptake = MagicMock()
+        result = WaterUptake._take_up_water(potential_uptakes, water_availabilities,
+                                            wilting_points)
+        expected_calls = []
+        for i in range(len(potential_uptakes)):
+            expected_calls.append(call(potential_uptakes[i], water_availabilities[i], wilting_points[i]))
+        WaterUptake._determine_actual_layer_uptake.assert_has_calls(expected_calls)
         zipped = zip(potential_uptakes, water_availabilities, wilting_points)
         expected = [WaterUptake._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
-        assert expected == WaterUptake._take_up_water(potential_uptakes, water_availabilities, wilting_points)
+        assert expected == result
