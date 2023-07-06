@@ -620,32 +620,58 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
 
 
 @pytest.mark.parametrize("nitrogen,phosphorus,coverage,year,day,fertilizer_applied,only_nitrogen_unmet", [
-    (100, 75, 0.9, 1993, 175, True, False),
-    (33, 0, 0.88, 2003, 200, True, True),
+    (75, 75, 0.9, 1993, 175, True, False),
+    (100, 0, 0.88, 2003, 200, True, True),
+    (50, 50, 0.91, 1998, 155, False, False),
     (0, 0, 0.5, 1996, 155, False, False)
 ])
 def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage: float, year: int, day: int,
                                     fertilizer_applied: bool, only_nitrogen_unmet: bool) -> None:
     """Tests that manure is applied to the soil correctly."""
-    field = Field()
+    field = Field(field_data=FieldData(field_size=1.4))
     field.manure_applicator.apply_machine_manure = MagicMock()
+    field._record_manure_application = MagicMock()
     field._determine_optimal_fertilizer_mix = MagicMock(return_value="expected_optimal_mix")
     field._execute_fertilizer_application = MagicMock()
 
     field._execute_manure_application(nitrogen, phosphorus, coverage, year, day)
 
-    field.manure_applicator.apply_machine_manure.assert_called_once_with(0.0, 0.0, 0.0, coverage, 1.0, 0.0, 0.0, 0.0)
-    if fertilizer_applied and only_nitrogen_unmet:
-        field._determine_optimal_fertilizer_mix.assert_not_called()
-        field._execute_fertilizer_application.assert_called_once_with("100_0_0", nitrogen, phosphorus, year, day)
-    elif fertilizer_applied and not only_nitrogen_unmet:
-        field._determine_optimal_fertilizer_mix.assert_called_once_with(nitrogen, phosphorus,
-                                                                        field.available_fertilizer_mixes)
-        field._execute_fertilizer_application.assert_called_once_with("expected_optimal_mix", nitrogen, phosphorus,
-                                                                      year, day)
-    else:
+    if nitrogen == phosphorus == 0.0:
+        field.manure_applicator.apply_machine_manure.assert_not_called()
+        field._record_manure_application.assert_not_called()
         field._determine_optimal_fertilizer_mix.assert_not_called()
         field._execute_fertilizer_application.assert_not_called()
+    else:
+        field.manure_applicator.apply_machine_manure.assert_called_once_with(
+            dry_matter_mass=150.0,
+            dry_matter_fraction=0.3,
+            total_phosphorus_mass=50.0,
+            field_coverage=coverage,
+            field_size=1.4,
+            inorganic_nitrogen_fraction=0.6,
+            ammonium_fraction=0.3,
+            organic_nitrogen_fraction=0.4,
+            water_extractable_inorganic_phosphorus_fraction=0.5)
+        field._record_manure_application.assert_called_once_with(
+            dry_matter_mass=150.0,
+            dry_matter_fraction=0.3,
+            field_coverage=coverage,
+            nitrogen=50,
+            phosphorus=50.0,
+            potassium=None,
+            year=year,
+            day=day)
+        if fertilizer_applied and only_nitrogen_unmet:
+            field._determine_optimal_fertilizer_mix.assert_not_called()
+            field._execute_fertilizer_application.assert_called_once_with("100_0_0", nitrogen - 50.0, 0.0, year, day)
+        elif fertilizer_applied and not only_nitrogen_unmet:
+            field._determine_optimal_fertilizer_mix.assert_called_once_with(nitrogen - 50.0, phosphorus - 50.0,
+                                                                            field.available_fertilizer_mixes)
+            field._execute_fertilizer_application.assert_called_once_with("expected_optimal_mix", nitrogen - 50.0,
+                                                                          phosphorus - 50.0, year, day)
+        else:
+            field._determine_optimal_fertilizer_mix.assert_not_called()
+            field._execute_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize("field_name,field_size,dry_mass,dry_fraction,coverage,nitrogen,phosphorus,potassium,"

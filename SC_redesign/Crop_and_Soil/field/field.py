@@ -319,7 +319,14 @@ class Field:
         day : int
             Julian day on which this manure application occurs.
 
+        Notes
+        -----
+        Because potassium is not currently specified in the manure request results, it is recorded as None.
+
         """
+        if requested_nitrogen == requested_phosphorus == 0.0:
+            return
+
         _manure_nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
         # TODO: call request_nutrients() on ManureManager when finished
         manure_filled_by_request = NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, total_manure_mass=500.0,
@@ -360,7 +367,8 @@ class Field:
         self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand, year, day)
 
     def _record_manure_application(self, dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
-                                   nitrogen: float, phosphorus: float, potassium: float, year: int, day: int) -> None:
+                                   nitrogen: float, phosphorus: float, year: int, day: int,
+                                   potassium: Optional[float] = None) -> None:
         """
         Records the amount of manure and related values for an individual manure application.
 
@@ -376,19 +384,19 @@ class Field:
             Mass of nitrogen in the manure applied (kg)
         phosphorus : float
             Mass of phosphorus in the manure applied (kg)
-        potassium : float
-            Mass of potassium in the manure applied (kg)
         year : int
             Calendar year in which this manure application occurs.
         day : int
             Julian day on which this manure application occurs.
+        potassium : float, Optional
+            Mass of potassium in the manure applied (kg)
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
-            field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
+                 field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
 
     # </editor-fold>
