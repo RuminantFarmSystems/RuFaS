@@ -1,7 +1,8 @@
 # !/usr/bin/env python3
 
-import csv
 import json
+
+import pandas as pd
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict
 
@@ -80,13 +81,15 @@ class InputManager:
                                    info_map)
                 elif details["type"] == "csv":
                     with open(file_path, "r") as csv_file:
-                        data_reader = csv.DictReader(csv_file)
-                        self.__pool[key] = list(data_reader)
+                        data_frame = pd.read_csv(csv_file)
+                        data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
+                        self.__pool[key] = data_dict
                         om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
                                    info_map)
                 else:
-                    om.add_warning("InputManager load data file is not csv/json", f"File for {key} data in path"
-                                   f" {file_path} was not a csv nor json file and was not added to data pool", info_map)
+                    om.add_warning("InputManager load data file is not csv/json",
+                                   f"{key} data must be available in either csv or json file type.",
+                                   info_map)
             except Exception as e:
                 raise e
 

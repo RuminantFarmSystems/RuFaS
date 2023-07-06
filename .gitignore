@@ -28,6 +28,7 @@ others
 # only stores non-empty directories
 output/*
 !output/.keep
+!output/output_filters/
 RUFAS/routines/manure/output/*
 !RUFAS/routines/manure/output/.keep
 
