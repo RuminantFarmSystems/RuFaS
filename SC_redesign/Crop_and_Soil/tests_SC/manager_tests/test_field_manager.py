@@ -1,12 +1,17 @@
 from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
+from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
+from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
 from SC_redesign.Crop_and_Soil.field.field_data import FieldData
 from SC_redesign.Crop_and_Soil.field.field import Field
+from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
 import pytest
 from typing import List, Dict
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 
 @pytest.mark.parametrize("year, day, expected_month", [
@@ -233,3 +238,119 @@ def test_correct_crop_schedule_setup(crop_schedule_config: Dict, expected: List[
     for index in range(len(expected)):
         assert actual[index].generate_planting_events() == expected[index].generate_planting_events()
         assert actual[index].generate_harvest_events() == expected[index].generate_harvest_events()
+
+
+@pytest.mark.parametrize("field_size,top,sand,silt,residue,nitrogen_mineralization,config,expected", [
+    (1.3, 0.0, 15, 65, 0.0, 0.05,
+     {"bottom_depth": 279.4, "wilting_point": 0.1, "field_capacity": 0.29, "saturation": 0.58, "K_sat": 20.0,
+      "clay": 22.5, "initial_temperature": 0.0, "bulk_density": 1.34, "org_C_percent": 0.012, "NH4": 1,
+      "active_N_percent": 0.02, "labile_P": 23.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
+      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.019},
+     LayerData(field_size=1.3, top_depth=0.0, bottom_depth=279.4, wilting_point_water_concentration=0.1,
+               field_capacity_water_concentration=0.29, saturation_point_water_concentration=0.58,
+               saturated_hydraulic_conductivity=20.0, percent_clay_content=22.5, temperature=0.0, bulk_density=1.34,
+               percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1.0,
+               initial_soil_nitrate_concentration=None, initial_labile_inorganic_phosphorus_concentration=23.7,
+               humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
+               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
+               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05)),
+    (2.2, 279.4, 15, 65, 0.0, 0.05,
+     {"bottom_depth": 1041.4, "wilting_point": 0.163, "field_capacity": 0.306, "saturation": 0.5, "K_sat": 9.17,
+      "clay": 30, "initial_temperature": 14.50797297, "bulk_density": 1.42, "org_C_percent": 0.012, "NH4": 1, "N03": 1,
+      "active_N_percent": 0.02, "labile_P": 2.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15,
+      "denitrification_rate": 0.1, "soil_water_percent": 0.3, "OM_percent": 0.006},
+     LayerData(field_size=2.2, top_depth=279.4, bottom_depth=1041.4, wilting_point_water_concentration=0.163,
+               field_capacity_water_concentration=0.306, saturation_point_water_concentration=0.5,
+               saturated_hydraulic_conductivity=9.17, percent_clay_content=30, temperature=14.50797297,
+               bulk_density=1.42, percent_organic_carbon_content=0.012, initial_soil_ammonium_concentration=1,
+               initial_soil_nitrate_concentration=1, initial_labile_inorganic_phosphorus_concentration=2.7,
+               humus_mineralization_rate_factor=0.0003, ammonium_volatilization_cation_exchange_factor=0.15,
+               denitrification_rate_coefficient=0.1, soil_water_concentration=0.3, percent_sand_content=15.0,
+               percent_silt_content=65.0, residue=0.0, residue_fresh_organic_mineralization_rate=0.05))
+])
+def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: float, residue: float,
+                          nitrogen_mineralization: float, config: Dict, expected: LayerData) -> None:
+    """Tests that LayerData instances are configured correctly with a given specification."""
+    actual = FieldManager._setup_soil_layer(field_size, top, sand, silt, residue, nitrogen_mineralization, config)
+    assert actual == expected
+
+
+@pytest.mark.parametrize("config", [
+    {},
+    {"wilting_point": 0.1, "field_capacity": 0.29, "saturation": 0.58, "K_sat": 20.0, "clay": 22.5,
+     "initial_temperature": 0.0, "bulk_density": 1.34, "org_C_percent": 0.012, "NH4": 1, "active_N_percent": 0.02,
+     "labile_P": 23.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15, "denitrification_rate": 0.1,
+     "soil_water_percent": 0.3, "OM_percent": 0.019}
+])
+def test_setup_soil_layer_error(config: Dict) -> None:
+    """Tests that errors are thrown correctly when not enough information is provided to create one."""
+    with pytest.raises(ValueError) as e:
+        FieldManager._setup_soil_layer(1.0, 0.0, 65.0, 15.0, 0.0, 0.05, config)
+    assert str(e.value) == "Bottom depth is required for each soil layer."
+
+
+@pytest.mark.parametrize("soil_input_file_name,expected_soil_layer_count", [
+    ("ARL_soil.json", 5),
+    ("ARL_soil_tillage.json", 5),
+    ("barnyard_soil.json", 4),
+    ("base_case_soil.json", 5),
+    ("LT_soil.json", 3),
+    ("multi_crop_soil.json", 5),
+    ("swat_soil.json", 5),
+    ("testing_soil.json", 5)
+])
+def test_setup_soil_with_full_inputs(soil_input_file_name: str, expected_soil_layer_count: int) -> None:
+    """Tests that current soil inputs can be handled by the soil setup routine."""
+    input_directory = Utility.get_base_dir() / 'input'
+    soil_config = Utility.read_json_file(input_directory / 'soil' / soil_input_file_name)
+    actual = FieldManager._setup_soil(soil_config)
+    assert len(actual.data.soil_layers) == expected_soil_layer_count
+
+
+@pytest.mark.parametrize("soil_config,soil_layer_count", [
+    ({"CN2": 85.00, "field_slope": 0.02, "slope_length": 3, "manning": 0.4, "field_size": 1.0, "sand": 15, "silt": 65,
+      "soil_albedo": 0.16, "initial_residue": 0, "fresh_N_mineral_rate": 0.05, "soil_cover_type": "BARE", "soil_layers":
+          {"layer_1": {"bottom_depth": 279.4},
+           "layer_2": {"bottom_depth": 1041.4},
+           "layer_3": {"bottom_depth": 1168.4},
+           "layer_4": {"bottom_depth": 2006.6}}
+      }, 4)
+])
+def test_setup_soil_subroutine_calls(soil_config: Dict, soil_layer_count: int) -> None:
+    """Tests that soil setup routine correctly parses input and calls subroutine."""
+    FieldManager._setup_soil_layer = MagicMock(return_value=LayerData(top_depth=0.0, bottom_depth=1000.0,
+                                                                      field_size=1.0))
+    FieldManager._setup_soil(soil_config)
+
+    assert FieldManager._setup_soil_layer.call_count == soil_layer_count
+
+
+@pytest.mark.parametrize("field_name,field_config", [
+    ("field_1", {"soil": "ARL_soil.json", "crop": "ARL_rotation.json",
+                 "field_management": "ARL_field_management.json"}),
+    ("field_2", {"soil": "barnyard_soil.json", "crop": "corn_scheduled_rotation.json",
+                 "field_management": "barnyard_scheduled_field_management.json"})
+])
+def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
+    """Tests that a Field instance is correctly initialized with a given input configuration."""
+    with patch("RUFAS.util.Utility.get_base_dir", new_callable=MagicMock) as mocked_base_dir:
+        with patch("RUFAS.util.Utility.read_json_file", new_callable=MagicMock,
+                   return_value={"field_size": 1.0, "initial_residue": 0.0, "latitude": 40.0}) as mocked_json_dir:
+            FieldManager._setup_management = MagicMock(return_value=({}, FertilizerSchedule("name", [], [], [], [], [],
+                                                                                            [], []),
+                                                                     ManureSchedule("name", [], [], [], [], []),
+                                                                     TillageSchedule("name", [], [], [], [], [])))
+            FieldManager._setup_crop_schedules = MagicMock(return_value=[CropSchedule("name", "crop", [1999], [100],
+                                                                                      [1999], [240], ["default"])])
+            FieldManager._setup_soil = MagicMock(return_value=Soil(field_size=1.0))
+
+            actual = FieldManager._setup_field(field_name, field_config)
+
+            mocked_base_dir.assert_called_once()
+            assert mocked_json_dir.call_count == 3
+            FieldManager._setup_management.assert_called_once()
+            FieldManager._setup_crop_schedules.assert_called_once()
+            FieldManager._setup_soil.assert_called_once()
+            assert actual.field_data.name == field_name
+            assert actual.field_data.current_residue == 0.0
+            assert actual.field_data.absolute_latitude == 40.0

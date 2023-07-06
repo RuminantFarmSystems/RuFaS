@@ -358,30 +358,33 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOpe
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
-    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
+    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000},
+                        "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Multiple crops to be harvested by single HarvestEvent."),
-    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
+    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "No crop found to be harvested by a HarvestEvent.")
 ])
 def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expected_message: str) -> None:
     """Tests that warnings are raised correctly to the OutputManager."""
-    for crop in crops:
-        crop.data.id = "test"
-        crop.crop_management.manage_harvest = MagicMock()
-    field = Field()
-    field.field_data.name = "test"
-    field.crops = crops
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "day", 200)
-    setattr(mocked_time, "calendar_year", 2000)
+    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
+               return_value="00-Jan-1970_Thu_00-00-00"):
+        for crop in crops:
+            crop.data.id = "test"
+            crop.crop_management.manage_harvest = MagicMock()
+        field = Field()
+        field.field_data.name = "test"
+        field.crops = crops
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "day", 200)
+        setattr(mocked_time, "calendar_year", 2000)
 
-    field._harvest_crop("test", "default", mocked_time)
+        field._harvest_crop("test", "default", mocked_time)
 
-    for crop in crops:
-        crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
-    actual = om.warnings_pool["field_name:'test'.harvest_warning"]
-    assert actual['info_maps'].__contains__(expected_info_map)
-    assert actual['values'].__contains__(expected_message)
+        for crop in crops:
+            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
+        actual = om.warnings_pool["field_name:'test'.harvest_warning"]
+        assert actual['info_maps'].__contains__(expected_info_map)
+        assert actual['values'].__contains__(expected_message)
 
 
 def test_remove_dead_crops() -> None:
