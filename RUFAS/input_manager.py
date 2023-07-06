@@ -100,7 +100,6 @@ class InputManager:
         ----------
         eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
-
         Returns
         -------
         bool
