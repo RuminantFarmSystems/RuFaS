@@ -3,6 +3,7 @@ from typing import Optional, List
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+import math
 
 """
 This module is based upon the "Water Uptake By Plants" section of SWAT (5:2.2.1)
@@ -194,8 +195,8 @@ class WaterUptake:
         return potential_uptake
 
     @staticmethod
-    def _adjust_water_uptakes(potential_uptakes: List[float], water_availabilities: List[float],
-                              unmet_demands: List[float], uptake_compensation: float) -> List[float]:
+    def _adjust_water_uptakes(potential_uptakes: List[float], unmet_demands: List[float],
+                              uptake_compensation: float) -> List[float]:
         """adjusts the potential water uptakes from each layer based by drawing from deeper layeres when possible.
 
         References
@@ -305,7 +306,7 @@ class WaterUptake:
             return 0
 
         term1 = max_transpiration / (1 - exp(-water_distro_parameter))
-        term2 = 1 - exp(-water_distro_parameter * depth / root_depth)
+        term2 = math.floor(1 - exp(-water_distro_parameter * depth / root_depth))
         return term1 * term2
 
 
