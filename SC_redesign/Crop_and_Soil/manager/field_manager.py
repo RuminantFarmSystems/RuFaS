@@ -278,23 +278,19 @@ class FieldManager:
         soil_layers = []
         for index, layer_config in enumerate(soil_layers_config):
             if index == 0:
-                new_layer = FieldManager._setup_soil_layer(field_size, 0.0, sand_content, silt_content, residue,
-                                                           nitrogen_mineralization_rate, layer_config)
+                top_depth = 0.0
             else:
-                new_layer = FieldManager._setup_soil_layer(field_size, soil_layers[-1].bottom_depth, sand_content,
-                                                           silt_content, residue, nitrogen_mineralization_rate,
-                                                           layer_config)
+                top_depth = soil_layers[-1].bottom_depth
+            new_layer = FieldManager._setup_soil_layer(field_size, top_depth, sand_content,
+                                                       silt_content, residue, nitrogen_mineralization_rate,
+                                                       layer_config)
             soil_layers.append(new_layer)
 
-        config_dictionary = {}
-
-        config_dictionary["second_moisture_condition_parameter"] = soil_config.get("CN2")
-        config_dictionary["average_subbasin_slope"] = soil_config.get("field_slope")
-        config_dictionary["slope_length"] = soil_config.get("slope_length")
-        config_dictionary["manning"] = soil_config.get("manning")
-        config_dictionary["albedo"] = soil_config.get("soil_albedo")
-        config_dictionary["cover_type"] = soil_config.get("soil_cover_type")
-        config_dictionary["soil_layers"] = soil_layers
+        config_dictionary = {"second_moisture_condition_parameter": soil_config.get("CN2"),
+                             "average_subbasin_slope": soil_config.get("field_slope"),
+                             "slope_length": soil_config.get("slope_length"), "manning": soil_config.get("manning"),
+                             "albedo": soil_config.get("soil_albedo"), "cover_type": soil_config.get("soil_cover_type"),
+                             "soil_layers": soil_layers}
 
         soil_data = SoilData(field_size=field_size, **config_dictionary)
         return Soil(soil_data=soil_data)
@@ -335,7 +331,11 @@ class FieldManager:
         """
         config_dictionary = {}
 
-        config_dictionary["bottom_depth"] = layer_config["bottom_depth"]
+        try:
+            config_dictionary["bottom_depth"] = layer_config["bottom_depth"]
+        except KeyError:
+            raise ValueError("Bottom depth is required for each soil layer.")
+
         config_dictionary["wilting_point_water_concentration"] = layer_config.get("wilting_point")
         config_dictionary["field_capacity_water_concentration"] = layer_config.get("field_capacity")
         config_dictionary["saturation_point_water_concentration"] = layer_config.get("saturation")

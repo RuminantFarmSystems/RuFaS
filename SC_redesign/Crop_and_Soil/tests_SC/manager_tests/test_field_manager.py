@@ -275,6 +275,20 @@ def test_setup_soil_layer(field_size: float, top: float, sand: float, silt: floa
     assert actual == expected
 
 
+@pytest.mark.parametrize("config", [
+    {},
+    {"wilting_point": 0.1, "field_capacity": 0.29, "saturation": 0.58, "K_sat": 20.0, "clay": 22.5,
+     "initial_temperature": 0.0, "bulk_density": 1.34, "org_C_percent": 0.012, "NH4": 1, "active_N_percent": 0.02,
+     "labile_P": 23.7, "active_mineral_rate": 0.0003, "volatile_exchange_factor": 0.15, "denitrification_rate": 0.1,
+     "soil_water_percent": 0.3, "OM_percent": 0.019}
+])
+def test_setup_soil_layer_error(config: Dict) -> None:
+    """Tests that errors are thrown correctly when not enough information is provided to create one."""
+    with pytest.raises(ValueError) as e:
+        FieldManager._setup_soil_layer(1.0, 0.0, 65.0, 15.0, 0.0, 0.05, config)
+    assert str(e.value) == "Bottom depth is required for each soil layer."
+
+
 @pytest.mark.parametrize("soil_input_file_name,expected_soil_layer_count", [
     ("ARL_soil.json", 5),
     ("ARL_soil_tillage.json", 5),
