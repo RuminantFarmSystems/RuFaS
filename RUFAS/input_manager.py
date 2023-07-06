@@ -128,8 +128,8 @@ class InputManager:
         """
         Perform data validation checks.
 
-        Args
-        ----
+        Parameters
+        ----------
         key : str
             The key of the data to validate.
 
@@ -150,8 +150,8 @@ class InputManager:
         """
         Attempt to fix the invalid data.
 
-        Args
-        ----
+        Parameters
+        ----------
         key : str
             The key of the data to fix.
 
