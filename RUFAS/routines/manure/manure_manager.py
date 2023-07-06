@@ -16,10 +16,15 @@ from typing import Tuple
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
+from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.input_handler.manure_manager_config_handler import ManureManagerConfigHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
+from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
@@ -28,6 +33,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.manure.output_handler.manure_manager_output_handler import ManureManagerOutputHandler
 from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
@@ -84,6 +90,8 @@ class ManureManager:
         self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
         self.manure_manager_output_handler = ManureManagerOutputHandler()
         self._all_data = collections.defaultdict(list)
+
+        self._manure_nutrient_manager = ManureNutrientManager()
 
         # Set up the manure manager components for each animal pen.
         self._configure_manure_manager_components(animal_manager)
@@ -178,6 +186,109 @@ class ManureManager:
             self.manure_manager_output_handler.sort_by_pen_id_and_simulation_day()
             self.manure_manager_output_handler.export_to_csv()
 
+    @staticmethod
+    def _get_manure_type(treatment_type: ManureTreatmentType) -> ManureType:
+        """
+        Look up the type of manure produced by a given manure treatment system.
+        This method is used to map the type of treatment system to the type of manure it produces.
+        This mapping is based on a predefined relationship between the treatment types and manure types.
+        Parameters
+        ----------
+        treatment_type : ManureTreatmentType
+            The type of manure treatment system.
+        Returns
+        -------
+        ManureType
+            The type of manure produced by the given manure treatment system. The possible values are
+            specified in the definition of the enum class :class:`ManureType`.
+        """
+        manure_type_by_treatment_type = {
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR: ManureType.SLURRY,
+            ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: ManureType.SLURRY,
+            ManureTreatmentType.ANAEROBIC_LAGOON: ManureType.LIQUID,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
+            ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
+        }
+        return manure_type_by_treatment_type[treatment_type]
+
+    @staticmethod
+    def _get_manure_density(pen: ManureManagerPen) -> float:
+        """
+        Look up the density of manure produced by a given pen.
+        This method determines the manure density based on the type of manure treatment system of a given pen.
+        Each manure type (SLURRY, LIQUID, SOLID) has a predefined density, which is specified in the class :class:`ManureConstants`.
+        Parameters
+        ----------
+        pen : ManureManagerPen
+            An instance of the ManureManagerPen class representing a specific pen.
+            The pen object should have a manure_treatment attribute that indicates the type of manure treatment system.
+        Returns
+        -------
+        float
+            The density of manure produced by the given pen, in units consistent with the densities
+            defined in ManureConstants. This value depends on the type of manure treatment system of the pen.
+        """
+        treatment_type = ManureTreatmentType.get_type(pen.manure_treatment)
+        manure_type = ManureManager._get_manure_type(treatment_type)
+        manure_density_by_manure_type = {
+            ManureType.SLURRY: ManureConstants.SLURRY_MANURE_DENSITY,
+            ManureType.LIQUID: ManureConstants.LIQUID_MANURE_DENSITY,
+            ManureType.SOLID: ManureConstants.SOLID_MANURE_DENSITY,
+        }
+        return manure_density_by_manure_type[manure_type]
+
+    def _add_manure_nutrients(self, pen: ManureManagerPen,
+                              manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+        """
+        Add the nutrients in the manure produced by a given pen to the manure nutrient manager.
+        Parameters
+        ----------
+        pen : ManureManagerPen
+            A pen object to look up the type of its manure treatment system.
+        manure_treatment_daily_output
+            The daily output data of the manure treatment system.
+        Returns
+        -------
+        None
+        """
+        # TODO: With the introduction of different manure types, we should rename attributes in ManureTreatmentDailyOutput
+        # to make it more generic and not specific to any manure type.
+        self._manure_nutrient_manager.add_nutrients(
+            ManureNutrients(
+                nitrogen=manure_treatment_daily_output.liquid_manure_nitrogen,
+                phosphorus=manure_treatment_daily_output.liquid_manure_phosphorus,
+                potassium=manure_treatment_daily_output.liquid_manure_potassium,
+                dry_matter=manure_treatment_daily_output.liquid_manure_total_solids,
+                total_manure_mass=(manure_treatment_daily_output.liquid_manure_daily_volume
+                                   * self._get_manure_density(pen))
+            )
+        )
+
+    def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
+        """
+        Handle the request for specific nutrients from the crop and soil module.
+        This method evaluates the nutrient request made by considering both nitrogen and phosphorus
+        quantities desired. It calculates the projected manure mass that would satisfy the request
+        and checks against the nutrients available in the manager.
+        If the request can be fulfilled either partially or wholly, the corresponding amount of nutrients
+        is subtracted from the manager's internal bookkeeping. The method then returns the results of the nutrient request,
+        which detail the amounts of nutrients that can be provided to fulfill the request. If the request
+        cannot be fulfilled at all, the method will return None.
+        Parameters
+        ----------
+        request : NutrientRequest
+            The specific nutrient request, including quantities of nitrogen and phosphorus.
+        Returns
+        -------
+        NutrientRequestResults | None
+            The results of the nutrient request, detailed in a `NutrientRequestResults` object, which includes
+            the amount of nitrogen, phosphorus, total manure mass, dry matter, and others that can be provided to fulfill the request.
+            Returns None if the request cannot be fulfilled.
+        """
+        # This is a wrapper method that calls the request_nutrients method of the manure nutrient manager.
+        return self._manure_nutrient_manager.request_nutrients(request)
+
     def _pen_daily_update(self, simulation_day: int, pen) -> None:
         """Calculates and stores daily output for each manure manager component for a given animal pen.
 
@@ -220,6 +331,8 @@ class ManureManager:
             manure_treatment_daily_output,
             anaerobic_digestion_daily_output
         )
+
+        self._add_manure_nutrients(mm_pen, manure_treatment_daily_output)
 
         self._all_data[mm_pen.id].append(daily_update_output)
         self.manure_manager_output_handler.append_daily_update_output_for_pen(
