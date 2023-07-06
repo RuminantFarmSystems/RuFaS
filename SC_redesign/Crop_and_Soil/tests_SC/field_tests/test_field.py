@@ -361,30 +361,33 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOpe
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
-    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
+    ([Crop(), Crop()], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000},
+                        "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "Multiple crops to be harvested by single HarvestEvent."),
-    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}},
+    ([], {"prefix": "field_name:'test'", "date": {"day": 200, "year": 2000}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
      "No crop found to be harvested by a HarvestEvent.")
 ])
 def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expected_message: str) -> None:
     """Tests that warnings are raised correctly to the OutputManager."""
-    for crop in crops:
-        crop.data.id = "test"
-        crop.crop_management.manage_harvest = MagicMock()
-    field = Field()
-    field.field_data.name = "test"
-    field.crops = crops
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "day", 200)
-    setattr(mocked_time, "calendar_year", 2000)
+    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
+               return_value="00-Jan-1970_Thu_00-00-00"):
+        for crop in crops:
+            crop.data.id = "test"
+            crop.crop_management.manage_harvest = MagicMock()
+        field = Field()
+        field.field_data.name = "test"
+        field.crops = crops
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "day", 200)
+        setattr(mocked_time, "calendar_year", 2000)
 
-    field._harvest_crop("test", "default", mocked_time)
+        field._harvest_crop("test", "default", mocked_time)
 
-    for crop in crops:
-        crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
-    actual = om.warnings_pool["field_name:'test'.harvest_warning"]
-    assert actual['info_maps'].__contains__(expected_info_map)
-    assert actual['values'].__contains__(expected_message)
+        for crop in crops:
+            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
+        actual = om.warnings_pool["field_name:'test'.harvest_warning"]
+        assert actual['info_maps'].__contains__(expected_info_map)
+        assert actual['values'].__contains__(expected_message)
 
 
 def test_remove_dead_crops() -> None:
@@ -630,23 +633,23 @@ def test_record_fertilizer_application(mix_name: str, total_mass: float, nitroge
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.5,
                                                      inorganic_phosphorus_fraction=0.5),
-                              NutrientRequest(75, 75)),
+                              NutrientRequest(nitrogen=75.0, phosphorus=75.0)),
                              (100.0, 0.0, 0.88, 2003, 200, True, True,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.5,
                                                      inorganic_phosphorus_fraction=0.5),
-                              NutrientRequest(100, 0)),
+                              NutrientRequest(nitrogen=100.0, phosphorus=0.0)),
                              (50.0, 50.0, 0.91, 1998, 155, False, False,
                               NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, dry_matter=250.0,
                                                      dry_matter_fraction=0.33, organic_nitrogen_fraction=0.3,
                                                      inorganic_nitrogen_fraction=0.7, ammonium_nitrogen_fraction=0.25,
                                                      organic_phosphorus_fraction=0.5,
                                                      inorganic_phosphorus_fraction=0.5),
-
-                              NutrientRequest(50.0, 50.0)),
-                             (65.0, 40.0, 0.77, 1999, 160, True, False, None, NutrientRequest(65.0, 40.0)),
+                              NutrientRequest(nitrogen=50.0, phosphorus=50.0)),
+                             (65.0, 40.0, 0.77, 1999, 160, True, False, None, NutrientRequest(nitrogen=65.0,
+                                                                                              phosphorus=40.0)),
                              (0, 0, 0.5, 1996, 155, False, False, None, None)
                          ])
 def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage: float, year: int, day: int,
