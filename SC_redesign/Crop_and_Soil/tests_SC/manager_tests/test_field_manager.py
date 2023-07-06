@@ -1,6 +1,5 @@
 from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
 from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
 from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
 from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
 from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
