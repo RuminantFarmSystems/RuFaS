@@ -36,7 +36,8 @@ def run_rufas(
     """
     if clear_output:
         output_dir = Path(config.global_variables.OUT_DIR)
-        Utility.empty_dir(output_dir, keep=[".keep"])
+        keep_list = [".keep", "output_filters"]
+        Utility.empty_dir(output_dir, keep=keep_list)
 
     set_global_variables(make_graphs, verbose)
     if verbose:
@@ -64,7 +65,7 @@ def execute_simulations_from_files(
         output_manager.flush_pools()
         simulator = SimulationEngine(input_file_path)
         simulator.simulate()
-        output_manager.save_variables(r"output", r"input/output_filters/", exclude_info_maps)
+        output_manager.save_variables(r"output", r"output/output_filters/", exclude_info_maps)
         output_manager.dump_all_pools(r"output", exclude_info_maps)
 
 
