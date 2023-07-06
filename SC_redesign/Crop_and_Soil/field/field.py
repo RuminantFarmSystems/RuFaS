@@ -17,7 +17,6 @@ from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
 from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from copy import copy
 
@@ -327,24 +326,20 @@ class Field:
         if requested_nitrogen == requested_phosphorus == 0.0:
             return
 
-        _manure_nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
         # TODO: call request_nutrients() on ManureManager when finished
         manure_filled_by_request = NutrientRequestResults(nitrogen=50.0, phosphorus=50.0, total_manure_mass=500.0,
                                                           dry_matter=150.0, dry_matter_fraction=0.3)
 
-        self.manure_applicator.apply_machine_manure(dry_matter_mass=manure_filled_by_request.dry_matter,
-                                                    dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
-                                                    total_phosphorus_mass=manure_filled_by_request.phosphorus,
-                                                    field_coverage=field_coverage,
-                                                    field_size=self.field_data.field_size,
-                                                    inorganic_nitrogen_fraction=
-                                                    manure_filled_by_request.inorganic_nitrogen_fraction,
-                                                    ammonium_fraction=
-                                                    manure_filled_by_request.ammonium_nitrogen_fraction,
-                                                    organic_nitrogen_fraction=
-                                                    manure_filled_by_request.organic_nitrogen_fraction,
-                                                    water_extractable_inorganic_phosphorus_fraction=
-                                                    manure_filled_by_request.inorganic_phosphorus_fraction)
+        self.manure_applicator.apply_machine_manure(
+            dry_matter_mass=manure_filled_by_request.dry_matter,
+            dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
+            total_phosphorus_mass=manure_filled_by_request.phosphorus,
+            field_coverage=field_coverage,
+            field_size=self.field_data.field_size,
+            inorganic_nitrogen_fraction=manure_filled_by_request.inorganic_nitrogen_fraction,
+            ammonium_fraction=manure_filled_by_request.ammonium_nitrogen_fraction,
+            organic_nitrogen_fraction=manure_filled_by_request.organic_nitrogen_fraction,
+            water_extractable_inorganic_phosphorus_fraction=manure_filled_by_request.inorganic_phosphorus_fraction)
 
         self._record_manure_application(dry_matter_mass=manure_filled_by_request.dry_matter,
                                         dry_matter_fraction=manure_filled_by_request.dry_matter_fraction,
