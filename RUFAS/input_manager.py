@@ -98,7 +98,7 @@ class InputManager:
 
         Parameters
         ----------
-        eager_termination : bool, optional
+        eager_termination : bool, default=True
             Flag to determine if the process should terminate upon finding invalid data.
 
         Returns
