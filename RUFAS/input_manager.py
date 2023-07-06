@@ -61,7 +61,6 @@ class InputManager:
         ------
         Exception
             If an error occurs while opening or reading a data file.
-
         """
 
         files_details = self.__metadata["files"]
@@ -161,7 +160,7 @@ class InputManager:
 
         Returns
         -------
-        bool 
+        bool
             True if the data is fixed, False otherwise.
         """
         # Attempt to fix the invalid data
