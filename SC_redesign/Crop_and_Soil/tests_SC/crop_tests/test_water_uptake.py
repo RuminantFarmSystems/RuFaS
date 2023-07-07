@@ -3,7 +3,6 @@ from typing import List
 
 import pytest
 from unittest.mock import MagicMock, patch, call
-import math
 
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.water_uptake import WaterUptake
@@ -36,10 +35,6 @@ def test_correct_layer_for_efficiency(pot, avail, cap):
         assert WaterUptake._correct_layer_for_efficiency(pot, avail, cap) == pot
     else:
         assert WaterUptake._correct_layer_for_efficiency(pot, avail, cap) == pot * exp(5 * ((avail / (0.25 * cap)) - 1))
-
-
-def test_determine_max_water_uptake_to_depth():
-    pass  # this is equivalent to the tests in test_nitrogen_incorporation and test_phosphorus_incorporation
 
 
 @pytest.mark.parametrize("max_trans", [
