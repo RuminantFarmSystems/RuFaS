@@ -40,7 +40,7 @@ jobs:
       uses: tj-actions/verify-changed-files@v14
       id: verify-changed-files
       with:
-        files: ./.github/workflows/badgescoverage.svg
+        files: ./.github/workflows/badges/coverage.svg
 
     - name: Commit files
       if: steps.verify-changed-files.outputs.files_changed == 'true'
