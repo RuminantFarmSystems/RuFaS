@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from RUFAS.classes import Weather
-
 
 @dataclass
 class CurrentWeather:
@@ -33,22 +31,8 @@ class CurrentWeather:
     """amount of rainfall that occurs on the day (mm)"""
     irrigation: float = 0.0
 
-    @classmethod
-    def check_current_weather(cls, weather: Weather, month: int) -> 'CurrentWeather':
-        """creates a CurrentWeather object by extracting the relevant values for the current day from a Weather
-        object"""
-        cls.incoming_light = weather.radiation
-        cls.min_air_temperature = weather.T_min
-        cls.mean_air_temperature = weather.T_avg
-        cls.max_air_temperature = weather.T_max
-        cls.annual_mean_air_temperature = weather.T_avg_annual
-        cls.rainfall = weather.rainfall
-        cls.irrigation = weather.irrigation
-        cls.daylength = CurrentWeather._determine_daylength(month=month)
-        return CurrentWeather()  # TODO: placeholder for typing, needs implementation
-
     @staticmethod
-    def _determine_daylength(month: int) -> int:
+    def determine_daylength(month: int) -> int:
         """
         Approximate day length of the month by using data from Madison, WI
         Parameters

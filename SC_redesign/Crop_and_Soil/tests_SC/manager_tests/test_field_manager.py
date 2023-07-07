@@ -54,6 +54,7 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     mocked_time = MagicMock(Time)
     mocked_weather = MagicMock(Weather)
     setattr(mocked_time, "calendar_year", 1998)
+    setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
     setattr(mocked_weather, "radiation", 3)
     setattr(mocked_weather, "T_min", 3)
@@ -63,11 +64,12 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "rainfall", 3)
     setattr(mocked_weather, "irrigation", 3)
     mocked_manure_manager = MagicMock(ManureManager)
-    fm = FieldManager([], mocked_manure_manager)
+    fm = FieldManager({}, mocked_manure_manager)
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
     fm.output_gatherer.send_daily_variables = MagicMock()
+    FieldManager._create_current_weather = MagicMock()
     fm.daily_update_routine(weather=mocked_weather, time=mocked_time)
     for field in fields:
         assert field.manage_field.call_count == 1
@@ -85,7 +87,7 @@ def test_annual_update_routine(fields: List[Field]):
     for field in fields:
         field.perform_annual_reset = MagicMock()
     mocked_field_manager = MagicMock(ManureManager)
-    fm = FieldManager([], mocked_field_manager)
+    fm = FieldManager({}, mocked_field_manager)
     fm.fields = fields
     fm.output_gatherer.send_annual_variables = MagicMock()
     fm.annual_update_routine()

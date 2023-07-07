@@ -85,9 +85,8 @@ class SimulationEngine:
             self.state.manure_storage, self.state.animal_manager)
         simulate_daily_manure_manager(
             self.state.manure_manager, self.state.animal_manager)
-        routines.daily_fields_routine(
-            self.state.fields, self.state.manure_storage, self.weather, self.time)
-        routines.daily_feed_routine(self.state.feed, self.state.fields, self.state.animal_manager,
+        self.state.field_manager.daily_update_routine(self.weather, self.time)
+        routines.daily_feed_routine(self.state.feed, self.state.field_manager, self.state.animal_manager,
                                     self.output.reports['feed_storage_report'])
 
         self.output.daily_update(self.state, self.weather, self.time)
@@ -111,7 +110,6 @@ class SimulationEngine:
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""
-        routines.annual_fields_routine(self.state.fields, self.time)
         routines.annual_feed_routine(self.state.feed)
 
     def _run_post_annual_routines(self) -> None:
