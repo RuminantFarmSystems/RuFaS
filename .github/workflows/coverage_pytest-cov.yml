@@ -1,0 +1,52 @@
+# This workflow will install Python dependencies, run tests with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Coverage
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Build coverage file
+      run: |
+        pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=RUFAS tests/ | tee pytest-coverage.txt
+
+    - name: Pytest coverage comment
+      id: coverageComment
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        hide-comment: true
+        pytest-coverage-path: ./pytest-coverage.txt
+
+    - name: Update Readme with Coverage Html
+      run: |
+        sed -i '/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\${{ steps.summary_report.outputs.content }}\n<!-- Pytest Coverage Comment:End -->' ./README.md
+
+    - name: Commit & Push changes to Readme
+      uses: actions-js/push@master
+      with:
+        message: Update coverage on Readme
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.head_ref }}
