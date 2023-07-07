@@ -16,6 +16,11 @@
 # ignore linear programming files
 *.lp
 
+# ignore temporary files generated when checking code coverage
+pytest.xml
+pytest.txt
+.coverage
+
 # ignore python compiled files
 *.pyc
 
