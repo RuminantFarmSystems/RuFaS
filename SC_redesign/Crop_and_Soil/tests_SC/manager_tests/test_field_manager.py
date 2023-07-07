@@ -44,8 +44,9 @@ def test_date_conversion_day(year: int, day: int, expected_day: int):
 
 
 @pytest.mark.parametrize("fields", [
-    [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
-     Field(field_data=FieldData(name="field3"))],
+    [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
 def test_daily_update_routine(fields: List[Field]) -> None:
@@ -74,8 +75,9 @@ def test_daily_update_routine(fields: List[Field]) -> None:
 
 
 @pytest.mark.parametrize("fields", [
-    [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
-     Field(field_data=FieldData(name="field3"))],
+    [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
 def test_annual_update_routine(fields: List[Field]):
