@@ -25,9 +25,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install coverage coverage-badge
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Test code coverage
+    - name: Run tests with coverage.py
       run:
         coverage run -m pytest
+
+    - name: Generate coverage data
+      run:
         coverage report
 
     - name: Generate coverage badge
