@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    # Environment setup
     - uses: actions/checkout@v2
       with:
         persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
@@ -23,46 +25,37 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "3.10"
+
+    # Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install coverage coverage-badge
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
+
+    # Test coverage
+    # https://coverage.readthedocs.io/en/7.2.7/index.html
     - name: Run tests with coverage.py
       run:
         coverage run -m pytest
 
-    - name: Generate coverage data
+    - name: Generate coverage report
       run:
         coverage report -m
 
+    - name: Generage html report
+      run:
+        coverage html -d ./docs/coverage/report/
+
+    # Create coverage badge
+    # https://github.com/marketplace/actions/coverage-py-badge
     - name: Coverage Badge
       uses: tj-actions/coverage-badge-py@v2
       with:
         output: ./docs/coverage/badge.svg
 
-#    - name: Verify Changed files
-#      uses: tj-actions/verify-changed-files@v14
-#      id: verify-changed-files
-#      with:
-#        files: ./.github/workflows/badges/coverage.svg
-
-#    - name: Build coverage file
-#      run: |
-#        pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=RUFAS tests/ | tee pytest-coverage.txt
-#
-#    - name: Pytest coverage comment
-#      id: coverageComment
-#      uses: MishaKav/pytest-coverage-comment@main
-#      with:
-#        hide-comment: true
-#        pytest-coverage-path: ./pytest-coverage.txt
-#
-#    - name: Update Readme with Coverage Html
-#      run: |
-#        sed -i '/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\${{ steps.summary_report.outputs.content }}\n<!-- Pytest Coverage Comment:End -->' ./README.md
-#
+    # Update repository
+    # https://github.com/marketplace/actions/github-commit-push
     - name: Commit & Push changes to Readme
       uses: actions-js/push@master
       with:

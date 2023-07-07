@@ -18,8 +18,6 @@
 
 # ignore temporary files generated when checking code coverage
 .coverage
-docs/coverage/*
-!docs/coverage/badge.svg
 
 # ignore python compiled files
 *.pyc
