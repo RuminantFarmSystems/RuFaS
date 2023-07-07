@@ -124,13 +124,13 @@ def test_daily_simulation(
     """Unit test for function _daily_simulation in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.routines.daily_animal_routine")
     mocker.patch("RUFAS.routines.daily_manure_storage_routine")
-    mocker.patch("RUFAS.routines.daily_fields_routine")
     mocker.patch("RUFAS.routines.daily_feed_routine")
     mocker.patch("RUFAS.simulation_engine.SimulationEngine._advance_time")
     patch_simulation_engine._daily_simulation()
     assert patch_simulation_engine.output.daily_update.call_count == 1
     for mocked in mocker._patches_and_mocks:
         assert mocked[1].call_count == 1
+    patch_simulation_engine.state.field_manager.daily_update_routine.assert_called_once()
 
 
 def test_advance_time(

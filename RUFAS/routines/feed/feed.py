@@ -684,6 +684,8 @@ class Feed:
                 can be added to output.
         """
         # aggregate crop yield across fields
+        return
+
         for field in fields.fields.values():
             name = list(field.crop.current_crop.keys())[0]
             crop = field.crop.current_crop[name]
