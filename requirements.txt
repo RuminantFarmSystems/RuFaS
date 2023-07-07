@@ -3,6 +3,7 @@ mock
 numpy
 pandas
 pytest
+pytest-cov
 pytest-mock
 scipy
 pytest-lazy-fixture
