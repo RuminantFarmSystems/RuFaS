@@ -238,9 +238,11 @@ class LayerData:
     # ---- Nitrogen
     initial_soil_nitrate_concentration: Optional[float] = None
     """Concentration of nitrates in this soil layer at beginning of the simulation (mg / kg soil)"""
+    initial_soil_ammonium_concentration: Optional[float] = None
+    """Concentration of ammonium in this soil layer at beginning of the simulation (mg / kg soil)"""
     nitrate_content: Optional[float] = None
     """Nitrate (NO3) content of this soil layer (kg / ha)"""
-    ammonium_content: float = 0
+    ammonium_content: Optional[float] = None
     """Ammonium (NH4+) content of this soil layer (kg / ha)"""
     active_organic_nitrogen_content: float = field(init=False)
     """Active organic nitrogen content of this soil layer (kg / ha)"""
@@ -359,7 +361,8 @@ class LayerData:
         Notes
         -----
         The active humic nitrogen fraction is defined as 0.02 in the SWAT Theoretical documentation page 186, beneath
-        eqn. 3:1.1.4.
+        eqn. 3:1.1.4. SWAT does not specify how ammonium levels should be initialized, so this method assumes no
+        ammonium is present if the user does not specify an initial amount.
 
         """
         if self.initial_soil_nitrate_concentration is None:
@@ -369,6 +372,13 @@ class LayerData:
         self.nitrate_content = self.determine_soil_nutrient_area_density(self.initial_soil_nitrate_concentration,
                                                                          self.bulk_density, self.layer_thickness,
                                                                          field_size)
+
+        if self.initial_soil_ammonium_concentration is None:
+            self.initial_soil_ammonium_concentration = 0.0
+
+        self.ammonium_content = self.determine_soil_nutrient_area_density(self.initial_soil_ammonium_concentration,
+                                                                          self.bulk_density, self.layer_thickness,
+                                                                          field_size)
 
         # SWAT eqn. 3:1.1.2
         humic_organic_nitrogen_concentration = (10 ** 4) * (self.percent_organic_carbon_content / 14)

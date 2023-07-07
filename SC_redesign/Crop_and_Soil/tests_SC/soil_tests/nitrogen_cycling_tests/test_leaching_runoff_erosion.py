@@ -187,9 +187,9 @@ def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: 
     """Tests that nitrogen is properly eroded from the surface of the field."""
     with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.saturation_content", new_callable=PropertyMock,
                return_value=8.8):
-        layer = LayerData(top_depth=0, bottom_depth=20, field_size=field_size, ammonium_content=ammonium,
-                          bulk_density=1.6)
+        layer = LayerData(top_depth=0, bottom_depth=20, field_size=field_size, bulk_density=1.6)
         layer.nitrate_content = nitrates
+        layer.ammonium_content = ammonium
         layer.active_organic_nitrogen_content = active
         layer.stable_organic_nitrogen_content = stable
         layer.fresh_organic_nitrogen_content = fresh
