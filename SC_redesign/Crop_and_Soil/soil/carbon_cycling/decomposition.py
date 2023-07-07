@@ -69,21 +69,19 @@ class Decomposition:
 
         Returns: moisture effect (unitless)
 
-        Notes: Negative bases are used, they result in complex numbers instead of the negative floats. The if statements
-            prevent complex numbers from being returned.
+        Notes: If negative bases are raised to a exponents, they sometimes result in complex numbers instead of negative
+            floats. This behavior causes the program to eventually crash and is avoided by computing a sign correction
+            factor, which allows the absolute value of the bases to be used.
         """
         # S.6.A.5
         base_1 = (water_factor - b_term) / (a_term - b_term)
         base_2 = (water_factor - c_term) / (a_term - c_term)
 
-        if base_1 < 0.0:
-            first_term = (-1) * ((-1 * base_1) ** first_exponent)
-        else:
-            first_term = base_1 ** first_exponent
+        sign_correction_factor = 1.0
+        if (base_1 < 0.0 < base_2) or (base_1 > 0.0 > base_2):
+            sign_correction_factor = -1.0
 
-        if base_2 < 0.0:
-            second_term = (-1) * ((-1 * base_2) ** second_exponent)
-        else:
-            second_term = base_2 ** second_exponent
+        first_term = abs(base_1) ** first_exponent
+        second_term = abs(base_2) ** second_exponent
 
-        return first_term * second_term
+        return first_term * second_term * sign_correction_factor

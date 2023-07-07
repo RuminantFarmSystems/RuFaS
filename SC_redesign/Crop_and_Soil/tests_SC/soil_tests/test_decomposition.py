@@ -25,7 +25,10 @@ def test_calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection
 @pytest.mark.parametrize("water_factor", [
     15,  # lower values
     13,  # higher values
-    16.6  # arbitrary
+    16.6,  # arbitrary
+    0.0,
+    1.333,
+    4.8,
 ])
 def test_calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float = 1.7,
                               c_term: float = -0.007, first_exponent=6.648115,
