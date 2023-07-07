@@ -86,10 +86,11 @@ class Field:
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
 
+        if manure_manager is None:
+            raise ValueError("Manure manager cannot be None.")
+
         self.manure_manager: ManureManager = manure_manager
         """:class:`ManureManager` instance from which manure is requested for application to the field."""
-        # HELPME: not sure how to deal with the manure manager being None. If it were a different class I would just
-        # instantiate a new one, but ManureManager is pretty involved.
 
     def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
         """
