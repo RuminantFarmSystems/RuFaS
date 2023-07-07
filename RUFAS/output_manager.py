@@ -455,7 +455,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(self, save_path: str, dir_path: str,
+    def save_variables(self, save_path: str, dir_path: str = 'output/output_filters/default_filter.txt',
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
