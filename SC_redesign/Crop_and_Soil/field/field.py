@@ -14,7 +14,6 @@ from math import exp
 from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
 from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
 from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
-from RUFAS.classes import Time
 from RUFAS.output_manager import OutputManager
 from copy import copy
 
@@ -84,7 +83,7 @@ class Field:
         self.manure_events: List[ManureEvent] = manure_events or []
         """List of all manure applications that will be applied to this field."""
 
-    def manage_field(self, time: Time, current_weather: CurrentWeather) -> None:
+    def manage_field(self, time, current_weather: CurrentWeather) -> None:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -362,7 +361,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def _check_crop_planting_schedule(self, time: Time) -> None:
+    def _check_crop_planting_schedule(self, time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -377,7 +376,7 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def _check_fertilizer_application_schedule(self, time: Time) -> None:
+    def _check_fertilizer_application_schedule(self, time) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
@@ -392,7 +391,7 @@ class Field:
             self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
                                                  event.day)
 
-    def _check_tillage_schedule(self, time: Time) -> None:
+    def _check_tillage_schedule(self, time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -407,7 +406,7 @@ class Field:
             self.tiller.till_soil(event.tillage_depth, event.incorporation_fraction, event.mixing_fraction,
                                   time.calendar_year, time.day)
 
-    def _check_manure_application_schedule(self, time: Time) -> None:
+    def _check_manure_application_schedule(self, time) -> None:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -422,7 +421,7 @@ class Field:
             self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
                                              event.year, event.day)
 
-    def _check_crop_harvest_schedule(self, time: Time) -> None:
+    def _check_crop_harvest_schedule(self, time) -> None:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -460,7 +459,7 @@ class Field:
                 crop.crop_management.manage_harvest(HarvestOperation.HARVEST_NOKILL)
 
     @staticmethod
-    def _filter_events(all_events: List[Event], time: Time) -> Tuple[List[Event], List[Event]]:
+    def _filter_events(all_events: List[Event], time) -> Tuple[List[Event], List[Event]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -496,7 +495,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time) -> None:
         """
         Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
         list of current crops.
@@ -572,7 +571,7 @@ class Field:
         value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest}
         om.add_variable("crop_planting", value, info_map)
 
-    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time: Time) -> None:
+    def _harvest_crop(self, crop_reference: str, harvest_operation: str, time) -> None:
         """
         Performs the specified crop operation on the specified crop.
 

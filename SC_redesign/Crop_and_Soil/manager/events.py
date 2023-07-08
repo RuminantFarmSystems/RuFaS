@@ -1,4 +1,3 @@
-from RUFAS.classes import Time
 
 """This module defines the various Event classes and helper functions
 
@@ -43,7 +42,7 @@ class Event:
         """Overrides the hash method for Event objects."""
         return hash((self.year, self.day))
 
-    def occurs_today(self, time: Time) -> bool:
+    def occurs_today(self, time) -> bool:
         """
         Checks if the event occurs on the current day in the current year..
 
