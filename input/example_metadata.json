@@ -1,81 +1,280 @@
 {
-    "config": {
-      "start_date": "2009:1",
-      "end_date": "2009:100",
-      "graphic_dir": "output/graphics/",
-      "output_dir": "output/",
-      "random_seed": 42,
-      "simulate_animals": true
+  "config": {
+    "start_date": "2009:1",
+    "end_date": "2009:100",
+    "graphic_dir": "output/graphics/",
+    "output_dir": "output/",
+    "random_seed": 42,
+    "simulate_animals": true
+  },
+  "files": {
+    "animal": {
+      "title": "Animal data",
+      "description": "Moo Moo!",
+      "path": "animal/example_animal.json",
+      "type": "json",
+      "properties": "a"
     },
-    "files": {
-      "animal": {
-        "title": "Animal data",
-        "description": "Moo Moo!",
-        "path": "animal/barnyard_animal.json",
-        "type": "json",
-        "properties": "a"
+    "crop": {
+      "title": "Crop data",
+      "description": "Alfafa is fun!",
+      "path": "crop/example_rotation.json",
+      "type": "json",
+      "properties": "b"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Time is money!",
+      "path": "EEE/example_costs.csv",
+      "type": "csv",
+      "properties": "c"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "Let's think about global warming",
+      "path": "EEE/example_emissions.json",
+      "type": "json",
+      "properties": "d"
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Those cows need to eat!",
+      "path": "feed/example_user_feeds.csv",
+      "type": "csv",
+      "properties": "e"
+    },
+    "manure": {
+      "title": "Manure data",
+      "description": "You thought it's a waste, but those crops need to eat as well",
+      "path": "manure/example_manure_management.json",
+      "type": "json",
+      "properties": "f"
+    },
+    "soil": {
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
+      "path": "soil/example_soil.json",
+      "type": "json",
+      "properties": "g"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Let's turn on the AC",
+      "path": "weather/example_weather.csv",
+      "type": "csv",
+      "properties": "h"
+    }
+  },
+  "properties": {
+    "a": {
+      "calf_num": {
+        "type": "number",
+        "description": "The average number of pre-weaned calves (head)",
+        "minimum": 0,
+        "default": 8
       },
-      "crop": {
-        "title": "Crop data",
-        "description": "Alfafa is fun!",
-        "path": "crop/alfalfa_rotation.json",
-        "type": "json",
-        "properties": "b"
+      "heiferI_num": {
+        "type": "number",
+        "description": "HeiferI is the number of youngstock post-weaning and before breeding (head)",
+        "minimum": 0,
+        "default": 44
       },
-      "economy": {
-        "title": "Economy data",
-        "description": "Time is money!",
-        "path": "EEE/costs.csv",
-        "type": "csv",
-        "properties": "c"
+      "heiferII_num": {
+        "type": "number",
+        "description": "HeiferII is the number of heifers eligible for breeding and in early pregnancy (head)",
+        "minimum": 0,
+        "default": 38
       },
-      "emission": {
-        "title": "Emissions data",
-        "description": "Let's think about global warming",
-        "path": "EEE/emissions.json",
-        "type": "json",
-        "properties": "d"
+      "heiferIII_num_springers": {
+        "type": "number",
+        "description": "HeiferIII is the number of close-up heifers (head)",
+        "minimum": 0,
+        "default": 5
       },
-      "feed": {
-        "title": "Feed data",
-        "description": "Those cows need to eat!",
-        "path": "feed/user_feeds.csv",
-        "type": "csv",
-        "properties": "e"
+      "cow_num": {
+        "type": "number",
+        "description": "The number of dry and lactating cows (head)",
+        "minimum": 0,
+        "default": 100
       },
-      "manure": {
-        "title": "Manure data",
-        "description": "You thought it's a waste, but those crops need to eat as well",
-        "path": "manure/manure_management.json",
-        "type": "json",
-        "properties": "f"
+      "herd_num": {
+        "type": "number",
+        "description": "The number of lactating and milking cows on farm (head)",
+        "minimum": 0,
+        "default": 187
       },
-      "soil": {
-        "title": "Soil data",
-        "description": "Stop treating soil like dirt!",
-        "path": "soil/LT_soil.json",
-        "type": "json",
-        "properties": "g"
+      "herd_init": {
+        "type": "boolean",
+        "description": "Whether or not to initialize a herd if the milk prod and body weight numbers are exceedingly abnormal",
+        "default": false
       },
-      "weather": {
-        "title": "Weather data",
-        "description": "Let's turn on the AC",
-        "path": "weather/ARL_weather.csv",
-        "type": "csv",
-        "properties": "h"
+      "breed": {
+        "type": "string",
+        "description": "The predominant breed of the herd (Holstein - HO or Jersey - JE)",
+        "default": "HO",
+        "minimum_length": 2,
+        "maximum_length": 2
       }
     },
-    "properties": {
-      "a": {},
-      "b": {},
-      "c": {},
-      "d": {},
-      "e": {},
-      "f": {},
-      "g": {},
-      "h": {}
+    "b": {
+      "crop_species": {
+        "type": "string",
+        "description": "the name of the crop being grown",
+        "minimum_length": 1,
+        "maximum_length": 50
+      },
+      "planting_years": {
+        "type": "array",
+        "description": "Years in which the planting occurs",
+        "minimum_length": 1
+      },
+      "planting_days": {
+        "type": "array",
+        "description": "Julian day(s) of year to plant",
+        "minimum_length": 1
+      },
+      "harvest_years": {
+        "type": "array",
+        "description": "Years in which the harvesting occurs",
+        "minimum_length": 1
+      },
+      "harvest_days": {
+        "type": "array",
+        "description": "Julian day(s) of year to harvest",
+        "minimum_length": 1
+      }
+
     },
-    "cross-validation": {}
-  }
-  
-  
+    "c": {
+      "electricity_cost_kwh": {
+        "description": "cost of electricity per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.15
+      },
+      "water_cost_gal": {
+        "description": "cost of water per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.008
+      },
+      "natural_gas_cost_kwh": {
+        "description": "cost of natural gas per kwh",
+        "type": "number",
+        "minimum": 0,
+        "default": 0.053
+      },
+      "diesel_cost_gal": {
+        "description": "cost of diesel per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 5.00
+      }
+    },
+    "d": {
+      "alfalfa_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
+        "minimum": 0,
+        "default": 500
+      },
+      "corn_silage_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
+        "minimum": 0,
+        "default": 400
+      },
+      "corn_grain_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
+        "minimum": 0,
+        "default": 300
+      }
+    },
+    "e": {
+      "entry": {
+        "description": "the entry number of the feed",
+        "type": "number",
+        "minimum": 1
+      },
+      "feed_name": {
+        "description": "the name of the feed",
+        "type": "string",
+        "minimum_length": 2,
+        "maximum_length": 50
+      },
+      "description": {
+        "description": "the description of the feed",
+        "type": "string",
+        "minimum_length": 2,
+        "maximum_length": 50
+      },
+      "type": {
+        "description": "the type of the feed",
+        "type": "string",
+        "minimum_length": 2,
+        "maximum_length": 50
+      },
+      "units": {
+        "description": "the unit the feed is measured in",
+        "type": "string",
+        "minimum_length": 2,
+        "maximum_length": 10,
+        "default": "kg"
+      }
+    },
+    "f": {},
+    "g": {
+     "soil_albedo": {
+      "type": "number",
+      "description": "The fraction of light that is reflected by the soil surface",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0.3
+     },
+     "sand_content": {
+      "type": "number",
+      "description": "The average fraction of soil comprised of sand",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0.08
+     },
+     "silt_content": {
+      "type": "number",
+      "description": "The average fraction of soil comprised of silt",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0.1
+     },
+     "n_mineralization": {
+      "type": "number",
+      "description": "The rate at which nitrogen is mineralized to nitrate (NO3)",
+      "minimum": 0,
+      "default": 1
+     }
+    },
+    "h": {
+      "year": {
+        "description": "year of simulation",
+        "type": "number",
+        "minimum": 1980,
+        "default": 2000
+      },
+      "jday": {
+        "description": "Julian day of simulation",
+        "type": "number",
+        "minimum": 1,
+        "maximum": 366,
+        "default": 1
+      },
+      "precip": {
+        "description": "amount of precipitation",
+        "type": "number",
+        "minimum": 0,
+        "default": 0
+      }
+    }
+  },
+  "cross-validation": {}
+}
+
