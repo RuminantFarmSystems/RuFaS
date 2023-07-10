@@ -18,6 +18,7 @@
 
 # ignore temporary files generated when checking code coverage
 .coverage
+docs/coverage/coverage.json
 
 # ignore python compiled files
 *.pyc
