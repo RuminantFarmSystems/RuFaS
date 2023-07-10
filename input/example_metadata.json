@@ -117,20 +117,15 @@
       }
     },
     "b": {
-      "crop_species": {
+       "crop_species": {
         "type": "string",
         "description": "the name of the crop being grown",
         "minimum_length": 1,
         "maximum_length": 50
       },
-      "planting_years": {
+      "harvest_days": {
         "type": "array",
-        "description": "Years in which the planting occurs",
-        "minimum_length": 1
-      },
-      "planting_days": {
-        "type": "array",
-        "description": "Julian day(s) of year to plant",
+        "description": "Julian day(s) of year to harvest",
         "minimum_length": 1
       },
       "harvest_years": {
@@ -138,12 +133,16 @@
         "description": "Years in which the harvesting occurs",
         "minimum_length": 1
       },
-      "harvest_days": {
+      "planting_days": {
         "type": "array",
-        "description": "Julian day(s) of year to harvest",
+        "description": "Julian day(s) of year to plant",
+        "minimum_length": 1
+      },
+      "planting_years": {
+        "type": "array",
+        "description": "Years in which the planting occurs",
         "minimum_length": 1
       }
-
     },
     "c": {
       "electricity_cost_kwh": {
