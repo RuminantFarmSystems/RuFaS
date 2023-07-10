@@ -115,7 +115,6 @@ class InputManager:
         for key, value in self.__pool.items():
             if not self._validate_element(key, value):
                 invalid_elements_count += 1
-                om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
                 data_fixable = self._fix_data(key, value)
                 if not data_fixable:
                     unfixed_elements_count += 1
@@ -126,15 +125,14 @@ class InputManager:
                         return False
                 else:
                     fixed_elements_count += 1
-                    om.add_warning("Data fixed",
-                                   f"Invalid data fixed: {key=}; {value=}",
-                                   info_map)
             else:
                 valid_elements_count += 1
-        om.add_log("Total Valid Elements", f"{valid_elements_count} valid elements found.")
-        om.add_log("Total Invalid Elements", f"{invalid_elements_count} invalid elements found.")
-        om.add_log("Total Fixed Elements", f"{fixed_elements_count} elements fixed.")
-        om.add_log("Total Unfixed Elements", f"{unfixed_elements_count} elements unable to be fixed")
+        total_elements_checked_count = valid_elements_count + invalid_elements_count
+        om.add_log("Total Valid Elements", f"{valid_elements_count} valid elements found.", info_map)
+        om.add_log("Total Invalid Elements", f"{invalid_elements_count} invalid elements found.", info_map)
+        om.add_log("Total Fixed Elements", f"{fixed_elements_count} elements fixed.", info_map)
+        om.add_log("Total Unfixed Elements", f"{unfixed_elements_count} elements unable to be fixed", info_map)
+        om.add_log("Total Checked Elements", f"{total_elements_checked_count} total elements checked")
         return True
 
     def _validate_element(self, key: str, value: Any) -> bool:
@@ -157,6 +155,10 @@ class InputManager:
         """
         # Perform data validation checks
         # Return True if the data is valid, False otherwise
+
+        # TODO in validate_element fun branch
+        # where element is found to be invalid, place this warning:
+        # om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
         pass
 
     def _fix_data(self, key: str, value: Any) -> bool:
@@ -178,4 +180,8 @@ class InputManager:
         """
         # Attempt to fix the invalid data
         # Return True if the data is fixed, False otherwise
+
+        # TODO in fix_data fun branch
+        # where element is fixed, place this warning:
+        # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
         pass
