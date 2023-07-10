@@ -71,27 +71,4 @@ jobs:
           $URL \
           -H "Content-Type: application/json" \
           -H "Authorization: token $GITHUB_TOKEN" \
-          --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}" }'
-
-#    - uses: actions/github-script@v6
-#        with:
-#          script: |
-#            github.rest.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: 'Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}'
-#            })
-
-#  comment:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/github-script@v6
-#        with:
-#          script: |
-#            github.rest.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: 'Test test'
-#            })
+          --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%" }'
