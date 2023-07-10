@@ -94,7 +94,7 @@ class InputManager:
 
     def _validate_data(self, eager_termination: bool = True) -> bool:
         """
-        Validates input data.
+        Validates input data and attempts to fix any invalid input data.
 
         Parameters
         ----------
@@ -109,11 +109,12 @@ class InputManager:
                     "function": self._validate_data.__name__,
                     }
         for key, value in self.__pool.items():
-            if not self._validate(key, value):
-                if eager_termination:
-                    om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
-                    if not self._fix_data(key, value):
-                        om.add_error("Data not fixable",
+            if not self._validate_element(key, value):
+                om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
+                data_fixable = self._fix_data(key, value)
+                if not data_fixable:
+                    if eager_termination:
+                        om.add_error("Data not fixable.",
                                      f"Unable to fix the invalid data: {key=}, {value=}. Terminating the process.",
                                      info_map)
                         return False
@@ -123,7 +124,7 @@ class InputManager:
                                        info_map)
         return True
 
-    def _validate(self, key: str, value: Any) -> bool:
+    def _validate_element(self, key: str, value: Any) -> bool:
         """
         Perform data validation checks.
 
