@@ -114,8 +114,8 @@ class InputManager:
                 if eager_termination:
                     om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
                     if not self._fix_data(key, value):
-                        om.add_error("Data not fixable.",
-                                     f"Unable to fix the invalid data: {key} - {value}. Terminating the process.",
+                        om.add_error("Data not fixable",
+                                     f"Unable to fix the invalid data: {key=}, {value=}. Terminating the process.",
                                      info_map)
                         return False
                     else:
