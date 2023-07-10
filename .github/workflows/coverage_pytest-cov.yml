@@ -40,8 +40,9 @@ jobs:
         coverage run -m pytest
 
     - name: Generate coverage report
-      run:
+      run: |
         coverage report -m
+        coverage json -o ./docs/coverage/coverage.json
 
     # Create coverage badge
     # https://github.com/marketplace/actions/coverage-py-badge
