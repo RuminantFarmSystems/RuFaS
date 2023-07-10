@@ -119,14 +119,14 @@ class InputManager:
                 property_map_key = self.__metadata["files"][key]["properties"]
                 data_critical = "default" not in self.__metadata["properties"][property_map_key][variable].keys()
                 if not self._validate_element(variable, value):
+                    invalid_elements_count += 1
                     if data_critical:
                         invalid_critical_elements_count += 1
-                    invalid_elements_count += 1
-                    data_fixable = self._fix_data(key, value)
+                    data_fixable = self._fix_data(variable, value)
                     if not data_fixable:
                         unfixed_elements_count += 1
                         om.add_error("Data not fixable.",
-                                     f"Unable to fix the invalid data: {key=}, {value=}. Terminating the process.",
+                                     f"Unable to fix the invalid data: {variable=}, {value=}. Terminating the process.",
                                      info_map)
                     else:
                         fixed_elements_count += 1
