@@ -115,11 +115,11 @@ class InputManager:
         invalid_critical_elements_count = 0
 
         for key in self.__pool.keys():
-            for variable, value in key.items():
+            for variable, value in self.__pool[key].items():
                 property_map_key = self.__metadata["files"][key]["properties"]
-                data_critical = "default" not in self.__metadata["properties"][property_map_key][variable].keys()
                 if not self._validate_element(variable, value):
                     invalid_elements_count += 1
+                    data_critical = "default" not in self.__metadata["properties"][property_map_key][variable].keys()
                     if data_critical:
                         invalid_critical_elements_count += 1
                     data_fixable = self._fix_data(variable, value)
