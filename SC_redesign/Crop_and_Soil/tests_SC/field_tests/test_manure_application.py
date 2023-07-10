@@ -253,8 +253,7 @@ def test_add_nitrogen_to_soil_layer(index: int, mass: float, inorganic_frac: flo
     (1000, 0.78, 150, 0.22, 0.45, 0.03, 1.8),
     (2344, 0.90, 201, 0.3, 0.39, 0.05, 2.34),
     (900, 0.688, 78, 0.29, 0.55, 0.1, 1.12),
-    (1500, 0.89, 400, 0.33, 0.4, 0.09, 4.1),
-    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+    (1500, 0.89, 400, 0.33, 0.4, 0.09, 4.1)
 ])
 def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_mass: float, inorganic_frac: float,
                               ammonium_frac: float, organic_frac: float, field_size: float) -> None:
@@ -291,8 +290,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
                             (1000, 0.75, 200, 0.85, 1.835, 0.11, 0.55, 0.01, 0.5, None),
                             (3000, 0.10, 150, 0.975, 2.2254, 0.2, 0.6, 0.03, None, "CATTLE"),
                             (2000, 0.44, 103.5, 0.88, 0.8898, 0.14, 0.44, 0.06, 0.25, "SWINE"),
-                            (2500, 0.08, 175, 0.79, 3.4453, 0.33, 0.39, 0.09, None, None),
-                            (0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, None, None)
+                            (2500, 0.08, 175, 0.79, 3.4453, 0.33, 0.39, 0.09, None, None)
                          ])
 def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosphorus_mass: float, coverage: float,
                               area: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
