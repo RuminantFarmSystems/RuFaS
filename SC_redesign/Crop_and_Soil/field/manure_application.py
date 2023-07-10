@@ -56,8 +56,6 @@ class ManureApplication:
         in the paragraph immediately following the head "Simulation of Grazing Manure Transforms".
 
         """
-        if dry_matter_mass == 0.0:
-            return
 
         self.data.grazing_water_extractable_inorganic_phosphorus += total_phosphorus_mass * 0.50
         self.data.grazing_water_extractable_organic_phosphorus += total_phosphorus_mass * 0.05
@@ -116,8 +114,6 @@ class ManureApplication:
             If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95]
 
         """
-        if dry_matter_mass == 0.0:
-            return
 
         if water_extractable_inorganic_phosphorus_fraction is not None:
             if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
