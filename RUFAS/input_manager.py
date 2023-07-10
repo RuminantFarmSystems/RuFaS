@@ -108,20 +108,33 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
+        valid_elements_count = 0
+        invalid_elements_count = 0
+        fixed_elements_count = 0
+        unfixed_elements_count = 0
         for key, value in self.__pool.items():
             if not self._validate_element(key, value):
+                invalid_elements_count += 1
                 om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
                 data_fixable = self._fix_data(key, value)
                 if not data_fixable:
+                    unfixed_elements_count += 1
                     if eager_termination:
                         om.add_error("Data not fixable.",
                                      f"Unable to fix the invalid data: {key=}, {value=}. Terminating the process.",
                                      info_map)
                         return False
-                    else:
-                        om.add_warning("Data fixed",
-                                       f"Invalid data fixed: {key=}; {value=}",
-                                       info_map)
+                else:
+                    fixed_elements_count += 1
+                    om.add_warning("Data fixed",
+                                   f"Invalid data fixed: {key=}; {value=}",
+                                   info_map)
+            else:
+                valid_elements_count += 1
+        om.add_log("Total Valid Elements", f"{valid_elements_count} valid elements found.")
+        om.add_log("Total Invalid Elements", f"{invalid_elements_count} invalid elements found.")
+        om.add_log("Total Fixed Elements", f"{fixed_elements_count} elements fixed.")
+        om.add_log("Total Unfixed Elements", f"{unfixed_elements_count} elements unable to be fixed")
         return True
 
     def _validate_element(self, key: str, value: Any) -> bool:
