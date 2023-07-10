@@ -119,8 +119,7 @@
        "crop_species": {
         "type": "string",
         "description": "the name of the crop being grown",
-        "minimum_length": 1,
-        "maximum_length": 50
+        "pattern": ".{1,50}"
       },
       "harvest_days": {
         "type": "array",
@@ -193,8 +192,7 @@
       "description": {
         "description": "the description of the feed",
         "type": "string",
-        "minimum_length": 2,
-        "maximum_length": 50
+        "pattern": ".{2,50}"
       },
       "entry": {
         "description": "the entry number of the feed",
@@ -204,20 +202,17 @@
       "feed_name": {
         "description": "the name of the feed",
         "type": "string",
-        "minimum_length": 2,
-        "maximum_length": 50
+        "pattern": ".{2,50}"
       },
       "type": {
         "description": "the type of the feed",
         "type": "string",
-        "minimum_length": 2,
-        "maximum_length": 50
+        "pattern": ".{2,50}"
       },
       "units": {
         "description": "the unit the feed is measured in",
         "type": "string",
-        "minimum_length": 2,
-        "maximum_length": 10,
+        "pattern": ".{2,10}",
         "default": "kg"
       }
     },
