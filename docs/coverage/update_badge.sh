@@ -4,6 +4,8 @@
 coverage_percentage=$( jq -r '.totals.percent_covered_display' ./docs/coverage/coverage.json )
 echo "$coverage_percentage"
 
+echo "all good"
+
 # Assign color accordingly
 color=$(case $((coverage_percentage)) in
   ([0-9]|[1-3][0-9])  echo "red";;          # 0 %  - 39 %
@@ -13,7 +15,7 @@ color=$(case $((coverage_percentage)) in
   (9[0-4])            echo "green";;        # 90%  - 94 %
   (9[5-9]|100)        echo "brightgreen";;  # 95%  - 100%
   *)                  echo "grey"           # Else
-esac)
+  esac)
 echo "$color"
 
 # Build the URL for badge
