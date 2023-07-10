@@ -119,8 +119,8 @@ class InputManager:
                                      info_map)
                         return False
                     else:
-                        om.add_warning("Data was fixable.",
-                                       f"Invalid data found: {key} - {value} but was fixable.",
+                        om.add_warning("Data fixed",
+                                       f"Invalid data fixed: {key=}; {value=}",
                                        info_map)
         return True
 
