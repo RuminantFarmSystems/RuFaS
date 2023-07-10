@@ -73,6 +73,12 @@
         "minimum": 0,
         "default": 8
       },
+      "cow_num": {
+        "type": "number",
+        "description": "The number of dry and lactating cows (head)",
+        "minimum": 0,
+        "default": 100
+      },
       "heiferI_num": {
         "type": "number",
         "description": "HeiferI is the number of youngstock post-weaning and before breeding (head)",
@@ -91,22 +97,16 @@
         "minimum": 0,
         "default": 5
       },
-      "cow_num": {
-        "type": "number",
-        "description": "The number of dry and lactating cows (head)",
-        "minimum": 0,
-        "default": 100
+      "herd_init": {
+        "type": "boolean",
+        "description": "Whether or not to initialize a herd if the milk prod and body weight numbers are exceedingly abnormal",
+        "default": false
       },
       "herd_num": {
         "type": "number",
         "description": "The number of lactating and milking cows on farm (head)",
         "minimum": 0,
         "default": 187
-      },
-      "herd_init": {
-        "type": "boolean",
-        "description": "Whether or not to initialize a herd if the milk prod and body weight numbers are exceedingly abnormal",
-        "default": false
       },
       "breed": {
         "type": "string",
@@ -144,17 +144,17 @@
       }
     },
     "c": {
+      "diesel_cost_gal": {
+        "description": "cost of diesel per gallon",
+        "type": "number",
+        "minimum": 0,
+        "default": 5.00
+      },
       "electricity_cost_kwh": {
         "description": "cost of electricity per kwh",
         "type": "number",
         "minimum": 0,
         "default": 0.15
-      },
-      "water_cost_gal": {
-        "description": "cost of water per gallon",
-        "type": "number",
-        "minimum": 0,
-        "default": 0.008
       },
       "natural_gas_cost_kwh": {
         "description": "cost of natural gas per kwh",
@@ -162,11 +162,11 @@
         "minimum": 0,
         "default": 0.053
       },
-      "diesel_cost_gal": {
-        "description": "cost of diesel per gallon",
+      "water_cost_gal": {
+        "description": "cost of water per gallon",
         "type": "number",
         "minimum": 0,
-        "default": 5.00
+        "default": 0.008
       }
     },
     "d": {
@@ -176,20 +176,26 @@
         "minimum": 0,
         "default": 500
       },
-      "corn_silage_tillage_emissions": {
-        "type": "number",
-        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
-        "minimum": 0,
-        "default": 400
-      },
       "corn_grain_tillage_emissions": {
         "type": "number",
         "description": "The amount of total tonnes CO2-eq generated from corn grain tillage",
         "minimum": 0,
         "default": 300
+      },
+      "corn_silage_tillage_emissions": {
+        "type": "number",
+        "description": "The amount of total tonnes CO2-eq generated from corn silage tillage",
+        "minimum": 0,
+        "default": 400
       }
     },
     "e": {
+      "description": {
+        "description": "the description of the feed",
+        "type": "string",
+        "minimum_length": 2,
+        "maximum_length": 50
+      },
       "entry": {
         "description": "the entry number of the feed",
         "type": "number",
@@ -197,12 +203,6 @@
       },
       "feed_name": {
         "description": "the name of the feed",
-        "type": "string",
-        "minimum_length": 2,
-        "maximum_length": 50
-      },
-      "description": {
-        "description": "the description of the feed",
         "type": "string",
         "minimum_length": 2,
         "maximum_length": 50
@@ -223,41 +223,35 @@
     },
     "f": {},
     "g": {
-     "soil_albedo": {
-      "type": "number",
-      "description": "The fraction of light that is reflected by the soil surface",
-      "minimum": 0,
-      "maximum": 1,
-      "default": 0.3
-     },
-     "sand_content": {
-      "type": "number",
-      "description": "The average fraction of soil comprised of sand",
-      "minimum": 0,
-      "maximum": 1,
-      "default": 0.08
-     },
-     "silt_content": {
-      "type": "number",
-      "description": "The average fraction of soil comprised of silt",
-      "minimum": 0,
-      "maximum": 1,
-      "default": 0.1
-     },
-     "n_mineralization": {
-      "type": "number",
-      "description": "The rate at which nitrogen is mineralized to nitrate (NO3)",
-      "minimum": 0,
-      "default": 1
-     }
+      "n_mineralization": {
+        "type": "number",
+        "description": "The rate at which nitrogen is mineralized to nitrate (NO3)",
+        "minimum": 0,
+        "default": 1
+      },
+      "sand_content": {
+        "type": "number",
+        "description": "The average fraction of soil comprised of sand",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.08
+      },
+      "silt_content": {
+        "type": "number",
+        "description": "The average fraction of soil comprised of silt",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.1
+      },
+      "soil_albedo": {
+        "type": "number",
+        "description": "The fraction of light that is reflected by the soil surface",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.3
+      }
     },
     "h": {
-      "year": {
-        "description": "year of simulation",
-        "type": "number",
-        "minimum": 1980,
-        "default": 2000
-      },
       "jday": {
         "description": "Julian day of simulation",
         "type": "number",
@@ -270,6 +264,12 @@
         "type": "number",
         "minimum": 0,
         "default": 0
+      },
+      "year": {
+        "description": "year of simulation",
+        "type": "number",
+        "minimum": 1980,
+        "default": 2000
       }
     }
   },
