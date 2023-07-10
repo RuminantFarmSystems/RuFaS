@@ -17,7 +17,7 @@ esac)
 echo "$color"
 
 # Build the URL for badge
-markdown_str="![Coverage](https://img.shields.io/badge/coverage-${coverage_percentage}-${color})"
+markdown_str="![Coverage](https://img.shields.io/badge/coverage-${coverage_percentage}%-${color})"
 echo "$markdown_str"
 
 # Update the coverage badge in README.md using sed
