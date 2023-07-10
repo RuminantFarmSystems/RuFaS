@@ -455,7 +455,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(self, save_path: str, dir_path: str = 'output/output_filters/default_filter.txt',
+    def save_variables(self, save_path: str, dir_path: str = r"output/output_filters/",
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -473,6 +473,11 @@ class OutputManager(object):
             Flag for whether or not the user wants to include info_maps data in their results files.
 
         """
+        cwd = os.getcwd()
+        if '\\' in cwd:
+            dir_path = cwd.split('MASM')[1].count('\\') * '../' + dir_path
+        elif '/' in cwd:
+            dir_path = cwd.split('MASM')[1].count('/') * '../' + dir_path
         info_map = {"class": self.__class__.__name__,
                     "function": self.save_variables.__name__,
                     }
@@ -485,6 +490,7 @@ class OutputManager(object):
             if exclude_info_maps:
                 filtered_pool = self._exclude_info_maps(filtered_pool)
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
+            print(file_path)
             self._dict_to_file_json(filtered_pool, file_path)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
@@ -607,7 +613,8 @@ class OutputManager(object):
         """
         dumps all pool into the given path to a directory.
         """
-        self.dump_variables(path, exclude_info_maps)
+        self.dump_variables(path, exclude_info_maps=exclude_info_maps)
+        # self.save_variables(path, dir_path=r"output/output_filters/", exclude_info_maps=exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
