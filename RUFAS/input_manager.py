@@ -112,7 +112,7 @@ class InputManager:
         for key, value in self.__pool.items():
             if not self._validate(key, value):
                 if eager_termination:
-                    om.add_error("Invalid data.", f"Invalid data found: {key} - {value}", info_map)
+                    om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
                     if not self._fix_data(key, value):
                         om.add_error("Data not fixable.",
                                      f"Unable to fix the invalid data: {key} - {value}. Terminating the process.",
