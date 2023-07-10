@@ -43,11 +43,21 @@ jobs:
       run: |
         coverage report -m
         coverage json -o ./docs/coverage/coverage.json
+        echo ::set-env name=COVERAGE_PERCENTAGE::$(jq -r '.totals.percent_covered_display' ./docs/coverage/coverage.json)
 
     # Generate a Shields.io static badge and update README.md coverage badge link
     - name: Update Coverage Badge
       run:
         ./docs/coverage/update_badge.sh
+
+    # Update repository
+    # https://github.com/marketplace/actions/github-commit-push
+    - name: Commit & Push changes to Readme
+      uses: actions-js/push@master
+      with:
+        message: Update coverage on Readme
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.head_ref }}
 
     # Post a comment to the Current PR with the updated Coverage
     - name: Comment Coverage
@@ -60,26 +70,27 @@ jobs:
           $URL \
           -H "Content-Type: application/json" \
           -H "Authorization: token $GITHUB_TOKEN" \
-          --data '{ "body": "Test commenting" }'
+          --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}" }'
 
-    # Update repository
-    # https://github.com/marketplace/actions/github-commit-push
-    - name: Commit & Push changes to Readme
-      uses: actions-js/push@master
-      with:
-        message: Update coverage on Readme
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.head_ref }}
-
-  comment:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/github-script@v6
+    - uses: actions/github-script@v6
         with:
           script: |
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Test test'
+              body: 'Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}'
             })
+
+#  comment:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/github-script@v6
+#        with:
+#          script: |
+#            github.rest.issues.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: 'Test test'
+#            })
