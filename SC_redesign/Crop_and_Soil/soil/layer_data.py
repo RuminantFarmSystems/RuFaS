@@ -123,11 +123,11 @@ class LayerData:
     # pseudocode_soil S.6.C.3
     active_carbon_decomposition_amount: float = 0.0
     """active carbon decomposed into slow or passive carbon and CO2 (kg/ha)"""
-    active_carbon_amount: float = 0.0
+    active_carbon_amount: Optional[float] = None
     """active carbon stored in the soil (kg/ha)"""
 
     # pseudocode_soil S.6.C.4
-    slow_carbon_amount: float = 0.0
+    slow_carbon_amount: Optional[float] = None
     """slow carbon stored in the soil (kg/ha)"""
     slow_carbon_decomposition_amount: float = 0.0
     """slow carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
@@ -135,7 +135,7 @@ class LayerData:
     # pseudocode_soil S.6.C.5
     passive_carbon_decomposition_amount: float = 0.0
     """passive carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
-    passive_carbon_amount: float = 0.0
+    passive_carbon_amount: Optional[float] = None
     """passive carbon stored in the soil (kg/ha)"""
 
     # pseudocode_soil S.6.C.7
@@ -344,6 +344,8 @@ class LayerData:
 
         self._initialize_nitrogen_pools(field_size, residue)
 
+        self._initialize_carbon_pools(field_size)
+
     def _initialize_nitrogen_pools(self, field_size: float, residue: float) -> None:
         """Initializes the nitrogen pools in the soil layer
 
@@ -395,6 +397,26 @@ class LayerData:
 
         if self.top_depth == 0:
             self.fresh_organic_nitrogen_content = 0.0015 * residue  # SWAT eqn. 3:1.1.5
+
+    def _initialize_carbon_pools(self, field_size: float) -> None:
+        """
+        Initializes soil carbon pools based on the carbon content fraction of the layer.
+
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha).
+
+        """
+        soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
+            CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+
+        one_third_soil_carbon = (1 / 3) * (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
+
+        self.active_carbon_amount = one_third_soil_carbon
+        self.passive_carbon_amount = one_third_soil_carbon
+        self.slow_carbon_amount = one_third_soil_carbon
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
