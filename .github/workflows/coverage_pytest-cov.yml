@@ -44,6 +44,10 @@ jobs:
         coverage report -m
         coverage json -o ./docs/coverage/coverage.json
 
+    - name: Change readme with sed
+      run: |
+        sed '3 s/\(.*\)/hi' ./README.md
+
     # Create coverage badge
     # https://github.com/marketplace/actions/coverage-py-badge
     - name: Coverage Badge
