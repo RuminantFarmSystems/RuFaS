@@ -112,8 +112,7 @@
         "type": "string",
         "description": "The predominant breed of the herd (Holstein - HO or Jersey - JE)",
         "default": "HO",
-        "minimum_length": 2,
-        "maximum_length": 2
+        "pattern": "[a-zA-Z]{2}"
       }
     },
     "b": {
