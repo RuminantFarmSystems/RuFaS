@@ -44,9 +44,23 @@ jobs:
         coverage report -m
         coverage json -o ./docs/coverage/coverage.json
 
-    - name: Generate a Shields.io static Badge and update README.md badge link
+    # Generate a Shields.io static badge and update README.md coverage badge link
+    - name: Update Coverage Badge
       run:
         ./docs/coverage/update_badge.sh
+
+    # Post a comment to the Current PR with the updated Coverage
+    - name: Comment Coverage
+      env:
+        URL: ${{ github.event.issue.comments_url }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        curl \
+          -X POST \
+          $URL \
+          -H "Content-Type: application/json" \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          --data '{ "body": "Test commenting" }'
 
     # Update repository
     # https://github.com/marketplace/actions/github-commit-push
