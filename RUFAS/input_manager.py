@@ -125,9 +125,6 @@ class InputManager:
                     data_fixable = self._fix_data(variable, value)
                     if not data_fixable:
                         unfixed_elements_count += 1
-                        om.add_error("Data not fixable.",
-                                     f"Unable to fix the invalid data: {variable=}, {value=}. Terminating the process.",
-                                     info_map)
                     else:
                         fixed_elements_count += 1
                 else:
@@ -199,4 +196,6 @@ class InputManager:
         # TODO in fix_data fun branch
         # where element is fixed, place this warning:
         # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
+        # where data is not fixable:
+        # om.add_error("Data not fixable.", f"Unable to fix the invalid data: {key=}, {value=}.", info_map)
         pass
