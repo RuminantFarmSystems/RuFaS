@@ -390,6 +390,7 @@ def test_initialize_carbon_pools(field_size: float, expected: float) -> None:
     assert actual.active_carbon_amount == actual.passive_carbon_amount == actual.slow_carbon_amount == \
            pytest.approx(expected)
 
+
 @pytest.mark.parametrize("top,bottom", [
     (13, 40),
     (188, 560.9328),
