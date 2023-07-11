@@ -35,17 +35,16 @@ jobs:
 
     # Test coverage
     # https://coverage.readthedocs.io/en/7.2.7/index.html
-    - name: Set Environment Variable
-      run: |
-        export COVERAGE_RCFILE=".coveragerc"
-        echo $COVERATE_RCFILE
-        
+#    - name: Set Environment Variable
+#      run: |
+#        export COVERAGE_RCFILE=".coveragerc"
+#        echo $COVERATE_RCFILE
 
     - name: Run coverage test, Generate report, and Save to JSON file
       run: |
-        coverage run
-        coverage report
-        coverage json
+        coverage run --rcfile=.coveragerc
+        coverage report --rcfile=.coveragerc
+        coverage json --rcfile=.coveragerc
 
     # Generate a Shields.io static badge and update README.md coverage badge link
     - name: Update Coverage Badge
