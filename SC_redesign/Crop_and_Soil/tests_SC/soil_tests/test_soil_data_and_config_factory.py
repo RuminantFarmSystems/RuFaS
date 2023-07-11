@@ -378,6 +378,18 @@ def test_post_init(top: float, bottom: float, concentration: float) -> None:
         init_carbon_pools.assert_called_once()
 
 
+@pytest.mark.parametrize("field_size,expected", [
+    (1.4, 0.0693),
+    (3.556, 0.06930000000000003),
+    (0.88, 0.06930000000000001)
+])
+def test_initialize_carbon_pools(field_size: float, expected: float) -> None:
+    """Tests that carbon pools in a soil layer are properly initialized."""
+    actual = LayerData(field_size=field_size, top_depth=120.0, bottom_depth=750.0, bulk_density=1.5,
+                       percent_organic_carbon_content=2.2)
+    assert actual.active_carbon_amount == actual.passive_carbon_amount == actual.slow_carbon_amount == \
+           pytest.approx(expected)
+
 @pytest.mark.parametrize("top,bottom", [
     (13, 40),
     (188, 560.9328),
