@@ -21,7 +21,7 @@ from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 
 
 om = OutputManager()
@@ -91,7 +91,7 @@ class BaseManureHandler:
         return avg_temp
 
     def daily_update(self,
-                     pen: ManureManagementPen,
+                     pen: ManureManagerPen,
                      bedding: BaseBedding,
                      sim_day: int) -> ManureHandlerDailyOutput:
         """Calculates and stores the daily output of the manure handler.
@@ -100,7 +100,7 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3
 
         Args:
-            pen: A ManureManagementPen object.
+            pen: A ManureManagerPen object.
             bedding: A BaseBedding object that specifies the type of bedding used.
             sim_day: The current simulation day.
 
@@ -110,9 +110,16 @@ class BaseManureHandler:
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
         
+        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                        "bedding_density": bedding.bedding_density,
+                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                        "bedding_type": bedding.bedding_type._name_,
+                        }
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
-                    "bedding": vars(bedding),
+                    "bedding": bedding_data,
                     "sim_day": sim_day, }
 
         housing_methane_emission = GasEmissions.calc_housing_methane_emission(
@@ -179,12 +186,12 @@ class BaseManureHandler:
                     "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
                     }
 
-        clean_water_volume = num_animals * self.config.cleaning_water_use_rate
+        cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
 
         om.add_variable(
-            "cleaning_water_volume_in_main_barn", clean_water_volume, info_map)
+            "cleaning_water_volume_in_main_barn", cleaning_water_volume, info_map)
 
-        return clean_water_volume
+        return cleaning_water_volume
 
 
 class FlushSystem(BaseManureHandler):

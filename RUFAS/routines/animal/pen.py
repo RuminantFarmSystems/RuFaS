@@ -5,7 +5,7 @@ Description: The class which represents a pen on the farm. Each pen has
     operations as described in the Animal Module Information Flow document on
     Basecamp (such as calculating average nutrient requirements, ration,
     manure excretion, etc). Method calls cascade through from the animal
-    management class to pen to each individual animal in that pen.
+    manager class to pen to each individual animal in that pen.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
@@ -175,7 +175,7 @@ class Pen:
         LAC_COW = 3  # lactating cows
 
         GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
-        NONE = 5  # TODO: Remove this option after fixing _init_default_pens() in AnimalManagement
+        NONE = 5  # TODO: Remove this option after fixing _init_default_pens() in AnimalManager
 
     def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
                  number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,

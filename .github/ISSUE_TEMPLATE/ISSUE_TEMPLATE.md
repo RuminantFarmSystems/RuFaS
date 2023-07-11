@@ -1,5 +1,5 @@
 ---
-name: Reporting a bug or roblem
+name: Reporting a bug or problem
 about: Encountered a problem
 title: ''
 labels: ''

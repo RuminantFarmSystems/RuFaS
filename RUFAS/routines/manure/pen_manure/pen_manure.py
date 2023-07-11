@@ -3,7 +3,7 @@ RUFAS: Ruminant Farm Systems Model
 File name: pen_manure.py
 
 Description: A data model that represents the manure data extracted from
-the Animal Management module.
+the Animal Manager module.
 
 """
 
