@@ -104,15 +104,48 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
         with pytest.raises(Exception):
             mock_input_manager._load_data("bad/path.csv")
 
+
 @pytest.fixture
 def mock_metadata(mocker) -> Dict[str, Dict[str, Any]]:
     return {"dummyconfig": {},
             "files": {
                 "dummykey1": {
-                    "properties": "dummyproperties"
-                    }
-                    }
+                    "properties": "dummyproperties1"
+                    },
+                "dummykey2": {
+                    "properties": "dummyproperties2"
+                    },
+                "dummykey3": {
+                    "properties": "dummyproperties3"
+                    },
+                },
+            "properties": {
+                "dummyproperties1": {"dummyvar1": "dummyvalue1",
+                                     "dummyvar2": "dummyvalue2"},
+                "dummyproperties2": {"dummyvar3": "dummyvalue3",
+                                     "dummyvar4": "dummyvalue4"},
+                "dummyproperties3": {"dummyvar5": "dummyvalue5",
+                                     "dummyvar6": "dummyvalue6"},
+                }
             }
+
+
+@pytest.fixture
+def mock_pool(mocker) -> Dict[str, Dict[str, Any]]:
+    return {"dummykey1": {
+                "dummyvar1": "dummyvalue1",
+                "dummyvar2": "dummyvalue2"
+                },
+            "dummykey2": {
+                "dummyvar3": "dummyvalue3",
+                "dummyvar4": "dummyvalue4"
+                },
+            "dummykey3": {
+                "dummyvar5": "dummyvalue5",
+                "dummyvar6": "dummyvalue6"
+                },
+            }
+
 
 def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager) -> None:
     """Unit test for valid data for function _validate_data in file input_manager.py"""
@@ -121,9 +154,9 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
                                                             },
                                                   "properties": {}
                                                   }
-    mock_input_manager._InputManager__pool = {"dummykey1": {"dummyvar1": "dummyvalue1", 
+    mock_input_manager._InputManager__pool = {"dummykey1": {"dummyvar1": "dummyvalue1",
                                                             "dummyvar2": "dummyvalue2"}
-                                                            }
+                                              }
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
 
     result = mock_input_manager._validate_data()
@@ -138,9 +171,9 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_in
                                                             },
                                                   "properties": {}
                                                   }
-    mock_input_manager._InputManager__pool = {"dummykey1": {"dummyvar1": "dummyvalue1", 
+    mock_input_manager._InputManager__pool = {"dummykey1": {"dummyvar1": "dummyvalue1",
                                                             "dummyvar2": "dummyvalue2"}
-                                                            }
+                                              }
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
@@ -148,7 +181,6 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_in
 
     assert result is False
     assert add_log.call_count == 6
-    
 
 
 # def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input_manager: InputManager) -> None:
