@@ -1,0 +1,76 @@
+# This workflow will install Python dependencies, run tests with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Coverage
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Environment setup
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install coverage
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # Test coverage
+    # https://coverage.readthedocs.io/en/7.2.7/index.html
+#    - name: Set Environment Variable
+#      run: |
+#        export COVERAGE_RCFILE=".coveragerc"
+#        echo $COVERATE_RCFILE
+
+    - name: Run coverage test, Generate report, and Save to JSON file
+      run: |
+        coverage run --rcfile=.coveragerc
+        coverage report --rcfile=.coveragerc
+        coverage json --rcfile=.coveragerc
+
+    # Generate a Shields.io static badge and update README.md coverage badge link
+    - name: Update Coverage Badge
+      run:
+        ./docs/coverage/update_badge.sh
+
+    # Update repository
+    # https://github.com/marketplace/actions/github-commit-push
+    - name: Commit & Push changes to Readme
+      uses: actions-js/push@master
+      with:
+        message: Update coverage on Readme
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.head_ref }}
+
+    # Extract COVERAGE_PERCENTAGE from JSON, Post a comment to current PR with the updated coverage
+    - name: Comment Coverage
+      env:
+        URL: ${{ github.event.pull_request.comments_url }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' ./docs/coverage/coverage.json )" >> "$GITHUB_ENV"
+        echo "${{ env.COVERAGE_PERCENTAGE }}"
+        curl \
+          -X POST \
+          $URL \
+          -H "Content-Type: application/json" \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%" }'
