@@ -407,6 +407,11 @@ class LayerData:
         field_size: float
             Size of the field (ha).
 
+        Notes
+        -----
+        This is an extremely simply and arbitrary way of initializing carbon pools in the soil, and is intended to be a
+        temporary solution until SWAT-C is implemented. TODO - #512
+
         """
         soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
             CUBIC_MILLIMETERS_TO_CUBIC_METERS
