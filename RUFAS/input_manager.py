@@ -117,8 +117,8 @@ class InputManager:
         total_elements_checked_counter = 0
 
         for key in self.__pool.keys():
-            total_elements_checked_counter += 1
             for variable, value in self.__pool[key].items():
+                total_elements_checked_counter += 1
                 property_map_key = self.__metadata["files"][key]["properties"]
                 if self._validate_element(variable, value):
                     valid_elements_counter += 1
