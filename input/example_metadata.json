@@ -5,67 +5,67 @@
       "description": "Configuration Information",
       "path": "config/example_config.json",
       "type": "json",
-      "properties": "a"
+      "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
       "path": "animal/example_animal.json",
       "type": "json",
-      "properties": "b"
+      "properties": "animal_properties"
     },
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
       "path": "crop/example_rotation.json",
       "type": "json",
-      "properties": "c"
+      "properties": "crop_properties"
     },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
       "path": "EEE/example_costs.csv",
       "type": "csv",
-      "properties": "d"
+      "properties": "economic_properties"
     },
     "emission": {
       "title": "Emissions data",
       "description": "Let's think about global warming",
       "path": "EEE/example_emissions.json",
       "type": "json",
-      "properties": "e"
+      "properties": "emissions_properties"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
       "path": "feed/example_user_feeds.csv",
       "type": "csv",
-      "properties": "f"
+      "properties": "feed_properties"
     },
     "manure": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
       "path": "manure/example_manure_management.json",
       "type": "json",
-      "properties": "g"
+      "properties": "manure_properties"
     },
     "soil": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
       "path": "soil/example_soil.json",
       "type": "json",
-      "properties": "h"
+      "properties": "soil_properties"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
       "path": "weather/example_weather.csv",
       "type": "csv",
-      "properties": "i"
+      "properties": "weather_properties"
     }
   },
   "properties": {
-    "a": {
+    "config_properties": {
       "start_date": {
         "type": "string",
         "description": "The year and Julian day on which the simulation will start.",
@@ -102,7 +102,7 @@
         "default": true
       }
     },
-    "b": {
+    "animal_properties": {
       "calf_num": {
         "type": "number",
         "description": "The average number of pre-weaned calves (head)",
@@ -151,7 +151,7 @@
         "pattern": "[a-zA-Z]{2}"
       }
     },
-    "c": {
+    "crop_properties": {
        "crop_species": {
         "type": "string",
         "description": "the name of the crop being grown",
@@ -178,7 +178,7 @@
         "minimum_length": 1
       }
     },
-    "d": {
+    "economic_properties": {
       "diesel_cost_gal": {
         "description": "cost of diesel per gallon",
         "type": "number",
@@ -204,7 +204,7 @@
         "default": 0.008
       }
     },
-    "e": {
+    "emissions_properties": {
       "alfalfa_tillage_emissions": {
         "type": "number",
         "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
@@ -224,7 +224,7 @@
         "default": 400
       }
     },
-    "f": {
+    "feed_properties": {
       "description": {
         "description": "the description of the feed",
         "type": "string",
@@ -252,8 +252,8 @@
         "default": "kg"
       }
     },
-    "g": {},
-    "h": {
+    "manure_properties": {},
+    "soil_properties": {
       "n_mineralization": {
         "type": "number",
         "description": "The rate at which nitrogen is mineralized to nitrate (NO3)",
@@ -282,7 +282,7 @@
         "default": 0.3
       }
     },
-    "i": {
+    "weather_properties": {
       "jday": {
         "description": "Julian day of simulation",
         "type": "number",
