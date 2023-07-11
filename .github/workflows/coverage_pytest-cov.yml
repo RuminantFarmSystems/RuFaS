@@ -35,16 +35,17 @@ jobs:
 
     # Test coverage
     # https://coverage.readthedocs.io/en/7.2.7/index.html
-    - name: Run tests with coverage.py
-      run:
-        coverage run -m pytest
-
-    - name: Generate coverage report and json file
+    - name: Set Environment Variable
       run: |
-        coverage report -m
-        coverage json -o ./docs/coverage/coverage.json
-        echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' ./docs/coverage/coverage.json )" >> "$GITHUB_ENV"
-        echo "${{ env.COVERAGE_PERCENTAGE }}"
+        export COVERAGE_RCFILE=".coveragerc"
+        echo $COVERATE_RCFILE
+        
+
+    - name: Run coverage test, Generate report, and Save to JSON file
+      run: |
+        coverage run
+        coverage report
+        coverage json
 
     # Generate a Shields.io static badge and update README.md coverage badge link
     - name: Update Coverage Badge
@@ -60,12 +61,14 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.head_ref }}
 
-    # Post a comment to the Current PR with the updated Coverage
+    # Extract COVERAGE_PERCENTAGE from JSON, Post a comment to current PR with the updated coverage
     - name: Comment Coverage
       env:
         URL: ${{ github.event.pull_request.comments_url }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' ./docs/coverage/coverage.json )" >> "$GITHUB_ENV"
+        echo "${{ env.COVERAGE_PERCENTAGE }}"
         curl \
           -X POST \
           $URL \
