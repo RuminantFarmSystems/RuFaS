@@ -147,16 +147,13 @@ def mock_pool(mocker) -> Dict[str, Dict[str, Any]]:
             }
 
 
-def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager) -> None:
+def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager,
+                                                    mock_metadata: Dict[str, Dict[str, Any]],
+                                                    mock_pool: Dict[str, Dict[str, Any]]
+                                                    ) -> None:
     """Unit test for valid data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {"dummyconfig": {},
-                                                  "files": {"dummykey1": {"properties": "dummyproperties"}
-                                                            },
-                                                  "properties": {}
-                                                  }
-    mock_input_manager._InputManager__pool = {"dummykey1": {"dummyvar1": "dummyvalue1",
-                                                            "dummyvar2": "dummyvalue2"}
-                                              }
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
 
     result = mock_input_manager._validate_data()
@@ -164,7 +161,10 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
     assert result is True
 
 
-def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_input_manager: InputManager) -> None:
+def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_input_manager: InputManager,
+                                                                 mock_metadata: Dict[str, Dict[str, Any]],
+                                                                 mock_pool: Dict[str, Dict[str, Any]]
+                                                                 ) -> None:
     """Unit test for invalid unfixable data for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = {"dummyconfig": {},
                                                   "files": {"dummykey1": {"properties": "dummyproperties"}
