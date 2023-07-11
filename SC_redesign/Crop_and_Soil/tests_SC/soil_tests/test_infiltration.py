@@ -181,32 +181,40 @@ def test_determine_moisture_condition_parameter(retention_param):
 
 
 # --- Integration tests ----
-@pytest.mark.parametrize("rainfall,is_top_frozen,coefficient, potential_evapotranspiration", [
-    (1.4, False, 0.91, 1.9),
-    (3.5, True, 0.4858, 3.8),
-    (2.5, False, 0.694, 0.0),
-    (0.3, False, 0.58392, 4.9),
-    (4.697, False, 0.5938, 5.1),
-    (2.45, False, 0.9694, 2.2),
+@pytest.mark.parametrize("average_subbasin_slope,rainfall,is_top_frozen,coefficient,potential_evapotranspiration,"
+                         "previous_retention_parameter", [
+    (0.07, 1.4, False, 0.91, 1.9, 27),
+    (0.07, 3.5, True, 0.4858, 3.8, 27),
+    (0.07, 2.5, False, 0.694, 0.0, 27),
+    (0.07, 0.3, False, 0.58392, 4.9, 27),
+    (0.07, 4.697, False, 0.5938, 5.1, 27),
+    (0.07, 2.45, False, 0.9694, 2.2, 27),
+    (0.05, 2.45, False, 0.9694, 2.2, 27),
+    (0.07, 2.5, False, 0.694, 0.0, None)
 ])
-def test_infiltrate(rainfall, is_top_frozen, coefficient, potential_evapotranspiration):
+def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_frozen: bool, coefficient: float,
+                    potential_evapotranspiration: float, previous_retention_parameter: float) -> None:
     """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
     # initialize objects
     if is_top_frozen:
-        data = SoilData(average_subbasin_slope=0.07, previous_retention_parameter=27, field_size=1.33,
+        data = SoilData(average_subbasin_slope=average_subbasin_slope,
+                        previous_retention_parameter=previous_retention_parameter, field_size=1.33,
                         soil_layers=[LayerData(top_depth=0, bottom_depth=20, temperature=-1,
                                                soil_water_concentration=0, field_size=1.33),
                                      LayerData(top_depth=20, bottom_depth=50, temperature=-1,
                                                soil_water_concentration=0, field_size=1.33)])
     else:
-        data = SoilData(average_subbasin_slope=0.07, previous_retention_parameter=27, field_size=1.33,
+        data = SoilData(average_subbasin_slope=average_subbasin_slope,
+                        previous_retention_parameter=previous_retention_parameter, field_size=1.33,
                         soil_layers=[LayerData(top_depth=0, bottom_depth=20, soil_water_concentration=0,
                                                field_size=1.33),
                                      LayerData(top_depth=20, bottom_depth=50, soil_water_concentration=0,
                                                field_size=1.33)])
     incorp = Infiltration(data)
-    assert incorp.data.average_subbasin_slope == 0.07
-    assert incorp.data.previous_retention_parameter == 27
+    if incorp.data.previous_retention_parameter is None:
+        status = True
+    else:
+        status = False
 
     # mock helper functions
     incorp._determine_third_moisture_condition_parameter = MagicMock(return_value=25)
@@ -225,9 +233,14 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient, potential_evapotranspi
     incorp.infiltrate(rainfall, coefficient, potential_evapotranspiration)
     expected_infiltrated_water = max(0.0, rainfall - 0.95)
 
+
     # assertions
-    assert incorp._determine_third_moisture_condition_parameter.call_count == 2
-    assert incorp._determine_second_moisture_condition_adjusted.call_count == 1
+    if average_subbasin_slope == 0.05:
+        assert incorp._determine_third_moisture_condition_parameter.call_count == 1
+        assert incorp._determine_second_moisture_condition_adjusted.call_count == 0
+    else:
+        assert incorp._determine_third_moisture_condition_parameter.call_count == 2
+        assert incorp._determine_second_moisture_condition_adjusted.call_count == 1
     assert incorp._determine_first_moisture_condition_parameter.call_count == 1
     assert incorp._determine_retention_parameter_for_moisture_condition.call_count == 2
     assert incorp._determine_second_shape_coefficient.call_count == 1
@@ -238,9 +251,13 @@ def test_infiltrate(rainfall, is_top_frozen, coefficient, potential_evapotranspi
     else:
         assert incorp._determine_frozen_retention_parameter.call_count == 0
     assert incorp._determine_accumulated_runoff.call_count == 1
-    assert incorp._determine_updated_retention_parameter.call_count == 1
+    if status:
+        assert incorp._determine_updated_retention_parameter.call_count == 0
+        assert incorp.data.previous_retention_parameter == 0.9 * 300
+    else:
+        assert incorp._determine_updated_retention_parameter.call_count == 1
+        assert incorp.data.previous_retention_parameter == 21.34
     assert incorp._determine_moisture_condition_parameter.call_count == 1
-    assert incorp.data.previous_retention_parameter == 21.34
     assert incorp.data.moisture_condition_parameter == 50
     assert incorp.data.accumulated_runoff == 0.95
     assert incorp.data.soil_layers[0].water_content == expected_infiltrated_water
