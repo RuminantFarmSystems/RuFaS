@@ -47,6 +47,9 @@ def test_calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float 
         expected_term_2 = expected_base_2 ** second_exponent
     expected = expected_term_1 * expected_term_2
 
+    if expected < 0.0:
+        expected = 0.0
+
     assert Decomposition._calc_moisture_factor(water_factor) == expected
 
 
