@@ -659,26 +659,21 @@ class LayerData:
         return 1.72 * self.percent_organic_carbon_content
 
     @property
-    def soil_water_content(self):
-        """volume of soil water in the layer (mm)"""
-        return self.soil_water_concentration / self.layer_thickness
-
-    @property
     def water_factor(self):
         """relative water saturation (%)"""
 
         # pseudocode_soil S.4.B.1
-        if self.soil_water_content <= self.field_capacity_content:
-            return (self.soil_water_content - self.wilting_point_content) / (
+        if self.water_content <= self.field_capacity_content:
+            return (self.water_content - self.wilting_point_content) / (
                     self.field_capacity_content - self.wilting_point_content)
         else:
-            return (self.saturation_content - self.soil_water_content) / (
+            return (self.saturation_content - self.water_content) / (
                     self.saturation_content - self.field_capacity_content)
 
     @property
     def silt_clay_content(self):
-        """silt and clay fraction in the soil (unitless)"""
-        return self.percent_silt_content / self.percent_clay_content
+        """combined silt and clay fraction in the soil (unitless)"""
+        return (self.percent_silt_content + self.percent_clay_content) / 100
 
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
