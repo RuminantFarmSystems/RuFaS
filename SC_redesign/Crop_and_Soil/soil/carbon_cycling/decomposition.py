@@ -34,6 +34,7 @@ class Decomposition:
 
         """
         self.data.decomposition_temperature_effect = self._calc_temp_factor(temp_average)
+
         for layer in self.data.soil_layers:
             layer.decomposition_moisture_effect = self._calc_moisture_factor(layer.water_factor)
 
