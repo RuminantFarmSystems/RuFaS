@@ -15,6 +15,36 @@ from typing import List, Dict
 from unittest.mock import MagicMock, patch
 
 
+
+@pytest.mark.parametrize("year,day,expected", [
+    (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
+                          annual_mean_air_temperature=1, rainfall=3, irrigation=3, daylength=15.5)),
+    (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
+                          annual_mean_air_temperature=2, rainfall=4, irrigation=4, daylength=15.5)),
+    (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
+                          annual_mean_air_temperature=3, rainfall=8, irrigation=8, daylength=15.5))
+])
+def test_create_current_weather(year: int, day: int, expected) -> None:
+    """Tests that current weather objects are correctly created from a time and weather object."""
+    weather = MagicMock()
+    setattr(weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "T_avg_annual", [1, 2, 3])
+    setattr(weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    setattr(weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    CurrentWeather.determine_daylength = MagicMock(return_value=15.5)
+    time = MagicMock()
+    setattr(time, "year", year)
+    setattr(time, "day", day)
+
+    actual = FieldManager._create_current_weather(weather, time, 4)
+
+    assert actual == expected
+    CurrentWeather.determine_daylength.assert_called_once()
+
+
 @pytest.mark.parametrize("year, day, expected_month", [
     (2000, 366, 12),  # leap year
     (2001, 365, 12),  # normal year
@@ -361,32 +391,3 @@ def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
             assert actual.field_data.name == field_name
             assert actual.field_data.current_residue == 0.0
             assert actual.field_data.absolute_latitude == 40.0
-
-
-@pytest.mark.parametrize("year,day,expected", [
-    (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
-                          annual_mean_air_temperature=1, rainfall=3, irrigation=3, daylength=15.5)),
-    (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
-                          annual_mean_air_temperature=2, rainfall=4, irrigation=4, daylength=15.5)),
-    (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
-                          annual_mean_air_temperature=3, rainfall=8, irrigation=8, daylength=15.5))
-])
-def test_create_current_weather(year: int, day: int, expected) -> None:
-    """Tests that current weather objects are correctly created from a time and weather object."""
-    weather = MagicMock()
-    setattr(weather, "radiation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_min", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_max", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "T_avg_annual", [1, 2, 3])
-    setattr(weather, "rainfall", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    setattr(weather, "irrigation", [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-    CurrentWeather.determine_daylength = MagicMock(return_value=15.5)
-    time = MagicMock()
-    setattr(time, "year", year)
-    setattr(time, "day", day)
-
-    actual = FieldManager._create_current_weather(weather, time, 4)
-
-    assert actual == expected
-    CurrentWeather.determine_daylength.assert_called_once()
