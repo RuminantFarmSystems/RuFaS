@@ -33,14 +33,10 @@ jobs:
         pip install coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # Test coverage
     # https://coverage.readthedocs.io/en/7.2.7/index.html
-#    - name: Set Environment Variable
-#      run: |
-#        export COVERAGE_RCFILE=".coveragerc"
-#        echo $COVERATE_RCFILE
-
-    - name: Run coverage test, Generate report, and Save to JSON file
+    # Run coverage test, Generate report, Save to JSON file, Set COVERAGE_PERCENTAGE extracted from JSON
+    # A configuration file ".coveragerc" can be found at the project root to customize coverage test settings
+    - name: Test coverage
       run: |
         coverage run --rcfile=.coveragerc
         coverage report --rcfile=.coveragerc
@@ -63,7 +59,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.head_ref }}
 
-    # Extract COVERAGE_PERCENTAGE from JSON, Post a comment to current PR with the updated coverage
+    # Post a comment to current PR with the updated coverage
     - name: Comment Coverage
       env:
         URL: ${{ github.event.pull_request.comments_url }}
