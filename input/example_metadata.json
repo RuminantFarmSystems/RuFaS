@@ -1,72 +1,108 @@
 {
-  "config": {
-    "start_date": "2009:1",
-    "end_date": "2009:100",
-    "graphic_dir": "output/graphics/",
-    "output_dir": "output/",
-    "random_seed": 42,
-    "simulate_animals": true
-  },
   "files": {
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration Information",
+      "path": "config/example_config.json",
+      "type": "json",
+      "properties": "a"
+    },
     "animal": {
       "title": "Animal data",
       "description": "Moo Moo!",
       "path": "animal/example_animal.json",
       "type": "json",
-      "properties": "a"
+      "properties": "b"
     },
     "crop": {
       "title": "Crop data",
       "description": "Alfafa is fun!",
       "path": "crop/example_rotation.json",
       "type": "json",
-      "properties": "b"
+      "properties": "c"
     },
     "economy": {
       "title": "Economy data",
       "description": "Time is money!",
       "path": "EEE/example_costs.csv",
       "type": "csv",
-      "properties": "c"
+      "properties": "d"
     },
     "emission": {
       "title": "Emissions data",
       "description": "Let's think about global warming",
       "path": "EEE/example_emissions.json",
       "type": "json",
-      "properties": "d"
+      "properties": "e"
     },
     "feed": {
       "title": "Feed data",
       "description": "Those cows need to eat!",
       "path": "feed/example_user_feeds.csv",
       "type": "csv",
-      "properties": "e"
+      "properties": "f"
     },
     "manure": {
       "title": "Manure data",
       "description": "You thought it's a waste, but those crops need to eat as well",
       "path": "manure/example_manure_management.json",
       "type": "json",
-      "properties": "f"
+      "properties": "g"
     },
     "soil": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
       "path": "soil/example_soil.json",
       "type": "json",
-      "properties": "g"
+      "properties": "h"
     },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
       "path": "weather/example_weather.csv",
       "type": "csv",
-      "properties": "h"
+      "properties": "i"
     }
   },
   "properties": {
     "a": {
+      "start_date": {
+        "type": "string",
+        "description": "The year and Julian day on which the simulation will start.",
+        "pattern": "[12][019][0-9]{2}:[1-9][0-9]{0,2}",
+        "default": "2009:1"
+      },
+      "end_date": {
+        "type": "string",
+        "description": "The year and Julian day on which the simulation will end.",
+        "pattern": "[12][019][0-9]{2}:[1-9][0-9]{0,2}",
+        "default": "2009:100"
+      },
+      "graphic_dir": {
+        "type": "string",
+        "description": "The location of the output graphics directory",
+        "pattern": ".{1,50}",
+        "default": "output/graphics/"
+      },
+      "output_dir": {
+        "type": "string",
+        "description": "The location of the output directory",
+        "pattern": ".{1,50}",
+        "default": "output/"
+      },
+      "random_seed": {
+        "type": "number",
+        "description": "The random seed",
+        "minimum": 0,
+        "default": 42
+      },
+      "simulate_animals": {
+        "type": "boolean",
+        "description": "Whether or not to simulate animals during the simulation",
+        "default": true
+      }
+    },
+    "b": {
       "calf_num": {
         "type": "number",
         "description": "The average number of pre-weaned calves (head)",
@@ -115,7 +151,7 @@
         "pattern": "[a-zA-Z]{2}"
       }
     },
-    "b": {
+    "c": {
        "crop_species": {
         "type": "string",
         "description": "the name of the crop being grown",
@@ -142,7 +178,7 @@
         "minimum_length": 1
       }
     },
-    "c": {
+    "d": {
       "diesel_cost_gal": {
         "description": "cost of diesel per gallon",
         "type": "number",
@@ -168,7 +204,7 @@
         "default": 0.008
       }
     },
-    "d": {
+    "e": {
       "alfalfa_tillage_emissions": {
         "type": "number",
         "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
@@ -188,7 +224,7 @@
         "default": 400
       }
     },
-    "e": {
+    "f": {
       "description": {
         "description": "the description of the feed",
         "type": "string",
@@ -216,8 +252,8 @@
         "default": "kg"
       }
     },
-    "f": {},
-    "g": {
+    "g": {},
+    "h": {
       "n_mineralization": {
         "type": "number",
         "description": "The rate at which nitrogen is mineralized to nitrate (NO3)",
@@ -246,7 +282,7 @@
         "default": 0.3
       }
     },
-    "h": {
+    "i": {
       "jday": {
         "description": "Julian day of simulation",
         "type": "number",
