@@ -21,6 +21,7 @@ from unittest.mock import MagicMock, patch
                          ])
 def test_create_current_weather(radiation: float, T_min: float, T_avg: float, T_max: float, T_avg_annual: float,
                                 irrigation: float, rainfall: float, year: int, day: int, month: int) -> None:
+    """Tests that Weather object was correctly transformed into a CurrentWeather object"""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "year", year)
     setattr(mocked_time, "day", day)
