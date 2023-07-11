@@ -209,7 +209,9 @@ class NitrogenIncorporation:
             mature_nitrogen_fraction=mature_nutrient_fraction, emergence_nitrogen_fraction=emergence_nutrient_fraction
         )
 
-        adjusted_near_mature_nutrient_fraction = mature_nutrient_fraction + 0.00001
+        assumed_near_mature_nutrient_fraction_difference = 0.00001
+        adjusted_near_mature_nutrient_fraction = mature_nutrient_fraction + \
+            assumed_near_mature_nutrient_fraction_difference
         log_full = NitrogenIncorporation._determine_shape_log(
             heat_fraction=mature_heat_fraction, nitrogen_fraction=adjusted_near_mature_nutrient_fraction,
             mature_nitrogen_fraction=mature_nutrient_fraction, emergence_nitrogen_fraction=emergence_nutrient_fraction
