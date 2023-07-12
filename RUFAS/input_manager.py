@@ -173,7 +173,8 @@ class InputManager:
             return False
         else:
             variable_properties = self.__metadata["properties"][property_map_key][variable_name]
-            if variable_properties["type"] == "string":
+            var_type = variable_properties["type"]
+            if var_type == "string":
                 if variable_properties["pattern"]:
                     match_found = re.match(variable_properties["pattern"], value)
                     if not match_found:
@@ -182,7 +183,7 @@ class InputManager:
                 else:
                     om.add_error("Metadata must have pattern to match string to.", f"{variable_name=}", info_map)
                     return False
-            elif variable_properties["type"] == "number":
+            elif var_type == "number":
                 if variable_properties["minimum"] and variable_properties["maximum"]:
                     value_in_range = variable_properties["minimum"] <= value <= variable_properties["maximum"]
                     if not value_in_range:
@@ -202,7 +203,7 @@ class InputManager:
                     om.add_error("Metadata must have minimum or maximum to validate number.", f"{variable_name=}",
                                  info_map)
                     return False
-            elif variable_properties["type"] == "array":
+            elif var_type == "array":
                 if variable_properties["minimum_length"] and variable_properties["maximum_length"]:
                     array_in_range = variable_properties["minimum_length"] <= value <= \
                         variable_properties["maximum_length"]
@@ -224,7 +225,7 @@ class InputManager:
                                  f"{variable_name=}",
                                  info_map)
                     return False
-            elif variable_properties["type"] == "boolean":
+            elif var_type == "boolean":
                 return value in (True, False)
             else:
                 om.add_error("Metadata properties must be type string, number, array or boolean.",
