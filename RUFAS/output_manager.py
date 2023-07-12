@@ -616,8 +616,8 @@ class OutputManager(object):
         """
         dumps all pool into the given path to a directory.
         """
-        self.dump_variables(path, exclude_info_maps=exclude_info_maps)
-        # self.save_variables(path, dir_path=r"output/output_filters/", exclude_info_maps=exclude_info_maps)
+        # self.dump_variables(path, exclude_info_maps=exclude_info_maps)
+        self.save_variables(path, dir_path=r"output/output_filters/", exclude_info_maps=exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
