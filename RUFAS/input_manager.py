@@ -204,7 +204,8 @@ class InputManager:
                     return False
             elif variable_properties["type"] == "array":
                 if variable_properties["minimum_length"] and variable_properties["maximum_length"]:
-                    array_in_range = variable_properties["minimum_length"] <= value <= variable_properties["maximum_length"]
+                    array_in_range = variable_properties["minimum_length"] <= value <= \
+                        variable_properties["maximum_length"]
                     if not array_in_range:
                         om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
                     return array_in_range
@@ -212,7 +213,7 @@ class InputManager:
                     array_in_range = variable_properties["minimum_length"] <= value
                     if not array_in_range:
                         om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
-                    return array_in_range 
+                    return array_in_range
                 elif variable_properties["maximum_length"]:
                     array_in_range = value <= variable_properties["maximum_length"]
                     if not array_in_range:
@@ -223,13 +224,13 @@ class InputManager:
                                  f"{variable_name=}",
                                  info_map)
                     return False
+            elif variable_properties["type"] == "boolean":
+                return value in (True, False)
             else:
-                boolean_value_present = value in (True, False)
-                if not boolean_value_present and value:
-                    om.add_error("Metadata must have either minimum or maximum length to validate array.",
-                                 f"{variable_name=}",
-                                 info_map)
-                return boolean_value_present
+                om.add_error("Metadata properties must be type string, number, array or boolean.",
+                             f"{variable_name=}",
+                             info_map)
+                return False
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
