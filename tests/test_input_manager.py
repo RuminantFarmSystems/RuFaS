@@ -106,7 +106,7 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
 
 
 @pytest.fixture
-def mock_non_critical_metadata(mocker) -> Dict[str, Dict[str, Any]]:
+def mock_metadata(mocker) -> Dict[str, Dict[str, Any]]:
     return {
             "dummyconfig": {},
             "files": {
@@ -129,29 +129,6 @@ def mock_non_critical_metadata(mocker) -> Dict[str, Dict[str, Any]]:
 
 
 @pytest.fixture
-def mock_critical_metadata(mocker) -> Dict[str, Dict[str, Any]]:
-    return {
-            "dummyconfig": {},
-            "files": {
-                "animal": {"properties": "animal_properties"},
-                "manure": {"properties": "manure_properties"},
-                "crop": {"properties": "crop_properties"},
-                },
-            "properties": {
-                "animal_properties": {"animal_var1": {},
-                                      "animal_var2": {}
-                                      },
-                "manure_properties": {"manure_var1": {"default": "dummyvalue1"},
-                                      "manure_var2": {"default": "dummyvalue2"},
-                                      },
-                "crop_properties": {"crop_var1": {},
-                                    "crop_var2": {}
-                                    }
-                }
-            }
-
-
-@pytest.fixture
 def mock_pool(mocker) -> Dict[str, Dict[str, Any]]:
     return {
             "animal": {"animal_var1": "dummyvalue1",
@@ -167,11 +144,11 @@ def mock_pool(mocker) -> Dict[str, Dict[str, Any]]:
 
 
 def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager,
-                                                    mock_non_critical_metadata: Dict[str, Dict[str, Any]],
+                                                    mock_metadata: Dict[str, Dict[str, Any]],
                                                     mock_pool: Dict[str, Dict[str, Any]]
                                                     ) -> None:
     """Unit test for valid data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_non_critical_metadata
+    mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
 
@@ -179,19 +156,20 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
         result = mock_input_manager._validate_data()
 
     assert result is True
-    assert add_log.call_count == 6
+    assert add_log.call_count == 5
 
 
 def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_input_manager: InputManager,
-                                                                 mock_non_critical_metadata: Dict[str, Dict[str, Any]],
+                                                                 mock_metadata: Dict[str, Dict[str, Any]],
                                                                  mock_pool: Dict[str, Dict[str, Any]]
                                                                  ) -> None:
     """Unit test for invalid unfixable data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_non_critical_metadata
+    mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
 
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
+
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         result = mock_input_manager._validate_data()
 
@@ -200,11 +178,11 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_in
 
 
 def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input_manager: InputManager,
-                                                              mock_non_critical_metadata: Dict[str, Dict[str, Any]],
+                                                              mock_metadata: Dict[str, Dict[str, Any]],
                                                               mock_pool: Dict[str, Dict[str, Any]]
                                                               ) -> None:
     """Unit test for invalid fixable data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_non_critical_metadata
+    mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=True)
@@ -213,40 +191,22 @@ def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input
         result = mock_input_manager._validate_data()
 
     assert result is True
-    assert add_log.call_count == 6
+    assert add_log.call_count == 5
 
 
 def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker, mock_input_manager: InputManager,
-                                                                           mock_non_critical_metadata: Dict[str, Dict[str, Any]],
+                                                                           mock_metadata: Dict[str, Dict[str, Any]],
                                                                            mock_pool: Dict[str, Dict[str, Any]]
                                                                            ) -> None:
     """Unit test for no eager termination with non-critical
     invalid data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_non_critical_metadata
+    mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
+    mocker.patch.object(mock_input_manager, "_fix_data", return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         result = mock_input_manager._validate_data(eager_termination=False)
 
     assert result is True
-    assert add_log.call_count == 6
-
-
-def test_validate_data_returns_false_with_invalid_critical_data(mocker, mock_input_manager: InputManager,
-                                                                mock_critical_metadata: Dict[str, Dict[str, Any]],
-                                                                mock_pool: Dict[str, Dict[str, Any]]
-                                                                ) -> None:
-    """Unit test for no eager termination with non-critical
-    invalid data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_critical_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
-
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data(eager_termination=False)
-
-    assert result is False
-    assert add_log.call_count == 6
+    assert add_log.call_count == 5

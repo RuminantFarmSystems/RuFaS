@@ -112,37 +112,30 @@ class InputManager:
         valid_elements_counter = 0
         invalid_elements_counter = 0
         fixed_elements_counter = 0
-        unfixed_elements_counter = 0
         invalid_critical_elements_counter = 0
         total_elements_checked_counter = 0
 
         for key in self.__pool.keys():
             for variable, value in self.__pool[key].items():
                 total_elements_checked_counter += 1
-                property_map_key = self.__metadata["files"][key]["properties"]
                 if self._validate_element(variable, value):
                     valid_elements_counter += 1
                 else:
                     invalid_elements_counter += 1
-                    is_data_critical = "default" not in self.__metadata["properties"][property_map_key][variable].keys()
-                    if is_data_critical:
-                        invalid_critical_elements_counter += 1
-                    is_data_fixable = self._fix_data(variable, value)
-                    if is_data_fixable:
+                    is_data_fixed = self._fix_data(variable, value)
+                    if is_data_fixed:
                         fixed_elements_counter += 1
-                    elif not is_data_fixable and eager_termination:
+                    elif not is_data_fixed and eager_termination:
+                        invalid_critical_elements_counter += 1
                         return False
                     else:
-                        unfixed_elements_counter += 1
+                        invalid_critical_elements_counter += 1
 
-        om.add_log("Total Valid Elements", f"{valid_elements_counter} valid elements found.", info_map)
-        om.add_log("Total Invalid Elements", f"{invalid_elements_counter} invalid elements found.", info_map)
-        om.add_log("Total Fixed Elements", f"{fixed_elements_counter} elements fixed.", info_map)
-        om.add_log("Total Unfixed Elements", f"{unfixed_elements_counter} elements unable to be fixed", info_map)
-        om.add_log("Total Checked Elements", f"{total_elements_checked_counter} total elements checked", info_map)
-        om.add_log("Total Invalid Critical Elements",
-                   f"{invalid_critical_elements_counter} invalid critical elements found",
-                   info_map)
+        om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
+        om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
+        om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
+        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
 
         if invalid_critical_elements_counter > 0:
             return False
