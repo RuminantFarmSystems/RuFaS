@@ -1,11 +1,13 @@
 # !/usr/bin/env python3
 
+from enum import Enum
 from pathlib import Path
 import re
 from typing import Any, Dict, List, Optional, Union
 import json
 import os
 import datetime
+import csv
 
 from RUFAS.util import Utility
 
@@ -34,6 +36,14 @@ class OutputManager(object):
 
     __instance = None
     pool_element_type = Dict[str, List[Dict[str, Any]]]
+
+    class OutputFormat(Enum):
+        """
+        Enumeration that represents valid output encodings for OutputManger pools
+        """
+        JSON = 0
+        CSV = 1
+
 
     def __new__(cls):
         if not hasattr(cls, "instance"):
@@ -307,6 +317,48 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
+    def _save_variables_to_csv(self, data_dict: Dict[str, Any], path: str) -> None:
+        """Saves variables and their values to a csv file.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The variable dictionary to be saved
+        path : str
+            The path to the file to be saved
+
+        Raises
+        ------
+        Exception
+            If an error occurs while writting to the file
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._save_variables_to_csv.__name__,
+                    }
+        self.add_log("_save_variables_to_csv", f"Attempting to save to {path}.", info_map)
+        if len(data_dict) == 0:
+            self.add_warning("_save_variables_to_csv", f"No variables in the pool to save to {path}", info_map)
+            with open(path, "w") as file:
+                file.truncate(0)
+            return
+
+        keys = list(data_dict.keys())
+        values = list(data_dict.values())
+        # Determine the maximum length of values to account for uneven lengths
+        max_length = max(len(d['values']) for d in values)
+
+        rows = []
+        for i in range(max_length):
+            row = [d['values'][i] if i < len(d['values']) else None for d in values]
+            rows.append(row)
+
+        with open(path, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(keys)
+            writer.writerows(rows)
+
+        self.add_log("_save_variables_to_csv", f"Successfully saved to {path}.", info_map)
+
     def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
         """Saves a list into a text file
 
@@ -487,7 +539,7 @@ class OutputManager(object):
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
             self._dict_to_file_json(filtered_pool, file_path)
 
-    def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
+    def dump_variables(self, path: str, format: OutputFormat, exclude_info_maps: bool = False) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
 
@@ -504,8 +556,12 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
-        self._dict_to_file_json(pool, file_path)
+        file_path = os.path.join(path, self._generate_file_name("all_variables", format.name.lower()))
+        match format:
+            case OutputManager.OutputFormat.JSON:
+                self._dict_to_file_json(pool, file_path)
+            case OutputManager.OutputFormat.CSV:
+                self._save_variables_to_csv(pool, file_path)
 
     def dump_logs(self, path: str) -> None:
         """
@@ -607,7 +663,8 @@ class OutputManager(object):
         """
         dumps all pool into the given path to a directory.
         """
-        self.dump_variables(path, exclude_info_maps)
+        self.dump_variables(path, OutputManager.OutputFormat.JSON, exclude_info_maps)
+        self.dump_variables(path, OutputManager.OutputFormat.CSV, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
