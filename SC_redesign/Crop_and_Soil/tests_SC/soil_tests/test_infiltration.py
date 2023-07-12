@@ -212,9 +212,9 @@ def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_froze
                                                field_size=1.33)])
     incorp = Infiltration(data)
     if incorp.data.previous_retention_parameter is None:
-        status = True
+        is_prev_retention_none = True
     else:
-        status = False
+        is_prev_retention_none = False
 
     # mock helper functions
     incorp._determine_third_moisture_condition_parameter = MagicMock(return_value=25)
@@ -251,7 +251,7 @@ def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_froze
     else:
         assert incorp._determine_frozen_retention_parameter.call_count == 0
     assert incorp._determine_accumulated_runoff.call_count == 1
-    if status:
+    if is_prev_retention_none:
         assert incorp._determine_updated_retention_parameter.call_count == 0
         assert incorp.data.previous_retention_parameter == 0.9 * 300
     else:
