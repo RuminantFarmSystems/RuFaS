@@ -297,27 +297,20 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
                               area: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
                               weiP_frac: float, source_animal: str, should_fail: bool) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
+    data = SoilData(field_size=1.1)
+    incorp = ManureApplication(data)
+
     if should_fail:
         with pytest.raises(ValueError) as e:
-            data = SoilData(field_size=1.1)
-            incorp = ManureApplication(data)
-
-            incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
-            incorp._apply_liquid_machine_manure = MagicMock()
-            incorp._apply_solid_machine_manure = MagicMock()
 
             incorp.apply_machine_manure(dry_mass, dry_fraction, total_phosphorus_mass, coverage, area, inorganic_frac,
                                         ammonium_frac, organic_frac, weiP_frac, source_animal)
         assert str(e.value) == f"Water extractable inorganic phosphorus fraction must be in the range [0.0, 0.95]," \
                                f" received '{weiP_frac}'."
     else:
-        data = SoilData(field_size=1.1)
-        incorp = ManureApplication(data)
-
         incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
         incorp._apply_liquid_machine_manure = MagicMock()
         incorp._apply_solid_machine_manure = MagicMock()
-
         incorp.apply_machine_manure(dry_mass, dry_fraction, total_phosphorus_mass, coverage, area, inorganic_frac,
                                     ammonium_frac, organic_frac, weiP_frac, source_animal)
 

@@ -35,7 +35,9 @@ def test_event_equality(event1, event2, expected: bool) -> None:
 
 
 @pytest.mark.parametrize("event,expected", [
-    (Event(1, 120), hash((1, 120)))
+    (Event(1, 120), hash((1, 120))),
+    (Event(3, 15), hash((3, 15))),
+    (Event(6, 1), hash((6, 1)))
 ])
 def test_event_hash(event: Event, expected: float) -> None:
     """Tests that hash returns correctly for Event objects."""
