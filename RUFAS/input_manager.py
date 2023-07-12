@@ -122,10 +122,10 @@ class InputManager:
                     valid_elements_counter += 1
                 else:
                     invalid_elements_counter += 1
-                    is_data_fixable = self._fix_data(variable, value)
-                    if is_data_fixable:
+                    is_data_fixed = self._fix_data(variable, value)
+                    if is_data_fixed:
                         fixed_elements_counter += 1
-                    elif not is_data_fixable and eager_termination:
+                    elif not is_data_fixed and eager_termination:
                         invalid_critical_elements_counter += 1
                         return False
                     else:
