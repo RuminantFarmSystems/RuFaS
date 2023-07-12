@@ -672,7 +672,20 @@ class LayerData:
 
     @property
     def silt_clay_content(self):
-        """combined silt and clay fraction in the soil (unitless)"""
+        """
+        Combined silt and clay fraction in the soil (unitless).
+
+        References
+        ----------
+        pseudocode_soil eqn. [S.6.C.2]
+
+        Notes
+        -----
+        This is not necessarily the correct way to calculate this value; because the documentation is so sparse, the
+        correct way is unknown. In the old code this value was hardcoded to be 0.5, and this property attempts to
+        generate a reasonable value close to that.
+
+        """
         return (self.percent_silt_content + self.percent_clay_content) / 100
 
     def do_annual_reset(self):
