@@ -135,7 +135,7 @@ class InputManager:
         om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
         om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
-        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter}", info_map)
+        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
 
         if invalid_critical_elements_counter > 0:
             return False
