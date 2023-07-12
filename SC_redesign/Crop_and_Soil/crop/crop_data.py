@@ -154,7 +154,7 @@ class CropData:
     """biomass accumulated by the plant during the day (kg/ha)"""
     previous_biomass: Optional[float] = None
     """biomass accumulated by the plant on the previous day (kg/ha)"""
-    above_ground_biomass: Optional[float] = None
+    above_ground_biomass: float = 0.1
     """biomass stored in the above ground portion of the plant; plant biomass excluding roots (kg/ha)"""
     root_biomass: Optional[float] = None
     """biomass stored in roots (kg/ha)"""
@@ -289,13 +289,13 @@ class CropData:
     """maximum depth of roots in the soil (mm)"""
 
     # ---- water dynamics
-    cumulative_evaporation: Optional[float] = None
+    cumulative_evaporation: float = 0.0
     """total water lost to evaporation by the plant during the growing season (mm)"""
-    cumulative_transpiration: Optional[float] = None
+    cumulative_transpiration: float = 0.0
     """total water lost to transpiration by the plant during the growing season (mm)"""
-    cumulative_evapotranspiration: Optional[float] = None
+    cumulative_evapotranspiration: float = 0.0
     """total water lost to evapotranspiration by the plant during the growing season (mm)"""
-    cumulative_potential_evapotranspiration: Optional[float] = None
+    cumulative_potential_evapotranspiration: float = 0.0
     """total expected maximum water loss by the plant during the growing season (mm)"""
     water_deficiency: Optional[float] = None
     """water deficiency factor for the plant (unitless)"""
@@ -396,6 +396,9 @@ class CropData:
                 self.plant_category == PlantCategory.WARM_ANNUAL_LEGUME or \
                 self.plant_category == PlantCategory.COOL_ANNUAL_LEGUME:
             self.is_nitrogen_fixer = True
+
+        if self.heat_fraction is None:
+            self.heat_fraction = self.accumulated_heat_units / self.potential_heat_units
 
     @property
     def is_mature(self) -> bool:
