@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 import json
+import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
@@ -118,7 +119,7 @@ class InputManager:
         for key in self.__pool.keys():
             for variable, value in self.__pool[key].items():
                 total_elements_checked_counter += 1
-                if self._validate_element(variable, value):
+                if self._validate_element(key, variable, value):
                     valid_elements_counter += 1
                 else:
                     invalid_elements_counter += 1
@@ -142,9 +143,9 @@ class InputManager:
 
         return True
 
-    def _validate_element(self, key: str, value: Any) -> bool:
+    def _validate_element(self, module_key: str, variable_name: str, value: Any) -> bool:
         """
-        Perform data validation checks.
+        Performs data validation checks on data elements.
 
         Parameters
         ----------
@@ -160,13 +161,75 @@ class InputManager:
         bool
             True if the data is valid, False otherwise.
         """
-        # Perform data validation checks
-        # Return True if the data is valid, False otherwise
-
-        # TODO in validate_element fun branch
-        # where element is found to be invalid, place this warning:
-        # om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
-        pass
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_element.__name__,
+                    }
+        property_map_key = self.__metadata["files"][module_key]["properties"]
+        if isinstance(value, dict):
+            for nested_key, nested_value in value.items():
+                self._validate_element(module_key, nested_key, nested_value)
+        elif variable_name not in self.__metadata["properties"][property_map_key].values():
+            om.add_error(f"Variable not found in {module_key} metadata properties.", f"{variable_name=}", info_map)
+            return False
+        else:
+            variable_properties = self.__metadata["properties"][property_map_key][variable_name]
+            if variable_properties["type"] == "string":
+                if variable_properties["pattern"]:
+                    match_found = re.match(variable_properties["pattern"], value)
+                    if not match_found:
+                        om.add_warning("String variable must match pattern.", f"{variable_name=}", info_map)
+                    return match_found
+                else:
+                    om.add_error("Metadata must have pattern to match string to.", f"{variable_name=}", info_map)
+                    return False
+            elif variable_properties["type"] == "number":
+                if variable_properties["minimum"] and variable_properties["maximum"]:
+                    value_in_range = variable_properties["minimum"] <= value <= variable_properties["maximum"]
+                    if not value_in_range:
+                        om.add_warning("Value out of range.", f"{variable_name=}", info_map)
+                    return value_in_range
+                elif variable_properties["minimum"]:
+                    value_in_range = variable_properties["minimum"] <= value
+                    if not value_in_range:
+                        om.add_warning("Value out of range.", f"{variable_name=}", info_map)
+                    return value_in_range
+                elif variable_properties["maximum"]:
+                    value_in_range = value <= variable_properties["maximum"]
+                    if not value_in_range:
+                        om.add_warning("Value out of range.", f"{variable_name=}", info_map)
+                    return value_in_range
+                else:
+                    om.add_error("Metadata must have minimum or maximum to validate number.", f"{variable_name=}",
+                                 info_map)
+                    return False
+            elif variable_properties["type"] == "array":
+                if variable_properties["minimum_length"] and variable_properties["maximum_length"]:
+                    array_in_range = variable_properties["minimum_length"] <= value <= variable_properties["maximum_length"]
+                    if not array_in_range:
+                        om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
+                    return array_in_range
+                elif variable_properties["minimum_length"]:
+                    array_in_range = variable_properties["minimum_length"] <= value
+                    if not array_in_range:
+                        om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
+                    return array_in_range 
+                elif variable_properties["maximum_length"]:
+                    array_in_range = value <= variable_properties["maximum_length"]
+                    if not array_in_range:
+                        om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
+                    return array_in_range
+                else:
+                    om.add_error("Metadata must have either minimum or maximum length to validate array.",
+                                 f"{variable_name=}",
+                                 info_map)
+                    return False
+            else:
+                boolean_value_present = value in (True, False)
+                if not boolean_value_present and value:
+                    om.add_error("Metadata must have either minimum or maximum length to validate array.",
+                                 f"{variable_name=}",
+                                 info_map)
+                return boolean_value_present
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
