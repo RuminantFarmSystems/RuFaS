@@ -176,13 +176,16 @@ class InputManager:
         # om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
         pass
 
-    def _fix_data(self, key: str, value: Any) -> bool:
+    def _fix_data(self, module_key: str, variable_name: str, value: Any) -> bool:
         """
         Attempt to fix the invalid data.
 
         Parameters
         ----------
-        key : str
+        module_key : str
+            The key of the module which the data to fix belongs to
+
+        variable_name : str
             The key of the data to fix.
 
         value : Any
@@ -200,4 +203,12 @@ class InputManager:
         # TODO in fix_data fun branch
         # where element is fixed, place this warning:
         # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
-        pass
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_data.__name__,
+                    }
+
+        property_map_key = self.__metadata["files"][module_key]["properties"]
+        default_value = self.__metadata["properties"][property_map_key]["default"]
+        self.__pool[module_key][variable_name] = default_value
+        om.add_warning("Data fixed", f"Invalid data fixed: {variable_name}; {value} => {default_value}", info_map)
+
