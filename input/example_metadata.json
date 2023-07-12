@@ -283,24 +283,11 @@
       }
     },
     "weather_properties": {
-      "jday": {
-        "description": "Julian day of simulation",
-        "type": "number",
-        "minimum": 1,
-        "maximum": 366,
-        "default": 1
-      },
       "precip": {
         "description": "amount of precipitation",
         "type": "number",
         "minimum": 0,
         "default": 0
-      },
-      "year": {
-        "description": "year of simulation",
-        "type": "number",
-        "minimum": 1980,
-        "default": 2000
       }
     }
   },
