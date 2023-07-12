@@ -6,7 +6,7 @@ Author(s): Niko Tomlinson, ndt2@cornell.edu
 """
 
 from typing import Any, Dict
-from mock import MagicMock, Mock, mock_open, patch
+from mock import Mock, mock_open, patch
 import pytest
 from pytest_mock import MockerFixture
 
