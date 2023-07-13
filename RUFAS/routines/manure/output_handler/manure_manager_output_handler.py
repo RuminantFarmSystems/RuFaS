@@ -33,6 +33,7 @@ class ManureManagerOutputHandler:
     ManureSeparatorDailyOutput, and ManureTreatmentDailyOutput.
 
     """
+    _DEFAULT_OUTPUT_DIR_NAME = 'manure_module_reports'
     _HEADER_PREFIXES = {
         ManureManagerPen: 'pen',
         PenManure: 'manure',
@@ -234,7 +235,7 @@ class ManureManagerOutputHandler:
         non_sorting_cols = [col for col in df.columns if col not in sorting_cols]
         df = df[sorting_cols + non_sorting_cols]
 
-        csv_dir = Path(csv_dir) / 'manure_module_reports'
+        csv_dir = Path(csv_dir) / cls._DEFAULT_OUTPUT_DIR_NAME
         csv_dir.mkdir(parents=True, exist_ok=True)
         all_data_file_path = csv_dir / f'all_manure_module_data_{cls._get_formatted_current_time()}.csv'
         df.to_csv(all_data_file_path, index=False)
@@ -618,7 +619,7 @@ class ManureManagerOutputHandler:
 
         """
         df = cls._create_dataframe_from_manure_manager_data(manure_manager)
-        graphics_dir = Path(graphics_dir) / 'manure_module_reports'
+        graphics_dir = Path(graphics_dir) / cls._DEFAULT_OUTPUT_DIR_NAME
         graphics_dir.mkdir(parents=True, exist_ok=True)
         pen_id = 'pen_id'
         simulation_day = 'simulation_day'
