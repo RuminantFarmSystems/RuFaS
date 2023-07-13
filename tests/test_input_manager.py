@@ -14,7 +14,7 @@ from RUFAS.input_manager import InputManager
 
 
 @pytest.fixture
-def mock_input_manager(mocker) -> InputManager:
+def mock_input_manager(mocker: MockerFixture) -> InputManager:
     input_manager = InputManager()
     return input_manager
 
@@ -106,7 +106,7 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
 
 
 @pytest.fixture
-def mock_metadata(mocker) -> Dict[str, Dict[str, Any]]:
+def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
             "dummyconfig": {},
             "files": {
@@ -129,7 +129,7 @@ def mock_metadata(mocker) -> Dict[str, Dict[str, Any]]:
 
 
 @pytest.fixture
-def mock_pool(mocker) -> Dict[str, Dict[str, Any]]:
+def mock_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
             "animal": {"animal_var1": "dummyvalue1",
                        "animal_var2": "dummyvalue2"
@@ -159,7 +159,7 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
     assert add_log.call_count == 5
 
 
-def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_input_manager: InputManager,
+def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture, mock_input_manager: InputManager,
                                                                  mock_metadata: Dict[str, Dict[str, Any]],
                                                                  mock_pool: Dict[str, Dict[str, Any]]
                                                                  ) -> None:
@@ -177,7 +177,7 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker, mock_in
     assert add_log.call_count == 0  # will reach eager_termination prior to adding logs
 
 
-def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input_manager: InputManager,
+def test_validate_data_returns_true_with_fixable_invalid_data(mocker: MockerFixture, mock_input_manager: InputManager,
                                                               mock_metadata: Dict[str, Dict[str, Any]],
                                                               mock_pool: Dict[str, Dict[str, Any]]
                                                               ) -> None:
@@ -194,7 +194,7 @@ def test_validate_data_returns_true_with_fixable_invalid_data(mocker, mock_input
     assert add_log.call_count == 5
 
 
-def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker, mock_input_manager: InputManager,
+def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker: MockerFixture, mock_input_manager: InputManager,
                                                                            mock_metadata: Dict[str, Dict[str, Any]],
                                                                            mock_pool: Dict[str, Dict[str, Any]]
                                                                            ) -> None:
