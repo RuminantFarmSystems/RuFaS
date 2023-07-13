@@ -285,15 +285,15 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
 @pytest.mark.parametrize("crop_reference,heat_scheduled,species,year,day,field_name,field_size,expected_info_map,"
                          "expected_value", [
                              ("ref_1", False, "species_1", 1993, 100, "name_1", 1.3,
-                              {"prefix": "field_name:'name_1'", "field_size": 1.3, "date": {"year": 1993, "day": 100},
+                              {"prefix": "field:'name_1'", "field_size": 1.3, "date": {"year": 1993, "day": 100},
                                "species": "species_1"},
                               {"crop_reference": "ref_1", "heat_scheduled_harvest": False}),
                              ("ref_2", True, "custom_alien_species", 1996, 120, "name_2", 2.55,
-                              {"prefix": "field_name:'name_2'", "field_size": 2.55, "date": {"year": 1996, "day": 120},
+                              {"prefix": "field:'name_2'", "field_size": 2.55, "date": {"year": 1996, "day": 120},
                                "species": "custom_alien_species"},
                               {"crop_reference": "ref_2", "heat_scheduled_harvest": True}),
                              ("ref_3", False, "custom_corn", 2008, 122, "name_3", 0.95,
-                              {"prefix": "field_name:'name_3'", "field_size": 0.95, "date": {"year": 2008, "day": 122},
+                              {"prefix": "field:'name_3'", "field_size": 0.95, "date": {"year": 2008, "day": 122},
                                "species": "custom_corn"},
                               {"crop_reference": "ref_3", "heat_scheduled_harvest": False})
                          ])
@@ -303,7 +303,7 @@ def test_record_planting(crop_reference: str, heat_scheduled: bool, species: str
     field = Field(field_data=FieldData(name=field_name, field_size=field_size))
     field._record_planting(crop_reference, heat_scheduled, species, year, day)
 
-    actual = om.variables_pool[f"field_name:'{field_name}'.crop_planting"]
+    actual = om.variables_pool[f"field:'{field_name}'.crop_planting"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
