@@ -68,7 +68,7 @@ class InputManager:
                     "function": self._load_data.__name__,
                     }
         for key, details in files_details.items():
-            file_path = "input/" + details[path_key]
+            file_path = details[path_key]
             om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
             try:
                 if details["type"] == "json":
@@ -244,13 +244,20 @@ class InputManager:
         if variable_path is None:
             variable_path = []
 
+        # recursive search
         for key, val in search_dict.items():
+            # return path if found
             if key == variable_name:
                 return variable_path + [key]
+
+            # recursive call if current value is still a dictionary
             if type(val) is dict:
                 variable_found = self._find_variable(variable_name, val, variable_path + [key])
+                # return path if found
                 if variable_found:
                     return variable_found
+
+        # return False if not found
         return False
 
     def _is_critical(self, variable_path: [str]) -> bool:
@@ -267,12 +274,17 @@ class InputManager:
         -------
         bool
             Returns if the variable of interest is a critical data.
+            True => the variable of interest is a critical data
+            False => the variable of interest is not a critical data
         """
+        # starting point for critical data search is always self.__metadata['properties']
         curr_metadata: dict = self.__metadata['properties']
 
+        # iterate through the list of path to reach the property specification of the variable of interest
         for metadata_key in variable_path:
             curr_metadata = curr_metadata[metadata_key]
 
+        # return if 'default' attribute exists
         return 'default' not in curr_metadata.keys()
 
     def _fix_with_default(self, metadata_variable_path: [str], pool_variable_path: [str]) -> Any:
@@ -292,14 +304,19 @@ class InputManager:
         bool
             Return the default value of the variable of interest specified in metadata for logging purpose.
         """
+        # initialize starting point
         curr_metadata: dict = self.__metadata['properties']
         curr_pool: dict = self.__pool
 
+        # iterate through paths to reach the variable
         for metadata_key in metadata_variable_path:
             curr_metadata = curr_metadata[metadata_key]
 
         for pool_key in pool_variable_path[:-1]:
             curr_pool = curr_pool[pool_key]
 
+        # fix the variable of interest in self.__pool with its default value specified in metadata
         curr_pool[pool_variable_path[-1]] = curr_metadata['default']
+
+        # return the specified default value of the variable of interest so that the parent function can log it
         return curr_metadata['default']
