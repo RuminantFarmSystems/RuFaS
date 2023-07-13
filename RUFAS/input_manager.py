@@ -179,7 +179,7 @@ class InputManager:
             var_type = variable_properties["type"]
             if var_type == "string":
                 if variable_properties["pattern"]:
-                    is_match = re.match(variable_properties["pattern"], value)
+                    is_match = bool(re.match(variable_properties["pattern"], value))
                     if not is_match:
                         om.add_warning(f"String variable must match pattern {variable_properties['pattern']}.",
                                        f"{variable_name=}",
