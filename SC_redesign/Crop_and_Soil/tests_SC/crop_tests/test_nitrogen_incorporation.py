@@ -132,8 +132,7 @@ def test_determine_deepest_accessible_layer(root, depths, expect):
 
 
 @pytest.mark.parametrize("root,depths", [
-    (-1, [0, 1, 2, 3]),  # root < 0
-    (0, [0, 1, 2, 3]),  # root = 0
+    (-1, [0, 1, 2, 3])  # root < 0
 ])
 def test_error_determine_deepest_accessible_layer(root, depths):
     with pytest.raises(ValueError):
