@@ -183,7 +183,7 @@ class OutputGatherer:
                 om.add_variable("total_soil_carbon_amount", layer.total_soil_carbon_amount, info_map)
                 om.add_variable("mean_phosphorus_sorption_parameter", layer.mean_phosphorus_sorption_parameter,
                                 info_map)
-                om.add_variable("labile_inorganic_phosphorus_contentr", layer.labile_inorganic_phosphorus_content,
+                om.add_variable("labile_inorganic_phosphorus_content", layer.labile_inorganic_phosphorus_content,
                                 info_map)
                 om.add_variable("active_inorganic_phosphorus_content", layer.active_inorganic_phosphorus_content,
                                 info_map)
@@ -200,7 +200,8 @@ class OutputGatherer:
                 om.add_variable("fresh_organic_nitrogen_content", layer.fresh_organic_nitrogen_content, info_map)
 
             for crop in field.crops:
-                info_map["prefix"] = "field:'" + field.field_data.name + "',crop:'" + crop.data.name + "'"
+                info_map["prefix"] = f"field:'{field.field_data.name}',crop:'{crop.data.name}'," \
+                                     f"planted:{crop.data.planting_day},{crop.data.planting_year}"
                 om.add_variable("root_depth", crop.data.root_depth, info_map)
                 om.add_variable("biomass", crop.data.biomass, info_map)
                 om.add_variable("usable_light", crop.data.usable_light, info_map)
