@@ -165,6 +165,6 @@ def test_absorb_heat_units(mean, mint, maxt, use_heat_unit_temp):
         expect_new_heat_units = HeatUnits._determine_new_heat_units(mean, 20)
     assert data.use_heat_unit_temperature == use_heat_unit_temp
     assert expect_new_heat_units == data.accumulated_heat_units
-    assert data.previous_heat_fraction is None
+    assert data.previous_heat_fraction == 0.0
     expect_heat_fraction = expect_new_heat_units / 800
     assert expect_heat_fraction == data.heat_fraction
