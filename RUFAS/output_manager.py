@@ -309,7 +309,7 @@ class OutputManager(object):
             raise e
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
-        """Saves variables and their values to a csv file.
+        """Saves a variable and its values to a csv file.
 
         Parameters
         ----------
@@ -328,7 +328,7 @@ class OutputManager(object):
                     }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
 
-        if not all("values" in v for v in data_dict.values()):
+        if len(data_dict) != 1 or all("values" not in v for v in data_dict.values()):
             self.add_error("save_dict_file_try", f"Unable to save {path} due to missing values.", info_map)
             return
 
@@ -520,9 +520,30 @@ class OutputManager(object):
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
             self._dict_to_file_json(filtered_pool, file_path)
 
+    def dump_variables_to_csv_files(self, path: str) -> None:
+        """
+        Dumps variables_pool into one csv file per variable in the given path to a directory.
+
+        Parameters
+        ----------
+        path : str
+            Path to the output directory for the OutputManager.
+
+        """
+        pool = self.variables_pool
+        variables_csv_path = Path(path) / "CSVs" / "om" / "variables"
+        try:
+            variables_csv_path.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            raise e
+
+        for key, value in pool.items():
+            csv_file_path = os.path.join(variables_csv_path, self._generate_file_name(key, "csv"))
+            self._dict_to_file_csv({key: value}, csv_file_path)
+
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
-        Dumps variables_pool into a json file and a csv file in the given path to a directory.
+        Dumps variables_pool into a json file in the given path to a directory.
 
         Parameters
         ----------
@@ -538,9 +559,7 @@ class OutputManager(object):
             pool = self._exclude_info_maps(self.variables_pool)
 
         json_file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
-        csv_file_path = os.path.join(path, self._generate_file_name("all_variables", "csv"))
         self._dict_to_file_json(pool, json_file_path)
-        self._dict_to_file_csv(pool, csv_file_path)
 
     def dump_logs(self, path: str) -> None:
         """
@@ -644,6 +663,7 @@ class OutputManager(object):
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        self.dump_variables_to_csv_files(path)
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
