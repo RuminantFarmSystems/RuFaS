@@ -199,7 +199,8 @@ class CropManagement:
         nitrogen_harvested = self.data.yield_nitrogen
         phosphorus_harvested = self.data.yield_phosphorus
         info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
-                    "prefix": f"field:'{field_name}'", "field_size": field_size,
+                    "prefix": f"field:'{field_name}',crop:'{self.data.name}',planted:{self.data.planting_day},"
+                              f"{self.data.planting_year}", "field_size": field_size,
                     "species": f"'{self.data.species}'", "date": {"year": year, "day": day}}
         value = {"yield": mass_harvested, "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested}
         om.add_variable("harvest_yield", value, info_map)

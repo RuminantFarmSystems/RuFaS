@@ -231,6 +231,9 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
 
+    crop_manager.data.name = "test-crop"
+    crop_manager.data.planting_day = 100
+    crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
     crop_manager.data.yield_collected = mass
     crop_manager.data.yield_nitrogen = nitrogen
@@ -238,11 +241,11 @@ def test_record_yield(field_name: str, field_size: float, species: str, year: in
 
     crop_manager._record_yield(field_name, field_size, year, day)
 
-    expected_info_map = {"prefix": f"field:'{field_name}'", "field_size": field_size, "species": f"'{species}'",
-                         "date": {"year": year, "day": day}}
+    expected_info_map = {"prefix": f"field:'{field_name}',crop:'test-crop',planted:100,1995", "field_size": field_size,
+                         "species": f"'{species}'", "date": {"year": year, "day": day}}
     expected_value = {"yield": mass, "nitrogen": nitrogen, "phosphorus": phosphorus}
 
-    actual = om.variables_pool[f"field:'{field_name}'.harvest_yield"]
+    actual = om.variables_pool[f"field:'{field_name}',crop:'test-crop',planted:100,1995.harvest_yield"]
     assert actual['info_maps'].__contains__(expected_info_map)
     assert actual['values'].__contains__(expected_value)
 

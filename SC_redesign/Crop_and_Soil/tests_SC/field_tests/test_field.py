@@ -278,6 +278,8 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species
+    assert field.crops[0].data.planting_year == year
+    assert field.crops[0].data.planting_day == day
     field._record_planting.assert_called_once_with(crop_reference, heat_scheduled, expected_crop.data.species,
                                                    year, day)
 

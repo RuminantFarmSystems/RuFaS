@@ -548,6 +548,8 @@ class Field:
             crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
+        crop.data.planting_year = time.calendar_year
+        crop.data.planting_day = time.day
 
         self.crops.append(crop)
 
