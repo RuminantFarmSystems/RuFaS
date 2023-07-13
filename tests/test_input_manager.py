@@ -159,7 +159,8 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
     assert add_log.call_count == 5
 
 
-def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture, mock_input_manager: InputManager,
+def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture,
+                                                                 mock_input_manager: InputManager,
                                                                  mock_metadata: Dict[str, Dict[str, Any]],
                                                                  mock_pool: Dict[str, Dict[str, Any]]
                                                                  ) -> None:
@@ -194,7 +195,8 @@ def test_validate_data_returns_true_with_fixable_invalid_data(mocker: MockerFixt
     assert add_log.call_count == 5
 
 
-def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker: MockerFixture, mock_input_manager: InputManager,
+def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker: MockerFixture,
+                                                                           mock_input_manager: InputManager,
                                                                            mock_metadata: Dict[str, Dict[str, Any]],
                                                                            mock_pool: Dict[str, Dict[str, Any]]
                                                                            ) -> None:
