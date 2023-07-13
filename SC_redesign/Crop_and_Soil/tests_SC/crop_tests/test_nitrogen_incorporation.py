@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 
 from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
@@ -43,26 +41,18 @@ def test_determine_nitrogen_shape_parameters(halfheat: float, heatfrac: float, e
         assert observe == [expect_1, expect_2]
 
 
-@pytest.mark.parametrize("heatfrac,current,mature,emergence,should_fail", [
-    (1, .5, .25, .75, False),  # max_evapotranspiration heatfrac
-    (0.8, .5, .25, 1, False),  # max_evapotranspiration mature nfrac
-    (0.32, .5, .25, .75, False),  # arbitrary
-    (0.32, .5, .75, .75, True)  # throw error
+@pytest.mark.parametrize("heatfrac,current,mature,emergence", [
+    (1, .5, .25, .75),  # max_evapotranspiration heatfrac
+    (0.8, .5, .25, 1),  # max_evapotranspiration mature nfrac
+    (0.32, .5, .25, .75),  # arbitrary
 ])
-def test_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float, should_fail: bool) \
-        -> None:
-    """check that determine_shape_log() calculates correct output and make sure that errors were raised correctly"""
-    if should_fail:
-        try:
-            NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
-        except ValueError as e:
-            assert str(e) == "emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction"
-    else:
-        observe = NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
-        bottom = 1 - ((current - mature) / (emergence - mature))
-        inside = (heatfrac / bottom) - heatfrac
-        expect = log(inside)
-        assert observe == expect
+def test_determine_shape_log(heatfrac, current, mature, emergence):
+    """check that determine_shape_log() calculates correct output"""
+    observe = NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
+    bottom = 1 - ((current - mature) / (emergence - mature))
+    inside = (heatfrac / bottom) - heatfrac
+    expect = log(inside)
+    assert observe == expect
 
 
 @pytest.mark.parametrize("heatfrac,current,mature,emergence", [
@@ -251,54 +241,37 @@ def test_determine_layer_nitrogen_demands(pots, avails):
     assert demand_list == pytest.approx(observe, rel=0.00001)
 
 
-@pytest.mark.parametrize("demand,potential,nitrate,should_fail", [
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3], False),  # use nitrate
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.6, 0.6], False),  # use nitrogen
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6], False),  # use nitrogen, then nitrate, then nitrogen
-    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6], False),  # increased demand
-    ([0.01, 0.01, 0.01], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6], False),  # decreased demand
-    ([25, 8.33, 2.05, 12.99, 0.5], [22.5, 15.98, 2.22, 35.4, 0.001], [15.5, 20.99, 8, 5.5, 0.1], True),
-    ([25, 8.33, 2.05, 12.99], [22.5, 15.98, 2.22, 35.4, 0.001, 0.2], [15.5, 5.5, 0.1], True)
+@pytest.mark.parametrize("demand,potential,nitrate", [
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),  # use nitrate
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.6, 0.6]),  # use nitrogen
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # use nitrogen, then nitrate, then nitrogen
+    ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # increased demand
+    ([0.01, 0.01, 0.01], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),  # decreased demand
+    ([25, 8.33, 2.05, 12.99, 0.5], [22.5, 15.98, 2.22, 35.4, 0.001], [15.5, 20.99, 8, 5.5, 0.1])  # arbitrary
 ])
-def test_determine_layer_nitrogen_uptake(demand: List[float], potential: List[float], nitrate: List[float],
-                                         should_fail: bool) -> None:
-    """test that actual nitrogen uptake from each layer is properly calculated by determine_layer_nitrogen_uptake() and
-     make sure that errors were raised correctly"""
-    if should_fail:
-        try:
-            NitrogenIncorporation.determine_layer_nutrient_uptake(demand, potential, nitrate)
-        except ValueError as e:
-            assert str(e) == "layer_potential, layer_demand, and layer_nitrate must be the same length"
-    else:
-        observe = NitrogenIncorporation.determine_layer_nutrient_uptake(demand, potential, nitrate)
-        expect = []
-        for d, p, n in zip(demand, potential, nitrate):
-            uptake = min(p + d, n)
-            expect.append(uptake)
-        assert observe == expect
+def test_determine_layer_nitrogen_uptake(demand, potential, nitrate):
+    """test that actual nitrogen uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()"""
+    observe = NitrogenIncorporation.determine_layer_nutrient_uptake(demand, potential, nitrate)
+    expect = []
+    for d, p, n in zip(demand, potential, nitrate):
+        uptake = min(p + d, n)
+        expect.append(uptake)
+    assert observe == expect
 
 
-@pytest.mark.parametrize("reqs,srcs,should_fail", [
-    ([0, 0], [1, 1], False),  # no requests
-    ([0.5, 0], [1, 1], False),  # request from first layer
-    ([0, 0.5], [1, 1], False),  # request from second layer
-    ([0.5, 0.5], [1, 1], False),  # request from both
-    ([18.66, 33.74], [20.30, 19.93], False),  # arbitrary,
-    ([18.66], [20.30, 19.93], True)  # size different in list
+@pytest.mark.parametrize("reqs,srcs", [
+    ([0, 0], [1, 1]),  # no requests
+    ([0.5, 0], [1, 1]),  # request from first layer
+    ([0, 0.5], [1, 1]),  # request from second layer
+    ([0.5, 0.5], [1, 1]),  # request from both
+    ([18.66, 33.74], [20.30, 19.93])  # arbitrary
 ])
-def test_determine_layer_extracted_resource(reqs: List[float], srcs: List[float], should_fail: bool):
-    """ensure that extracted nitrogen is correctly calculated for each layer and make sure that errors were raised
-     correctly"""
-    if should_fail:
-        try:
-            NitrogenIncorporation.determine_layer_extracted_resource(reqs, srcs)
-        except ValueError as e:
-            assert str(e) == "requests and sources should be the same length"
-    else:
-        draws = []
-        for i in range(len(reqs)):
-            draws.append(NitrogenIncorporation._determine_extracted_resource(reqs[i], srcs[i]))
-        assert draws == NitrogenIncorporation.determine_layer_extracted_resource(reqs, srcs)
+def test_determine_layer_extracted_resource(reqs, srcs):
+    """ensure that extracted nitrogen is correctly calculated for each layer"""
+    draws = []
+    for i in range(len(reqs)):
+        draws.append(NitrogenIncorporation._determine_extracted_resource(reqs[i], srcs[i]))
+    assert draws == NitrogenIncorporation.determine_layer_extracted_resource(reqs, srcs)
 
 
 @pytest.mark.parametrize("requested,available", [

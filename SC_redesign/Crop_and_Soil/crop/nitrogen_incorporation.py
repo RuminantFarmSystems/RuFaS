@@ -25,7 +25,7 @@ class NitrogenIncorporation:
         for any unmet demand. Nitrogen from extraction and fixation are added to plant biomass.
         """
         layer_depths = soil_data.get_vectorized_layer_attribute('bottom_depth')
-        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate")
+        layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
         soil_water_factor = soil_data.soil_water_factor
         # TODO: soil_water_factor should be vectorized (methods need updating) instead of just using the average.
         #   That will require refactoring the subroutines. - GitHub Issue #450
@@ -33,8 +33,7 @@ class NitrogenIncorporation:
         self.shift_nitrogen_time()
         self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction, self.data.mature_heat_fraction, self.data.emergence_nitrogen_fraction,
-            self.data.half_mature_nitrogen_fraction, self.data.near_mature_nitrogen_fraction,
-            self.data.mature_nitrogen_fraction
+            self.data.half_mature_nitrogen_fraction, self.data.mature_nitrogen_fraction
         )
         self.data.optimal_nitrogen_fraction = self.determine_optimal_nutrient_fraction(
             self.data.heat_fraction, self.data.emergence_nitrogen_fraction, self.data.mature_nitrogen_fraction,
@@ -51,7 +50,7 @@ class NitrogenIncorporation:
                 self.data.biomass_growth_max
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
-        soil_data.set_vectorized_layer_attribute("nitrate", layer_nitrates)
+        soil_data.set_vectorized_layer_attribute("nitrate_content", layer_nitrates)
         # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
@@ -182,7 +181,6 @@ class NitrogenIncorporation:
     @staticmethod
     def determine_nutrient_shape_parameters(half_mature_heat_fraction: float, mature_heat_fraction: float,
                                             emergence_nutrient_fraction: float, half_mature_nutrient_fraction: float,
-                                            near_mature_nutrient_fraction: float,
                                             mature_nutrient_fraction: float) -> List[float]:
         # pseudocode: C.5.A.1, C.5.A.2
         """
@@ -193,12 +191,15 @@ class NitrogenIncorporation:
             mature_heat_fraction: PHU fraction at full-maturity
             emergence_nutrient_fraction: nitrogen fraction at emergence
             half_mature_nutrient_fraction: nitrogen fraction at half-maturity
-            near_mature_nutrient_fraction: nitrogen fraction *near* maturity
             mature_nutrient_fraction: nitrogen fraction *at* maturity
 
         SWAT Reference: Equations 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
         Returns: list of the first and second shape coefficients, respectively
+
+        Notes: SWAT assumes that the fraction of nutrients near maturity minus the fraction of nutrients at maturity in
+            the crop is equal to 0.00001 (see theoretical documentation pages 331 and 336, top paragraphs of both), so
+            the near mature nutrient fraction is set to meet that assumption here.
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
@@ -207,8 +208,12 @@ class NitrogenIncorporation:
             heat_fraction=half_mature_heat_fraction, nitrogen_fraction=half_mature_nutrient_fraction,
             mature_nitrogen_fraction=mature_nutrient_fraction, emergence_nitrogen_fraction=emergence_nutrient_fraction
         )
+
+        assumed_near_mature_nutrient_fraction_difference = 0.00001
+        adjusted_near_mature_nutrient_fraction = mature_nutrient_fraction + \
+            assumed_near_mature_nutrient_fraction_difference
         log_full = NitrogenIncorporation._determine_shape_log(
-            heat_fraction=mature_heat_fraction, nitrogen_fraction=near_mature_nutrient_fraction,
+            heat_fraction=mature_heat_fraction, nitrogen_fraction=adjusted_near_mature_nutrient_fraction,
             mature_nitrogen_fraction=mature_nutrient_fraction, emergence_nitrogen_fraction=emergence_nutrient_fraction
         )
         s2 = (log_half - log_full) / (mature_heat_fraction - half_mature_heat_fraction)
@@ -340,9 +345,16 @@ class NitrogenIncorporation:
 
             example: return of 1 means only the first layer is accessible (i.e., accessible_depths[:1]) and a return of
             2 means the first and second layers are accessible (i.e., accessible_depths[:2])
+
+        Notes:
+            This method assumes that if there are no roots, then none of the soil layers are accessible for nutrient
+            uptake by the crop.
+
         """
-        if root_depth <= 0:  # handle no roots
+        if root_depth < 0.0:
             raise ValueError("root_depth cannot be less than zero")
+        elif root_depth == 0.0:
+            return 0
         else:
             insert_position = bisect(layer_bounds, root_depth)
             deepest_layer = len(layer_bounds)

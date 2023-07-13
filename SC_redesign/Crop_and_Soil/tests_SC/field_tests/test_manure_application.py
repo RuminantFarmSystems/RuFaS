@@ -296,7 +296,7 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
                               area: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
                               weiP_frac: float, source_animal: str) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
-    data = SoilData(field_size=1.1)
+    data = SoilData(field_size=area)
     incorp = ManureApplication(data)
 
     incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal = MagicMock(return_value=0.25)
@@ -321,5 +321,5 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
     else:
         incorp._apply_solid_machine_manure.assert_called_once_with(dry_mass, dry_fraction, total_phosphorus_mass,
                                                                    coverage, expected_weiP_frac, inorganic_frac,
-                                                                   ammonium_frac, organic_frac)
+                                                                   ammonium_frac, organic_frac, area)
     assert incorp.data.machine_manure_applied_mass == dry_mass
