@@ -176,50 +176,52 @@ class InputManager:
             var_type = variable_properties["type"]
             if var_type == "string":
                 if variable_properties["pattern"]:
-                    match_found = re.match(variable_properties["pattern"], value)
-                    if not match_found:
-                        om.add_warning("String variable must match pattern.", f"{variable_name=}", info_map)
-                    return match_found
+                    is_match = re.match(variable_properties["pattern"], value)
+                    if not is_match:
+                        om.add_warning(f"String variable must match pattern {variable_properties['pattern']}.",
+                                       f"{variable_name=}",
+                                       info_map)
+                    return is_match
                 else:
                     om.add_error("Metadata must have pattern to match string to.", f"{variable_name=}", info_map)
                     return False
             elif var_type == "number":
                 if variable_properties["minimum"] and variable_properties["maximum"]:
-                    value_in_range = variable_properties["minimum"] <= value <= variable_properties["maximum"]
-                    if not value_in_range:
+                    is_in_range = variable_properties["minimum"] <= value <= variable_properties["maximum"]
+                    if not is_in_range:
                         om.add_warning("Value out of range.", f"{variable_name=}", info_map)
-                    return value_in_range
+                    return is_in_range
                 elif variable_properties["minimum"]:
-                    value_in_range = variable_properties["minimum"] <= value
-                    if not value_in_range:
+                    is_in_range = variable_properties["minimum"] <= value
+                    if not is_in_range:
                         om.add_warning("Value out of range.", f"{variable_name=}", info_map)
-                    return value_in_range
+                    return is_in_range
                 elif variable_properties["maximum"]:
-                    value_in_range = value <= variable_properties["maximum"]
-                    if not value_in_range:
+                    is_in_range = value <= variable_properties["maximum"]
+                    if not is_in_range:
                         om.add_warning("Value out of range.", f"{variable_name=}", info_map)
-                    return value_in_range
+                    return is_in_range
                 else:
                     om.add_error("Metadata must have minimum or maximum to validate number.", f"{variable_name=}",
                                  info_map)
                     return False
             elif var_type == "array":
                 if variable_properties["minimum_length"] and variable_properties["maximum_length"]:
-                    array_in_range = variable_properties["minimum_length"] <= value <= \
+                    is_in_range = variable_properties["minimum_length"] <= value <= \
                         variable_properties["maximum_length"]
-                    if not array_in_range:
+                    if not is_in_range:
                         om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
-                    return array_in_range
+                    return is_in_range
                 elif variable_properties["minimum_length"]:
-                    array_in_range = variable_properties["minimum_length"] <= value
-                    if not array_in_range:
+                    is_in_range = variable_properties["minimum_length"] <= value
+                    if not is_in_range:
                         om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
-                    return array_in_range
+                    return is_in_range
                 elif variable_properties["maximum_length"]:
-                    array_in_range = value <= variable_properties["maximum_length"]
-                    if not array_in_range:
+                    is_in_range = value <= variable_properties["maximum_length"]
+                    if not is_in_range:
                         om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
-                    return array_in_range
+                    return is_in_range
                 else:
                     om.add_error("Metadata must have either minimum or maximum length to validate array.",
                                  f"{variable_name=}",
@@ -229,7 +231,7 @@ class InputManager:
                 return value in (True, False)
             else:
                 om.add_error("Metadata properties must be type string, number, array or boolean.",
-                             f"{variable_name=}",
+                             f"{variable_name=}, provided type:{var_type}",
                              info_map)
                 return False
 
