@@ -151,7 +151,7 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
     top_depths = [0] + depths[:2]
     soil.set_vectorized_layer_attribute("top_depth", top_depths)
     soil.set_vectorized_layer_attribute("bottom_depth", depths)
-    soil.set_vectorized_layer_attribute("phosphate", phosphates)
+    soil.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", phosphates)
     incorp = PhosphorusIncorporation(data)
 
     # mock intermediate functions
@@ -172,8 +172,7 @@ def test_incorporate_phosphorus(phosphates, depths, gate):
 
     # assertions
     incorp.shift_phosphorus_time.assert_called_once()
-    NitrogenIncorporation.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68,
-                                                                                      0.62, 0.60)
+    NitrogenIncorporation.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
     assert data.phosphorus_shapes == [1.2, 0.8]
 
     NitrogenIncorporation.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)

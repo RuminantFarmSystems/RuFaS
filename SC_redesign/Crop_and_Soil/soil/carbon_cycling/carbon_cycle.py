@@ -58,11 +58,11 @@ class CarbonCycling:
             soil_volume = self._determine_soil_volume(layer.layer_thickness, field_size)
             soil_mass = self._determine_soil_mass(layer.bulk_density, soil_volume)*MEGAGRAMS_TO_KILOGRAMS
             soil_active_carbon_fraction = self._determine_soil_active_carbon_fraction(layer.active_carbon_amount,
-                                                                                      soil_mass)
+                                                                                      soil_mass, field_size)
             soil_slow_carbon_fraction = self._determine_soil_slow_carbon_fraction(layer.slow_carbon_amount,
-                                                                                  soil_mass)
+                                                                                  soil_mass, field_size)
             soil_passive_carbon_fraction = self._determine_soil_passive_carbon_fraction(layer.passive_carbon_amount,
-                                                                                        soil_mass)
+                                                                                        soil_mass, field_size)
             layer.soil_overall_carbon_fraction = self._determine_soil_overall_carbon_fraction(
                 soil_active_carbon_fraction,
                 soil_slow_carbon_fraction,
