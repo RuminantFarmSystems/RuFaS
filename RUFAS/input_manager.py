@@ -6,7 +6,6 @@ import pandas as pd
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict
 
-
 om = OutputManager()
 
 
@@ -69,7 +68,7 @@ class InputManager:
                     "function": self._load_data.__name__,
                     }
         for key, details in files_details.items():
-            file_path = details[path_key]
+            file_path = "input/" + details[path_key]
             om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
             try:
                 if details["type"] == "json":
@@ -171,6 +170,7 @@ class InputManager:
     def _fix_data(self, module_key: str, variable_name: str, value: Any) -> bool:
         """
         Attempt to fix the invalid data.
+        Return True if the data is fixed, False otherwise
 
         Parameters
         ----------
@@ -188,18 +188,61 @@ class InputManager:
         bool
             True if the data is fixed, False otherwise.
         """
-        # Attempt to fix the invalid data
-        # Return True if the data is fixed, False otherwise
-
-
-        # TODO in fix_data fun branch
-        # where element is fixed, place this warning:
-        # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_data.__name__,
+                    "function": self._fix_data.__name__,
                     }
 
-        property_map_key = self.__metadata["files"][module_key]["properties"]
-        default_value = self.__metadata["properties"][property_map_key]["default"]
-        self.__pool[module_key][variable_name] = default_value
+        # Recursively check if the variable of interest exists in metadata
+        metadata_variable_path = self._find_variable(variable_name, self.__metadata['properties'], [])
+
+        # if variable of interest is found, find the path in pool
+        if metadata_variable_path:
+            pool_variable_path = self._find_variable(variable_name, self.__pool[module_key], [module_key])
+
+        # if no variable with such name is found, return False
+        else:
+            return False
+
+        # else check if the variable of interest is a critical variable
+        if self._is_critical(metadata_variable_path):
+            return False
+
+        default_value = self._fix_with_default(metadata_variable_path, pool_variable_path)
         om.add_warning("Data fixed", f"Invalid data fixed: {variable_name}; {value} => {default_value}", info_map)
+
+    def _find_variable(self, variable_name: str, search_dict: dict = None, variable_path: [str] = None):
+        if search_dict is None:
+            search_dict = self.__metadata['properties']
+        if variable_path is None:
+            variable_path = []
+
+        for key, val in search_dict.items():
+            if key == variable_name:
+                return variable_path + [key]
+            if type(val) is dict:
+                variable_found = self._find_variable(variable_name, val, variable_path + [key])
+                if variable_found:
+                    return variable_found
+        return False
+
+    def _is_critical(self, variable_path: [str]):
+        curr_dict: dict = self.__metadata['properties']
+
+        for i in range(len(variable_path)):
+            curr_dict = curr_dict[variable_path[i]]
+
+        return 'default' not in curr_dict.keys()
+        # return True if 'default' not in curr_dict.keys() else curr_dict['default']
+
+    def _fix_with_default(self, metadata_variable_path: [str], pool_variable_path: [str]):
+        curr_metadata: dict = self.__metadata['properties']
+        curr_pool: dict = self.__pool
+
+        for metadata_key in metadata_variable_path:
+            curr_metadata = curr_metadata[metadata_key]
+
+        for pool_key in pool_variable_path[:-1]:
+            curr_pool = curr_pool[pool_key]
+
+        curr_pool[pool_variable_path[-1]] = curr_metadata['default']
+        return curr_metadata['default']
