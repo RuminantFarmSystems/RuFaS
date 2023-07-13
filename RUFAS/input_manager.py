@@ -61,8 +61,8 @@ class InputManager:
         ------
         Exception
             If an error occurs while opening or reading a data file.
-
         """
+
         files_details = self.__metadata["files"]
         path_key = "path"
         info_map = {"class": self.__class__.__name__,
@@ -91,3 +91,106 @@ class InputManager:
                                    info_map)
             except Exception as e:
                 raise e
+
+    def _validate_data(self, eager_termination: bool = True) -> bool:
+        """
+        Validates input data and attempts to fix any invalid input data.
+
+        Parameters
+        ----------
+        eager_termination : bool, default=True
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        bool
+            True if all data is valid; False otherwise.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_data.__name__,
+                    }
+        valid_elements_counter = 0
+        invalid_elements_counter = 0
+        fixed_elements_counter = 0
+        invalid_critical_elements_counter = 0
+        total_elements_checked_counter = 0
+
+        for key in self.__pool.keys():
+            for variable, value in self.__pool[key].items():
+                total_elements_checked_counter += 1
+                if self._validate_element(variable, value):
+                    valid_elements_counter += 1
+                else:
+                    invalid_elements_counter += 1
+                    is_data_fixed = self._fix_data(variable, value)
+                    if is_data_fixed:
+                        fixed_elements_counter += 1
+                    elif not is_data_fixed and eager_termination:
+                        invalid_critical_elements_counter += 1
+                        return False
+                    else:
+                        invalid_critical_elements_counter += 1
+
+        om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
+        om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
+        om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
+        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
+
+        if invalid_critical_elements_counter > 0:
+            return False
+
+        return True
+
+    def _validate_element(self, key: str, value: Any) -> bool:
+        """
+        Perform data validation checks.
+
+        Parameters
+        ----------
+        key : str
+            The key of the data to validate.
+
+        value : Any
+            The value of the data to validate.
+
+
+        Returns
+        -------
+        bool
+            True if the data is valid, False otherwise.
+        """
+        # Perform data validation checks
+        # Return True if the data is valid, False otherwise
+
+        # TODO in validate_element fun branch
+        # where element is found to be invalid, place this warning:
+        # om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
+        pass
+
+    def _fix_data(self, key: str, value: Any) -> bool:
+        """
+        Attempt to fix the invalid data.
+
+        Parameters
+        ----------
+        key : str
+            The key of the data to fix.
+
+        value : Any
+            The value of the data to fix.
+
+        Returns
+        -------
+        bool
+            True if the data is fixed, False otherwise.
+        """
+        # Attempt to fix the invalid data
+        # Return True if the data is fixed, False otherwise
+
+        # TODO in fix_data fun branch
+        # where element is fixed, place this warning:
+        # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
+        # where data is not fixable:
+        # om.add_error("Data not fixable.", f"Unable to fix the invalid data: {key=}, {value=}.", info_map)
+        pass
