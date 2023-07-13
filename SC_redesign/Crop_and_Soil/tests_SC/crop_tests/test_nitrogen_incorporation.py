@@ -29,14 +29,15 @@ def test_determine_nitrogen_shape_parameters(halfheat: float, heatfrac: float, e
      correctly"""
     if should_fail:
         try:
-            NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, near, mature)
+            NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         except ValueError as e:
             assert str(e) == "half_mature_heat_fraction must not equal mature_heat_fraction"
     else:
-        observe = NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, near,
-                                                                            mature)
+        expected_near = mature + 0.00001
+        observe = NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) -
-                    NitrogenIncorporation._determine_shape_log(heatfrac, near, mature, emerge)) / (heatfrac - halfheat)
+                    NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)) / \
+                   (heatfrac - halfheat)
         expect_1 = NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
@@ -597,7 +598,7 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
 
         # assertions
         incorp.shift_nitrogen_time.assert_called_once()
-        incorp.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.62, 0.60)
+        incorp.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
         assert data.nitrogen_shapes == [1.2, 0.8]
         incorp.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
         assert data.optimal_nitrogen_fraction == 0.75
