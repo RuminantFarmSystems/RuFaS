@@ -201,16 +201,44 @@ class InputManager:
 
         # if no variable with such name is found, return False
         else:
+            om.add_error("Property not found", f"No property definition found for {variable_name} with value {value} "
+                                               f"in metadata ", info_map)
             return False
 
         # else check if the variable of interest is a critical variable
         if self._is_critical(metadata_variable_path):
+            om.add_error("Unfixable critical data", f"Variable {variable_name} with value {value} is an unfixable "
+                                                    f"critical data", info_map)
             return False
 
+        # fix the variable with default variable
         default_value = self._fix_with_default(metadata_variable_path, pool_variable_path)
-        om.add_warning("Data fixed", f"Invalid data fixed: {variable_name}; {value} => {default_value}", info_map)
+        om.add_warning("Data fixed", f"Invalid data fixed: {variable_name}: {value} => {default_value}", info_map)
 
-    def _find_variable(self, variable_name: str, search_dict: dict = None, variable_path: [str] = None):
+    def _find_variable(self, variable_name: str, search_dict: dict = None, variable_path: [str] = None) -> Any:
+        """
+        Searches if a variable with name 'variable_name' exists in the dictionary 'search_dict'. Returns the path to
+        reach the variable of interest 'variable_path' if found, returns False if not found.
+
+        Parameters
+        ----------
+        variable_name : str
+            Name of the variable of interest.
+
+        search_dict : dict
+            Starting dictionary structure for searching.
+            This parameter will be initialized to self.__metadata['properties'] if not specified.
+
+        variable_path : [str]
+            List to keep track of the path to reach the variable of interest in the specified dictionary 'search_dict'.
+            This parameter will be initialized to an empty list [] if not specified.
+
+        Returns
+        -------
+        Any: List[str] or False
+            Returns the path to reach the variable of interest, variable_path, if found;
+            Returns False if not found.
+        """
         if search_dict is None:
             search_dict = self.__metadata['properties']
         if variable_path is None:
@@ -225,16 +253,45 @@ class InputManager:
                     return variable_found
         return False
 
-    def _is_critical(self, variable_path: [str]):
-        curr_dict: dict = self.__metadata['properties']
+    def _is_critical(self, variable_path: [str]) -> bool:
+        """
+        Follows the provided 'variable_path' to reach the variable of interest, to check if the variable of interest is
+        a critical data, which does not have a 'default' attribute in its property specification.
 
-        for i in range(len(variable_path)):
-            curr_dict = curr_dict[variable_path[i]]
+        Parameters
+        ----------
+        variable_path : List[str]
+            Path to reach the property specification of the variable of interest in metadata.
 
-        return 'default' not in curr_dict.keys()
-        # return True if 'default' not in curr_dict.keys() else curr_dict['default']
+        Returns
+        -------
+        bool
+            Returns if the variable of interest is a critical data.
+        """
+        curr_metadata: dict = self.__metadata['properties']
 
-    def _fix_with_default(self, metadata_variable_path: [str], pool_variable_path: [str]):
+        for metadata_key in variable_path:
+            curr_metadata = curr_metadata[metadata_key]
+
+        return 'default' not in curr_metadata.keys()
+
+    def _fix_with_default(self, metadata_variable_path: [str], pool_variable_path: [str]) -> Any:
+        """
+        Fixes the variable of interest in self.__pool with its default value defined in metadata.
+
+        Parameters
+        ----------
+        metadata_variable_path : List[str]
+            Path to reach the property specification of the variable of interest in metadata.
+
+        pool_variable_path : List[str]
+            Path to reach the variable of interest in the variable pool.
+
+        Returns
+        -------
+        bool
+            Return the default value of the variable of interest specified in metadata for logging purpose.
+        """
         curr_metadata: dict = self.__metadata['properties']
         curr_pool: dict = self.__pool
 
