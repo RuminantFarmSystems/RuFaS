@@ -232,7 +232,7 @@ class ManureManagerOutputHandler:
         df.sort_values(by=sorting_cols, inplace=True)
         df = cls._drop_all_zeros_nan_none_columns(df)
 
-        non_sorting_cols = [col for col in df.columns if col not in sorting_cols]
+        non_sorting_cols = [col for col in df.columns if not any(sorting_col.lower() in col.lower() for sorting_col in sorting_cols)]
         df = df[sorting_cols + non_sorting_cols]
 
         csv_dir = Path(csv_dir) / cls._DEFAULT_OUTPUT_DIR_NAME
@@ -623,8 +623,9 @@ class ManureManagerOutputHandler:
         graphics_dir.mkdir(parents=True, exist_ok=True)
         pen_id = 'pen_id'
         simulation_day = 'simulation_day'
+        plot_file_extension = '.png'
         fixed_cols = [pen_id, simulation_day]
-        non_fixed_cols = [col for col in df.columns if col not in fixed_cols]
+        non_fixed_cols = [col for col in df.columns if all(fixed_col.lower() not in col.lower() for fixed_col in fixed_cols)]
 
         for col in non_fixed_cols:
             output_dir = graphics_dir / cls._extract_dir_name_from_col_name(col)
@@ -635,7 +636,7 @@ class ManureManagerOutputHandler:
                 x_series = df.loc[df[pen_id] == val, simulation_day]
                 y_series = df.loc[df[pen_id] == val, col]
                 plot_name = f'Pen {val} - {cls._format_title(col)}'
-                output_path = output_sub_dir / f'{plot_name}.png'
+                output_path = output_sub_dir / f'{plot_name}{plot_file_extension}'
                 cls._make_simple_scatter_plot_with_matplotlib(
                     output_path=output_path,
                     x=x_series,
