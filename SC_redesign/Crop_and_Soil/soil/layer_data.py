@@ -68,104 +68,104 @@ class LayerData:
     """rock content expressed as percent of soil in this layer (unitless)"""
 
     # --- Decomposition
-    decomposition_moisture_effect: Optional[float] = None
+    decomposition_moisture_effect: float = 0.0
     """moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2)"""
 
     # --- pool_gas_partition
     # (pseudocode_soil S.6.A.1)
-    plant_metabolic_active_carbon_usage: Optional[float] = None
+    plant_metabolic_active_carbon_usage: float = 0.0
     """plant metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.)"""
-    plant_metabolic_active_carbon_loss: Optional[float] = None
+    plant_metabolic_active_carbon_loss: float = 0.0
     """plant metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
-    plant_metabolic_active_carbon_remaining: Optional[float] = None
+    plant_metabolic_active_carbon_remaining: float = 0.0
     """plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-    plant_structural_active_carbon_usage: Optional[float] = None
+    plant_structural_active_carbon_usage: float = 0.0
     """plant structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.I.11)"""
-    plant_structural_active_carbon_loss: Optional[float] = None
+    plant_structural_active_carbon_loss: float = 0.0
     """plant structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
-    plant_structural_active_carbon_remaining: Optional[float] = None
+    plant_structural_active_carbon_remaining: float = 0.0
     """plant metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-    plant_structural_slow_carbon_usage: Optional[float] = None
+    plant_structural_slow_carbon_usage: float = 0.0
     """plant structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.I.11)"""
-    plant_structural_slow_carbon_loss: Optional[float] = None
+    plant_structural_slow_carbon_loss: float = 0.0
     """plant structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)"""
-    plant_structural_slow_carbon_remaining: Optional[float] = None
+    plant_structural_slow_carbon_remaining: float = 0.0
     """plant metabolic carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-    soil_metabolic_active_carbon_usage: Optional[float] = None
+    soil_metabolic_active_carbon_usage: float = 0.0
     """soil metabolic carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.8)"""
-    soil_metabolic_active_carbon_loss: Optional[float] = None
+    soil_metabolic_active_carbon_loss: float = 0.0
     """soil metabolic carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
-    soil_metabolic_active_carbon_remaining: Optional[float] = None
+    soil_metabolic_active_carbon_remaining: float = 0.0
     """soil metabolic carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-    soil_structural_active_carbon_usage: Optional[float] = None
+    soil_structural_active_carbon_usage: float = 0.0
     """soil structural carbon decomposed into active carbon (kg/ha) (pseudocode_soil S.6.B.II.11)"""
-    soil_structural_active_carbon_loss: Optional[float] = None
+    soil_structural_active_carbon_loss: float = 0.0
     """soil structural carbon being lost as carbon dioxide during decomposition into active carbon (kg/ha)"""
-    soil_structural_active_carbon_remaining: Optional[float] = None
+    soil_structural_active_carbon_remaining: float = 0.0
     """soil structural carbon decomposed to active carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-    soil_structural_slow_carbon_usage: Optional[float] = None
+    soil_structural_slow_carbon_usage: float = 0.0
     """soil structural carbon decomposed into slow carbon (kg/ha) (pseudocode_soil S.6.B.II.11)"""
-    soil_structural_slow_carbon_loss: Optional[float] = None
+    soil_structural_slow_carbon_loss: float = 0.0
     """soil structural carbon being lost as carbon dioxide during decomposition into slow carbon (kg/ha)"""
-    soil_structural_slow_carbon_remaining: Optional[float] = None
+    soil_structural_slow_carbon_remaining: float = 0.0
     """soil structural carbon decomposed to slow carbon after accounting for carbon dioxide loss (kg/ha)"""
 
-    active_carbon_decomposition_rate: Optional[float] = None
+    active_carbon_decomposition_rate: float = 0.0
     """rate at which active carbon is decomposed into slow or passive carbon and CO2 (%) (pseudocode_soil S.6.C.2)"""
-    carbon_lost_adjusted_factor: Optional[float] = None
+    carbon_lost_adjusted_factor: float = 0.0
     """adjusted factor of CO2 loss from the decomposition of active carbon (pseudocode_soil S.6.C.6)"""
 
     # pseudocode_soil S.6.C.3
-    active_carbon_decomposition_amount: Optional[float] = None
+    active_carbon_decomposition_amount: float = 0.0
     """active carbon decomposed into slow or passive carbon and CO2 (kg/ha)"""
-    active_carbon_amount: Optional[float] = None
+    active_carbon_amount: float = 0.0
     """active carbon stored in the soil (kg/ha)"""
 
     # pseudocode_soil S.6.C.4
-    slow_carbon_amount: Optional[float] = None
+    slow_carbon_amount: float = 0.0
     """slow carbon stored in the soil (kg/ha)"""
-    slow_carbon_decomposition_amount: Optional[float] = None
+    slow_carbon_decomposition_amount: float = 0.0
     """slow carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
 
     # pseudocode_soil S.6.C.5
-    passive_carbon_decomposition_amount: Optional[float] = None
+    passive_carbon_decomposition_amount: float = 0.0
     """passive carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
-    passive_carbon_amount: Optional[float] = None
+    passive_carbon_amount: float = 0.0
     """passive carbon stored in the soil (kg/ha)"""
 
     # pseudocode_soil S.6.C.7
-    active_carbon_to_slow_amount: Optional[float] = None
+    active_carbon_to_slow_amount: float = 0.0
     """active carbon decomposed into slow carbon (kg/ha)"""
-    active_carbon_to_slow_loss: Optional[float] = None
+    active_carbon_to_slow_loss: float = 0.0
     """active carbon lost as CO2 during decomposition into slow carbon (kg/ha)"""
 
     # pseudocode_soil S.6.C.8
-    active_carbon_to_passive_amount: Optional[float] = None
+    active_carbon_to_passive_amount: float = 0.0
     """active carbon decomposed into passive carbon (kg/ha)"""
 
     # pseudocode_soil S.6.C.9
-    slow_to_active_carbon_amount: Optional[float] = None
+    slow_to_active_carbon_amount: float = 0.0
     """slow carbon decomposed into active carbon (kg/ha)"""
-    slow_carbon_co2_lost_amount: Optional[float] = None
+    slow_carbon_co2_lost_amount: float = 0.0
     """slow carbon lost as CO2 during decomposition (kg/ha)"""
-    slow_to_passive_carbon_amount: Optional[float] = None
+    slow_to_passive_carbon_amount: float = 0.0
     """slow carbon decomposed into passive carbon (kg/ha)"""
 
     # pseudocode_soil S.6.C.10
-    passive_to_active_carbon_amount: Optional[float] = None
+    passive_to_active_carbon_amount: float = 0.0
     """passive carbon decomposed into active carbon (kg/ha)"""
-    passive_carbon_co2_lost_amount: Optional[float] = None
+    passive_carbon_co2_lost_amount: float = 0.0
     """passive carbon lost as CO2 during decomposition (kg/ha)"""
 
     # pseudocode_soil S.6.C.11
-    plant_active_decompose_carbon: Optional[float] = None
+    plant_active_decompose_carbon: float = 0.0
     """plant carbon decomposed into the active carbon pool (kg/ha)"""
-    soil_active_decompose_carbon: Optional[float] = None
+    soil_active_decompose_carbon: float = 0.0
     """soil carbon decomposed into the active carbon pool (kg/ha)"""
 
     # --- Phosphorus
@@ -203,36 +203,36 @@ class LayerData:
     """The phosphorus balance on the previous day (unitless)"""
 
     # --- Residue partition
-    plant_metabolic_to_soil_carbon_amount: Optional[float] = None
+    plant_metabolic_to_soil_carbon_amount: float = 0.0
     """metabolic carbon incorporated into soil during tillage (kg/ha)"""
-    plant_structural_carbon_amount: Optional[float] = None
+    plant_structural_carbon_amount: float = 0.0
     """amount of plant structural carbon (kg/ha)"""
-    plant_metabolic_carbon_amount: Optional[float] = None
+    plant_metabolic_carbon_amount: float = 0.0
     """plant metabolic carbon amount (hg/ha)"""
-    tillage_fraction: Optional[float] = None
+    tillage_fraction: float = 0.0
     """Fraction of metabolic carbon incorporated into soil during tillage (unitless)"""
     # TODO: needs to create a method to update this, not sure where it would be
-    structural_carbon_transfer_amount: Optional[float] = None
+    structural_carbon_transfer_amount: float = 0.0
     """the amount of transfer of structural carbon during tillage (kg/ha)"""
-    soil_dry_matter_residue_amount: Optional[float] = None
+    soil_dry_matter_residue_amount: float = 0.0
     """the amount of soil dry matter residue at harvest (kg/ha)"""
-    plant_dry_matter_residue_amount: Optional[float] = None
+    plant_dry_matter_residue_amount: float = 0.0
     """the amount of plant dry matter residue at harvest (kg/ha)"""
-    plant_residue_metabolic_fraction: Optional[float] = None
+    plant_residue_metabolic_fraction: float = 0.0
     """fraction of plant residue that is metabolic (unitless)"""
-    plant_structural_to_slow_or_active_rate: Optional[float] = None
+    plant_structural_to_slow_or_active_rate: float = 0.0
     """the rate at which above ground structural carbon decomposes into slow or active carbon (unitless)"""
-    weighted_residue_dry_matter_lignin_fraction: Optional[float] = None
+    weighted_residue_dry_matter_lignin_fraction: float = 0.0
     """the weighted fractional of lignin amount in residue dry matter (unitless)"""
-    soil_residue_lignin_fraction: Optional[float] = None
+    soil_residue_lignin_fraction: float = 0.0
     """the fraction of soil residue that's comprised of lignin (unitless)"""
-    soil_lignin_to_nitrogen_fraction: Optional[float] = None
+    soil_lignin_to_nitrogen_fraction: float = 0.0
     """soil lignin to nitrogen fraction(unitless)"""
-    soil_residue_metabolic_fraction: Optional[float] = None
+    soil_residue_metabolic_fraction: float = 0.0
     """the fraction of soil residue that is metabolic(unitless)"""
-    soil_metabolic_carbon_amount: Optional[float] = None
+    soil_metabolic_carbon_amount: float = 0.0
     """soil metabolic carbon amount (kg/ha)"""
-    soil_structural_carbon_amount: Optional[float] = None
+    soil_structural_carbon_amount: float = 0.0
     """amount of soil structural carbon decomposed into slow or active carbon (kg/ha)"""
 
     # ---- Nitrogen
