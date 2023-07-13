@@ -119,14 +119,14 @@ def test_process_pen(mocker: MockFixture) -> None:
     )
 
     manure_manager_output_handler = ManureManagerOutputHandler()
-    temp_header_prefixes = ManureManagerOutputHandler.HEADER_PREFIXES
+    temp_header_prefixes = ManureManagerOutputHandler._HEADER_PREFIXES
     mock_pen_prefix = '<test_prefix>'
-    ManureManagerOutputHandler.HEADER_PREFIXES = {
+    ManureManagerOutputHandler._HEADER_PREFIXES = {
         ManureManagerPen: mock_pen_prefix
     }
-    temp_header_primary_delimiter = ManureManagerOutputHandler.HEADER_PRIMARY_DELIMITER
+    temp_header_primary_delimiter = ManureManagerOutputHandler._HEADER_PRIMARY_DELIMITER
     mock_header_primary_delimiter = '<test_primary_delimiter>'
-    ManureManagerOutputHandler.HEADER_PRIMARY_DELIMITER = mock_header_primary_delimiter
+    ManureManagerOutputHandler._HEADER_PRIMARY_DELIMITER = mock_header_primary_delimiter
     pen_data = {
         'pen_id': [pen_id],
         'num_animals': [num_animals],
@@ -149,8 +149,8 @@ def test_process_pen(mocker: MockFixture) -> None:
     assert actual_pen_dataframe_dict == expected_pen_dataframe_dict
 
     # Cleanup
-    ManureManagerOutputHandler.HEADER_PREFIXES = temp_header_prefixes
-    ManureManagerOutputHandler.HEADER_PRIMARY_DELIMITER = temp_header_primary_delimiter
+    ManureManagerOutputHandler._HEADER_PREFIXES = temp_header_prefixes
+    ManureManagerOutputHandler._HEADER_PRIMARY_DELIMITER = temp_header_primary_delimiter
 
 
 def test_process_dataclass_output_obj(mocker: MockFixture) -> None:
@@ -181,18 +181,18 @@ def test_process_dataclass_output_obj(mocker: MockFixture) -> None:
             'fields',
             return_value=mock_dataclass_fields
     )
-    temp_header_prefixes = ManureManagerOutputHandler.HEADER_PREFIXES
+    temp_header_prefixes = ManureManagerOutputHandler._HEADER_PREFIXES
     mock_header_prefix = '<test_header_prefix>'
-    ManureManagerOutputHandler.HEADER_PREFIXES = {
+    ManureManagerOutputHandler._HEADER_PREFIXES = {
         mock_obj_type: mock_header_prefix
     }
-    temp_header_secondary_delimiter = ManureManagerOutputHandler.HEADER_SECONDARY_DELIMITER
+    temp_header_secondary_delimiter = ManureManagerOutputHandler._HEADER_SECONDARY_DELIMITER
     mock_header_secondary_delimiter = '<test_header_secondary_delimiter>'
-    ManureManagerOutputHandler.HEADER_SECONDARY_DELIMITER = mock_header_secondary_delimiter
+    ManureManagerOutputHandler._HEADER_SECONDARY_DELIMITER = mock_header_secondary_delimiter
 
-    temp_header_primary_delimiter = ManureManagerOutputHandler.HEADER_PRIMARY_DELIMITER
+    temp_header_primary_delimiter = ManureManagerOutputHandler._HEADER_PRIMARY_DELIMITER
     mock_header_primary_delimiter = '<test_header_primary_delimiter>'
-    ManureManagerOutputHandler.HEADER_PRIMARY_DELIMITER = mock_header_primary_delimiter
+    ManureManagerOutputHandler._HEADER_PRIMARY_DELIMITER = mock_header_primary_delimiter
 
     # Act
     actual_dataframe_dict = manure_manager_output_handler._process_dataclass_output_obj(
@@ -212,9 +212,9 @@ def test_process_dataclass_output_obj(mocker: MockFixture) -> None:
     )
 
     # Cleanup
-    ManureManagerOutputHandler.HEADER_PREFIXES = temp_header_prefixes
-    ManureManagerOutputHandler.HEADER_SECONDARY_DELIMITER = temp_header_secondary_delimiter
-    ManureManagerOutputHandler.HEADER_PRIMARY_DELIMITER = temp_header_primary_delimiter
+    ManureManagerOutputHandler._HEADER_PREFIXES = temp_header_prefixes
+    ManureManagerOutputHandler._HEADER_SECONDARY_DELIMITER = temp_header_secondary_delimiter
+    ManureManagerOutputHandler._HEADER_PRIMARY_DELIMITER = temp_header_primary_delimiter
 
 
 def test_append_daily_update_output_for_pen(mocker: MockFixture) -> None:
