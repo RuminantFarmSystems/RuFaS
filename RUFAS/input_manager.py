@@ -215,6 +215,8 @@ class InputManager:
         default_value = self._fix_with_default(metadata_variable_path, pool_variable_path)
         om.add_warning("Data fixed", f"Invalid data fixed: {variable_name}: {value} => {default_value}", info_map)
 
+        return True
+
     def _find_variable(self, variable_name: str, search_dict: dict = None, variable_path: [str] = None) -> Any:
         """
         Searches if a variable with name 'variable_name' exists in the dictionary 'search_dict'. Returns the path to
