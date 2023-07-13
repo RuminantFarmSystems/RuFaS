@@ -149,8 +149,11 @@ class InputManager:
 
         Parameters
         ----------
-        key : str
-            The key of the data to validate.
+        module_key : str
+            The key of the module to which the data to validate belongs.
+
+        variable_name : str
+            The name of the variable to validate.
 
         value : Any
             The value of the data to validate.
