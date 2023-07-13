@@ -205,9 +205,7 @@ class InputManager:
                         om.add_warning("Value out of range.", f"{variable_name=}", info_map)
                     return is_in_range
                 else:
-                    om.add_error("Metadata must have minimum or maximum to validate number.", f"{variable_name=}",
-                                 info_map)
-                    return False
+                    return True
             elif var_type == "array":
                 if variable_properties["minimum_length"] and variable_properties["maximum_length"]:
                     is_in_range = variable_properties["minimum_length"] <= value <= \
@@ -226,9 +224,6 @@ class InputManager:
                         om.add_warning("Array out of length range.", f"{variable_name=}", info_map)
                     return is_in_range
                 else:
-                    om.add_error("Metadata must have either minimum or maximum length to validate array.",
-                                 f"{variable_name=}",
-                                 info_map)
                     return False
             elif var_type == "boolean":
                 return value in (True, False)
