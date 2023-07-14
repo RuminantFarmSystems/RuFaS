@@ -45,7 +45,7 @@ def methane_mitigation(NDF_concentration: float,
         Reduction in methane yield (methane production/DMI), %.   
     """
 
-    # methane_yield_reduction = 0.0
+    methane_yield_reduction = 0.0
     # NOP_lower_bound = 40
     # NOP_upper_bound = 100
     # Monensin_lower_bound = 16
