@@ -45,18 +45,20 @@ def methane_mitigation(NDF_concentration: float,
         Reduction in methane yield (methane production/DMI), %.   
     """
 
-    methane_yield_reduction = 0.0
-    NOP_lower_bound = 40
-    NOP_upper_bound = 100
-    Monensin_lower_bound = 16
-    Monensin_upper_bound = 36
+    # methane_yield_reduction = 0.0
+    # NOP_lower_bound = 40
+    # NOP_upper_bound = 100
+    # Monensin_lower_bound = 16
+    # Monensin_upper_bound = 36
     Monensin_CP_lower_bound = 15
     Monensin_CP_upper_bound = 19
 
-    if methane_mitigation_method == "3-NOP" and NOP_lower_bound <= methane_mitigation_additive_amount <= NOP_upper_bound:
+    # if methane_mitigation_method == "3-NOP" and NOP_lower_bound <= methane_mitigation_additive_amount <= NOP_upper_bound:
+    if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
-    elif methane_mitigation_method == "Monensin" and Monensin_lower_bound < methane_mitigation_additive_amount <= Monensin_upper_bound:
+    # elif methane_mitigation_method == "Monensin" and Monensin_lower_bound < methane_mitigation_additive_amount <= Monensin_upper_bound:
+    elif methane_mitigation_method == "Monensin":    
         if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
             methane_yield_reduction = (0.30054 - 0.00377 *
                                        methane_mitigation_additive_amount - 1.57832 * CP_concentration/100) * 100
