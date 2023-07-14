@@ -28,4 +28,4 @@ show_missing = True
 ignore_errors = True
 
 [json]
-output = docs/coverage/coverage.json
+output = .github/workflows/coverage.json

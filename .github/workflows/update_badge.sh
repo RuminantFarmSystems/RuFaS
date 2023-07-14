@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Parse coverage report JSON file to find the coverage percentage
-coverage_percentage=$( jq -r '.totals.percent_covered_display' ./docs/coverage/coverage.json )
+coverage_percentage=$( jq -r '.totals.percent_covered_display' ./.github/workflows/coverage.json )
 echo "$coverage_percentage"
 
 # Assign color accordingly
