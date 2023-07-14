@@ -41,7 +41,7 @@ jobs:
         coverage run --rcfile=.coveragerc
         coverage report --rcfile=.coveragerc
         coverage json --rcfile=.coveragerc
-        echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' ./.github.workflows/coverage.json )" >> "$GITHUB_ENV"
+        echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' ./.github/workflows/coverage.json )" >> "$GITHUB_ENV"
         echo "${{ env.COVERAGE_PERCENTAGE }}"
 
     # Generate a Shields.io static badge and update README.md coverage badge link
