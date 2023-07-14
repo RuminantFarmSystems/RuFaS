@@ -455,7 +455,7 @@ class OutputManager(object):
         self.add_log("num_filter_pattern_matches", filter_log_count_msg, info_map)
         return filter_pattern_matches
 
-    def save_variables(self, save_path: str, dir_path: str = r"output/output_filters/",
+    def save_variables(self, save_path: str, dir_path: str,
                        exclude_info_maps: bool = False) -> None:
         """
         Reads a text file containing a list of keys and filters the variables pool by those keys.
@@ -477,14 +477,6 @@ class OutputManager(object):
                     "function": self.save_variables.__name__,
                     }
         self.add_log("exclude_info_maps", f"exclude_info_maps flag set to {exclude_info_maps}", info_map)
-
-        cwd = os.getcwd()
-        if not dir_path == 'dummy_dir_path/':
-            if '\\' in cwd:
-                dir_path = cwd.split('MASM')[1].count('\\') * '../' + dir_path
-            elif '/' in cwd:
-                dir_path = cwd.split('MASM')[1].count('/') * '../' + dir_path
-
         list_of_filter_files = self._list_txt_file_names_in_dir(dir_path)
         for filter_file in list_of_filter_files:
             input_path = os.path.join(dir_path, filter_file)
@@ -615,8 +607,7 @@ class OutputManager(object):
         """
         dumps all pool into the given path to a directory.
         """
-        # self.dump_variables(path, exclude_info_maps=exclude_info_maps)
-        self.save_variables(path, dir_path=r"output/output_filters/", exclude_info_maps=exclude_info_maps)
+        self.dump_variables(path, exclude_info_maps=exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
