@@ -6,7 +6,6 @@ import pandas as pd
 from RUFAS.output_manager import OutputManager
 from typing import Any, Dict
 
-
 om = OutputManager()
 
 
@@ -53,7 +52,7 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _load_data(self) -> None:
+    def _load_data(self, eager_termination: bool = True) -> None:
         """
         Loads data from JSON or CSV file.
 
@@ -71,11 +70,29 @@ class InputManager:
         for key, details in files_details.items():
             file_path = details[path_key]
             om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
+            property_map_key = files_details[key]["properties"]
+            properties = self.__metadata["properties"][property_map_key]
             try:
                 if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
-                        self.__pool[key] = data
+                        for element in properties.keys():
+                            if data[element]:
+                                is_element_good = self._validate_element(element, eager_termination)
+                                if is_element_good:
+                                    self.__pool[element] = data[element]
+                                else:
+                                    # TODO
+                                    # return false?
+                                    # raise exception?
+                                    pass
+                            elif self.__metadata["properties"][element]["default"]:
+                                self.__pool[element] = self.__metadata["properties"][element]["default"]
+                            else:
+                                # TODO figure out what to do here
+                                # raise exception?
+                                # log error and return to raise exception in start()?
+                                pass
                         om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
                                    info_map)
                 elif details["type"] == "csv":
@@ -92,7 +109,7 @@ class InputManager:
             except Exception as e:
                 raise e
 
-    def _validate_data(self, eager_termination: bool = True) -> bool:
+    def _validate_data(self, key: str, eager_termination: bool = True) -> bool:
         """
         Validates input data and attempts to fix any invalid input data.
 
@@ -115,32 +132,57 @@ class InputManager:
         invalid_critical_elements_counter = 0
         total_elements_checked_counter = 0
 
-        for key in self.__pool.keys():
-            for variable, value in self.__pool[key].items():
-                total_elements_checked_counter += 1
-                if self._validate_element(variable, value):
-                    valid_elements_counter += 1
-                else:
-                    invalid_elements_counter += 1
-                    is_data_fixed = self._fix_data(variable, value)
-                    if is_data_fixed:
-                        fixed_elements_counter += 1
-                    elif not is_data_fixed and eager_termination:
-                        invalid_critical_elements_counter += 1
-                        return False
-                    else:
-                        invalid_critical_elements_counter += 1
+        key_hiererachy = key.split('.')
+        root_key = key_hiererachy[0]
+        # is_nested = check if self._metadata["properties"][root_key] is dict #check this, if it wrong
+        variable_to_check = self.__metadata["properties"][root_key]
+        is_nested = isinstance(variable_to_check, dict)
+        if is_nested:
+            children_status: Dict[str, bool] = {}
+            false_counter = 0
+            for nested_key in self._metadata["properties"][key].keys():
+                whole_key = f"{key}.{nested_key}"
+                child_status = self._validate_data(self, whole_key, eager_termination)
+                if eager_termination and not child_status:
+                    return False            
+                children_status[whole_key] = child_status
+                if not child_status:
+                    false_counter += 1
+            is_valid = false_counter == 0
+            if is_valid:
+                return True
+            else:
+                # TODO logging
+                return False
+        # do regular checks for flat types
+        
 
-        om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
-        om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
-        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
+        # for key in self.__pool.keys():
+        #     for variable, value in self.__pool[key].items():
+        #         total_elements_checked_counter += 1
+        #         if self._validate_element(variable, value):
+        #             valid_elements_counter += 1
+        #         else:
+        #             invalid_elements_counter += 1
+        #             is_data_fixed = self._fix_data(key, variable, value)
+        #             if is_data_fixed:
+        #                 fixed_elements_counter += 1
+        #             elif not is_data_fixed and eager_termination:
+        #                 invalid_critical_elements_counter += 1
+        #                 return False
+        #             else:
+        #                 invalid_critical_elements_counter += 1
 
-        if invalid_critical_elements_counter > 0:
-            return False
+        # om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
+        # om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
+        # om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
+        # om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
+        # om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
 
-        return True
+        # if invalid_critical_elements_counter > 0:
+        #     return False
+
+        # return True
 
     def _validate_element(self, key: str, value: Any) -> bool:
         """
