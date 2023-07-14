@@ -18,7 +18,7 @@
 
 # ignore temporary files generated when checking code coverage
 .coverage
-docs/coverage/coverage.json
+.github/workflows/coverage.json
 
 # ignore python compiled files
 *.pyc
