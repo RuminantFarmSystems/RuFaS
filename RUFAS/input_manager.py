@@ -1,5 +1,6 @@
 # !/usr/bin/env python3
 
+from functools import reduce
 import json
 
 import pandas as pd
@@ -117,7 +118,7 @@ class InputManager:
             except Exception as e:
                 raise e
 
-    def _validate_data(self, key: str, property_map_key, eager_termination: bool = True) -> bool:
+    def _validate_data(self, element: str, property_map_key, eager_termination: bool = True) -> bool:
         """
         Validates input data and attempts to fix any invalid input data.
 
@@ -134,17 +135,17 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
-        key_hiererachy = key.split('.')
-        root_key = key_hiererachy[0]  # if key 
-        # will next line always just be checking the first piece of the path to the nested variable?
+        # key_hiererachy = element.split('.')
+        # root_key = key_hiererachy[0]  # if key
+        # key_to_search = ''.join(f"[{key}]" for key in key_hiererachy)
 
-        variable_to_check = self.__metadata["properties"][property_map_key][root_key]
+        variable_to_check = self._get_value_from_nested_dictionary(element, property_map_key)
         is_nested = isinstance(variable_to_check, dict)
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
-            for nested_key in self._metadata["properties"][key].keys():
-                whole_key = f"{key}.{nested_key}"
+            for nested_key in variable_to_check.keys():
+                whole_key = f"{element}.{nested_key}"
                 child_status = self._validate_data(self, whole_key, property_map_key, eager_termination)
                 if eager_termination and not child_status:
                     return False
@@ -158,7 +159,7 @@ class InputManager:
                 # TODO logging
                 return False
         else:
-            self._validate_element(root_key, variable_to_check)
+            pass
         # do regular checks for flat types
 
         # for key in self.__pool.keys():
@@ -187,6 +188,11 @@ class InputManager:
         #     return False
 
         # return True
+
+    def _get_value_from_nested_dictionary(self, key_path, property_map_key):
+        keys = key_path.split('.')
+        result = reduce(lambda d, key: d[key], keys, self.__metadata["properties"][property_map_key])
+        return result
 
     def _validate_element(self, key: str, value: Any) -> bool:
         """
