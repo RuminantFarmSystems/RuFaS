@@ -162,7 +162,7 @@
        "crop_species": {
         "type": "string",
         "description": "the name of the crop being grown",
-        "pattern": ".{1,50}"
+        "pattern": ".{a-z,A-Z,_}"
       },
       "harvest_days": {
         "type": "array",
@@ -171,8 +171,20 @@
       },
       "harvest_years": {
         "type": "array",
-        "description": "Years in which the harvesting occurs",
+        "description": "Calendar years in which the harvesting occurs",
         "minimum_length": 1
+      },
+      "harvest_operations": {
+        "type": "array",
+        "description": "Operation(s) with which this crop will be harvested.",
+        "minimum_length": 1,
+        "default": ["default"]
+      },
+      "harvest_type": {
+        "type": "array",
+        "description": "Whether the crop uses scheduled harvests or optimal harvests",
+        "minimum_length": 1,
+        "default": ["scheduled"]
       },
       "planting_days": {
         "type": "array",
@@ -181,8 +193,20 @@
       },
       "planting_years": {
         "type": "array",
-        "description": "Years in which the planting occurs",
+        "description": "Calendar years in which the planting occurs",
         "minimum_length": 1
+      },
+      "pattern_repeat": {
+        "type": "number",
+        "description": "Number of times that this crop schedule should be repeated.",
+        "minimum": 0,
+        "default": 0
+      },
+      "pattern_skip": {
+        "type": "number",
+        "description": "Number of years to be skipped between schedule repetitions.",
+        "minimum": 0,
+        "default": 0
       }
     },
     "economic_properties": {
