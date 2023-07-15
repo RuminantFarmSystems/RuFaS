@@ -56,6 +56,13 @@
       "type": "json",
       "properties": "soil_properties"
     },
+    "field_management": {
+      "title": "Field Management Configuration",
+      "description": "Fertilizer, manure, and tillage application schedules",
+      "path": "field_management/example_field_management.json",
+      "type": "json",
+      "properties": "field_management_properties"
+    },
     "weather": {
       "title": "Weather data",
       "description": "Let's turn on the AC",
