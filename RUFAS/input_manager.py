@@ -5,7 +5,7 @@ import json
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 om = OutputManager()
 
@@ -109,12 +109,6 @@ class InputManager:
 
         Parameters
         ----------
-        element : str
-            The element from the data pool to be validated.
-
-        property_map_kay : str
-            The metadata properties section for the data input file being checked.
-
         eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
 
@@ -132,13 +126,13 @@ class InputManager:
         invalid_critical_elements_counter = 0
         total_elements_checked_counter = 0
 
-        for key in self.__pool.keys():
+        for module_key in self.__pool.keys():
             files_details = self.__metadata["files"]
-            property_map_key = files_details[key]["properties"]
+            property_map_key = files_details[module_key]["properties"]
             module_properties = self.__metadata["properties"][property_map_key]
             for element in module_properties.keys():
                 total_elements_checked_counter += 1
-                is_valid = self._validate_element(element, property_map_key)
+                is_valid = self._validate_element(module_key, element, property_map_key)
                 if is_valid:
                     valid_elements_counter += 1
                 else:
@@ -163,14 +157,14 @@ class InputManager:
 
         return True
 
-    def _get_value_from_nested_dictionary(self, key_path: str, property_map_key: str) -> Dict[str, Any]:
+    def _get_value_from_metadata(self, element_heirarchy: List[str], property_map_key: str) -> Dict[str, Any]:
         """
         Convert and then use string path to search metadata for value.
 
         Parameters
         ----------
-        key_path : str
-            The string path to the data being checked.
+        element_heirarchy : str
+            The nested element heirarchy of the data being checked.
 
         property_map_kay : str
             The metadata properties section for the data input file being checked.
@@ -180,11 +174,10 @@ class InputManager:
         result : Dict[str, Any]
             The nested metadata structure found by the path.
         """
-        keys = key_path.split('.')
-        result = reduce(lambda d, key: d[key], keys, self.__metadata["properties"][property_map_key])
+        result = reduce(lambda d, key: d[key], element_heirarchy, self.__metadata["properties"][property_map_key])
         return result
 
-    def _validate_element(self, element: str, property_map_key: str, eager_termination: bool = True) -> bool:
+    def _validate_element(self, module_key: str, element: str, property_map_key: str, eager_termination: bool = True) -> bool:
         """
         Perform data validation checks.
 
@@ -195,13 +188,17 @@ class InputManager:
 
         property_map_kay : str
             The metadata properties section for the data input file being checked.
+        
+        eager_termination : bool, default=True
+            If true, the process will be terminated upon finding invalid data.
 
         Returns
         -------
         bool
             True if the data is valid, False otherwise.
         """
-        variable_to_check = self._get_value_from_nested_dictionary(element, property_map_key)
+        element_heirarchy = element.split(".")
+        variable_to_check = self._get_value_from_metadata(element_heirarchy, property_map_key)
         non_nested_types = ["number", "string", "boolean", "array"]
         if variable_to_check["type"] in non_nested_types:
             is_nested = False
@@ -228,7 +225,81 @@ class InputManager:
                 # TODO logging
                 return False
         else:
-            pass
+            var_type = variable_to_check["type"]
+            if var_type == "string":
+                is_valid = self._validate_string_element(module_key, element_heirarchy, variable_to_check)
+            elif var_type == "number":
+                is_valid = self._validate_num_element(module_key, element_heirarchy, variable_to_check)
+            elif var_type == "boolean":
+                is_valid = self._validate_bool_element(module_key, element_heirarchy, variable_to_check)
+            else:
+                is_valid = self._validate_array_type_element(module_key, element_heirarchy, variable_to_check)
+
+            return is_valid
+
+    def _get_value_from_pool(self, module_key: str, element_heirarchy: List[str]) -> Any:
+        """
+        Convert and then use string path to get value for variable being checked.
+
+        Parameters
+        ----------
+        element_heirarchy : str
+            The nested element heirarchy of the data being checked.
+
+        property_map_kay : str
+            The metadata properties section for the data input file being checked.
+
+        Returns
+        -------
+        result : Dict[str, Any]
+            The nested metadata structure found by the path.
+        """
+        result = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
+        return result
+
+    def _validate_string_element(self, module_key: str,
+                                 element_heirarchy: List[str],
+                                 variable_to_check: Dict[str, Any]) -> bool:
+        """
+        Validates a __pool string element.
+
+        Parameters
+        ----------
+        module_key : str
+            The module whose data is currently being validated.
+
+        element_heirarchy : str
+            The nested element heirarchy of the data being checked.
+
+        variable_to_check : str
+            A dictionary with the metadata validation guidelines.
+
+        Returns:
+        bool
+            Returns True if variable meets guidelines; otherwise False.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_string_element.__name__,
+                    }
+        value = self._get_value_from_pool(module_key, element_heirarchy)
+        var_name = element_heirarchy[-1]
+        if variable_to_check["minimum"] and variable_to_check["maximum"]:
+            is_in_range = variable_to_check["minimum"] <= value <= variable_to_check["maximum"]
+            if not is_in_range:
+                om.add_warning("Value out of range.", f"{var_name=}", info_map)
+            return is_in_range
+        elif variable_to_check["minimum"]:
+            is_in_range = variable_to_check["minimum"] <= value
+            if not is_in_range:
+                om.add_warning("Value out of range.", f"{var_name=}", info_map)
+            return is_in_range
+        elif variable_to_check["maximum"]:
+            is_in_range = value <= variable_to_check["maximum"]
+            if not is_in_range:
+                om.add_warning("Value out of range.", f"{var_name=}", info_map)
+            return is_in_range
+        else:
+            return True
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
