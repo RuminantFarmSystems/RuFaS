@@ -72,13 +72,13 @@ class InputManager:
             file_path = details[path_key]
             om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
             property_map_key = files_details[key]["properties"]
-            properties = self.__metadata["properties"][property_map_key]
+            module_properties = self.__metadata["properties"][property_map_key]
             try:
                 if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
                         # check metadata properties
-                        for element in properties.keys():
+                        for element in module_properties.keys():
                             # if the element is present in the data loaded from the json file
                             if data[element]:
                                 # check validity of the individual element
@@ -88,7 +88,7 @@ class InputManager:
                                     self.__pool[element] = data[element]
                                 else:
                                     # TODO
-                                    # return false?
+                                    # if eager_termination -> stop process
                                     # raise exception?
                                     pass
                             # if the element is not present in the data and there is a default present,
@@ -141,16 +141,14 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
-        # get the path for the value being checked.
         variable_to_check = self._get_value_from_nested_dictionary(element, property_map_key)
-        # is_nested = isinstance(variable_to_check, dict)
         non_nested_types = ["number", "string", "boolean", "array"]
         if variable_to_check["type"] in non_nested_types:
             is_nested = False
         elif variable_to_check["type"] == "object":
             is_nested = True
         else:
-            # assume if no type then is object?
+            # assume if no type then is object and make is_nested False?
             is_nested = False
         if is_nested:
             children_status: Dict[str, bool] = {}
@@ -158,8 +156,7 @@ class InputManager:
             for nested_key in variable_to_check.keys():
                 whole_key = f"{element}.{nested_key}"
                 child_status = self._validate_data(self, whole_key, property_map_key, eager_termination)
-
-                if eager_termination and not child_status:  # when is this happening?
+                if eager_termination and not child_status:
                     return False
                 children_status[whole_key] = child_status
                 if not child_status:
@@ -171,7 +168,9 @@ class InputManager:
                 # TODO logging
                 return False
         else:
+            # issue: data element is just stored locally by load function
             pass
+
         # do regular checks for flat types
 
         # for key in self.__pool.keys():
@@ -201,7 +200,23 @@ class InputManager:
 
         # return True
 
-    def _get_value_from_nested_dictionary(self, key_path, property_map_key):
+    def _get_value_from_nested_dictionary(self, key_path: str, property_map_key: str) -> Dict[str, Any]:
+        """
+        Convert and then use string path to search metadata for value.
+
+        Parameters
+        ----------
+        key_path : str
+            The string path to the data being checked.
+
+        property_map_kay : str
+            The metadata properties section for the data input file being checked.
+
+        Returns
+        -------
+        result : Dict[str, Any]
+            The nested metadata structure found by the path.
+        """
         keys = key_path.split('.')
         result = reduce(lambda d, key: d[key], keys, self.__metadata["properties"][property_map_key])
         return result
