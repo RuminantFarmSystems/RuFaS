@@ -118,12 +118,18 @@ class InputManager:
             except Exception as e:
                 raise e
 
-    def _validate_data(self, element: str, property_map_key, eager_termination: bool = True) -> bool:
+    def _validate_data(self, element: str, property_map_key: str, eager_termination: bool = True) -> bool:
         """
         Validates input data and attempts to fix any invalid input data.
 
         Parameters
         ----------
+        element : str
+            The element from the data pool to be validated.
+
+        property_map_kay : str
+            The metadata properties section for the data input file being checked.
+
         eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
 
@@ -135,19 +141,25 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
-        # key_hiererachy = element.split('.')
-        # root_key = key_hiererachy[0]  # if key
-        # key_to_search = ''.join(f"[{key}]" for key in key_hiererachy)
-
+        # get the path for the value being checked.
         variable_to_check = self._get_value_from_nested_dictionary(element, property_map_key)
-        is_nested = isinstance(variable_to_check, dict)
+        # is_nested = isinstance(variable_to_check, dict)
+        non_nested_types = ["number", "string", "boolean", "array"]
+        if variable_to_check["type"] in non_nested_types:
+            is_nested = False
+        elif variable_to_check["type"] == "object":
+            is_nested = True
+        else:
+            # assume if no type then is object?
+            is_nested = False
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
             for nested_key in variable_to_check.keys():
                 whole_key = f"{element}.{nested_key}"
                 child_status = self._validate_data(self, whole_key, property_map_key, eager_termination)
-                if eager_termination and not child_status:
+
+                if eager_termination and not child_status:  # when is this happening?
                     return False
                 children_status[whole_key] = child_status
                 if not child_status:
