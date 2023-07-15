@@ -2,6 +2,7 @@
 
 from functools import reduce
 import json
+import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
@@ -177,7 +178,8 @@ class InputManager:
         result = reduce(lambda d, key: d[key], element_heirarchy, self.__metadata["properties"][property_map_key])
         return result
 
-    def _validate_element(self, module_key: str, element: str, property_map_key: str, eager_termination: bool = True) -> bool:
+    def _validate_element(self, module_key: str, element: str,
+                          property_map_key: str, eager_termination: bool = True) -> bool:
         """
         Perform data validation checks.
 
@@ -188,7 +190,7 @@ class InputManager:
 
         property_map_kay : str
             The metadata properties section for the data input file being checked.
-        
+
         eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
 
@@ -227,11 +229,11 @@ class InputManager:
         else:
             var_type = variable_to_check["type"]
             if var_type == "string":
-                is_valid = self._validate_string_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_string_type_element(module_key, element_heirarchy, variable_to_check)
             elif var_type == "number":
-                is_valid = self._validate_num_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_number_type_element(module_key, element_heirarchy, variable_to_check)
             elif var_type == "boolean":
-                is_valid = self._validate_bool_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_bool_type_element(module_key, element_heirarchy, variable_to_check)
             else:
                 is_valid = self._validate_array_type_element(module_key, element_heirarchy, variable_to_check)
 
@@ -257,11 +259,11 @@ class InputManager:
         result = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
         return result
 
-    def _validate_string_element(self, module_key: str,
-                                 element_heirarchy: List[str],
-                                 variable_to_check: Dict[str, Any]) -> bool:
+    def _validate_array_type_element(self, module_key: str,
+                                     element_heirarchy: List[str],
+                                     variable_to_check: Dict[str, Any]) -> bool:
         """
-        Validates a __pool string element.
+        Validates a __pool element when the element is an array.
 
         Parameters
         ----------
@@ -274,12 +276,83 @@ class InputManager:
         variable_to_check : str
             A dictionary with the metadata validation guidelines.
 
-        Returns:
+        Returns
+        -------
         bool
             Returns True if variable meets guidelines; otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_string_element.__name__,
+                    "function": self._validate_number_element.__name__,
+                    }
+        value = self._get_value_from_pool(module_key, element_heirarchy)
+        var_name = element_heirarchy[-1]
+        if variable_to_check["minimum_length"] and variable_to_check["maximum_length"]:
+            is_in_range = variable_to_check["minimum_length"] <= value <= \
+                variable_to_check["maximum_length"]
+            if not is_in_range:
+                om.add_warning("Array out of length range.", f"{var_name=}", info_map)
+            return is_in_range
+        elif variable_to_check["minimum_length"]:
+            is_in_range = variable_to_check["minimum_length"] <= value
+            if not is_in_range:
+                om.add_warning("Array out of length range.", f"{var_name=}", info_map)
+            return is_in_range
+        elif variable_to_check["maximum_length"]:
+            is_in_range = value <= variable_to_check["maximum_length"]
+            if not is_in_range:
+                om.add_warning("Array out of length range.", f"{var_name=}", info_map)
+            return is_in_range
+        else:
+            return False
+
+    def _validate_boolean_type_element(self, module_key: str,
+                                       element_heirarchy: List[str]) -> bool:
+        """
+        Validates a __pool boolean element.
+
+        Parameters
+        ----------
+        module_key : str
+            The module whose data is currently being validated.
+
+        element_heirarchy : str
+            The nested element heirarchy of the data being checked.
+
+        variable_to_check : str
+            A dictionary with the metadata validation guidelines.
+
+        Returns
+        -------
+        bool
+            Returns True if variable meets guidelines; otherwise False.
+        """
+        value = self._get_value_from_pool(module_key, element_heirarchy)
+        return value in (True, False)
+
+    def _validate_number_element(self, module_key: str,
+                                 element_heirarchy: List[str],
+                                 variable_to_check: Dict[str, Any]) -> bool:
+        """
+        Validates a __pool number element.
+
+        Parameters
+        ----------
+        module_key : str
+            The module whose data is currently being validated.
+
+        element_heirarchy : str
+            The nested element heirarchy of the data being checked.
+
+        variable_to_check : str
+            A dictionary with the metadata validation guidelines.
+
+        Returns
+        -------
+        bool
+            Returns True if variable meets guidelines; otherwise False.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_number_element.__name__,
                     }
         value = self._get_value_from_pool(module_key, element_heirarchy)
         var_name = element_heirarchy[-1]
@@ -300,6 +373,44 @@ class InputManager:
             return is_in_range
         else:
             return True
+
+    def _validate_string_element(self, module_key: str,
+                                 element_heirarchy: List[str],
+                                 variable_to_check: Dict[str, Any]) -> bool:
+        """
+        Validates a __pool string element.
+
+        Parameters
+        ----------
+        module_key : str
+            The module whose data is currently being validated.
+
+        element_heirarchy : str
+            The nested element heirarchy of the data being checked.
+
+        variable_to_check : str
+            A dictionary with the metadata validation guidelines.
+
+        Returns
+        -------
+        bool
+            Returns True if variable meets guidelines; otherwise False.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_string_element.__name__,
+                    }
+        value = self._get_value_from_pool(module_key, element_heirarchy)
+        var_name = element_heirarchy[-1]
+        if variable_to_check["pattern"]:
+            is_match = bool(re.match(variable_to_check["pattern"], value))
+            if not is_match:
+                om.add_warning(f"String variable must match pattern {variable_to_check['pattern']}.",
+                               f"{var_name=}",
+                               info_map)
+            return is_match
+        else:
+            om.add_error("Metadata must have pattern to match string to.", f"{var_name=}", info_map)
+            return False
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
