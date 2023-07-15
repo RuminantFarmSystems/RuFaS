@@ -76,9 +76,13 @@ class InputManager:
                 if details["type"] == "json":
                     with open(file_path) as json_file:
                         data = json.load(json_file)
+                        # check metadata properties
                         for element in properties.keys():
+                            # if the element is present in the data loaded from the json file
                             if data[element]:
-                                is_element_good = self._validate_element(element, eager_termination)
+                                # check validity of the individual element
+                                is_element_good = self._validate_data(element, property_map_key, eager_termination)
+                                # if it is valid, add it to the pool
                                 if is_element_good:
                                     self.__pool[element] = data[element]
                                 else:
@@ -86,8 +90,12 @@ class InputManager:
                                     # return false?
                                     # raise exception?
                                     pass
+                            # if the element is not present in the data and there is a default present,
+                            # add the default to the pool
                             elif self.__metadata["properties"][element]["default"]:
                                 self.__pool[element] = self.__metadata["properties"][element]["default"]
+                                # TODO need "default" field at metadata object level for an object that's
+                                # missing from input data?
                             else:
                                 # TODO figure out what to do here
                                 # raise exception?
@@ -109,7 +117,7 @@ class InputManager:
             except Exception as e:
                 raise e
 
-    def _validate_data(self, key: str, eager_termination: bool = True) -> bool:
+    def _validate_data(self, key: str, property_map_key, eager_termination: bool = True) -> bool:
         """
         Validates input data and attempts to fix any invalid input data.
 
@@ -126,25 +134,20 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
-        valid_elements_counter = 0
-        invalid_elements_counter = 0
-        fixed_elements_counter = 0
-        invalid_critical_elements_counter = 0
-        total_elements_checked_counter = 0
-
         key_hiererachy = key.split('.')
-        root_key = key_hiererachy[0]
-        # is_nested = check if self._metadata["properties"][root_key] is dict #check this, if it wrong
-        variable_to_check = self.__metadata["properties"][root_key]
+        root_key = key_hiererachy[0]  # if key 
+        # will next line always just be checking the first piece of the path to the nested variable?
+
+        variable_to_check = self.__metadata["properties"][property_map_key][root_key]
         is_nested = isinstance(variable_to_check, dict)
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
             for nested_key in self._metadata["properties"][key].keys():
                 whole_key = f"{key}.{nested_key}"
-                child_status = self._validate_data(self, whole_key, eager_termination)
+                child_status = self._validate_data(self, whole_key, property_map_key, eager_termination)
                 if eager_termination and not child_status:
-                    return False            
+                    return False
                 children_status[whole_key] = child_status
                 if not child_status:
                     false_counter += 1
@@ -154,8 +157,9 @@ class InputManager:
             else:
                 # TODO logging
                 return False
+        else:
+            self._validate_element(root_key, variable_to_check)
         # do regular checks for flat types
-        
 
         # for key in self.__pool.keys():
         #     for variable, value in self.__pool[key].items():
