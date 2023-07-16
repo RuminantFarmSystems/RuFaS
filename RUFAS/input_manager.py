@@ -4,7 +4,7 @@ import json
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 om = OutputManager()
 
@@ -167,158 +167,38 @@ class InputManager:
         # om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
         pass
 
-    def _fix_data(self, module_key: str, variable_name: str, value: Any) -> bool:
+    def _fix_data(self, variable_path: List[str]) -> bool:
         """
         Attempt to fix the invalid data.
-        Return True if the data is fixed, False otherwise
+        Return True if the data is fixed, False for critical data
 
         Parameters
         ----------
-        module_key : str
-            The key of the module which the data to fix belongs to
-
-        variable_name : str
-            The key of the data to fix.
-
-        value : Any
-            The value of the data to fix.
+        variable_path : List[str]
+            The path to reach the variable of interest.
 
         Returns
         -------
         bool
-            True if the data is fixed, False otherwise.
+            True if the data is fixed, False for critical data.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._fix_data.__name__,
                     }
 
-        # Recursively check if the variable of interest exists in metadata
-        metadata_variable_path = self._find_variable(variable_name, self.__metadata['properties'], [])
-
-        # if variable of interest is found, find the path in pool
-        if metadata_variable_path:
-            pool_variable_path = self._find_variable(variable_name, self.__pool[module_key], [module_key])
-
-        # if no variable with such name is found, return False
-        else:
-            om.add_error("Property not found", f"No property definition found for {variable_name} with value {value} "
-                                               f"in metadata ", info_map)
-            return False
-
-        # else check if the variable of interest is a critical variable
-        if self._is_critical(metadata_variable_path):
-            om.add_error("Unfixable critical data", f"Variable {variable_name} with value {value} is an unfixable "
-                                                    f"critical data", info_map)
-            return False
-
-        # fix the variable with default variable
-        default_value = self._fix_with_default(metadata_variable_path, pool_variable_path)
-        om.add_warning("Data fixed", f"Invalid data fixed: {variable_name}: {value} => {default_value}", info_map)
-
-        return True
-
-    def _find_variable(self, variable_name: str, search_dict: dict = None, variable_path: [str] = None) -> Any:
-        """
-        Searches if a variable with name 'variable_name' exists in the dictionary 'search_dict'. Returns the path to
-        reach the variable of interest 'variable_path' if found, returns False if not found.
-
-        Parameters
-        ----------
-        variable_name : str
-            Name of the variable of interest.
-
-        search_dict : dict
-            Starting dictionary structure for searching.
-            This parameter will be initialized to self.__metadata['properties'] if not specified.
-
-        variable_path : [str]
-            List to keep track of the path to reach the variable of interest in the specified dictionary 'search_dict'.
-            This parameter will be initialized to an empty list [] if not specified.
-
-        Returns
-        -------
-        Any: List[str] or False
-            Returns the path to reach the variable of interest, variable_path, if found;
-            Returns False if not found.
-        """
-        if search_dict is None:
-            search_dict = self.__metadata['properties']
-        if variable_path is None:
-            variable_path = []
-
-        # recursive search
-        for key, val in search_dict.items():
-            # return path if found
-            if key == variable_name:
-                return variable_path + [key]
-
-            # recursive call if current value is still a dictionary
-            if type(val) is dict:
-                variable_found = self._find_variable(variable_name, val, variable_path + [key])
-                # return path if found
-                if variable_found:
-                    return variable_found
-
-        # return False if not found
-        return False
-
-    def _is_critical(self, variable_path: [str]) -> bool:
-        """
-        Follows the provided 'variable_path' to reach the variable of interest, to check if the variable of interest is
-        a critical data, which does not have a 'default' attribute in its property specification.
-
-        Parameters
-        ----------
-        variable_path : List[str]
-            Path to reach the property specification of the variable of interest in metadata.
-
-        Returns
-        -------
-        bool
-            Returns if the variable of interest is a critical data.
-            True => the variable of interest is a critical data
-            False => the variable of interest is not a critical data
-        """
-        # starting point for critical data search is always self.__metadata['properties']
-        curr_metadata: dict = self.__metadata['properties']
-
-        # iterate through the list of path to reach the property specification of the variable of interest
+        current_metadata: dict = self.__metadata['properties']
         for metadata_key in variable_path:
-            curr_metadata = curr_metadata[metadata_key]
+            current_metadata = current_metadata[metadata_key]
 
-        # return if 'default' attribute exists
-        return 'default' not in curr_metadata.keys()
+        if 'default' in current_metadata.keys():
+            current_pool = self.__pool
+            for pool_key in variable_path[:-1]:
+                current_pool = current_pool[pool_key]
 
-    def _fix_with_default(self, metadata_variable_path: [str], pool_variable_path: [str]) -> Any:
-        """
-        Fixes the variable of interest in self.__pool with its default value defined in metadata.
+            current_pool[variable_path[-1]] = current_metadata['default']
+            om.add_warning("Data fixed", f"Invalid data fixed: {variable_path[-1]} => {current_metadata['default']}",
+                           info_map)
+            return True
 
-        Parameters
-        ----------
-        metadata_variable_path : List[str]
-            Path to reach the property specification of the variable of interest in metadata.
-
-        pool_variable_path : List[str]
-            Path to reach the variable of interest in the variable pool.
-
-        Returns
-        -------
-        bool
-            Return the default value of the variable of interest specified in metadata for logging purpose.
-        """
-        # initialize starting point
-        curr_metadata: dict = self.__metadata['properties']
-        curr_pool: dict = self.__pool
-
-        # iterate through paths to reach the variable
-        for metadata_key in metadata_variable_path:
-            curr_metadata = curr_metadata[metadata_key]
-
-        for pool_key in pool_variable_path[:-1]:
-            curr_pool = curr_pool[pool_key]
-
-        # fix the variable of interest in self.__pool with its default value specified in metadata
-        curr_pool[pool_variable_path[-1]] = curr_metadata['default']
-
-        # return the specified default value of the variable of interest so that the parent function can log it
-        return curr_metadata['default']
+        else:
+            return False
