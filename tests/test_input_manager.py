@@ -209,10 +209,10 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerF
 
 
 def test_validate_data_returns_false_with_invalid_data_no_eager_termination(mocker: MockerFixture,
-                                                                           mock_input_manager: InputManager,
-                                                                           mock_metadata: Dict[str, Dict[str, Any]],
-                                                                           mock_pool: Dict[str, Dict[str, Any]]
-                                                                           ) -> None:
+                                                                            mock_input_manager: InputManager,
+                                                                            mock_metadata: Dict[str, Dict[str, Any]],
+                                                                            mock_pool: Dict[str, Dict[str, Any]]
+                                                                            ) -> None:
     """Unit test for no eager termination with non-critical
     invalid data for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
