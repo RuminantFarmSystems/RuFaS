@@ -202,15 +202,15 @@ class InputManager:
         else:
             var_type = variable_to_check["type"]
             var_name = element_heirarchy[-1]
-            value = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
+            input_data_value = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
             if var_type == "string":
-                is_valid = self._validate_string_type_element(variable_to_check, var_name, value)
+                is_valid = self._validate_string_type_element(variable_to_check, var_name, input_data_value)
             elif var_type == "number":
-                is_valid = self._validate_num_type_element(variable_to_check, var_name, value)
+                is_valid = self._validate_num_type_element(variable_to_check, var_name, input_data_value)
             elif var_type == "boolean":
-                is_valid = self._validate_bool_type_element(value)
+                is_valid = self._validate_bool_type_element(input_data_value)
             else:
-                is_valid = self._validate_array_type_element(variable_to_check, var_name, value)
+                is_valid = self._validate_array_type_element(variable_to_check, var_name, input_data_value)
 
             if is_valid:
                 return True
@@ -221,7 +221,7 @@ class InputManager:
     def _validate_array_type_element(self,
                                      variable_to_check: Dict[str, Any],
                                      var_name: str,
-                                     value: list) -> bool:
+                                     input_data_value: list) -> bool:
         """
         Validates a __pool element when the element is an array.
 
@@ -242,28 +242,28 @@ class InputManager:
             Returns True if variable meets guidelines; otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_number_element.__name__,
+                    "function": self._validate_array_type_element.__name__,
                     }
         if variable_to_check["minimum_length"] and variable_to_check["maximum_length"]:
-            is_in_range = variable_to_check["minimum_length"] <= value <= \
+            is_in_range = variable_to_check["minimum_length"] <= len(input_data_value) <= \
                 variable_to_check["maximum_length"]
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
             return is_in_range
         elif variable_to_check["minimum_length"]:
-            is_in_range = variable_to_check["minimum_length"] <= value
+            is_in_range = variable_to_check["minimum_length"] <= len(input_data_value)
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
             return is_in_range
         elif variable_to_check["maximum_length"]:
-            is_in_range = value <= variable_to_check["maximum_length"]
+            is_in_range = len(input_data_value) <= variable_to_check["maximum_length"]
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
             return is_in_range
         else:
             return False
 
-    def _validate_bool_type_element(self, value: bool) -> bool:
+    def _validate_bool_type_element(self, input_data_value: bool) -> bool:
         """
         Validates a __pool boolean element.
 
@@ -277,12 +277,12 @@ class InputManager:
         bool
             Returns True if variable meets guidelines; otherwise False.
         """
-        return value in (True, False)
+        return input_data_value in (True, False)
 
     def _validate_num_type_element(self,
                                    variable_to_check: Dict[str, Any],
                                    var_name: str,
-                                   value: int) -> bool:
+                                   input_data_value: int) -> bool:
         """
         Validates a __pool number element.
 
@@ -303,30 +303,30 @@ class InputManager:
             Returns True if variable meets guidelines; otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_number_element.__name__,
+                    "function": self._validate_num_type_element.__name__,
                     }
         if variable_to_check["minimum"] and variable_to_check["maximum"]:
-            is_in_range = variable_to_check["minimum"] <= value <= variable_to_check["maximum"]
+            is_in_range = variable_to_check["minimum"] <= input_data_value <= variable_to_check["maximum"]
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
             return is_in_range
         elif variable_to_check["minimum"]:
-            is_in_range = variable_to_check["minimum"] <= value
+            is_in_range = variable_to_check["minimum"] <= input_data_value
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
             return is_in_range
         elif variable_to_check["maximum"]:
-            is_in_range = value <= variable_to_check["maximum"]
+            is_in_range = input_data_value <= variable_to_check["maximum"]
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
             return is_in_range
         else:
             return True
 
-    def _validate_string_element(self,
-                                 variable_to_check: Dict[str, Any],
-                                 var_name: str,
-                                 value: str) -> bool:
+    def _validate_string_type_element(self,
+                                      variable_to_check: Dict[str, Any],
+                                      var_name: str,
+                                      input_data_value: str) -> bool:
         """
         Validates a __pool string element.
 
@@ -347,10 +347,10 @@ class InputManager:
             Returns True if variable meets guidelines; otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_string_element.__name__,
+                    "function": self._validate_string_type_element.__name__,
                     }
         if variable_to_check["pattern"]:
-            is_match = bool(re.match(variable_to_check["pattern"], value))
+            is_match = bool(re.match(variable_to_check["pattern"], input_data_value))
             if not is_match:
                 om.add_warning(f"String variable must match pattern {variable_to_check['pattern']}.",
                                f"{var_name=}",
