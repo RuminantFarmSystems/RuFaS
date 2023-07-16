@@ -36,7 +36,7 @@ class InputManager:
         if not start_simulation:
             # TODO what actions to take if data is not valid?
             # need to trigger OM data dumping
-            # need to stop simulation
+            # need to stop simulation (what's the best way to do this?)
             pass
 
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
@@ -158,26 +158,6 @@ class InputManager:
 
         return True
 
-    def _get_value_from_metadata(self, element_heirarchy: List[str], property_map_key: str) -> Dict[str, Any]:
-        """
-        Convert and then use string path to search metadata for value.
-
-        Parameters
-        ----------
-        element_heirarchy : str
-            The nested element heirarchy of the data being checked.
-
-        property_map_kay : str
-            The metadata properties section for the data input file being checked.
-
-        Returns
-        -------
-        result : Dict[str, Any]
-            The nested metadata structure found by the path.
-        """
-        result = reduce(lambda d, key: d[key], element_heirarchy, self.__metadata["properties"][property_map_key])
-        return result
-
     def _validate_element(self, module_key: str, element: str,
                           property_map_key: str, eager_termination: bool = True) -> bool:
         """
@@ -200,7 +180,8 @@ class InputManager:
             True if the data is valid, False otherwise.
         """
         element_heirarchy = element.split(".")
-        variable_to_check = self._get_value_from_metadata(element_heirarchy, property_map_key)
+        variable_to_check = reduce(lambda d, key: d[key], element_heirarchy,
+                                   self.__metadata["properties"][property_map_key])
         non_nested_types = ["number", "string", "boolean", "array"]
         if variable_to_check["type"] in non_nested_types:
             is_nested = False
@@ -237,7 +218,11 @@ class InputManager:
             else:
                 is_valid = self._validate_array_type_element(module_key, element_heirarchy, variable_to_check)
 
-            return is_valid
+            if is_valid:
+                return True
+            else:
+                is_fixed = self._fix_data()
+                return is_fixed
 
     def _get_value_from_pool(self, module_key: str, element_heirarchy: List[str]) -> Any:
         """
