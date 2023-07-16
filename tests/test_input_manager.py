@@ -5,8 +5,8 @@ Description: Implements test cases for Input Manager
 Author(s): Niko Tomlinson, ndt2@cornell.edu
 """
 
-from typing import Any, Dict
-from mock import Mock, mock_open, patch
+from typing import Any, Callable, Dict
+from mock import MagicMock, Mock, mock_open, patch
 import pytest
 from pytest_mock import MockerFixture
 
@@ -25,6 +25,18 @@ def test_input_manager_singleton(mocker: MockerFixture) -> None:
     im2 = InputManager()
 
     assert im1 is im2
+
+
+@pytest.fixture
+def input_manager_original_method_states(
+    mock_input_manager: InputManager,
+) -> Dict[str, Callable]:
+    """Fixture to store original methods of OutputManager"""
+    return {
+        "_load_metadata": mock_input_manager._load_metadata,
+        "_load_data": mock_input_manager._load_data,
+        "_validate_data": mock_input_manager._validate_data
+    }
 
 
 def test_load_metadata(mock_input_manager: InputManager) -> None:
@@ -105,6 +117,25 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
             mock_input_manager._load_data("bad/path.csv")
 
 
+def test_start_data_pipeline(mock_input_manager: InputManager,
+                             input_manager_original_method_states: Dict[str, Callable]) -> None:
+    """Unit test for function start_data_pipeline in file input_manager.py"""
+    mock_input_manager._load_metadata = MagicMock()
+    mock_input_manager._load_data = MagicMock()
+    mock_input_manager._validate_data = MagicMock(return_value=True)
+
+    mock_input_manager.start_data_pipeline()
+
+    mock_input_manager._load_metadata.assert_called_once()
+    mock_input_manager._load_data.assert_called_once()
+    mock_input_manager._validate_data.assert_called_once()
+
+    # Restore original methods
+    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
+    mock_input_manager._load_data = input_manager_original_method_states["_load_data"]
+    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+
+
 @pytest.fixture
 def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
@@ -159,7 +190,8 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
     assert add_log.call_count == 5
 
 
-def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture, mock_input_manager: InputManager,
+def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture,
+                                                                 mock_input_manager: InputManager,
                                                                  mock_metadata: Dict[str, Dict[str, Any]],
                                                                  mock_pool: Dict[str, Dict[str, Any]]
                                                                  ) -> None:
@@ -194,7 +226,8 @@ def test_validate_data_returns_true_with_fixable_invalid_data(mocker: MockerFixt
     assert add_log.call_count == 5
 
 
-def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker: MockerFixture, mock_input_manager: InputManager,
+def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker: MockerFixture,
+                                                                           mock_input_manager: InputManager,
                                                                            mock_metadata: Dict[str, Dict[str, Any]],
                                                                            mock_pool: Dict[str, Dict[str, Any]]
                                                                            ) -> None:
