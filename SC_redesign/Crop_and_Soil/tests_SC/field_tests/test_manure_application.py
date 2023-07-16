@@ -297,7 +297,7 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
                               area: float, inorganic_frac: float, ammonium_frac: float, organic_frac: float,
                               weiP_frac: float, source_animal: str, should_fail: bool) -> None:
     """Tests that the machine-applied manure is correctly added into existing manure on the field."""
-    data = SoilData(field_size=1.1)
+    data = SoilData(field_size=area)
     incorp = ManureApplication(data)
 
     if should_fail:
@@ -331,3 +331,4 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
                                                                        coverage, expected_weiP_frac, inorganic_frac,
                                                                        ammonium_frac, organic_frac)
         assert incorp.data.machine_manure_applied_mass == dry_mass
+

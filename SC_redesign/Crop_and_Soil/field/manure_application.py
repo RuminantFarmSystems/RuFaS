@@ -129,7 +129,8 @@ class ManureApplication:
         else:
             self._apply_solid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
                                              field_coverage, water_extractable_inorganic_phosphorus_fraction,
-                                             inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction)
+                                             inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction,
+                                             field_size)
         self.data.machine_manure_applied_mass = dry_matter_mass
 
     def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
