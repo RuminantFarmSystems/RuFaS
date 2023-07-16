@@ -329,18 +329,20 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     assert expected in str(e.value)
 
 
-@pytest.mark.parametrize("crop_reference,harvest_op,expected", [
-    ("test_1", "default", HarvestOperation.HARVEST),
-    ("test_2", "no_kill", HarvestOperation.HARVEST_NOKILL),
+@pytest.mark.parametrize("crop_reference,harvest_op,field_name,field_size,expected_operation", [
+    ("test_1", "default", "field_1", 1.4, HarvestOperation.HARVEST),
+    ("test_2", "no_kill", "field_2", 2.33, HarvestOperation.HARVEST_NOKILL),
 ])
-def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOperation) -> None:
+def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, field_size: float,
+                      expected_operation: HarvestOperation) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
     harvest_crop.data.id = crop_reference
     other_crop_1 = Crop()
     other_crop_2 = Crop()
     other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
-    field = Field()
+    field_data = FieldData(name=field_name, field_size=field_size)
+    field = Field(field_data=field_data)
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
     for crop in field.crops:
         crop.crop_management.manage_harvest = MagicMock()
@@ -354,7 +356,8 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, expected: HarvestOpe
         if crop.data.id == "not this crop":
             crop.crop_management.manage_harvest.assert_not_called()
         else:
-            crop.crop_management.manage_harvest.assert_called_once_with(expected)
+            crop.crop_management.manage_harvest.assert_called_once_with(expected_operation, field_name, field_size,
+                                                                        1995, 100, field.soil.data)
 
 
 @pytest.mark.parametrize("crops,expected_info_map,expected_message", [
@@ -381,7 +384,8 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
         field._harvest_crop("test", "default", mocked_time)
 
         for crop in crops:
-            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST)
+            crop.crop_management.manage_harvest.assert_called_once_with(HarvestOperation.HARVEST, "test", 1.0, 2000,
+                                                                        200, field.soil.data)
         actual = om.warnings_pool["field_name:'test'.harvest_warning"]
         assert actual['info_maps'].__contains__(expected_info_map)
         assert actual['values'].__contains__(expected_message)
@@ -520,16 +524,16 @@ def test_make_crop_from_config_dict(config: dict):
         Field._make_custom_crop.assert_called_once()
 
 
-@pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size", {
-    ("test_mix_1", 80.0, 30.0, 1993, 100, 3.1),
-    ("test_mix_2", 150.0, 89.0, 2001, 240, 1.3),
-    ("test_mix_3", 10.0, 90.33, 1992, 30, 2.44),
-    ("test_mix_4", 0.0, 50.0, 1996, 60, 1.45),
-    ("test_mix_5", 67.5, 0.0, 1998, 200, 2.3),
-    ("test_mix_6", 0.0, 0.0, 1988, 120, 0.5)
+@pytest.mark.parametrize("mix_name,requested_n,requested_p,year,day,field_size,fertilizer_applied", {
+    ("test_mix_1", 80.0, 30.0, 1993, 100, 3.1, True),
+    ("test_mix_2", 150.0, 89.0, 2001, 240, 1.3, True),
+    ("test_mix_3", 10.0, 90.33, 1992, 30, 2.44, True),
+    ("test_mix_4", 0.0, 50.0, 1996, 60, 1.45, True),
+    ("test_mix_5", 67.5, 0.0, 1998, 200, 2.3, True),
+    ("test_mix_6", 0.0, 0.0, 1988, 120, 0.5, False)
 })
 def test_execute_fertilizer_application(mix_name: str, requested_n: float, requested_p: float,
-                                        year: int, day: int, field_size: float) -> None:
+                                        year: int, day: int, field_size: float, fertilizer_applied: bool) -> None:
     """Tests that fertilizer applications are being correctly executed and recorded."""
     field_data = FieldData(name="test", field_size=field_size)
     field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}})
@@ -541,11 +545,16 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
 
     field._execute_fertilizer_application(mix_name, requested_n, requested_p, year, day)
 
-    expected_nitrogen_fraction = 0.2
-    field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
-    field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0, 0.0,
-                                                                         field_size)
-    field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
+    if fertilizer_applied:
+        expected_nitrogen_fraction = 0.2
+        field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
+        field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0,
+                                                                             0.0, field_size)
+        field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, year, day)
+    else:
+        field._formulate_fertilizer_required.assert_not_called()
+        field.fertilizer_applicator.apply_fertilizer.assert_not_called()
+        field._record_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize("field_name,mix_name,available_mixes,expected_message", [
@@ -570,7 +579,8 @@ def test_execute_fertilizer_application_error(field_name: str, mix_name: str, av
     (100, 20, {"100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0}, "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}, "26_4_24"),
     (50, 60, {"30_40_50": {"N": 0.3, "P": 0.4, "K": 0.5}}, "30_40_50"),
     (22.5, 33, {"25_15_28": {"N": 0.25, "P": 0.15, "K": 0.28}, "33_40_3": {"N": 0.33, "P": 0.4, "K": 0.28},
-                "40_22_6": {"N": 0.4, "P": 0.22, "K": 0.06}}, "33_40_3")
+                "40_22_6": {"N": 0.4, "P": 0.22, "K": 0.06}}, "33_40_3"),
+    (245.0, 43.0, {"0_0_60": {"N": 0.0, "P": 0.0, "K": 0.6}, "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24}}, "26_4_24")
 ])
 def test_determine_optimal_fertilizer_mix(nitrogen: float, phosphorus: float, mixes: Dict[str, Dict[str, float]],
                                           expected: float) -> None:
@@ -637,7 +647,8 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
 
     field._execute_manure_application(nitrogen, phosphorus, coverage, year, day)
 
-    field.manure_applicator.apply_machine_manure.assert_called_once_with(0.0, 0.0, 0.0, coverage, 1.0, 0.0, 0.0, 0.0)
+    field.manure_applicator.apply_machine_manure.assert_called_once_with(100.0, 0.33, 25.0, coverage, 1.0, 0.5, 0.5,
+                                                                         0.5, 0.5)
     if fertilizer_applied and only_nitrogen_unmet:
         field._determine_optimal_fertilizer_mix.assert_not_called()
         field._execute_fertilizer_application.assert_called_once_with("100_0_0", nitrogen, phosphorus, year, day)
@@ -687,8 +698,9 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
                                  min_temp: float, max_temp: float, annual_mean_temp: float,
                                  transpiration: float) -> None:
     """Tests that all component processes and subroutines are correctly called in Field."""
-    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
-               return_value=crops_growing):
+    with patch.multiple("SC_redesign.Crop_and_Soil.crop.crop_data.CropData",
+                        is_mature=PropertyMock(return_value=not crops_growing),
+                        is_dormant=PropertyMock(return_value=not crops_growing)):
         field_data = FieldData(field_size=field_size, current_residue=residue)
         incorp = Field(field_data=field_data)
         crop_1 = Crop()
@@ -810,9 +822,9 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         incorp.soil.evaporation.evaporate.assert_called_once_with(10.5)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 3.5)
         if crops_growing:
-            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil)
+            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
-            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil)
+            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
             crop_2.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
         else:
             assert crop_1.data.cumulative_evaporation == 0
@@ -964,7 +976,7 @@ def test_determine_latent_heat_vaporization(avg_temp):
     assert expect == observe
 
 
-@pytest.mark.parametrize("above_ground_biomass,residue,snow_water,potential_evapotrans_adj, transpiration", [
+@pytest.mark.parametrize("above_ground_biomass,residue,snow_water,potential_evapotrans_adj,transpiration", [
     (800, 40, 0.3, 1.6, 0.9),  # arbitrary
     (1200, 300, 0.433, 2.4, 1.8),  # arbitrary
     (0, 800, 0.03, 0, 3.6),  # after harvest
@@ -972,6 +984,7 @@ def test_determine_latent_heat_vaporization(avg_temp):
     (0, 0, 0.22, 0.69, 0.45),  # empty field
     (400, 150, 0, 0.01, 0),  # dry conditions
     (500, 200, 0, 6.3, 4.5),  # wet conditions
+    (300, 40, 2.33, 0.0, 0.0)
 ])
 def test_determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass: float, residue: float,
                                                              snow_water: float, potential_evapotrans_adj: float,
@@ -981,11 +994,16 @@ def test_determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomas
                return_value=1.3) as mocked_soil_cover_index:
         actual = Field._determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass, residue, snow_water,
                                                                             potential_evapotrans_adj, transpiration)
-        soil_evaporation = potential_evapotrans_adj * 1.3
-        reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / (soil_evaporation + transpiration)
-        expected = min(soil_evaporation, reduced_soil_evaporation)
+        if potential_evapotrans_adj == transpiration == 0.0:
+            expected = 0.0
+            mocked_soil_cover_index.assert_not_called()
+        else:
+            soil_evaporation = potential_evapotrans_adj * 1.3
+            reduced_soil_evaporation = (soil_evaporation * potential_evapotrans_adj) / \
+                                       (soil_evaporation + transpiration)
+            expected = min(soil_evaporation, reduced_soil_evaporation)
+            mocked_soil_cover_index.assert_called_once_with(above_ground_biomass, residue, snow_water)
 
-        mocked_soil_cover_index.assert_called_once_with(above_ground_biomass, residue, snow_water)
         assert actual == expected
 
 

@@ -63,12 +63,25 @@ class Decomposition:
         Description: calculates the moisture factor for carbon decomposition for the layer
             "pseudocode_soil" S.6.A.2
             defaults drawn from defac: course soil
+
         Args:
             water_factor: relative water saturation (%)
+
         Returns: moisture effect (unitless)
+
+        Notes: If negative bases are raised to a exponents, they sometimes result in complex numbers instead of negative
+            floats. This behavior causes the program to eventually crash and is avoided by computing a sign correction
+            factor, which allows the absolute value of the bases to be used.
         """
         # S.6.A.5
         base_1 = (water_factor - b_term) / (a_term - b_term)
         base_2 = (water_factor - c_term) / (a_term - c_term)
 
-        return (base_1 ** first_exponent) * (base_2 ** second_exponent)
+        sign_correction_factor = 1.0
+        if (base_1 < 0.0 < base_2) or (base_1 > 0.0 > base_2):
+            sign_correction_factor = -1.0
+
+        first_term = abs(base_1) ** first_exponent
+        second_term = abs(base_2) ** second_exponent
+
+        return first_term * second_term * sign_correction_factor

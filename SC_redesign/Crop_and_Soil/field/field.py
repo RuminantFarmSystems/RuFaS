@@ -152,9 +152,14 @@ class Field:
         -----
         This method is responsible for determining the exact amounts of fertilizer and nutrients added to the field,
         passing those amount to the FertilizerApplication module, and recording the fertilizer application to the
-        OutputManager.
+        OutputManager. Because potassium requests are still not accounted for when determining the amount of fertilizer
+        applied, the method checks that there is at least some nitrogen or phosphorus requested, if not it returns
+        without applying any fertilizer.
 
         """
+        if requested_nitrogen == requested_phosphorus == 0.0:
+            return
+
         try:
             fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:
@@ -220,9 +225,12 @@ class Field:
             fertilizer_application = Field._formulate_fertilizer_required(mix_values["N"], mix_values["P"],
                                                                           mix_values["K"], requested_nitrogen,
                                                                           requested_phosphorus)
-            if fertilizer_application["total_mass"] < least_fertilizer_mix_required:
+            total_mass = fertilizer_application["total_mass"]
+            if total_mass == 0.0:
+                continue
+            elif total_mass < least_fertilizer_mix_required:
                 optimal_mix = mix_name
-                least_fertilizer_mix_required = fertilizer_application["total_mass"]
+                least_fertilizer_mix_required = total_mass
         return optimal_mix
 
     @staticmethod
@@ -314,7 +322,7 @@ class Field:
         # TODO: integrate the manure manager's request manure method here when it is finished.
         manure_filled_by_request = {"nitrogen": 0.0, "phosphorus": 0.0}
 
-        self.manure_applicator.apply_machine_manure(0.0, 0.0, 0.0, field_coverage, 1.0, 0.0, 0.0, 0.0)
+        self.manure_applicator.apply_machine_manure(100.0, 0.33, 25.0, field_coverage, 1.0, 0.5, 0.5, 0.5, 0.5)
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - manure_filled_by_request["nitrogen"])
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - manure_filled_by_request["phosphorus"])
@@ -606,7 +614,9 @@ class Field:
 
         for crop in crops_to_be_harvested:
             harvest_operation_enum = HarvestOperation(harvest_operation)
-            crop.crop_management.manage_harvest(harvest_operation_enum)
+            crop.crop_management.manage_harvest(harvest_operation_enum, self.field_data.name,
+                                                self.field_data.field_size, time.calendar_year, time.day,
+                                                self.soil.data)
 
     def _remove_dead_crops(self) -> None:
         """
@@ -733,7 +743,7 @@ class Field:
         self._cycle_water(current_weather)
 
         for crop in self.crops:
-            if not crop.data.in_growing_season:
+            if crop.data.is_mature or crop.data.is_dormant:
                 continue
 
             crop.heat_units.absorb_heat_units(current_weather.mean_air_temperature, current_weather.min_air_temperature,
@@ -796,7 +806,11 @@ class Field:
             crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
             weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
             weights_sum += crop.data.field_proportion
-        weighted_average_transpiration = weighted_transpiration_total / weights_sum
+
+        if weights_sum == 0.0:
+            weighted_average_transpiration = 0.0
+        else:
+            weighted_average_transpiration = weighted_transpiration_total / weights_sum
 
         # TODO: Implement snow (melting and sublimation) - issue #317
         snow_water_content = 0.0
@@ -815,7 +829,7 @@ class Field:
 
         for crop in self.crops:
             if crop.data.in_growing_season:
-                crop.water_uptake.uptake_water(self.soil)
+                crop.water_uptake.uptake_water(self.soil.data)
                 crop.water_dynamics.cycle_water(actual_evaporation, crop.data.total_water_uptake,
                                                 full_evapotranspirative_demand)
             else:
@@ -1008,6 +1022,7 @@ class Field:
                                                              potential_evapotranspiration_adjusted: float,
                                                              transpiration: float) -> float:
         """Calculate the amount of sublimation and soil evaporation for this day, adjusted for plant use.
+
         Parameters
         ----------
         above_ground_biomass : float
@@ -1020,14 +1035,26 @@ class Field:
             Potential evapotranspiration adjusted for evaporation of free water in canopy (mm)
         transpiration : float
             Maximum transpiration for a given day (mm)
+
         Returns
         -------
         float
             Soil evaporation and sublimation, adjusted for plant water use (mm)
+
         References
         ----------
         SWAT Theoretical documentation eqn. 2:2.3.7, 9
+
+        Notes
+        -----
+        If both the adjusted potential evapotranspiration and transpiration are 0, then it is assumed that all
+        evapotranspirative demands have been met for the current day and no sublimation or evaporation from the soil
+        will occur.
+
         """
+        if potential_evapotranspiration_adjusted == transpiration == 0.0:
+            return 0.0
+
         soil_cover_index = Field._determine_soil_cover_index(above_ground_biomass, residue, snow_water_content)
         max_soil_evaporation_sublimation = potential_evapotranspiration_adjusted * soil_cover_index
         adjusted_soil_evaporation_sublimation = \
