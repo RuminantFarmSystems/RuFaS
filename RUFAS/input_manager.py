@@ -244,18 +244,20 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_array_type_element.__name__,
                     }
-        if variable_to_check["minimum_length"] and variable_to_check["maximum_length"]:
+        is_maximum_length = variable_to_check.get("maximum_length")
+        is_minimum_length = variable_to_check.get("minimum_length")
+        if is_maximum_length and is_minimum_length:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value) <= \
                 variable_to_check["maximum_length"]
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
             return is_in_range
-        elif variable_to_check["minimum_length"]:
+        elif is_minimum_length:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value)
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
             return is_in_range
-        elif variable_to_check["maximum_length"]:
+        elif is_maximum_length:
             is_in_range = len(input_data_value) <= variable_to_check["maximum_length"]
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
@@ -305,17 +307,19 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_num_type_element.__name__,
                     }
-        if variable_to_check["minimum"] and variable_to_check["maximum"]:
+        is_minimum_check = variable_to_check.get("minimum")
+        is_maximum_check = variable_to_check.get("maximum")
+        if is_minimum_check and is_maximum_check:
             is_in_range = variable_to_check["minimum"] <= input_data_value <= variable_to_check["maximum"]
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
             return is_in_range
-        elif variable_to_check["minimum"]:
+        elif is_minimum_check:
             is_in_range = variable_to_check["minimum"] <= input_data_value
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
             return is_in_range
-        elif variable_to_check["maximum"]:
+        elif is_maximum_check:
             is_in_range = input_data_value <= variable_to_check["maximum"]
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
@@ -349,16 +353,35 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_string_type_element.__name__,
                     }
-        if variable_to_check["pattern"]:
-            is_match = bool(re.match(variable_to_check["pattern"], input_data_value))
-            if not is_match:
+        is_pattern_check = variable_to_check.get("pattern")
+        is_minimum_length = variable_to_check.get("minimum_length")
+        is_maximum_length = variable_to_check.get("maximum_length")
+        is_valid_string = True
+        if is_pattern_check:
+            is_valid_string = bool(re.match(variable_to_check["pattern"], input_data_value))
+            if not is_valid_string:
                 om.add_warning(f"String variable must match pattern {variable_to_check['pattern']}.",
                                f"{var_name=}",
                                info_map)
-            return is_match
-        else:
-            om.add_error("Metadata must have pattern to match string to.", f"{var_name=}", info_map)
-            return False
+                return is_valid_string
+        if is_minimum_length and is_maximum_length:
+            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
+                variable_to_check["maximum_length"]
+            if not is_valid_string:
+                om.add_warning("String out length range.", f"{var_name=}", info_map)
+                return False
+        elif is_minimum_length:
+            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
+            if not is_valid_string:
+                om.add_warning("String out length range.", f"{var_name=}", info_map)
+                return False
+        elif is_maximum_length:
+            is_valid_string = len(input_data_value) <= variable_to_check["maximum_length"]
+            if not is_valid_string:
+                om.add_warning("String out length range.", f"{var_name=}", info_map)
+                return False
+
+        return is_valid_string
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
