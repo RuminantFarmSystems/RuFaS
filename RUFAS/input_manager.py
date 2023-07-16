@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 om = OutputManager()
 
@@ -122,34 +122,24 @@ class InputManager:
                     "function": self._validate_data.__name__,
                     }
         valid_elements_counter = 0
-        invalid_elements_counter = 0
-        fixed_elements_counter = 0
         invalid_critical_elements_counter = 0
         total_elements_checked_counter = 0
 
         for module_key in self.__pool.keys():
-            files_details = self.__metadata["files"]
-            property_map_key = files_details[module_key]["properties"]
+            property_map_key = self.__metadata["files"][module_key]["properties"]
             module_properties = self.__metadata["properties"][property_map_key]
             for element in module_properties.keys():
                 total_elements_checked_counter += 1
-                is_valid = self._validate_element(module_key, element, property_map_key)
-                if is_valid:
+                is_valid_element = self._validate_element(module_key, element, property_map_key)
+                if is_valid_element:
                     valid_elements_counter += 1
+                elif not is_valid_element and eager_termination:
+                    invalid_critical_elements_counter += 1
+                    return False
                 else:
-                    invalid_elements_counter += 1
-                    is_data_fixed = self._fix_data(element, property_map_key)
-                    if is_data_fixed:
-                        fixed_elements_counter += 1
-                    elif not is_data_fixed and eager_termination:
-                        invalid_critical_elements_counter += 1
-                        return False
-                    else:
-                        invalid_critical_elements_counter += 1
+                    invalid_critical_elements_counter += 1
 
         om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
-        om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
         om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
 
@@ -165,6 +155,9 @@ class InputManager:
 
         Parameters
         ----------
+        module_key : str
+            The module whose data is being validated.
+
         element : str
             The key of the data to validate.
 
@@ -188,7 +181,6 @@ class InputManager:
         elif variable_to_check["type"] == "object":
             is_nested = True
         else:
-            # assume if no type then is object and make is_nested False?
             is_nested = False
         if is_nested:
             children_status: Dict[str, bool] = {}
@@ -209,14 +201,16 @@ class InputManager:
                 return False
         else:
             var_type = variable_to_check["type"]
+            var_name = element_heirarchy[-1]
+            value = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
             if var_type == "string":
-                is_valid = self._validate_string_type_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_string_type_element(variable_to_check, var_name, value)
             elif var_type == "number":
-                is_valid = self._validate_number_type_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_num_type_element(variable_to_check, var_name, value)
             elif var_type == "boolean":
-                is_valid = self._validate_bool_type_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_bool_type_element(value)
             else:
-                is_valid = self._validate_array_type_element(module_key, element_heirarchy, variable_to_check)
+                is_valid = self._validate_array_type_element(variable_to_check, var_name, value)
 
             if is_valid:
                 return True
@@ -224,42 +218,23 @@ class InputManager:
                 is_fixed = self._fix_data()
                 return is_fixed
 
-    def _get_value_from_pool(self, module_key: str, element_heirarchy: List[str]) -> Any:
-        """
-        Convert and then use string path to get value for variable being checked.
-
-        Parameters
-        ----------
-        element_heirarchy : str
-            The nested element heirarchy of the data being checked.
-
-        property_map_kay : str
-            The metadata properties section for the data input file being checked.
-
-        Returns
-        -------
-        result : Dict[str, Any]
-            The nested metadata structure found by the path.
-        """
-        result = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
-        return result
-
-    def _validate_array_type_element(self, module_key: str,
-                                     element_heirarchy: List[str],
-                                     variable_to_check: Dict[str, Any]) -> bool:
+    def _validate_array_type_element(self,
+                                     variable_to_check: Dict[str, Any],
+                                     var_name: str,
+                                     value: list) -> bool:
         """
         Validates a __pool element when the element is an array.
 
         Parameters
         ----------
-        module_key : str
-            The module whose data is currently being validated.
-
-        element_heirarchy : str
-            The nested element heirarchy of the data being checked.
-
         variable_to_check : str
             A dictionary with the metadata validation guidelines.
+
+        var_name : str
+            The name of the variable being checked.
+
+        value : Union[int, str, bool, list]
+            The value of the variable being checked.
 
         Returns
         -------
@@ -269,8 +244,6 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_number_element.__name__,
                     }
-        value = self._get_value_from_pool(module_key, element_heirarchy)
-        var_name = element_heirarchy[-1]
         if variable_to_check["minimum_length"] and variable_to_check["maximum_length"]:
             is_in_range = variable_to_check["minimum_length"] <= value <= \
                 variable_to_check["maximum_length"]
@@ -290,46 +263,39 @@ class InputManager:
         else:
             return False
 
-    def _validate_boolean_type_element(self, module_key: str,
-                                       element_heirarchy: List[str]) -> bool:
+    def _validate_bool_type_element(self, value: bool) -> bool:
         """
         Validates a __pool boolean element.
 
         Parameters
         ----------
-        module_key : str
-            The module whose data is currently being validated.
-
-        element_heirarchy : str
-            The nested element heirarchy of the data being checked.
-
-        variable_to_check : str
-            A dictionary with the metadata validation guidelines.
+        value : Union[int, str, bool, list]
+            The value of the variable being checked.
 
         Returns
         -------
         bool
             Returns True if variable meets guidelines; otherwise False.
         """
-        value = self._get_value_from_pool(module_key, element_heirarchy)
         return value in (True, False)
 
-    def _validate_number_element(self, module_key: str,
-                                 element_heirarchy: List[str],
-                                 variable_to_check: Dict[str, Any]) -> bool:
+    def _validate_num_type_element(self,
+                                   variable_to_check: Dict[str, Any],
+                                   var_name: str,
+                                   value: int) -> bool:
         """
         Validates a __pool number element.
 
         Parameters
         ----------
-        module_key : str
-            The module whose data is currently being validated.
-
-        element_heirarchy : str
-            The nested element heirarchy of the data being checked.
-
         variable_to_check : str
             A dictionary with the metadata validation guidelines.
+
+        var_name : str
+            The name of the variable being checked.
+
+        value : int
+            The value of the integer variable being checked.
 
         Returns
         -------
@@ -339,8 +305,6 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_number_element.__name__,
                     }
-        value = self._get_value_from_pool(module_key, element_heirarchy)
-        var_name = element_heirarchy[-1]
         if variable_to_check["minimum"] and variable_to_check["maximum"]:
             is_in_range = variable_to_check["minimum"] <= value <= variable_to_check["maximum"]
             if not is_in_range:
@@ -359,22 +323,23 @@ class InputManager:
         else:
             return True
 
-    def _validate_string_element(self, module_key: str,
-                                 element_heirarchy: List[str],
-                                 variable_to_check: Dict[str, Any]) -> bool:
+    def _validate_string_element(self,
+                                 variable_to_check: Dict[str, Any],
+                                 var_name: str,
+                                 value: str) -> bool:
         """
         Validates a __pool string element.
 
         Parameters
         ----------
-        module_key : str
-            The module whose data is currently being validated.
-
-        element_heirarchy : str
-            The nested element heirarchy of the data being checked.
-
         variable_to_check : str
             A dictionary with the metadata validation guidelines.
+
+        var_name : str
+            The name of the variable being checked.
+
+        value : str
+            The value of the string variable being checked.
 
         Returns
         -------
@@ -384,8 +349,6 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_string_element.__name__,
                     }
-        value = self._get_value_from_pool(module_key, element_heirarchy)
-        var_name = element_heirarchy[-1]
         if variable_to_check["pattern"]:
             is_match = bool(re.match(variable_to_check["pattern"], value))
             if not is_match:
