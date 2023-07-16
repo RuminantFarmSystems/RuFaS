@@ -224,3 +224,27 @@ def test_validate_data_returns_false_with_invalid_data_no_eager_termination(mock
 
     assert result is False
     assert add_log.call_count == 3
+
+
+@pytest.mark.parametrize(
+    'dummy_value, expected_result, expected_warning_count',
+    [
+        ([1, 2, 3], False, 1),
+        ([1, 2, 3, 4, 5], True, 0),
+        ([1, 2, 3, 4, 5, 6, 7], True, 0),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], True, 0),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], False, 1),
+        ([], False, 1),
+    ]
+)
+def test_validate_array_type_element(dummy_value: list, expected_result: bool, 
+                                     expected_warning_count: int, mock_input_manager: InputManager) -> None:
+    """Unit test for function _validate_array_type_element function in file input_manager.py"""
+    dummy_variable_to_check = {"minimum_length": 5, "maximum_length": 10}
+    dummy_var_name = "dummy_array"
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._validate_array_type_element(dummy_variable_to_check, dummy_var_name, dummy_value)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_count
