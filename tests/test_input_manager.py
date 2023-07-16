@@ -187,7 +187,7 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
         result = mock_input_manager._validate_data()
 
     assert result is True
-    assert add_log.call_count == 5
+    assert add_log.call_count == 3
 
 
 def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture,
@@ -200,7 +200,6 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerF
     mock_input_manager._InputManager__pool = mock_pool
 
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         result = mock_input_manager._validate_data()
@@ -209,24 +208,7 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerF
     assert add_log.call_count == 0  # will reach eager_termination prior to adding logs
 
 
-def test_validate_data_returns_true_with_fixable_invalid_data(mocker: MockerFixture, mock_input_manager: InputManager,
-                                                              mock_metadata: Dict[str, Dict[str, Any]],
-                                                              mock_pool: Dict[str, Dict[str, Any]]
-                                                              ) -> None:
-    """Unit test for invalid fixable data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=True)
-
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data()
-
-    assert result is True
-    assert add_log.call_count == 5
-
-
-def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocker: MockerFixture,
+def test_validate_data_returns_false_with_invalid_data_no_eager_termination(mocker: MockerFixture,
                                                                            mock_input_manager: InputManager,
                                                                            mock_metadata: Dict[str, Dict[str, Any]],
                                                                            mock_pool: Dict[str, Dict[str, Any]]
@@ -236,10 +218,9 @@ def test_validate_data_returns_true_with_invalid_data_no_eager_termination(mocke
     mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         result = mock_input_manager._validate_data(eager_termination=False)
 
-    assert result is True
-    assert add_log.call_count == 5
+    assert result is False
+    assert add_log.call_count == 3

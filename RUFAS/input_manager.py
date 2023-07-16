@@ -162,7 +162,7 @@ class InputManager:
             The key of the data to validate.
 
         property_map_kay : str
-            The metadata properties section for the data input file being checked.
+            The metadata properties section keyword for the data input file being checked.
 
         eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
