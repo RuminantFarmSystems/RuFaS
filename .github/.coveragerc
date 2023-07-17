@@ -3,7 +3,6 @@
 command_line = -m pytest
 include =
 
-
 omit =
     *__init__.py
 branch = False
