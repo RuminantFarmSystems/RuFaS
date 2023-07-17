@@ -38,9 +38,9 @@ jobs:
     # A configuration file ".coveragerc" can be found at the project root to customize coverage test settings
     - name: Test coverage
       run: |
-        coverage run --rcfile=.coveragerc
-        coverage report --rcfile=.coveragerc
-        coverage json --rcfile=.coveragerc
+        coverage run --rcfile=.github/.coveragerc
+        coverage report --rcfile=.github/.coveragerc
+        coverage json --rcfile=.github/.coveragerc
         echo "COVERAGE_PERCENTAGE=$( jq -r '.totals.percent_covered_display' ./.github/workflows/coverage.json )" >> "$GITHUB_ENV"
         echo "${{ env.COVERAGE_PERCENTAGE }}"
 

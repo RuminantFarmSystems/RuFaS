@@ -4,6 +4,7 @@ command_line = -m pytest
 omit =
     *__init__.py
 branch = False
+data_file = .github/.coverage
 
 [report]
 ; Regexes for lines to exclude from consideration
