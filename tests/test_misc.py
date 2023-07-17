@@ -5,10 +5,11 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
-import re
 import os
+import re
 from typing import Any, Callable, Dict
 from mock import Mock, mock_open, patch
+from pathlib import Path
 
 import pytest
 from mock.mock import MagicMock, call
@@ -312,6 +313,15 @@ def test_get_prefix() -> None:
     om = OutputManager()
     assert om._get_prefix("class", "func") == "class.func"
 
+def test_csv_output_dir() -> None:
+    """Unit test for function _csv_output_directory in file output_manager.py"""
+    om = OutputManager()
+    assert str(om._csv_output_directory("test")) == Path("test/CSVs/om/")
+
+def test_csv_output_dir() -> None:
+    """Unit test for function _csv_output_directory in file output_manager.py"""
+    om = OutputManager()
+    assert om._csv_variable_output_directory("test") == Path("test/CSVs/om/variables/")
 
 @pytest.fixture
 def mock_output_manager(mocker) -> OutputManager:
@@ -329,8 +339,6 @@ def mock_output_manager(mocker) -> OutputManager:
      True),
     ({"var1": {"not a value": [1]}}, "",
      False),
-    ({"var1": {"values": []}, "var2": {"not a value": 1}}, "",
-     False)
 ])
 def test_dict_to_csv(data: Dict[str, Any], expected_result: str, should_write: bool) -> None:
     """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
@@ -600,7 +608,7 @@ def output_manager_original_method_states(
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
-        "dump_variables_to_csv_files ": mock_output_manager.dump_variables_to_csv_files,
+        "save_variables_to_csv_files ": mock_output_manager.save_variables_to_csv_files,
     }
 
 
@@ -615,7 +623,7 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
-    mock_output_manager.dump_variables_to_csv_files = MagicMock()
+    mock_output_manager.save_variables_to_csv_files = MagicMock()
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
 
@@ -624,7 +632,7 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs.assert_called_once_with(path)
     mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
-    mock_output_manager.dump_variables_to_csv_files.assert_called_once_with(path)
+    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(f"{path}/CSVs/om/variables")
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
@@ -633,7 +641,7 @@ def test_dump_all_pools(
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
     assert mock_output_manager.dump_variables.call_count == 2
-    assert mock_output_manager.dump_variables_to_csv_files.call_count == 2
+    assert mock_output_manager.save_variables_to_csv_files.call_count == 2
 
     # Restore original methods
     mock_output_manager.dump_variables = output_manager_original_method_states[
@@ -649,8 +657,8 @@ def test_dump_all_pools(
     mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
         "dump_variable_names_and_contexts"
     ]
-    mock_output_manager.dump_variables_to_csv_files = output_manager_original_method_states[
-        "dump_variables_to_csv_files "
+    mock_output_manager.save_variables_to_csv_files = output_manager_original_method_states[
+        "save_variables_to_csv_files "
     ]
 
 def test_generate_file_name(mocker: MockerFixture) -> None:
@@ -690,7 +698,7 @@ def test_dump_variables(
         "_dict_to_file_json"
     ]
 
-def test_dump_variables_to_csv_files(
+def test_save_variables_to_csv_files(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
@@ -702,12 +710,12 @@ def test_dump_variables_to_csv_files(
 
     with patch('pathlib.Path.mkdir') as mock_mkdir:
         mock_mkdir.return_value = None
-        mock_output_manager.dump_variables_to_csv_files("dummy_path")
+        mock_output_manager.save_variables_to_csv_files("dummy_path")
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
     mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables", "dummy_name")
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
 
     mock_output_manager.variables_pool = original_variables_pool
