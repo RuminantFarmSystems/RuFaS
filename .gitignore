@@ -17,6 +17,10 @@
 # ignore linear programming files
 *.lp
 
+# ignore temporary files generated when checking code coverage
+.coverage
+.github/workflows/coverage.json
+
 # ignore python compiled files
 *.pyc
 
