@@ -40,10 +40,11 @@ jobs:
         echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
 
     # https://stackoverflow.com/questions/50128549/travis-configuration-of-phpcs-for-only-current-commit-files/50128977#50128977
-    # Get a list of modified files in the newest commit, and add indentation for each line
+    # Get a list of modified files in the newest commit, add indentation for each line, add '\' before each '/' in file
+    # path
     - name: Get modified files
       run : |
-        echo "MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r | sed 's/^/    /')" >> "$GITHUB_ENV"
+        echo "MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r | sed 's/^/    /' | sed 's/\//\\\//g')" >> "$GITHUB_ENV"
 
     - name: Update .coveragerc
       run : |
