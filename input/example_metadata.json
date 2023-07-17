@@ -19,7 +19,7 @@
       "description": "Alfafa is fun!",
       "path": "crop/example_rotation.json",
       "type": "json",
-      "properties": "crop_properties"
+      "properties": "crop_schedule_properties"
     },
     "economy": {
       "title": "Economy data",
@@ -158,7 +158,7 @@
         "pattern": "[a-zA-Z]{2}"
       }
     },
-    "crop_properties": {
+    "crop_schedule_properties": {
        "crop_species": {
         "type": "string",
         "description": "the name of the crop being grown",
@@ -285,6 +285,15 @@
     },
     "manure_properties": {},
     "soil_properties": {
+      "second_moisture_condition_parameter": {
+        "type": "number",
+        "description": "Curve number parameter for average moisture condition equation.",
+        "units": "unitless",
+        "reference": "SWAT Input: .MGT",
+        "minimum": 30,
+        "maximum": 100,
+        "default": 85
+      },
       "n_mineralization": {
         "type": "number",
         "description": "The rate at which nitrogen is mineralized to nitrate (NO3)",
