@@ -316,10 +316,10 @@ def test_get_prefix() -> None:
 def test_csv_output_dir() -> None:
     """Unit test for function _csv_output_directory in file output_manager.py"""
     om = OutputManager()
-    assert str(om._csv_output_directory("test")) == Path("test/CSVs/om/")
+    assert om._csv_output_directory("test") == Path("test/CSVs/om/")
 
-def test_csv_output_dir() -> None:
-    """Unit test for function _csv_output_directory in file output_manager.py"""
+def test_csv_variable_output_dir() -> None:
+    """Unit test for function _csv_variable_output_directory in file output_manager.py"""
     om = OutputManager()
     assert om._csv_variable_output_directory("test") == Path("test/CSVs/om/variables/")
 
