@@ -47,7 +47,7 @@ jobs:
 
     - name: Update .coveragerc
       run : |
-        sed -i '5 s/^/%{{ env.MODIFIED_FILES }}\n/' .github/.coveragerc
+        sed -i '5 s/^/${{ env.MODIFIED_FILES }}\n/' .github/.coveragerc
 
     # https://coverage.readthedocs.io/en/7.2.7/index.html
     # Run coverage test, Generate report, Save to JSON file, Set COVERAGE_PERCENTAGE extracted from JSON
