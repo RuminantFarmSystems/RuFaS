@@ -1,6 +1,8 @@
 ; See https://coverage.readthedocs.io/en/latest/config.html
 [run]
 command_line = -m pytest
+include =
+
 omit =
     *__init__.py
 branch = False
