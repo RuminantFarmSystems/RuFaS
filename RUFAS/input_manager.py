@@ -2,7 +2,6 @@
 
 from functools import reduce
 import json
-import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
