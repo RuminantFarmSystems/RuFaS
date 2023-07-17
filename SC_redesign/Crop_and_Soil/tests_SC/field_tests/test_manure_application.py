@@ -329,6 +329,6 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
         else:
             incorp._apply_solid_machine_manure.assert_called_once_with(dry_mass, dry_fraction, total_phosphorus_mass,
                                                                        coverage, expected_weiP_frac, inorganic_frac,
-                                                                       ammonium_frac, organic_frac)
+                                                                       ammonium_frac, organic_frac, area)
         assert incorp.data.machine_manure_applied_mass == dry_mass
 
