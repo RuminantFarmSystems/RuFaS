@@ -354,7 +354,7 @@
         "description": "The soil layers that this profile contains. Each element of the array should be a `soil_layer` object.",
         "minimum_length": 1
       },
-      "soil_layer": {
+      "soil_layer_properties": {
         "type": "object",
         "description": "This represents a single soil layer.",
         "bottom_depth": {
