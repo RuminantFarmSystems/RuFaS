@@ -60,10 +60,8 @@ def test_mineralize_organic_nitrogen(active_to_stable: float, active_to_nitrate:
     incorp.data.soil_layers[0].nitrate_content = 25
     incorp.data.soil_layers[0].humus_mineralization_rate_factor = 0.00035
 
-
     incorp._determine_intra_organic_mineralization = MagicMock(return_value=active_to_stable)
     incorp._determine_organic_to_nitrate_mineralization = MagicMock(return_value=active_to_nitrate)
-
 
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
                         nutrient_cycling_temp_factor=PropertyMock(return_value=0.5),
