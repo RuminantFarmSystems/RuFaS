@@ -50,6 +50,7 @@ jobs:
         echo "MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r | sed 's/^/    /' | sed 's/\//\\\//g' | sed '/\.py$/!d')" >> "$GITHUB_ENV"
         if [ "${{ env.MODIFIED_FILES }}" == "" ]; then
           echo "empty"
+        fi
 
     - name: Update .coveragerc
       run : |
