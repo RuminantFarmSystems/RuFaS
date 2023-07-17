@@ -43,7 +43,7 @@ jobs:
     # Get a list of modified files in the newest commit
     - name: Get list of modified files
       run : |
-        echo "MODIFIED_FILES="$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r)" >> "$GITHUB_ENV"
+        echo "MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r)" >> "$GITHUB_ENV"
         echo "${{ env.MODIFIED_FILES }}"
 
     # https://coverage.readthedocs.io/en/7.2.7/index.html
