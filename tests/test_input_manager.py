@@ -288,6 +288,27 @@ def test_validate_element_unfixable_invalid_element_returns_false(mocker: Mocker
     assert result is False
 
 
+def test_validate_element_with_element_no_type_returns_false(mocker: MockerFixture,
+                                                             mock_input_manager: InputManager,
+                                                             mock_metadata: Dict[str, Dict[str, Any]],
+                                                             mock_pool: Dict[str, Dict[str, Any]],
+                                                             ) -> None:
+    """Unit test for function _validate_element function with invalid element in file input_manager.py"""
+    dummy_module_key = "animal"
+    dummy_valid_element = "animal_var1"
+    dummy_property_map_key = "animal_properties"
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+    mocker.patch.object(mock_input_manager, "_check_variable_nested", return_value=False)
+    mocker.patch.object(mock_input_manager, "_get_variable_type", return_value=None)
+    eager_termination = True
+
+    result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                                  dummy_property_map_key, eager_termination)
+
+    assert result is False
+
+
 @pytest.mark.parametrize(
     'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
     [
