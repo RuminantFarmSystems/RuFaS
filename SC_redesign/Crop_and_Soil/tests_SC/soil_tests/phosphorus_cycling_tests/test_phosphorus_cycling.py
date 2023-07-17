@@ -15,15 +15,23 @@ from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import
 ])
 def test_phosphorus_cycling(rainfall: float, runoff: float, field_size: float, mean_air_temperature: float) -> None:
     """Tests that the main routine were executed correctly"""
-    Manure.daily_manure_update = MagicMock()
-    Fertilizer.do_fertilizer_phosphorus_operations = MagicMock()
-    PhosphorusMineralization.mineralize_phosphorus = MagicMock()
-    SolublePhosphorus.daily_update_routine = MagicMock()
+    manure = MagicMock(Manure)
+    manure.daily_manure_update = MagicMock()
+    fert = MagicMock(Fertilizer)
+    fert.do_fertilizer_phosphorus_operations = MagicMock()
+    mineralization = MagicMock(PhosphorusMineralization)
+    mineralization.mineralize_phosphorus = MagicMock()
+    soluble_phosphorus = MagicMock(SolublePhosphorus)
+    soluble_phosphorus.daily_update_routine = MagicMock()
     cycle = PhosphorusCycling(field_size=field_size)
+    cycle.manure = manure
+    cycle.fertilizer = fert
+    cycle.mineralization = mineralization
+    cycle.soluble_phosphorus = soluble_phosphorus
 
     cycle.cycle_phosphorus(rainfall, runoff, field_size, mean_air_temperature)
 
-    Manure.daily_manure_update.assert_called_once_with(rainfall, runoff, field_size, mean_air_temperature)
-    Fertilizer.do_fertilizer_phosphorus_operations.assert_called_once_with(rainfall, runoff, field_size)
-    PhosphorusMineralization.mineralize_phosphorus.assert_called_once_with(field_size)
-    SolublePhosphorus.daily_update_routine.assert_called_once_with(runoff, field_size)
+    manure.daily_manure_update.assert_called_once_with(rainfall, runoff, field_size, mean_air_temperature)
+    fert.do_fertilizer_phosphorus_operations.assert_called_once_with(rainfall, runoff, field_size)
+    mineralization.mineralize_phosphorus.assert_called_once_with(field_size)
+    soluble_phosphorus.daily_update_routine.assert_called_once_with(runoff, field_size)
