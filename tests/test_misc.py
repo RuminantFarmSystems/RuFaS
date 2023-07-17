@@ -313,16 +313,6 @@ def test_get_prefix() -> None:
     om = OutputManager()
     assert om._get_prefix("class", "func") == "class.func"
 
-def test_csv_output_dir() -> None:
-    """Unit test for function _csv_output_directory in file output_manager.py"""
-    om = OutputManager()
-    assert om._csv_output_directory("test") == Path("test/CSVs/om/")
-
-def test_csv_variable_output_dir() -> None:
-    """Unit test for function _csv_variable_output_directory in file output_manager.py"""
-    om = OutputManager()
-    assert om._csv_variable_output_directory("test") == Path("test/CSVs/om/variables/")
-
 @pytest.fixture
 def mock_output_manager(mocker) -> OutputManager:
     output_manager = OutputManager()

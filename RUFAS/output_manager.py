@@ -57,14 +57,6 @@ class OutputManager(object):
                 },
             )
 
-    def _csv_output_directory(self, base_output_dir: str) -> Path:
-        """Directory where csv files are written to."""
-        return Path(base_output_dir) / "CSVs" / "om"
-
-    def _csv_variable_output_directory(self, base_output_dir: str) -> Path:
-        """Directory where variable pool's csv files are written to."""
-        return self._csv_output_directory(base_output_dir) / "variables"
-
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
         info_maps: List[Dict[str, Any]] = []
@@ -670,7 +662,7 @@ class OutputManager(object):
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
-        self.save_variables_to_csv_files(str(self._csv_variable_output_directory(path)))
+        self.save_variables_to_csv_files(str(Path(path) / "CSVs" / "om" / "variables"))
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
