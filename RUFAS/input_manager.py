@@ -148,6 +148,43 @@ class InputManager:
 
         return True
 
+    def _check_variable_nested(self, variable_to_check: Dict[str, Any]) -> bool:
+        """Checks if element currently being validated is nested.
+
+        Parameters
+        ----------
+        variable_to_check : (Dict[str, Any])
+            The corresponding value for the variable being checked.
+
+        Returns
+        -------
+        bool
+            True if variable_to_check has "object" as "type" in metadata. False otherwise.
+        """
+        non_nested_types = ["number", "string", "boolean", "array"]
+        if variable_to_check["type"] in non_nested_types:
+            is_nested = False
+        elif variable_to_check["type"] == "object":
+            is_nested = True
+        else:
+            is_nested = False
+        return is_nested
+
+    def _get_variable_type(self, variable_to_check: Dict[str, Any]) -> str:
+        """_summary_
+
+        Parameters
+        ----------
+        variable_to_check : Dict[str, Any]
+            The corresponding value for the variable being checked.
+
+        Returns
+        -------
+        str
+            The type of the variable being checked.
+        """
+        return variable_to_check.get("type")
+
     def _validate_element(self, module_key: str, element: str,
                           property_map_key: str, eager_termination: bool = True) -> bool:
         """
@@ -172,16 +209,13 @@ class InputManager:
         bool
             True if the data is valid, False otherwise.
         """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_element.__name__,
+                    }
         element_heirarchy = element.split(".")
         variable_to_check = reduce(lambda d, key: d[key], element_heirarchy,
                                    self.__metadata["properties"][property_map_key])
-        non_nested_types = ["number", "string", "boolean", "array"]
-        if variable_to_check["type"] in non_nested_types:
-            is_nested = False
-        elif variable_to_check["type"] == "object":
-            is_nested = True
-        else:
-            is_nested = False
+        is_nested = self._check_variable_nested(element_heirarchy, variable_to_check)
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
@@ -192,15 +226,19 @@ class InputManager:
                     return False
                 children_status[whole_key] = child_status
                 if not child_status:
+                    om.add_warning("Invalid nested element found", f"{whole_key=}", info_map)
                     false_counter += 1
             is_valid = false_counter == 0
             if is_valid:
                 return True
             else:
-                # TODO logging
+                invalid_child_vars = [key for key, value in children_status.items() if value is False]
+                om.add_warning("Invalid nested element(s) found",
+                               f"{invalid_child_vars=}",
+                               info_map)
                 return False
         else:
-            var_type = variable_to_check["type"]
+            var_type = self._get_variable_type(variable_to_check)
             var_name = element_heirarchy[-1]
             input_data_value = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
             if var_type == "string":
@@ -209,13 +247,15 @@ class InputManager:
                 is_valid = self._validate_num_type_element(variable_to_check, var_name, input_data_value)
             elif var_type == "boolean":
                 is_valid = self._validate_bool_type_element(input_data_value)
-            else:
+            elif var_type == "array":
                 is_valid = self._validate_array_type_element(variable_to_check, var_name, input_data_value)
+            else:
+                return False
 
             if is_valid:
                 return True
             else:
-                is_fixed = self._fix_data()
+                is_fixed = self._fix_data(module_key, element_heirarchy)
                 return is_fixed
 
     def _validate_array_type_element(self,

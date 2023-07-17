@@ -33,9 +33,15 @@ def input_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
+        "start_data_pipeline": mock_input_manager.start_data_pipeline,
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_data": mock_input_manager._load_data,
-        "_validate_data": mock_input_manager._validate_data
+        "_validate_data": mock_input_manager._validate_data,
+        "_validate_element": mock_input_manager._validate_element,
+        "_validate_array_type_element": mock_input_manager._validate_array_type_element,
+        "_validate_bool_type_element": mock_input_manager._validate_bool_type_element,
+        "_validate_num_type_element": mock_input_manager._validate_num_type_element,
+        "_validate_string_type_element": mock_input_manager._validate_string_type_element,
     }
 
 
@@ -118,7 +124,7 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
 
 
 def test_start_data_pipeline(mock_input_manager: InputManager,
-                             input_manager_original_method_states: Dict[str, Callable]) -> None:
+                             input_manager_original_method_states: Dict[str, Callable],) -> None:
     """Unit test for function start_data_pipeline in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
     mock_input_manager._load_data = MagicMock()
@@ -147,13 +153,16 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
                 },
             "properties": {
                 "animal_properties": {"animal_var1": {"default": "dummyvalue1"},
-                                      "animal_var2": {"default": "dummyvalue2"}
+                                      "animal_var2": {"default": "dummyvalue2"},
+                                      "animal_var3": {"animal_nested1": {"default": "dummyvalue3"}}
                                       },
                 "manure_properties": {"manure_var1": {"default": "dummyvalue1"},
                                       "manure_var2": {"default": "dummyvalue2"},
+                                      "manure_var3": {"manure_nested1": {"default": "dummyvalue3"}},
                                       },
                 "crop_properties": {"crop_var1": {"default": "dummyvalue1"},
                                     "crop_var2": {"default": "dummyvalue2"},
+                                    "crop_var3": {"crop_nested1": {"default": "dummyvalue3"}},
                                     }
                 }
             }
@@ -163,20 +172,29 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 def mock_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
             "animal": {"animal_var1": "dummyvalue1",
-                       "animal_var2": "dummyvalue2"
+                       "animal_var2": "dummyvalue2",
+                       "animal_var3": {
+                           "animal_nested1": "dummyvalue3"
+                       },
                        },
             "manure": {"manure_var1": "dummyvalue3",
-                       "manure_var2": "dummyvalue4"
+                       "manure_var2": "dummyvalue4",
+                       "manure_var3": {
+                           "manure_nested1": "dummyvalue3"
+                       },
                        },
             "crop": {"crop_var1": "dummyvalue5",
-                     "crop_var2": "dummyvalue6"
+                     "crop_var2": "dummyvalue6",
+                     "crop_var3": {
+                           "crop_nested1": "dummyvalue3"
+                       },
                      },
             }
 
 
 def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager,
                                                     mock_metadata: Dict[str, Dict[str, Any]],
-                                                    mock_pool: Dict[str, Dict[str, Any]]
+                                                    mock_pool: Dict[str, Dict[str, Any]],
                                                     ) -> None:
     """Unit test for valid data for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
@@ -193,7 +211,7 @@ def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: 
 def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture,
                                                                  mock_input_manager: InputManager,
                                                                  mock_metadata: Dict[str, Dict[str, Any]],
-                                                                 mock_pool: Dict[str, Dict[str, Any]]
+                                                                 mock_pool: Dict[str, Dict[str, Any]],
                                                                  ) -> None:
     """Unit test for invalid unfixable data for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
@@ -211,7 +229,7 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerF
 def test_validate_data_returns_false_with_invalid_data_no_eager_termination(mocker: MockerFixture,
                                                                             mock_input_manager: InputManager,
                                                                             mock_metadata: Dict[str, Dict[str, Any]],
-                                                                            mock_pool: Dict[str, Dict[str, Any]]
+                                                                            mock_pool: Dict[str, Dict[str, Any]],
                                                                             ) -> None:
     """Unit test for no eager termination with non-critical
     invalid data for function _validate_data in file input_manager.py"""
@@ -224,6 +242,50 @@ def test_validate_data_returns_false_with_invalid_data_no_eager_termination(mock
 
     assert result is False
     assert add_log.call_count == 3
+
+
+def test_validate_element_valid_element_returns_true(mocker: MockerFixture,
+                                                     mock_input_manager: InputManager,
+                                                     mock_metadata: Dict[str, Dict[str, Any]],
+                                                     mock_pool: Dict[str, Dict[str, Any]],
+                                                     ) -> None:
+    """Unit test for function _validate_element function with valid element in file input_manager.py"""
+    dummy_module_key = "animal"
+    dummy_valid_element = "animal_var1"
+    dummy_property_map_key = "animal_properties"
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+    mocker.patch.object(mock_input_manager, "_check_variable_nested", return_value=False)
+    mocker.patch.object(mock_input_manager, "_get_variable_type", return_value="string")
+    eager_termination = True
+
+    result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                                  dummy_property_map_key, eager_termination)
+
+    assert result is True
+
+
+def test_validate_element_unfixable_invalid_element_returns_false(mocker: MockerFixture,
+                                                                  mock_input_manager: InputManager,
+                                                                  mock_metadata: Dict[str, Dict[str, Any]],
+                                                                  mock_pool: Dict[str, Dict[str, Any]],
+                                                                  ) -> None:
+    """Unit test for function _validate_element function with invalid element in file input_manager.py"""
+    dummy_module_key = "animal"
+    dummy_valid_element = "animal_var1"
+    dummy_property_map_key = "animal_properties"
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+    mocker.patch.object(mock_input_manager, "_check_variable_nested", return_value=False)
+    mocker.patch.object(mock_input_manager, "_get_variable_type", return_value="number")
+    mocker.patch.object(mock_input_manager, "_validate_num_type_element", return_value=False)
+    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
+    eager_termination = True
+
+    result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                                  dummy_property_map_key, eager_termination)
+
+    assert result is False
 
 
 @pytest.mark.parametrize(
