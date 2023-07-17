@@ -9,6 +9,9 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("temp_average", [
+    -40.33,
+    -20.1,
+    0.0,
     70,  # lower values
     150,  # higher values
     88.8,  # arbitrary
@@ -17,8 +20,8 @@ def test_calc_temp_factor(temp_average, x_inflection: float = 15.4, y_inflection
                           point_distance: float = 29.7, inflection_slope=0.03,
                           normalizer=20.80546):
     """ensures that temperature effect was calculated according to the formula in "pseudocode_soil" S.6.A.1"""
-    expect = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-            temp_average - x_inflection))) / normalizer
+    expect = max(0.0, (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
+            temp_average - x_inflection))) / normalizer)
     assert Decomposition._calc_temp_factor(temp_average) == expect
 
 
@@ -46,6 +49,9 @@ def test_calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float 
     else:
         expected_term_2 = expected_base_2 ** second_exponent
     expected = expected_term_1 * expected_term_2
+
+    if expected < 0.0:
+        expected = 0.0
 
     assert Decomposition._calc_moisture_factor(water_factor) == expected
 
