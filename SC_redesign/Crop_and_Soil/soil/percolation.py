@@ -34,8 +34,10 @@ class Percolation:
         """
         layer_count = len(self.data.soil_layers)
         deepest_layer = layer_count - 1
+        #print(layer_count)
 
         for layer_number in range(layer_count):  # loop through each layer
+            print(layer_number)
             current_layer = self.data.soil_layers[layer_number]
 
             # get the appropriate underlying layer

@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 from unittest.mock import MagicMock, patch, PropertyMock
 from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
@@ -81,8 +83,8 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
     lower_data = LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1, field_size=1.33)
     with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.excess_water_available', new_callable=PropertyMock,
                return_value=excess_water_available), \
-            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.acceptable_percolation_amount',
-                  new_callable=PropertyMock, return_value=acceptable_percolation_amount):
+         patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.acceptable_percolation_amount',
+               new_callable=PropertyMock, return_value=acceptable_percolation_amount):
 
         Percolation._determine_percolation_travel_time = MagicMock()
         Percolation._determine_percolation_to_next_layer = MagicMock(return_value=amount_to_percolate)
@@ -96,11 +98,11 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
 
 
 # --- Integration tests ----
-@pytest.mark.parametrize("high_seasonal_water_table", [
-    True,
-    False,
+@pytest.mark.parametrize("can_percolate, expected", [
+    (True, [4.7, 4.75, 21, 0.3]),
+    (False, [5.0, 4.75, 21, 0])
 ])
-def test_percolate(high_seasonal_water_table):
+def test_percolate(can_percolate: bool, expected: List[float]):
     """tests the main routine of percolation.py (percolate()) and check that it updates all values correctly"""
     # Initialize objects
     layers = [LayerData(top_depth=0, bottom_depth=39, field_size=1.33),
@@ -113,32 +115,31 @@ def test_percolate(high_seasonal_water_table):
     data = SoilData(field_size=1.33, soil_layers=layers,
                     vadose_zone_layer=LayerData(top_depth=100000, bottom_depth=200000,
                                                 soil_water_concentration=0, field_size=1.33))
-    incorp = Percolation(data)
 
     # Mock intermediate functions
-    Percolation._determine_if_percolation_allowed = MagicMock(return_value=True)
+    Percolation._determine_if_percolation_allowed = MagicMock(return_value=can_percolate)
     Percolation._determine_percolation_travel_time = MagicMock(return_value=0.245)
     Percolation._determine_percolation_to_next_layer = MagicMock(return_value=0.5)
     Percolation._percolate_between_layers = MagicMock(return_value=0.3)
-
+    incorp = Percolation(data)
     # Record expected final values for soil water content in each layer and vadose zone
     # Top layer should lose 0.3 mm of water
     # Second layer gains then loses 0.3 mm of water
     # Third layer gains then loses 0.3 mm of water
     # Vadose zone starts empty, then gains 0.3 mm of water
-    expect = [incorp.data.soil_layers[0].water_content - 0.3, incorp.data.soil_layers[1].water_content,
-              incorp.data.soil_layers[2].water_content, 0.3]
 
     # Run function
-    incorp.percolate(high_seasonal_water_table)
-
+    incorp.percolate(True)
     # Collect results
     observe = [incorp.data.soil_layers[0].water_content, incorp.data.soil_layers[1].water_content,
                incorp.data.soil_layers[2].water_content, incorp.data.vadose_zone_layer.water_content]
-
     # Assertions
-    assert observe == expect
-    assert Percolation._determine_if_percolation_allowed.call_count == len(data.soil_layers)
-    assert Percolation._percolate_between_layers.call_count == len(data.soil_layers)
-    for layer in incorp.data.soil_layers:
-        assert layer.percolated_water == 0.3
+    if can_percolate:
+        assert observe == expected
+        assert Percolation._determine_if_percolation_allowed.call_count == len(data.soil_layers)
+        assert Percolation._percolate_between_layers.call_count == len(data.soil_layers)
+        for layer in incorp.data.soil_layers:
+            assert layer.percolated_water == 0.3
+    else:
+        assert observe == expected
+
