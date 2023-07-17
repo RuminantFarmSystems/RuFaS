@@ -284,15 +284,61 @@
       }
     },
     "manure_properties": {},
-    "soil_properties": {
+    "soil_profile_properties": {
       "second_moisture_condition_parameter": {
         "type": "number",
         "description": "Curve number parameter for average moisture condition equation.",
         "units": "unitless",
-        "reference": "SWAT Input: .MGT",
+        "reference": "SWAT Input: .MGT - CN2",
         "minimum": 30,
         "maximum": 100,
         "default": 85
+      },
+      "average_subbasin_slope": {
+        "type": "number",
+        "description": "Slope of the field, measured as rise over run.",
+        "units": "meters / meters or unitless",
+        "reference": "SWAT Input: .HRU - HRU_SLP",
+        "default": 0.05
+      },
+      "manning_roughness_coefficient": {
+        "type": "number",
+        "description": "Manning's \"n\" value for overland flow.",
+        "units": "unitless",
+        "reference": "SWAT Input: .HRU - OV_N",
+        "minimum": 0.001,
+        "default": 0.4
+      },
+      "support_practice_factor": {
+        "type": "number",
+        "description": "Ratio of soil loss with a specific support practice based on slope characteristics.",
+        "units": "unitless",
+        "reference": "SWAT Input: .MGT - USLE_P",
+        "notes": "This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used.",
+        "default": 0.08
+      },
+      "albedo": {
+        "type": "number",
+        "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.",
+        "reference": "SWAT Input: .SOL - SOL_ALB",
+        "units": "unitless",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.16
+      },
+      "initial_residue": {
+        "type": "number",
+        "description": "Amount of residue present on the soil surface at the start of the simulation.",
+        "units": "kg / ha",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "soil_cover_type": {
+        "type": "string",
+        "description": "Type of soil cover at the beginning of the simulation.",
+        "reference": "SurPhos Theoretical documentation eqn. [14].",
+        "pattern": "^(BARE|RESIDUE_COVER|GRASSED)$",
+        "default": "BARE"
       },
       "n_mineralization": {
         "type": "number",
