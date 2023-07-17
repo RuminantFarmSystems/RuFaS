@@ -37,7 +37,7 @@ jobs:
     # Get the commit ID of the newest commit and save it as an environment variable
     - name: Get newst commit ID
       run : |
-        echo "COMMIT_ID=$(git log --format="%H" -n 1)" >> "$GITHUB_ENV"
+        echo "COMMIT_ID=$(git log --format='%H' -n 1)" >> "$GITHUB_ENV"
         echo "${{ env.COMMIT_ID }}"
 
     # Get a list of modified files in the newest commit
