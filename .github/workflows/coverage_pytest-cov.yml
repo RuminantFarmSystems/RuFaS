@@ -36,9 +36,8 @@ jobs:
     # https://stackoverflow.com/questions/58886293/getting-current-branch-and-commit-hash-in-github-action
     # Get the commit ID of the newest commit and save it as an environment variable
     - name: Get newst commit ID
-      run : |        
-        echo "${{ env.COMMIT_ID }}"
-        echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV
+      run : |
+        echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
         echo "${{ env.COMMIT_ID }}"
 
     # https://stackoverflow.com/questions/50128549/travis-configuration-of-phpcs-for-only-current-commit-files/50128977#50128977
