@@ -80,10 +80,9 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
     upper_data = LayerData(top_depth=0, bottom_depth=20, field_size=1.33)
     lower_data = LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1, field_size=1.33)
     with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.excess_water_available', new_callable=PropertyMock,
-               return_value=excess_water_available) as mocked_excess_water, \
+               return_value=excess_water_available), \
             patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.acceptable_percolation_amount',
-                  new_callable=PropertyMock, return_value=acceptable_percolation_amount) as \
-                    mocked_acceptable_percolation_amount:
+                  new_callable=PropertyMock, return_value=acceptable_percolation_amount):
 
         Percolation._determine_percolation_travel_time = MagicMock()
         Percolation._determine_percolation_to_next_layer = MagicMock(return_value=amount_to_percolate)
