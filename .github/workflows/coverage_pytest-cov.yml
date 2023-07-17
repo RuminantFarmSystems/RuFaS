@@ -37,10 +37,10 @@ jobs:
     # Get the commit ID of the newest commit and save it as an environment variable
     - name: Get newst commit ID
       run : |
-        echo "COMMIT_ID=$(git rev-parse "$GITHUB_SHA")" >> "$GITHUB_ENV"
+#        echo "COMMIT_ID=$(git rev-parse "$GITHUB_SHA")" >> "$GITHUB_ENV"
+
+        echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV
         echo "${{ env.COMMIT_ID }}"
-        echo ${{ github.event.pull_request.head.sha }}
-        echo "${{ github.event.pull_request.head.sha }}"
 
     # https://stackoverflow.com/questions/50128549/travis-configuration-of-phpcs-for-only-current-commit-files/50128977#50128977
     # Get a list of modified files in the newest commit
