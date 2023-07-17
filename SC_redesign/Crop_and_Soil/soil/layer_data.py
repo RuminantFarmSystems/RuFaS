@@ -123,11 +123,11 @@ class LayerData:
     # pseudocode_soil S.6.C.3
     active_carbon_decomposition_amount: float = 0.0
     """active carbon decomposed into slow or passive carbon and CO2 (kg/ha)"""
-    active_carbon_amount: float = 0.0
+    active_carbon_amount: Optional[float] = None
     """active carbon stored in the soil (kg/ha)"""
 
     # pseudocode_soil S.6.C.4
-    slow_carbon_amount: float = 0.0
+    slow_carbon_amount: Optional[float] = None
     """slow carbon stored in the soil (kg/ha)"""
     slow_carbon_decomposition_amount: float = 0.0
     """slow carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
@@ -135,7 +135,7 @@ class LayerData:
     # pseudocode_soil S.6.C.5
     passive_carbon_decomposition_amount: float = 0.0
     """passive carbon decomposed into active or passive carbon and CO2 (kg/ha)"""
-    passive_carbon_amount: float = 0.0
+    passive_carbon_amount: Optional[float] = None
     """passive carbon stored in the soil (kg/ha)"""
 
     # pseudocode_soil S.6.C.7
@@ -344,6 +344,8 @@ class LayerData:
 
         self._initialize_nitrogen_pools(field_size, residue)
 
+        self._initialize_carbon_pools(field_size)
+
     def _initialize_nitrogen_pools(self, field_size: float, residue: float) -> None:
         """Initializes the nitrogen pools in the soil layer
 
@@ -395,6 +397,31 @@ class LayerData:
 
         if self.top_depth == 0:
             self.fresh_organic_nitrogen_content = 0.0015 * residue  # SWAT eqn. 3:1.1.5
+
+    def _initialize_carbon_pools(self, field_size: float) -> None:
+        """
+        Initializes soil carbon pools based on the carbon content fraction of the layer.
+
+        Parameters
+        ----------
+        field_size: float
+            Size of the field (ha).
+
+        Notes
+        -----
+        This is an extremely simply and arbitrary way of initializing carbon pools in the soil, and is intended to be a
+        temporary solution until SWAT-C is implemented. TODO - #512
+
+        """
+        soil_volume_in_cubic_meters = self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * \
+            CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+
+        one_third_soil_carbon = (1 / 3) * (soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size)
+
+        self.active_carbon_amount = one_third_soil_carbon
+        self.passive_carbon_amount = one_third_soil_carbon
+        self.slow_carbon_amount = one_third_soil_carbon
 
     def add_to_labile_phosphorus(self, phosphorus_to_add: float, field_size: float) -> None:
         """This method is a wrapper for adding a specified mass of phosphorus to the labile phosphorus content of this
@@ -632,26 +659,34 @@ class LayerData:
         return 1.72 * self.percent_organic_carbon_content
 
     @property
-    def soil_water_content(self):
-        """volume of soil water in the layer (mm)"""
-        return self.soil_water_concentration / self.layer_thickness
-
-    @property
     def water_factor(self):
         """relative water saturation (%)"""
 
         # pseudocode_soil S.4.B.1
-        if self.soil_water_content <= self.field_capacity_content:
-            return (self.soil_water_content - self.wilting_point_content) / (
+        if self.water_content <= self.field_capacity_content:
+            return (self.water_content - self.wilting_point_content) / (
                     self.field_capacity_content - self.wilting_point_content)
         else:
-            return (self.saturation_content - self.soil_water_content) / (
+            return (self.saturation_content - self.water_content) / (
                     self.saturation_content - self.field_capacity_content)
 
     @property
     def silt_clay_content(self):
-        """silt and clay fraction in the soil (unitless)"""
-        return self.percent_silt_content / self.percent_clay_content
+        """
+        Combined silt and clay fraction in the soil (unitless).
+
+        References
+        ----------
+        pseudocode_soil eqn. [S.6.C.2]
+
+        Notes
+        -----
+        This is not necessarily the correct way to calculate this value; because the documentation is so sparse, the
+        correct way is unknown. In the old code this value was hardcoded to be 0.5, and this property attempts to
+        generate a reasonable value close to that.
+
+        """
+        return (self.percent_silt_content + self.percent_clay_content) / 100
 
     def do_annual_reset(self):
         self.annual_carbon_CO2_lost = 0
