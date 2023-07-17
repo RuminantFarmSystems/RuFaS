@@ -7,6 +7,7 @@ from pytest import approx
 from pytest_mock import MockerFixture
 
 from RUFAS.routines import AnimalManager
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
@@ -61,7 +62,6 @@ def test_group_pens_by_animal_combination(mocker: MockerFixture) -> None:
         Pen.AnimalCombination.GROWING,
         Pen.AnimalCombination.GROWING_AND_CLOSE_UP,
         Pen.AnimalCombination.LAC_COW,
-        Pen.AnimalCombination.NONE,
         Pen.AnimalCombination.CLOSE_UP,
     ]
     num_groups = len(animal_combinations)
@@ -237,11 +237,11 @@ def test_create_default_pens_for_potential_space_shortage(animal_combination: Pe
     mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.__init__',
                  return_value=None)
     animal_manager = AnimalManager(data=mocker.MagicMock(),
-                                      config=mocker.MagicMock(),
-                                      feed=mocker.MagicMock(),
-                                      weather=mocker.MagicMock(),
-                                      time=mocker.MagicMock()
-                                      )
+                                   config=mocker.MagicMock(),
+                                   feed=mocker.MagicMock(),
+                                   weather=mocker.MagicMock(),
+                                   time=mocker.MagicMock()
+                                   )
 
     # Act
     new_default_pens = animal_manager._create_default_pens_for_potential_space_shortage(
@@ -479,15 +479,6 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
         return_value=pens_by_animal_combination
     )
 
-    patch_for_get_dry_cows = mocker.patch(
-        'RUFAS.routines.animal.animal_manager.AnimalManager._get_dry_cows',
-        return_value=dry_cows
-    )
-    patch_for_get_lactating_cows = mocker.patch(
-        'RUFAS.routines.animal.animal_manager.AnimalManager._get_lactating_cows',
-        return_value=lac_cows
-    )
-
     num_new_default_pens = 10
     dummy_new_default_pens = [mocker.MagicMock() for _ in range(num_new_default_pens)]
     mocker.patch(
@@ -522,13 +513,26 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
     animal_manager.cows = cows
     animal_manager.all_pens = mock_pens
 
+    patch_for_sort_animals_before_allocation = mocker.patch.object(
+        AnimalManager,
+        '_sort_animals_before_allocation',
+        return_value=None
+    )
+
+    mocker.patch('RUFAS.routines.animal.animal_manager.AnimalManager.ANIMAL_GROUPING_SCENARIO.find_animal_combination',
+                 side_effect=lambda animal: Pen.AnimalCombination.CALF
+                 if animal in calves
+                 else Pen.AnimalCombination.GROWING
+                 if animal in heiferIs + heiferIIs
+                 else Pen.AnimalCombination.CLOSE_UP
+                 if animal in heiferIIIs + dry_cows
+                 else Pen.AnimalCombination.LAC_COW)
+
     # Act
     animal_manager.allocate_animals_to_pens()
 
     # Assert
     patch_for_group_pens_by_animal_combination.assert_called_once_with(mock_pens)
-    patch_for_get_dry_cows.assert_called_once_with(cows)
-    patch_for_get_lactating_cows.assert_called_once_with(cows)
 
     assert animal_manager.all_pens[-(num_new_default_pens * len(animals_by_combination)):] == \
            dummy_new_default_pens * len(animals_by_combination)
@@ -537,3 +541,4 @@ def test_allocate_animals_to_pens(mocker: MockerFixture) -> None:
 
     assert patch_for_allocate_animals_to_pens_helper.call_count == len(animals_by_combination)
     patch_for_fully_update_animal_to_pen_id_map.assert_called_once()
+    patch_for_sort_animals_before_allocation.assert_called_once()
