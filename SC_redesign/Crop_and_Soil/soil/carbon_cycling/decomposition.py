@@ -50,10 +50,14 @@ class Decomposition:
             temp_average: Average temperature (celsius)
 
         Returns: temperature effect (unitless)
+
+        Notes: this temperature factor is lower-bounded at 0.0, because if negative it may result in a negative amount
+            of decomposition, which in this context would be considered a bug.
         """
         # S.6.A.4
-        return (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
-                temp_average - x_inflection))) / normalizer
+        temp_factor = (y_inflection + (point_distance / math.pi) * math.atan(math.pi * inflection_slope * (
+                       temp_average - x_inflection))) / normalizer
+        return max(0.0, temp_factor)
 
     @staticmethod
     def _calc_moisture_factor(water_factor, a_term: float = 0.55, b_term: float = 1.7,
@@ -72,6 +76,9 @@ class Decomposition:
         Notes: If negative bases are raised to a exponents, they sometimes result in complex numbers instead of negative
             floats. This behavior causes the program to eventually crash and is avoided by computing a sign correction
             factor, which allows the absolute value of the bases to be used.
+
+            This value is lower-bounded at 0, because if negative it will lead to a negative decomposition factor, which
+            does not make any sense.
         """
         # S.6.A.5
         base_1 = (water_factor - b_term) / (a_term - b_term)
@@ -84,4 +91,4 @@ class Decomposition:
         first_term = abs(base_1) ** first_exponent
         second_term = abs(base_2) ** second_exponent
 
-        return first_term * second_term * sign_correction_factor
+        return max(0.0, first_term * second_term * sign_correction_factor)
