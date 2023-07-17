@@ -62,6 +62,7 @@ class OutputManager(object):
         return Path(base_output_dir) / "CSVs" / "om"
 
     def _csv_variable_output_directory(self, base_output_dir: str) -> Path:
+        """Directory where variable pool's csv files are written to."""
         return self._csv_output_directory(base_output_dir) / "variables"
 
     def _pool_element_factory(self) -> pool_element_type:
