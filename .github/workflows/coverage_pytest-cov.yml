@@ -49,7 +49,8 @@ jobs:
       run : |
         echo "MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r | sed 's/^/    /' | sed 's/\//\\\//g' | sed '/\.py$/!d')" >> "$GITHUB_ENV"
         if [ "${{ env.MODIFIED_FILES }}" == "" ]; then
-          echo "empty"
+          echo "No python files changed, skipping coverage test!"
+          exit 0
         fi
 
     - name: Update .coveragerc
