@@ -142,4 +142,3 @@ def test_percolate(can_percolate: bool, expected: List[float]):
             assert layer.percolated_water == 0.3
     else:
         assert observe == expected
-
