@@ -192,7 +192,48 @@ def mock_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
             }
 
 
-def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager,
+@pytest.mark.parametrize(
+    'dummy_variable_to_check, expected_result',
+    [
+        ({"type": "string"}, False),
+        ({"type": "bool"}, False),
+        ({"type": "number"}, False),
+        ({"type": "array"}, False),
+        ({"type": "object"}, True),
+        ({"type": None}, False)
+    ]
+)
+def test_check_variable_nested(mocker: MockerFixture,
+                               mock_input_manager: InputManager,
+                               dummy_variable_to_check: Dict[str, str],
+                               expected_result: bool,
+                               ) -> None:
+    result = mock_input_manager._check_variable_nested(dummy_variable_to_check)
+
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_to_check, expected_result',
+    [
+        ({"type": "string"}, "string"),
+        ({"type": "bool"}, "bool"),
+        ({"type": "number"}, "number"),
+        ({"type": "array"}, "array"),
+        ({"type": "object"}, "object"),
+        ({"type": None}, None)
+    ]
+)
+def test_get_variable_type(mock_input_manager: InputManager,
+                           dummy_variable_to_check: Dict[str, str],
+                           expected_result: str, ) -> None:
+    result = mock_input_manager._get_variable_type(dummy_variable_to_check)
+
+    assert result == expected_result
+
+
+def test_validate_data_returns_true_with_valid_data(mocker: MockerFixture,
+                                                    mock_input_manager: InputManager,
                                                     mock_metadata: Dict[str, Dict[str, Any]],
                                                     mock_pool: Dict[str, Dict[str, Any]],
                                                     ) -> None:
@@ -307,95 +348,3 @@ def test_validate_element_with_element_no_type_returns_false(mocker: MockerFixtu
                                                   dummy_property_map_key, eager_termination)
 
     assert result is False
-
-
-@pytest.mark.parametrize(
-    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
-    [
-        ([1, 2, 3], {"minimum_length": 5, "maximum_length": 10}, False, 1),
-        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0),
-        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1),
-        ([], {"minimum_length": 5}, False, 1),
-    ]
-)
-def test_validate_array_type_element(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
-                                     expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_array_type_element function in file input_manager.py"""
-    dummy_var_name = "dummy_array"
-
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._validate_array_type_element(dummy_variable_to_check, dummy_var_name, dummy_value)
-
-    assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
-
-
-@pytest.mark.parametrize(
-    'dummy_bool_value, expected_result',
-    [
-        (True, True),
-        (False, True),
-        ('', False)
-    ]
-)
-def test_validate_bool_type_element(dummy_bool_value: bool,
-                                    expected_result: bool,
-                                    mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_bool_type_element function in file input_manager.py"""
-    result = mock_input_manager._validate_bool_type_element(dummy_bool_value)
-
-    assert result == expected_result
-
-
-@pytest.mark.parametrize(
-    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
-    [
-        (1, {"minimum": 3, "maximum": 7}, False, 1),
-        (3, {"minimum": 3, "maximum": 7}, True, 0),
-        (5, {"minimum": 3}, True, 0),
-        (7, {"minimum": 3, "maximum": 7}, True, 0),
-        (9, {"maximum": 7}, False, 1),
-        (-1, {"minimum": 3, "maximum": 7}, False, 1),
-    ]
-)
-def test_validate_num_type_element(dummy_value: int,
-                                   dummy_variable_to_check: Dict[str, int],
-                                   expected_result: bool,
-                                   expected_warning_call_count: int,
-                                   mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_num_type_element function in file input_manager.py"""
-    dummy_var_name = "dummy_num"
-
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._validate_num_type_element(dummy_variable_to_check, dummy_var_name, dummy_value)
-
-    assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
-
-
-@pytest.mark.parametrize(
-    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
-    [
-        ("cow", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, True, 0),
-        ("cow", {"pattern": r".{3}", "minimum_length": 1}, True, 0),
-        ("COW", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, False, 1),
-        ("cow", {"minimum_length": 1, "maximum_length": 5}, True, 0),
-        ("cow", {"minimum_length": 5}, False, 1),
-        ("cow", {"maximum_length": 1}, False, 1),
-    ]
-)
-def test_validate_string_type_element(dummy_value: int,
-                                      dummy_variable_to_check: Dict[str, int],
-                                      expected_result: bool,
-                                      expected_warning_call_count: int,
-                                      mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_string_type_element function in file input_manager.py"""
-    dummy_var_name = "dummy_var"
-
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-        result = mock_input_manager._validate_string_type_element(dummy_variable_to_check, dummy_var_name, dummy_value)
-
-    assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
