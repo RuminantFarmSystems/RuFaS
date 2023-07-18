@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 om = OutputManager()
 
@@ -423,7 +423,7 @@ class InputManager:
 
         return is_valid_string
 
-    def _fix_data(self, variable_path: List[str]) -> bool:
+    def _fix_data(self, module_key: str, property_map_key: str, element_hierarchy: List[str]) -> bool:
         """
         Attempt to fix the invalid data.
         Return True if the data is fixed, False for critical data
@@ -442,17 +442,17 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
-        current_metadata: dict = self.__metadata['properties']
-        for metadata_key in variable_path:
+        current_metadata: dict = self.__metadata['properties'][property_map_key]
+        for metadata_key in element_hierarchy:
             current_metadata = current_metadata[metadata_key]
 
         if 'default' in current_metadata.keys():
-            current_pool = self.__pool
-            for pool_key in variable_path[:-1]:
+            current_pool = self.__pool[module_key]
+            for pool_key in element_hierarchy[:-1]:
                 current_pool = current_pool[pool_key]
 
-            current_pool[variable_path[-1]] = current_metadata['default']
-            om.add_warning("Data fixed", f"Invalid data fixed: {variable_path[-1]} => {current_metadata['default']}",
+            current_pool[element_hierarchy[-1]] = current_metadata['default']
+            om.add_warning("Data fixed", f"Invalid data fixed: {element_hierarchy[-1]} => {current_metadata['default']}",
                            info_map)
             return True
 
