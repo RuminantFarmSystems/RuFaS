@@ -658,7 +658,7 @@ def test_soil_data_post_init_error() -> None:
     with pytest.raises(ValueError) as e2:
         soil_data = SoilData(field_size=0.98)
         soil_data.__post_init__(-20)
-        assert str(e2) == f"Expected field_size to be greater than 0, received -20."
+        assert str(e2) == "Expected field_size to be greater than 0, received -20."
 
 
 @pytest.mark.parametrize("cover_type", [
