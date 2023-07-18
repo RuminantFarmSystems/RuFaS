@@ -628,8 +628,9 @@ class Field:
         """
         info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
                     "prefix": f"field:'{self.field_data.name}'", "field_size": self.field_data.field_size,
-                    "date": {"year": year, "day": day}, "species": species}
-        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest}
+                    "species": species}
+        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest,
+                 "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
     def _harvest_crop(self, crop_reference: str, harvest_operation: str, time) -> None:
