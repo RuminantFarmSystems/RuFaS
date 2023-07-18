@@ -218,7 +218,7 @@
         "type": "object",
         "description": "Defines the schedule of fertilizer applications for a field.",
         "available_fertilizer_mixes": {
-          "type": "dictionary",
+          "type": "object",
           "description": "All the available fertilizer mixes that are available besides the default ones.",
           "default": {}
         },
