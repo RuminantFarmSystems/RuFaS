@@ -73,6 +73,9 @@ class Field:
         """List of all fertilizer mixes available for application to this field. The 100_0_0 and 26_4_24 mixes will
             always be available as supplements to unfulfilled manure nutrient demands."""
 
+        self.ONLY_NITROGEN_MIX = "100_0_0"
+        """Constant with the name of the fertilizer mix that contains only Nitrogen."""
+
         self.tiller = TillageApplication(self.field_data, self.soil.data)
         """Provides interface to till the field."""
 
@@ -374,8 +377,8 @@ class Field:
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
-        elif not unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
-            optimal_mix = "100_0_0"
+        elif unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+            optimal_mix = self.ONLY_NITROGEN_MIX
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
                                                                  self.available_fertilizer_mixes)
