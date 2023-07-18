@@ -188,8 +188,11 @@ class SolublePhosphorus:
         """
         try:
             dissolved_reactive_phosphorus_leachate = exp((soil_phosphorus * 1.5 - isotherm_intercept) / isotherm_slope)
+            print("did not fail")
         except OverflowError:
+            print("a")
             dissolved_reactive_phosphorus_leachate = inf
+        print(dissolved_reactive_phosphorus_leachate)
         return min(20.0, dissolved_reactive_phosphorus_leachate)
 
     @staticmethod
