@@ -2,7 +2,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from math import exp
-import math
 
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
