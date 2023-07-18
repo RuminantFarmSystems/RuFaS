@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Optional
+import warnings
 
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
@@ -55,10 +56,10 @@ class Soil:
         """Process component that track erosion from the soil profile"""
 
     @classmethod
-    def make_from_config(cls, soil_config) -> Soil:
+    def make_from_config(cls, soil_config) -> "Soil":
         """Creates a soil profile with attributes specified in the soil_config passed"""
-        Warning("create from config file not yet implement, returning default Soil()")
-        return Soil()
+        warnings.warn("create from config file not yet implement, returning default Soil() with field_size 1")
+        return Soil(field_size=1)
 
     def daily_soil_routine(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
                            plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
