@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Optional
-import warnings
 
 from SC_redesign.Crop_and_Soil.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
