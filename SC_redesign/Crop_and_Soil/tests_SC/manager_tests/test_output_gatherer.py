@@ -65,8 +65,8 @@ def test_send_daily_variables(runoff_values: List[float],
     assert pool["field:'name 2'.accumulated_runoff"]['values'] == [1.3, 2.4, 1.22]
 
     # Testing vadose data
-    assert len(pool["field:'name 1_vadose_layer'.active_organic_nitrogen_content"]['info_maps']) == 3
-    assert pool["field:'name 1_vadose_layer'.active_organic_nitrogen_content"]['values'] == [0, 0, 0]
+    assert len(pool["field:'name 1',vadose_zone_layer.active_organic_nitrogen_content"]['info_maps']) == 3
+    assert pool["field:'name 1',vadose_zone_layer.active_organic_nitrogen_content"]['values'] == [0, 0, 0]
 
     # Testing layer data
     assert len(pool["field:'name 1',layer_index:'0'.percolated_water"]['info_maps']) == 3
