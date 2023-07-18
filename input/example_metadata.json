@@ -259,9 +259,118 @@
         },
         "surface_remainder_fractions": {
           "type": "array",
-          "description": "List of fractions of fertilizer which remain on the surface when applied via injection.",
+          "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
           "default": []
+        },
+        "pattern_repeat": {
+          "type": "number",
+          "description": "Number of times that this fertilizer application schedule should be repeated.",
+          "minimum": 0,
+          "default": 0
+        },
+        "pattern_skip": {
+          "type": "number",
+          "description": "Number of years to be skipped between schedule repetitions.",
+          "minimum": 0,
+          "default": 0
         }
+      },
+      "manure_schedule_properties": {
+        "type": "object",
+        "description": "Defines the schedule of manure applications for a field.",
+        "years": {
+          "type": "array",
+          "description": "List of years in which manure will be applied.",
+          "default": []
+        },
+        "days": {
+          "type": "array",
+          "description": "List of days on which manure will be applied.",
+          "default": []
+        },
+        "nitrogen_masses": {
+          "type": "array",
+          "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.",
+          "default": []
+        },
+        "phosphorus_masses": {
+          "type": "array",
+          "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.",
+          "default": []
+        },
+        "potassium_masses": {
+          "type": "array",
+          "description": "List of minimum potassium masses that the corresponding manure applications should contain.",
+          "default": []
+        },
+        "coverage_fractions": {
+          "type": "array",
+          "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
+          "default": []
+        },
+        "application_depths": {
+          "type": "array",
+          "description": "List of depths at which the manure is injected into the soil.",
+          "default": []
+        },
+        "surface_remainder_fractions": {
+          "type": "array",
+          "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
+          "default": []
+        },
+        "pattern_repeat": {
+          "type": "number",
+          "description": "Number of times that this manure application schedule should be repeated.",
+          "minimum": 0,
+          "default": 0
+        },
+        "pattern_skip": {
+          "type": "number",
+          "description": "Number of years to be skipped between schedule repetitions.",
+          "minimum": 0,
+          "default": 0
+       }
+      },
+      "tillage_schedule_properties": {
+        "type": "object",
+        "description": "Defines the schedule of tillage applications for a field.",
+        "years": {
+          "type": "array",
+          "description": "List of years in which manure will be applied.",
+          "default": []
+        },
+        "days": {
+          "type": "array",
+          "description": "List of days on which manure will be applied.",
+          "default": []
+        },
+        "tillage_depths": {
+          "type": "array",
+          "description": "List of depths that the corresponding tillage applications reach.",
+          "default": []
+        },
+        "incorporation_fractions": {
+          "type": "array",
+          "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
+          "default": []
+        },
+        "mixing_fractions": {
+          "type": "array",
+          "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
+          "default": []
+        },
+        "pattern_repeat": {
+          "type": "number",
+          "description": "Number of times that this tillage schedule should be repeated.",
+          "minimum": 0,
+          "default": 0
+        },
+        "pattern_skip": {
+          "type": "number",
+          "description": "Number of years to be skipped between schedule repetitions.",
+          "minimum": 0,
+          "default": 0
+       }
       }
     },
     "economic_properties": {
