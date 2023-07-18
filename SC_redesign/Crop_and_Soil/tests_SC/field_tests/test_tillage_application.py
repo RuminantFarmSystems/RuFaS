@@ -8,6 +8,7 @@ from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
 from SC_redesign.Crop_and_Soil.field.tillage_application import om
+from RUFAS.routines.manure.manure_manager import ManureManager
 
 
 @pytest.mark.parametrize("data,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed", [
@@ -29,7 +30,7 @@ def test_remove_amount_incorporated(data: object, attr_name: str, attr_value: fl
 
 @pytest.mark.parametrize("data,expected", [
     ([1, 2, 3], "<class 'list'>"),
-    (Field(), "<class 'SC_redesign.Crop_and_Soil.field.field.Field'>")
+    (Field(manure_manager=MagicMock(ManureManager)), "<class 'SC_redesign.Crop_and_Soil.field.field.Field'>")
 ])
 def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
     """Test that errors are handled correctly when removing material from soil surface."""
