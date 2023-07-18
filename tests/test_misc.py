@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict
 from mock import Mock, mock_open, patch
 
 import pytest
-from mock.mock import MagicMock
+from mock.mock import MagicMock, call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
@@ -319,20 +319,30 @@ def mock_output_manager(mocker) -> OutputManager:
     return output_manager
 
 
-@pytest.mark.parametrize("data, expected_result, should_write", [
-    ({"var1": {"values": [1.0, True, "test", {"key": 1}]}}, "var1\n1.0\nTrue\ntest\n{'key': 1}\n",
+@pytest.mark.parametrize("data, field, expected_result, should_write", [
+    ({"var1": {"values": [1.0, True, "test", {"key": 1}]}}, "values", "var1\n1.0\nTrue\ntest\n{'key': 1}\n",
      True),
-    ({}, "",
+    ({}, "", "",
      False),
-    ({"var1": {"values": [1, 2, 3]}},
+    ({"var1": {"values": [1, 2, 3]}}, "values",
      "var1\n1\n2\n3\n",
      True),
-    ({"var1": {"not a value": [1]}}, "",
+    ({"var1": {"values": [1, 2, 3]}}, "no_such_field",
+     "",
+     False),
+    ({"var1": {"values": [1, 2, 3], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}}, "info_maps",
+     "var1\n{'map1': 'value1'}\n{'map1': 'value2'}\n",
+     True),
+    ({"var1": {"values": [1, 2, 3], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}}, "values",
+     "var1\n1\n2\n3\n",
+     True),
+    ({"var1": {"not a value": [1]}}, "values", "",
      False),
 ])
 def test_dict_to_csv(
     mock_output_manager: OutputManager,
     data: Dict[str, Any],
+    field: str,
     expected_result: str,
     should_write: bool
 ) -> None:
@@ -340,7 +350,7 @@ def test_dict_to_csv(
     open_mock = mock_open()
 
     with patch("builtins.open", open_mock):
-        mock_output_manager._dict_to_file_csv(data, "test")
+        mock_output_manager._dict_to_file_csv(data, "test", field)
 
     if should_write:
         open_mock.assert_called_with("test", "w", encoding="utf-8", errors="strict", newline='')
@@ -632,7 +642,7 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs.assert_called_once_with(path)
     mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
-    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(f"{path}/CSVs/om/variables")
+    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(f"{path}/CSVs/om", False)
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
@@ -713,13 +723,23 @@ def test_save_variables_to_csv_files(
 
     with patch('pathlib.Path.mkdir') as mock_mkdir:
         mock_mkdir.return_value = None
-        mock_output_manager.save_variables_to_csv_files("dummy_path")
+        mock_output_manager.save_variables_to_csv_files("dummy_path", True)
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
     mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "variables", "dummy_name"), "values"
     )
+
+    mock_output_manager.save_variables_to_csv_files("dummy_path", False)
+    mock_output_manager._generate_file_name.assert_has_calls([
+        call("var1", "csv"),
+        call("var1_info_maps", "csv"),
+    ])
+    mock_output_manager._dict_to_file_csv.assert_has_calls([
+        call(mock_output_manager.variables_pool, os.path.join("dummy_path", "variables", "dummy_name"), "values"),
+        call(mock_output_manager.variables_pool, os.path.join("dummy_path", "info_maps", "dummy_name"), "info_maps"),
+    ])
 
     mock_output_manager.variables_pool = original_variables_pool
     # Restore original methods
