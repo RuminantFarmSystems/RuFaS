@@ -32,12 +32,8 @@ class InputManager:
         """Organize metadata and input data processing pipeline"""
         self._load_metadata()
         self._load_data()
-        start_simulation = self._validate_data()
-        if not start_simulation:
-            # TODO what actions to take if data is not valid?
-            # need to trigger OM data dumping
-            # need to stop simulation (what's the best way to do this?)
-            pass
+        is_input_data_valid = self._validate_data()
+        return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
         """
@@ -161,7 +157,7 @@ class InputManager:
         element : str
             The key of the data to validate.
 
-        property_map_kay : str
+        property_map_key : str
             The metadata properties section keyword for the data input file being checked.
 
         eager_termination : bool, default=True
@@ -175,8 +171,8 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_element.__name__,
                     }
-        element_heirarchy = element.split(".")
-        variable_to_check = reduce(lambda d, key: d[key], element_heirarchy,
+        element_hierarchy = element.split(".")
+        variable_to_check = reduce(lambda d, key: d[key], element_hierarchy,
                                    self.__metadata["properties"][property_map_key])
         var_type = variable_to_check["type"]
         is_nested = var_type == "object"
@@ -202,8 +198,8 @@ class InputManager:
                                info_map)
                 return False
         else:
-            var_name = element_heirarchy[-1]
-            input_data_value = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
+            var_name = element_hierarchy[-1]
+            input_data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool[module_key])
             type_validation_dict = {"string":
                                     self._validate_string_type_element(variable_to_check, var_name, input_data_value),
                                     "number":
@@ -219,7 +215,7 @@ class InputManager:
             elif is_valid is None:
                 raise Exception("Element must be type number, array, string, or bool")
             else:
-                is_fixed = self._fix_data(module_key, element_heirarchy)
+                is_fixed = self._fix_data(module_key, element_hierarchy)
                 return is_fixed
 
     def _validate_array_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
