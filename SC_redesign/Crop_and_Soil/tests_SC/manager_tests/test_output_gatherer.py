@@ -7,7 +7,8 @@ from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
 from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
 from SC_redesign.Crop_and_Soil.crop.crop import Crop
 from SC_redesign.Crop_and_Soil.manager.output_gatherer import om
-from unittest.mock import patch, PropertyMock
+from RUFAS.routines.manure.manure_manager import ManureManager
+from unittest.mock import patch, PropertyMock, MagicMock
 
 
 @pytest.mark.parametrize("runoff_values, current_residues, percolated_waters, root_depths", [
@@ -25,8 +26,8 @@ def test_send_daily_variables(runoff_values: List[float],
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data=field_data_1)
-    field_2 = Field(field_data=field_data_2)
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
+    field_2 = Field(field_data=field_data_2, manure_manager=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -115,8 +116,8 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data_1)
-    field_2 = Field(field_data_2)
+    field_1 = Field(field_data_1, manure_manager=MagicMock(ManureManager))
+    field_2 = Field(field_data_2, manure_manager=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)

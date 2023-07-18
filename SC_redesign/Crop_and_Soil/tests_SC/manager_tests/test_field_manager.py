@@ -10,6 +10,7 @@ from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from RUFAS.classes import Time, Weather
 from RUFAS.util import Utility
+from RUFAS.routines.manure.manure_manager import ManureManager
 import pytest
 from typing import List, Dict
 from unittest.mock import MagicMock, patch
@@ -73,8 +74,9 @@ def test_create_current_weather(year: int, day: int, expected) -> None:
 
 
 @pytest.mark.parametrize("fields", [
-    [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
-     Field(field_data=FieldData(name="field3"))],
+    [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
 def test_daily_update_routine(fields: List[Field]) -> None:
@@ -92,7 +94,8 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "T_avg_annual", 3)
     setattr(mocked_weather, "rainfall", 3)
     setattr(mocked_weather, "irrigation", 3)
-    fm = FieldManager({})
+    mocked_manure_manager = MagicMock(ManureManager)
+    fm = FieldManager({}, mocked_manure_manager)
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()
@@ -106,15 +109,17 @@ def test_daily_update_routine(fields: List[Field]) -> None:
 
 
 @pytest.mark.parametrize("fields", [
-    [Field(field_data=FieldData(name="field1")), Field(field_data=FieldData(name="field2")),
-     Field(field_data=FieldData(name="field3"))],
+    [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
+     Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager))],
     []
 ])
 def test_annual_update_routine(fields: List[Field]):
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    fm = FieldManager({})
+    mocked_field_manager = MagicMock(ManureManager)
+    fm = FieldManager({}, mocked_field_manager)
     fm.fields = fields
     fm.output_gatherer.send_annual_variables = MagicMock()
     fm.annual_update_routine()
@@ -377,8 +382,9 @@ def test_setup_field(field_name: str, field_config: Dict[str, str]) -> None:
             FieldManager._setup_crop_schedules = MagicMock(return_value=[CropSchedule("name", "crop", [1999], [100],
                                                                                       [1999], [240], ["default"])])
             FieldManager._setup_soil = MagicMock(return_value=Soil(field_size=1.0))
+            mocked_manure_manager = MagicMock(ManureManager)
 
-            actual = FieldManager._setup_field(field_name, field_config)
+            actual = FieldManager._setup_field(field_name, field_config, mocked_manure_manager)
 
             mocked_base_dir.assert_called_once()
             assert mocked_json_dir.call_count == 3
