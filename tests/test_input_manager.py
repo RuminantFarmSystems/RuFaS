@@ -47,9 +47,11 @@ def input_manager_original_method_states(
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
-        mock_input_manager._load_metadata("path/dummy_metadata.json")
-        assert mock_input_manager._InputManager__metadata == {"dummy_key1": "dummy_value1",
-                                                              "dummy_key2": "dummy_value2"}
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_metadata("path/dummy_metadata.json")
+            assert mock_input_manager._InputManager__metadata == {"dummy_key1": "dummy_value1",
+                                                                  "dummy_key2": "dummy_value2"}
+            assert add_log.call_count == 2
 
 
 def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> None:
@@ -58,8 +60,10 @@ def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> Non
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
-        with pytest.raises(Exception):
-            mock_input_manager._load_metadata("path/dummy_metadata.json")
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(Exception):
+                mock_input_manager._load_metadata("path/dummy_metadata.json")
+            assert add_log.call_count == 1
 
 
 def test_load_data_json(mock_input_manager: InputManager) -> None:
@@ -74,8 +78,11 @@ def test_load_data_json(mock_input_manager: InputManager) -> None:
     }
 
     with patch("builtins.open", mock_open(read_data='{"key": "value"}')):
-        mock_input_manager._load_data()
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_data()
+
     assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key": "value"}}
+    assert add_log.call_count == 2
 
 
 def test_load_data_csv(mock_input_manager: InputManager) -> None:
@@ -89,9 +96,12 @@ def test_load_data_csv(mock_input_manager: InputManager) -> None:
         }
     }
     with patch("builtins.open", mock_open(read_data="key1,key2\na,1\nb,2\n")):
-        mock_input_manager._load_data()
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_data()
+
     assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key1": ["a", "b"],
                                                                           "key2": [1, 2]}}
+    assert add_log.call_count == 2
 
 
 def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manager: InputManager) -> None:
@@ -107,9 +117,12 @@ def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manage
 
     with patch("builtins.open", mock_open(read_data="key_and_value")):
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            mock_input_manager._load_data()
-        assert mock_input_manager._InputManager__pool == {}
-        assert add_warning.call_count == 1
+            with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+                mock_input_manager._load_data()
+
+    assert mock_input_manager._InputManager__pool == {}
+    assert add_warning.call_count == 1
+    assert add_log.call_count == 1
 
 
 def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
@@ -118,8 +131,10 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
-        with pytest.raises(Exception):
-            mock_input_manager._load_data("bad/path.csv")
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(Exception):
+                mock_input_manager._load_data("bad/path.csv")
+                assert add_log.call_count == 1
 
 
 def test_start_data_processing(mock_input_manager: InputManager,
