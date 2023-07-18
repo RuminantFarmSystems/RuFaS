@@ -50,7 +50,6 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        self.field_manager = FieldManager(data['fields'])
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(
             input_dir / 'feed' / data['feed']))
@@ -60,7 +59,7 @@ class State:
         self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
         self.manure_storage = ManureStorage(self.animal_manager)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
-
+        self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)
 
     def annual_reset(self):
         """
