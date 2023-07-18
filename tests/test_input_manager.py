@@ -39,7 +39,6 @@ def input_manager_original_method_states(
         "_validate_data": mock_input_manager._validate_data,
         "_validate_element": mock_input_manager._validate_element,
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
-        "_validate_bool_type_element": mock_input_manager._validate_bool_type_element,
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
         "_validate_string_type_element": mock_input_manager._validate_string_type_element,
     }
@@ -152,20 +151,28 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
                 "crop": {"properties": "crop_properties"},
                 },
             "properties": {
-                "animal_properties": {"animal_var1": {"default": "dummyvalue1"},
-                                      "animal_var2": {"default": "dummyvalue2"},
-                                      "animal_var3": {"animal_nested1": {"default": "dummyvalue3"}}
+                "animal_properties": {"animal_var1": {"default": "dummyvalue1", "type": "string"},
+                                      "animal_var2": {"default": 5, "type": "number"},
+                                      "animal_var3": {"type": "object",
+                                                      "animal_nested1": {"default": "dummyvalue3",
+                                                                         "type": "string"}, }
                                       },
-                "manure_properties": {"manure_var1": {"default": "dummyvalue1"},
-                                      "manure_var2": {"default": "dummyvalue2"},
-                                      "manure_var3": {"manure_nested1": {"default": "dummyvalue3"}},
+                "manure_properties": {"manure_var1": {"default": [1, 2, 3], "type": "array"},
+                                      "manure_var2": {"default": "dummyvalue2", "type": "string"},
+                                      "manure_var3": {"type": "object",
+                                                      "manure_nested1": {"default": True,
+                                                                         "type": "bool", }},
                                       },
                 "crop_properties": {"crop_var1": {"default": "dummyvalue1"},
                                     "crop_var2": {"default": "dummyvalue2"},
-                                    "crop_var3": {"crop_nested1": {"default": "dummyvalue3"}},
+                                    "crop_var3": {"type": "object",
+                                                  "crop_nested1": {"type": "object",
+                                                                   "crop_nested2": {
+                                                                       "default": "dummyvalue3",
+                                                                       "type": "string", }},
+                                                  }
                                     }
-                }
-            }
+                }}
 
 
 @pytest.fixture
@@ -192,7 +199,8 @@ def mock_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
             }
 
 
-def test_validate_data_returns_true_with_valid_data(mocker, mock_input_manager: InputManager,
+def test_validate_data_returns_true_with_valid_data(mocker: MockerFixture,
+                                                    mock_input_manager: InputManager,
                                                     mock_metadata: Dict[str, Dict[str, Any]],
                                                     mock_pool: Dict[str, Dict[str, Any]],
                                                     ) -> None:
@@ -255,8 +263,6 @@ def test_validate_element_valid_element_returns_true(mocker: MockerFixture,
     dummy_property_map_key = "animal_properties"
     mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
-    mocker.patch.object(mock_input_manager, "_check_variable_nested", return_value=False)
-    mocker.patch.object(mock_input_manager, "_get_variable_type", return_value="string")
     eager_termination = True
 
     result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
@@ -276,9 +282,7 @@ def test_validate_element_unfixable_invalid_element_returns_false(mocker: Mocker
     dummy_property_map_key = "animal_properties"
     mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
-    mocker.patch.object(mock_input_manager, "_check_variable_nested", return_value=False)
-    mocker.patch.object(mock_input_manager, "_get_variable_type", return_value="number")
-    mocker.patch.object(mock_input_manager, "_validate_num_type_element", return_value=False)
+    mocker.patch.object(mock_input_manager, "_validate_string_type_element", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
     eager_termination = True
 
@@ -286,6 +290,38 @@ def test_validate_element_unfixable_invalid_element_returns_false(mocker: Mocker
                                                   dummy_property_map_key, eager_termination)
 
     assert result is False
+
+
+def test_validate_element_with_element_no_type_or_bad_type_raises_exception(mocker: MockerFixture,
+                                                                            mock_input_manager: InputManager,
+                                                                            mock_metadata: Dict[str, Dict[str, Any]],
+                                                                            mock_pool: Dict[str, Dict[str, Any]],
+                                                                            ) -> None:
+    """Unit test for function _validate_element function with invalid element in file input_manager.py"""
+    dummy_module_key = "animal"
+    dummy_valid_element = "animal_var1"
+    dummy_property_map_key = "animal_properties"
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+    eager_termination = True
+
+    # set type to empty string
+    mock_metadata["properties"]["animal_properties"]["animal_var1"]["type"] = ""
+
+    with pytest.raises(Exception):
+        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                             dummy_property_map_key, eager_termination)
+        error_message = "Element must be type number, array, string, or bool"
+        assert error_message in Exception.message
+
+    # update type to unsupported type
+    mock_metadata["properties"]["animal_properties"]["animal_var1"]["type"] = "dict"
+
+    with pytest.raises(Exception):
+        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                             dummy_property_map_key, eager_termination)
+        error_message = "Element must be type number, array, string, or bool"
+        assert error_message in Exception.message
 
 
 @pytest.mark.parametrize(
@@ -309,23 +345,6 @@ def test_validate_array_type_element(dummy_value: list, dummy_variable_to_check:
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
-
-
-@pytest.mark.parametrize(
-    'dummy_bool_value, expected_result',
-    [
-        (True, True),
-        (False, True),
-        ('', False)
-    ]
-)
-def test_validate_bool_type_element(dummy_bool_value: bool,
-                                    expected_result: bool,
-                                    mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_bool_type_element function in file input_manager.py"""
-    result = mock_input_manager._validate_bool_type_element(dummy_bool_value)
-
-    assert result == expected_result
 
 
 @pytest.mark.parametrize(
