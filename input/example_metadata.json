@@ -163,10 +163,10 @@
       }
     },
     "crop_schedule_properties": {
-       "crop_species": {
+      "crop_species": {
         "type": "string",
-        "description": "the name of the crop being grown",
-        "pattern": ".{a-z,A-Z,_}"
+        "description": "Name of the crop being grown.",
+        "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley|fall_oats|tall_fescue|alfalfa|soybean|sugar_beet|potato}$"
       },
       "harvest_days": {
         "type": "array",
@@ -211,6 +211,57 @@
         "description": "Number of years to be skipped between schedule repetitions.",
         "minimum": 0,
         "default": 0
+      }
+    },
+    "field_management_properties": {
+      "fertilizer_schedule_properties": {
+        "type": "object",
+        "description": "Defines the schedule of fertilizer applications for a field.",
+        "available_fertilizer_mixes": {
+          "type": "dictionary",
+          "description": "All the available fertilizer mixes that are available besides the default ones.",
+          "default": {}
+        },
+        "mix_names": {
+          "type": "array",
+          "description": "List of the mix names that will be used for the corresponding fertilizer application.",
+          "default": []
+        },
+        "years": {
+          "type": "array",
+          "description": "List of years in which fertilizer will be applied.",
+          "default": []
+        },
+        "days": {
+          "type": "array",
+          "description": "List of days on which fertilizer will be applied.",
+          "default": []
+        },
+        "nitrogen_masses": {
+          "type": "array",
+          "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.",
+          "default": []
+        },
+        "phosphorus_masses": {
+          "type": "array",
+          "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.",
+          "default": []
+        },
+        "potassium_masses": {
+          "type": "array",
+          "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.",
+          "default": []
+        },
+        "application_depths": {
+          "type": "array",
+          "description": "List of depths at which the fertilizer is injected into the soil.",
+          "default": []
+        },
+        "surface_remainder_fractions": {
+          "type": "array",
+          "description": "List of fractions of fertilizer which remain on the surface when applied via injection.",
+          "default": []
+        }
       }
     },
     "economic_properties": {
