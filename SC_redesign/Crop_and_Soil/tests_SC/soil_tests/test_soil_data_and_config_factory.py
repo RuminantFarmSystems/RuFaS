@@ -352,24 +352,44 @@ def test_layer_thickness_error(top: float, bottom: float) -> None:
 def test_post_init(top: float, bottom: float, concentration: float) -> None:
     """Test that __post_init__() runs and correctly initializes attributes in LayerData"""
     with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter',
-               new_callable=MagicMock, return_value=0.5) as calc_psp:
-        with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density',
-                   new_callable=MagicMock, return_value=22) as determine_phosphorus_amount:
-            # Initialize object
-            layer = LayerData(top_depth=top, bottom_depth=bottom, soil_water_concentration=concentration,
-                              field_size=1.66)
+               new_callable=MagicMock, return_value=0.5) as calc_psp, \
+            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density',
+                  new_callable=MagicMock, return_value=22) as determine_nutrient_density, \
+            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData._initialize_nitrogen_pools',
+                  new_callable=MagicMock) as init_nitrogen_pools, \
+            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData._initialize_carbon_pools',
+                  new_callable=MagicMock) as init_carbon_pools:
+        # Initialize object
+        layer = LayerData(top_depth=top, bottom_depth=bottom, soil_water_concentration=concentration,
+                          field_size=1.66)
 
-            # Calculate expected value
-            expected_water_content = layer.layer_thickness * concentration
+        # Calculate expected value
+        expected_water_content = layer.layer_thickness * concentration
 
-            # Check everything
-            assert layer.water_content == expected_water_content
-            calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_content)
-            assert determine_phosphorus_amount.call_count == 7
-            assert layer.mean_phosphorus_sorption_parameter == 0.5
-            assert layer.labile_inorganic_phosphorus_content == 22
-            assert layer.active_inorganic_phosphorus_content == 22
-            assert layer.stable_inorganic_phosphorus_content == 22
+        # Check everything
+        assert layer.water_content == expected_water_content
+        calc_psp.assert_called_once_with(layer.percent_clay_content, 25, layer.percent_organic_carbon_content)
+        assert determine_nutrient_density.call_count == 3
+        assert layer.mean_phosphorus_sorption_parameter == 0.5
+        assert layer.labile_inorganic_phosphorus_content == 22
+        assert layer.active_inorganic_phosphorus_content == 22
+        assert layer.stable_inorganic_phosphorus_content == 22
+        init_nitrogen_pools.assert_called_once()
+        init_carbon_pools.assert_called_once()
+
+
+@pytest.mark.parametrize("field_size,expected", [
+                             (1.4, 0.0693),
+                             (3.556, 0.06930000000000003),
+                             (0.88, 0.06930000000000001)
+])
+def test_initialize_carbon_pools(field_size: float, expected: float) -> None:
+    """Tests that carbon pools in a soil layer are properly initialized."""
+    actual = LayerData(field_size=field_size, top_depth=120.0, bottom_depth=750.0, bulk_density=1.5,
+                       percent_organic_carbon_content=2.2)
+    assert actual.active_carbon_amount == pytest.approx(expected)
+    assert actual.passive_carbon_amount == pytest.approx(expected)
+    assert actual.slow_carbon_amount == pytest.approx(expected)
 
 
 @pytest.mark.parametrize("top,bottom", [
