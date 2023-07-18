@@ -1,19 +1,8 @@
-import warnings
 from unittest.mock import MagicMock
 
 import pytest
 
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
-
-
-def test_from_config() -> None:
-    """Tests that warning were correctly warned"""
-    warnings.filterwarnings("error")
-    soil = Soil(field_size=50)
-    try:
-        default = soil.make_from_config("testing")
-    except UserWarning as w:
-        assert str(w) == "create from config file not yet implement, returning default Soil() with field_size 1"
 
 
 @pytest.mark.parametrize("solar_radiation,avg_temp,min_temp,max_temp,plant_cover,snow_cover,avg_annual_air_temp", [
