@@ -292,25 +292,36 @@ def test_validate_element_unfixable_invalid_element_returns_false(mocker: Mocker
     assert result is False
 
 
-def test_validate_element_with_element_no_type_returns_false(mocker: MockerFixture,
-                                                             mock_input_manager: InputManager,
-                                                             mock_pool: Dict[str, Dict[str, Any]],
-                                                             ) -> None:
+def test_validate_element_with_element_no_type_or_bad_type_raises_exception(mocker: MockerFixture,
+                                                                            mock_input_manager: InputManager,
+                                                                            mock_metadata: Dict[str, Dict[str, Any]],
+                                                                            mock_pool: Dict[str, Dict[str, Any]],
+                                                                            ) -> None:
     """Unit test for function _validate_element function with invalid element in file input_manager.py"""
     dummy_module_key = "animal"
     dummy_valid_element = "animal_var1"
     dummy_property_map_key = "animal_properties"
-    mock_input_manager._InputManager__metadata = {
-            "dummyconfig": {},
-            "files": {"animal": {"properties": "animal_properties"}, },
-            "properties": {"animal_properties": {"animal_var1": {"default": "dummyvalue1", "type": ""}, }}}
+    mock_input_manager._InputManager__metadata = mock_metadata
     mock_input_manager._InputManager__pool = mock_pool
     eager_termination = True
 
-    result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
-                                                  dummy_property_map_key, eager_termination)
+    # set type to empty string
+    mock_metadata["properties"]["animal_properties"]["animal_var1"]["type"] = ""
 
-    assert result is False
+    with pytest.raises(Exception):
+        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                             dummy_property_map_key, eager_termination)
+        error_message = "Element must be type number, array, string, or bool"
+        assert error_message in Exception.message
+
+    # update type to unsupported type
+    mock_metadata["properties"]["animal_properties"]["animal_var1"]["type"] = "dict"
+
+    with pytest.raises(Exception):
+        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                             dummy_property_map_key, eager_termination)
+        error_message = "Element must be type number, array, string, or bool"
+        assert error_message in Exception.message
 
 
 @pytest.mark.parametrize(

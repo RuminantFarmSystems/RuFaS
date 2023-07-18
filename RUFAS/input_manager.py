@@ -204,44 +204,27 @@ class InputManager:
         else:
             var_name = element_heirarchy[-1]
             input_data_value = reduce(lambda d, key: d[key], element_heirarchy, self.__pool[module_key])
-            if var_type == "string":
-                is_valid = self._validate_string_type_element(variable_to_check, var_name, input_data_value)
-            elif var_type == "number":
-                is_valid = self._validate_num_type_element(variable_to_check, var_name, input_data_value)
-            elif var_type == "array":
-                is_valid = self._validate_array_type_element(variable_to_check, var_name, input_data_value)
-            else:
-                return False
+            type_validation_dict = {"string":
+                                    self._validate_string_type_element(variable_to_check, var_name, input_data_value),
+                                    "number":
+                                    self._validate_num_type_element(variable_to_check, var_name, input_data_value),
+                                    "array":
+                                    self._validate_array_type_element(variable_to_check, var_name, input_data_value),
+                                    "bool":
+                                    True}
+            is_valid = type_validation_dict.get(var_type)
 
             if is_valid:
                 return True
+            elif is_valid is None:
+                raise Exception("Element must be type number, array, string, or bool")
             else:
                 is_fixed = self._fix_data(module_key, element_heirarchy)
                 return is_fixed
 
-    def _validate_array_type_element(self,
-                                     variable_to_check: Dict[str, Any],
-                                     var_name: str,
+    def _validate_array_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
                                      input_data_value: list) -> bool:
-        """
-        Validates a __pool element when the element is an array.
-
-        Parameters
-        ----------
-        variable_to_check : str
-            A dictionary with the metadata validation guidelines.
-
-        var_name : str
-            The name of the variable being checked.
-
-        value : Union[int, str, bool, list]
-            The value of the variable being checked.
-
-        Returns
-        -------
-        bool
-            Returns True if variable meets guidelines; otherwise False.
-        """
+        """Validates a __pool element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_array_type_element.__name__,
                     }
@@ -252,43 +235,23 @@ class InputManager:
                 variable_to_check["maximum_length"]
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
-            return is_in_range
-        elif is_minimum_length:
+                return is_in_range
+        if is_minimum_length:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value)
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
-            return is_in_range
-        elif is_maximum_length:
+                return is_in_range
+        if is_maximum_length:
             is_in_range = len(input_data_value) <= variable_to_check["maximum_length"]
             if not is_in_range:
                 om.add_warning("Array out of length range.", f"{var_name=}", info_map)
-            return is_in_range
-        else:
-            return False
+                return is_in_range
 
-    def _validate_num_type_element(self,
-                                   variable_to_check: Dict[str, Any],
-                                   var_name: str,
+        return True
+
+    def _validate_num_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
                                    input_data_value: int) -> bool:
-        """
-        Validates a __pool number element.
-
-        Parameters
-        ----------
-        variable_to_check : str
-            A dictionary with the metadata validation guidelines.
-
-        var_name : str
-            The name of the variable being checked.
-
-        value : int
-            The value of the integer variable being checked.
-
-        Returns
-        -------
-        bool
-            Returns True if variable meets guidelines; otherwise False.
-        """
+        """Validates a __pool number element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_num_type_element.__name__,
                     }
@@ -298,43 +261,22 @@ class InputManager:
             is_in_range = variable_to_check["minimum"] <= input_data_value <= variable_to_check["maximum"]
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
-            return is_in_range
-        elif is_minimum_check:
+                return is_in_range
+        if is_minimum_check:
             is_in_range = variable_to_check["minimum"] <= input_data_value
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
-            return is_in_range
-        elif is_maximum_check:
+                return is_in_range
+        if is_maximum_check:
             is_in_range = input_data_value <= variable_to_check["maximum"]
             if not is_in_range:
                 om.add_warning("Value out of range.", f"{var_name=}", info_map)
-            return is_in_range
-        else:
-            return True
+                return is_in_range
+        return True
 
-    def _validate_string_type_element(self,
-                                      variable_to_check: Dict[str, Any],
-                                      var_name: str,
+    def _validate_string_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
                                       input_data_value: str) -> bool:
-        """
-        Validates a __pool string element.
-
-        Parameters
-        ----------
-        variable_to_check : str
-            A dictionary with the metadata validation guidelines.
-
-        var_name : str
-            The name of the variable being checked.
-
-        value : str
-            The value of the string variable being checked.
-
-        Returns
-        -------
-        bool
-            Returns True if variable meets guidelines; otherwise False.
-        """
+        """Validates a __pool string element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_string_type_element.__name__,
                     }
@@ -354,19 +296,19 @@ class InputManager:
                 variable_to_check["maximum_length"]
             if not is_valid_string:
                 om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return False
-        elif is_minimum_length:
+                return is_valid_string
+        if is_minimum_length:
             is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
             if not is_valid_string:
                 om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return False
-        elif is_maximum_length:
+                return is_valid_string
+        if is_maximum_length:
             is_valid_string = len(input_data_value) <= variable_to_check["maximum_length"]
             if not is_valid_string:
                 om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return False
+                return is_valid_string
 
-        return is_valid_string
+        return True
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
