@@ -214,7 +214,11 @@ class InputManager:
                 return False
         else:
             var_name = element_hierarchy[-1]
-            input_data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool[module_key])
+            try:
+                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool[module_key])
+            except KeyError as e:
+                raise KeyError(f"Key {var_name} not found in pool: {e}")
+
             type_validation_dict = {"string":
                                     self._validate_string_type_element(variable_to_check, var_name, input_data_value),
                                     "number":
