@@ -35,7 +35,7 @@ jobs:
 
     # https://coverage.readthedocs.io/en/7.2.7/index.html
     # Run coverage test, Generate report, Save to JSON file, Set COVERAGE_PERCENTAGE extracted from JSON
-    # A configuration file ".coveragerc" can be found at the project root to customize coverage test settings
+    # A configuration file ".coveragerc" can be found in .github/ to customize coverage test settings
     - name: Test coverage
       run: |
         coverage run --rcfile=.github/.coveragerc
