@@ -208,8 +208,6 @@ class InputManager:
                 is_valid = self._validate_string_type_element(variable_to_check, var_name, input_data_value)
             elif var_type == "number":
                 is_valid = self._validate_num_type_element(variable_to_check, var_name, input_data_value)
-            elif var_type == "boolean":
-                is_valid = self._validate_bool_type_element(input_data_value)
             elif var_type == "array":
                 is_valid = self._validate_array_type_element(variable_to_check, var_name, input_data_value)
             else:
@@ -267,22 +265,6 @@ class InputManager:
             return is_in_range
         else:
             return False
-
-    def _validate_bool_type_element(self, input_data_value: bool) -> bool:
-        """
-        Validates a __pool boolean element.
-
-        Parameters
-        ----------
-        value : Union[int, str, bool, list]
-            The value of the variable being checked.
-
-        Returns
-        -------
-        bool
-            Returns True if variable meets guidelines; otherwise False.
-        """
-        return input_data_value in (True, False)
 
     def _validate_num_type_element(self,
                                    variable_to_check: Dict[str, Any],

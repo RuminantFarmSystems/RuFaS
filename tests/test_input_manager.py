@@ -39,7 +39,6 @@ def input_manager_original_method_states(
         "_validate_data": mock_input_manager._validate_data,
         "_validate_element": mock_input_manager._validate_element,
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
-        "_validate_bool_type_element": mock_input_manager._validate_bool_type_element,
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
         "_validate_string_type_element": mock_input_manager._validate_string_type_element,
     }
@@ -295,7 +294,6 @@ def test_validate_element_unfixable_invalid_element_returns_false(mocker: Mocker
 
 def test_validate_element_with_element_no_type_returns_false(mocker: MockerFixture,
                                                              mock_input_manager: InputManager,
-                                                             mock_metadata: Dict[str, Dict[str, Any]],
                                                              mock_pool: Dict[str, Dict[str, Any]],
                                                              ) -> None:
     """Unit test for function _validate_element function with invalid element in file input_manager.py"""
@@ -336,23 +334,6 @@ def test_validate_array_type_element(dummy_value: list, dummy_variable_to_check:
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
-
-
-@pytest.mark.parametrize(
-    'dummy_bool_value, expected_result',
-    [
-        (True, True),
-        (False, True),
-        ('', False)
-    ]
-)
-def test_validate_bool_type_element(dummy_bool_value: bool,
-                                    expected_result: bool,
-                                    mock_input_manager: InputManager) -> None:
-    """Unit test for function _validate_bool_type_element function in file input_manager.py"""
-    result = mock_input_manager._validate_bool_type_element(dummy_bool_value)
-
-    assert result == expected_result
 
 
 @pytest.mark.parametrize(
