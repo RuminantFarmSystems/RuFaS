@@ -33,7 +33,7 @@ def input_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
-        "start_data_pipeline": mock_input_manager.start_data_pipeline,
+        "start_data_processing": mock_input_manager.start_data_processing,
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_data": mock_input_manager._load_data,
         "_validate_data": mock_input_manager._validate_data,
@@ -122,14 +122,14 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
             mock_input_manager._load_data("bad/path.csv")
 
 
-def test_start_data_pipeline(mock_input_manager: InputManager,
-                             input_manager_original_method_states: Dict[str, Callable],) -> None:
-    """Unit test for function start_data_pipeline in file input_manager.py"""
+def test_start_data_processing(mock_input_manager: InputManager,
+                               input_manager_original_method_states: Dict[str, Callable],) -> None:
+    """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
     mock_input_manager._load_data = MagicMock()
     mock_input_manager._validate_data = MagicMock(return_value=True)
 
-    mock_input_manager.start_data_pipeline()
+    mock_input_manager.start_data_processing("mock/metadata/path")
 
     mock_input_manager._load_metadata.assert_called_once()
     mock_input_manager._load_data.assert_called_once()
@@ -210,7 +210,7 @@ def test_validate_data_returns_true_with_valid_data(mocker: MockerFixture,
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data()
+        result = mock_input_manager._validate_data(eager_termination=True)
 
     assert result is True
     assert add_log.call_count == 3
@@ -228,7 +228,7 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerF
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data()
+        result = mock_input_manager._validate_data(eager_termination=True)
 
     assert result is False
     assert add_log.call_count == 0  # will reach eager_termination prior to adding logs

@@ -28,14 +28,29 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
 
-    def start_data_pipeline(self) -> None:
-        """Organize metadata and input data processing pipeline"""
-        self._load_metadata()
+    def start_data_processing(self, metadata_path,
+                              eager_termination: bool = True) -> bool:
+        """
+        Organize metadata and input data processing pipeline
+
+        Parameters
+        ----------
+        metadata_path : str
+            File path to the metadata.
+        eager_termination : bool, optional, default=True
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        bool
+            Flag indicating whether input data is valid.
+        """
+        self._load_metadata(metadata_path)
         self._load_data()
-        is_input_data_valid = self._validate_data()
+        is_input_data_valid = self._validate_data(eager_termination)
         return is_input_data_valid
 
-    def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
+    def _load_metadata(self, metadata_path) -> None:
         """
         Loads metadata from json file to IM metadata dict.
 
