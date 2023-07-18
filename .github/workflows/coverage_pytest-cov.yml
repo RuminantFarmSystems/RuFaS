@@ -33,6 +33,30 @@ jobs:
         pip install coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+    # https://stackoverflow.com/questions/58886293/getting-current-branch-and-commit-hash-in-github-action
+    # Get the commit ID of the newest commit and save it as an environment variable
+    - name: Get commit ID
+      run : |
+        echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+
+    # https://stackoverflow.com/questions/50128549/travis-configuration-of-phpcs-for-only-current-commit-files/50128977#50128977
+    # Get a list of modified files in the newest commit,
+    # Delete all non .py files,
+    # Add indentation for each line,
+    # Replace '/' with '\/' for each filepath
+    # Save as an environment variable
+    - name: Get modified files
+      run : |
+        echo "MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only ${{ env.COMMIT_ID }} -r | sed 's/^/    /' | sed 's/\//\\\//g' | sed '/\.py$/!d')" >> "$GITHUB_ENV"
+        if [ "${{ env.MODIFIED_FILES }}" == "" ]; then
+          echo "No python files changed, skipping coverage test!"
+          exit 0
+        fi
+
+    - name: Update .coveragerc
+      run : |
+        sed -i '5 s/^/${{ env.MODIFIED_FILES }}\n/' .github/.coveragerc
+
     # https://coverage.readthedocs.io/en/7.2.7/index.html
     # Run coverage test, Generate report, Save to JSON file, Set COVERAGE_PERCENTAGE extracted from JSON
     # A configuration file ".coveragerc" can be found in .github/ to customize coverage test settings
@@ -69,4 +93,4 @@ jobs:
           $URL \
           -H "Content-Type: application/json" \
           -H "Authorization: token $GITHUB_TOKEN" \
-          --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%" }'
+          --data '{ "body": "Current Coverage on Modified Files: ${{ env.COVERAGE_PERCENTAGE }}%" }'
