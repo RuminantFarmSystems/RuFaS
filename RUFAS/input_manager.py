@@ -28,7 +28,7 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
 
-    def start_data_processing(self, metadata_path,
+    def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
         """
         Organize metadata and input data processing pipeline.
@@ -37,7 +37,7 @@ class InputManager:
         ----------
         metadata_path : str
             File path to the metadata.
-        eager_termination : bool, optional, default=True
+        eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
 
         Returns
@@ -50,7 +50,7 @@ class InputManager:
         is_input_data_valid = self._validate_data(eager_termination)
         return is_input_data_valid
 
-    def _load_metadata(self, metadata_path) -> None:
+    def _load_metadata(self, metadata_path: str) -> None:
         """
         Loads metadata from json file to IM metadata dict.
 
@@ -243,26 +243,24 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_array_type_element.__name__,
                     }
-        is_maximum_length = variable_to_check.get("maximum_length")
-        is_minimum_length = variable_to_check.get("minimum_length")
-        if is_maximum_length and is_minimum_length:
+        maximum_length = variable_to_check.get("maximum_length")
+        minimum_length = variable_to_check.get("minimum_length")
+        is_in_range = True
+        if maximum_length is not None and minimum_length is not None:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value) <= \
                 variable_to_check["maximum_length"]
-            if not is_in_range:
-                om.add_warning("Array out of length range.", f"{var_name=}", info_map)
-                return is_in_range
-        if is_minimum_length:
+            warning_string = f"Array length not in range[{minimum_length}, {maximum_length}]"
+        elif minimum_length is not None:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value)
-            if not is_in_range:
-                om.add_warning("Array out of length range.", f"{var_name=}", info_map)
-                return is_in_range
-        if is_maximum_length:
+            warning_string = f"Array length less than {minimum_length}."
+        elif maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_to_check["maximum_length"]
-            if not is_in_range:
-                om.add_warning("Array out of length range.", f"{var_name=}", info_map)
-                return is_in_range
+            warning_string = f"Array length more than {maximum_length}."
 
-        return True
+        if not is_in_range:
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+
+        return is_in_range
 
     def _validate_num_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
                                    input_data_value: int) -> bool:
@@ -270,24 +268,23 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_num_type_element.__name__,
                     }
-        is_minimum_check = variable_to_check.get("minimum")
-        is_maximum_check = variable_to_check.get("maximum")
-        if is_minimum_check and is_maximum_check:
-            is_in_range = variable_to_check["minimum"] <= input_data_value <= variable_to_check["maximum"]
-            if not is_in_range:
-                om.add_warning("Value out of range.", f"{var_name=}", info_map)
-                return is_in_range
-        if is_minimum_check:
-            is_in_range = variable_to_check["minimum"] <= input_data_value
-            if not is_in_range:
-                om.add_warning("Value out of range.", f"{var_name=}", info_map)
-                return is_in_range
-        if is_maximum_check:
-            is_in_range = input_data_value <= variable_to_check["maximum"]
-            if not is_in_range:
-                om.add_warning("Value out of range.", f"{var_name=}", info_map)
-                return is_in_range
-        return True
+        minimum_value = variable_to_check.get("minimum")
+        maximum_value = variable_to_check.get("maximum")
+        is_in_range = True
+        if minimum_value is not None and maximum_value is not None:
+            is_in_range = minimum_value <= input_data_value <= maximum_value
+            warning_string = f"Value not in range [{minimum_value}, {maximum_value}]."
+        elif minimum_value is not None:
+            is_in_range = minimum_value <= input_data_value
+            warning_string = f"Value less than {minimum_value}."
+        elif maximum_value is not None:
+            is_in_range = input_data_value <= maximum_value
+            warning_string = f"Value greater than {maximum_value}."
+
+        if not is_in_range:
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+
+        return is_in_range
 
     def _validate_string_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
                                       input_data_value: str) -> bool:
@@ -295,35 +292,32 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_string_type_element.__name__,
                     }
-        is_pattern_check = variable_to_check.get("pattern")
-        is_minimum_length = variable_to_check.get("minimum_length")
-        is_maximum_length = variable_to_check.get("maximum_length")
+        pattern_check = variable_to_check.get("pattern")
         is_valid_string = True
-        if is_pattern_check:
-            is_valid_string = bool(re.match(variable_to_check["pattern"], input_data_value))
+        if pattern_check is not None:
+            is_valid_string = bool(re.match(pattern_check, input_data_value))
+            warning_string = f"String variable must match pattern {variable_to_check['pattern']}."
             if not is_valid_string:
-                om.add_warning(f"String variable must match pattern {variable_to_check['pattern']}.",
-                               f"{var_name=}",
-                               info_map)
-                return is_valid_string
-        if is_minimum_length and is_maximum_length:
-            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                variable_to_check["maximum_length"]
-            if not is_valid_string:
-                om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return is_valid_string
-        if is_minimum_length:
-            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
-            if not is_valid_string:
-                om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return is_valid_string
-        if is_maximum_length:
-            is_valid_string = len(input_data_value) <= variable_to_check["maximum_length"]
-            if not is_valid_string:
-                om.add_warning("String out length range.", f"{var_name=}", info_map)
+                om.add_warning(warning_string, f"{var_name=}", info_map)
                 return is_valid_string
 
-        return True
+        minimum_length = variable_to_check.get("minimum_length")
+        maximum_length = variable_to_check.get("maximum_length")
+        if minimum_length is not None and maximum_length is not None:
+            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
+                variable_to_check["maximum_length"]
+            warning_string = f"String out length range [{minimum_length}, {maximum_length}]."
+        elif minimum_length is not None:
+            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
+            warning_string = f"String length less than {minimum_length}."
+        elif maximum_length is not None:
+            is_valid_string = len(input_data_value) <= variable_to_check["maximum_length"]
+            warning_string = f"String length more than {maximum_length}."
+
+        if not is_valid_string:
+            om.add_warning(warning_string, f"{var_name=}", info_map)
+
+        return is_valid_string
 
     def _fix_data(self, key: str, value: Any) -> bool:
         """
