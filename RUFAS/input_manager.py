@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 om = OutputManager()
 
@@ -345,4 +345,7 @@ class InputManager:
         # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
         # where data is not fixable:
         # om.add_error("Data not fixable.", f"Unable to fix the invalid data: {key=}, {value=}.", info_map)
+        pass
+
+    def get_data(self, data_address: str) -> Optional[Any]:
         pass
