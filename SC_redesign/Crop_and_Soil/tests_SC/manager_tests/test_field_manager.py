@@ -73,16 +73,6 @@ def test_date_conversion_day(year: int, day: int, expected_day: int):
     assert FieldManager._date_conversion_day(mocked_time) == expected_day
 
 
-@pytest.mark.parametrize("year,day,expected", [
-    (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
-                          annual_mean_air_temperature=1, rainfall=3, irrigation=3, daylength=15.5)),
-    (2, 1, CurrentWeather(incoming_light=4, min_air_temperature=4, mean_air_temperature=4, max_air_temperature=4,
-                          annual_mean_air_temperature=2, rainfall=4, irrigation=4, daylength=15.5)),
-    (3, 2, CurrentWeather(incoming_light=8, min_air_temperature=8, mean_air_temperature=8, max_air_temperature=8,
-                          annual_mean_air_temperature=3, rainfall=8, irrigation=8, daylength=15.5))
-])
-
-
 @pytest.mark.parametrize("fields", [
     [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
      Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
