@@ -33,7 +33,7 @@ def input_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
-        "start_data_pipeline": mock_input_manager.start_data_pipeline,
+        "start_data_processing": mock_input_manager.start_data_processing,
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_data": mock_input_manager._load_data,
         "_validate_data": mock_input_manager._validate_data,
@@ -47,9 +47,11 @@ def input_manager_original_method_states(
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}')):
-        mock_input_manager._load_metadata("path/dummy_metadata.json")
-        assert mock_input_manager._InputManager__metadata == {"dummy_key1": "dummy_value1",
-                                                              "dummy_key2": "dummy_value2"}
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_metadata("path/dummy_metadata.json")
+            assert mock_input_manager._InputManager__metadata == {"dummy_key1": "dummy_value1",
+                                                                  "dummy_key2": "dummy_value2"}
+            assert add_log.call_count == 2
 
 
 def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> None:
@@ -58,8 +60,10 @@ def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> Non
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
-        with pytest.raises(Exception):
-            mock_input_manager._load_metadata("path/dummy_metadata.json")
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(Exception):
+                mock_input_manager._load_metadata("path/dummy_metadata.json")
+            assert add_log.call_count == 1
 
 
 def test_load_data_json(mock_input_manager: InputManager) -> None:
@@ -74,8 +78,11 @@ def test_load_data_json(mock_input_manager: InputManager) -> None:
     }
 
     with patch("builtins.open", mock_open(read_data='{"key": "value"}')):
-        mock_input_manager._load_data()
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_data()
+
     assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key": "value"}}
+    assert add_log.call_count == 2
 
 
 def test_load_data_csv(mock_input_manager: InputManager) -> None:
@@ -89,9 +96,12 @@ def test_load_data_csv(mock_input_manager: InputManager) -> None:
         }
     }
     with patch("builtins.open", mock_open(read_data="key1,key2\na,1\nb,2\n")):
-        mock_input_manager._load_data()
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            mock_input_manager._load_data()
+
     assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key1": ["a", "b"],
                                                                           "key2": [1, 2]}}
+    assert add_log.call_count == 2
 
 
 def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manager: InputManager) -> None:
@@ -107,9 +117,12 @@ def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manage
 
     with patch("builtins.open", mock_open(read_data="key_and_value")):
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            mock_input_manager._load_data()
-        assert mock_input_manager._InputManager__pool == {}
-        assert add_warning.call_count == 1
+            with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+                mock_input_manager._load_data()
+
+    assert mock_input_manager._InputManager__pool == {}
+    assert add_warning.call_count == 1
+    assert add_log.call_count == 1
 
 
 def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
@@ -118,8 +131,29 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
     mock_open_func.side_effect = Exception("Error opening file")
 
     with patch("builtins.open", mock_open_func):
-        with pytest.raises(Exception):
-            mock_input_manager._load_data("bad/path.csv")
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(Exception):
+                mock_input_manager._load_data("bad/path.csv")
+                assert add_log.call_count == 1
+
+
+def test_start_data_processing(mock_input_manager: InputManager,
+                               input_manager_original_method_states: Dict[str, Callable],) -> None:
+    """Unit test for function start_data_processing in file input_manager.py"""
+    mock_input_manager._load_metadata = MagicMock()
+    mock_input_manager._load_data = MagicMock()
+    mock_input_manager._validate_data = MagicMock(return_value=True)
+
+    mock_input_manager.start_data_processing("mock/metadata/path")
+
+    mock_input_manager._load_metadata.assert_called_once()
+    mock_input_manager._load_data.assert_called_once()
+    mock_input_manager._validate_data.assert_called_once()
+
+    # Restore original methods
+    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
+    mock_input_manager._load_data = input_manager_original_method_states["_load_data"]
+    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
 
 
 def test_start_data_pipeline(mock_input_manager: InputManager,
@@ -210,7 +244,7 @@ def test_validate_data_returns_true_with_valid_data(mocker: MockerFixture,
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data()
+        result = mock_input_manager._validate_data(eager_termination=True)
 
     assert result is True
     assert add_log.call_count == 3
@@ -228,7 +262,7 @@ def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerF
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data()
+        result = mock_input_manager._validate_data(eager_termination=True)
 
     assert result is False
     assert add_log.call_count == 0  # will reach eager_termination prior to adding logs
@@ -322,6 +356,32 @@ def test_validate_element_with_element_no_type_or_bad_type_raises_exception(mock
                                              dummy_property_map_key, eager_termination)
         error_message = "Element must be type number, array, string, or bool"
         assert error_message in Exception.message
+
+
+def test_validate_element_with_element_not_in_pool_raises_exception(mocker: MockerFixture,
+                                                                    mock_input_manager: InputManager,
+                                                                    mock_metadata: Dict[str, Dict[str, Any]],
+                                                                    mock_pool: Dict[str, Dict[str, Any]],
+                                                                    ) -> None:
+    """Unit test for function _validate_element function with element missing from pool in file input_manager.py"""
+    dummy_module_key = "animal"
+    dummy_valid_element = "animal_var1"
+    dummy_property_map_key = "animal_properties"
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+    eager_termination = True
+    var_name = "crop_var1"
+
+    # remove crop_var1 variable from mock_pool
+    mock_pool["crop"] = {"crop_var2": "dummyvalue6",
+                         "crop_var3": {"crop_nested1": "dummyvalue3"},
+                         },
+
+    with pytest.raises(Exception) as KeyError:
+        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
+                                             dummy_property_map_key, eager_termination)
+        error_message = f"Key {var_name} not found in pool"
+        assert error_message in KeyError
 
 
 @pytest.mark.parametrize(
