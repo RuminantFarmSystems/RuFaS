@@ -348,4 +348,29 @@ class InputManager:
         pass
 
     def get_data(self, data_address: str) -> Optional[Any]:
-        pass
+        """
+        Get the requested data from the pool
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested data.
+
+        Returns
+        -------
+        Any
+            The requested data if found, else None.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._fix_data.__name__,
+                    }
+        element_hierarchy = data_address.split('.')
+        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
+                                 self.__pool)
+
+        if element_hierarchy[-1] in variable_parent.keys():
+            return variable_parent[element_hierarchy[-1]]
+
+        else:
+            om.add_warning("Data not found:", f"Cannot find {data_address}", info_map)
+            return None
