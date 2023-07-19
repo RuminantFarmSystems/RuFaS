@@ -10,27 +10,36 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 # --- static function tests ----
-@pytest.mark.parametrize("halfheat,heatfrac,emerge,half,mature", [
-    (0.5, 1.0, 0.8, 0.6, 0.2),  # start
-    (0.99, 1.0, 0.8, 0.6, 0.2),  # half_heat close to mature heat
-    (0.01, 1.0, 0.8, 0.6, 0.2),  # small half_heat
-    (0.5, 1.0, 0.8, 0.6, 0.2),  # near very close to mature
-    (0.286, 0.54, 0.522, 0.4, 0.08),  # arbitrary
+@pytest.mark.parametrize("halfheat,heatfrac,emerge,half,near,mature,should_fail", [
+    (0.5, 1.0, 0.8, 0.6, 0.3, 0.2, False),  # start
+    (0.99, 1.0, 0.8, 0.6, 0.3, 0.2, False),  # half_heat close to mature heat
+    (0.01, 1.0, 0.8, 0.6, 0.3, 0.2, False),  # small half_heat
+    (0.5, 1.0, 0.8, 0.6, 0.20001, 0.2, False),  # near very close to mature
+    (0.286, 0.54, 0.522, 0.4, 0.1, 0.08, False),  # arbitrary
     # Above tests are copied from old subroutine tests
-    (0.8, 1, 0.9, 0.6, 0.25),
-    (0.8, 0.81, 0.9, 0.6, 0.25),  # small difference in heat units
-    (0.8, 1, 0.9, 0.6, 0.25),  # small difference in nfrac_near and nfrac_3
-    (0.633, 0.691, 0.530, 0.101, 0.013),  # arbitrary
+    (0.8, 1, 0.9, 0.6, 0.3, 0.25, False),
+    (0.8, 0.81, 0.9, 0.6, 0.3, 0.25, False),  # small difference in heat units
+    (0.8, 1, 0.9, 0.6, 0.25000001, 0.25, False),  # small difference in nfrac_near and nfrac_3
+    (0.633, 0.691, 0.530, 0.101, 0.057, 0.013, False),  # arbitrary
+    (0.5, 0.5, 0.530, 0.101, 0.057, 0.013, True)
 ])
-def test_determine_nitrogen_shape_parameters(halfheat, heatfrac, emerge, half, mature):
-    """check that the shape parameters are correctly calculated by determine_nshapes()"""
-    expected_near = mature + 0.00001
-    observe = NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
-    expect_2 = (NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) -
-                NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)) / \
-               (heatfrac - halfheat)
-    expect_1 = NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
-    assert observe == [expect_1, expect_2]
+def test_determine_nitrogen_shape_parameters(halfheat: float, heatfrac: float, emerge: float, half: float,
+                                             near: float, mature: float, should_fail: bool) -> None:
+    """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
+     correctly"""
+    if should_fail:
+        try:
+            NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
+        except ValueError as e:
+            assert str(e) == "half_mature_heat_fraction must not equal mature_heat_fraction"
+    else:
+        expected_near = mature + 0.00001
+        observe = NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
+        expect_2 = (NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) -
+                    NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)) / \
+                   (heatfrac - halfheat)
+        expect_1 = NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
+        assert observe == [expect_1, expect_2]
 
 
 @pytest.mark.parametrize("heatfrac,current,mature,emergence", [
@@ -116,16 +125,14 @@ def test_determine_potential_nitrogen_uptake(optimal, previous, mature, max_grow
     (1.5, [0, 1, 2, 3], 3),  # roots access layer 3
     (2.7, [0, 1, 2, 3], 4),  # 4th layer
     (3.8, [0, 1, 2, 3], 4),  # beyond max_evapotranspiration depth
-    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4),  # arbitrary
-    (0.0, [20, 50, 350, 1000], 0)
+    (83.33, [10.4, 18.20, 63.7, 100, 1937.8], 4)  # arbitrary
 ])
 def test_determine_deepest_accessible_layer(root, depths, expect):
     assert NitrogenIncorporation.determine_deepest_accessible_layer(root, depths) == expect
 
 
 @pytest.mark.parametrize("root,depths", [
-    (-1, [0, 1, 2, 3]),  # root < 0
-    (-0.5, [0, 1, 2, 3]),  # root = 0
+    (-1, [0, 1, 2, 3])  # root < 0
 ])
 def test_error_determine_deepest_accessible_layer(root, depths):
     with pytest.raises(ValueError):

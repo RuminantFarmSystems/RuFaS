@@ -381,7 +381,7 @@ class CropData:
         """Initialize all attributes with defaults that depend on other attributes"""
 
         # Set dormancy loss
-        if self.plant_category == PlantCategory.PERENNIAL or PlantCategory.PERENNIAL_LEGUME:
+        if self.plant_category == PlantCategory.PERENNIAL or self.plant_category == PlantCategory.PERENNIAL_LEGUME:
             self.dormancy_loss_fraction = 0.1
         elif self.plant_category == PlantCategory.TREE:
             self.dormancy_loss_fraction = 0.3
