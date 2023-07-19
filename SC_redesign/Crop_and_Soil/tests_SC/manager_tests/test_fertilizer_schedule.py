@@ -79,7 +79,16 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
         FertilizerEvent("mix_4", 1998, 100, 20.0, 10.0, 0.0, 1.0),
         FertilizerEvent("mix_3", 1999, 100, 10.0, 25.0, 0.0, 1.0),
         FertilizerEvent("mix_4", 2000, 100, 20.0, 10.0, 0.0, 1.0)
-    ])
+    ]),
+    (["mix_1", "mix_2", "mix_1"], [1991, 1991, 1992], [150, 240, 90], [15.0, 8.0, 20.0], [10.0, 10.0, 10.0], None,
+     None, 0, 1, [
+         FertilizerEvent("mix_1", 1991, 150, 15.0, 10.0, 0.0, 1.0),
+         FertilizerEvent("mix_2", 1991, 240, 8.0, 10.0, 0.0, 1.0),
+         FertilizerEvent("mix_1", 1992, 90, 20.0, 10.0, 0.0, 1.0),
+         FertilizerEvent("mix_1", 1993, 150, 15.0, 10.0, 0.0, 1.0),
+         FertilizerEvent("mix_2", 1993, 240, 8.0, 10.0, 0.0, 1.0),
+         FertilizerEvent("mix_1", 1994, 90, 20.0, 10.0, 0.0, 1.0)
+     ])
 ])
 def test_generate_fertilizer_events(mixes: List[str], years: List[int], days: List[int], nitrogen: List[float],
                                     phosphorus: List[float], depths: List[float], fractions: List[float], skip: int,
