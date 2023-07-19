@@ -92,18 +92,14 @@ def update_all(soil, crop_type, field_management, time):
     calc_quality_assessment(crop_type)
 
 
-#
-# Calculates max potential harvest index for a given day.
-# "pseudocode_crop" C.10.C.1
-#
 def calc_HI_max(crop_type):
     """
     Description:
         Calculates max potential harvest index for a given day.
-        "pseudocode_crop" C.10.C.1
+        "pseudocode_crop" C.10.B.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     top = 100 * crop_type.fr_PHU
@@ -118,7 +114,7 @@ def calc_HI_act(crop_type):
         "pseudocode_crop" C.10.C.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     term1 = crop_type.HI_max - crop_type.HI_min
@@ -127,16 +123,16 @@ def calc_HI_act(crop_type):
 
     crop_type.HI_actual = term1 * term2 + crop_type.HI_min
 
-
+# TODO: add documentation and pseudocode reference - GitHub Issue #170
 def calc_dry_down(crop_type):
-    # TODO: stand in for more sophisticated dry down method
+    # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
+    """
+    Description:
+        "pseudocode_crop"?
+    """
     crop_type.bio_AG -= (crop_type.bio_AG * crop_type.biomass_dry_down_percent)
 
 
-#
-# Calculates maximum crop yield at harvest.
-# "pseudocode_crop" C.10.D.1
-#
 def calc_yield_max(crop_type):
     """
     Description:
@@ -144,7 +140,7 @@ def calc_yield_max(crop_type):
         "pseudocode_crop" C.10.D.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     crop_type.yield_max = crop_type.bio_AG * crop_type.HI_actual
@@ -157,17 +153,15 @@ def calc_yield_act(crop_type):
         "pseudocode_crop" C.10.E.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     crop_type.yield_actual = crop_type.yield_max * crop_type.harvest_eff
 
-
-def calc_quality_assessment(crop_type):
+def calc_quality_assessment(crop_type):  #TODO: Stand in for more sophisticated method - GitHub Issue #161
     """
     Description:
-        TODO: Stand in for more sophisticated method
-        Assesses quality of feed at harvest
+         Assesses quality of feed at harvest
         "Feed Inventory Pseudocode" F.1.1
     Args:
         crop_type: the crop for which a quality is being assessed
@@ -193,7 +187,7 @@ def calc_nutrient_removal(crop_type):
         "pseudocode_crop" C.10.F.1/2
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
 
     crop_type.N_yield = crop_type.fr_N * crop_type.yield_actual
@@ -207,18 +201,19 @@ def calc_residue(soil, crop_type, field_management, time):
         "pseudocode_crop" C.10.H.1/4/5
 
     Args:
-        soil
-        crop_type
-        field_management
-        time
+        soil: an instance of the Soil class
+        crop_type: an instance of a crop class
+        field_management: an instance of the FieldManagement class
+        time: an instance of the Time class specified in classes.py
     """
     # for carbon, needs to be calculated only at harvest
     # C.3.A.4
     crop_type.bio_BG = crop_type.fr_root * crop_type.biomass_actual
-    soil.soil_layers[0].tillage_percent = 0.55
+    soil.soil_layers[0].tillage_percent = 0.55 #TODO: hard coded value - GitHub Issue #163
+
     # lignin residue reset at harvest
-    soil.AG_lignin_res_percent = 17  # TODO
-    soil.BG_lignin_res_percent = 17  # TODO
+    soil.AG_lignin_res_percent = 17  # TODO: should depend upon crops and management - GitHub Issue #163
+    soil.BG_lignin_res_percent = 17  # TODO: should depend upon crops and management - GitHub Issue #163
 
     d_residue = 0
     if time.day == crop_type.kill_day or crop_type.crop_type == 'annual':
@@ -232,15 +227,14 @@ def calc_residue(soil, crop_type, field_management, time):
 
     soil.residue_harvest = soil.residue
 
-
-def calc_harvest_quality(crop_type):
+# TODO: missing pseudocode in pseudocode_crop Google Doc - GitHub Issue #168
+def calc_harvest_quality(crop_type): # TODO: Stand in for more sophisticated method - GitHub Issue #161
     """
     Description:
-        # TODO: Stand in for more sophisticated method
         Calculate quality of yield for grouping in feed storage
         "pseudocode_crop" C.10.G
     Args:
-        crop_type
+        crop_type: an instance of a crop class
     """
     crop_type.harvest_quality = "good"
 
@@ -254,9 +248,9 @@ def kill(crop_type, field_management, time):
         "pseudocode_crop" C.10.H.4
 
     Args:
-        crop_type
-        field_management
-        time
+        crop_type: an instance of a crop class
+        field_management: an instance of the FieldManagement class
+        time: an instance of the Time class as specified in classes.py
     """
     crop_type.accumulated_HU = 0
     crop_type.prev_accumulated_HU = 0
@@ -281,7 +275,7 @@ def kill(crop_type, field_management, time):
 
     crop_type.planted = False
     crop_type.growing = False
-    crop_type.harvested = True
+    crop_type.killed = True
 
     # FM.2.2
     till_management = field_management.managed_applications['tillage']
@@ -296,7 +290,7 @@ def cut(crop_type, bio_frac):
         "pseudocode_crop" C.10.H.2/3
 
     Args:
-        crop_type
+        crop_type: an instance of a crop class
         bio_frac: fraction of biomass removed during the cut
     """
 

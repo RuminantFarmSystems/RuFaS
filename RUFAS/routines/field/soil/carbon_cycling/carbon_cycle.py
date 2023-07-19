@@ -8,7 +8,7 @@ Author(s): Jacob Johnson, jacob8399@gmail.com
 Description: Carbon Cycle driver class.
 """
 
-from . import decomp_factors, residue_partitioning, pool_gas_partitioning
+from . import decomp_factors, pool_gas_partitioning, residue_partitioning
 
 
 def update_all(soil, crop_type, weather, time):
@@ -37,10 +37,10 @@ def soil_carbon_aggregation(soil):
     """
     Description:
         This function does the aggregation of carbon into pools
-        "pseudocode_soil" S.6.C
+        "pseudocode_soil" S.6.D
 
     Args:
-        soil
+        soil: an instance of the Soil class
     """
 
     for layer in soil.soil_layers:

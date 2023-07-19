@@ -76,8 +76,9 @@ def update_all(soil, crop, weather, time):
         weather: instance of the Weather class specified in classes.py
         time: instance of the Time class specified in classes.py
     """
-
-    calc_T_surf(soil, crop, weather, time)
+    for crop_types in crop.current_crop.values():
+        
+        calc_T_surf(soil, crop_types, weather, time)
 
     calc_T_soil(soil, weather, time)
 
@@ -86,12 +87,12 @@ def calc_T_soil(soil, weather, time):
     """
     Description:
         Calculates the soil temperature for each layer given average annual air
-        temperature. "pseudocode_soil" S.1.A.1
+        temperature. "pseudocode_soil" S.1.A.1-3
 
     Args:
-        soil
-        weather
-        time
+        soil: an instance of the Soil class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
     """
 
     L = 0.8
@@ -130,7 +131,7 @@ def calc_dd(soil):
         "pseudocode_soil" S.1.A.4
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: dd, damping depth of the profile (mm)
@@ -153,7 +154,7 @@ def calc_scale(soil):
         "pseudocode_soil" S.1.A.5
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: soil water scaling factor for the profile
@@ -173,7 +174,7 @@ def calc_dd_max(soil):
         "pseudocode_soil" S.1.A.6
 
     Args:
-        soil
+        soil: an instance of the Soil class
 
     Returns:
         int: dd_max, the maximum damping depth fro the profile (mm)
@@ -190,7 +191,7 @@ def sum_soil_water(soil):
        Helper method to calculates the sum of soil water in the profile.
 
     Args:
-        soil
+        soil: an instance of the Soil claass
 
     Returns:
         int: total_soil_water (mm)
@@ -204,7 +205,7 @@ def sum_soil_water(soil):
     return total_soil_water
 
 
-def calc_T_surf(soil, crop, weather, time):
+def calc_T_surf(soil, crop_type, weather, time):
     """
     Description:
         Calculates the surface temperature as a function of the previous day's
@@ -213,62 +214,62 @@ def calc_T_surf(soil, crop, weather, time):
         "pseudocode_soil" S.1.A.13
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
     """
 
-    T_bare = calc_T_bare(soil, crop, weather, time)
-    bcv = calc_bcv(crop, time)
+    T_bare = calc_T_bare(soil, crop_type, weather, time)
+    bcv = calc_bcv(crop_type, time)
 
     soil.T_surf = (bcv * soil.soil_layers[0].temperature) + ((1 - bcv) * T_bare)
 
 
-def calc_T_bare(soil, crop, weather, time):
+def calc_T_bare(soil, crop_type, weather, time):
     """
     Description:
         Calculates the temperature of a bare soil.
         "pseudocode_soil" S.1.A.7
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
 
     Returns:
         int: T_bare, the theoretical temperature of the bare soil (ºC)
     """
     T_av = weather.T_avg[time.year - 1][time.day - 1]
-    radiate = calc_radiate(soil, crop, weather, time)
+    radiate = calc_radiate(soil, crop_type, weather, time)
 
     return T_av + radiate * T_av
 
 
-def calc_radiate(soil, crop, weather, time):
+def calc_radiate(soil, crop_type, weather, time):
     """
     Description:
         Calculates the radiation term for the temperature of bare soil.
         "pseudocode_soil" S.1.A.8
 
     Args:
-        soil
-        crop
-        weather
-        time
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
+        weather: an instance of the Weather class
+        time: an instance of the Time class
 
     Returns:
         int: radiate, the radiation term for the temperature of bare soil
     """
 
     H_day = weather.radiation[time.year - 1][time.day - 1]
-    albedo = calc_albedo(soil, crop)
+    albedo = calc_albedo(soil, crop_type)
 
     return (H_day * (1 - albedo) - 14) / 20
 
 
-def calc_albedo(soil, crop):
+def calc_albedo(soil, crop_type):
     """
     Description:
         Calculates the daily albedo as a function of soil type, plant cover,
@@ -276,14 +277,14 @@ def calc_albedo(soil, crop):
         "pseudocode_soil" S.1.A.9/10
 
     Args:
-        soil
-        crop
+        soil: an instance of the Soil class
+        crop: an instance of the Crop class
 
     Returns:
         int: soil albedo
     """
 
-    CV = crop.current_crop.bio_AG
+    CV = crop_type.bio_AG
 
     # "pseudocode_soil" S.1.A.10
     cover = exp(-0.00005 * CV)
@@ -292,27 +293,27 @@ def calc_albedo(soil, crop):
     return 0.23 * (1 - cover) + soil.soil_albedo * cover
 
 
-def calc_bcv(crop, time):
+def calc_bcv(crop_type, time):
     """
     Description:
         Calculates the weighting factor for ground cover
         "pseudocode_soil" S.1.A.11/12
 
     Args:
-        crop
-        time
+        crop: an instance of the Crop class
+        time: an instance of the Time class
 
     Returns:
         int: bcv, the bio-cover weighting factor for ground cover
     """
 
-    CV = crop.current_crop.bio_AG
+    CV = crop_type.bio_AG
     exp_part = exp(7.563 - 0.0001297 * (-CV))
 
     bcv = CV / (CV + exp_part)
 
     snow = 0
-    # TODO: arbitrary snow flag
+    # TODO: arbitrary snow flag - GitHub Issue #164
     if time.day > 335 or time.day < 59:
         albedo_snow = 0.8
         snow = 10 * albedo_snow

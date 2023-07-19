@@ -128,7 +128,7 @@ def fertilizer_N(soil, field_management, fert_app):
     field_management.fert_N_applied = fert_app['N_mass']
 
     # FM.3.C.1
-    soil.soil_layers[0].NH4 += field_management.fert_N_applied
+    soil.soil_layers[0].NO3 += field_management.fert_N_applied
 
 
 def fertilizer_K(soil, field_management, fert_app):

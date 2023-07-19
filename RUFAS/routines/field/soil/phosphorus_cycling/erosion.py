@@ -11,10 +11,9 @@ Coder(s):   Jacob Johnson jacob8399@gmail.com
 """
 
 
-def update_all(soil):
+def update_all(soil):  # TODO: Peter was skeptical about the compatibility of this module with SurPhos - GitHub Issue #165
     """
     Description:
-        TODO: Peter was skeptical about the compatibility of this module with SurPhos
         Calculates sediment P transported in runoff using SWAT
         "pseudocode_soil" S.5.F
     Args:

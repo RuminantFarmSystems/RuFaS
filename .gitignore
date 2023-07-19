@@ -51,6 +51,11 @@ venv/
 # ignore .DS_store
 .DS_store
 
+# ignore R files
+.RData
+.RHistory
+
+# ignore pytest cache folder
 .pytest_cache/
 *.bak
 tests/__pycache__/test_user_prompt.cpython-311-pytest-7.2.2.pyc.27508

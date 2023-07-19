@@ -52,10 +52,16 @@ def calc_daily_root_biomass(crop_type):
         "pseudocode_crop" C.3.A.1
 
     Args:
-        crop_type
+        crop_type: an instance of a crop
     """
 
-    crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
+    fr_root=0.4 - 0.2 * crop_type.fr_PHU
+    if fr_root < 0:
+        crop_type.fr_root = 0
+    else: 
+        crop_type.fr_root = fr_root
+
+
 
 
 def calc_z_root(crop_type):
@@ -66,7 +72,7 @@ def calc_z_root(crop_type):
         "pseudocode_crop" C.3.A.2/3
 
     Args:
-        crop_type
+        crop_type: an instance of a crop
     """
 
     if not crop_type.z_root == crop_type.z_root_max:
