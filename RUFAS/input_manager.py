@@ -44,7 +44,7 @@ class InputManager:
         Returns
         -------
         bool
-            Flag indicating whether input data is valid.
+            True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
         self._load_data()
