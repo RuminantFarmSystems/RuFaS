@@ -57,7 +57,7 @@
       "properties": "soil_profile_properties"
     },
     "soil_2": {
-      "title": "Alternate soil data",
+      "title": "Second soil data",
       "description": "Soil is still being treated like dirt.",
       "path": "soil/example_soil_2.json",
       "type": "json",
