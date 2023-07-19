@@ -183,15 +183,15 @@ def test_determine_moisture_condition_parameter(retention_param):
 # --- Integration tests ----
 @pytest.mark.parametrize("average_subbasin_slope,rainfall,is_top_frozen,coefficient,potential_evapotranspiration,"
                          "previous_retention_parameter", [
-    (0.07, 1.4, False, 0.91, 1.9, 27),
-    (0.07, 3.5, True, 0.4858, 3.8, 27),
-    (0.07, 2.5, False, 0.694, 0.0, 27),
-    (0.07, 0.3, False, 0.58392, 4.9, 27),
-    (0.07, 4.697, False, 0.5938, 5.1, 27),
-    (0.07, 2.45, False, 0.9694, 2.2, 27),
-    (0.05, 2.45, False, 0.9694, 2.2, 27),
-    (0.07, 2.5, False, 0.694, 0.0, None)
-])
+                             (0.07, 1.4, False, 0.91, 1.9, 27),
+                             (0.07, 3.5, True, 0.4858, 3.8, 27),
+                             (0.07, 2.5, False, 0.694, 0.0, 27),
+                             (0.07, 0.3, False, 0.58392, 4.9, 27),
+                             (0.07, 4.697, False, 0.5938, 5.1, 27),
+                             (0.07, 2.45, False, 0.9694, 2.2, 27),
+                             (0.05, 2.45, False, 0.9694, 2.2, 27),
+                             (0.07, 2.5, False, 0.694, 0.0, None)
+                         ])
 def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_frozen: bool, coefficient: float,
                     potential_evapotranspiration: float, previous_retention_parameter: float) -> None:
     """test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should"""
@@ -232,8 +232,6 @@ def test_infiltrate(average_subbasin_slope: float, rainfall: float, is_top_froze
     # run main method
     incorp.infiltrate(rainfall, coefficient, potential_evapotranspiration)
     expected_infiltrated_water = max(0.0, rainfall - 0.95)
-
-
     # assertions
     if average_subbasin_slope == 0.05:
         assert incorp._determine_third_moisture_condition_parameter.call_count == 1

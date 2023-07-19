@@ -15,13 +15,13 @@ def test_water_factor(soil_water_content: float, field_capacity_content: float, 
                       saturation_content: float, expected: float) -> None:
     """Tests that water factor was calculated correctly"""
     with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.soil_water_content',
-               new_callable=PropertyMock, return_value=soil_water_content) as mocked_soil_water, \
-        patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content',
-              new_callable=PropertyMock, return_value=field_capacity_content) as mocked_field_cap, \
-        patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.wilting_point_content',
-              new_callable=PropertyMock, return_value=wilting_point_content) as mocked_wilt_point, \
-        patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.saturation_content',
-              new_callable=PropertyMock, return_value=saturation_content) as mocked_sat_content:
-                    layer = LayerData(top_depth=15, bottom_depth=32, field_size=35)
-                    actual = layer.water_factor
-                    assert expected == approx(actual)
+               new_callable=PropertyMock, return_value=soil_water_content), \
+         patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content',
+               new_callable=PropertyMock, return_value=field_capacity_content), \
+         patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.wilting_point_content',
+               new_callable=PropertyMock, return_value=wilting_point_content), \
+         patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.saturation_content',
+               new_callable=PropertyMock, return_value=saturation_content):
+        layer = LayerData(top_depth=15, bottom_depth=32, field_size=35)
+        actual = layer.water_factor
+        assert expected == approx(actual)

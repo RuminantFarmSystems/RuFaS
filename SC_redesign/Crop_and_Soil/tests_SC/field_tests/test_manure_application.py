@@ -331,4 +331,3 @@ def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosph
                                                                        coverage, expected_weiP_frac, inorganic_frac,
                                                                        ammonium_frac, organic_frac, area)
         assert incorp.data.machine_manure_applied_mass == dry_mass
-
