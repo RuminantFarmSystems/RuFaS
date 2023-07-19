@@ -254,21 +254,25 @@
         "nitrogen_masses": {
           "type": "array",
           "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.",
+          "units": "kg",
           "default": []
         },
         "phosphorus_masses": {
           "type": "array",
           "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.",
+          "units": "kg",
           "default": []
         },
         "potassium_masses": {
           "type": "array",
           "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.",
+          "units": "kg",
           "default": []
         },
         "application_depths": {
           "type": "array",
           "description": "List of depths at which the fertilizer is injected into the soil.",
+          "units": "mm",
           "default": []
         },
         "surface_remainder_fractions": {
@@ -305,16 +309,19 @@
         "nitrogen_masses": {
           "type": "array",
           "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.",
+          "units": "kg",
           "default": []
         },
         "phosphorus_masses": {
           "type": "array",
           "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.",
+          "units": "kg",
           "default": []
         },
         "potassium_masses": {
           "type": "array",
           "description": "List of minimum potassium masses that the corresponding manure applications should contain.",
+          "units": "kg",
           "default": []
         },
         "coverage_fractions": {
@@ -325,6 +332,7 @@
         "application_depths": {
           "type": "array",
           "description": "List of depths at which the manure is injected into the soil.",
+          "units": "mm",
           "default": []
         },
         "surface_remainder_fractions": {
@@ -361,6 +369,7 @@
         "tillage_depths": {
           "type": "array",
           "description": "List of depths that the corresponding tillage applications reach.",
+          "units": "mm",
           "default": []
         },
         "incorporation_fractions": {
