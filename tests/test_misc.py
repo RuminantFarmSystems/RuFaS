@@ -5,10 +5,9 @@ Description: Implements test cases
 Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
-import re
 import os
-from typing import Callable
-from typing import Dict
+import re
+from typing import Any, Callable, Dict
 from mock import Mock, mock_open, patch
 
 import pytest
@@ -320,6 +319,35 @@ def mock_output_manager(mocker) -> OutputManager:
     return output_manager
 
 
+@pytest.mark.parametrize("data, expected_result, should_write", [
+    ({"var1": {"values": [1.0, True, "test", {"key": 1}]}}, "var1\n1.0\nTrue\ntest\n{'key': 1}\n",
+     True),
+    ({}, "",
+     False),
+    ({"var1": {"values": [1, 2, 3]}},
+     "var1\n1\n2\n3\n",
+     True),
+    ({"var1": {"not a value": [1]}}, "",
+     False),
+])
+def test_dict_to_csv(
+    mock_output_manager: OutputManager,
+    data: Dict[str, Any],
+    expected_result: str,
+    should_write: bool
+) -> None:
+    """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
+    open_mock = mock_open()
+
+    with patch("builtins.open", open_mock):
+        mock_output_manager._dict_to_file_csv(data, "test")
+
+    if should_write:
+        open_mock.assert_called_with("test", "w", encoding="utf-8", errors="strict", newline='')
+    written_data = ''.join(call[1][0] for call in open_mock().write.mock_calls)
+    assert written_data == expected_result
+
+
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
@@ -353,6 +381,7 @@ def test_generate_key(mocker: MockerFixture) -> None:
     key = om._generate_key("key_name", info_map)
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
+
 def test_get_timestamp(mocker: MockerFixture) -> None:
     """Unit test for the function _get_timestamp in file output_manager.py"""
     om = OutputManager()
@@ -363,6 +392,7 @@ def test_get_timestamp(mocker: MockerFixture) -> None:
 
     assert re.match(timestamp_with_millis_pattern, om._get_timestamp(include_millis=True))
     assert re.match(timestamp_without_millis_pattern, om._get_timestamp(include_millis=False))
+
 
 def test_add_error(
     mock_output_manager: OutputManager,
@@ -397,6 +427,7 @@ def test_add_error(
         "_get_timestamp"
     ]
 
+
 def test_add_warning(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -430,6 +461,7 @@ def test_add_warning(
         "_get_timestamp"
     ]
 
+
 def test_add_log(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -462,6 +494,7 @@ def test_add_log(
     mock_output_manager._get_timestamp = output_manager_original_method_states[
         "_get_timestamp"
     ]
+
 
 def test_add_variable(
     mock_output_manager: OutputManager,
@@ -558,6 +591,7 @@ def output_manager_original_method_states(
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_dict_to_file_json": mock_output_manager._dict_to_file_json,
+        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_add_to_pool": mock_output_manager._add_to_pool,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
@@ -574,6 +608,7 @@ def output_manager_original_method_states(
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
+        "save_variables_to_csv_files ": mock_output_manager.save_variables_to_csv_files,
     }
 
 
@@ -588,16 +623,16 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
+    mock_output_manager.save_variables_to_csv_files = MagicMock()
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variables.assert_called_once_with(
-        path, False
-    )
+    mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
+    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(f"{path}/CSVs/om/variables")
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
@@ -605,6 +640,8 @@ def test_dump_all_pools(
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
+    assert mock_output_manager.dump_variables.call_count == 2
+    assert mock_output_manager.save_variables_to_csv_files.call_count == 2
 
     # Restore original methods
     mock_output_manager.dump_variables = output_manager_original_method_states[
@@ -620,6 +657,10 @@ def test_dump_all_pools(
     mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
         "dump_variable_names_and_contexts"
     ]
+    mock_output_manager.save_variables_to_csv_files = output_manager_original_method_states[
+        "save_variables_to_csv_files "
+    ]
+
 
 def test_generate_file_name(mocker: MockerFixture) -> None:
     """Unit test for function _generate_file_name in file output_manager.py"""
@@ -634,6 +675,7 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
             om._generate_file_name(base_name, extension)
             == f"{base_name}_{timestamp}.{extension}"
         )
+
 
 def test_dump_variables(
     mock_output_manager: OutputManager,
@@ -656,6 +698,36 @@ def test_dump_variables(
     ]
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
         "_dict_to_file_json"
+    ]
+
+
+def test_save_variables_to_csv_files(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test case for function save_variables_to_csv_files in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._dict_to_file_csv = MagicMock()
+    original_variables_pool = mock_output_manager.variables_pool
+    mock_output_manager.variables_pool = {"var1": {"values": [1]}}
+
+    with patch('pathlib.Path.mkdir') as mock_mkdir:
+        mock_mkdir.return_value = None
+        mock_output_manager.save_variables_to_csv_files("dummy_path")
+
+    mock_mkdir.assert_called_with(parents=True, exist_ok=True)
+    mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
+    mock_output_manager._dict_to_file_csv.assert_called_once_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
+
+    mock_output_manager.variables_pool = original_variables_pool
+    # Restore original methods
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._dict_to_file_csv = output_manager_original_method_states[
+        "_dict_to_file_csv"
     ]
 
 
@@ -1075,6 +1147,7 @@ def test_filter_variables_pool_exclude_duplicate_patterns(
     ]
     mock_output_manager.variables_pool = {}
 
+
 @pytest.fixture
 def mock_variables_pool() -> Dict[str, str]:
     dummy_variables_pool = {
@@ -1306,7 +1379,7 @@ def test_make_serializable_recursive(
 ) -> None:
     """Unit test for function _make_serializable() in file util.py"""
     # Arrange
-    patch_for_get_str = mocker.patch.object(
+    _ = mocker.patch.object(
         Utility, "_get_str", side_effect=lambda x: str(x)
     )
 
