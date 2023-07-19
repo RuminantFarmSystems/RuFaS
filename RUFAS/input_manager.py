@@ -374,19 +374,15 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
-        current_metadata: dict = self.__metadata['properties'][property_map_key]
-        for metadata_key in element_hierarchy:
-            current_metadata = current_metadata[metadata_key]
-
-        if 'default' in current_metadata.keys():
-            current_pool = self.__pool[module_key]
-            for pool_key in element_hierarchy[:-1]:
-                current_pool = current_pool[pool_key]
-
-            current_pool[element_hierarchy[-1]] = current_metadata['default']
-            om.add_warning("Data fixed", f"Invalid data fixed: {element_hierarchy[-1]} => {current_metadata['default']}",
+        variable_metadata: Dict = reduce(lambda d, key: d[key], element_hierarchy,
+                                   self.__metadata['properties'][property_map_key])
+        if 'default' in variable_metadata.keys():
+            variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
+                                     self.__pool[module_key])
+            variable_parent[element_hierarchy[-1]] = variable_metadata['default']
+            om.add_warning("Data fixed",
+                           f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
                            info_map)
             return True
-
         else:
             return False

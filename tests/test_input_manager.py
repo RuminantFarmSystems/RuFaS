@@ -4,7 +4,7 @@ File name: test_input_manager.py
 Description: Implements test cases for Input Manager
 Author(s): Niko Tomlinson, ndt2@cornell.edu
 """
-
+from functools import reduce
 from typing import Any, Callable, Dict
 from mock import MagicMock, Mock, mock_open, patch
 import pytest
@@ -29,7 +29,7 @@ def test_input_manager_singleton(mocker: MockerFixture) -> None:
 
 @pytest.fixture
 def input_manager_original_method_states(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
@@ -41,6 +41,7 @@ def input_manager_original_method_states(
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
         "_validate_string_type_element": mock_input_manager._validate_string_type_element,
+        "_fix_data": mock_input_manager._fix_data,
     }
 
 
@@ -138,7 +139,7 @@ def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
 
 
 def test_start_data_processing(mock_input_manager: InputManager,
-                               input_manager_original_method_states: Dict[str, Callable],) -> None:
+                               input_manager_original_method_states: Dict[str, Callable], ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
     mock_input_manager._load_data = MagicMock()
@@ -156,81 +157,258 @@ def test_start_data_processing(mock_input_manager: InputManager,
     mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
 
 
-def test_start_data_pipeline(mock_input_manager: InputManager,
-                             input_manager_original_method_states: Dict[str, Callable],) -> None:
-    """Unit test for function start_data_pipeline in file input_manager.py"""
-    mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._load_data = MagicMock()
-    mock_input_manager._validate_data = MagicMock(return_value=True)
-
-    mock_input_manager.start_data_pipeline()
-
-    mock_input_manager._load_metadata.assert_called_once()
-    mock_input_manager._load_data.assert_called_once()
-    mock_input_manager._validate_data.assert_called_once()
-
-    # Restore original methods
-    mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._load_data = input_manager_original_method_states["_load_data"]
-    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
-
-
 @pytest.fixture
 def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
-            "dummyconfig": {},
-            "files": {
-                "animal": {"properties": "animal_properties"},
-                "manure": {"properties": "manure_properties"},
-                "crop": {"properties": "crop_properties"},
-                },
-            "properties": {
-                "animal_properties": {"animal_var1": {"default": "dummyvalue1", "type": "string"},
-                                      "animal_var2": {"default": 5, "type": "number"},
-                                      "animal_var3": {"type": "object",
-                                                      "animal_nested1": {"default": "dummyvalue3",
-                                                                         "type": "string"}, }
-                                      },
-                "manure_properties": {"manure_var1": {"default": [1, 2, 3], "type": "array"},
-                                      "manure_var2": {"default": "dummyvalue2", "type": "string"},
-                                      "manure_var3": {"type": "object",
-                                                      "manure_nested1": {"default": True,
-                                                                         "type": "bool", }},
-                                      },
-                "crop_properties": {"crop_var1": {"default": "dummyvalue1"},
-                                    "crop_var2": {"default": "dummyvalue2"},
-                                    "crop_var3": {"type": "object",
-                                                  "crop_nested1": {"type": "object",
-                                                                   "crop_nested2": {
-                                                                       "default": "dummyvalue3",
-                                                                       "type": "string", }},
-                                                  }
-                                    }
-                }}
+        "dummyconfig": {},
+        "files": {
+            "animal": {"properties": "animal_properties"},
+            "manure": {"properties": "manure_properties"},
+            "crop": {"properties": "crop_properties"},
+            "economy": {"properties": "economy_properties"},
+        },
+        "properties": {
+            "animal_properties": {"animal_var1": {"default": "dummyvalue1", "type": "string"},
+                                  "animal_var2": {"default": 5, "type": "number"},
+                                  "animal_var3": {"type": "object",
+                                                  "animal_nested1": {"default": "dummyvalue3",
+                                                                     "type": "string"}, }
+                                  },
+            "manure_properties": {"manure_var1": {"default": [1, 2, 3], "type": "array"},
+                                  "manure_var2": {"default": "dummyvalue2", "type": "string"},
+                                  "manure_var3": {"type": "object",
+                                                  "manure_nested1": {"default": True,
+                                                                     "type": "bool", }},
+                                  },
+            "crop_properties": {"crop_var1": {"default": "dummyvalue1"},
+                                "crop_var2": {"default": "dummyvalue2"},
+                                "crop_var3": {"type": "object",
+                                              "crop_nested1": {"type": "object",
+                                                               "crop_nested2": {
+                                                                   "default": "dummyvalue3",
+                                                                   "type": "string", }},
+                                              }
+                                },
+            "economy_properties": {"array_var1": {"type": "array",
+                                                  "default": [1, 2, 3, 4, 5],
+                                                  "minimum_length": 5,
+                                                  "maximum_length": 10,
+                                                  },
+                                   "array_var2": {"type": "array",
+                                                  "default": [],
+                                                  "minimum_length": 0,
+                                                  "maximum_length": 5,
+                                                  },
+                                   "array_var3": {"type": "array",
+                                                  "default": [1, 2, 3],
+                                                  "minimum_length": 2,
+                                                  "maximum_length": 5,
+                                                  },
+                                   "array_var4": {"type": "object",
+                                                  "array_var5": {"type": "array",
+                                                                 "default": [1, 2, 3],
+                                                                 "minimum_length": 2,
+                                                                 "maximum_length": 5,
+                                                                 },
+                                                  },
+                                   "array_var6": {"type": "array",
+                                                  "minimum_length": 5,
+                                                  "maximum_length": 10,
+                                                  },
+                                   "array_var7": {"type": "array",
+                                                  "minimum_length": 0,
+                                                  "maximum_length": 5,
+                                                  },
+                                   "array_var8": {"type": "array",
+                                                  "minimum_length": 2,
+                                                  "maximum_length": 5,
+                                                  },
+                                   "array_var9": {"type": "object",
+                                                  "array_var10": {"type": "array",
+                                                                  "minimum_length": 2,
+                                                                  "maximum_length": 5,
+                                                                  },
+                                                  },
+                                   "str_var1": {"type": "str",
+                                                "default": "cow",
+                                                "pattern": r"cow",
+                                                "minimum_length": 1,
+                                                "maximum_length": 5,
+                                                },
+                                   "str_var2": {"type": "str",
+                                                "default": "",
+                                                "minimum_length": 0,
+                                                "maximum_length": 5,
+                                                },
+                                   "str_var3": {"type": "str",
+                                                "default": "cow",
+                                                "pattern": r"cow",
+                                                "minimum_length": 2,
+                                                "maximum_length": 5,
+                                                },
+                                   "str_var4": {"type": "object",
+                                                "str_var5": {"type": "str",
+                                                             "default": "cow",
+                                                             "pattern": r"cow",
+                                                             "minimum_length": 2,
+                                                             "maximum_length": 5,
+                                                             },
+                                                },
+                                   "str_var6": {"type": "str",
+                                                "pattern": r"cow",
+                                                "minimum_length": 1,
+                                                "maximum_length": 5,
+                                                },
+                                   "str_var7": {"type": "str",
+                                                "pattern": r"cow",
+                                                "minimum_length": 1,
+                                                "maximum_length": 5,
+                                                },
+                                   "str_var8": {"type": "str",
+                                                "pattern": r"cow",
+                                                "minimum_length": 1,
+                                                "maximum_length": 5,
+                                                },
+                                   "str_var9": {"type": "object",
+                                                "str_var10": {"type": "str",
+                                                              "pattern": r"cow",
+                                                              "minimum_length": 2,
+                                                              "maximum_length": 5,
+                                                              },
+                                                },
+                                   "num_var1": {"type": "number",
+                                                "default": 5,
+                                                "minimum": 0,
+                                                "maximum": 10,
+                                                },
+                                   "num_var2": {"type": "number",
+                                                "default": 0,
+                                                "minimum": 0,
+                                                "maximum": 10,
+                                                },
+                                   "num_var3": {"type": "number",
+                                                "default": 5,
+                                                "minimum": 1,
+                                                "maximum": 10,
+                                                },
+                                   "num_var4": {"type": "object",
+                                                "num_var5": {"type": "number",
+                                                             "default": 5,
+                                                             "minimum": 0,
+                                                             "maximum": 10,
+                                                             },
+                                                },
+                                   "num_var6": {"type": "number",
+                                                "minimum": 0,
+                                                "maximum": 10,
+                                                },
+                                   "num_var7": {"type": "number",
+                                                "minimum": 0,
+                                                "maximum": 10,
+                                                },
+                                   "num_var8": {"type": "number",
+                                                "minimum": 1,
+                                                "maximum": 10,
+                                                },
+                                   "num_var9": {"type": "object",
+                                                "num_var10": {"type": "number",
+                                                              "minimum": 0,
+                                                              "maximum": 10,
+                                                              },
+                                                },
+                                   "bool_var1": {"type": "bool",
+                                                 "default": True
+                                                 },
+                                   "bool_var2": {"type": "bool",
+                                                 "default": False
+                                                 },
+                                   "bool_var3": {"type": "object",
+                                                 "bool_var4": {"type": "bool",
+                                                               "default": True
+                                                               },
+                                                 },
+                                   "bool_var5": {"type": "bool",
+                                                 },
+                                   "bool_var6": {"type": "bool",
+                                                 },
+                                   "bool_var7": {"type": "object",
+                                                 "bool_var8": {"type": "bool",
+                                                               },
+                                                 },
+                                   }
+        }}
 
 
 @pytest.fixture
 def mock_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
-            "animal": {"animal_var1": "dummyvalue1",
-                       "animal_var2": "dummyvalue2",
-                       "animal_var3": {
-                           "animal_nested1": "dummyvalue3"
-                       },
-                       },
-            "manure": {"manure_var1": "dummyvalue3",
-                       "manure_var2": "dummyvalue4",
-                       "manure_var3": {
-                           "manure_nested1": "dummyvalue3"
-                       },
-                       },
-            "crop": {"crop_var1": "dummyvalue5",
-                     "crop_var2": "dummyvalue6",
-                     "crop_var3": {
-                           "crop_nested1": "dummyvalue3"
-                       },
-                     },
-            }
+        "animal": {"animal_var1": "dummyvalue1",
+                   "animal_var2": "dummyvalue2",
+                   "animal_var3": {
+                       "animal_nested1": "dummyvalue3"
+                   },
+                   },
+        "manure": {"manure_var1": "dummyvalue3",
+                   "manure_var2": "dummyvalue4",
+                   "manure_var3": {
+                       "manure_nested1": "dummyvalue3"
+                   },
+                   },
+        "crop": {"crop_var1": "dummyvalue5",
+                 "crop_var2": "dummyvalue6",
+                 "crop_var3": {
+                     "crop_nested1": "dummyvalue3"
+                 },
+                 },
+        "economy": {"array_var1": [1, 2, 3],
+                    "array_var2": [1, 2, 3, 4, 5],
+                    "array_var3": [],
+                    "array_var4": {
+                        "array_var5": [1, 2],
+                    },
+                    "array_var6": [1, 2, 3],
+                    "array_var7": [1, 2, 3, 4, 5],
+                    "array_var8": [],
+                    "array_var9": {
+                        "array_var10": [1, 2],
+                    },
+                    "str_var1": "muu",
+                    "str_var2": "muumuu",
+                    "str_var3": "",
+                    "str_var4": {
+                        "str_var5": "muu",
+                    },
+                    "str_var6": "muu",
+                    "str_var7": "muumuu",
+                    "str_var8": "",
+                    "str_var9": {
+                        "str_var10": "muu",
+                    },
+                    "num_var1": -1,
+                    "num_var2": -1,
+                    "num_var3": 0,
+                    "num_var4": {
+                        "num_var5": 15,
+                    },
+                    "num_var6": -1,
+                    "num_var7": -1,
+                    "num_var8": 0,
+                    "num_var9": {
+                        "num_var10": 15,
+                    },
+                    "bool_var1": False,
+                    "bool_var2": True,
+                    "bool_var3": {
+                        "bool_var4": False,
+                    },
+                    "bool_var5": False,
+                    "bool_var6": True,
+                    "bool_var7": {
+                        "bool_var8": False,
+                    },
+                    },
+
+    }
 
 
 def test_validate_data_returns_true_with_valid_data(mocker: MockerFixture,
@@ -454,6 +632,232 @@ def test_validate_string_type_element(dummy_value: int,
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._validate_string_type_element(dummy_variable_to_check, dummy_var_name, dummy_value)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["array_var1"], [1, 2, 3, 4, 5], True, 1),
+        ("economy", "economy_properties", ["array_var2"], [], True, 1),
+        ("economy", "economy_properties", ["array_var3"], [1, 2, 3], True, 1),
+        ("economy", "economy_properties", ["array_var4", "array_var5"], [1, 2, 3], True, 1),
+    ]
+)
+def test_fix_array_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                     dummy_element_hierarchy: list[str], expected_value: list, expected_result: bool,
+                                     expected_warning_call_count: int, mock_input_manager: InputManager,
+                                     mock_metadata: Dict[str, Dict[str, Any]],
+                                     mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               mock_pool[dummy_module_key])
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["array_var6"], False, 0),
+        ("economy", "economy_properties", ["array_var7"], False, 0),
+        ("economy", "economy_properties", ["array_var8"], False, 0),
+        ("economy", "economy_properties", ["array_var9", "array_var10"], False, 0),
+    ]
+)
+def test_fix_array_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                      dummy_element_hierarchy: list[str], expected_result: bool,
+                                      expected_warning_call_count: int, mock_input_manager: InputManager,
+                                      mock_metadata: Dict[str, Dict[str, Any]],
+                                      mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["str_var1"], "cow", True, 1),
+        ("economy", "economy_properties", ["str_var2"], "", True, 1),
+        ("economy", "economy_properties", ["str_var3"], "cow", True, 1),
+        ("economy", "economy_properties", ["str_var4", "str_var5"], "cow", True, 1),
+    ]
+)
+def test_fix_str_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                   dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                   expected_warning_call_count: int, mock_input_manager: InputManager,
+                                   mock_metadata: Dict[str, Dict[str, Any]],
+                                   mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               mock_pool[dummy_module_key])
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["str_var6"], False, 0),
+        ("economy", "economy_properties", ["str_var7"], False, 0),
+        ("economy", "economy_properties", ["str_var8"], False, 0),
+        ("economy", "economy_properties", ["str_var9", "str_var10"], False, 0),
+    ]
+)
+def test_fix_str_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                    dummy_element_hierarchy: list[str], expected_result: bool,
+                                    expected_warning_call_count: int, mock_input_manager: InputManager,
+                                    mock_metadata: Dict[str, Dict[str, Any]],
+                                    mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["num_var1"], 5, True, 1),
+        ("economy", "economy_properties", ["num_var2"], 0, True, 1),
+        ("economy", "economy_properties", ["num_var3"], 5, True, 1),
+        ("economy", "economy_properties", ["num_var4", "num_var5"], 5, True, 1),
+    ]
+)
+def test_fix_num_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                   dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                   expected_warning_call_count: int, mock_input_manager: InputManager,
+                                   mock_metadata: Dict[str, Dict[str, Any]],
+                                   mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               mock_pool[dummy_module_key])
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["num_var6"], False, 0),
+        ("economy", "economy_properties", ["num_var7"], False, 0),
+        ("economy", "economy_properties", ["num_var8"], False, 0),
+        ("economy", "economy_properties", ["num_var9", "num_var10"], False, 0),
+    ]
+)
+def test_fix_num_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                    dummy_element_hierarchy: list[str], expected_result: bool,
+                                    expected_warning_call_count: int, mock_input_manager: InputManager,
+                                    mock_metadata: Dict[str, Dict[str, Any]],
+                                    mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["bool_var1"], True, True, 1),
+        ("economy", "economy_properties", ["bool_var2"], False, True, 1),
+        ("economy", "economy_properties", ["bool_var3", "bool_var4"], True, True, 1),
+    ]
+)
+def test_fix_bool_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                    dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                    expected_warning_call_count: int, mock_input_manager: InputManager,
+                                    mock_metadata: Dict[str, Dict[str, Any]],
+                                    mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for fixable Boolean-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               mock_pool[dummy_module_key])
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
+    'expected_warning_call_count',
+    [
+        ("economy", "economy_properties", ["bool_var5"], False, 0),
+        ("economy", "economy_properties", ["bool_var6"], False, 0),
+        ("economy", "economy_properties", ["bool_var7", "bool_var8"], False, 0),
+    ]
+)
+def test_fix_bool_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                     dummy_element_hierarchy: list[str], expected_result: bool,
+                                     expected_warning_call_count: int, mock_input_manager: InputManager,
+                                     mock_metadata: Dict[str, Dict[str, Any]],
+                                     mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+    """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_metadata
+    mock_input_manager._InputManager__pool = mock_pool
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
