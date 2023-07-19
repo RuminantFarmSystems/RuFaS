@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, PropertyMock
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
 
 
 @pytest.mark.parametrize("frac,expect", [
@@ -27,7 +27,7 @@ def test_in_growing_season_property(mature: bool, dormant: bool, alive: bool, gr
     """Tests that crop's growth status is correctly determined."""
     with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_mature", new_callable=PropertyMock,
                return_value=mature):
-        data = CropData(is_dormant=dormant, is_alive=alive)
+        data = CropData(is_dormant=dormant, is_alive=alive, is_growing=growing)
         assert data.in_growing_season == expected
 
 
@@ -54,3 +54,10 @@ def test_water_canopy_storage_capacity(max_capacity: float, lai: float, max_lai:
     actual = data.water_canopy_storage_capacity
     expected = max_capacity * lai / max_lai
     assert pytest.approx(actual) == expected
+
+
+def test_tree_dormancy_loss() -> None:
+    """A separate test to check the dormancy loss for future use of TREE"""
+    crop_data = CropData(plant_category=PlantCategory("tree"))
+    print(crop_data.plant_category)
+    assert crop_data.dormancy_loss_fraction == 0.3
