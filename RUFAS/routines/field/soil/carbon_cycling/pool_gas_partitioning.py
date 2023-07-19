@@ -39,44 +39,45 @@ def update_all(soil):
         # partitioning The Active and Slow Carbon Pools (in soil) Decomposition to Alternative Carbon Pools
         # (e.g., Active Carbon Pool to Slow Carbon Pool) or Gas Loss
 
-        K5 = 0.14
+        #TODO: verify that the K5,K6,K7 numbers are correct, they are different in the psuedocode - GitHub Issue 176
+        K5 = 0.02
         # S.6.C.2
         C_active_decomp_rate = K5 * (1 - 0.75 * soil.silt_to_clay_percent)
 
         # S.6.C.3
-        C_active_decomp = C_active_decomp_rate * layer.M_d * soil.T_d * layer.C_active
+        layer.C_active_decomp = C_active_decomp_rate * layer.M_d * soil.T_d * layer.C_active
 
         # S.6.C.4
-        K6 = 0.0038
-        C_slow_decomp = K6 * layer.M_d * soil.T_d * layer.C_slow
+        K6 = 0.000542857
+        layer.C_slow_decomp = K6 * layer.M_d * soil.T_d * layer.C_slow
 
         # S.6.C.5
-        K7 = 0.00013
-        C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
+        K7 = 0.0000185714
+        layer.C_passive_decomp = K7 * layer.M_d * soil.T_d * layer.C_passive
 
-        # S.6.B.6
+        # S.6.C.6
         Es = 0.85 - 0.68 * soil.silt_to_clay_percent
 
         # S.6.C.7
-        layer.C_active_to_slow = C_active_decomp * (1 - Es - 0.004)
-        layer.C_active_loss = C_active_decomp * Es
+        layer.C_active_to_slow = layer.C_active_decomp * (1 - Es - 0.004)
+        layer.C_active_loss = layer.C_active_decomp * Es
 
         # S.6.C.8
-        layer.C_active_to_passive = C_active_decomp * 0.004
+        layer.C_active_to_passive = layer.C_active_decomp * 0.004
 
         percent_CO2_to_C_slow_loss = 0.55
         percent_C_slow_to_passive = 0.03
 
         # S.6.C.9
-        layer.C_slow_to_active = C_slow_decomp * (1 - percent_CO2_to_C_slow_loss - percent_C_slow_to_passive)
-        layer.C_slow_loss = C_slow_decomp * percent_CO2_to_C_slow_loss
-        layer.C_slow_to_passive = C_slow_decomp * percent_C_slow_to_passive
+        layer.C_slow_to_active = layer.C_slow_decomp * (1 - percent_CO2_to_C_slow_loss - percent_C_slow_to_passive)
+        layer.C_slow_loss = layer.C_slow_decomp * percent_CO2_to_C_slow_loss
+        layer.C_slow_to_passive = layer.C_slow_decomp * percent_C_slow_to_passive
 
         percent_CO2_to_C_passive_loss = 0.55
 
         # S.6.C.10
-        layer.C_passive_to_active = C_passive_decomp * (1 - percent_CO2_to_C_passive_loss)
-        layer.C_passive_loss = C_passive_decomp * percent_CO2_to_C_passive_loss
+        layer.C_passive_to_active = layer.C_passive_decomp * (1 - percent_CO2_to_C_passive_loss)
+        layer.C_passive_loss = layer.C_passive_decomp * percent_CO2_to_C_passive_loss
 
         # active, slow and lost CO2 pools
 
@@ -89,8 +90,8 @@ def update_all(soil):
         # aggregate slow carbon pool flux
         # S.6.C.12
         layer.C_slow += (layer.AG_struct_to_C_slow_act + layer.BG_struct_to_C_slow_act +
-                         layer.C_active_to_slow) - C_slow_decomp
+                         layer.C_active_to_slow) - layer.C_slow_decomp
 
         # aggregate passive carbon pool flux
         # S.6.C.13
-        layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - C_passive_decomp
+        layer.C_passive += (layer.C_slow_to_passive + layer.C_active_to_passive) - layer.C_passive_decomp

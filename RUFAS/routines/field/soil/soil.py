@@ -30,6 +30,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
     """
     daily_soil_reset(soil)
 
+    
     # calculate and update the temperature of the soil layers
     soil_temp.update_all(soil, crop, weather, time)
 
@@ -41,7 +42,7 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     # transpiration is defined in the crop module, but called here as a
     # component of water balance
-    transpiration.update_all(soil, crop.current_crop)
+    transpiration.update_all(soil, crop)
 
     # calculate daily percolation
     percolation.update_all(soil)
@@ -58,25 +59,44 @@ def daily_soil_routine(soil, crop, field_management, weather, time):
 
     phosphorus_cycling.update_all(soil, field_management, weather, time)
 
-    carbon_cycle.update_all(soil, crop.current_crop, weather, time)
+    carbon_cycle.update_all(soil, crop, weather, time)
 
     # update annual sums at the end of each day
     annual_variable_update(soil)
 
 
+#TODO: pseudocode (if necessary) - GitHub Issue #168
 def daily_soil_reset(soil):
+    """
+    Description: 
+        Resets the DRP_runoff and DRP_drainage attributes of the Soil instance to 0
+        "pseudocode_soil" ?
+    Args:
+        soil: an instance of the Soil class
+    """
     soil.DRP_runoff = 0.0
     soil.DRP_drainage = 0.0
 
-
+#TODO: pseudocode (if necessary) - GitHub Issue #168
 def annual_variable_update(soil):
+    """
+    Description:
+        Updates the soil_water, phosphorus_cycling, and nitrogen_cycling modules with the 
+        appropriate annual values from the Soil instance
+        "pseudocode_soil" ?
+
+
+    Args:
+        soil: an instance of the Soil class
+    """
+    #soil.ag_biomass=0
     soil_water.update_annual_SW(soil)
     phosphorus_cycling.update_annual_P(soil)
     nitrogen_cycling.update_annual_N(soil)
 
 
 class Soil:
-
+    #TODO: add proper docstrings - GitHub Issue #169
     def __init__(self, data):
         """
         Description:
@@ -92,7 +112,8 @@ class Soil:
         self.slope_length = data['slope_length']
         self.manning = data['manning']
         self.field_size = data['field_size']
-        self.practice_factor = data['practice_factor']
+        # self.practice_factor = data['practice_factor']
+        self.tillage = data['tillage']
         self.sand = data['sand']
         self.silt = data['silt']
 
@@ -236,7 +257,7 @@ class Soil:
 
         self.runoff = 0.0
         self.evap = 0.0
-        self.trans = 0.0
+        self.trans = 0.0  # TODO: why on earth is plant transpiration stored in the soil object???
         self.drainage = 0.0
 
         self.ET_max_annual = 0.0
@@ -255,6 +276,8 @@ class Soil:
 
         self.infiltration = 0.0
         self.residue = data['initial_residue']
+        self.ag_biomass = 0.0
+
 
         # soil Nitrogen
         self.decay_rate = 0.0
@@ -292,12 +315,12 @@ class Soil:
 
         # soil carbon attributes
         self.residue_harvest = 0.0
-        # TODO unsure what this should be initialized as
+        # TODO unsure what this should be initialized as - GitHub Issue #164
         self.AG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
         self.BG_lignin_res_percent = 17  # tied to the reset of this variable in yields, if changed, change together
 
         self.curr_layer_depth = 0
-        self.silt_to_clay_percent = 0.5  # TODO database item
+        self.silt_to_clay_percent = 0.5  # TODO database item - GitHub Issue #164
 
         self.AG_L_to_N = 0
         self.BG_L_to_N = 0
@@ -338,6 +361,7 @@ class Soil:
 
         self.initialize_profile_characteristics()
 
+    #TODO: add proper docstrings - GitHub Issue #169
     class SoilLayer:
         def __init__(self, layer_name, layer_data):
             """
@@ -388,8 +412,7 @@ class Soil:
             self.percolation = 0.0  # amount of water that percolates to next layer
 
             # Variable to simulate nitrogen Cycling
-            # self.org_C = layer_data['org_C_percent']
-            self.org_C = 0
+            self.org_C = layer_data['org_C_percent']
             self.active_mineral_rate = layer_data['active_mineral_rate']
             self.denitrification_rate = layer_data['denitrification_rate']
             self.NH4 = layer_data['NH4']
@@ -464,16 +487,16 @@ class Soil:
             # C in the soil layer
             self.M_d = 0
 
-            self.AG_met = 500
-            self.BG_met = 500
-            self.AG_struct = 500
-            self.BG_struct = 500
+            self.AG_met = 1250000
+            self.BG_met = 1250000
+            self.AG_struct = 1250000
+            self.BG_struct = 1250000
 
             self.tillage_percent = 0.0
 
-            self.C_active = 5000
-            self.C_slow = 5000
-            self.C_passive = 5000
+            self.C_active = 1250000
+            self.C_slow = 1250000
+            self.C_passive = 1250000
 
             self.AG_met_to_C_active = 0
             self.AG_struct_to_C_active = 0
@@ -517,7 +540,15 @@ class Soil:
 
             self.K = 0.0
 
+            self.ADJ_crop_type_bio_BG = 0.0
+
     def initialize_profile_characteristics(self):
+        """
+        Description:
+            initializes the soil layer profile with the proper information given the instance of the soil class it is
+            being created for. This function is called in the __init__() of the Soil class.
+            "pseudocode_soil" S.5.A.1-6, S.4.A.1-7
+        """
         if self.cover == "GRASSED":
             self.cover_factor = 0.8
         elif self.cover == "RESIDUE COVER":
@@ -559,7 +590,7 @@ class Soil:
             layer.stable_P = layer.active_P * 4.0
             self.stable_P += layer.stable_P
 
-            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked
+            # S.5.A.5 TODO organic soil pools (labile_O, and active_O) are not being tracked - GitHub Issue #164
             layer.org_P = layer.org_C / 8.0 / 14.0 * 10000 * layer.bulk_density \
                           * layer.thickness_cm * 0.1
             self.org_P += layer.org_P
@@ -575,7 +606,7 @@ class Soil:
 
             # S.4.A.2
             org_C = layer.org_C
-            org_N = (10 ** 4) * (org_C / 14)
+            org_N = (10 ** 4) * (org_C / 14) #nitrogen bug
 
             # S.4.A.3
             frac_N = 0.02
@@ -614,16 +645,30 @@ class Soil:
         self.initial_profile_SW = self.profile_SW
         self.initial_profile_N = self.profile_N
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_mass_balance(self, field_management, time):
         """
         Description:
-            Calculates annual water balance
+            Wrapper function that updates the annual water,phosphorus and nitrogen
+            balances by calling their appropriate functions
+        "pseudocode_soil" ?
+            
+        Args:
+            field_management: An instance of the FieldManagement class
+            time: an instance of the Time class
         """
         self.annual_water_balance()
         self.annual_phosphorus_balance(field_management, time)
         self.annual_nitrogen_balance(field_management, time)
 
+
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_water_balance(self):
+        """
+        Description:
+            Computes the annual water balance of the Soil instance...
+            "pseudocode_soil" ?
+        """
         self.delta_SW_annual = self.profile_SW - self.initial_profile_SW
 
         self.p_calc_annual = self.delta_SW_annual + \
@@ -632,7 +677,13 @@ class Soil:
 
         self.water_balance_difference_annual = self.p_act_annual - self.p_calc_annual
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_phosphorus_balance(self, field_management, time):
+        """
+        Description:
+            Computes the annual phosphorus balance of the Soil instance...
+            "pseudocode_soil" ?
+        """
         self.STP_annual = self.STP_annual / len(time.years[time.year - 1])
 
         self.delta_P_annual = self.profile_P - self.initial_profile_P
@@ -643,7 +694,13 @@ class Soil:
 
         self.P_balance_difference_annual = field_management.manure_P_applied_annual - self.P_calc_annual
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_nitrogen_balance(self, field_management, time):
+        """
+        Description:
+            Computes the annual nitrogen balance of the Soil instance...
+            "pseudocode_soil" ?
+        """
         for layer in self.soil_layers:
             layer.NO3_average = layer.NO3_average / len(time.years[time.year - 1])
             layer.NH4_average = layer.NH4_average / len(time.years[time.year - 1])
@@ -662,10 +719,12 @@ class Soil:
 
         self.N_balance_difference_annual = field_management.manure_N_applied_annual - self.N_calc_annual
 
+    #TODO: pseudocode (if necessary) - GitHub Issue #168
     def annual_reset(self):
         """
         Description:
             Resets the annual values for the next year.
+            "pseudocode_soil" ?
         """
 
         # annual mass balance reset

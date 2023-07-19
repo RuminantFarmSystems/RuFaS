@@ -38,7 +38,7 @@ CropType values updated by calling update_all():
 from math import exp
 
 
-def update_all(soil, crop_type):
+def update_all(soil, crop):
     """
     Description:
         This function updates all of a crop's soil water uptake information.
@@ -47,17 +47,18 @@ def update_all(soil, crop_type):
         soil:
         crop_type:
     """
+    for crop_types in crop.current_crop.values():
 
-    max_uptakes_ly = calc_max_water_uptake_each_layer(soil, crop_type)
+        max_uptakes_ly = calc_max_water_uptake_each_layer(soil, crop_types)
 
-    # First adjustment of water uptakes
-    adj_uptakes_ly = inc_lower_layer_uptake(soil, crop_type, max_uptakes_ly)
+        # First adjustment of water uptakes
+        adj_uptakes_ly = inc_lower_layer_uptake(soil, crop_types, max_uptakes_ly)
 
-    # Second adjustment of water uptakes
-    adj_uptakes_ly = decrease_efficiency_of_uptake(soil, adj_uptakes_ly)
+        # Second adjustment of water uptakes
+        adj_uptakes_ly = decrease_efficiency_of_uptake(soil, adj_uptakes_ly)
 
-    # Calculate total actual water uptake
-    calc_act_water_uptake(soil, crop_type, adj_uptakes_ly)
+        # Calculate total actual water uptake
+        calc_act_water_uptake(soil, crop_types, adj_uptakes_ly)
 
 
 def calc_max_water_uptake_each_layer(soil, crop_type):

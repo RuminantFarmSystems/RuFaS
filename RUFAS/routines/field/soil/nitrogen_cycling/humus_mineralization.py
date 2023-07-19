@@ -22,11 +22,10 @@ def humus_mineralization(soil):
     for layer in soil.soil_layers:
         active_N = layer.active_N
         stable_N = layer.stable_N
-        frac_N = 0.02
+        frac_N = 0.02 #nitrogen bug 
 
         # "pseudocode_soil" S.4.F.1
         N_trans = 0.00001 * (active_N * ((1 / frac_N) - 1) - stable_N)
-
         layer.active_N -= N_trans
         layer.stable_N += N_trans
 
