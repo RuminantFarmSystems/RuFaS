@@ -689,6 +689,42 @@
         }
       }
     },
+    "field_properties": {
+      "fields": {
+        "type": "object",
+        "description": "Map from field names to objects, each describing the configuration for a single field.",
+        "default": {}
+      },
+      "field_specification": {
+        "type": "object",
+        "description": "A field specification provides all the necessary elements for simulating a single field.",
+        "soil_specification": {
+          "type": "string",
+          "description": "Path to the soil profile specification for this field.",
+          "pattern": "*.json$"
+        },
+        "crop_specification": {
+          "type": "string",
+          "description": "Path to the crop schedule specification for this field.",
+          "pattern": "*.json$"
+        },
+        "field_management_specification": {
+          "type": "string",
+          "description": "Path to the field management schedule specification for this field.",
+          "pattern": "*.json$"
+        },
+        "field_size": {
+          "type": "number",
+          "description": "Size of the field.",
+          "units": "ha",
+          "minimum": 0.0
+        },
+        "seasonal_high_water_table": {
+          "type": "bool",
+
+        }
+      }
+    },
     "weather_properties": {
       "precip": {
         "description": "amount of precipitation",
