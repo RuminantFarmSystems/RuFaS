@@ -690,39 +690,71 @@
       }
     },
     "field_properties": {
-      "fields": {
-        "type": "object",
-        "description": "Map from field names to objects, each describing the configuration for a single field.",
-        "default": {}
+      "soil_specification": {
+        "type": "string",
+        "description": "Path to the soil profile specification for this field.",
+        "pattern": "*.json$"
       },
-      "field_specification": {
-        "type": "object",
-        "description": "A field specification provides all the necessary elements for simulating a single field.",
-        "soil_specification": {
-          "type": "string",
-          "description": "Path to the soil profile specification for this field.",
-          "pattern": "*.json$"
-        },
-        "crop_specification": {
-          "type": "string",
-          "description": "Path to the crop schedule specification for this field.",
-          "pattern": "*.json$"
-        },
-        "field_management_specification": {
-          "type": "string",
-          "description": "Path to the field management schedule specification for this field.",
-          "pattern": "*.json$"
-        },
-        "field_size": {
-          "type": "number",
-          "description": "Size of the field.",
-          "units": "ha",
-          "minimum": 0.0
-        },
-        "seasonal_high_water_table": {
-          "type": "bool",
-
-        }
+      "crop_specification": {
+        "type": "string",
+        "description": "Path to the crop schedule specification for this field.",
+        "pattern": "*.json$"
+      },
+      "field_management_specification": {
+        "type": "string",
+        "description": "Path to the field management schedule specification for this field.",
+        "pattern": "*.json$"
+      },
+      "field_size": {
+        "type": "number",
+        "description": "Size of the field.",
+        "units": "ha",
+        "minimum": 0.0
+      },
+      "absolute_latitude": {
+        "type": "number",
+        "description": "The absolute latitude of the center of this field.",
+        "units": "degrees",
+        "minimum": 0.0,
+        "maximum": 90.0,
+        "default": 43.5
+      },
+      "longitude": {
+        "type": "number",
+        "description": "The longitude of the center of this field.",
+        "units": "degrees",
+        "minimum": -180.0,
+        "maximum": 180.0,
+        "default": -89.4
+      },
+      "minimum_daylength": {
+        "type": "number",
+        "description": "Length of the shortest day of the year for watershed the field is located in.",
+        "units": "hours",
+        "minimum": 0.0,
+        "maximum": 24.0,
+        "default": 9.0
+      },
+      "seasonal_high_water_table": {
+        "type": "bool",
+        "description": "True if the HRU that contains the field has a high seasonal water table, false otherwise.",
+        "reference": "SWAT Theoretical documentation: section 2:3.2, SWAT Input: .HRU - IWATABLE",
+        "units": "unitless",
+        "default": false
+      },
+      "watering_amount_in_liters": {
+        "type": "number",
+        "description": "Amount of water to be applied as irrigation at the end of a specified interval.",
+        "units": "liters",
+        "minimum": 0.0,
+        "default": 0.0
+      },
+      "watering_interval": {
+        "type": "number",
+        "description": "Number of days that make up the irrigation interval.",
+        "units": "days",
+        "minimum": 0,
+        "default": 0
       }
     },
     "weather_properties": {
