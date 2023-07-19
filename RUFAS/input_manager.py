@@ -31,7 +31,7 @@ class InputManager:
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
         """
-        Organize metadata and input data processing pipeline.
+        Starts the pipeline for organizing metadata and input data processing.
 
         Parameters
         ----------
