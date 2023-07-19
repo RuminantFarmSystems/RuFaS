@@ -31,19 +31,20 @@ class InputManager:
     def start_data_processing(self, metadata_path: str,
                               eager_termination: bool = True) -> bool:
         """
-        Organize metadata and input data processing pipeline.
+        Starts the pipeline for organizing metadata and input data processing.
 
         Parameters
         ----------
         metadata_path : str
             File path to the metadata.
         eager_termination : bool, default=True
-            If true, the process will be terminated upon finding invalid data.
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+            If False, the process will be terminated after going through and validating the entire data.
 
         Returns
         -------
         bool
-            Flag indicating whether input data is valid.
+            True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
         self._load_data()
