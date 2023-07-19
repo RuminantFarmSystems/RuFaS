@@ -49,10 +49,17 @@
       "type": "json",
       "properties": "manure_properties"
     },
-    "soil": {
+    "soil_1": {
       "title": "Soil data",
       "description": "Stop treating soil like dirt!",
       "path": "soil/example_soil.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "soil_2": {
+      "title": "Alternate soil data",
+      "description": "Soil is still being treated like dirt.",
+      "path": "soil/example_soil_2.json",
       "type": "json",
       "properties": "soil_profile_properties"
     },
@@ -62,6 +69,13 @@
       "path": "field_management/example_field_management.json",
       "type": "json",
       "properties": "field_management_properties"
+    },
+    "field": {
+      "title": "Field specification",
+      "description": "Contains overall field properties and references to specification files.",
+      "path": "field/Barnyard_field_1.json",
+      "type": "json",
+      "properties": "field_properties"
     },
     "weather": {
       "title": "Weather data",
