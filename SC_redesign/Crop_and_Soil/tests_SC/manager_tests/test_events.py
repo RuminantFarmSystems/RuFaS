@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.manager.events import Event
+from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, TillageEvent, ManureEvent, \
+    FertilizerEvent
 
 
 @pytest.mark.parametrize("year,day,current_year,current_day,expected", [
@@ -22,15 +23,12 @@ def test_occurs_today(year: int, day: int, current_year: int, current_day: int, 
     assert actual == expected
 
 
-@pytest.mark.parametrize("year1,day1,year2,day2,expected", [
-    (1, 240, 1, 240, True),
-    (2, 120, 3, 120, False),
-    (4, 220, 4, 240, False),
-    (5, 150, 6, 200, False)
+@pytest.mark.parametrize("event1,event2,expected", [
+    (Event(1, 120), Event(1, 120), True),
+    (Event(2, 120), Event(1, 120), False),
+    (3, Event(1, 120), False)
 ])
-def test_event_equality(year1: int, day1: int, year2: int, day2: int, expected: bool) -> None:
+def test_event_equality(event1, event2, expected: bool) -> None:
     """Tests that equality is tested correctly between Event objects."""
-    event1 = Event(year1, day1)
-    event2 = Event(year2, day2)
     actual = event1 == event2
     assert actual == expected
