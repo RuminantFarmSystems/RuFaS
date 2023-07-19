@@ -38,7 +38,8 @@ class InputManager:
         metadata_path : str
             File path to the metadata.
         eager_termination : bool, default=True
-            If true, the process will be terminated upon finding invalid data.
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+            If False, the process will be terminated after going through and validating the entire data.
 
         Returns
         -------
