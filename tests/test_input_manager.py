@@ -167,7 +167,7 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
         }
 
 
-def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any],
+def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
                              input_manager_original_method_states: Dict[str, Callable], ):
     """Unit test for valid data for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
@@ -188,7 +188,7 @@ def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Di
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any],
+def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
                                input_manager_original_method_states: Dict[str, Callable], ):
     """Unit test for invalid data for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
@@ -209,7 +209,7 @@ def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any],
+def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
                                          input_manager_original_method_states: Dict[str, Callable], ):
     """Unit test for invalid data with eager termination for function _validate_data in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
