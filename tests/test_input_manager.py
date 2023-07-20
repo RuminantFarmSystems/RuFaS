@@ -103,7 +103,7 @@ def test_load_data_from_json_invalid_data_raises_error(mock_input_manager: Input
                 assert add_log.call_count == 1
 
 
-def test_load_data_from_csv(mock_input_manager: InputManager) -> None:
+def test_load_data_from_csv(mock_input_manager: InputManager, ) -> None:
     """Unit test for function _load_data_from_csv with valid csv file in file input_manager.py"""
     dummy_csv_data = "key1,key2\na,1\nb,2\n"
     dummy_expected_data = {'key1': ['a', 'b'], 'key2': [1, 2]}
@@ -257,7 +257,7 @@ def test_validate_element_string_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element1": "123-45-6789"}
-    result = mock_input_manager._validate_element("module_key", "element1", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", ["element1"], "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -271,7 +271,7 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element2": 123}
-    result = mock_input_manager._validate_element("module_key", "element2", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", ["element2"], "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -285,7 +285,7 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element3": [1, 2, 3]}
-    result = mock_input_manager._validate_element("module_key", "element3", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", ["element3"], "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -300,7 +300,7 @@ def test_validate_element_object_type(mock_input_manager: InputManager, mocker: 
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
     input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._validate_element("module_key", "element4", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", ["element4"], "property_map_key1", input_data)
 
     assert result is True
 
