@@ -174,10 +174,10 @@ class InputManager:
                 is_valid_element = self._validate_element(module_key, [element], property_map_key, data,
                                                           eager_termination)
                 if is_valid_element:
-                    if isinstance(element, dict):
+                    if isinstance(data[element], dict):
                         if module_key not in self.__pool:
                             self.__pool[module_key] = {}
-                        self.__pool[module_key].update(element)
+                        self.__pool[module_key].update(data[element])
                     valid_items_counter += 1
                 elif not is_valid_element and eager_termination:
                     invalid_critical_items_counter += 1
