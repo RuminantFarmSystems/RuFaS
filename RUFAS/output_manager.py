@@ -534,7 +534,7 @@ class OutputManager(object):
             Path to the output directory for the OutputManager's csv files.
 
         exclude_info_maps : bool
-            Flag for whether or not the user wants to inlcude info_maps data in their results files.
+            Flag for whether or not the user wants to include info_maps data in their results files.
 
         """
         pool = self.variables_pool
@@ -551,7 +551,10 @@ class OutputManager(object):
             variable_file_path = os.path.join(str(variables_path), self._generate_file_name(key, "csv"))
             self._dict_to_file_csv({key: pool[key]}, variable_file_path, "values")
             if not exclude_info_maps:
-                info_maps_file_path = os.path.join(str(info_map_path), self._generate_file_name(f"{key}_info_maps", "csv"))
+                info_maps_file_path = os.path.join(
+                    str(info_map_path),
+                    self._generate_file_name(f"{key}_info_maps", "csv")
+                )
                 self._dict_to_file_csv({key: pool[key]}, info_maps_file_path, "info_maps")
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:

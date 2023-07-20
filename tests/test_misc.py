@@ -339,7 +339,7 @@ def mock_output_manager(mocker) -> OutputManager:
     ({"var1": {"not a value": [1]}}, "values", "",
      False),
 ])
-def test_dict_to_csv(
+def test_dict_to_file_csv(
     mock_output_manager: OutputManager,
     data: Dict[str, Any],
     field: str,
@@ -356,6 +356,27 @@ def test_dict_to_csv(
         open_mock.assert_called_with("test", "w", encoding="utf-8", errors="strict", newline='')
     written_data = ''.join(call[1][0] for call in open_mock().write.mock_calls)
     assert written_data == expected_result
+
+
+def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
+    """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
+    open_mock = mock_open()
+    open_mock.side_effect = IOError
+    data = {"var1": {"values": [1, 2, 3]}}
+
+    with patch("builtins.open", open_mock):
+        with raises(Exception):
+            mock_output_manager._dict_to_file_csv(data, "test", "values")
+
+
+def test_save_variables_to_csv_files_exceptions(
+    mock_output_manager: OutputManager,
+    mocker: MockerFixture
+) -> None:
+    """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
+    mocker.patch("pathlib.Path.mkdir", side_effect=IOError)
+    with raises(Exception):
+        mock_output_manager.save_variables_to_csv_files("test_dir", False)
 
 
 def test_generate_key(mocker: MockerFixture) -> None:
