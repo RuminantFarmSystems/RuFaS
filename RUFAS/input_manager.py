@@ -393,7 +393,8 @@ class InputManager:
 
         return True
 
-    def _fix_data(self, module_key: str, property_map_key: str, element_hierarchy: List[str]) -> bool:
+    def _fix_data(self, module_key: str, property_map_key: str, element_hierarchy: List[str],
+                  input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
         Return True if the data is fixed, False for critical data
@@ -422,7 +423,7 @@ class InputManager:
                                          self.__metadata['properties'][property_map_key])
         if 'default' in variable_metadata.keys():
             variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
-                                     self.__pool[module_key])
+                                     input_data[module_key])
             variable_parent[element_hierarchy[-1]] = variable_metadata['default']
             om.add_warning("Data fixed",
                            f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
