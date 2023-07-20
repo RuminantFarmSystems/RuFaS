@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 om = OutputManager()
 
@@ -170,7 +170,7 @@ class InputManager:
             module_properties = self.__metadata["properties"][property_map_key]
             for element in module_properties.keys():
                 total_items_counter += 1
-                is_valid_element = self._validate_element(module_key, element, property_map_key, data,
+                is_valid_element = self._validate_element(module_key, [element], property_map_key, data,
                                                           eager_termination)
                 if is_valid_element:
                     if isinstance(element, dict):
@@ -191,7 +191,7 @@ class InputManager:
                 return False
             return True
 
-    def _validate_element(self, module_key: str, element: str,
+    def _validate_element(self, module_key: str, element_hierarchy: List[str],
                           property_map_key: str, input_data: Dict[str, Any],
                           eager_termination: bool) -> bool:
         """
@@ -222,7 +222,6 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_element.__name__,
                     }
-        element_hierarchy = element.split(".")
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][property_map_key])
         var_type = variable_properties["type"]
@@ -231,14 +230,15 @@ class InputManager:
             children_status: Dict[str, bool] = {}
             false_counter = 0
             for nested_key in variable_properties.keys():
-                whole_key = f"{element}.{nested_key}"
-                child_status = self._validate_element(self, module_key, whole_key, property_map_key, input_data,
-                                                      eager_termination)
+                element_hierarchy.append(nested_key)
+                child_status = self._validate_element(self, module_key, element_hierarchy,
+                                                      property_map_key, input_data, eager_termination)
                 if eager_termination and not child_status:
                     return False
-                children_status[whole_key] = child_status
+                element_path = ".".join(element_hierarchy)
+                children_status[element_path] = child_status
                 if not child_status:
-                    om.add_warning("Invalid nested element found", f"{whole_key=}", info_map)
+                    om.add_warning("Invalid nested element found", f"{element_path}", info_map)
                     false_counter += 1
             is_valid = false_counter == 0
             if is_valid:
