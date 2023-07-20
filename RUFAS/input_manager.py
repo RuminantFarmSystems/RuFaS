@@ -6,7 +6,8 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+
 
 om = OutputManager()
 
@@ -140,7 +141,7 @@ class InputManager:
         ----------
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
-            If False, the process will be terminated after going through and validating the entire data.
+            If False, the process will be terminated after going through and validating the entire data, if invalid data is found.
 
         Returns
         -------
@@ -150,9 +151,9 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
-        valid_elements_counter = 0
-        invalid_critical_elements_counter = 0
-        total_elements_counter = 0
+        valid_items_counter = 0
+        invalid_critical_items_counter = 0
+        total_items_counter = 0
 
         for module_key, details in self.__metadata["files"].items():
             file_path = details["path"]
@@ -169,31 +170,29 @@ class InputManager:
             property_map_key = details["properties"]
             module_properties = self.__metadata["properties"][property_map_key]
             for element in module_properties.keys():
-                total_elements_counter += 1
-                is_valid_element = self._validate_element(module_key, element, property_map_key, data,
+                total_items_counter += 1
+                is_valid_element = self._validate_element(module_key, [element], property_map_key, data,
                                                           eager_termination)
                 if is_valid_element:
                     if isinstance(element, dict):
                         if module_key not in self.__pool:
                             self.__pool[module_key] = {}
                         self.__pool[module_key].update(element)
-                    valid_elements_counter += 1
+                    valid_items_counter += 1
                 elif not is_valid_element and eager_termination:
-                    invalid_critical_elements_counter += 1
+                    invalid_critical_items_counter += 1
                     return False
                 else:
-                    invalid_critical_elements_counter += 1
+                    invalid_critical_items_counter += 1
 
-            om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
-            om.add_log("Total Checked Elements", f"{total_elements_counter=}", info_map)
-            om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
-            if invalid_critical_elements_counter > 0:
-                return False
-            return True
+            om.add_log("Total Valid Items", f"{valid_items_counter=}", info_map)
+            om.add_log("Total Checked Items", f"{total_items_counter=}", info_map)
+            om.add_log("Total Invalid Critical Items", f"{invalid_critical_items_counter=}", info_map)
+            return invalid_critical_items_counter == 0
 
-    def _validate_element(self, module_key: str, element: str,
+    def _validate_element(self, module_key: str, element_hierarchy: List[str],
                           property_map_key: str, input_data: Dict[str, Any],
-                          eager_termination: bool = True, ) -> bool:
+                          eager_termination: bool) -> bool:
         """
         Perform data validation checks.
 
@@ -222,23 +221,25 @@ class InputManager:
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_element.__name__,
                     }
-        element_hierarchy = element.split(".")
-        variable_to_check = reduce(lambda d, key: d[key], element_hierarchy,
-                                   self.__metadata["properties"][property_map_key])
-        var_type = variable_to_check["type"]
+        variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
+                                     self.__metadata["properties"][property_map_key])
+        var_type = variable_properties["type"]
         is_nested = var_type == "object"
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
-            for nested_key in variable_to_check.keys():
-                whole_key = f"{element}.{nested_key}"
-                child_status = self._validate_element(self, whole_key, property_map_key, eager_termination)
+            for nested_key in variable_properties.keys():
+                element_hierarchy.append(nested_key)
+                child_status = self._validate_element(self, module_key, element_hierarchy,
+                                                      property_map_key, input_data, eager_termination)
                 if eager_termination and not child_status:
                     return False
-                children_status[whole_key] = child_status
+                element_path = ".".join(element_hierarchy)
+                children_status[element_path] = child_status
                 if not child_status:
-                    om.add_warning("Invalid nested element found", f"{whole_key=}", info_map)
+                    om.add_warning("Invalid nested element found", f"{element_path}", info_map)
                     false_counter += 1
+                element_hierarchy.remove(nested_key)
             is_valid = false_counter == 0
             if is_valid:
                 return True
@@ -256,13 +257,11 @@ class InputManager:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
 
             type_validation_dict = {"string":
-                                        self._validate_string_type_element(variable_to_check, var_name,
-                                                                           input_data_value),
+                                    self._validate_string_type_element(variable_properties, var_name, input_data_value),
                                     "number":
-                                        self._validate_num_type_element(variable_to_check, var_name, input_data_value),
+                                    self._validate_num_type_element(variable_properties, var_name, input_data_value),
                                     "array":
-                                        self._validate_array_type_element(variable_to_check, var_name,
-                                                                          input_data_value),
+                                    self._validate_array_type_element(variable_properties, var_name, input_data_value),
                                     "bool":
                                         True}
             is_valid = type_validation_dict.get(var_type)
@@ -272,27 +271,27 @@ class InputManager:
             elif is_valid is None:
                 raise Exception("Element must be type number, array, string, or bool")
             else:
-                is_fixed = self._fix_data(module_key, element_hierarchy)
+                is_fixed = self._fix_data(module_key, property_map_key, element_hierarchy, input_data)
                 return is_fixed
 
-    def _validate_array_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
+    def _validate_array_type_element(self, variable_properties: Dict[str, Any], var_name: str,
                                      input_data_value: list) -> bool:
-        """Validates a __pool element of type array."""
+        """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_array_type_element.__name__,
                     }
-        maximum_length = variable_to_check.get("maximum_length")
-        minimum_length = variable_to_check.get("minimum_length")
+        maximum_length = variable_properties.get("maximum_length")
+        minimum_length = variable_properties.get("minimum_length")
         is_in_range = True
         if maximum_length is not None and minimum_length is not None:
-            is_in_range = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                          variable_to_check["maximum_length"]
+            is_in_range = variable_properties["minimum_length"] <= len(input_data_value) <= \
+                variable_properties["maximum_length"]
             warning_string = f"Array length not in range[{minimum_length}, {maximum_length}]"
         elif minimum_length is not None:
-            is_in_range = variable_to_check["minimum_length"] <= len(input_data_value)
+            is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             warning_string = f"Array length less than {minimum_length}."
         elif maximum_length is not None:
-            is_in_range = len(input_data_value) <= variable_to_check["maximum_length"]
+            is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             warning_string = f"Array length more than {maximum_length}."
 
         if not is_in_range:
@@ -300,14 +299,14 @@ class InputManager:
 
         return is_in_range
 
-    def _validate_num_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
-                                   input_data_value: int) -> bool:
-        """Validates a __pool number element."""
+    def _validate_num_type_element(self, variable_properties: Dict[str, Any], var_name: str,
+                                   input_data_value: float) -> bool:
+        """Validates an input data number element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_num_type_element.__name__,
                     }
-        minimum_value = variable_to_check.get("minimum")
-        maximum_value = variable_to_check.get("maximum")
+        minimum_value = variable_properties.get("minimum")
+        maximum_value = variable_properties.get("maximum")
         is_in_range = True
         if minimum_value is not None and maximum_value is not None:
             is_in_range = minimum_value <= input_data_value <= maximum_value
@@ -324,32 +323,32 @@ class InputManager:
 
         return is_in_range
 
-    def _validate_string_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
+    def _validate_string_type_element(self, variable_properties: Dict[str, Any], var_name: str,
                                       input_data_value: str) -> bool:
-        """Validates a __pool string element."""
+        """Validates an input data string element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_string_type_element.__name__,
                     }
-        pattern_check = variable_to_check.get("pattern")
+        pattern_check = variable_properties.get("pattern")
         is_valid_string = True
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
-            warning_string = f"String variable must match pattern {variable_to_check['pattern']}."
+            warning_string = f"String variable must match pattern {variable_properties['pattern']}."
             if not is_valid_string:
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return is_valid_string
 
-        minimum_length = variable_to_check.get("minimum_length")
-        maximum_length = variable_to_check.get("maximum_length")
+        minimum_length = variable_properties.get("minimum_length")
+        maximum_length = variable_properties.get("maximum_length")
         if minimum_length is not None and maximum_length is not None:
-            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                              variable_to_check["maximum_length"]
-            warning_string = f"String out length range [{minimum_length}, {maximum_length}]."
+            is_valid_string = variable_properties["minimum_length"] <= len(input_data_value) <= \
+                variable_properties["maximum_length"]
+            warning_string = f"String out of length range [{minimum_length}, {maximum_length}]."
         elif minimum_length is not None:
-            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
+            is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
             warning_string = f"String length less than {minimum_length}."
         elif maximum_length is not None:
-            is_valid_string = len(input_data_value) <= variable_to_check["maximum_length"]
+            is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             warning_string = f"String length more than {maximum_length}."
 
         if not is_valid_string:
