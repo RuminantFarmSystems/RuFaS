@@ -5,8 +5,10 @@ Description: Implements test cases for Input Manager
 Author(s): Niko Tomlinson, ndt2@cornell.edu
 """
 from functools import reduce
+import json
 from typing import Any, Callable, Dict
 from mock import MagicMock, Mock, mock_open, patch
+import pandas as pd
 import pytest
 from pytest_mock import MockerFixture
 
@@ -35,7 +37,8 @@ def input_manager_original_method_states(
     return {
         "start_data_processing": mock_input_manager.start_data_processing,
         "_load_metadata": mock_input_manager._load_metadata,
-        "_load_data": mock_input_manager._load_data,
+        "_load_data_from_json": mock_input_manager._load_data_from_json,
+        "_load_data_from_csv": mock_input_manager._load_data_from_csv,
         "_validate_data": mock_input_manager._validate_data,
         "_validate_element": mock_input_manager._validate_element,
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
@@ -67,499 +70,243 @@ def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> Non
             assert add_log.call_count == 1
 
 
-def test_load_data_json(mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_data with json file in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {
-        "files": {
-            "dummy_data_file": {
-                "path": "dummy_data.json",
-                "type": "json"
-            }
-        }
-    }
+def test_load_data_from_json(mock_input_manager: InputManager, ) -> None:
+    """Unit test for function _load_data_from_json with valid json file in file input_manager.py"""
+    dummy_data = {
+        "files": {"dummy_data_file": {"path": "dummy_data.json", "type": "json"}}}
+    file_path = "path/to/json/file"
+    dummy_file_content = json.dumps(dummy_data)
 
-    with patch("builtins.open", mock_open(read_data='{"key": "value"}')):
+    with patch("builtins.open", mock_open(read_data=dummy_file_content)):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-            mock_input_manager._load_data()
+            result_data = mock_input_manager._load_data_from_json(file_path)
 
-    assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key": "value"}}
-    assert add_log.call_count == 2
+            assert result_data == dummy_data
+            assert add_log.call_count == 2
 
 
-def test_load_data_csv(mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_data with csv file in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {
-        "files": {
-            "dummy_data_file": {
-                "path": "dummy_data.csv",
-                "type": "csv"
-            }
-        }
-    }
-    with patch("builtins.open", mock_open(read_data="key1,key2\na,1\nb,2\n")):
+def test_load_data_from_json_missing_file_raises_error(mock_input_manager: InputManager, ) -> None:
+    """Unit test for function _load_data_from_json with missing json file in file input_manager.py"""
+    with patch("builtins.open", side_effect=FileNotFoundError):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-            mock_input_manager._load_data()
-
-    assert mock_input_manager._InputManager__pool == {"dummy_data_file": {"key1": ["a", "b"],
-                                                                          "key2": [1, 2]}}
-    assert add_log.call_count == 2
-
-
-def test_load_data_wont_add_non_csv_non_json_file_data_to_pool(mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_data with a file that's neither a csv nor json in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = {
-        "files": {
-            "dummy_data_file": {
-                "path": "dummy_data.txt",
-                "type": "txt"
-            }
-        }
-    }
-
-    with patch("builtins.open", mock_open(read_data="key_and_value")):
-        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-                mock_input_manager._load_data()
-
-    assert mock_input_manager._InputManager__pool == {}
-    assert add_warning.call_count == 1
-    assert add_log.call_count == 1
-
-
-def test_load_data_raises_exception(mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_data raising an exception in file input_manager.py"""
-    mock_open_func = Mock()
-    mock_open_func.side_effect = Exception("Error opening file")
-
-    with patch("builtins.open", mock_open_func):
-        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-            with pytest.raises(Exception):
-                mock_input_manager._load_data("bad/path.csv")
+            with pytest.raises(FileNotFoundError):
+                mock_input_manager._load_data_from_json("non_existent_file.json")
                 assert add_log.call_count == 1
+
+
+def test_load_data_from_json_invalid_data_raises_error(mock_input_manager: InputManager, ) -> None:
+    """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
+    with patch("builtins.open", mock_open(read_data="invalid_json_data")):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(json.JSONDecodeError):
+                mock_input_manager._load_data_from_json("dummy_file.json")
+                assert add_log.call_count == 1
+
+
+def test_load_data_from_csv(mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_data_from_csv with valid csv file in file input_manager.py"""
+    dummy_csv_data = "key1,key2\na,1\nb,2\n"
+    dummy_expected_data = {'key1': ['a', 'b'], 'key2': [1, 2]}
+    file_path = "path/to/csv/file"
+    with patch("builtins.open", mock_open(read_data=dummy_csv_data)):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            result_data = mock_input_manager._load_data_from_csv(file_path)
+
+            assert result_data == dummy_expected_data
+            assert add_log.call_count == 2
+
+
+def test_load_data_from_csv_missing_file_raises_error(mock_input_manager: InputManager, ) -> None:
+    """Unit test for function _load_data_from_json with missing json file in file input_manager.py"""
+    with patch("builtins.open", side_effect=FileNotFoundError):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with pytest.raises(FileNotFoundError):
+                mock_input_manager._load_data_from_csv("non_existent_file.csv")
+                assert add_log.call_count == 2
+
+
+def test_load_data_from_csv_invalid_data_raises_error(mock_input_manager: InputManager, ) -> None:
+    """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
+    with patch("builtins.open", mock_open(read_data="invalid_csv_data")):
+        with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+            with patch("pandas.read_csv", side_effect=pd.errors.ParserError("Invalid CSV")):
+                with pytest.raises(pd.errors.ParserError):
+                    mock_input_manager._load_data_from_csv("dummy_file.csv")
+                    assert add_log.call_count == 1
 
 
 def test_start_data_processing(mock_input_manager: InputManager,
                                input_manager_original_method_states: Dict[str, Callable], ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._load_data = MagicMock()
     mock_input_manager._validate_data = MagicMock(return_value=True)
 
-    mock_input_manager.start_data_processing("mock/metadata/path")
+    eager_termination = True
+    mock_metadata_path = "mock/metadata/path"
 
-    mock_input_manager._load_metadata.assert_called_once()
-    mock_input_manager._load_data.assert_called_once()
-    mock_input_manager._validate_data.assert_called_once()
+    mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
+
+    mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
+    mock_input_manager._validate_data.assert_called_once_with(eager_termination)
 
     # Restore original methods
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._load_data = input_manager_original_method_states["_load_data"]
     mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
 
 
 @pytest.fixture
 def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
-        "dummyconfig": {},
-        "files": {
-            "animal": {"properties": "animal_properties"},
-            "manure": {"properties": "manure_properties"},
-            "crop": {"properties": "crop_properties"},
-            "economy": {"properties": "economy_properties"},
-        },
-        "properties": {
-            "animal_properties": {"animal_var1": {"default": "dummyvalue1", "type": "string"},
-                                  "animal_var2": {"default": 5, "type": "number"},
-                                  "animal_var3": {"type": "object",
-                                                  "animal_nested1": {"default": "dummyvalue3",
-                                                                     "type": "string"}, }
-                                  },
-            "manure_properties": {"manure_var1": {"default": [1, 2, 3], "type": "array"},
-                                  "manure_var2": {"default": "dummyvalue2", "type": "string"},
-                                  "manure_var3": {"type": "object",
-                                                  "manure_nested1": {"default": True,
-                                                                     "type": "bool", }},
-                                  },
-            "crop_properties": {"crop_var1": {"default": "dummyvalue1"},
-                                "crop_var2": {"default": "dummyvalue2"},
-                                "crop_var3": {"type": "object",
-                                              "crop_nested1": {"type": "object",
-                                                               "crop_nested2": {
-                                                                   "default": "dummyvalue3",
-                                                                   "type": "string", }},
-                                              }
-                                },
-            "economy_properties": {"array_var1": {"type": "array",
-                                                  "default": [1, 2, 3, 4, 5],
-                                                  "minimum_length": 5,
-                                                  "maximum_length": 10,
-                                                  },
-                                   "array_var2": {"type": "array",
-                                                  "default": [],
-                                                  "minimum_length": 0,
-                                                  "maximum_length": 5,
-                                                  },
-                                   "array_var3": {"type": "array",
-                                                  "default": [1, 2, 3],
-                                                  "minimum_length": 2,
-                                                  "maximum_length": 5,
-                                                  },
-                                   "array_var4": {"type": "object",
-                                                  "array_var5": {"type": "array",
-                                                                 "default": [1, 2, 3],
-                                                                 "minimum_length": 2,
-                                                                 "maximum_length": 5,
-                                                                 },
-                                                  },
-                                   "array_var6": {"type": "array",
-                                                  "minimum_length": 5,
-                                                  "maximum_length": 10,
-                                                  },
-                                   "array_var7": {"type": "array",
-                                                  "minimum_length": 0,
-                                                  "maximum_length": 5,
-                                                  },
-                                   "array_var8": {"type": "array",
-                                                  "minimum_length": 2,
-                                                  "maximum_length": 5,
-                                                  },
-                                   "array_var9": {"type": "object",
-                                                  "array_var10": {"type": "array",
-                                                                  "minimum_length": 2,
-                                                                  "maximum_length": 5,
-                                                                  },
-                                                  },
-                                   "str_var1": {"type": "str",
-                                                "default": "cow",
-                                                "pattern": r"cow",
-                                                "minimum_length": 1,
-                                                "maximum_length": 5,
-                                                },
-                                   "str_var2": {"type": "str",
-                                                "default": "",
-                                                "minimum_length": 0,
-                                                "maximum_length": 5,
-                                                },
-                                   "str_var3": {"type": "str",
-                                                "default": "cow",
-                                                "pattern": r"cow",
-                                                "minimum_length": 2,
-                                                "maximum_length": 5,
-                                                },
-                                   "str_var4": {"type": "object",
-                                                "str_var5": {"type": "str",
-                                                             "default": "cow",
-                                                             "pattern": r"cow",
-                                                             "minimum_length": 2,
-                                                             "maximum_length": 5,
-                                                             },
-                                                },
-                                   "str_var6": {"type": "str",
-                                                "pattern": r"cow",
-                                                "minimum_length": 1,
-                                                "maximum_length": 5,
-                                                },
-                                   "str_var7": {"type": "str",
-                                                "pattern": r"cow",
-                                                "minimum_length": 1,
-                                                "maximum_length": 5,
-                                                },
-                                   "str_var8": {"type": "str",
-                                                "pattern": r"cow",
-                                                "minimum_length": 1,
-                                                "maximum_length": 5,
-                                                },
-                                   "str_var9": {"type": "object",
-                                                "str_var10": {"type": "str",
-                                                              "pattern": r"cow",
-                                                              "minimum_length": 2,
-                                                              "maximum_length": 5,
-                                                              },
-                                                },
-                                   "num_var1": {"type": "number",
-                                                "default": 5,
-                                                "minimum": 0,
-                                                "maximum": 10,
-                                                },
-                                   "num_var2": {"type": "number",
-                                                "default": 0,
-                                                "minimum": 0,
-                                                "maximum": 10,
-                                                },
-                                   "num_var3": {"type": "number",
-                                                "default": 5,
-                                                "minimum": 1,
-                                                "maximum": 10,
-                                                },
-                                   "num_var4": {"type": "object",
-                                                "num_var5": {"type": "number",
-                                                             "default": 5,
-                                                             "minimum": 0,
-                                                             "maximum": 10,
-                                                             },
-                                                },
-                                   "num_var6": {"type": "number",
-                                                "minimum": 0,
-                                                "maximum": 10,
-                                                },
-                                   "num_var7": {"type": "number",
-                                                "minimum": 0,
-                                                "maximum": 10,
-                                                },
-                                   "num_var8": {"type": "number",
-                                                "minimum": 1,
-                                                "maximum": 10,
-                                                },
-                                   "num_var9": {"type": "object",
-                                                "num_var10": {"type": "number",
-                                                              "minimum": 0,
-                                                              "maximum": 10,
-                                                              },
-                                                },
-                                   "bool_var1": {"type": "bool",
-                                                 "default": True
-                                                 },
-                                   "bool_var2": {"type": "bool",
-                                                 "default": False
-                                                 },
-                                   "bool_var3": {"type": "object",
-                                                 "bool_var4": {"type": "bool",
-                                                               "default": True
-                                                               },
-                                                 },
-                                   "bool_var5": {"type": "bool",
-                                                 },
-                                   "bool_var6": {"type": "bool",
-                                                 },
-                                   "bool_var7": {"type": "object",
-                                                 "bool_var8": {"type": "bool",
-                                                               },
-                                                 },
-                                   }
-        }}
+            "files": {
+                "file1": {"type": "json", "path": "path/to/json/file1.json", "properties": "properties1"},
+                "file2": {"type": "csv", "path": "path/to/csv/file2.csv", "properties": "properties2"},
+            },
+            "properties": {
+                "properties1": {"element1": "some_value1", "element2": "some_value2"},
+                "properties2": {"element3": "some_value3", "element4": "some_value4"},
+            }
+        }
+
+
+def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
+                             input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for valid data for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata
+
+    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
+    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
+    mock_input_manager._validate_element = lambda *_: True
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            result = mock_input_manager._validate_data(eager_termination=True)
+
+            assert result is True
+            assert add_log.call_count == 3
+            assert add_warning.call_count == 0
+
+    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
+                               input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid data for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata
+
+    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
+    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
+    mock_input_manager._validate_element = lambda *_: False
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+
+            result = mock_input_manager._validate_data(eager_termination=False)
+            assert result is False
+            assert add_log.call_count == 3
+            assert add_warning.call_count == 0
+
+    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
+                                         input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid data with eager termination for function _validate_data in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata
+
+    mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
+    mock_input_manager._load_data_from_csv = lambda _: {"element3": "value3", "element4": "value4"}
+    mock_input_manager._validate_element = lambda *_: False
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+
+            result = mock_input_manager._validate_data(eager_termination=True)
+            assert result is False
+            assert add_log.call_count == 0
+            assert add_warning.call_count == 0
+
+    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
 @pytest.fixture
-def mock_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
-        "animal": {"animal_var1": "dummyvalue1",
-                   "animal_var2": "dummyvalue2",
-                   "animal_var3": {
-                       "animal_nested1": "dummyvalue3"
-                   },
-                   },
-        "manure": {"manure_var1": "dummyvalue3",
-                   "manure_var2": "dummyvalue4",
-                   "manure_var3": {
-                       "manure_nested1": "dummyvalue3"
-                   },
-                   },
-        "crop": {"crop_var1": "dummyvalue5",
-                 "crop_var2": "dummyvalue6",
-                 "crop_var3": {
-                     "crop_nested1": "dummyvalue3"
-                 },
-                 },
-        "economy": {"array_var1": [1, 2, 3],
-                    "array_var2": [1, 2, 3, 4, 5],
-                    "array_var3": [],
-                    "array_var4": {
-                        "array_var5": [1, 2],
-                    },
-                    "array_var6": [1, 2, 3],
-                    "array_var7": [1, 2, 3, 4, 5],
-                    "array_var8": [],
-                    "array_var9": {
-                        "array_var10": [1, 2],
-                    },
-                    "str_var1": "muu",
-                    "str_var2": "muumuu",
-                    "str_var3": "",
-                    "str_var4": {
-                        "str_var5": "muu",
-                    },
-                    "str_var6": "muu",
-                    "str_var7": "muumuu",
-                    "str_var8": "",
-                    "str_var9": {
-                        "str_var10": "muu",
-                    },
-                    "num_var1": -1,
-                    "num_var2": -1,
-                    "num_var3": 0,
-                    "num_var4": {
-                        "num_var5": 15,
-                    },
-                    "num_var6": -1,
-                    "num_var7": -1,
-                    "num_var8": 0,
-                    "num_var9": {
-                        "num_var10": 15,
-                    },
-                    "bool_var1": False,
-                    "bool_var2": True,
-                    "bool_var3": {
-                        "bool_var4": False,
-                    },
-                    "bool_var5": False,
-                    "bool_var6": True,
-                    "bool_var7": {
-                        "bool_var8": False,
-                    },
-                    },
-
-    }
+            "files": {
+                "file1": {
+                    "type": "json",
+                    "path": "/path/to/file1.json",
+                    "properties": "property_map_key1"
+                }
+            },
+            "properties": {
+                "property_map_key1": {
+                    "element1": {"type": "string", "pattern": r"^\d{3}-\d{2}-\d{4}$"},
+                    "element2": {"type": "number", "minimum": 0, "maximum": 150},
+                    "element3": {"type": "array",
+                                 "minimum_length": 1, "maximum_length": 5},
+                }
+            }
+        }
 
 
-def test_validate_data_returns_true_with_valid_data(mocker: MockerFixture,
-                                                    mock_input_manager: InputManager,
-                                                    mock_metadata: Dict[str, Dict[str, Any]],
-                                                    mock_pool: Dict[str, Dict[str, Any]],
-                                                    ) -> None:
-    """Unit test for valid data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+def test_validate_element_string_type(mock_input_manager: InputManager,
+                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                      input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for string type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element1": "123-45-6789"}
+    result = mock_input_manager._validate_element("module_key", "element1", "property_map_key1", input_data)
+
+    assert result is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_number_type(mock_input_manager: InputManager,
+                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                      input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for number type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element2": 123}
+    result = mock_input_manager._validate_element("module_key", "element2", "property_map_key1", input_data)
+
+    assert result is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_array_type(mock_input_manager: InputManager,
+                                     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                     input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for array type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element3": [1, 2, 3]}
+    result = mock_input_manager._validate_element("module_key", "element3", "property_map_key1", input_data)
+
+    assert result is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_object_type(mock_input_manager: InputManager, mocker: MockerFixture,
+                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                      input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for nested object type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
-
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data(eager_termination=True)
-
-    assert result is True
-    assert add_log.call_count == 3
-
-
-def test_validate_data_returns_false_with_unfixable_invalid_data(mocker: MockerFixture,
-                                                                 mock_input_manager: InputManager,
-                                                                 mock_metadata: Dict[str, Dict[str, Any]],
-                                                                 mock_pool: Dict[str, Dict[str, Any]],
-                                                                 ) -> None:
-    """Unit test for invalid unfixable data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data(eager_termination=True)
-
-    assert result is False
-    assert add_log.call_count == 0  # will reach eager_termination prior to adding logs
-
-
-def test_validate_data_returns_false_with_invalid_data_no_eager_termination(mocker: MockerFixture,
-                                                                            mock_input_manager: InputManager,
-                                                                            mock_metadata: Dict[str, Dict[str, Any]],
-                                                                            mock_pool: Dict[str, Dict[str, Any]],
-                                                                            ) -> None:
-    """Unit test for no eager termination with non-critical
-    invalid data for function _validate_data in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=False)
-
-    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
-        result = mock_input_manager._validate_data(eager_termination=False)
-
-    assert result is False
-    assert add_log.call_count == 3
-
-
-def test_validate_element_valid_element_returns_true(mocker: MockerFixture,
-                                                     mock_input_manager: InputManager,
-                                                     mock_metadata: Dict[str, Dict[str, Any]],
-                                                     mock_pool: Dict[str, Dict[str, Any]],
-                                                     ) -> None:
-    """Unit test for function _validate_element function with valid element in file input_manager.py"""
-    dummy_module_key = "animal"
-    dummy_valid_element = "animal_var1"
-    dummy_property_map_key = "animal_properties"
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    eager_termination = True
-
-    result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
-                                                  dummy_property_map_key, eager_termination)
-
-    assert result is True
-
-
-def test_validate_element_unfixable_invalid_element_returns_false(mocker: MockerFixture,
-                                                                  mock_input_manager: InputManager,
-                                                                  mock_metadata: Dict[str, Dict[str, Any]],
-                                                                  mock_pool: Dict[str, Dict[str, Any]],
-                                                                  ) -> None:
-    """Unit test for function _validate_element function with invalid element in file input_manager.py"""
-    dummy_module_key = "animal"
-    dummy_valid_element = "animal_var1"
-    dummy_property_map_key = "animal_properties"
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    mocker.patch.object(mock_input_manager, "_validate_string_type_element", return_value=False)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
-    eager_termination = True
+    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
+    result = mock_input_manager._validate_element("module_key", "element4", "property_map_key1", input_data)
 
-    result = mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
-                                                  dummy_property_map_key, eager_termination)
+    assert result is True
 
-    assert result is False
-
-
-def test_validate_element_with_element_no_type_or_bad_type_raises_exception(mocker: MockerFixture,
-                                                                            mock_input_manager: InputManager,
-                                                                            mock_metadata: Dict[str, Dict[str, Any]],
-                                                                            mock_pool: Dict[str, Dict[str, Any]],
-                                                                            ) -> None:
-    """Unit test for function _validate_element function with invalid element in file input_manager.py"""
-    dummy_module_key = "animal"
-    dummy_valid_element = "animal_var1"
-    dummy_property_map_key = "animal_properties"
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    eager_termination = True
-
-    # set type to empty string
-    mock_metadata["properties"]["animal_properties"]["animal_var1"]["type"] = ""
-
-    with pytest.raises(Exception):
-        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
-                                             dummy_property_map_key, eager_termination)
-        error_message = "Element must be type number, array, string, or bool"
-        assert error_message in Exception.message
-
-    # update type to unsupported type
-    mock_metadata["properties"]["animal_properties"]["animal_var1"]["type"] = "dict"
-
-    with pytest.raises(Exception):
-        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
-                                             dummy_property_map_key, eager_termination)
-        error_message = "Element must be type number, array, string, or bool"
-        assert error_message in Exception.message
-
-
-def test_validate_element_with_element_not_in_pool_raises_exception(mocker: MockerFixture,
-                                                                    mock_input_manager: InputManager,
-                                                                    mock_metadata: Dict[str, Dict[str, Any]],
-                                                                    mock_pool: Dict[str, Dict[str, Any]],
-                                                                    ) -> None:
-    """Unit test for function _validate_element function with element missing from pool in file input_manager.py"""
-    dummy_module_key = "animal"
-    dummy_valid_element = "animal_var1"
-    dummy_property_map_key = "animal_properties"
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
-    eager_termination = True
-    var_name = "crop_var1"
-
-    # remove crop_var1 variable from mock_pool
-    mock_pool["crop"] = {"crop_var2": "dummyvalue6",
-                         "crop_var3": {"crop_nested1": "dummyvalue3"},
-                         },
-
-    with pytest.raises(Exception) as KeyError:
-        mock_input_manager._validate_element(dummy_module_key, dummy_valid_element,
-                                             dummy_property_map_key, eager_termination)
-        error_message = f"Key {var_name} not found in pool"
-        assert error_message in KeyError
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
 @pytest.mark.parametrize(
