@@ -256,15 +256,17 @@ class InputManager:
             except KeyError as e:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
 
-            type_validation_dict = {"string":
-                                    self._validate_string_type_element(variable_properties, var_name, input_data_value),
-                                    "number":
-                                    self._validate_num_type_element(variable_properties, var_name, input_data_value),
-                                    "array":
-                                    self._validate_array_type_element(variable_properties, var_name, input_data_value),
-                                    "bool":
-                                    True}
-            is_valid = type_validation_dict.get(var_type)
+            match var_type:
+                case "string":
+                    is_valid = self._validate_string_type_element(variable_properties, var_name, input_data_value)
+                case "number":
+                    is_valid = self._validate_num_type_element(variable_properties, var_name, input_data_value)
+                case "array":
+                    is_valid = self._validate_array_type_element(variable_properties, var_name, input_data_value)
+                case "bool":
+                    is_valid = True
+                case _:
+                    is_valid = None
 
             if is_valid:
                 return True
