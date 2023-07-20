@@ -373,4 +373,4 @@ class InputManager:
 
         else:
             om.add_warning("Data not found:", f"Cannot find {data_address}", info_map)
-            return None
+            raise KeyError("Data not found:", f"Cannot find {data_address}")
