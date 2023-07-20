@@ -229,7 +229,7 @@ class InputManager:
             false_counter = 0
             for nested_key in variable_properties.keys():
                 element_hierarchy.append(nested_key)
-                child_status = self._validate_element(self, module_key, element_hierarchy,
+                child_status = self._validate_element(module_key, element_hierarchy,
                                                       property_map_key, input_data, eager_termination)
                 if eager_termination and not child_status:
                     return False
