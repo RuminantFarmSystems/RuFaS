@@ -357,47 +357,10 @@ class InputManager:
 
         return is_valid_string
 
-    def _validate_string_type_element(self, variable_to_check: Dict[str, Any], var_name: str,
-                                      input_data_value: str) -> bool:
-        """Validates a __pool string element."""
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_string_type_element.__name__,
-                    }
-        is_pattern_check = variable_to_check.get("pattern")
-        is_minimum_length = variable_to_check.get("minimum_length")
-        is_maximum_length = variable_to_check.get("maximum_length")
-        is_valid_string = True
-        if is_pattern_check:
-            is_valid_string = bool(re.match(variable_to_check["pattern"], input_data_value))
-            if not is_valid_string:
-                om.add_warning(f"String variable must match pattern {variable_to_check['pattern']}.",
-                               f"{var_name=}",
-                               info_map)
-                return is_valid_string
-        if is_minimum_length and is_maximum_length:
-            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                              variable_to_check["maximum_length"]
-            if not is_valid_string:
-                om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return is_valid_string
-        if is_minimum_length:
-            is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
-            if not is_valid_string:
-                om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return is_valid_string
-        if is_maximum_length:
-            is_valid_string = len(input_data_value) <= variable_to_check["maximum_length"]
-            if not is_valid_string:
-                om.add_warning("String out length range.", f"{var_name=}", info_map)
-                return is_valid_string
-
-        return True
-
     def _fix_data(self, module_key: str, property_map_key: str, element_hierarchy: List[str],
                   input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
-        Return True if the data is fixed, False for critical data
 
         Parameters
         ----------
@@ -409,6 +372,9 @@ class InputManager:
 
         element_hierarchy: List[str]
             A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+
+        input_data: dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
 
         Returns
         -------
