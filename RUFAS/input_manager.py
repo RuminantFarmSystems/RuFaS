@@ -44,10 +44,9 @@ class InputManager:
         Returns
         -------
         bool
-            True if data is valid, otherwise False.
+            Flag indicating whether input data is valid.
         """
         self._load_metadata(metadata_path)
-        self._load_data()
         is_input_data_valid = self._validate_data(eager_termination)
         return is_input_data_valid
 
@@ -77,73 +76,107 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _load_data(self) -> None:
+    def _load_data_from_json(self, file_path: str) -> Dict[str, Any]:
         """
-        Loads data from JSON or CSV file.
-
-        Raises
-        ------
-        Exception
-            If an error occurs while opening or reading a data file.
-        """
-
-        files_details = self.__metadata["files"]
-        path_key = "path"
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._load_data.__name__,
-                    }
-        for key, details in files_details.items():
-            file_path = details[path_key]
-            om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
-            try:
-                if details["type"] == "json":
-                    with open(file_path) as json_file:
-                        data = json.load(json_file)
-                        self.__pool[key] = data
-                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
-                                   info_map)
-                elif details["type"] == "csv":
-                    with open(file_path, "r") as csv_file:
-                        data_frame = pd.read_csv(csv_file)
-                        data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
-                        self.__pool[key] = data_dict
-                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
-                                   info_map)
-                else:
-                    om.add_warning("InputManager load data file is not csv/json",
-                                   f"{key} data must be available in either csv or json file type.",
-                                   info_map)
-            except Exception as e:
-                raise e
-
-    def _validate_data(self, eager_termination: bool = True) -> bool:
-        """
-        Validates input data and attempts to fix any invalid input data.
+        Loads data from input json file.
 
         Parameters
         ----------
-        eager_termination : bool, default=True
-            If true, the process will be terminated upon finding invalid data.
+        file_path : str
+            Path to the input file to load.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The data dictionary loaded from the json file.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_data_from_json.__name__,
+                    }
+        om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
+        try:
+            with open(file_path) as json_file:
+                data = json.load(json_file)
+                om.add_log("load_data_successful", f"Successfully loaded data from {file_path}.", info_map)
+                return data
+        except Exception as e:
+            raise e
+
+    def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
+        """
+        Loads data from input csv file.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the input file to load.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The data dictionary loaded from the json file.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_data_from_csv.__name__,
+                    }
+        om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
+        try:
+            with open(file_path, "r") as csv_file:
+                data_frame = pd.read_csv(csv_file)
+                data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
+                if not data_frame.empty:
+                    om.add_log("load_data_successful",
+                               f"Successfully loaded data from {file_path}.",
+                               info_map)
+                return data_dict
+        except Exception as e:
+            raise e
+
+    def _validate_data(self, eager_termination: bool) -> bool:
+        """
+        Validates data from input files and adds data to pool if valid.
+
+        Parameters
+        ----------
+        eager_termination : bool
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+            If False, the process will be terminated after going through and validating the entire data.
 
         Returns
         -------
         bool
-            True if all data is valid; False otherwise.
+            True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_data.__name__,
                     }
         valid_elements_counter = 0
         invalid_critical_elements_counter = 0
-        total_elements_checked_counter = 0
+        total_elements_counter = 0
 
-        for module_key in self.__pool.keys():
-            property_map_key = self.__metadata["files"][module_key]["properties"]
+        for module_key, details in self.__metadata["files"].items():
+            file_path = details["path"]
+            if details["type"] == "json":
+                data = self._load_data_from_json(file_path)
+            elif details["type"] == "csv":
+                data = self._load_data_from_csv(file_path)
+            else:
+                om.add_warning("InputManager load data file is not csv/json",
+                               f"{module_key} data must be available in either csv or json file type.",
+                               info_map)
+                continue
+
+            property_map_key = details["properties"]
             module_properties = self.__metadata["properties"][property_map_key]
             for element in module_properties.keys():
-                total_elements_checked_counter += 1
-                is_valid_element = self._validate_element(module_key, element, property_map_key)
+                total_elements_counter += 1
+                is_valid_element = self._validate_element(module_key, element, property_map_key, data,
+                                                          eager_termination)
                 if is_valid_element:
+                    if isinstance(element, dict):
+                        if module_key not in self.__pool:
+                            self.__pool[module_key] = {}
+                        self.__pool[module_key].update(element)
                     valid_elements_counter += 1
                 elif not is_valid_element and eager_termination:
                     invalid_critical_elements_counter += 1
@@ -151,17 +184,16 @@ class InputManager:
                 else:
                     invalid_critical_elements_counter += 1
 
-        om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
-        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
-
-        if invalid_critical_elements_counter > 0:
-            return False
-
-        return True
+            om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
+            om.add_log("Total Checked Elements", f"{total_elements_counter=}", info_map)
+            om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
+            if invalid_critical_elements_counter > 0:
+                return False
+            return True
 
     def _validate_element(self, module_key: str, element: str,
-                          property_map_key: str, eager_termination: bool = True) -> bool:
+                          property_map_key: str, input_data: Dict[str, Any],
+                          eager_termination: bool = True, ) -> bool:
         """
         Perform data validation checks.
 
@@ -178,6 +210,9 @@ class InputManager:
 
         eager_termination : bool, default=True
             If true, the process will be terminated upon finding invalid data.
+
+        input_data : Dict[str, Any]
+            The data from the input file.
 
         Returns
         -------
@@ -216,7 +251,7 @@ class InputManager:
         else:
             var_name = element_hierarchy[-1]
             try:
-                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool[module_key])
+                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError as e:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
 
