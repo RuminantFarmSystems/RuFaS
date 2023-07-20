@@ -157,15 +157,15 @@ def test_start_data_processing(mock_input_manager: InputManager,
 @pytest.fixture
 def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
-            "files": {
-                "file1": {"type": "json", "path": "path/to/json/file1.json", "properties": "properties1"},
-                "file2": {"type": "csv", "path": "path/to/csv/file2.csv", "properties": "properties2"},
-            },
-            "properties": {
-                "properties1": {"element1": "some_value1", "element2": "some_value2"},
-                "properties2": {"element3": "some_value3", "element4": "some_value4"},
-            }
+        "files": {
+            "file1": {"type": "json", "path": "path/to/json/file1.json", "properties": "properties1"},
+            "file2": {"type": "csv", "path": "path/to/csv/file2.csv", "properties": "properties2"},
+        },
+        "properties": {
+            "properties1": {"element1": "some_value1", "element2": "some_value2"},
+            "properties2": {"element3": "some_value3", "element4": "some_value4"},
         }
+    }
 
 
 def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
@@ -200,7 +200,6 @@ def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: 
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-
             result = mock_input_manager._validate_data(eager_termination=False)
             assert result is False
             assert add_log.call_count == 3
@@ -221,7 +220,6 @@ def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-
             result = mock_input_manager._validate_data(eager_termination=True)
             assert result is False
             assert add_log.call_count == 0
@@ -234,22 +232,22 @@ def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_
 @pytest.fixture
 def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
-            "files": {
-                "file1": {
-                    "type": "json",
-                    "path": "/path/to/file1.json",
-                    "properties": "property_map_key1"
-                }
-            },
-            "properties": {
-                "property_map_key1": {
-                    "element1": {"type": "string", "pattern": r"^\d{3}-\d{2}-\d{4}$"},
-                    "element2": {"type": "number", "minimum": 0, "maximum": 150},
-                    "element3": {"type": "array",
-                                 "minimum_length": 1, "maximum_length": 5},
-                }
+        "files": {
+            "file1": {
+                "type": "json",
+                "path": "/path/to/file1.json",
+                "properties": "property_map_key1"
+            }
+        },
+        "properties": {
+            "property_map_key1": {
+                "element1": {"type": "string", "pattern": r"^\d{3}-\d{2}-\d{4}$"},
+                "element2": {"type": "number", "minimum": 0, "maximum": 150},
+                "element3": {"type": "array",
+                             "minimum_length": 1, "maximum_length": 5},
             }
         }
+    }
 
 
 def test_validate_element_string_type(mock_input_manager: InputManager,
@@ -384,31 +382,308 @@ def test_validate_string_type_element(dummy_value: int,
     assert add_warning.call_count == expected_warning_call_count
 
 
+@pytest.fixture
+def mock_metadata_for_fix_data(mocker: MockerFixture) -> dict[str, dict[str, Any]]:
+    return {
+        "dummyconfig": {},
+        "files": {
+            "array": {
+                "properties": "array_properties"
+            },
+            "string": {
+                "properties": "string_properties"
+            },
+            "number": {
+                "properties": "number_properties"
+            },
+            "boolean": {
+                "properties": "boolean_properties"
+            },
+        },
+        "properties": {
+            "array_properties": {
+                "element1": {
+                    "type": "array",
+                    "default": [1, 2, 3, 4, 5],
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                "element2": {
+                    "type": "array",
+                    "default": [],
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                "element3": {
+                    "type": "array",
+                    "default": [1, 2, 3],
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                "element4": {
+                    "type": "object",
+                    "element5": {
+                        "type": "array",
+                        "default": [1, 2, 3],
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+                "element6": {
+                    "type": "array",
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                "element7": {
+                    "type": "array",
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                "element8": {
+                    "type": "array",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                "element9": {
+                    "type": "object",
+                    "element10": {
+                        "type": "array",
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+            },
+            "string_properties": {
+                "element1": {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element2": {
+                    "type": "str",
+                    "default": "",
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                "element3": {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                "element4": {
+                    "type": "object",
+                    "element5": {
+                        "type": "str",
+                        "default": "cow",
+                        "pattern": r"cow",
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+                "element6": {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element7": {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element8": {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element9": {
+                    "type": "object",
+                    "element10": {
+                        "type": "str",
+                        "pattern": r"cow",
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+            },
+            "number_properties": {
+                "element1": {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element2": {
+                    "type": "number",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element3": {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                "element4": {
+                    "type": "object",
+                    "element5": {
+                        "type": "number",
+                        "default": 5,
+                        "minimum": 0,
+                        "maximum": 10,
+                    },
+                },
+                "element6": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element7": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element8": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                "element9": {
+                    "type": "object",
+                    "element10": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10,
+                    },
+                },
+            },
+            "boolean_properties": {
+                "element1": {
+                    "type": "bool",
+                    "default": True
+                },
+                "element2": {
+                    "type": "bool",
+                    "default": False
+                },
+                "element3": {
+                    "type": "object",
+                    "element4": {
+                        "type": "bool",
+                        "default": True
+                    },
+                },
+                "element5": {
+                    "type": "bool",
+                },
+                "element6": {
+                    "type": "bool",
+                },
+                "element7": {
+                    "type": "object",
+                    "element8": {
+                        "type": "bool",
+                    },
+                },
+
+            },
+
+        },
+    }
+
+
+@pytest.fixture
+def mock_pool_for_fix_data(mocker: MockerFixture) -> dict[str, dict[str, Any]]:
+    return {
+        "array": {
+            "element1": [1, 2, 3],
+            "element2": [1, 2, 3, 4, 5],
+            "element3": [],
+            "element4": {
+                "element5": [1, 2],
+            },
+            "element6": [1, 2, 3],
+            "element7": [1, 2, 3, 4, 5],
+            "element8": [],
+            "element9": {
+                "element10": [1, 2],
+            },
+        },
+        "string": {
+            "element1": "muu",
+            "element2": "muumuu",
+            "element3": "",
+            "element4": {
+                "element5": "muu",
+            },
+            "element6": "muu",
+            "element7": "muumuu",
+            "element8": "",
+            "element9": {
+                "element10": "muu",
+            },
+        },
+        "number": {
+            "element1": -1,
+            "element2": -1,
+            "element3": 0,
+            "element4": {
+                "element5": 15,
+            },
+            "element6": -1,
+            "element7": -1,
+            "element8": 0,
+            "element9": {
+                "element10": 15,
+            },
+        },
+        "boolean": {
+            "element1": False,
+            "element2": True,
+            "element3": {
+                "element4": False,
+            },
+            "element5": False,
+            "element6": True,
+            "element7": {
+                "element8": False,
+            },
+        },
+    }
+
+
 @pytest.mark.parametrize(
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["array_var1"], [1, 2, 3, 4, 5], True, 1),
-        ("economy", "economy_properties", ["array_var2"], [], True, 1),
-        ("economy", "economy_properties", ["array_var3"], [1, 2, 3], True, 1),
-        ("economy", "economy_properties", ["array_var4", "array_var5"], [1, 2, 3], True, 1),
+        ("array", "array_properties", ["element1"], [1, 2, 3, 4, 5], True, 1),
+        ("array", "array_properties", ["element2"], [], True, 1),
+        ("array", "array_properties", ["element3"], [1, 2, 3], True, 1),
+        ("array", "array_properties", ["element4", "element5"], [1, 2, 3], True, 1),
     ]
 )
 def test_fix_array_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
                                      dummy_element_hierarchy: list[str], expected_value: list, expected_result: bool,
                                      expected_warning_call_count: int, mock_input_manager: InputManager,
-                                     mock_metadata: Dict[str, Dict[str, Any]],
-                                     mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+                                     mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                     mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
-                               mock_pool[dummy_module_key])
+                               mock_pool_for_fix_data[dummy_module_key])
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -418,21 +693,21 @@ def test_fix_array_type_fixable_data(dummy_module_key: str, dummy_property_map_k
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["array_var6"], False, 0),
-        ("economy", "economy_properties", ["array_var7"], False, 0),
-        ("economy", "economy_properties", ["array_var8"], False, 0),
-        ("economy", "economy_properties", ["array_var9", "array_var10"], False, 0),
+        ("array", "array_properties", ["element6"], False, 0),
+        ("array", "array_properties", ["element7"], False, 0),
+        ("array", "array_properties", ["element8"], False, 0),
+        ("array", "array_properties", ["element9", "element10"], False, 0),
     ]
 )
 def test_fix_array_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
                                       dummy_element_hierarchy: list[str], expected_result: bool,
                                       expected_warning_call_count: int, mock_input_manager: InputManager,
-                                      mock_metadata: Dict[str, Dict[str, Any]],
-                                      mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+                                      mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                      mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
@@ -445,27 +720,27 @@ def test_fix_array_type_critical_data(dummy_module_key: str, dummy_property_map_
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["str_var1"], "cow", True, 1),
-        ("economy", "economy_properties", ["str_var2"], "", True, 1),
-        ("economy", "economy_properties", ["str_var3"], "cow", True, 1),
-        ("economy", "economy_properties", ["str_var4", "str_var5"], "cow", True, 1),
+        ("string", "string_properties", ["element1"], "cow", True, 1),
+        ("string", "string_properties", ["element2"], "", True, 1),
+        ("string", "string_properties", ["element3"], "cow", True, 1),
+        ("string", "string_properties", ["element4", "element5"], "cow", True, 1),
     ]
 )
-def test_fix_str_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
-                                   dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
-                                   expected_warning_call_count: int, mock_input_manager: InputManager,
-                                   mock_metadata: Dict[str, Dict[str, Any]],
-                                   mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+def test_fix_string_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                      dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                      expected_warning_call_count: int, mock_input_manager: InputManager,
+                                      mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                      mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
-                               mock_pool[dummy_module_key])
+                               mock_pool_for_fix_data[dummy_module_key])
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -475,21 +750,21 @@ def test_fix_str_type_fixable_data(dummy_module_key: str, dummy_property_map_key
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["str_var6"], False, 0),
-        ("economy", "economy_properties", ["str_var7"], False, 0),
-        ("economy", "economy_properties", ["str_var8"], False, 0),
-        ("economy", "economy_properties", ["str_var9", "str_var10"], False, 0),
+        ("string", "string_properties", ["element6"], False, 0),
+        ("string", "string_properties", ["element7"], False, 0),
+        ("string", "string_properties", ["element8"], False, 0),
+        ("string", "string_properties", ["element9", "element10"], False, 0),
     ]
 )
-def test_fix_str_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
-                                    dummy_element_hierarchy: list[str], expected_result: bool,
-                                    expected_warning_call_count: int, mock_input_manager: InputManager,
-                                    mock_metadata: Dict[str, Dict[str, Any]],
-                                    mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+def test_fix_string_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                       dummy_element_hierarchy: list[str], expected_result: bool,
+                                       expected_warning_call_count: int, mock_input_manager: InputManager,
+                                       mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                       mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
@@ -502,27 +777,27 @@ def test_fix_str_type_critical_data(dummy_module_key: str, dummy_property_map_ke
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["num_var1"], 5, True, 1),
-        ("economy", "economy_properties", ["num_var2"], 0, True, 1),
-        ("economy", "economy_properties", ["num_var3"], 5, True, 1),
-        ("economy", "economy_properties", ["num_var4", "num_var5"], 5, True, 1),
+        ("number", "number_properties", ["element1"], 5, True, 1),
+        ("number", "number_properties", ["element2"], 0, True, 1),
+        ("number", "number_properties", ["element3"], 5, True, 1),
+        ("number", "number_properties", ["element4", "element5"], 5, True, 1),
     ]
 )
-def test_fix_num_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
-                                   dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
-                                   expected_warning_call_count: int, mock_input_manager: InputManager,
-                                   mock_metadata: Dict[str, Dict[str, Any]],
-                                   mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+def test_fix_number_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                      dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                      expected_warning_call_count: int, mock_input_manager: InputManager,
+                                      mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                      mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
-                               mock_pool[dummy_module_key])
+                               mock_pool_for_fix_data[dummy_module_key])
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -532,21 +807,21 @@ def test_fix_num_type_fixable_data(dummy_module_key: str, dummy_property_map_key
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["num_var6"], False, 0),
-        ("economy", "economy_properties", ["num_var7"], False, 0),
-        ("economy", "economy_properties", ["num_var8"], False, 0),
-        ("economy", "economy_properties", ["num_var9", "num_var10"], False, 0),
+        ("number", "number_properties", ["element6"], False, 0),
+        ("number", "number_properties", ["element7"], False, 0),
+        ("number", "number_properties", ["element8"], False, 0),
+        ("number", "number_properties", ["element9", "element10"], False, 0),
     ]
 )
-def test_fix_num_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
-                                    dummy_element_hierarchy: list[str], expected_result: bool,
-                                    expected_warning_call_count: int, mock_input_manager: InputManager,
-                                    mock_metadata: Dict[str, Dict[str, Any]],
-                                    mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+def test_fix_number_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                       dummy_element_hierarchy: list[str], expected_result: bool,
+                                       expected_warning_call_count: int, mock_input_manager: InputManager,
+                                       mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                       mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
@@ -559,26 +834,26 @@ def test_fix_num_type_critical_data(dummy_module_key: str, dummy_property_map_ke
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_value, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["bool_var1"], True, True, 1),
-        ("economy", "economy_properties", ["bool_var2"], False, True, 1),
-        ("economy", "economy_properties", ["bool_var3", "bool_var4"], True, True, 1),
+        ("boolean", "boolean_properties", ["element1"], True, True, 1),
+        ("boolean", "boolean_properties", ["element2"], False, True, 1),
+        ("boolean", "boolean_properties", ["element3", "element4"], True, True, 1),
     ]
 )
-def test_fix_bool_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
-                                    dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
-                                    expected_warning_call_count: int, mock_input_manager: InputManager,
-                                    mock_metadata: Dict[str, Dict[str, Any]],
-                                    mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+def test_fix_boolean_type_fixable_data(dummy_module_key: str, dummy_property_map_key: str,
+                                       dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                       expected_warning_call_count: int, mock_input_manager: InputManager,
+                                       mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                       mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for fixable Boolean-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
 
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
-                               mock_pool[dummy_module_key])
+                               mock_pool_for_fix_data[dummy_module_key])
     assert variable_to_check == expected_value
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
@@ -588,20 +863,20 @@ def test_fix_bool_type_fixable_data(dummy_module_key: str, dummy_property_map_ke
     'dummy_module_key, dummy_property_map_key, dummy_element_hierarchy, expected_result, '
     'expected_warning_call_count',
     [
-        ("economy", "economy_properties", ["bool_var5"], False, 0),
-        ("economy", "economy_properties", ["bool_var6"], False, 0),
-        ("economy", "economy_properties", ["bool_var7", "bool_var8"], False, 0),
+        ("boolean", "boolean_properties", ["element5"], False, 0),
+        ("boolean", "boolean_properties", ["element6"], False, 0),
+        ("boolean", "boolean_properties", ["element7", "element8"], False, 0),
     ]
 )
-def test_fix_bool_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
-                                     dummy_element_hierarchy: list[str], expected_result: bool,
-                                     expected_warning_call_count: int, mock_input_manager: InputManager,
-                                     mock_metadata: Dict[str, Dict[str, Any]],
-                                     mock_pool: Dict[str, Dict[str, Any]], ) -> None:
+def test_fix_boolean_type_critical_data(dummy_module_key: str, dummy_property_map_key: str,
+                                        dummy_element_hierarchy: list[str], expected_result: bool,
+                                        expected_warning_call_count: int, mock_input_manager: InputManager,
+                                        mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+                                        mock_pool_for_fix_data: Dict[str, Dict[str, Any]], ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
 
-    mock_input_manager._InputManager__metadata = mock_metadata
-    mock_input_manager._InputManager__pool = mock_pool
+    mock_input_manager._InputManager__metadata = mock_metadata_for_fix_data
+    mock_input_manager._InputManager__pool = mock_pool_for_fix_data
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
         result = mock_input_manager._fix_data(dummy_module_key, dummy_property_map_key, dummy_element_hierarchy)
