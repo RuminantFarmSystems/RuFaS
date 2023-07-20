@@ -12,7 +12,7 @@ class GasEmissionConstants:
 
     E = 112700.0
     """
-    Activation energy (joules per mole, J/mol). The activation energy is the 
+    Activation energy (joules per mole, J/mol). The activation energy is the
     minimum energy that must be available to molecules for a reaction to occur.
     """
 
@@ -35,7 +35,7 @@ class GasEmissionConstants:
 
     METHANE_ENERGY_DENSITY = 55.0
     """
-    Methane energy density (megajoules per kg, MJ/kg). This is the amount of energy stored per unit 
+    Methane energy density (megajoules per kg, MJ/kg). This is the amount of energy stored per unit
     mass of methane.
     """
 
@@ -45,10 +45,24 @@ class GasEmissionConstants:
     METHANE_POTENTIAL_Go = 240.0
     """Methane potential (mL/g). Default is set to 240.0."""
 
+    MCF_CONSTANT_A = 7.11
+    """
+    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+    Methane Conversion Factor (MCF) calculation. This coefficient scales the exponential
+    function of ambient barn temperature.
+    """
+
+    MCF_CONSTANT_B = 0.0884
+    """
+    Parameter estimate (unitless) of a regression using IPCC data (2006) used in the
+    Methane Conversion Factor (MCF) calculation. This exponent coefficient determines the rate
+    at which MCF increases with ambient barn temperature.
+    """
+
     POTENTIAL_METHANE_YIELD_OF_MANURE = 0.48
     """
-    Potential methane yield of manure, (kg :math:`CH_4`/kg VS). This represents the potential 
-    amount of methane that can be produced per kilogram of volatile solids (VS) in manure. 
+    Potential methane yield of manure, (kg :math:`CH_4`/kg VS). This represents the potential
+    amount of methane that can be produced per kilogram of volatile solids (VS) in manure.
     Default is set to 0.48.
     """
 
@@ -57,25 +71,25 @@ class GasEmissionConstants:
 
     DEFAULT_VOLATILE_SOLIDS_FRACTION = 0.68
     """
-    Default volatile solids fraction, (unitless, [0, 1]). This is the fraction of 
+    Default volatile solids fraction, (unitless, [0, 1]). This is the fraction of
     total solids that are volatile Default is set to 0.68.
     """
 
     CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH = 3.1
     """
-    Chen-Hashimoto kinetic constant (unitless). This constant is used in the 
+    Chen-Hashimoto kinetic constant (unitless). This constant is used in the
     Chen-Hashimoto equation to model the kinetic behaviour of the anaerobic digestion process.
     """
 
     SPECIFIC_GROWTH_RATE = 0.637
     """
-    Specific growth rate (:math:`\mu`m). This represents the rate at which the microbial population 
+    Specific growth rate (:math:`\mu`m). This represents the rate at which the microbial population
     in the anaerobic digestion process increases.
     """
 
     DEFAULT_HOUSING_SPECIFIC_CONSTANT = 260.0  # s/m
     """
-    Default housing specific constant (s/m). This constant may be used in calculations 
+    Default housing specific constant (s/m). This constant may be used in calculations
     related to the housing conditions for animals. Default is set to 260.0 s/m.
     """
 
@@ -84,3 +98,6 @@ class GasEmissionConstants:
 
     DEFAULT_PH_FOR_STORAGE_AMMONIA = 7.5
     """Default pH for storage ammonia (unitless). Default is set to 7.5."""
+
+    OXYGEN_HALF_SATURATION_CONSTANT = 0.02
+    """The half saturation constant of Oxygen gas (O2)"""
