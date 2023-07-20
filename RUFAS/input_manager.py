@@ -219,15 +219,17 @@ class InputManager:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, self.__pool[module_key])
             except KeyError as e:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
-                
+
             type_validation_dict = {"string":
-                                    self._validate_string_type_element(variable_to_check, var_name, input_data_value),
+                                        self._validate_string_type_element(variable_to_check, var_name,
+                                                                           input_data_value),
                                     "number":
-                                    self._validate_num_type_element(variable_to_check, var_name, input_data_value),
+                                        self._validate_num_type_element(variable_to_check, var_name, input_data_value),
                                     "array":
-                                    self._validate_array_type_element(variable_to_check, var_name, input_data_value),
+                                        self._validate_array_type_element(variable_to_check, var_name,
+                                                                          input_data_value),
                                     "bool":
-                                    True}
+                                        True}
             is_valid = type_validation_dict.get(var_type)
 
             if is_valid:
@@ -249,7 +251,7 @@ class InputManager:
         is_in_range = True
         if maximum_length is not None and minimum_length is not None:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                variable_to_check["maximum_length"]
+                          variable_to_check["maximum_length"]
             warning_string = f"Array length not in range[{minimum_length}, {maximum_length}]"
         elif minimum_length is not None:
             is_in_range = variable_to_check["minimum_length"] <= len(input_data_value)
@@ -306,7 +308,7 @@ class InputManager:
         maximum_length = variable_to_check.get("maximum_length")
         if minimum_length is not None and maximum_length is not None:
             is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                variable_to_check["maximum_length"]
+                              variable_to_check["maximum_length"]
             warning_string = f"String out length range [{minimum_length}, {maximum_length}]."
         elif minimum_length is not None:
             is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value)
@@ -339,7 +341,7 @@ class InputManager:
                 return is_valid_string
         if is_minimum_length and is_maximum_length:
             is_valid_string = variable_to_check["minimum_length"] <= len(input_data_value) <= \
-                variable_to_check["maximum_length"]
+                              variable_to_check["maximum_length"]
             if not is_valid_string:
                 om.add_warning("String out length range.", f"{var_name=}", info_map)
                 return is_valid_string
@@ -363,20 +365,26 @@ class InputManager:
 
         Parameters
         ----------
-        variable_path : List[str]
-            The path to reach the variable of interest.
+        module_key : str
+            The module where data of interest belongs to.
+
+        property_map_key: str
+            The metadata properties section keyword for the data of interest.
+
+        element_hierarchy: List[str]
+            A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
 
         Returns
         -------
         bool
-            True if the data is fixed, False for critical data.
+            True if the data is fixed, False if there is no default value found.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._fix_data.__name__,
                     }
 
         variable_metadata: Dict = reduce(lambda d, key: d[key], element_hierarchy,
-                                   self.__metadata['properties'][property_map_key])
+                                         self.__metadata['properties'][property_map_key])
         if 'default' in variable_metadata.keys():
             variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                      self.__pool[module_key])
