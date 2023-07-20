@@ -113,14 +113,11 @@ def test_aneerobic_coefficient(
 ) -> None:
     """Tests _aneerobic_coefficient() in gas_emissions.py."""
     if should_throw:
-        try:
+        with pytest.raises(ValueError):
             GasEmissions._anaerobic_coefficient(
                 oxygen_mole_fraction=oxygen_mole_fraction,
                 oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
             )
-        except ValueError:
-            return
-        assert False
     else:
         expected = (
             (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction))
