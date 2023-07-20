@@ -140,7 +140,7 @@ class InputManager:
         ----------
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
-            If False, the process will be terminated after going through and validating the entire data.
+            If False, the process will be terminated after going through and validating the entire data, if invalid data is found.
 
         Returns
         -------
