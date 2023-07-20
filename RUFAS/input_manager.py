@@ -211,7 +211,7 @@ class InputManager:
             If true, the process will be terminated upon finding invalid data.
 
         input_data : Dict[str, Any]
-            The data from the input file.
+            A buffer dictionary that holds the input data for validation and fixing.
 
         Returns
         -------
