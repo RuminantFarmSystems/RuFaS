@@ -240,6 +240,7 @@ class InputManager:
                 if not child_status:
                     om.add_warning("Invalid nested element found", f"{element_path}", info_map)
                     false_counter += 1
+                element_hierarchy.remove(nested_key)
             is_valid = false_counter == 0
             if is_valid:
                 return True
