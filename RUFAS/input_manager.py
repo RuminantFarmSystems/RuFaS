@@ -232,7 +232,8 @@ class InputManager:
             false_counter = 0
             for nested_key in variable_to_check.keys():
                 whole_key = f"{element}.{nested_key}"
-                child_status = self._validate_element(self, whole_key, property_map_key, eager_termination)
+                child_status = self._validate_element(self, module_key, whole_key, property_map_key, input_data,
+                                                      eager_termination)
                 if eager_termination and not child_status:
                     return False
                 children_status[whole_key] = child_status
