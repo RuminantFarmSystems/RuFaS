@@ -187,9 +187,7 @@ class InputManager:
             om.add_log("Total Valid Items", f"{valid_items_counter=}", info_map)
             om.add_log("Total Checked Items", f"{total_items_counter=}", info_map)
             om.add_log("Total Invalid Critical Items", f"{invalid_critical_items_counter=}", info_map)
-            if invalid_critical_items_counter > 0:
-                return False
-            return True
+            return invalid_critical_items_counter == 0
 
     def _validate_element(self, module_key: str, element_hierarchy: List[str],
                           property_map_key: str, input_data: Dict[str, Any],
