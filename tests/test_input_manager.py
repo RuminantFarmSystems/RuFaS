@@ -258,7 +258,7 @@ def test_validate_element_string_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element1": "123-45-6789"}
-    result = mock_input_manager._validate_element("module_key", "element1", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", "element1", "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -272,7 +272,7 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element2": 123}
-    result = mock_input_manager._validate_element("module_key", "element2", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", "element2", "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -286,7 +286,7 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element3": [1, 2, 3]}
-    result = mock_input_manager._validate_element("module_key", "element3", "property_map_key1", input_data)
+    result = mock_input_manager._validate_element("module_key", "element3", "property_map_key1", input_data, True)
 
     assert result is True
 

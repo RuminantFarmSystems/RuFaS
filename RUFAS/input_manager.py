@@ -193,7 +193,7 @@ class InputManager:
 
     def _validate_element(self, module_key: str, element: str,
                           property_map_key: str, input_data: Dict[str, Any],
-                          eager_termination: bool = True, ) -> bool:
+                          eager_termination: bool) -> bool:
         """
         Perform data validation checks.
 
