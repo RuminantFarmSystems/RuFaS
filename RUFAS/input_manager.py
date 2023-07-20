@@ -140,7 +140,8 @@ class InputManager:
         ----------
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
-            If False, the process will be terminated after going through and validating the entire data.
+            If False, the process will be terminated after going through and validating the entire data,
+            if invalid data is found.
 
         Returns
         -------
@@ -173,10 +174,10 @@ class InputManager:
                 is_valid_element = self._validate_element(module_key, [element], property_map_key, data,
                                                           eager_termination)
                 if is_valid_element:
-                    if isinstance(element, dict):
+                    if isinstance(data[element], dict):
                         if module_key not in self.__pool:
                             self.__pool[module_key] = {}
-                        self.__pool[module_key].update(element)
+                        self.__pool[module_key].update(data[element])
                     valid_items_counter += 1
                 elif not is_valid_element and eager_termination:
                     invalid_critical_items_counter += 1
@@ -187,9 +188,7 @@ class InputManager:
             om.add_log("Total Valid Items", f"{valid_items_counter=}", info_map)
             om.add_log("Total Checked Items", f"{total_items_counter=}", info_map)
             om.add_log("Total Invalid Critical Items", f"{invalid_critical_items_counter=}", info_map)
-            if invalid_critical_items_counter > 0:
-                return False
-            return True
+            return invalid_critical_items_counter == 0
 
     def _validate_element(self, module_key: str, element_hierarchy: List[str],
                           property_map_key: str, input_data: Dict[str, Any],
@@ -202,17 +201,17 @@ class InputManager:
         module_key : str
             The module whose data is being validated.
 
-        element : str
-            The key of the data to validate.
+        element_hierarchy : List[str]
+            A list of strings representing the path to the data being validated.
 
         property_map_key : str
             The metadata properties section keyword for the data input file being checked.
 
-        eager_termination : bool, default=True
+        eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
         input_data : Dict[str, Any]
-            The data from the input file.
+            A buffer dictionary that holds the input data for validation and fixing.
 
         Returns
         -------
@@ -231,7 +230,7 @@ class InputManager:
             false_counter = 0
             for nested_key in variable_properties.keys():
                 element_hierarchy.append(nested_key)
-                child_status = self._validate_element(self, module_key, element_hierarchy,
+                child_status = self._validate_element(module_key, element_hierarchy,
                                                       property_map_key, input_data, eager_termination)
                 if eager_termination and not child_status:
                     return False
@@ -257,20 +256,22 @@ class InputManager:
             except KeyError as e:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
 
-            type_validation_dict = {"string":
-                                    self._validate_string_type_element(variable_properties, var_name, input_data_value),
-                                    "number":
-                                    self._validate_num_type_element(variable_properties, var_name, input_data_value),
-                                    "array":
-                                    self._validate_array_type_element(variable_properties, var_name, input_data_value),
-                                    "bool":
-                                        True}
-            is_valid = type_validation_dict.get(var_type)
+            match var_type:
+                case "string":
+                    is_valid = self._validate_string_type_element(variable_properties, var_name, input_data_value)
+                case "number":
+                    is_valid = self._validate_num_type_element(variable_properties, var_name, input_data_value)
+                case "array":
+                    is_valid = self._validate_array_type_element(variable_properties, var_name, input_data_value)
+                case "bool":
+                    is_valid = True
+                case _:
+                    is_valid = None
 
             if is_valid:
                 return True
             elif is_valid is None:
-                raise Exception("Element must be type number, array, string, or bool")
+                raise Exception(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
             else:
                 is_fixed = self._fix_data(module_key, property_map_key, element_hierarchy, input_data)
                 return is_fixed

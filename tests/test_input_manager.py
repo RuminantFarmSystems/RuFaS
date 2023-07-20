@@ -307,6 +307,25 @@ def test_validate_element_object_type(mock_input_manager: InputManager, mocker: 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
+def test_validate_element_raises_exception_with_bad_var_type(mock_input_manager: InputManager, mocker: MockerFixture,
+                                                             input_manager_original_method_states: Dict[str, Callable],
+                                                             ) -> None:
+    """Unit test for _validate_element raising an exception in file input_manager.py"""
+    module_key = "dummy_module"
+    element_hierarchy = ["element1"]
+    property_map_key = "dummy_property_map_key"
+    input_data = {"element1": {"type": "dummy_type"}}
+    eager_termination = False
+
+    # Use pytest.raises to check if the Exception is raised
+    with pytest.raises(Exception) as e:
+        mock_input_manager._validate_element(module_key, element_hierarchy, property_map_key,
+                                             input_data, eager_termination)
+        assert "Invalid type" in str(e.value)
+    
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
 @pytest.mark.parametrize(
     'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
     [
