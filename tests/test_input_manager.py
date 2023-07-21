@@ -39,7 +39,7 @@ def input_manager_original_method_states(
         "_load_metadata": mock_input_manager._load_metadata,
         "_load_data_from_json": mock_input_manager._load_data_from_json,
         "_load_data_from_csv": mock_input_manager._load_data_from_csv,
-        "_validate_data": mock_input_manager._validate_data,
+        "_validate_data_and_add_to_pool": mock_input_manager._validate_data_and_add_to_pool,
         "_validate_element": mock_input_manager._validate_element,
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
@@ -140,7 +140,7 @@ def test_start_data_processing(mock_input_manager: InputManager,
                                input_manager_original_method_states: Dict[str, Callable], ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     mock_input_manager._load_metadata = MagicMock()
-    mock_input_manager._validate_data = MagicMock(return_value=True)
+    mock_input_manager._validate_data_and_add_to_pool = MagicMock(return_value=True)
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -148,11 +148,12 @@ def test_start_data_processing(mock_input_manager: InputManager,
     mock_input_manager.start_data_processing(mock_metadata_path, eager_termination)
 
     mock_input_manager._load_metadata.assert_called_once_with(mock_metadata_path)
-    mock_input_manager._validate_data.assert_called_once_with(eager_termination)
+    mock_input_manager._validate_data_and_add_to_pool.assert_called_once_with(eager_termination)
 
     # Restore original methods
     mock_input_manager._load_metadata = input_manager_original_method_states["_load_metadata"]
-    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_data_and_add_to_pool = \
+        input_manager_original_method_states["_validate_data_and_add_to_pool"]
 
 
 @pytest.fixture
@@ -169,9 +170,9 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     }
 
 
-def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
-                             input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for valid data for function _validate_data in file input_manager.py"""
+def test_validate_data_and_add_to_pool_valid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
+                                             input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for valid data for function _validate_data_and_add_to_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
@@ -180,19 +181,21 @@ def test_validate_data_valid(mock_input_manager: InputManager, mock_metadata: Di
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._validate_data(eager_termination=True)
+            result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=True)
 
             assert result is True
             assert add_log.call_count == 3
             assert add_warning.call_count == 0
 
-    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_data_and_add_to_pool = \
+        input_manager_original_method_states["_validate_data_and_add_to_pool"]
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
-                               input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for invalid data for function _validate_data in file input_manager.py"""
+def test_validate_data_and_add_to_pool_invalid(mock_input_manager: InputManager,
+                                               mock_metadata: Dict[str, Dict[str, Any]],
+                                               input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid data for function _validate_data_and_add_to_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
@@ -201,18 +204,22 @@ def test_validate_data_invalid(mock_input_manager: InputManager, mock_metadata: 
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._validate_data(eager_termination=False)
+
+            result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=False)
             assert result is False
             assert add_log.call_count == 3
             assert add_warning.call_count == 0
 
-    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_data_and_add_to_pool = \
+        input_manager_original_method_states["_validate_data_and_add_to_pool"]
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_metadata: Dict[str, Dict[str, Any]],
-                                         input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for invalid data with eager termination for function _validate_data in file input_manager.py"""
+def test_validate_data_and_add_to_pool_eager_termination(mock_input_manager: InputManager,
+                                                         mock_metadata: Dict[str, Dict[str, Any]],
+                                                         input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid data with eager termination for function
+    _validate_data_and_add_to_pool in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata
 
     mock_input_manager._load_data_from_json = lambda _: {"element1": "value1", "element2": "value2"}
@@ -221,12 +228,14 @@ def test_validate_data_eager_termination(mock_input_manager: InputManager, mock_
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-            result = mock_input_manager._validate_data(eager_termination=True)
+
+            result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=True)
             assert result is False
             assert add_log.call_count == 0
             assert add_warning.call_count == 0
 
-    mock_input_manager._validate_data = input_manager_original_method_states["_validate_data"]
+    mock_input_manager._validate_data_and_add_to_pool = \
+        input_manager_original_method_states["_validate_data_and_add_to_pool"]
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
@@ -258,7 +267,7 @@ def test_validate_element_string_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element1": "123-45-6789"}
-    result = mock_input_manager._validate_element("module_key", ["element1"], "property_map_key1", input_data, True)
+    result = mock_input_manager._validate_element(["element1"], "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -272,7 +281,7 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element2": 123}
-    result = mock_input_manager._validate_element("module_key", ["element2"], "property_map_key1", input_data, True)
+    result = mock_input_manager._validate_element(["element2"], "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -286,7 +295,7 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element3": [1, 2, 3]}
-    result = mock_input_manager._validate_element("module_key", ["element3"], "property_map_key1", input_data, True)
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
 
     assert result is True
 
@@ -301,7 +310,7 @@ def test_validate_element_object_type(mock_input_manager: InputManager, mocker: 
     mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
     mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
     input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._validate_element("module_key", ["element4"], "property_map_key1", input_data)
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data)
 
     assert result is True
 
@@ -312,7 +321,6 @@ def test_validate_element_raises_exception_with_bad_var_type(mock_input_manager:
                                                              input_manager_original_method_states: Dict[str, Callable],
                                                              ) -> None:
     """Unit test for _validate_element raising an exception in file input_manager.py"""
-    module_key = "dummy_module"
     element_hierarchy = ["element1"]
     property_map_key = "dummy_property_map_key"
     input_data = {"element1": {"type": "dummy_type"}}
@@ -320,7 +328,7 @@ def test_validate_element_raises_exception_with_bad_var_type(mock_input_manager:
 
     # Use pytest.raises to check if the Exception is raised
     with pytest.raises(Exception) as e:
-        mock_input_manager._validate_element(module_key, element_hierarchy, property_map_key,
+        mock_input_manager._validate_element(element_hierarchy, property_map_key,
                                              input_data, eager_termination)
         assert "Invalid type" in str(e.value)
 
