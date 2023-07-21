@@ -348,32 +348,40 @@ class InputManager:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
-    def _fix_data(self, key: str, value: Any) -> bool:
+    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
+                  input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
 
         Parameters
         ----------
-        key : str
-            The key of the data to fix.
+        variable_properties : dict[str, Any]
+            The properties for the variable of interest.
 
-        value : Any
-            The value of the data to fix.
+        element_hierarchy: List[str]
+            A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+
+        input_data: dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
 
         Returns
         -------
         bool
             True if the data is fixed, False otherwise.
         """
-        # Attempt to fix the invalid data
-        # Return True if the data is fixed, False otherwise
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._fix_data.__name__,
+                    }
 
-        # TODO in fix_data fun branch
-        # where element is fixed, place this warning:
-        # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
-        # where data is not fixable:
-        # om.add_error("Data not fixable.", f"Unable to fix the invalid data: {key=}, {value=}.", info_map)
-        pass
+        if 'default' not in variable_properties.keys():
+            return False
+        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
+                                 input_data)
+        variable_parent[element_hierarchy[-1]] = variable_properties['default']
+        om.add_warning("Data fixed",
+                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+                       info_map)
+        return True
 
     def get_data(self, data_address: str) -> Optional[Any]:
         """
@@ -400,7 +408,7 @@ class InputManager:
         This will return the value of `calf_num` of the `herd` section in the `animal` module.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._fix_data.__name__,
+                    "function": self.get_data.__name__,
                     }
 
         element_hierarchy = data_address.split('.')
