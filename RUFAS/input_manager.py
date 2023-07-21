@@ -249,22 +249,19 @@ class InputManager:
             except KeyError as e:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
 
-            match var_type:
-                case "string":
-                    is_valid = self._validate_string_type_element(variable_properties, var_name, input_data_value)
-                case "number":
-                    is_valid = self._validate_num_type_element(variable_properties, var_name, input_data_value)
-                case "array":
-                    is_valid = self._validate_array_type_element(variable_properties, var_name, input_data_value)
-                case "bool":
-                    is_valid = True
-                case _:
-                    is_valid = None
+            type_validation_dict = {"string": self._validate_string_type_element,
+                                    "number": self._validate_num_type_element,
+                                    "array": self._validate_array_type_element,
+                                    "bool": self._validate_bool_type_element, }
+
+            try:
+                validity_checker = type_validation_dict[var_type]
+                is_valid = validity_checker(variable_properties, var_name, input_data_value)
+            except KeyError:
+                raise KeyError(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
 
             if is_valid:
                 return True
-            elif is_valid is None:
-                raise Exception(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 return is_fixed
