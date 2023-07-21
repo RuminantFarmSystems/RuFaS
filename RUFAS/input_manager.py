@@ -357,18 +357,15 @@ class InputManager:
 
         return is_valid_string
 
-    def _fix_data(self, module_key: str, property_map_key: str, element_hierarchy: List[str],
+    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
                   input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
 
         Parameters
         ----------
-        module_key : str
-            The module where data of interest belongs to.
-
-        property_map_key: str
-            The metadata properties section keyword for the data of interest.
+        variable_properties : dict[str, Any]
+            The properties for the variable of interest.
 
         element_hierarchy: List[str]
             A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
@@ -385,15 +382,13 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
-        variable_metadata: Dict[str, Any] = reduce(lambda d, key: d[key], element_hierarchy,
-                                                   self.__metadata['properties'][property_map_key])
-        if 'default' not in variable_metadata.keys():
+        if 'default' not in variable_properties.keys():
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
-                                 input_data[module_key])
-        variable_parent[element_hierarchy[-1]] = variable_metadata['default']
+                                 input_data)
+        variable_parent[element_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
-                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
+                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
                        info_map)
         return True
 
