@@ -384,7 +384,7 @@ class InputManager:
                     "function": self._fix_data.__name__,
                     }
 
-        variable_metadata: Dict = reduce(lambda d, key: d[key], element_hierarchy,
+        variable_metadata: Dict[str, Any] = reduce(lambda d, key: d[key], element_hierarchy,
                                          self.__metadata['properties'][property_map_key])
         if 'default' in variable_metadata.keys():
             variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
