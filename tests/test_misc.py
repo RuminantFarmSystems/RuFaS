@@ -354,8 +354,8 @@ def mock_output_manager(mocker) -> OutputManager:
         ]
     }},
      "subkey1,subkey2,subkey3,subkey4,subkey5\n\
-        1,1.0,Hello,\"[1, 2, 3]\",\"{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}\"\n\
-        2,2.0,Hi,\"[4, 5, 6]\",\"{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}\"\n",
+1,1.0,Hello,\"[1, 2, 3]\",\"{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}\"\n\
+2,2.0,Hi,\"[4, 5, 6]\",\"{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}\"\n",
      False),
 ])
 def test_dict_to_csv(
