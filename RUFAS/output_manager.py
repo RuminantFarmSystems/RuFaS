@@ -332,7 +332,12 @@ class OutputManager(object):
             self.add_error("save_dict_file_try", f"Unable to save {path} due to missing values.", info_map)
             return
 
-        df = pd.DataFrame({k: pd.Series(v['values'], dtype=object) for k, v in data_dict.items()})
+        value = data_dict[next(iter(data_dict))]
+        if isinstance(value["values"][0], dict):
+            df = pd.DataFrame(value['values'], dtype=object)
+        else:
+            df = pd.DataFrame({k: pd.Series(v['values'], dtype=object) for k, v in data_dict.items()})
+
         try:
             df.to_csv(path, index=False)
         except Exception as e:
