@@ -414,8 +414,8 @@ class InputManager:
             parent_address = str(data_address.split("." + invalid_key)[0])
 
             om.add_warning("Data not found:", f"Cannot find \"{data_address}\", "
-                                              f"\"{parent_address}\" does not have attribute \"{invalid_key}\"",
+                                              f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
                            info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
-                           f"\"{parent_address}\" does not have attribute \"{invalid_key}\"")
+                           f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
