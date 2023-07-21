@@ -4,7 +4,7 @@ File name: test_input_manager.py
 Description: Implements test cases for Input Manager
 Author(s): Niko Tomlinson, ndt2@cornell.edu
 """
-
+from functools import reduce
 import json
 from typing import Any, Callable, Dict
 from mock import MagicMock, Mock, mock_open, patch
@@ -44,6 +44,7 @@ def input_manager_original_method_states(
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
         "_validate_string_type_element": mock_input_manager._validate_string_type_element,
+        "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
     }
 
@@ -410,6 +411,545 @@ def test_validate_string_type_element(dummy_value: int,
 
 
 @pytest.fixture
+def mock_metadata_for_fix_data(mocker: MockerFixture) -> dict[str, dict[str, Any]]:
+    return {
+        "dummyconfig": {},
+        "files": {
+            "array": {
+                "properties": "array_properties"
+            },
+            "string": {
+                "properties": "string_properties"
+            },
+            "number": {
+                "properties": "number_properties"
+            },
+            "boolean": {
+                "properties": "boolean_properties"
+            },
+        },
+        "properties": {
+            "array_properties": {
+                "element1": {
+                    "type": "array",
+                    "default": [1, 2, 3, 4, 5],
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                "element2": {
+                    "type": "array",
+                    "default": [],
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                "element3": {
+                    "type": "array",
+                    "default": [1, 2, 3],
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                "element4": {
+                    "type": "object",
+                    "element5": {
+                        "type": "array",
+                        "default": [1, 2, 3],
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+                "element6": {
+                    "type": "array",
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                "element7": {
+                    "type": "array",
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                "element8": {
+                    "type": "array",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                "element9": {
+                    "type": "object",
+                    "element10": {
+                        "type": "array",
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+            },
+            "string_properties": {
+                "element1": {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element2": {
+                    "type": "str",
+                    "default": "",
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                "element3": {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                "element4": {
+                    "type": "object",
+                    "element5": {
+                        "type": "str",
+                        "default": "cow",
+                        "pattern": r"cow",
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+                "element6": {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element7": {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element8": {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                "element9": {
+                    "type": "object",
+                    "element10": {
+                        "type": "str",
+                        "pattern": r"cow",
+                        "minimum_length": 2,
+                        "maximum_length": 5,
+                    },
+                },
+            },
+            "number_properties": {
+                "element1": {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element2": {
+                    "type": "number",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element3": {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                "element4": {
+                    "type": "object",
+                    "element5": {
+                        "type": "number",
+                        "default": 5,
+                        "minimum": 0,
+                        "maximum": 10,
+                    },
+                },
+                "element6": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element7": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                "element8": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                "element9": {
+                    "type": "object",
+                    "element10": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10,
+                    },
+                },
+            },
+            "boolean_properties": {
+                "element1": {
+                    "type": "bool",
+                    "default": True
+                },
+                "element2": {
+                    "type": "bool",
+                    "default": False
+                },
+                "element3": {
+                    "type": "object",
+                    "element4": {
+                        "type": "bool",
+                        "default": True
+                    },
+                },
+                "element5": {
+                    "type": "bool",
+                },
+                "element6": {
+                    "type": "bool",
+                },
+                "element7": {
+                    "type": "object",
+                    "element8": {
+                        "type": "bool",
+                    },
+                },
+
+            },
+
+        },
+    }
+
+
+def mock_input_array_data_for_fix_data() -> dict[str, dict[str, Any]]:
+    return {
+
+        "element1": [1, 2, 3],
+        "element2": [1, 2, 3, 4, 5],
+        "element3": [],
+        "element4": {
+            "element5": [1, 2],
+        },
+        "element6": [1, 2, 3],
+        "element7": [1, 2, 3, 4, 5],
+        "element8": [],
+        "element9": {
+            "element10": [1, 2],
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count',
+    [
+        ({
+             "type": "array",
+             "default": [1, 2, 3, 4, 5],
+             "minimum_length": 5,
+             "maximum_length": 10,
+         }, ["element1"], [1, 2, 3, 4, 5], True, 1),
+
+        ({
+             "type": "array",
+             "default": [],
+             "minimum_length": 0,
+             "maximum_length": 5,
+         }, ["element2"], [], True, 1),
+
+        ({
+             "type": "array",
+             "default": [1, 2, 3, 4, 5],
+             "minimum_length": 5,
+             "maximum_length": 10,
+         }, ["element3"], [1, 2, 3, 4, 5], True, 1),
+        ({
+             "type": "array",
+             "default": [1, 2, 3],
+             "minimum_length": 2,
+             "maximum_length": 5,
+         }, ["element4", "element5"], [1, 2, 3], True, 1),
+    ]
+)
+def test_fix_array_type_fixable_data(dummy_variable_properties: dict[str, Any],
+                                     dummy_element_hierarchy: list[str],
+                                     expected_value: list, expected_result: bool, expected_warning_call_count: int,
+                                     mock_input_manager: InputManager) -> None:
+    """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = mock_input_array_data_for_fix_data()
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               dummy_input_data)
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count',
+    [
+        ({
+             "type": "array",
+             "minimum_length": 5,
+             "maximum_length": 10,
+         }, ["element6"], False, 0),
+        ({
+             "type": "array",
+             "minimum_length": 0,
+             "maximum_length": 5,
+         }, ["element7"], False, 0),
+        ({
+             "type": "array",
+             "minimum_length": 2,
+             "maximum_length": 5,
+         }, ["element8"], False, 0),
+        ({
+             "type": "array",
+             "minimum_length": 2,
+             "maximum_length": 5,
+         }, ["element9", "element10"], False, 0),
+    ]
+)
+def test_fix_array_type_critical_data(dummy_variable_properties: dict[str, Any],
+                                      dummy_element_hierarchy: list[str], expected_result: bool,
+                                      expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
+    """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = mock_input_array_data_for_fix_data()
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
+    return {
+        "element1": "muu",
+        "element2": "muumuu",
+        "element3": "",
+        "element4": {
+            "element5": "muu",
+        },
+        "element6": "muu",
+        "element7": "muumuu",
+        "element8": "",
+        "element9": {
+            "element10": "muu",
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count',
+    [
+        ({
+             "type": "str",
+             "default": "cow",
+             "pattern": r"cow",
+             "minimum_length": 1,
+             "maximum_length": 5,
+         }, ["element1"], "cow", True, 1),
+        ({
+             "type": "str",
+             "default": "",
+             "minimum_length": 0,
+             "maximum_length": 5,
+         }, ["element2"], "", True, 1),
+        ({
+             "type": "str",
+             "default": "cow",
+             "pattern": r"cow",
+             "minimum_length": 2,
+             "maximum_length": 5,
+         }, ["element3"], "cow", True, 1),
+        ({
+             "type": "str",
+             "default": "cow",
+             "pattern": r"cow",
+             "minimum_length": 2,
+             "maximum_length": 5,
+         }, ["element4", "element5"], "cow", True, 1),
+    ]
+)
+def test_fix_string_type_fixable_data(dummy_variable_properties: dict[str, Any],
+                                      dummy_element_hierarchy: list[str], expected_value: str, expected_result: bool,
+                                      expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
+    """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = mock_input_string_data_for_fix_data()
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               dummy_input_data)
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count',
+    [
+        ({
+             "type": "str",
+             "pattern": r"cow",
+             "minimum_length": 1,
+             "maximum_length": 5,
+         }, ["element6"], False, 0),
+        ({
+             "type": "str",
+             "pattern": r"cow",
+             "minimum_length": 1,
+             "maximum_length": 5,
+         }, ["element7"], False, 0),
+        ({
+             "type": "str",
+             "pattern": r"cow",
+             "minimum_length": 1,
+             "maximum_length": 5,
+         }, ["element8"], False, 0),
+        ({
+             "type": "str",
+             "pattern": r"cow",
+             "minimum_length": 2,
+             "maximum_length": 5,
+         }, ["element9", "element10"], False, 0),
+    ]
+)
+def test_fix_string_type_critical_data(dummy_variable_properties: dict[str, Any],
+                                       dummy_element_hierarchy: list[str], expected_result: bool,
+                                       expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
+    """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = mock_input_string_data_for_fix_data()
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties,
+                                              dummy_element_hierarchy, dummy_input_data)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+def mock_input_number_data_for_fix_data() -> dict[str, dict[str, Any]]:
+    return {
+        "element1": -1,
+        "element2": -1,
+        "element3": 0,
+        "element4": {
+            "element5": 15,
+        },
+        "element6": -1,
+        "element7": -1,
+        "element8": 0,
+        "element9": {
+            "element10": 15,
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count',
+    [
+        ({
+             "type": "number",
+             "default": 5,
+             "minimum": 0,
+             "maximum": 10,
+         }, ["element1"], 5, True, 1),
+        ({
+             "type": "number",
+             "default": 0,
+             "minimum": 0,
+             "maximum": 10,
+         }, ["element2"], 0, True, 1),
+        ({
+             "type": "number",
+             "default": 5,
+             "minimum": 1,
+             "maximum": 10,
+         }, ["element3"], 5, True, 1),
+        ({
+             "type": "number",
+             "default": 5,
+             "minimum": 0,
+             "maximum": 10,
+         }, ["element4", "element5"], 5, True, 1),
+    ]
+)
+def test_fix_number_type_fixable_data(dummy_variable_properties: dict[str, Any],
+                                      dummy_element_hierarchy: list[str],
+                                      expected_value: str, expected_result: bool, expected_warning_call_count: int,
+                                      mock_input_manager: InputManager) -> None:
+    """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = mock_input_number_data_for_fix_data()
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+
+    variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                               dummy_input_data)
+    assert variable_to_check == expected_value
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_variable_properties, dummy_element_hierarchy, expected_result, '
+    'expected_warning_call_count',
+    [
+        ({
+             "type": "number",
+             "minimum": 0,
+             "maximum": 10,
+         }, ["element6"], False, 0),
+        ({
+             "type": "number",
+             "minimum": 0,
+             "maximum": 10,
+         }, ["element7"], False, 0),
+        ({
+             "type": "number",
+             "minimum": 1,
+             "maximum": 10,
+         }, ["element8"], False, 0),
+        ({
+             "type": "number",
+             "minimum": 0,
+             "maximum": 10,
+         }, ["element9", "element10"], False, 0),
+    ]
+)
+def test_fix_number_type_critical_data(dummy_variable_properties: dict[str, Any],
+                                       dummy_element_hierarchy: list[str], expected_result: bool,
+                                       expected_warning_call_count: int, mock_input_manager: InputManager,
+                                       mock_metadata_for_fix_data: Dict[str, Dict[str, Any]]) -> None:
+    """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = mock_input_number_data_for_fix_data()
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties,
+                                              dummy_element_hierarchy, dummy_input_data)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.fixture
 def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
         "module1": {
@@ -466,6 +1006,7 @@ def test_get_data_with_valid_key(dummy_data_path: str,
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
+
 
 @pytest.mark.parametrize(
     'dummy_data_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count',
