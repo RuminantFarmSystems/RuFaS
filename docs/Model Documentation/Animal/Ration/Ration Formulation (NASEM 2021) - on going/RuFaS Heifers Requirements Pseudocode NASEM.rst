@@ -349,7 +349,7 @@ Maintenance requirement
 
       DMI = Dry matter intake, kg/d
 
-   :math:`\mathbf{NPMFP = CPMFP * 073}` [B.Heifer.B.6]
+   :math:`\mathbf{NPMFP = CPMFP * 0.73}` [B.Heifer.B.6]
 
       NPMFP = Net protein requirement for metabolic fecal protein in grams
       per day. There is an assumption: 73 percent of true protein (TP) in MFP.
