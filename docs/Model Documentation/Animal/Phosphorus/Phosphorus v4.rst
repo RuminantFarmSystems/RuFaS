@@ -221,16 +221,15 @@ B. **Phosphorus requirements for the animal**
    Amount of P required by the heifer or cow for growth of a fetus
    (g/d).
 
-[A.1C-F.E.4]
-+---------------------------------------------------------+------------+
-| :math:`P\_ gest = \left. \ (0.00002743 \times e^{ |  |
-| \left( \left( 0.05527 - 0.000075 \times gest\text{\_}da |            |
-| y \right) \times gest\text{\_}day \right)} - 0.00002743 |            |
-|  \times e^{\left( \left( 0.05527 - 0.000075 \times \lef |            |
-| t( gest\text{\_}day - 1 \right) \right) \times \left( g |            |
-| est\text{\_}day - 1 \right) \right)}) \right.\  \times  |            |
-| 1000\frac{g}{kg}\ \ if\ gestation\ day\  \geq 190\ days `    
-+---------------------------------------------------------+------------+
+
++--------------------+--------------------------------------+--------------+
+| :math:`P\_ gest =` | :math:`(0.00002743 * e^{(( 0.05527   | [A.1C-F.E.4] |
+|                    | - 0.000075 * gest\_ day) * gest\_ da |              |
+|                    | y)} - 0.00002743 * e^{(( 0.05527 - 0 |              |
+|                    | .000075 * (gest\_ day - 1)) * (gest\ |              |
+|                    | _ day - 1))}) * 1000 \frac{g}{kg}\ if|              |
+|                    | \ gestation\ day\ \geq 190\ days`    |              |
++--------------------+--------------------------------------+--------------+
 
 ..
 
@@ -244,10 +243,9 @@ B. **Phosphorus requirements for the animal**
 
    Calculation of the daily amount of P in milk from a cow (g/d).
 
-+------------------------------------------------------------+---------+
-| :math:`P\text{\_}m                                         | [A.     |
-| ilk = 0.0009 \times milk\text{\_}\ prod \times 1000\ g/kg` | 1E.E.5] |
-+------------------------------------------------------------+---------+
++------------------------------------------------------------+------------+
+| :math:`P\_ milk = 0.0009 * milk\_ prod * 1000 \frac{g}{kg}`| [A.1E.E.5] |
++------------------------------------------------------------+------------+
 
 ..
 
@@ -263,8 +261,10 @@ B. **Phosphorus requirements for the animal**
 
    The absorbed P requirement is the sum of P requirements (g/d).
 
-   :math:`P\text{\_}absorb = P\text{\_}urine + P\text{\_}maint\text{\_}feces + P\text{\_}growth + P\text{\_}gest + P\text{\_}milk`
-   [A.1A-F.E.6]
++----------------------------------------------------------------+------------+
+| :math:`P\_ absorb = P\_ urine + P\_ maint\_ feces + P\_ growth |[A.1A-F.E.6]|
+| + P\_ gest + P\_ milk`                                         |            |
++----------------------------------------------------------------+------------+
 
    P absorb = absorbed P required by the animal (g)
 
@@ -286,18 +286,16 @@ B. **Phosphorus requirements for the animal**
    absorption coefficient for lactating cows is calculated from a
    regression equation of 20 studies (r\ :sup:`2` = 0.7) (NRC, 2001).
 
-+----------------------------------------------------------+-----------+
-|:math:``                                               | [A.       |
-|                                                          | 1A-F.E.7] |
-|    P\text{\_}req = \left\{ \begin{matrix}                |           |
-|    \frac{P\text{\_}absorb}{0.90}\ if\ class = calf \\    |           |
-|    \frac{P\                                              |           |
-| text{\_}absorb}{0.664}\ if\ class = heifer,\ dry\ cow \\ |           |
-|    \frac{P\text{\_}absor                                 |           |
-| b}{1.86696 - 5.01238 \times P\text{\_}conc + 5.12286 \ti |           |
-| mes {P\text{\_}conc}^{2}}\ if\ class = lactating\ cow \\ |           |
-|    \end{matrix} \right.\                                 |           |
-+----------------------------------------------------------+-----------+
++------------------+---------------------------------------------------+--------------+
+|:math:`P\_ req =` | :math:`\frac{P\_ absorb}{0.90}\ if\ class = calf` | [A.1A-F.E.7] |
++------------------+---------------------------------------------------+--------------+
+|                  | :math:`\frac{P\_ absorb}{0.664}\ if\ class = heif |              |
+|                  | er,\ dry\ cow`                                    |              |
++------------------+---------------------------------------------------+--------------+
+|                  | :math:`\frac{P\_ absorb}{1.86696 - 5.01238 * P\_  |              |
+|                  | conc + 5.12286 * P\_ conc^{2}}\ if\ class =       |              |
+|                  | lactating\ cow`                                   |              |
++------------------+---------------------------------------------------+--------------+
 
 ..
 
@@ -322,10 +320,9 @@ C. **Phosphorus excreted by the animal**
 
    Phosphorus in urine
 
-+--------------------------------------------------------------+-------+
-| :math:`P\_ urine = 0.000002 \times bw \times 1000\ g/kg\ `   | [A.1G |
-|                                                              | .B.1] |
-+--------------------------------------------------------------+-------+
++--------------------------------------------------------------+-----------+
+| :math:`P\_ urine = 0.000002 \times bw \times 1000\ g/kg\ `   | [A.1G.B.1]|
++--------------------------------------------------------------+-----------+
 
 ..
 
@@ -347,10 +344,9 @@ C. **Phosphorus excreted by the animal**
    If dietary P intake is greater than the animal requirements, then
    there is excess P in the diet.
 
-+--------------------------------------------------------------+-------+
-| :math:`P\text{\_}excess = P\text{\_}intake - P\text{\_}req`  | [A.1G |
-|                                                              | .A.1] |
-+--------------------------------------------------------------+-------+
++--------------------------------------------+------------+
+| :math:`P\_ excess = P\_ intake - P\_ req`  | [A.1G.A.1] |
++--------------------------------------------+------------+
 
 ..
 
@@ -365,20 +361,18 @@ C. **Phosphorus excreted by the animal**
    P intake. Efficiency of P absorption for bone development is 0.7 (Wan
    Zahari et al., 1994).
 
-+------------------------------------------------------------+---------+
-| :math:`P\text{\_}feces\_ excrt = \left\{ \begin{matrix}    | [A.     |
-| P\text{\_}intake - P\text{\_}req + P\text{\_}maint         | 1G.B.2] |
-| \text{\_}feces\ if\ dP\text{\_}{reserves}_{n - 1} = 0\  \\ |         |
-| and\ P\text{\_}intake\  \geq P\text{\_}req \\              |         |
-| P\text{\_}intake - P\text{\_}req +                         |         |
-| P\text{\_}maint\text{\_}feces + \frac{dP\text{\_}{reserves |         |
-| }_{n - 1}}{0.7}\ if\ dP\text{\_}{reserves}_{n - 1} < 0, \\ |         |
-| P\text{\_}inta                                             |         |
-| ke\  \geq P\text{\_}req,\ and\ P\text{\_}excess\  \geq \ \ |         |
-| frac{- 1\  \times \ dP\text{\_}{reserves}_{n - 1}}{0.7} \\ |         |
-| P\text{\_}maint\text{\_}feces\ otherwise \\                |         |
-| \end{matrix} \right.\ `                                    |         |
-+------------------------------------------------------------+---------+
++------------------------------------------------------------+----------+
+| :math:`P\_ feces\_ excrt = \left\{ \begin{matrix}          |[A.1G.B.2]|
+| P\_ intake - P\_ req + P\_ maint\_ feces\ if\ dP\_ reserve |          |
+| s_{n - 1} = 0\  \\                                         |          |
+| and\ P\_ intake\  \geq P\_ req \\                          |          |
+| P\_ intake - P\_ req + P\_ maint\_ feces + \frac{dP\_ rese |          |
+| rves_{n - 1}}{0.7}\ if\ dP\_ reserves_{n - 1} < 0, \\      |          |
+| P\_ intake\  \geq P\_ req,\ and\ P\_ excess\  \geq \ \     |          |
+| frac{- 1\ * dP\_ reserves_{n - 1}}{0.7} \\                 |          |
+| P\_ maint\_ feces\ otherwise \\                            |          |
+| \end{matrix} \right.\ `                                    |          |
++------------------------------------------------------------+----------+
 
 ..
 
@@ -406,11 +400,10 @@ C. **Phosphorus excreted by the animal**
 
    Total phosphorus fraction of feces.
 
-+-----------------------------------------------------+----------------+
-| :math:`` P\tex                                     | [A.3.A.1]      |
-| t{\_}frac = \frac{P\text{\_}feces\text{\_}excrt + \ |                |
-|  P\text{\_}urine}{total\text{\_}manure \times 1000} |                |
-+-----------------------------------------------------+----------------+
+
++-------------------------------------------------------------------------------+-----------+
+| :math:`P\_ frac = \frac{P\_ feces\_ excrt + P\_ urine}{total\_ manure * 1000}`| [A.3.A.1] | 
++-------------------------------------------------------------------------------+-----------+
 
 ..
 
@@ -424,11 +417,10 @@ C. **Phosphorus excreted by the animal**
 
    Water extractable inorganic P.
 
-+-----------------------------------------------------+----------------+
-| :math:`` WIP\text{\_}frac =                        | [A.3.A.2]      |
-| 0.50 \times \frac{P\text{\_}feces\text{\_}excrt + \ |                |
-|  P\text{\_}urine}{total\text{\_}manure \times 1000} |                |
-+-----------------------------------------------------+----------------+
++------------------------------------------------------+-----------+
+| :math:`WIP\_ frac = 0.50 * \frac{P\_ feces\_ excrt + | [A.3.A.2] |
+| P\_ urine}{total\_ manure * 1000}`                   |           |
++------------------------------------------------------+-----------+
 
 ..
 
@@ -443,11 +435,10 @@ C. **Phosphorus excreted by the animal**
 
    Water extractable organic P.
 
-+--------------------------------------------------------------+-------+
-| :math:`` W                                                  | [A.3  |
-| OP\text{\_}frac = 0.05 \times \frac{P\text{\_}feces\text{\_} | .A.3] |
-| excrt + \ P\text{\_}urine}{total\text{\_}manure \times 1000} |       |
-+--------------------------------------------------------------+-------+
++--------------------------------------------------------------+---------+
+| :math:`WOP\_ frac = 0.05 * \frac{P\_ feces\_ excrt + P\_ uri |[A.3.A.3]|
+| ne} {total\_ manure * 1000}`                                 |         |
++--------------------------------------------------------------+---------+
 
 ..
 
@@ -469,10 +460,9 @@ C. **Phosphorus excreted by the animal**
    Calculation of the daily amount of P in milk from a cow (g/d) (NRC,
    2001).
 
-+------------------------------------------------------------+---------+
-| :math:`P\text{\_}m                                         | [A.     |
-| ilk = 0.0009 \times milk\text{\_}\ prod \times 1000\ g/kg` | 3E.B.1] |
-+------------------------------------------------------------+---------+
++-------------------------------------------------------+------------+
+| :math:`P\_ milk = 0.0009 * milk\_ prod * 1000\ g/kg`  | [A.3E.B.1] |
++-------------------------------------------------------+------------+
 
 ..
 
@@ -484,10 +474,9 @@ C. **Phosphorus excreted by the animal**
 
    Manure P excreted by a cow (g/d).
 
-+------------------------------------------------------------+---------+
-| :math:`P\text{\_}excrt\text{\_                             | [A      |
-| }manure = P\text{\_}feces\text{\_}excrt + P\text{\_}urine` | .3.B.2] |
-+------------------------------------------------------------+---------+
++------------------------------------------------------------+----------+
+| :math:`P\_ excrt\_ manure = P\_ feces\_ excrt + P\_ urine` | [A.3.B.2]|
++------------------------------------------------------------+----------+
 
 ..
 
@@ -501,10 +490,9 @@ C. **Phosphorus excreted by the animal**
 
    P excreted by a cow (g/d).
 
-+------------------------------------------------------------+---------+
-| :math:`P\text{\_}excrt = P\text{                           | [A      |
-| \_}milk + P\text{\_}feces\text{\_}excrt + P\text{\_}urine` | .3.B.3] |
-+------------------------------------------------------------+---------+
++------------------------------------------------------------+-----------+
+|:math:`P\_ excrt = P\_ milk + P\_ feces\_ excrt + P\_ urine`| [A.3.B.3] |
++------------------------------------------------------------+-----------+
 
 ..
 
@@ -530,10 +518,9 @@ D. **Phosphorus in the animal**
    If dietary P intake is greater than the animal requirements, then
    there is excess P in the diet.
 
-+--------------------------------------------------------------+-------+
-| :math:`P\text{\_}excess = P\text{\_}intake - P\text{\_}req`  | [A.1G |
-|                                                              | .A.1] |
-+--------------------------------------------------------------+-------+
++--------------------------------------------+------------+
+| :math:`P\_ excess = P\_ intake - P\_ req`  | [A.1G.A.1] |
++--------------------------------------------+------------+
 
 ..
 
@@ -547,17 +534,14 @@ D. **Phosphorus in the animal**
    from it’s body to meet requirements. The change in P reserves is
    calculated daily.
 
-+--------------------------------------------------------------+-------+
-| :math:`dP\text{\_}reserves = \left\{ \begin{matrix}          | [A.1G |
-| P\text{\_}intake - P\text{\_}req + dP\text{\_                | .A.2] |
-| }{reserves}_{n - 1}\ if\ P\text{\_}intake < P\text{\_}req \\ |       |
-| 0.7 \times P\text{\_}ex                                      |       |
-| cess + dP\text{\_}{reserves}_{n - 1}\ if\ P\text{\_}intake \ |       |
-| geq P\text{\_}req\ and\ dP\text{\_}{reserves}_{n - 1} < 0 \\ |       |
-| 0\ if\ P\text{\_}intake \                                    |       |
-| geq P\text{\_}req\ and\ dP\text{\_}{reserves}_{n - 1} = 0 \\ |       |
-| \end{matrix} \right.\ `                                      |       |
-+--------------------------------------------------------------+-------+
++--------------------------------------------------------+------------+
+| :math:`dP\_ reserves = \left\{ \begin{matrix}          | [A.1G.A.2] |
+| P\_ intake - P\_ req + dP\_ reserves_{n - 1}\ if\ P\_i |            |
+| ntake < P\_ req \\ 0.7 * P\_ excess = dp\_ reserv      |            |
+| es_{n - 1}\ if\ P\_ intake \geq P\_ req\ and\ dP\_ res |            |
+| erves_{n - 1} < 0 \\  0 if\ P\_ intake \geq P\_ req\ an|            |
+| d\ dP\_ reserves_{n - 1} = 0 \\ \end{matrix} \right.\ `|            |
++--------------------------------------------------------+------------+
 
 ..
 
@@ -572,10 +556,10 @@ D. **Phosphorus in the animal**
 
    P excess = excess P in the diet (g)
 
-+------------------------------------------------------------+---------+
-| :math:`P\text{\_}animal = P\text{\_}animal_{n - 1}         | [A.     |
-| + P\text{\_}gest + P\text{\_}growth + dP\text{\_}reserves` | 1G.A.3] |
-+------------------------------------------------------------+---------+
++-----------------------------------------------------+------------+
+| :math:`P\_ animal = P\_ animal_{n - 1} + P\_ gest + | [A.1G.A.3] |
+| P\_ growth + dP\_ reserves`                         |            |
++-----------------------------------------------------+------------+
 
 ..
 
@@ -593,11 +577,10 @@ D. **Phosphorus in the animal**
    subtracted from the animal value. The sum of P absorbed for gestation
    is equal to the initial animal P value for the calf.
 
-+--------------------------------------------------------------+-------+
-| :m                                                           | [A.1G |
-| ath:`P\text{\_}animal = P\text{\_}animal_{n - 1} - \sum_{i}^ | .A.4] |
-| {}{P\text{\_}gest} + P\text{\_}growth + dP\text{\_}reserves` |       |
-+--------------------------------------------------------------+-------+
++---------------------------------------------------+-----------+
+| :math:`P\_ animal = P\_ animal_{n - 1} - \sum_{i} |[A.1G.A.4] |
+| P\_ gest + P\_ growth + dP\_ reserves`            |           |
++---------------------------------------------------+-----------+
 
 ..
 
@@ -618,15 +601,12 @@ D. **Phosphorus in the animal**
    Based on the amount of P used for fetal growth or a value for
    purchased animals (Williams, 1978).
 
-+-----------------------------------------------------------+----------+
-| :math:`                                                   | [A       |
-| P\text{\_}animal\text{\_}initial = \left\{ \begin{matrix} | .1G.C.1] |
-| \sum_{i}^{}{P_{gest_{i}}\                                 |          |
-|  \ \ \ \ \ \ \ \ \ \ \ if\ calved\ during\ simulation} \\ |          |
-| 0.0072\  \t                                               |          |
-| imes bw\  \times 1000\ g/kg\ \ \ \ \ \ \ if\ purchased \\ |          |
-| \end{matrix} \right.\ `                                   |          |
-+-----------------------------------------------------------+----------+
++----------------------------------------------------------+----------+
+| :math:`P\_ animal\_ initial = \left\{ \begin{matrix}     |[A.1G.C.1]|
+| \sum_{i} P_{gest_{i}}\ if\ calved\ during\ simulation \\ |          |
+| 0.0072\ * bw\ * 1000\ g/kg\ if\ purchased \\             |          |
+| \end{matrix} \right.\ `                                  |          |
++----------------------------------------------------------+----------+
 
 ..
 
@@ -638,7 +618,7 @@ D. **Phosphorus in the animal**
 
    bw = animal body weight (kg)
 
-.. image:: vertopal_6ef2940ef0114ea0a3740f24e794556b/media/image1.jpg
+.. image:: media/image1.jpg
    :alt: A close up of a map Description automatically generated
    :width: 6.5in
    :height: 3.86875in
