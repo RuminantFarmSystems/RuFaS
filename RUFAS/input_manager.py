@@ -45,10 +45,10 @@ class InputManager:
         Returns
         -------
         bool
-            Flag indicating whether input data is valid.
+            True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        is_input_data_valid = self._validate_data(eager_termination)
+        is_input_data_valid = self._validate_data_and_add_to_pool(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -133,7 +133,7 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _validate_data(self, eager_termination: bool) -> bool:
+    def _validate_data_and_add_to_pool(self, eager_termination: bool) -> bool:
         """
         Validates data from input files and adds data to pool if valid.
 
@@ -150,29 +150,29 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_data.__name__,
+                    "function": self._validate_data_and_add_to_pool.__name__,
                     }
         valid_items_counter = 0
         invalid_critical_items_counter = 0
         total_items_counter = 0
 
-        for module_key, details in self.__metadata["files"].items():
-            file_path = details["path"]
-            if details["type"] == "json":
+        for file_blob_key, file_details in self.__metadata["files"].items():
+            file_path = file_details["path"]
+            if file_details["type"] == "json":
                 data = self._load_data_from_json(file_path)
-            elif details["type"] == "csv":
+            elif file_details["type"] == "csv":
                 data = self._load_data_from_csv(file_path)
             else:
                 om.add_warning("InputManager load data file is not csv/json",
-                               f"{module_key} data must be available in either csv or json file type.",
+                               f"{file_blob_key} data must be available in either csv or json file type.",
                                info_map)
                 continue
 
-            property_map_key = details["properties"]
-            module_properties = self.__metadata["properties"][property_map_key]
-            for element in module_properties.keys():
+            properties_blob_key = file_details["properties"]
+            properties = self.__metadata["properties"][properties_blob_key]
+            for property in properties.keys():
                 total_items_counter += 1
-                is_valid_element = self._validate_element(module_key, [element], property_map_key, data,
+                is_valid_element = self._validate_element([property], properties_blob_key, data,
                                                           eager_termination)
                 if is_valid_element:
                     valid_items_counter += 1
@@ -182,28 +182,24 @@ class InputManager:
                 else:
                     invalid_critical_items_counter += 1
             if invalid_critical_items_counter == 0:
-                self.__pool[module_key] = data
+                self.__pool[file_blob_key] = data
 
         om.add_log("Total Valid Items", f"{valid_items_counter=}", info_map)
         om.add_log("Total Checked Items", f"{total_items_counter=}", info_map)
         om.add_log("Total Invalid Critical Items", f"{invalid_critical_items_counter=}", info_map)
         return invalid_critical_items_counter == 0
 
-    def _validate_element(self, module_key: str, element_hierarchy: List[str],
-                          property_map_key: str, input_data: Dict[str, Any],
-                          eager_termination: bool) -> bool:
+    def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
+                          input_data: Dict[str, Any], eager_termination: bool) -> bool:
         """
         Perform data validation checks.
 
         Parameters
         ----------
-        module_key : str
-            The module whose data is being validated.
-
         element_hierarchy : List[str]
             A list of strings representing the path to the data being validated.
 
-        property_map_key : str
+        properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
 
         eager_termination : bool
@@ -221,7 +217,7 @@ class InputManager:
                     "function": self._validate_element.__name__,
                     }
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
-                                     self.__metadata["properties"][property_map_key])
+                                     self.__metadata["properties"][properties_blob_key])
         var_type = variable_properties["type"]
         is_nested = var_type == "object"
         if is_nested:
@@ -229,8 +225,8 @@ class InputManager:
             false_counter = 0
             for nested_key in variable_properties.keys():
                 element_hierarchy.append(nested_key)
-                child_status = self._validate_element(module_key, element_hierarchy,
-                                                      property_map_key, input_data, eager_termination)
+                child_status = self._validate_element(element_hierarchy, properties_blob_key,
+                                                      input_data, eager_termination)
                 if eager_termination and not child_status:
                     return False
                 element_path = ".".join(element_hierarchy)
@@ -272,7 +268,7 @@ class InputManager:
             elif is_valid is None:
                 raise Exception(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
             else:
-                is_fixed = self._fix_data(module_key, property_map_key, element_hierarchy, input_data)
+                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 return is_fixed
 
     def _validate_array_type_element(self, variable_properties: Dict[str, Any], var_name: str,
@@ -284,19 +280,17 @@ class InputManager:
         maximum_length = variable_properties.get("maximum_length")
         minimum_length = variable_properties.get("minimum_length")
         is_in_range = True
-        if maximum_length is not None and minimum_length is not None:
-            is_in_range = variable_properties["minimum_length"] <= len(input_data_value) <= \
-                variable_properties["maximum_length"]
-            warning_string = f"Array length not in range[{minimum_length}, {maximum_length}]"
-        elif minimum_length is not None:
+        if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
-            warning_string = f"Array length less than {minimum_length}."
-        elif maximum_length is not None:
+            if not is_in_range:
+                warning_string = f"Array length less than {minimum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return is_in_range
+        if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
-            warning_string = f"Array length more than {maximum_length}."
-
-        if not is_in_range:
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            if not is_in_range:
+                warning_string = f"Array length more than {maximum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
 
         return is_in_range
 
@@ -309,18 +303,17 @@ class InputManager:
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
         is_in_range = True
-        if minimum_value is not None and maximum_value is not None:
-            is_in_range = minimum_value <= input_data_value <= maximum_value
-            warning_string = f"Value not in range [{minimum_value}, {maximum_value}]."
-        elif minimum_value is not None:
+        if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
-            warning_string = f"Value less than {minimum_value}."
-        elif maximum_value is not None:
+            if not is_in_range:
+                warning_string = f"Value less than {minimum_value}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return is_in_range
+        if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
-            warning_string = f"Value greater than {maximum_value}."
-
-        if not is_in_range:
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            if not is_in_range:
+                warning_string = f"Value greater than {maximum_value}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
 
         return is_in_range
 
@@ -334,28 +327,31 @@ class InputManager:
         is_valid_string = True
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
-            warning_string = f"String variable must match pattern {variable_properties['pattern']}."
             if not is_valid_string:
+                warning_string = f"String variable must match pattern {variable_properties['pattern']}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return is_valid_string
 
         minimum_length = variable_properties.get("minimum_length")
         maximum_length = variable_properties.get("maximum_length")
-        if minimum_length is not None and maximum_length is not None:
-            is_valid_string = variable_properties["minimum_length"] <= len(input_data_value) <= \
-                variable_properties["maximum_length"]
-            warning_string = f"String out of length range [{minimum_length}, {maximum_length}]."
-        elif minimum_length is not None:
+        if minimum_length is not None:
             is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
-            warning_string = f"String length less than {minimum_length}."
-        elif maximum_length is not None:
+            if not is_valid_string:
+                warning_string = f"String length less than {minimum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return is_valid_string
+        if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
-            warning_string = f"String length more than {maximum_length}."
-
-        if not is_valid_string:
-            om.add_warning(warning_string, f"{var_name=}", info_map)
+            if not is_valid_string:
+                warning_string = f"String length more than {maximum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
 
         return is_valid_string
+
+    def _validate_bool_type_element(self, variable_properties: Dict[str, Any], var_name: str,
+                                    input_data_value: bool) -> bool:
+        """Validates an input data bool element."""
+        return input_data_value in (True, False)
 
     def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
                   input_data: dict[str, Any]) -> bool:
