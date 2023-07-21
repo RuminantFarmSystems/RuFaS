@@ -158,15 +158,13 @@ class InputManager:
 
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
-            if file_details["type"] == "json":
-                data = self._load_data_from_json(file_path)
-            elif file_details["type"] == "csv":
-                data = self._load_data_from_csv(file_path)
-            else:
-                om.add_warning("InputManager load data file is not csv/json",
-                               f"{file_blob_key} data must be available in either csv or json file type.",
-                               info_map)
-                continue
+            data_type_to_loader_map = {"json": self._load_data_from_json,
+                                       "csv": self._load_data_from_csv}
+            try:
+                data_loader = data_type_to_loader_map[file_details["type"]]
+                data = data_loader(file_path)
+            except KeyError:
+                raise KeyError(f"Faulty data type in {file_blob_key}, only CSV and JSON are supported.")
 
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
@@ -251,22 +249,19 @@ class InputManager:
             except KeyError as e:
                 raise KeyError(f"Key {var_name} not found in pool: {e}")
 
-            match var_type:
-                case "string":
-                    is_valid = self._validate_string_type_element(variable_properties, var_name, input_data_value)
-                case "number":
-                    is_valid = self._validate_num_type_element(variable_properties, var_name, input_data_value)
-                case "array":
-                    is_valid = self._validate_array_type_element(variable_properties, var_name, input_data_value)
-                case "bool":
-                    is_valid = True
-                case _:
-                    is_valid = None
+            type_validation_dict = {"string": self._validate_string_type_element,
+                                    "number": self._validate_num_type_element,
+                                    "array": self._validate_array_type_element,
+                                    "bool": self._validate_bool_type_element, }
+
+            try:
+                validity_checker = type_validation_dict[var_type]
+                is_valid = validity_checker(variable_properties, var_name, input_data_value)
+            except KeyError:
+                raise KeyError(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
 
             if is_valid:
                 return True
-            elif is_valid is None:
-                raise Exception(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 return is_fixed
