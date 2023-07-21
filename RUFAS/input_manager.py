@@ -6,7 +6,8 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+
 
 om = OutputManager()
 
@@ -382,3 +383,49 @@ class InputManager:
         # where data is not fixable:
         # om.add_error("Data not fixable.", f"Unable to fix the invalid data: {key=}, {value=}.", info_map)
         pass
+
+    def get_data(self, data_address: str) -> Optional[Any]:
+        """
+        Get the requested data from the pool
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested data.
+
+        Returns
+        -------
+        Any
+            The requested data if found.
+
+        Raises
+        -------
+        KeyError
+            If the requested data is not found.
+
+        Examples
+        -------
+        >>> InputManager.get_data('animal.herd.calf_num')
+        This will return the value of `calf_num` of the `herd` section in the `animal` module.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._fix_data.__name__,
+                    }
+
+        element_hierarchy = data_address.split('.')
+
+        try:
+            data_value = reduce(lambda d, key: d[key], element_hierarchy,
+                                self.__pool)
+            return data_value
+
+        except KeyError as key_error:
+            invalid_key = str(key_error).strip("\'")
+            parent_address = str(data_address.split("." + invalid_key)[0])
+
+            om.add_warning("Data not found:", f"Cannot find \"{data_address}\", "
+                                              f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                           info_map)
+
+            raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
+                           f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
