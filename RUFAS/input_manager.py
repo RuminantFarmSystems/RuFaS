@@ -386,7 +386,15 @@ class InputManager:
 
         variable_metadata: Dict[str, Any] = reduce(lambda d, key: d[key], element_hierarchy,
                                          self.__metadata['properties'][property_map_key])
-        if 'default' in variable_metadata.keys():
+        if 'default' not in variable_metadata.keys():
+            return False
+        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
+                                     input_data[module_key])
+        variable_parent[element_hierarchy[-1]] = variable_metadata['default']
+        om.add_warning("Data fixed",
+                           f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
+                           info_map)
+        return True
             variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
                                      input_data[module_key])
             variable_parent[element_hierarchy[-1]] = variable_metadata['default']
