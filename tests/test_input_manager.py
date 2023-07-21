@@ -239,6 +239,26 @@ def test_validate_data_and_add_to_pool_eager_termination(mock_input_manager: Inp
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
+def test_validate_data_and_add_to_pool_raises_keyerror(mock_input_manager: InputManager,
+                                                       input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid data file type for function _validate_data_and_add_to_pool in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = {"files": {"dummy_file_key": {"type": "invalid_data_type",
+                                                                               "path": "/path/to/your/file",
+                                                                               "properties": "some_properties_key"}}}
+
+    with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            with pytest.raises(KeyError):
+                mock_input_manager._validate_data_and_add_to_pool(eager_termination=True)
+
+                assert add_log.call_count == 0
+                assert add_warning.call_count == 0
+
+    mock_input_manager._validate_data_and_add_to_pool = \
+        input_manager_original_method_states["_validate_data_and_add_to_pool"]
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
 @pytest.fixture
 def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
     return {
@@ -317,9 +337,10 @@ def test_validate_element_object_type(mock_input_manager: InputManager, mocker: 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: InputManager, mocker: MockerFixture,
+def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: InputManager,
                                                            input_manager_original_method_states: Dict[str, Callable],
                                                            ) -> None:
+    """Unit test for keyerror raised for invalid var name for _validate_element in file input_manager.py"""
     element_hierarchy = ["valid_key", "invalid_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
@@ -334,6 +355,7 @@ def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: I
 def test_validate_element_invalid_var_type_raises_keyerror(mock_input_manager: InputManager, mocker: MockerFixture,
                                                            input_manager_original_method_states: Dict[str, Callable],
                                                            ) -> None:
+    """Unit test for keyerror raised for invalid var type for _validate_element in file input_manager.py"""
     element_hierarchy = ["valid_key"]
     properties_blob_key = "dummy_valid_key"
     input_data = {"valid_key": "some_value"}
