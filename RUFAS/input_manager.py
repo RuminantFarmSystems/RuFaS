@@ -396,7 +396,17 @@ class InputManager:
         Returns
         -------
         Any
-            The requested data if found, else None.
+            The requested data if found.
+
+        Raises
+        -------
+        KeyError
+            If the requested data is not found.
+
+        Examples
+        -------
+        >>> InputManager.get_data('animal.herd.calf_num')
+        This will return the value of `calf_num` of the `herd` section in the `animal` module.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._fix_data.__name__,
