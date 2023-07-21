@@ -153,7 +153,7 @@ class InputManager:
                     "function": self._validate_data_and_add_to_pool.__name__,
                     }
         valid_items_counter = 0
-        invalid_critical_items_counter = 0
+        invalid_items_counter = 0
         total_items_counter = 0
 
         for file_blob_key, file_details in self.__metadata["files"].items():
@@ -174,18 +174,17 @@ class InputManager:
                                                           eager_termination)
                 if is_valid_element:
                     valid_items_counter += 1
-                elif not is_valid_element and eager_termination:
-                    invalid_critical_items_counter += 1
-                    return False
+                    self.__pool[file_blob_key] = data
                 else:
-                    invalid_critical_items_counter += 1
-            if invalid_critical_items_counter == 0:
-                self.__pool[file_blob_key] = data
+                    if not eager_termination:
+                        invalid_items_counter += 1
+                    else:
+                        return False
 
         om.add_log("Total Valid Items", f"{valid_items_counter=}", info_map)
         om.add_log("Total Checked Items", f"{total_items_counter=}", info_map)
-        om.add_log("Total Invalid Critical Items", f"{invalid_critical_items_counter=}", info_map)
-        return invalid_critical_items_counter == 0
+        om.add_log("Total Invalid Critical Items", f"{invalid_items_counter=}", info_map)
+        return invalid_items_counter == 0
 
     def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
                           input_data: Dict[str, Any], eager_termination: bool) -> bool:
@@ -200,11 +199,11 @@ class InputManager:
         properties_blob_key : str
             The metadata properties section keyword for the data input file being checked.
 
-        eager_termination : bool
-            If true, the process will be terminated upon finding invalid data.
-
         input_data : Dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
+
+        eager_termination : bool
+            If true, the process will be terminated upon finding invalid data.
 
         Returns
         -------
@@ -246,8 +245,8 @@ class InputManager:
             var_name = element_hierarchy[-1]
             try:
                 input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
-            except KeyError as e:
-                raise KeyError(f"Key {var_name} not found in pool: {e}")
+            except KeyError:
+                raise KeyError(f"Key {var_name} not found in input data")
 
             type_validation_dict = {"string": self._validate_string_type_element,
                                     "number": self._validate_num_type_element,

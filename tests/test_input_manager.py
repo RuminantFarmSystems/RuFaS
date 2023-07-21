@@ -317,20 +317,32 @@ def test_validate_element_object_type(mock_input_manager: InputManager, mocker: 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_element_raises_exception_with_bad_var_type(mock_input_manager: InputManager, mocker: MockerFixture,
-                                                             input_manager_original_method_states: Dict[str, Callable],
-                                                             ) -> None:
-    """Unit test for _validate_element raising an exception in file input_manager.py"""
-    element_hierarchy = ["element1"]
-    property_map_key = "dummy_property_map_key"
-    input_data = {"element1": {"type": "dummy_type"}}
+def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: InputManager, mocker: MockerFixture,
+                                                           input_manager_original_method_states: Dict[str, Callable],
+                                                           ) -> None:
+    element_hierarchy = ["valid_key", "invalid_key"]
+    properties_blob_key = "dummy_properties_blob_key"
+    input_data = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
 
-    # Use pytest.raises to check if the Exception is raised
-    with pytest.raises(Exception) as e:
-        mock_input_manager._validate_element(element_hierarchy, property_map_key,
-                                             input_data, eager_termination)
-        assert "Invalid type" in str(e.value)
+    with pytest.raises(KeyError):
+        mock_input_manager._validate_element(element_hierarchy, properties_blob_key, input_data, eager_termination)
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_invalid_var_type_raises_keyerror(mock_input_manager: InputManager, mocker: MockerFixture,
+                                                           input_manager_original_method_states: Dict[str, Callable],
+                                                           ) -> None:
+    element_hierarchy = ["valid_key"]
+    properties_blob_key = "dummy_valid_key"
+    input_data = {"valid_key": "some_value"}
+    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
+                                                                 {"valid_key": {"type": "invalid_type"}}}}
+    eager_termination = False
+
+    with pytest.raises(KeyError):
+        mock_input_manager._validate_element(element_hierarchy, properties_blob_key, input_data, eager_termination)
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
