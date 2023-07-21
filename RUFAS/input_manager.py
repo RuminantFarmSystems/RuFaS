@@ -6,7 +6,8 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+
 
 om = OutputManager()
 
@@ -385,22 +386,59 @@ class InputManager:
                     }
 
         variable_metadata: Dict[str, Any] = reduce(lambda d, key: d[key], element_hierarchy,
-                                         self.__metadata['properties'][property_map_key])
+                                                   self.__metadata['properties'][property_map_key])
         if 'default' not in variable_metadata.keys():
             return False
         variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
-                                     input_data[module_key])
+                                 input_data[module_key])
         variable_parent[element_hierarchy[-1]] = variable_metadata['default']
         om.add_warning("Data fixed",
-                           f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
-                           info_map)
+                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
+                       info_map)
         return True
-            variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
-                                     input_data[module_key])
-            variable_parent[element_hierarchy[-1]] = variable_metadata['default']
-            om.add_warning("Data fixed",
-                           f"Invalid data fixed: {element_hierarchy[-1]} => {variable_metadata['default']}",
+
+    def get_data(self, data_address: str) -> Optional[Any]:
+        """
+        Get the requested data from the pool
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested data.
+
+        Returns
+        -------
+        Any
+            The requested data if found.
+
+        Raises
+        -------
+        KeyError
+            If the requested data is not found.
+
+        Examples
+        -------
+        >>> InputManager.get_data('animal.herd.calf_num')
+        This will return the value of `calf_num` of the `herd` section in the `animal` module.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.get_data.__name__,
+                    }
+
+        element_hierarchy = data_address.split('.')
+
+        try:
+            data_value = reduce(lambda d, key: d[key], element_hierarchy,
+                                self.__pool)
+            return data_value
+
+        except KeyError as key_error:
+            invalid_key = str(key_error).strip("\'")
+            parent_address = str(data_address.split("." + invalid_key)[0])
+
+            om.add_warning("Data not found:", f"Cannot find \"{data_address}\", "
+                                              f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
                            info_map)
-            return True
-        else:
-            return False
+
+            raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
+                           f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")

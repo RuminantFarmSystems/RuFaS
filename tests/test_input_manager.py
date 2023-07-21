@@ -45,6 +45,7 @@ def input_manager_original_method_states(
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
         "_validate_string_type_element": mock_input_manager._validate_string_type_element,
         "_fix_data": mock_input_manager._fix_data,
+        "get_data": mock_input_manager.get_data,
     }
 
 
@@ -846,3 +847,95 @@ def test_fix_number_type_critical_data(dummy_module_key: str, dummy_property_map
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.fixture
+def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+    return {
+        "module1": {
+            "integer_var": 5,
+            "float_var": 0.5,
+            "string_var": "dummyvalue1",
+            "boolean_var": True,
+            "integer_array_var": [1, 2, 3],
+            "float_array_var": [0.1, 0.2, 3.14159],
+            "string_array_var": ["1", "2", "3", "4", "5"],
+            "boolean_array_var": [True, False],
+            "submodule1": {
+                "nested_var": "dummyvalue2"
+            },
+        },
+        "module2": {
+            "submodule1": {
+                "nested_module1": {
+                    "nested_var1": "dummyvalue3",
+                    "nested_var2": "dummyvalue4",
+                },
+            },
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    'dummy_data_path, expected_result, expected_warning_call_count',
+    [
+        ("module1.integer_var", 5, 0),
+        ("module1.float_var", 0.5, 0),
+        ("module1.string_var", "dummyvalue1", 0),
+        ("module1.boolean_var", True, 0),
+        ("module1.integer_array_var", [1, 2, 3], 0),
+        ("module1.float_array_var", [0.1, 0.2, 3.14159], 0),
+        ("module1.string_array_var", ["1", "2", "3", "4", "5"], 0),
+        ("module1.string_var", "dummyvalue1", 0),
+        ("module1.boolean_array_var", [True, False], 0),
+        ("module1.submodule1.nested_var", "dummyvalue2", 0),
+        ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3", 0),
+        ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4", 0),
+    ]
+)
+def test_get_data_with_valid_key(dummy_data_path: str,
+                                 mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+                                 expected_result: Any, expected_warning_call_count: int,
+                                 mock_input_manager: InputManager) -> None:
+    """Unit test for get_data function in file input_manager.py with a valid data_path key"""
+
+    mock_input_manager._InputManager__pool = mock_pool_for_get_data
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager.get_data(dummy_data_path)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+@pytest.mark.parametrize(
+    'dummy_data_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count',
+    [
+        ("module1.dummy_key", "module1", "dummy_key", 1),
+        ("module1.submodule1.dummy_key", "module1.submodule1", "dummy_key", 1),
+        ("module2.submodule1.nested_module1.dummy_key", "module2.submodule1.nested_module1", "dummy_key", 1),
+        ("module2.submodule1.dummy_key.nested_var1", "module2.submodule1", "dummy_key", 1),
+        ("module2.dummy_key.nested_module1.nested_var1", "module2", "dummy_key", 1),
+    ]
+)
+def test_get_data_raises_exception(dummy_data_path: str,
+                                   expected_error_parent_address: str, expected_error_invalid_key: str,
+                                   mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+                                   expected_warning_call_count: int,
+                                   mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_metadata raising an exception in file input_manager.py"""
+
+    mock_input_manager._InputManager__pool = mock_pool_for_get_data
+
+    mock_open_func = Mock()
+    mock_open_func.side_effect = KeyError()
+
+    with patch("builtins.open", mock_open_func):
+        with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+            with pytest.raises(KeyError) as key_error:
+                mock_input_manager.get_data(dummy_data_path)
+
+            error_message = key_error.value.__str__().strip("\'")
+            assert error_message == f"Data not found: Cannot find \"{dummy_data_path}\", " \
+                                    f"\"{expected_error_parent_address}\" does not have attribute " \
+                                    f"\"{expected_error_invalid_key}\"."
+            assert add_warning.call_count == expected_warning_call_count
