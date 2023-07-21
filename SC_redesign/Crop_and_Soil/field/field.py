@@ -888,7 +888,7 @@ class Field:
                 crop.data.cumulative_transpiration = 0.0
                 crop.data.cumulative_potential_evapotranspiration = 0.0
 
-    def _determine_watering_amount(self, rainfall: float) -> float:
+    def _determine_watering_amount(self, rainfall: float, irrigation: float) -> float:
         """Manages watering of the field.
 
         Parameters
