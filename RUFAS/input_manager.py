@@ -378,7 +378,7 @@ class InputManager:
         Returns
         -------
         bool
-            True if the data is fixed, False if there is no default value found.
+            True if the data is fixed, False otherwise.
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._fix_data.__name__,
