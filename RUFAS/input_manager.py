@@ -150,7 +150,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_data.__name__,
+                    "function": self._validate_data_and_add_to_pool.__name__,
                     }
         valid_items_counter = 0
         invalid_critical_items_counter = 0
@@ -327,8 +327,8 @@ class InputManager:
         is_valid_string = True
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
-            warning_string = f"String variable must match pattern {variable_properties['pattern']}."
             if not is_valid_string:
+                warning_string = f"String variable must match pattern {variable_properties['pattern']}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return is_valid_string
 
@@ -337,8 +337,8 @@ class InputManager:
         if minimum_length is not None:
             is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_valid_string:
-                om.add_warning(warning_string, f"{var_name=}", info_map)
                 warning_string = f"String length less than {minimum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
                 return is_valid_string
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
