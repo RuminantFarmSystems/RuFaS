@@ -210,6 +210,10 @@ class InputManager:
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
+        counter_dict : Dict[str, int]
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements.
+
         Returns
         -------
         bool
