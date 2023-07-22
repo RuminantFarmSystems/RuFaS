@@ -185,7 +185,7 @@ def test_validate_data_and_add_to_pool_valid(mock_input_manager: InputManager, m
             result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=True)
 
             assert result is True
-            assert add_log.call_count == 3
+            assert add_log.call_count == 4
             assert add_warning.call_count == 0
 
     mock_input_manager._validate_data_and_add_to_pool = \
@@ -208,7 +208,7 @@ def test_validate_data_and_add_to_pool_invalid(mock_input_manager: InputManager,
 
             result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=False)
             assert result is False
-            assert add_log.call_count == 3
+            assert add_log.call_count == 4
             assert add_warning.call_count == 0
 
     mock_input_manager._validate_data_and_add_to_pool = \

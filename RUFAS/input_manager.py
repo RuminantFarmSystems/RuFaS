@@ -155,6 +155,7 @@ class InputManager:
         valid_items_counter = 0
         invalid_items_counter = 0
         total_items_counter = 0
+        fixed_elements_counter = 0
 
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
@@ -166,12 +167,14 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Faulty data type in {file_blob_key}, only CSV and JSON are supported.")
 
+            data["fixed_elements"] = 0
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
             for property in properties.keys():
                 total_items_counter += 1
                 is_valid_element = self._validate_element([property], properties_blob_key, data,
                                                           eager_termination)
+                fixed_elements_counter += data["fixed_elements"]
                 if is_valid_element:
                     valid_items_counter += 1
                     self.__pool[file_blob_key] = data
@@ -183,7 +186,8 @@ class InputManager:
 
         om.add_log("Total Valid Items", f"{valid_items_counter=}", info_map)
         om.add_log("Total Checked Items", f"{total_items_counter=}", info_map)
-        om.add_log("Total Invalid Critical Items", f"{invalid_items_counter=}", info_map)
+        om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Total Invalid Items", f"{invalid_items_counter=}", info_map)
         return invalid_items_counter == 0
 
     def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
@@ -263,6 +267,7 @@ class InputManager:
                 return True
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
+                input_data["fixed_elements"] += 1
                 return is_fixed
 
     def _validate_array_type_element(self, variable_properties: Dict[str, Any], var_name: str,
