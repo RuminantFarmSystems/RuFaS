@@ -44,6 +44,7 @@ def input_manager_original_method_states(
         "_validate_array_type_element": mock_input_manager._validate_array_type_element,
         "_validate_num_type_element": mock_input_manager._validate_num_type_element,
         "_validate_string_type_element": mock_input_manager._validate_string_type_element,
+        "_validate_bool_type_element": mock_input_manager._validate_bool_type_element,
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
     }
@@ -320,6 +321,30 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     assert result is True
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+@pytest.mark.parametrize(
+    "input_data_value, expected_result",
+    [
+        (True, True),
+        (False, True),
+        ("hello", False),
+        (2, False),
+        (3.5, False),
+        ({}, False),
+        ([], False),
+        (None, False),
+    ],
+)
+def test_validate_bool_type_element(input_data_value: bool,
+                                    expected_result: bool,
+                                    mock_input_manager: InputManager) -> None:
+    """Unit test for function _validate_bool_type_element function in file input_manager.py"""
+    variable_properties = {}
+    var_name = "dummy_var_name"
+    result = mock_input_manager._validate_bool_type_element(variable_properties, var_name, input_data_value)
+
+    assert result == expected_result
 
 
 def test_validate_element_object_type(mock_input_manager: InputManager, mocker: MockerFixture,
