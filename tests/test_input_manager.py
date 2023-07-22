@@ -206,9 +206,9 @@ def test_validate_data_and_add_to_pool_invalid(mock_input_manager: InputManager,
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
-            result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=False)
+            result = mock_input_manager._validate_data_and_add_to_pool(eager_termination=True)
             assert result is False
-            assert add_log.call_count == 4
+            assert add_log.call_count == 0
             assert add_warning.call_count == 0
 
     mock_input_manager._validate_data_and_add_to_pool = \
@@ -288,7 +288,9 @@ def test_validate_element_string_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element1": "123-45-6789"}
-    result = mock_input_manager._validate_element(["element1"], "property_map_key1", input_data, True)
+    counter_dict = MagicMock()
+    result = mock_input_manager._validate_element(["element1"], "property_map_key1", input_data, True,
+                                                  counter_dict)
 
     assert result is True
 
@@ -302,7 +304,9 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element2": 123}
-    result = mock_input_manager._validate_element(["element2"], "property_map_key1", input_data, True)
+    counter_dict = MagicMock()
+    result = mock_input_manager._validate_element(["element2"], "property_map_key1", input_data, True,
+                                                  counter_dict)
 
     assert result is True
 
@@ -316,7 +320,9 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element3": [1, 2, 3]}
-    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
+    counter_dict = MagicMock()
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True,
+                                                  counter_dict)
 
     assert result is True
 
@@ -370,9 +376,11 @@ def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: I
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
+    counter_dict = MagicMock()
 
     with pytest.raises(KeyError):
-        mock_input_manager._validate_element(element_hierarchy, properties_blob_key, input_data, eager_termination)
+        mock_input_manager._validate_element(element_hierarchy, properties_blob_key, input_data,
+                                             eager_termination, counter_dict)
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
@@ -387,9 +395,11 @@ def test_validate_element_invalid_var_type_raises_keyerror(mock_input_manager: I
     mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
                                                                  {"valid_key": {"type": "invalid_type"}}}}
     eager_termination = False
+    counter_dict = MagicMock()
 
     with pytest.raises(KeyError):
-        mock_input_manager._validate_element(element_hierarchy, properties_blob_key, input_data, eager_termination)
+        mock_input_manager._validate_element(element_hierarchy, properties_blob_key, input_data,
+                                             eager_termination, counter_dict)
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
