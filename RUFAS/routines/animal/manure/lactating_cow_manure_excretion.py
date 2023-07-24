@@ -14,7 +14,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
-
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 def methane_mitigation(NDF_concentration: float,
                        EE_concentration: float,
@@ -46,18 +46,12 @@ def methane_mitigation(NDF_concentration: float,
     """
 
     methane_yield_reduction = 0.0
-    # NOP_lower_bound = 40
-    # NOP_upper_bound = 100
-    # Monensin_lower_bound = 16
-    # Monensin_upper_bound = 36
-    Monensin_CP_lower_bound = 15
-    Monensin_CP_upper_bound = 19
+    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND 
+    Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
 
-    # if methane_mitigation_method == "3-NOP" and NOP_lower_bound <= methane_mitigation_additive_amount <= NOP_upper_bound:
     if methane_mitigation_method == "3-NOP":
         methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
             NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
-    # elif methane_mitigation_method == "Monensin" and Monensin_lower_bound < methane_mitigation_additive_amount <= Monensin_upper_bound:
     elif methane_mitigation_method == "Monensin":    
         if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
             methane_yield_reduction = (0.30054 - 0.00377 *
@@ -203,8 +197,8 @@ def manure_calculations(ration_formulation,
         0.86 * urinary_nitrogen_concentration
 
     # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = 2
-    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
+    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
     urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
         urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
 
