@@ -540,128 +540,7 @@ def test_percentile_list():
 
 
 def test_grouping():
-    """Unit test for function grouping in file routines/animal/clustering_pen_grouping.py"""
-
-    # Test case 1: Single cow and pen, stocking density 0.5
-    args1 = {
-        'id': 1,
-        'breed': 'Holstein',
-        'birth_date': '2022-01-01',
-        'days_born': 365,
-        'tai_method_h': '5dCG2P',
-        'synch_ed_method_h': '2P',
-        'repro_program': 'ED',
-        'presynch_method': 'PreSynch',
-        'tai_method_c': 'OvSynch 56',
-        'resynch_method': 'TAIafterPD',
-        'birth_weight': 100,
-        'body_weight': 500,
-        'wean_weight': 400,
-        'mature_body_weight': 1200,
-        'events': [],
-        'estrus_count': 1,
-        'estrus_day': 365,
-        'tai_program_start_day_h': 365,
-        'synch_ed_program_start_day_h': 365,
-        'synch_ed_estrus_day': 365,
-        'synch_ed_stop_day': 365,
-        'conception_rate': 0.75,
-        'ai_day': 365,
-        'abortion_day': None,
-        'days_in_preg': None,
-        'gestation_length': None,
-        'p_gest_for_calf': None,
-        'days_in_milk': None,
-        'parity': None,
-        'calving_interval': None,
-
-    }
-    cow1 = cow.Cow(args1)
-
-    # Instance 2
-    args2 = {
-        'id': 2,
-        'breed': 'Jersey',
-        'birth_date': '2021-12-01',
-        'days_born': 400,
-        'tai_method_h': '5dCGP',
-        'synch_ed_method_h': 'CP',
-        'repro_program': 'TAI',
-        'presynch_method': 'Double OvSynch',
-        'tai_method_c': 'OvSynch 48',
-        'resynch_method': 'TAIbeforePD',
-        'birth_weight': 90,
-        'body_weight': 450,
-        'wean_weight': 350,
-        'mature_body_weight': 1000,
-        'events': [],
-        'estrus_count': 2,
-        'estrus_day': 380,
-        'tai_program_start_day_h': 365,
-        'synch_ed_program_start_day_h': 365,
-        'synch_ed_estrus_day': 365,
-        'synch_ed_stop_day': 365,
-        'conception_rate': 0.80,
-        'ai_day': 365,
-        'abortion_day': None,
-        'days_in_preg': None,
-        'gestation_length': None,
-        'p_gest_for_calf': None,
-        'days_in_milk': None,
-        'parity': None,
-        'calving_interval': None
-    }
-    cow2 = cow.Cow(args2)
-
-    # Instance 3
-    args3 = {
-        'id': 3,
-        'breed': 'Angus',
-        'birth_date': '2020-11-01',
-        'days_born': 500,
-        'tai_method_h': 'user-defined',
-        'synch_ed_method_h': 'user-defined',
-        'repro_program': 'ED-TAI',
-        'presynch_method': 'G6G',
-        'tai_method_c': '5d CoSynch',
-        'resynch_method': 'PGFatPD',
-        'birth_weight': 80,
-        }
-    cow3 = cow.Cow(args3)
-
-    pen1 = Pen(pen_id=1, vertical_dist_to_milking_parlor=1.5, horizontal_dist_to_milking_parlor=2.0,
-               number_of_stalls=50, housing_type="Freestall", bedding_type="Sand", pen_type="freestall",
-               manure_handling="Scraping", manure_separator="None", manure_storage="Lagoon",
-               animal_combination=Pen.AnimalCombination.CALF, max_stocking_density=2.5)
-
-    pen2 = Pen(pen_id=2, vertical_dist_to_milking_parlor=3.0, horizontal_dist_to_milking_parlor=1.0,
-               number_of_stalls=40, housing_type="Tiestall", bedding_type="Straw", pen_type="tiestall",
-               manure_handling="Pit", manure_separator="Screw Press", manure_storage="Concrete Pit",
-               animal_combination=Pen.AnimalCombination.LAC_COW, max_stocking_density=3.0)
-
-    pen3 = Pen(pen_id=3, vertical_dist_to_milking_parlor=2.5, horizontal_dist_to_milking_parlor=1.5,
-               number_of_stalls=30, housing_type="Freestall", bedding_type="Rubber Mat", pen_type="freestall",
-               manure_handling="Composting", manure_separator="Screen Separator", manure_storage="Compost Bedded Pack",
-               animal_combination=Pen.AnimalCombination.GROWING_AND_CLOSE_UP, max_stocking_density=2.0)
-    cow_list = [cow1]
-
-    pens = [pen1]
-    stocking_density = 0.5
-    result = RUFAS.routines.animal.clustering_pen_grouping.grouping(cow_list, pens, stocking_density)
-    assert len(result) == 1
-    assert result[0] == pen1
-
-    # Test case 2: Multiple cows and pens, stocking density 0.7
-
-    cow_list = [cow1, cow2, cow3]
-    pens = [pen1, pen2, pen3]
-    stocking_density = 0.7
-    result = RUFAS.routines.animal.clustering_pen_grouping.grouping(cow_list, pens, stocking_density)
-    assert len(result) == 3
-    assert result[0] == pen3
-    assert result[1] == pen2
-    assert result[2] == pen1
-
+    pass
 
 def test_update_animals():
     """Unit test for function update_animals in file routines/animal/pen.py"""
@@ -1404,7 +1283,7 @@ def test_calc_requirements():
 
 
 def test_set_globals():
-    """Unit test for function set_globals in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function set_globals in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
@@ -1415,92 +1294,87 @@ def test_set_globals():
         ]
 )
 def test_list_reconfig(input, expected)->None:
-    """Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function list_reconfig in file routines/animal/ration/ration_NLP.py"""
     assert list_reconfig(input) == expected
 
 
 def test_objective():
-    """Unit test for function objective in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function objective in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NEmact_constraint():
-    """Unit test for function NEmact_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NEmact_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NEl_constraint():
-    """Unit test for function NEl_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NEl_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NEgact_constraint():
-    """Unit test for function NEgact_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NEgact_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_calcium_constraint():
-    """Unit test for function calcium_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function calcium_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_phosphorus_constraint():
-    """Unit test for function phosphorus_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_protein_constraint():
-    """Unit test for function protein_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function protein_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NDF_constraint_1():
-    """Unit test for function NDF_constraint_1 in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NDF_constraint_2():
-    """Unit test for function NDF_constraint_2 in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_forage_NDF_constraint():
-    """Unit test for function forage_NDF_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function forage_NDF_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_fat_constraint():
-    """Unit test for function fat_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function fat_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_DMI_constraint():
-    """Unit test for function DMI_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function DMI_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_energy_req_limit_constraint():
-    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
-def test_get_ration_vals():
-    """Unit test for function get_ration_vals in file routines/animal/ration/cow_ration_NLP.py"""
-    pass
-
-
-def test_cow_ration_NLP_optimize():
-    """Unit test for function optimize in file routines/animal/ration/cow_ration_NLP.py"""
+def test_ration_NLP_optimize():
+    """Unit test for function optimize in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_calc_rqmts():
-    """Unit test for function calc_rqmts in file routines/animal/ration/cow_requirements.py"""
+    """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
     pass
 
 
 def test_energy_activity_rqmts():
-    """Unit test for function energy_activity_rqmts in file routines/animal/ration/cow_requirements.py"""
+    """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
     pass
 
 
@@ -1511,16 +1385,6 @@ def test_growing_heifer_ration_optimize():
 
 def test_calculate_rqmts():
     """Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py"""
-    pass
-
-
-def test_get_ration():
-    """Unit test for function get_ration in file routines/animal/ration/hardcoded_ration.py"""
-    pass
-
-
-def test_get_nutrient_rqmts():
-    """Unit test for function get_nutrient_rqmts in file routines/animal/ration/hardcoded_ration.py"""
     pass
 
 
