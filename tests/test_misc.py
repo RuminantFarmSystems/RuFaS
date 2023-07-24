@@ -320,12 +320,12 @@ def mock_output_manager(mocker) -> OutputManager:
 
 
 @pytest.mark.parametrize("data, expected_result, should_write", [
-    ({"var1": {"values": [1.0, True, "test", {"key": 1}]}}, "var1\n1.0\nTrue\ntest\n{'key': 1}\n",
+    ({"var1": {"values": [1.0, True, "test", {"key": 1}]}}, f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}{{'key': 1}}{os.linesep}",
      True),
     ({}, "",
      False),
     ({"var1": {"values": [1, 2, 3]}},
-     "var1\n1\n2\n3\n",
+     f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
      True),
     ({"var1": {"not a value": [1]}}, "",
      False),
