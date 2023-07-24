@@ -24,4 +24,15 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
 
     DMI_CONSTRAINT_PERCENT = 0.20
+
+    MONENSIN_CP_LOWER_BOUND = 15
+    '''The lower bound of dietary CP(Crude Protein) level (%DM) that should be considered when using the CP equation to caculate the mitigation effects of monensin '''
+    MONENSIN_CP_UPPER_BOUND = 19
+    '''The upper bound of dietary CP(Crude Protein) level (%DM) that should be considered when using the CP equation to caculate the mitigation effects of monensin '''
+    URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND = 2
+    '''The lower bound of urine urea nitrogen concentration '''
+    URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND = 12
+    '''The upper bound of urine urea nitrogen concentration '''
+
+   
     
