@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Union
 
 
 om = OutputManager()
@@ -48,7 +48,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        is_input_data_valid = self._validate_data_and_add_to_pool(eager_termination)
+        is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: str) -> None:
@@ -133,9 +133,10 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _validate_data_and_add_to_pool(self, eager_termination: bool) -> bool:
+    def _populate_pool(self, eager_termination: bool) -> bool:
         """
-        Validates data from input files and adds data to pool if valid.
+        Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
+        then adds data to the pool.
 
         Parameters
         ----------
@@ -150,37 +151,40 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_data_and_add_to_pool.__name__,
+                    "function": self._populate_pool.__name__,
                     }
         valid_elements_counter = 0
         invalid_elements_counter = 0
         total_elements_counter = 0
         fixed_elements_counter = 0
 
+        data_type_to_loader_map = {"json": self._load_data_from_json,
+                                   "csv": self._load_data_from_csv}
+
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
-            data_type_to_loader_map = {"json": self._load_data_from_json,
-                                       "csv": self._load_data_from_csv}
+
             try:
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 data = data_loader(file_path)
             except KeyError:
-                raise KeyError(f"Faulty data type in {file_blob_key}, only CSV and JSON are supported.")
+                raise KeyError(f"Faulty data type in {file_blob_key},"
+                               f"supported types are: {data_type_to_loader_map.keys()}")
 
-            counter_dict = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0}
+            # counter_dict = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0}
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
             for property in properties.keys():
-                is_valid_element = self._validate_element([property], properties_blob_key, data,
-                                                          eager_termination, counter_dict)
-                fixed_elements_counter += counter_dict["fixed_elements"]
-                valid_elements_counter += counter_dict["valid_elements"]
-                total_elements_counter += counter_dict["total_elements"]
-                if is_valid_element:
+                element_counter_and_validity = self._validate_element([property], properties_blob_key, data,
+                                                                      eager_termination)
+                fixed_elements_counter += element_counter_and_validity["fixed_elements"]
+                valid_elements_counter += element_counter_and_validity["valid_elements"]
+                total_elements_counter += element_counter_and_validity["total_elements"]
+                if element_counter_and_validity["is_valid"]:
                     self.__pool[file_blob_key] = data
                 else:
                     if not eager_termination:
-                        invalid_elements_counter += counter_dict["invalid_elements"]
+                        invalid_elements_counter += element_counter_and_validity["invalid_elements"]
                     else:
                         return False
 
@@ -191,10 +195,11 @@ class InputManager:
         return invalid_elements_counter == 0
 
     def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
-                          input_data: Dict[str, Any], eager_termination: bool,
-                          counter_dict: Dict[str, int], ) -> bool:
+                          input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
-        Perform data validation checks.
+        Receives data loaded from input file, recursively finds and then validates nested elements,
+        attempts to fix any invalid elements, and tracks the number of how many valid, invalid, fixed,
+        and total elements from the input data are checked.
 
         Parameters
         ----------
@@ -210,18 +215,20 @@ class InputManager:
         eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
-        counter_dict : Dict[str, int]
-            A dictionary that collects the counts of total elements checked,
-            invalid elements, valid elements, and fixed elements.
-
         Returns
         -------
-        bool
-            True if the data is valid, False otherwise.
+        dict
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
+
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._validate_element.__name__,
                     }
+        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                        "invalid_elements": 0, "is_valid": True}
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][properties_blob_key])
         var_type = variable_properties["type"]
@@ -231,25 +238,21 @@ class InputManager:
             false_counter = 0
             for nested_key in variable_properties.keys():
                 element_hierarchy.append(nested_key)
-                child_status = self._validate_element(element_hierarchy, properties_blob_key,
-                                                      input_data, eager_termination)
-                if eager_termination and not child_status:
-                    return False
+                element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
+                                                                      input_data, eager_termination)
+                is_child_valid = element_counter_and_validity["is_valid"]
+                if eager_termination and not is_child_valid:
+                    return element_counter_and_validity
                 element_path = ".".join(element_hierarchy)
-                children_status[element_path] = child_status
-                if not child_status:
+                children_status[element_path] = is_child_valid
+                if not is_child_valid:
                     om.add_warning("Invalid nested element found", f"{element_path}", info_map)
                     false_counter += 1
                 element_hierarchy.remove(nested_key)
+
             is_valid = false_counter == 0
-            if is_valid:
-                return True
-            else:
-                invalid_child_vars = [key for key, value in children_status.items() if value is False]
-                om.add_warning("Invalid nested element(s) found",
-                               f"{invalid_child_vars=}",
-                               info_map)
-                return False
+
+            return is_valid
         else:
             var_name = element_hierarchy[-1]
             try:
@@ -257,89 +260,86 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            type_validation_dict = {"string": self._validate_string_type_element,
-                                    "number": self._validate_num_type_element,
-                                    "array": self._validate_array_type_element,
-                                    "bool": self._validate_bool_type_element, }
-
+            data_type_to_validator_map = {"string": self._string_type_validator,
+                                          "number": self._num_type_validator,
+                                          "array": self._array_type_validator,
+                                          "bool": self._bool_type_validator, }
             try:
-                validity_checker = type_validation_dict[var_type]
-                is_valid = validity_checker(variable_properties, var_name, input_data_value)
+                validator = data_type_to_validator_map[var_type]
             except KeyError:
-                raise KeyError(f"Invalid type {var_type}: Element must be type number, array, string, or bool")
+                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
-            counter_dict["total_elements"] += 1
+            is_valid = validator(variable_properties, var_name, input_data_value)
+
+            element_counter_and_validity["total_elements"] += 1
             if is_valid:
-                counter_dict["valid_elements"] += 1
-                return True
+                element_counter_and_validity["valid_elements"] += 1
+                return element_counter_and_validity
             else:
                 is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 if is_fixed:
-                    counter_dict["fixed_elements"] += 1
+                    element_counter_and_validity["fixed_elements"] += 1
                 else:
-                    counter_dict["invalid_elements"] += 1
-                return is_fixed
+                    element_counter_and_validity["invalid_elements"] += 1
+                    element_counter_and_validity["is_valid"] = False
+                return element_counter_and_validity
 
-    def _validate_array_type_element(self, variable_properties: Dict[str, Any], var_name: str,
-                                     input_data_value: list) -> bool:
+    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list) -> bool:
         """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_array_type_element.__name__,
+                    "function": self._array_type_validator.__name__,
                     }
         maximum_length = variable_properties.get("maximum_length")
         minimum_length = variable_properties.get("minimum_length")
-        is_in_range = True
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
             if not is_in_range:
                 warning_string = f"Array length less than {minimum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
-                return is_in_range
+                return False
         if maximum_length is not None:
             is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_in_range:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
+        return True
 
-        return is_in_range
-
-    def _validate_num_type_element(self, variable_properties: Dict[str, Any], var_name: str,
-                                   input_data_value: float) -> bool:
+    def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
+                            input_data_value: Union[int, float]) -> bool:
         """Validates an input data number element."""
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_num_type_element.__name__,
+                    "function": self._num_type_validator.__name__,
                     }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
-        is_in_range = True
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
             if not is_in_range:
                 warning_string = f"Value less than {minimum_value}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
-                return is_in_range
+                return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
             if not is_in_range:
                 warning_string = f"Value greater than {maximum_value}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
 
-        return is_in_range
+        return True
 
-    def _validate_string_type_element(self, variable_properties: Dict[str, Any], var_name: str,
-                                      input_data_value: str) -> bool:
+    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str) -> bool:
         """Validates an input data string element."""
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_string_type_element.__name__,
+                    "function": self._string_type_validator.__name__,
                     }
         pattern_check = variable_properties.get("pattern")
-        is_valid_string = True
         if pattern_check is not None:
             is_valid_string = bool(re.match(pattern_check, input_data_value))
             if not is_valid_string:
                 warning_string = f"String variable must match pattern {variable_properties['pattern']}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
-                return is_valid_string
+                return False
 
         minimum_length = variable_properties.get("minimum_length")
         maximum_length = variable_properties.get("maximum_length")
@@ -348,17 +348,17 @@ class InputManager:
             if not is_valid_string:
                 warning_string = f"String length less than {minimum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
-                return is_valid_string
+                return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
                 warning_string = f"String length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
 
-        return is_valid_string
+        return True
 
-    def _validate_bool_type_element(self, variable_properties: Dict[str, Any], var_name: str,
-                                    input_data_value: bool) -> bool:
+    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool) -> bool:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
@@ -397,7 +397,7 @@ class InputManager:
                        info_map)
         return True
 
-    def get_data(self, data_address: str) -> Optional[Any]:
+    def get_data(self, data_address: str) -> Any:
         """
         Get the requested data from the pool
 
@@ -418,7 +418,8 @@ class InputManager:
 
         Examples
         -------
-        >>> InputManager.get_data('animal.herd.calf_num')
+        >>> input_manager = InputManager()
+        >>> input_manager.get_data('animal.herd.calf_num')
         This will return the value of `calf_num` of the `herd` section in the `animal` module.
         """
         info_map = {"class": self.__class__.__name__,
@@ -436,9 +437,9 @@ class InputManager:
             invalid_key = str(key_error).strip("\'")
             parent_address = str(data_address.split("." + invalid_key)[0])
 
-            om.add_warning("Data not found:", f"Cannot find \"{data_address}\", "
-                                              f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
-                           info_map)
+            om.add_error("Data not found:", f"Cannot find \"{data_address}\", "
+                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                            info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
