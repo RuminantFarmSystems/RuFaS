@@ -269,7 +269,8 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
-            is_valid = validator(variable_properties, var_name, input_data_value)
+            is_valid = validator(variable_properties, var_name, input_data_value,
+                                 properties_blob_key, element_hierarchy)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
@@ -284,7 +285,8 @@ class InputManager:
                     element_counter_and_validity["is_valid"] = False
                 return element_counter_and_validity
 
-    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list) -> bool:
+    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
+                              properties_blob_key: str, element_hierarchy: list) -> bool:
         """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
@@ -303,10 +305,20 @@ class InputManager:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
+        
+        for i, element in enumerate(input_data_value):
+            element_hierarchy = element_hierarchy + [f"{var_name}[{i}]"]
+            element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
+                                                                  {var_name: element}, eager_termination=False)
+
+            if not element_counter_and_validity["is_valid"]:
+                return False
+
         return True
 
     def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
-                            input_data_value: Union[int, float]) -> bool:
+                            input_data_value: Union[int, float], properties_blob_key: str,
+                            element_hierarchy: list) -> bool:
         """Validates an input data number element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._num_type_validator.__name__,
@@ -328,7 +340,8 @@ class InputManager:
 
         return True
 
-    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str) -> bool:
+    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, 
+                               input_data_value: str, properties_blob_key: str, element_hierarchy: list) -> bool:
         """Validates an input data string element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
@@ -358,7 +371,8 @@ class InputManager:
 
         return True
 
-    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool) -> bool:
+    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool,
+                             properties_blob_key: str, element_hierarchy: list) -> bool:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
