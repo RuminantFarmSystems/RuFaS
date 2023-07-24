@@ -64,7 +64,7 @@ jobs:
         URL: ${{ github.event.pull_request.comments_url }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        if [ ${{ URL }} != '' ]; then
+        if [ ${{ env.URL }} != '' ]; then
           curl \
             -X POST \
             $URL \
