@@ -64,11 +64,9 @@ jobs:
         URL: ${{ github.event.pull_request.comments_url }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        if [ ${{ env.URL }} != '' ]; then
-          curl \
-            -X POST \
-            $URL \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%" }'
-        fi
+        curl \
+          -X POST \
+          $URL \
+          -H "Content-Type: application/json" \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          --data '{ "body": "Current Coverage: ${{ env.COVERAGE_PERCENTAGE }}%" }'
