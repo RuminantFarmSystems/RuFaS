@@ -13,12 +13,12 @@ from RUFAS.routines.manure_storage import manure_emissions, manure_handling, man
 om = OutputManager()
 
 
-def daily_manure_storage_routine(manure_storage, animal_management):
+def daily_manure_storage_routine(manure_storage, animal_manager):
     manure_storage.reset_daily_variables()
 
     for pen_id in manure_storage.pens:
         pen = manure_storage.pens[pen_id]
-        pen.update_pen(animal_management)
+        pen.update_pen(animal_manager)
         manure_handling.update_all(pen, manure_storage)
 
     for separator_type in manure_storage.separators:
@@ -34,7 +34,7 @@ def daily_manure_storage_routine(manure_storage, animal_management):
 
 
 class ManureStorage:
-    def __init__(self, animal_management):
+    def __init__(self, animal_manager):
         """
         Description:
             The ManureStorage class aggregates the components of the manure
@@ -43,17 +43,17 @@ class ManureStorage:
             "pseudocode_manure_storage" MS.1
 
         Args:
-            animal_management: an instance of the AnimalManagement class
-                specified in animal_management.py
+            animal_manager: an instance of the AnimalManager class
+                specified in animal_manager.py
         """
         self.pens = {}
         self.separators = {}
         self.storage = {}
 
         # MS.1.2
-        self.initialize_pens(animal_management)
-        self.initialize_separators(animal_management)
-        self.initialize_storage(animal_management)
+        self.initialize_pens(animal_manager)
+        self.initialize_separators(animal_manager)
+        self.initialize_storage(animal_manager)
 
         self.Bo = 0.24
         self.MCF = 0.01
@@ -127,45 +127,45 @@ class ManureStorage:
         self.other_solids_annual = 0.0
         self.other_liquids_annual = 0.0
 
-    def initialize_pens(self, animal_management):
+    def initialize_pens(self, animal_manager):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of pens
             based on the Animal model
 
         Args:
-            animal_management
+            animal_manager
         """
 
-        for pen in animal_management.all_pens:
+        for pen in animal_manager.all_pens:
             self.pens[pen.id] = (ManureStorage.Pen(pen))
 
-    def initialize_separators(self, animal_management):
+    def initialize_separators(self, animal_manager):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of
             separators based on the Animal model
 
         Args:
-            animal_management
+            animal_manager
         """
 
-        for pen in animal_management.all_pens:
+        for pen in animal_manager.all_pens:
             if not self.separators.keys().__contains__(pen.manure_separator):
                 self.separators[pen.manure_separator] = (
                     ManureStorage.Separator(pen))
 
-    def initialize_storage(self, animal_management):
+    def initialize_storage(self, animal_manager):
         """
         Description:
             Class helper method initializes ManureStorage's dictionary of
             storage receptacles based on the Animal model
 
         Args:
-            animal_management
+            animal_manager
         """
 
-        for pen in animal_management.all_pens:
+        for pen in animal_manager.all_pens:
             if not self.storage.keys().__contains__(pen.manure_storage):
                 self.storage[pen.manure_storage] = (ManureStorage.Storage(pen))
 
@@ -331,8 +331,8 @@ class ManureStorage:
             self.bedding_washed = self.bedding_washed_perc * self.bedding_added
             self.flush_water_daily = self.water_use_rate * self.cow_num
 
-        def update_pen(self, animal_management):
-            pen = animal_management.all_pens[self.pen_id]
+        def update_pen(self, animal_manager):
+            pen = animal_manager.all_pens[self.pen_id]
             self.raw_manure = pen.manure['manure_mass']
             self.VS_excreted = pen.manure['degradable_volatile_solids'] + pen.manure['non_degradable_volatile_solids']
             self.TS_excreted = pen.manure['total_solids']

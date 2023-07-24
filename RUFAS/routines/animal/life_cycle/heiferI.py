@@ -45,14 +45,14 @@ class HeiferI(Calf):
         """
         return self.get_calf_values()
 
-    def set_nutrient_rqmts(self, temp):
+    def set_nutrient_rqmts(self, temp, animal_grouping_scenario):
         """
         Calculates this heiferI's nutrient requirements.
         """
         req = calc_rqmts(body_weight=self.body_weight,
                          mature_body_weight=self.mature_body_weight,
                          day_of_pregnancy=None,
-                         animal_type='heifer',
+                         animal_type=animal_grouping_scenario.get_animal_type(self),
                          body_condition_score_5=3,
                          previous_temperature=temp,
                          average_daily_gain_heifer=self.daily_growth)

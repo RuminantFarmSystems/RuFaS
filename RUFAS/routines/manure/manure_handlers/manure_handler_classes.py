@@ -21,7 +21,7 @@ from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 
 
 om = OutputManager()
@@ -91,7 +91,7 @@ class BaseManureHandler:
         return avg_temp
 
     def daily_update(self,
-                     pen: ManureManagementPen,
+                     pen: ManureManagerPen,
                      bedding: BaseBedding,
                      sim_day: int) -> ManureHandlerDailyOutput:
         """Calculates and stores the daily output of the manure handler.
@@ -100,42 +100,63 @@ class BaseManureHandler:
             "pseudocode_manure_management" MS.3
 
         Args:
-            pen: A ManureManagementPen object.
+            pen: A ManureManagerPen object.
             bedding: A BaseBedding object that specifies the type of bedding used.
             sim_day: The current simulation day.
 
         Returns:
             A ManureHandlerDailyOutput object.
         """
+        if pen.num_animals == 0:
+            return ManureHandlerDailyOutput()
+        
+        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                        "bedding_density": bedding.bedding_density,
+                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                        "bedding_type": bedding.bedding_type._name_,
+                        }
+
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
-                    "bedding": vars(bedding),
+                    "bedding": bedding_data,
                     "sim_day": sim_day, }
 
-        NH3_housing_emission = GasEmissions.calc_ammonia_emission(
+        housing_methane_emission = GasEmissions.calc_housing_methane_emission(
             num_animals=pen.num_animals,
-            barn_area=pen.barn_area_from_pen_type,  # m^2/animal
-            total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg/animal
-            mass=pen.manure.urine / pen.num_animals,  # kg/animal
-            temperature_celsius=self._get_current_day_average_temperature_in_celsius()
+            barn_area=pen.barn_area_from_pen_type,
+            barn_temp=self._get_current_day_average_temperature_in_celsius(),
         )
+
+        housing_carbon_dioxide_emission = GasEmissions.calc_housing_carbon_dioxide_emission(
+            num_animals=pen.num_animals,
+            barn_area=pen.barn_area_from_pen_type,
+            barn_temp=self._get_current_day_average_temperature_in_celsius(),
+        )
+
+        housing_ammonia_emission = GasEmissions.calc_housing_ammonia_emission(
+            num_animals=pen.num_animals,
+            barn_area_per_animal=pen.barn_area_from_pen_type,  # m^2/animal
+            urine_total_ammoniacal_nitrogen=pen.manure.urine_total_ammoniacal_nitrogen,  # kg
+            urine=pen.manure.urine,  # kg
+            temp=self._get_current_day_average_temperature_in_celsius(),
+        )
+
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
             pen_id=pen.id,
             manure_urea=pen.manure.urea,
             liquid_manure_total_ammoniacal_nitrogen=(
-                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - NH3_housing_emission)),  # kg - kg
+                max(0.0, pen.manure.manure_total_ammoniacal_nitrogen - housing_ammonia_emission)),
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             manure_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
             manure_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
             liquid_manure_phosphorus=pen.manure.phosphorus,
             liquid_manure_potassium=pen.manure.potassium,
-            housing_methane=GasEmissions.calc_methane_housing_emission(
-                pen.num_animals, pen.barn_area_from_pen_type),
-            housing_carbon_dioxide=GasEmissions.calc_carbon_dioxide_housing_emission(
-                pen.num_animals, pen.barn_area_from_pen_type),
-            housing_ammonia=NH3_housing_emission,
+            housing_methane=housing_methane_emission,
+            housing_carbon_dioxide=housing_carbon_dioxide_emission,
+            housing_ammonia=housing_ammonia_emission,
             manure_volume=pen.manure.manure_volume,
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
                 pen.num_animals),
@@ -165,12 +186,12 @@ class BaseManureHandler:
                     "function": self.calc_cleaning_water_volume_in_main_barn.__name__,
                     }
 
-        clean_water_volume = num_animals * self.config.cleaning_water_use_rate
+        cleaning_water_volume = num_animals * self.config.cleaning_water_use_rate
 
         om.add_variable(
-            "cleaning_water_volume_in_main_barn", clean_water_volume, info_map)
+            "cleaning_water_volume_in_main_barn", cleaning_water_volume, info_map)
 
-        return clean_water_volume
+        return cleaning_water_volume
 
 
 class FlushSystem(BaseManureHandler):

@@ -3,13 +3,13 @@ RUFAS: Ruminant Farm Systems Model
 File name: pen_manure.py
 
 Description: A data model that represents the manure data extracted from
-the Animal Management module.
+the Animal Manager module.
 
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from dataclasses import field
 
 from RUFAS.general_constants import GeneralConstants
@@ -77,6 +77,13 @@ class PenManure:
         """Performs any necessary unit conversion after initialization."""
         self.manure_volume = self.manure_mass / ManureConstants.MANURE_DENSITY
 
+        # Zero out any negative field
+        # TODO: This is a temporary fix. Need to find out why negative values are being generated
+        # from the animal module. Later, we should raise an exception if a negative value is found.
+        for fld in fields(self):
+            if getattr(self, fld.name) < 0:
+                setattr(self, fld.name, 0)
+
     @classmethod
     def get_instance(cls, animal_manure: AnimalManureExcretions, num_animals: int) -> PenManure:
         """Returns a PenManure object based on the information given in the manure data.
@@ -101,6 +108,9 @@ class PenManure:
                                             animal_manure['total_ammoniacal_nitrogen_concentration']  # g/L
                                             * manure_volume  # L
                                     ) * GeneralConstants.GRAMS_TO_KG  # kg
+
+        if num_animals == 0:
+            return cls()
 
         return cls(
             urea=animal_manure['urea'] / num_animals,
