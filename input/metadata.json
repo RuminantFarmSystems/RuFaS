@@ -1,0 +1,503 @@
+{
+  "blobs": {
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration Information",
+      "path": "config/example_config.json",
+      "type": "json",
+      "properties": "config_properties"
+    },
+    "animal": {
+      "title": "Animal data",
+      "description": "Moo Moo!",
+      "path": "animal/example_animal.json",
+      "type": "json",
+      "properties": "animal_properties"
+    },
+    "crop": {
+      "title": "Crop data",
+      "description": "Alfafa is fun!",
+      "path": "crop/example_rotation.json",
+      "type": "json",
+      "properties": "crop_properties"
+    },
+    "economy": {
+      "title": "Economy data",
+      "description": "Time is money!",
+      "path": "EEE/example_costs.csv",
+      "type": "csv",
+      "properties": "economic_properties"
+    },
+    "emission": {
+      "title": "Emissions data",
+      "description": "Let's think about global warming",
+      "path": "EEE/example_emissions.json",
+      "type": "json",
+      "properties": "emissions_properties"
+    },
+    "feed": {
+      "title": "Feed data",
+      "description": "Those cows need to eat!",
+      "path": "feed/example_user_feeds.csv",
+      "type": "csv",
+      "properties": "feed_properties"
+    },
+    "manure": {
+      "title": "Manure data",
+      "description": "You thought it's a waste, but those crops need to eat as well",
+      "path": "manure/example_manure_management.json",
+      "type": "json",
+      "properties": "manure_properties"
+    },
+    "soil": {
+      "title": "Soil data",
+      "description": "Stop treating soil like dirt!",
+      "path": "soil/example_soil.json",
+      "type": "json",
+      "properties": "soil_properties"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Let's turn on the AC",
+      "path": "weather/example_weather.csv",
+      "type": "csv",
+      "properties": "weather_properties"
+    }
+  },
+  "properties": {
+    "config_properties": {
+      "start_date": {
+        "type": "string",
+        "description": "The year and Julian day on which the simulation will start.",
+        "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
+        "default": "2009:1"
+      },
+      "end_date": {
+        "type": "string",
+        "description": "The year and Julian day on which the simulation will end.",
+        "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
+        "default": "2009:100"
+      },
+      "graphic_dir": {
+        "type": "string",
+        "description": "The location of the output graphics directory",
+        "pattern": ".{1,50}",
+        "default": "output/graphics/"
+      },
+      "output_dir": {
+        "type": "string",
+        "description": "The location of the output directory",
+        "pattern": ".{1,50}",
+        "default": "output/"
+      },
+      "random_seed": {
+        "type": "number",
+        "description": "The random seed",
+        "minimum": 0,
+        "default": 42
+      },
+      "simulate_animals": {
+        "type": "boolean",
+        "description": "Whether or not to simulate animals during the simulation",
+        "default": true
+      }
+    },
+    "animal_properties": {
+      "type": "object",
+      "description": "Animal data",
+      "herd_information": {
+        "type": "object",
+        "description": "Herd Demographics - An overview of the counts of different animal groups on the farm",
+        "calf_num": {
+          "description": "Number of Calves, (head)",
+          "type": "number",
+          "default": 8,
+          "minimum": 0,
+        },
+        "heiferI_num": {
+          "description": "The number of HeiferIs (youngstock post-weaning and before breeding), (head)",
+          "type": "number",
+          "default": 44,
+          "minimum": 0,
+        },
+        "heiferII_num": {
+          "description": "The number of HeiferIIs (heifers eligible for breeding and in early pregnancy), (head)",
+          "type": "number",
+          "default": 38,
+          "minimum": 0,
+        },
+        "heiferIII_num_springers": {
+          "description": "The number of HeiferIIIs (close-up heifers), (head)",
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+        },
+        "cow_num": {
+          "description": "The number of dry and lactating cows, (head)",
+          "type": "number",
+          "default": 100,
+          "minimum": 0,
+        },
+        "herd_num": {
+          "description": "The number of lactating and milking cows on farm, (head)",
+          "type": "number",
+          "default": 187,
+          "minimum": 0,
+        },
+        "herd_init": {
+          "description": "Initialize Herd or not",
+          "type": "boolean",
+        },
+        "breed": {
+          "description": "Breed (either Holstein or Jersey)",
+          "type": "String",
+          "default": "HO",
+          "pattern": "^{HO|JE}$",
+        }
+      },
+      "animal_config": {
+        "type": "object",
+        "description": "Animal Configuration",
+        'breeding_start_day_h': {
+          'type': 'number',
+          'default': 390,
+          'minimum': 0,
+          'description': 'Breeding Start Day - Heifers (days)'
+        },
+        'heifer_repro_method': {
+          'type': 'string',
+          'default': 'TAI',
+          'description': 'Heifer Reproductive Program (select one)',
+          'pattern': '^{TAI|ED|ED-TAI}$'
+        },
+        'cow_repro_method': {
+          'type': 'string',
+          'default': 'ED',
+          'description': 'Cow Reproductive Program (select one)',
+          'pattern': '^{TAI|ED|ED-TAI}$'
+        },
+        'semen_type': {
+          'type': 'string',
+          'default': 'sexed',
+          'description': 'Semen Type (select one)',
+          'pattern': '^{sexed|conventional}$'
+        },
+        'days_in_preg_when_dry': {
+          'type': 'number',
+          'default': 218,
+          'minimum': 0,
+          'description': 'Days In Pregnancy When Dry (days)'
+        },
+        'heifer_repro_cull_time': {
+          'type': 'number',
+          'default': 480,
+          'minimum': 0,
+          'description': 'Heifer Reproductive Cull Time (days)'
+        },
+        'do_not_breed_time': {
+          'type': 'number',
+          'default': 400,
+          'minimum': 0,
+          'description': 'Do Not Breed Time (days)'
+        },
+        'cull_milk_production': {
+          'type': 'number',
+          'default': 22,
+          'minimum': 0,
+          'description': 'Cull Milk Production (kg/d)'
+        },
+        'cow_times_milked_per_day': {
+          'type': 'number',
+          'default': 3,
+          'minimum': 0,
+          'description': 'Number of Times Cows Milked (per day)'
+        },
+        'male_calf_rate_sexed_semen': {
+          'type': 'number',
+          'default': 0.1,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Male Calf Rate - Sexed Semen'
+        },
+        'male_calf_rate_conventional_semen': {
+          'type': 'number',
+          'default': 0.53,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Male Calf Rate - Conventional Semen'
+        },
+        'keep_female_calf_rate': {
+          'type': 'number',
+          'default': 1,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Female Calf Rate'
+        },
+        'wean_day': {
+          'type': 'number',
+          'default': 56,
+          'minimum': 0,
+          'description': 'Wean Day (days)'
+        },
+        'wean_length': {
+          'type': 'number',
+          'default': 7,
+          'minimum': 0,
+          'description': 'Wean Length (days)'
+        },
+        'milk_type': {
+          'type': 'string',
+          'default': 'whole',
+          'description': 'Milk Type (select one)',
+          'pattern': '^{whole|replacement}$'
+        },
+        'estrus_detection_rate': {
+          'type': 'number',
+          'default': 0.65,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Estrus Detection Rate'
+        },
+        'estrus_service_rate': {
+          'type': 'number',
+          'default': 0.9,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Estrus Service Rate'
+        },
+        'ed_conception_rate': {
+          'type': 'number',
+          'default': 0.5,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'ED Conception Rate'
+        },
+        'heifer_TAI_protocol': {
+          'type': 'string',
+          'description': 'Heifer TAI (Timed Artificial Insemination) Protocol (select one)',
+          'pattern': '^{md5CG2P|md5CGP}$'
+        },
+        'md5CG2P_conception_rate': {
+          'type': 'number',
+          'default': 0.7,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Heifer Conception Rate for md5CG2P Protocol'
+        },
+        'md5CGP_conception_rate': {
+          'type': 'number',
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'Heifer Conception Rate for md5CGP Protocol'
+        },
+        'heifer_synchED_protocol': {
+          'type': 'string',
+          'default': '2P',
+          'description': 'Heifer SynchED Protocol (select one)',
+          'pattern': '^{2P|CP}$'
+        },
+        'cow_presynch_protocol': {
+          'type': 'string',
+          'default': 'Double OvSynch',
+          'description': 'Cow Presynch Protocol',
+          'pattern': '^{Double OvSynch|Presynch|G6G}$'
+        },
+        'cow_TAI_protocol': {
+          'type': 'string',
+          'default': 'OvSynch 56',
+          'description': 'Cow TAI (Timed Artificial Insemination) Protocol',
+          'pattern': '^{OvSynch 56|OvSynch 48|CoSynch 72|5d CoSynch}$'
+        },
+        'ovsynch56_conception_rate': {
+          'type': 'number',
+          'default': 0.5,
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'OvSynch56 Conception Rate'
+        },
+        'ovsynch48_conception_rate': {
+          'type': 'number',
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'OvSynch48 Conception Rate'
+        },
+        'cosynch72_conception_rate': {
+          'type': 'number',
+          'minimum': 0,
+          'maximum': 1,
+          'description': 'CoSynch72 Conception Rate'
+        },
+        'cosynch5d_conception_rate': {
+          'type': 'number',
+          'minimum': 0,
+          'maximum': 1,
+          'description': '5d CoSynch Conception Rate'
+        },
+        'cow_resynch_protocol': {
+          'type': 'string',
+          'default': 'TAIafterPD',
+          'description': 'Cow Resynch Protocol',
+          'pattern': '^{TAIafterPD|TAIbeforePD|PGFatPD}$'
+        },
+        'voluntary_waiting_period': {
+          'type': 'number',
+          'default': 74,
+          'minimum': 0,
+          'description': 'Voluntary Waiting Period (days)'
+        },
+        'conception_rate_decrease': {
+          'type': 'number',
+          'default': 0.026,
+          'minimum': 0,
+          'maximum': 0.1,
+          'description': 'Conception Rate Decrease'
+        },
+        'avg_gestation_len': {
+          'type': 'number',
+          'default': 278,
+          'minimum': 0,
+          'description': 'Average Gestation Length (days)'
+        },
+        'std_gestation_len': {
+          'type': 'number',
+          'default': 6,
+          'minimum': 0,
+          'description': 'Gestation Length Standard Deviation (days)'
+        },
+        'prefresh_day': {
+          'type': 'number',
+          'default': 21,
+          'minimum': 0,
+          'description': 'Prefresh Day (days)'
+        },
+        'num_21_days_repro': {
+          'type': 'number',
+          'default': 15,
+          'minimum': 0,
+          'description': 'Reproductive Indicator Calculation (days)'
+        },
+        'calving_interval': {
+          'type': 'number',
+          'default': 371,
+          'minimum': 0,
+          'description': 'Calving Interval (days)'
+        },
+        'birth_weight_avg_ho': {
+          'type': 'number',
+          'default': 82,
+          'minimum': 0,
+          'description': 'Average Holstein Birth Weight (kg/head)'
+        },
+        'birth_weight_std_ho': {
+          'type': 'number',
+          'default': 1,
+          'minimum': 0,
+          'description': 'Holstein Birth Weight Standard Deviation (kg/head)'
+        },
+        'birth_weight_avg_je': {
+          'type': 'number',
+          'default': 35.2,
+          'minimum': 0,
+          'description': 'Average Jersey Birth Weight (kg/head)'
+        },
+        'birth_weight_std_je': {
+          'type': 'number',
+          'default': 0.9,
+          'minimum': 0,
+          'description': 'Jersey Birth Weight Standard Deviation (kg/head)'
+        },
+        'target_heifer_preg_day': {
+          'type': 'number',
+          'default': 420,
+          'minimum': 0,
+          'description': 'Target Heifer Pregnancy Day (days)'
+        },
+        'mature_body_weight_avg': {
+          'type': 'number',
+          'default': 1200,
+          'minimum': 0,
+          'description': 'Average Mature Body Weight (kg/head)'
+        },
+        'mature_body_weight_std': {
+          'type': 'number',
+          'default': 73.5,
+          'minimum': 0,
+          'description': 'Mature Body Weight Standard Deviation (kg/head)'
+        },
+        'preg_check_day_1': {
+          'type': 'number',
+          'default': 32,
+          'minimum': 0,
+          'description': 'Pregnancy Check Day 1 (days)'
+        },
+        'preg_loss_rate_1': {
+          'type': 'number',
+          'default': 0.02,
+          'minimum': 0,
+          'maximum': 0.1,
+          'description': 'Pregnancy Loss Rate 1'
+        },
+        'preg_check_day_2': {
+          'type': 'number',
+          'default': 60,
+          'minimum': 0,
+          'description': 'Pregnancy Check Day 2 (days)'
+        },
+        'preg_loss_rate_2': {
+          'type': 'number',
+          'default': 0.096,
+          'minimum': 0,
+          'maximum': 0.1,
+          'description': 'Pregnancy Loss Rate 2'
+        },
+        'preg_check_day_3': {
+          'type': 'number',
+          'default': 172,
+          'minimum': 0,
+          'description': 'Pregnancy Check Day 3 (days)'
+        },
+        'preg_loss_rate_3': {
+          'type': 'number',
+          'default': 0.017,
+          'minimum': 0,
+          'maximum': 0.1,
+          'description': 'Pregnancy Loss Rate 3'
+        },
+      },
+      "methane_mitigation": {
+        'methane_mitigation_method': {
+          'type': 'string',
+          'default': 'None',
+          'description': 'Methane Mitigation Method',
+          'pattern': '^{None|3-NOP|monensin|essential_oils|seaweed}$'
+        },
+        '3-NOP_additive_amount': {
+          'type': 'number',
+          'minimum': 40,
+          'maximum': 100,
+          'default': 70,
+          'description': '3-NOP Additive Amount (mg/kg DMI)'
+        },
+        'monensin_additive_amount': {
+          'type': 'number',
+          'minimum': 20,
+          'maximum': 36,
+          'default': 24,
+          'description': 'Monensin Additive Amount (mg/kg DMI)'
+        },
+        'essential_oils_additive_amount': {
+          'type': 'number',
+          'minimum': 0,
+          'maximum': 100,
+          'description': 'Essential Oils Additive Amount (mg/kg DMI)'
+        },
+        'seaweed_additive_amount': {
+          'type': 'number',
+          'minimum': 0,
+          'maximum': 100,
+          'description': 'Seaweed Additive Amount (mg/kg DMI)'
+        }
+      }
+    }
+  }
+}
