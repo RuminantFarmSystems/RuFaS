@@ -921,16 +921,16 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
 
 @pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,should_fail,old_method",
                          [
-    (3.4, 3, 1.5, False, 0, False, False),  # No watering because water_occurs is False
-    (3.1, 5, 2.3, True, 0, False, False),  # No watering because rainfall takes care of watering
-    (0.2, 5, 3.6, True, 0, False, False),  # Watering occurs because water deficit has not been met
-    (0.19, 4, 2.8, True, 0, False, False), # No watering occurs because interval has not been met
-    (0.2, 5, 3.6, True, 9.24, True, False),
-    (0.2, 5, 3.6, False, 77.7, False, True)
-])
+                        (3.4, 3, 1.5, False, 0, False, False),  # No watering because water_occurs is False
+                        (3.1, 5, 2.3, True, 0, False, False),  # No watering because rainfall takes care of watering
+                        (0.2, 5, 3.6, True, 0, False, False),  # Watering occurs because water deficit has not been met
+                        (0.19, 4, 2.8, True, 0, False, False),  # No watering occurs because interval has not been met
+                        (0.2, 5, 3.6, True, 9.24, True, False),
+                        (0.2, 5, 3.6, False, 77.7, False, True)
+                        ])
 def test_determine_watering_amount(rainfall: float, days_into_interval: int, water_deficit: float,
                                    watering_occurs: float, irrigation: float, should_fail: bool,
-                                   old_method: bool)-> None:
+                                   old_method: bool) -> None:
     """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
         totals are updated correctly."""
     data = FieldData(watering_amount_in_liters=50_000, watering_interval=5,
