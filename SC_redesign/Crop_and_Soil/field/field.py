@@ -828,7 +828,7 @@ class Field:
             of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
-        watering_amount = self._determine_watering_amount(current_weather.rainfall)
+        watering_amount = self._determine_watering_amount(current_weather.rainfall, current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
 
@@ -888,7 +888,7 @@ class Field:
                 crop.data.cumulative_transpiration = 0.0
                 crop.data.cumulative_potential_evapotranspiration = 0.0
 
-    def _determine_watering_amount(self, rainfall: float, irrigation: float) -> float:
+    def _determine_watering_amount(self, rainfall: float, irrigation=0.0) -> float:
         """Manages watering of the field.
 
         Parameters
@@ -911,21 +911,27 @@ class Field:
         resources is tracked on an annual basis, so that water budgeting may be accurately predicted.
 
         """
-        if not self.field_data.watering_occurs:
+        # Old method that uses hard coded irrigation amount from the weather data
+        if self.field_data.watering_occurs and irrigation > 0:
+            raise ValueError("Expected to use hardcoded irrigation data or specified amount, but tried to use both")
+        elif not self.field_data.watering_occurs and irrigation > 0:
+            self.field_data.annual_irrigation_water_use_total += irrigation
+            return irrigation
+        elif self.field_data.watering_occurs and irrigation == 0:
+            self.field_data.current_water_deficit -= rainfall
+            self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
+
+            if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
+                self.field_data.days_into_watering_interval = 0
+                water_applied_this_interval = self.field_data.current_water_deficit
+                self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
+                self.field_data.annual_irrigation_water_use_total += water_applied_this_interval
+                return water_applied_this_interval
+
+            self.field_data.days_into_watering_interval += 1
             return 0.0
-
-        self.field_data.current_water_deficit -= rainfall
-        self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
-
-        if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
-            self.field_data.days_into_watering_interval = 0
-            water_applied_this_interval = self.field_data.current_water_deficit
-            self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
-            self.field_data.annual_irrigation_water_use_total += water_applied_this_interval
-            return water_applied_this_interval
-
-        self.field_data.days_into_watering_interval += 1
-        return 0.0
+        else:
+            return 0.0
 
     def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.
