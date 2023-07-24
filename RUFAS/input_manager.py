@@ -305,7 +305,7 @@ class InputManager:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
-        
+
         for i, element in enumerate(input_data_value):
             element_hierarchy = element_hierarchy + [f"{var_name}[{i}]"]
             element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
@@ -313,6 +313,8 @@ class InputManager:
 
             if not element_counter_and_validity["is_valid"]:
                 return False
+
+            element_hierarchy.pop()
 
         return True
 

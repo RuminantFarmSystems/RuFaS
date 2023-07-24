@@ -292,8 +292,23 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
             "property_map_key1": {
                 "element1": {"type": "string", "pattern": r"^\d{3}-\d{2}-\d{4}$"},
                 "element2": {"type": "number", "minimum": 0, "maximum": 150},
-                "element3": {"type": "array",
-                             "minimum_length": 1, "maximum_length": 5},
+                "element3": {
+                             "type": "array",
+                             "minimum_length": 1,
+                             "name": {
+                                "type": "string",
+                                "pattern": "^[A-Za-z]+$"
+                             },
+                             "color": {
+                                "type": "string",
+                                "enum": ["red", "green", "yellow"]
+                             },
+                             "quantity": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100
+                                }
+                            }
             }
         }
     }
