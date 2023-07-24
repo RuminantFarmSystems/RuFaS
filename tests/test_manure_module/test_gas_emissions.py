@@ -114,7 +114,7 @@ def test_aneerobic_coefficient(
     """Tests _aneerobic_coefficient() in gas_emissions.py."""
     if should_throw:
         with pytest.raises(ValueError):
-            GasEmissions._anaerobic_coefficient(
+            GasEmissions._anaerobic_effect(
                 oxygen_mole_fraction=oxygen_mole_fraction,
                 oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
             )
@@ -123,7 +123,7 @@ def test_aneerobic_coefficient(
             (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction))
             * ((0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
         )
-        assert GasEmissions._anaerobic_coefficient(
+        assert GasEmissions._anaerobic_effect(
                 oxygen_mole_fraction=oxygen_mole_fraction,
                 oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
             ) == pytest.approx(expected)
@@ -142,7 +142,7 @@ def test_calc_total_carbon_decomposition(mocker: MockerFixture) -> None:
         return_value=c_decomp_rate
     )
     _ = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._anaerobic_coefficient',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._anaerobic_effect',
         return_value=anaerobic_effect
     )
     expected = (total_solids * 0.5 + bedding_mass * 0.35) * c_decomp_rate * 0.65 * anaerobic_effect

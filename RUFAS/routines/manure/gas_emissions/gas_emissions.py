@@ -653,11 +653,12 @@ class GasEmissions:
     def calc_mcf(cls, ambient_barn_temp: float) -> float:
         """
         Calculate the Methane Conversion Factor (MCF) using the exponential function:
-        MCF(T) = MCF_CONSTANT_A * e^(MCF_CONSTANT_B * T)
+
+        MCF(T) = 7.11 * e^(0.0884 * t)
 
         Parameters
         ----------
-        ambient_barn_temperature : float
+        ambient_barn_temp : float
             The ambient barn temperature (in Celsius).
 
         Returns
@@ -674,11 +675,14 @@ class GasEmissions:
         of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
         management.
 
+        CH4 emission = (VS * Bo * 0.67 * MCF) / 100
+
         Parameters
         ----------
         manure_volatile_solids : float
             The volatile solids (in kg)
-        ambient_barn_temperature : float
+
+        ambient_barn_temp : float
             The ambient barn temperature (in Celsius)
 
         Returns
@@ -697,8 +701,9 @@ class GasEmissions:
     @classmethod
     def _microbial_decomp_rate(cls, temperature: float) -> float:
         """
-        Calculates the microbial decomposition (unitless) rate per day.
+        Calculates the microbial decomposition (unitless) rate per day:
 
+        max decomp rate = eff. decomp rate * (1.066^(temp - 10) - 1.21^(temp - 50))
 
         Parameters
         ----------
@@ -716,6 +721,27 @@ class GasEmissions:
 
     @classmethod
     def _carbon_decomposition_rate(cls, days_since_last_tillage: int = 1, lag: int = 2) -> float:
+        """
+        Calculates the carbon decomposition taking place in the composting process of
+        the manure-bedding mix due to microbial activity.
+
+        Rate C Decomp = (max decomp rate - slow decomp rate) *
+        e^(decay * (days_since_last_tillage - lag)) * slow decomp rate
+
+        Parameters
+        ----------
+        days_since_last_tillage : int
+            The number of days since manure was last tilled
+
+        lag : int
+            Lag time in days.
+
+        Returns
+        -------
+        float
+            The carbon decomposition rate per day (unitless)
+
+        """
         decomposition_temp = 60
         compost_bed_pack_temp = 30
         decay = 0.1
@@ -732,29 +758,33 @@ class GasEmissions:
         return c_decomp_rate
 
     @classmethod
-    def _anaerobic_coefficient(
+    def _anaerobic_effect(
         cls,
         oxygen_mole_fraction: float = 0.15,
         oxygen_half_saturation_constant: float = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT,
         oxygen_ambient_air_mole_fraction: float = 0.21
     ) -> float:
         """
-        Calculates the anaerobic coefficient.
+        Calculates the anaerobic effect.
+
+        Anaerobic effect = (O2 / (O2,hsat + O2)) * ((O2,hsat + O2,amb) / O2,amb)
 
 
         Parameters
         ----------
         oxygen_mole_fraction : float
             Mole fraction of oxygen in the air within the windrow
+
         oxygen_half_saturation_constant : float
             half saturation constant for oxygen gas
+
         oxygen_ambient_air_mole_fraction : fot
             mole fraction of oxygen gas in ambient air
 
         Returns
         -------
         float
-            The anaerobic coefficient (unitless)
+            The anaerobic effect (unitless)
 
         Raises
         ------
@@ -766,11 +796,11 @@ class GasEmissions:
             raise ValueError(f"{oxygen_mole_fraction=} must be in the range [0, 1]")
         if not (0.0 < oxygen_ambient_air_mole_fraction < 1.0):
             raise ValueError(f"{oxygen_ambient_air_mole_fraction=} must be in the range [0, 1]")
-        anaerobic_coefficient = (
+        anaerobic_effect = (
             (oxygen_mole_fraction / (oxygen_half_saturation_constant + oxygen_mole_fraction))
             * ((oxygen_half_saturation_constant + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
         )
-        return anaerobic_coefficient
+        return anaerobic_effect
 
     @classmethod
     def calc_total_carbon_decomposition(
@@ -814,7 +844,7 @@ class GasEmissions:
         total_carbon = carbon_from_manure + carbon_from_bedding
 
         microbial_decomp_rate = cls._carbon_decomposition_rate(days_since_last_tillage, lag)
-        microbial_decomp_anaerobic_conditions_effect = cls._anaerobic_coefficient()
+        microbial_decomp_anaerobic_conditions_effect = cls._anaerobic_effect()
         total_carbon_decomposition = (
             total_carbon
             * microbial_decomp_rate
