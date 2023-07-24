@@ -920,7 +920,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
 
 
 @pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,should_fail,old_method",
-                         [
+                        [
                         (3.4, 3, 1.5, False, 0, False, False),  # No watering because water_occurs is False
                         (3.1, 5, 2.3, True, 0, False, False),  # No watering because rainfall takes care of watering
                         (0.2, 5, 3.6, True, 0, False, False),  # Watering occurs because water deficit has not been met
