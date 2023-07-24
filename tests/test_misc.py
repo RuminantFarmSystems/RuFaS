@@ -633,7 +633,9 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs.assert_called_once_with(path)
     mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
-    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(f"{path}/CSVs/om/variables")
+    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(
+        os.path.join(path, "CSVs", "om", "variables")
+    )
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
