@@ -29,7 +29,7 @@ class BodyWeightHistory:
 
 class AnimalBase(object):
     config = {}
-    nutrients = {}
+    nutrients = None
 
     @staticmethod
     def set_nutrient_list(nutrients):
@@ -58,8 +58,7 @@ class AnimalBase(object):
         self.breed = args['breed']
         self.birth_date = args['birth_date']
         self.days_born = args['days_born']
-        #self.semen_used = self.config['semen_type']
-        self.semen_used = self.config.get('semen_type', 'default_semen_type')
+        self.semen_used = self.config['semen_type']
         self.culled = False
         self.do_not_breed = False
         self.body_weight_history = []
