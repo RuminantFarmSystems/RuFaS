@@ -24,4 +24,6 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
 
     DMI_CONSTRAINT_PERCENT = 0.20
-    
+
+    DAILY_MILK_VARIATION_MEAN = 0
+    DAILY_MILK_VARIATION_STD_DEV = 1.0

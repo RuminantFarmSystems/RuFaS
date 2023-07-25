@@ -388,13 +388,7 @@ def protein_constraint(x):
     # Total metabolizable protein supply
     MP_supply = MPbact + RUP_diet + 0.4 * 11.8 * DMI
 
-    # B: PROTEIN REQUIREMENTS:
-    # Maintenance Requirement
-    # ---------------------
-    # [A.Cow.B.1]-[A.Heifer.B.1]
-    # Metabolizable protein requirement for maintenance (g)
-    MPm = (DMI * 1000 * 0.03 - 0.5 * ((MPbact / 0.8) - MPbact)) + 0.4 * 11.8 * (DMI / 0.67)
-    return (MP_supply - ((MP_req + MPm) / 1000))
+    return (MP_supply - (MP_req / 1000))
 
 
 def NDF_constraint_1(x):
@@ -463,8 +457,7 @@ def fat_constraint(x):
 def DMI_constraint_lower(x):
     """
     Constraint in place to make sure the sum of all the feeds in the ration is
-    greater than the DMI_est + 20% calculated in the requirements
-    greater than the DMI_est + 20% calculated in the requirements
+    greater than the DMI_est - 20% calculated in the requirements
 
     Args:
         x: The decision vector of the NLP
@@ -550,6 +543,7 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
+        # print((key, targetbounds))
     return tribounds
 
 
@@ -601,6 +595,7 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         x0.append(random.random() * 10)
     # OPTIMIZE:
     # establishing the bounds of the NLP
+
     # Dividing limit by 3 for tri-decision variables for farm grown feeds
     if udrv.udr_or_not:
         bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)

@@ -164,6 +164,29 @@ def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.Op
     ration['objective'] = NLP.objective(solution.x)
     return ration
 
+def make_solution_from_fixed_ration(ration: Dict) -> List:
+    """
+    makes solution object from returned fixed ration for use in get_ration_vals function in ration_NLP.py
+    Simply puts the value in triplicate, and multiplies by the MEact defined in the set_globals function
+
+    Parameters
+    ----------
+    ration: Dict
+
+    Returns
+    -------
+    List
+
+    """
+    solution_from_ration = []
+    for key in ration.keys():
+        if key != 'status' and key != 'objective':
+            solution_from_ration.append(ration[key]/3)
+            solution_from_ration.append(ration[key]/3)
+            solution_from_ration.append(ration[key]/3)
+    return solution_from_ration
+
+
 #TODO how should we handle type hints for classes that aren't imported already? Import just for type hint?
 def get_user_defined_ration(req: animal_requirements, pen, available_feeds, animal_grouping_scenario) \
     -> tuple[Dict[str, float], Dict[str, float]]:
@@ -247,8 +270,10 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
             
     if fixed_ration:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
+        ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
     elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         ration = make_ration_from_solution(available_feeds, solution)
+        ration_vals = NLP.get_ration_vals(solution.x)
     else:
         print('ERROR') #TODO output to error log? Or force a fixed ration?
     return ration, ration_vals
@@ -307,7 +332,7 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
         pen: an object of class Pen
         available_feeds: an object of class AvailableFeeds
         animal_grouping_scenario: A grouping scenario of animals used in the current simulation, specified in
-            AnimalGroupingScenario enum and AnimalManagement class
+            AnimalGroupingScenario enum and AnimalManager class
 
     """
     # creating instance of class requirements
@@ -537,7 +562,7 @@ class Requirements:
 
         Args:
             pen: an instance of an object of class Pen
-            animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManagement
+            animal_grouping_scenario: a grouping scenario fixed for current simulation, specified in AnimalManager
             recalc: boolean to see if requirements need to be recalculated since grouping
         """
         NEmaint = []
