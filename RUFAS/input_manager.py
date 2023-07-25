@@ -231,14 +231,17 @@ class InputManager:
                                         "invalid_elements": 0, "is_valid": True}
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][properties_blob_key])
+        print("element_hierarchy:", element_hierarchy)
+        print("self.__metadata['properties'][properties_blob_key]:", self.__metadata["properties"][properties_blob_key])
+
         var_type = variable_properties["type"]
         is_nested = var_type == "object"
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
             for nested_key in variable_properties.keys():
-                element_hierarchy.append(nested_key)
-                element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
+                nested_hierarchy = element_hierarchy + nested_key
+                element_counter_and_validity = self._validate_element(nested_hierarchy, properties_blob_key,
                                                                       input_data, eager_termination)
                 is_child_valid = element_counter_and_validity["is_valid"]
                 if eager_termination and not is_child_valid:
@@ -307,10 +310,11 @@ class InputManager:
                 return False
 
         for i, element in enumerate(input_data_value):
-            element_hierarchy = element_hierarchy + [f"{var_name}[{i}]"]
+            element_hierarchy = element_hierarchy.append(f"{var_name}[{i}]")
+            print("element_hierarchy before:", element_hierarchy)
             element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
                                                                   {var_name: element}, eager_termination=False)
-
+            print("element_hierarchy after:", element_hierarchy)
             if not element_counter_and_validity["is_valid"]:
                 return False
 
