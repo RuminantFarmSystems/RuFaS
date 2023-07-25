@@ -1,2 +1,0 @@
-^LifeCycleManager.*update$
-.*milk.*update

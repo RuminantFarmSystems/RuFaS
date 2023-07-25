@@ -118,7 +118,7 @@ Joseph Merhi, <a class="reference external" href="mailto:jm2257&#37;&#52;&#48;co
 </dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.animal.animal_management.AnimalManagement">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.animal_management.</span></span><span class="sig-name descname"><span class="pre">AnimalManagement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.animal.animal_management.</span></span><span class="sig-name descname"><span class="pre">AnimalManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weather</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.animal.animal_management.AnimalManagement" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Manages all animal routines (i.e. calling daily updates, allocating animals
 to pens, etc). Stores a list of all animals and pens in the simulation as
@@ -391,7 +391,7 @@ in the simulation and calls &#64;animal_management’s daily_updates() method
 with &#64;feed and &#64;time as arguments. [Note that currently, &#64;weather and
 &#64; time are not used in animal updates.]</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>animal_management: instance of the AnimalManagement class
+<dt>Args:</dt><dd><p>animal_management: instance of the AnimalManager class
 feed: instance of the Feed class
 weather: instance of the Weather class as defined in classes.py
 time: instance of the Time class as defined in classes.py</p>

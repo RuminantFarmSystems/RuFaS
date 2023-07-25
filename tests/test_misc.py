@@ -6,8 +6,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 """
 
 import os
-from typing import Callable
-from typing import Dict
+import re
+from typing import Any, Callable, Dict
 from mock import Mock, mock_open, patch
 
 import pytest
@@ -138,12 +138,12 @@ def test_advance_time(
     """Unit test for function _advance_time in file RUFAS/simulation_engine.py"""
     mocker.patch("RUFAS.classes.Time.to_str")
     mocker.patch("RUFAS.classes.Time.advance")
-    patch_simulation_engine.state.animal_management.simulation_day = 1
+    patch_simulation_engine.state.animal_manager.simulation_day = 1
     patch_simulation_engine._advance_time(False)
     patch_simulation_engine._advance_time(True)
     assert patch_simulation_engine.time.advance.call_count == 2
     assert patch_simulation_engine.time.to_str.call_count == 1
-    assert patch_simulation_engine.state.animal_management.simulation_day == 3
+    assert patch_simulation_engine.state.animal_manager.simulation_day == 3
 
 
 def test_input_prompt():
@@ -319,6 +319,36 @@ def mock_output_manager(mocker) -> OutputManager:
     return output_manager
 
 
+@pytest.mark.parametrize("data, expected_result, should_write", [
+    ({"var1": {"values": [1.0, True, "test", {"key": 1}]}},
+     f"var1{os.linesep}1.0{os.linesep}True{os.linesep}test{os.linesep}{{'key': 1}}{os.linesep}",
+     True),
+    ({}, "",
+     False),
+    ({"var1": {"values": [1, 2, 3]}},
+     f"var1{os.linesep}1{os.linesep}2{os.linesep}3{os.linesep}",
+     True),
+    ({"var1": {"not a value": [1]}}, "",
+     False),
+])
+def test_dict_to_csv(
+    mock_output_manager: OutputManager,
+    data: Dict[str, Any],
+    expected_result: str,
+    should_write: bool
+) -> None:
+    """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
+    open_mock = mock_open()
+
+    with patch("builtins.open", open_mock):
+        mock_output_manager._dict_to_file_csv(data, "test")
+
+    if should_write:
+        open_mock.assert_called_with("test", "w", encoding="utf-8", errors="strict", newline='')
+    written_data = ''.join(call[1][0] for call in open_mock().write.mock_calls)
+    assert written_data == expected_result
+
+
 def test_generate_key(mocker: MockerFixture) -> None:
     """Unit test for function _generate_key in file output_manager.py"""
     om = OutputManager()
@@ -353,6 +383,18 @@ def test_generate_key(mocker: MockerFixture) -> None:
     assert key == "dummy_prefix.key_name.dummy_suffix"
 
 
+def test_get_timestamp(mocker: MockerFixture) -> None:
+    """Unit test for the function _get_timestamp in file output_manager.py"""
+    om = OutputManager()
+    # match 28-Jun-2023_Wed_15-48-21.406585
+    timestamp_with_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}\.\d{6}"
+    # match 28-Jun-2023_Wed_15-48-21
+    timestamp_without_millis_pattern = r"\d{2}-[A-Za-z]{3}-\d{4}_[A-Za-z]{3}_\d{2}-\d{2}-\d{2}"
+
+    assert re.match(timestamp_with_millis_pattern, om._get_timestamp(include_millis=True))
+    assert re.match(timestamp_without_millis_pattern, om._get_timestamp(include_millis=False))
+
+
 def test_add_error(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
@@ -361,13 +403,17 @@ def test_add_error(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
+    timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
 
     mock_output_manager.add_error(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map.get("timestamp") == timestamp
     mock_output_manager._add_to_pool(
         mock_output_manager.errors_pool, key, value, info_map
     )
@@ -377,6 +423,9 @@ def test_add_error(
     ]
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
+    ]
+    mock_output_manager._get_timestamp = output_manager_original_method_states[
+        "_get_timestamp"
     ]
 
 
@@ -388,13 +437,17 @@ def test_add_warning(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
+    timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
 
     mock_output_manager.add_warning(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map.get("timestamp") == timestamp
     mock_output_manager._add_to_pool(
         mock_output_manager.warnings_pool, key, value, info_map
     )
@@ -404,6 +457,9 @@ def test_add_warning(
     ]
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
+    ]
+    mock_output_manager._get_timestamp = output_manager_original_method_states[
+        "_get_timestamp"
     ]
 
 
@@ -415,13 +471,17 @@ def test_add_log(
     key = "dummy_key"
     name = "dummy_name"
     value = "dummy_value"
+    timestamp = "18-Jan-2023_Wed_22-38-14.123456"
     info_map = {}
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
+    mock_output_manager._get_timestamp = MagicMock(return_value=timestamp)
 
     mock_output_manager.add_log(name, value, info_map)
 
     mock_output_manager._generate_key.assert_called_once_with(name, info_map)
+
+    assert info_map.get("timestamp") == timestamp
     mock_output_manager._add_to_pool(
         mock_output_manager.logs_pool, key, value, info_map
     )
@@ -431,6 +491,9 @@ def test_add_log(
     ]
     mock_output_manager._add_to_pool = output_manager_original_method_states[
         "_add_to_pool"
+    ]
+    mock_output_manager._get_timestamp = output_manager_original_method_states[
+        "_get_timestamp"
     ]
 
 
@@ -525,9 +588,11 @@ def output_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
+        "_get_timestamp": mock_output_manager._get_timestamp,
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
         "_dict_to_file_json": mock_output_manager._dict_to_file_json,
+        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
         "_add_to_pool": mock_output_manager._add_to_pool,
         "_exclude_info_maps": mock_output_manager._exclude_info_maps,
@@ -544,6 +609,7 @@ def output_manager_original_method_states(
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
+        "save_variables_to_csv_files ": mock_output_manager.save_variables_to_csv_files,
     }
 
 
@@ -558,16 +624,18 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
+    mock_output_manager.save_variables_to_csv_files = MagicMock()
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
 
     mock_output_manager.dump_errors.assert_called_once_with(path)
     mock_output_manager.dump_warnings.assert_called_once_with(path)
     mock_output_manager.dump_logs.assert_called_once_with(path)
-    mock_output_manager.dump_variables.assert_called_once_with(
-        path, False
-    )
+    mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
+    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(
+        os.path.join(path, "CSVs", "om", "variables")
+    )
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
@@ -575,6 +643,8 @@ def test_dump_all_pools(
     assert mock_output_manager.dump_logs.call_count == 2
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
+    assert mock_output_manager.dump_variables.call_count == 2
+    assert mock_output_manager.save_variables_to_csv_files.call_count == 2
 
     # Restore original methods
     mock_output_manager.dump_variables = output_manager_original_method_states[
@@ -590,19 +660,24 @@ def test_dump_all_pools(
     mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
         "dump_variable_names_and_contexts"
     ]
+    mock_output_manager.save_variables_to_csv_files = output_manager_original_method_states[
+        "save_variables_to_csv_files "
+    ]
 
 
 def test_generate_file_name(mocker: MockerFixture) -> None:
     """Unit test for function _generate_file_name in file output_manager.py"""
     timestamp = "18-Jan-2023_Wed_22-38-14"
-    mocker.patch("time.strftime", return_value=timestamp)
     base_name = "dummy_name"
     extension = "ext"
     om = OutputManager()
-    assert (
-        om._generate_file_name(base_name, extension)
-        == f"{base_name}_{timestamp}.{extension}"
-    )
+
+    with patch.object(om, "_get_timestamp") as mock_method:
+        mock_method.return_value = timestamp
+        assert (
+            om._generate_file_name(base_name, extension)
+            == f"{base_name}_{timestamp}.{extension}"
+        )
 
 
 def test_dump_variables(
@@ -626,6 +701,36 @@ def test_dump_variables(
     ]
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
         "_dict_to_file_json"
+    ]
+
+
+def test_save_variables_to_csv_files(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+) -> None:
+    """Test case for function save_variables_to_csv_files in output_manager.py"""
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._dict_to_file_csv = MagicMock()
+    original_variables_pool = mock_output_manager.variables_pool
+    mock_output_manager.variables_pool = {"var1": {"values": [1]}}
+
+    with patch('pathlib.Path.mkdir') as mock_mkdir:
+        mock_mkdir.return_value = None
+        mock_output_manager.save_variables_to_csv_files("dummy_path")
+
+    mock_mkdir.assert_called_with(parents=True, exist_ok=True)
+    mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
+    mock_output_manager._dict_to_file_csv.assert_called_once_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
+
+    mock_output_manager.variables_pool = original_variables_pool
+    # Restore original methods
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._dict_to_file_csv = output_manager_original_method_states[
+        "_dict_to_file_csv"
     ]
 
 
@@ -853,10 +958,11 @@ def test_filter_variables_pool_include_empty_filter_pattern_pool(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = []
     expected_result = {}
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -876,6 +982,7 @@ def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["exclude"]
     expected_result = {
         "key1": "value1",
@@ -883,7 +990,7 @@ def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
         "key3": "value3"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -902,13 +1009,14 @@ def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["key1", "key2"]
     expected_result = {
         "key1": "value1",
         "key2": "value2"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -928,12 +1036,13 @@ def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["exclude", "key1", "key2"]
     expected_result = {
         "key3": "value3"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -953,12 +1062,13 @@ def test_filter_variables_pool_non_matching_pattern(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["key1", "key4"]
     expected_result = {
         "key1": "value1"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -978,13 +1088,14 @@ def test_filter_variables_pool_exclude_non_matching_pattern(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["exclude", "key1", "key4"]
     expected_result = {
         "key2": "value2",
         "key3": "value3"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
 
 def test_filter_variables_pool_duplicate_patterns(
@@ -998,12 +1109,13 @@ def test_filter_variables_pool_duplicate_patterns(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["key1", "key1"]
     expected_result = {
         "key1": "value1"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -1023,13 +1135,14 @@ def test_filter_variables_pool_exclude_duplicate_patterns(
         "key2": "value2",
         "key3": "value3"
     }
+    dummy_input_file = ""
     filter_patterns = ["exclude", "key1", "key1"]
     expected_result = {
         "key2": "value2",
         "key3": "value3"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -1038,13 +1151,9 @@ def test_filter_variables_pool_exclude_duplicate_patterns(
     mock_output_manager.variables_pool = {}
 
 
-def test_filter_variables_pool_regex_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable]
-) -> None:
-    """Test case for pattern pool using regex patterns with
-    function _filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
+@pytest.fixture
+def mock_variables_pool() -> Dict[str, str]:
+    dummy_variables_pool = {
         "DummyClass1.dummy_fun1.dummy_var1": "value1",
         "DummyClass1.dummy_fun1.dummy_var2": "value2",  # same class as prev, same fun, different var
         "DummyClass2.dummy_fun2.dummy_var3": "value3",  # new class, new fun, new var
@@ -1053,6 +1162,18 @@ def test_filter_variables_pool_regex_patterns(
         "DummyClass3.dummy_fun4.dummy_var2": "value6",  # new class, new fun, same var name as 2nd entry
         "DummyClass4.dummy_fun2.dummy_var5": "value7"   # new class, same fun name as 3rd entry, new var
     }
+    return dummy_variables_pool
+
+
+def test_filter_variables_pool_regex_patterns(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    mock_variables_pool: Dict[str, str],
+) -> None:
+    """Test case for pattern pool using regex patterns with
+    function _filter_variables_pool in output_manager.py"""
+    mock_output_manager.variables_pool = mock_variables_pool
+    dummy_input_file = ""
 
     # get all Class1 vars
     filter_patterns = ["^DummyClass1.*"]
@@ -1061,7 +1182,7 @@ def test_filter_variables_pool_regex_patterns(
         "DummyClass1.dummy_fun1.dummy_var2": "value2"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # get only vars from fun2s
     filter_patterns = [".*fun2.*"]
@@ -1070,7 +1191,7 @@ def test_filter_variables_pool_regex_patterns(
         "DummyClass4.dummy_fun2.dummy_var5": "value7"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # get Class2 with var4 but not Class2 with var3
     filter_patterns = ["^DummyClass2.*var4$"]
@@ -1079,7 +1200,7 @@ def test_filter_variables_pool_regex_patterns(
         "DummyClass2.dummy_fun4.dummy_var4": "value5"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # get all var2s and var4s
     filter_patterns = [".*var2$", ".*var4$"]
@@ -1090,7 +1211,7 @@ def test_filter_variables_pool_regex_patterns(
         "DummyClass3.dummy_fun4.dummy_var2": "value6"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -1101,19 +1222,13 @@ def test_filter_variables_pool_regex_patterns(
 
 def test_filter_variables_pool_exclude_regex_patterns(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable]
+    output_manager_original_method_states: Dict[str, Callable],
+    mock_variables_pool: Dict[str, str],
 ) -> None:
     """Test case for pattern pool with regex patterns and exclude keyword with
     function _filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "DummyClass1.dummy_fun1.dummy_var1": "value1",
-        "DummyClass1.dummy_fun1.dummy_var2": "value2",  # same class as prev, same fun, different var
-        "DummyClass2.dummy_fun2.dummy_var3": "value3",  # new class, new fun, new var
-        "DummyClass2.dummy_fun3.dummy_var4": "value4",  # same class as prev, new fun, new var
-        "DummyClass2.dummy_fun4.dummy_var4": "value5",  # same class as prev, new fun, same var
-        "DummyClass3.dummy_fun4.dummy_var2": "value6",  # new class, new fun, same var name as 2nd entry
-        "DummyClass4.dummy_fun2.dummy_var5": "value7"   # new class, same fun name as 3rd entry, new var
-    }
+    mock_output_manager.variables_pool = mock_variables_pool
+    dummy_input_file = ""
 
     # get everything except Class1 vars
     filter_patterns = ["exclude", "^DummyClass1.*"]
@@ -1125,7 +1240,7 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass4.dummy_fun2.dummy_var5": "value7"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # get everything except vars from fun2s
     filter_patterns = ["exclude", ".*fun2.*"]
@@ -1137,7 +1252,7 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass3.dummy_fun4.dummy_var2": "value6"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # get everything without Class2 with var4
     filter_patterns = ["exclude", "^DummyClass2.*var4$"]
@@ -1149,7 +1264,7 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass4.dummy_fun2.dummy_var5": "value7"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # get everything that doesn't have var2s and var4s
     filter_patterns = ["exclude", ".*var2$", ".*var4$"]
@@ -1159,7 +1274,7 @@ def test_filter_variables_pool_exclude_regex_patterns(
         "DummyClass4.dummy_fun2.dummy_var5": "value7"
     }
 
-    assert mock_output_manager._filter_variables_pool(filter_patterns) == expected_result
+    assert mock_output_manager._filter_variables_pool(filter_patterns, dummy_input_file) == expected_result
 
     # Restore original method
     mock_output_manager._filter_variables_pool = output_manager_original_method_states[
@@ -1267,7 +1382,7 @@ def test_make_serializable_recursive(
 ) -> None:
     """Unit test for function _make_serializable() in file util.py"""
     # Arrange
-    patch_for_get_str = mocker.patch.object(
+    _ = mocker.patch.object(
         Utility, "_get_str", side_effect=lambda x: str(x)
     )
 
