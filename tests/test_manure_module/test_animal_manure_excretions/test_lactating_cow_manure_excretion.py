@@ -42,7 +42,8 @@ def test_methane_mitigation(NDF_concentration, EE_concentration, starch_concentr
         ("Mutian", "3-NOP"),
         ("Mills", "Monensin"),
         ("IPCC", "Essential Oils"),
-        ("IPCC", "Seaweed")
+        ("IPCC", "Seaweed"),
+        ("Mutian", "None")
     ]
 )
 def test_lactating_cow_manure_calculations(methane_model: str, methane_mitigation_method: str, mocker: MockerFixture) -> None:
