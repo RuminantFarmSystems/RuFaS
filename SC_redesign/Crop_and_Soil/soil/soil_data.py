@@ -346,39 +346,30 @@ class SoilData:
             wilting water point and another layer has water content less than its wilting point, the first layer will
             not have to compensate for the deficit in the second layer.
         """
-        if self.soil_layers is None:
-            return 0
-        else:
-            water_sum = 0
-            for layer in self.soil_layers:
-                water_sum += max(0.0, (layer.water_content - layer.wilting_point_content))
-            return water_sum
+        water_sum = 0
+        for layer in self.soil_layers:
+            water_sum += max(0.0, (layer.water_content - layer.wilting_point_content))
+        return water_sum
 
     @property
     def profile_saturation(self) -> float:
         """
         Returns: amount of water in the soil profile when completely saturated (mm)
         """
-        if self.soil_layers is None:
-            return 0
-        else:
-            saturation_sum = 0
-            for layer in self.soil_layers:
-                saturation_sum += layer.saturation_content
-            return saturation_sum
+        saturation_sum = 0
+        for layer in self.soil_layers:
+            saturation_sum += layer.saturation_content
+        return saturation_sum
 
     @property
     def profile_field_capacity(self) -> float:
         """
          Returns: total amount of water contained in the entire soil profile at field capacity (but not saturated) (mm)
         """
-        if self.soil_layers is None:
-            return 0
-        else:
-            field_capacity_sum = 0
-            for layer in self.soil_layers:
-                field_capacity_sum += layer.field_capacity_content
-            return field_capacity_sum
+        field_capacity_sum = 0
+        for layer in self.soil_layers:
+            field_capacity_sum += layer.field_capacity_content
+        return field_capacity_sum
 
     @property
     def soil_water_factor(self) -> float:
@@ -408,13 +399,10 @@ class SoilData:
     @property
     def profile_nitrates_total(self) -> float:
         """Calculates and returns the total amount of nitrates in the soil (kg per hectare)"""
-        if self.soil_layers is None:
-            return 0
-        else:
-            nitrates_sum = 0
-            for layer in self.soil_layers:
-                nitrates_sum += layer.nitrate_content
-            return nitrates_sum
+        nitrates_sum = 0
+        for layer in self.soil_layers:
+            nitrates_sum += layer.nitrate_content
+        return nitrates_sum
 
     @property
     def cover_factor(self) -> float:
