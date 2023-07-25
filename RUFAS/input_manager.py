@@ -244,8 +244,8 @@ class InputManager:
             children_status: Dict[str, bool] = {}
             false_counter = 0
             for nested_key in variable_properties.keys():
-                nested_hierarchy = element_hierarchy + nested_key
-                element_counter_and_validity = self._validate_element(nested_hierarchy, properties_blob_key,
+                element_hierarchy = element_hierarchy.append(nested_key)
+                element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
                                                                       input_data, eager_termination)
                 is_child_valid = element_counter_and_validity["is_valid"]
                 if eager_termination and not is_child_valid:
@@ -261,7 +261,7 @@ class InputManager:
 
             return is_valid
         else:
-            var_name = input_data_hierarchy[-1]
+            var_name = element_hierarchy[-1]
             try:
                 input_data_value = reduce(lambda d, key: d[key], input_data_hierarchy, input_data)
             except KeyError:
@@ -284,7 +284,7 @@ class InputManager:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data_hierarchy, input_data)
+                is_fixed = self._fix_data(variable_properties, input_data_hierarchy, input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
@@ -383,7 +383,7 @@ class InputManager:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
-    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str], input_data_hierarchy: list,
+    def _fix_data(self, variable_properties: dict[str, Any], input_data_hierarchy: list,
                   input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.

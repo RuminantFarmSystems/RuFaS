@@ -326,6 +326,20 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
+def test_validate_element_array_type(mock_input_manager: InputManager,
+                                     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                     input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for array type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element3": [1, 2, 3]}
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
 @pytest.mark.parametrize(
     "input_data_value, expected_result",
     [
@@ -399,6 +413,29 @@ def test_validate_element_invalid_var_type_raises_keyerror(mock_input_manager: I
                                              eager_termination)
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+@pytest.mark.parametrize(
+    'dummy_value, dummy_variable_to_check, expected_result, expected_warning_call_count',
+    [
+        ([1, 2, 3], {"minimum_length": 5, "maximum_length": 10}, False, 1),
+        ([1, 2, 3, 4, 5], {"minimum_length": 5, "maximum_length": 10}, True, 0),
+        ([1, 2, 3, 4, 5, 6, 7], {"minimum_length": 5}, True, 0),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {"maximum_length": 10}, True, 0),
+        ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], {"minimum_length": 5, "maximum_length": 10}, False, 1),
+        ([], {"minimum_length": 5}, False, 1),
+    ]
+)
+def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
+                              expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
+    """Unit test for function _array_type_validator function in file input_manager.py"""
+    dummy_var_name = "dummy_array"
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._array_type_validator(dummy_variable_to_check, dummy_var_name, dummy_value)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
 
 
 @pytest.mark.parametrize(
