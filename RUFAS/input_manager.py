@@ -229,10 +229,14 @@ class InputManager:
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
+        # if any element in element_hierarchy is a number, replace with "properties"
+        input_data_hierarchy = element_hierarchy[:]
+        if any(isinstance(element, int) for element in element_hierarchy):
+            for i in range(len(element_hierarchy)):
+                if isinstance(element_hierarchy[i], int):
+                    element_hierarchy[i] = "properties"
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][properties_blob_key])
-        print("element_hierarchy:", element_hierarchy)
-        print("self.__metadata['properties'][properties_blob_key]:", self.__metadata["properties"][properties_blob_key])
 
         var_type = variable_properties["type"]
         is_nested = var_type == "object"
@@ -257,9 +261,9 @@ class InputManager:
 
             return is_valid
         else:
-            var_name = element_hierarchy[-1]
+            var_name = input_data_hierarchy[-1]
             try:
-                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
+                input_data_value = reduce(lambda d, key: d[key], input_data_hierarchy, input_data)
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
@@ -273,14 +277,14 @@ class InputManager:
                 raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
             is_valid = validator(variable_properties, var_name, input_data_value,
-                                 properties_blob_key, element_hierarchy)
+                                 properties_blob_key, input_data_hierarchy, eager_termination)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
+                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data_hierarchy, input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
@@ -289,7 +293,7 @@ class InputManager:
                 return element_counter_and_validity
 
     def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list,
-                              properties_blob_key: str, element_hierarchy: list) -> bool:
+                              properties_blob_key: str, input_data_hierarchy: list, eager_termination: bool) -> bool:
         """Validates an input data element of type array."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._array_type_validator.__name__,
@@ -308,23 +312,19 @@ class InputManager:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
-
-        for i, element in enumerate(input_data_value):
-            element_hierarchy = element_hierarchy.append(f"{var_name}[{i}]")
-            print("element_hierarchy before:", element_hierarchy)
-            element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
-                                                                  {var_name: element}, eager_termination=False)
-            print("element_hierarchy after:", element_hierarchy)
+        for index, element in enumerate(input_data_value):
+            input_data_hierarchy.append(f"[{index}]")
+            element_counter_and_validity = self._validate_element(input_data_hierarchy, properties_blob_key, element,
+                                                                  eager_termination)
             if not element_counter_and_validity["is_valid"]:
                 return False
-
-            element_hierarchy.pop()
+            input_data_hierarchy.pop()
 
         return True
 
     def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
                             input_data_value: Union[int, float], properties_blob_key: str,
-                            element_hierarchy: list) -> bool:
+                            element_hierarchy: list, eager_termination: bool) -> bool:
         """Validates an input data number element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._num_type_validator.__name__,
@@ -346,8 +346,9 @@ class InputManager:
 
         return True
 
-    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, 
-                               input_data_value: str, properties_blob_key: str, element_hierarchy: list) -> bool:
+    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
+                               input_data_value: str, properties_blob_key: str, element_hierarchy: list,
+                               eager_termination: bool) -> bool:
         """Validates an input data string element."""
         info_map = {"class": self.__class__.__name__,
                     "function": self._string_type_validator.__name__,
@@ -378,11 +379,11 @@ class InputManager:
         return True
 
     def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool,
-                             properties_blob_key: str, element_hierarchy: list) -> bool:
+                             properties_blob_key: str, element_hierarchy: list, eager_termination: bool) -> bool:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
-    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
+    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str], input_data_hierarchy: list,
                   input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
@@ -409,11 +410,11 @@ class InputManager:
 
         if 'default' not in variable_properties.keys():
             return False
-        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
+        variable_parent = reduce(lambda d, key: d[key], input_data_hierarchy[:-1],
                                  input_data)
-        variable_parent[element_hierarchy[-1]] = variable_properties['default']
+        variable_parent[input_data_hierarchy[-1]] = variable_properties['default']
         om.add_warning("Data fixed",
-                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+                       f"Invalid data fixed: {input_data_hierarchy[-1]} => {variable_properties['default']}",
                        info_map)
         return True
 
