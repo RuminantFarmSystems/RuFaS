@@ -53,7 +53,7 @@
     has an instance of LifeCycleManager, which is where the daily
     update methods are stored.
 
-  .. image:: media/image1.png
+  .. image:: media/image6.png
      :width: 6.18229in
      :height: 4.46829in
      :name: Figure 2
@@ -140,7 +140,7 @@
     (4) If it is the end of a ration_interval, we:
       #. Iterate through each animal to calculate the animals’ general nutrient 
          requirements. (See :ref:`calf-requirements`, :ref:`heifer-requirements`,
-         :ref:`dairy-cattle-requirements`, and :ref:`cow-heifer-calf-combined-requirements`)
+         :ref:`dairy-cattle-requirements`)
       #. Allocate the animals to pens based on their animal groups, their age or
          their days in milk.
       #. Calculate the average or X percentile of nutrient requirements for the 

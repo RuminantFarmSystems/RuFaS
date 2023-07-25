@@ -11,6 +11,7 @@ Welcome to Ruminant Farm Simulation (RuFaS)'s documentation!
    :caption: Contents:
 
    modules
+   manual
 
 Indices and tables
 ==================

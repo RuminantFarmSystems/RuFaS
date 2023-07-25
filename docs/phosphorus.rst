@@ -618,7 +618,7 @@ D. **Phosphorus in the animal**
 
    bw = animal body weight (kg)
 
-.. image:: media/image1.jpg
+.. image:: media/phosphorus.jpg
    :alt: A close up of a map Description automatically generated
    :width: 6.5in
    :height: 3.86875in

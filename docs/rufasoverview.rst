@@ -1,5 +1,5 @@
-   **Ruminant Farm Systems Model: Development Progress and
-   Applications**
+Ruminant Farm Systems Model: Development Progress and Applications
+==================================================================
 
    | K. F. Reed
    | Department of Animal Science
@@ -60,7 +60,7 @@ images, and an SQL database. The model uses a daily time-step and is
 programmed in Python, an adaptable and easy to read computer programming
 language.
 
-   .. image:: RuFaSOverviewGraphs/media/image1.png
+   .. image:: media/image1.png
       :width: 6.44167in
       :height: 3.77083in
 
