@@ -1453,7 +1453,7 @@ def test_make_ration_from_solution():
     price = []
     for _ in range(len(mock_solution.x)):
         price.append(0.0)
-    UFAS.routines.animal.ration.ration_NLP.price = price
+    RUFAS.routines.animal.ration.ration_NLP.price = price
     # TODO how to reset the above? Since it relies on a global, I tried patch
         # however, this solution worked for now, and forthcoming PRs will remove usage of globals
 
