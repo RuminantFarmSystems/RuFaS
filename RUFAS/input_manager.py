@@ -393,8 +393,8 @@ class InputManager:
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
 
-        element_hierarchy: List[str]
-            A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+        input_data_hierarchy: List[str]
+            A list of strings indicating the path to reach the variable of interest in the input data.
 
         input_data: dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.
