@@ -54,12 +54,6 @@ class Soil:
         self.soil_erosion = SoilErosion(self.data)
         """Process component that track erosion from the soil profile"""
 
-    @classmethod
-    def make_from_config(cls, soil_config) -> Soil:
-        """Creates a soil profile with attributes specified in the soil_config passed"""
-        Warning("create from config file not yet implement, returning default Soil()")
-        return Soil()
-
     def daily_soil_routine(self, solar_radiation: float, avg_temp: float, min_temp: float, max_temp: float,
                            plant_cover: float, snow_cover: float, avg_annual_air_temp: float) -> None:
         """this method calls all now-water related daily update routines
