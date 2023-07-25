@@ -633,3 +633,51 @@ def test_nutrient_cycling_water_factor(water_content: float, field_capacity: flo
         observed = layer.nutrient_cycling_water_factor
         expected = max(0.05, water_content / field_capacity)
         assert observed == expected
+
+
+@pytest.mark.parametrize("plant_surface_residue,plant_root_residue,expected", [
+    (16, 4, 20),
+    (16.5, 4.5, 21),
+    (0, 0, 0)
+])
+def test_all_residue(plant_surface_residue: float, plant_root_residue: float, expected: float) -> None:
+    """Tests the property method all_residue sums up the residues correctly"""
+    with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.plant_surface_residue", plant_surface_residue), \
+         patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.plant_root_residue", plant_root_residue):
+        soil_data = SoilData(field_size=0.98)
+        assert soil_data.all_residue == expected
+
+
+def test_soil_data_post_init_error() -> None:
+    """Test that the correct errors were thrown when incorrect values were used in post init"""
+    with pytest.raises(TypeError) as e:
+        soil_data = SoilData(field_size=0.98)
+        soil_data.__post_init__(None)
+        assert str(e) == "'field_size' attribute is NoneType, must be given value when SoilData is initialized."
+
+    with pytest.raises(ValueError) as e2:
+        soil_data = SoilData(field_size=0.98)
+        soil_data.__post_init__(-20)
+        assert str(e2) == "Expected field_size to be greater than 0, received -20."
+
+
+@pytest.mark.parametrize("cover_type", [
+    "BARE",
+    "RESIDUE_COVER",
+    "GRASSED",
+    "SOU"
+])
+def test_cover_factor(cover_type: str) -> None:
+    """Test that the cover factor method returns the correct value for each time or else gives the right error"""
+    soil_data = SoilData(field_size=0.98, cover_type=cover_type)
+    if cover_type == "BARE":
+        assert soil_data.cover_factor == 0.5333
+    elif cover_type == "RESIDUE_COVER":
+        assert soil_data.cover_factor == 0.6667
+    elif cover_type == "GRASSED":
+        assert soil_data.cover_factor == 0.8
+    else:
+        with pytest.raises(ValueError) as e:
+            soil_data.cover_factor
+            assert str(e) == f"Expected cover type to be \'BARE\', \'RESIDUE_COVER\', or \'GRASSED\', " \
+                             f"received: '{cover_type}'."
