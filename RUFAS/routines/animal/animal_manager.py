@@ -1,11 +1,11 @@
 """
 RUFAS: Ruminant Farm Systems Model
-File name: animal_management.py
+File name: animal_manager.py
 
 Description: The class which manages all of the animal routines and keeps track of
     all animals and pens. All operations are as described in the Animal Module
     Information Flow document on Basecamp (such as daily animal updates and
-    pen allocation). Method calls cascade through from the animal management
+    pen allocation). Method calls cascade through from the animal manager
     class to pen to each individual animal in that pen. The life cycle of each animal
     is controlled by an instance of the LifeCycleManager class, and this instance
     updates the animals daily.
@@ -40,6 +40,7 @@ from RUFAS.routines.animal.ration import ration_driver as ration_driver
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
+from RUFAS.routines.animal.ration import user_defined_ration as udr
 
 import random
 from statistics import mean
@@ -47,26 +48,25 @@ from typing import Any, Dict, Tuple, List
 
 om = OutputManager()
 
-from RUFAS.routines.animal.ration import user_defined_ration as udr
 
-def daily_animal_routine(animal_management, feed, weather, time):
+def daily_animal_routine(animal_manager, feed, weather, time):
     """
     Executes daily routines relating to Animals. This method is called every day
-    in the simulation and calls @animal_management's daily_updates() method
+    in the simulation and calls @animal_manager's daily_updates() method
     with @feed and @time as arguments. [Note that currently, @weather and
     @ time are not used in animal updates.]
 
     Args:
-        animal_management: instance of the AnimalManagement class
+        animal_manager: instance of the AnimalManager class
         feed: instance of the Feed class
         weather: instance of the Weather class as defined in classes.py
         time: instance of the Time class as defined in classes.py
     """
 
-    animal_management.daily_updates2(feed, weather, time)
+    animal_manager.daily_updates(feed, weather, time)
 
 
-class AnimalManagement:
+class AnimalManager:
     """
     Manages all animal routines (i.e. calling daily updates, allocating animals
     to pens, etc). Stores a list of all animals and pens in the simulation as
@@ -191,11 +191,11 @@ class AnimalManagement:
 
         # concentrate supplementation when farming type is "pasture", kg
         self.pasture_concentrate = data['pasture_concentrate']
-
+        
         udrv = udr.UserDefinedRationManager()
         self.ration_user_input = data['ration']['user_input']
         udrv.udr_or_not = self.ration_user_input
-
+        
         # how often a ration is calculated, days
         self.formulation_interval = data['ration']['formulation_interval']
 
@@ -211,7 +211,7 @@ class AnimalManagement:
 
             self.init_nutrient_rqmts(weather, time, feed)
 
-            self.allocate_animals_to_pens2()
+            self.allocate_animals_to_pens()
 
         self._print_animal_num_warnings(data['herd_information'])
 
@@ -251,37 +251,6 @@ class AnimalManagement:
             pen = Pen(**pen_data)
 
             self.all_pens.append(pen)
-
-        self._init_default_pens(herd_data['herd_num'])
-
-    def _init_default_pens(self, herd_num):
-        """
-            Initializes default pens if not enough exist in the simulation.
-            Args:
-                herd_num: number of animals in the herd
-            """
-
-        num_pens = len(self.all_pens)
-        num_additional_pens_needed = self.MIN_NUM_PENS - len(self.all_pens)
-
-        info_map = {"class": self.__class__.__name__,
-                    "function": self.init_pens.__name__,
-                    "MIN_NUM_PENS": self.MIN_NUM_PENS,
-                    "num_pens": num_pens,
-                    "num_additional_pens_needed": num_additional_pens_needed
-                    }
-
-        # Check if any default pens need to be added
-        if num_additional_pens_needed > 0 and herd_num > 0:
-            om.add_warning("invalid_pen_num_warning",
-                           f"Warning: herd_num > 0, but num_pens = {num_pens}."
-                           + f" Initializing {num_additional_pens_needed} additional pens.",
-                           info_map)
-            for i in range(num_additional_pens_needed):
-                new_default_pen = Pen(0, 0.1, 1.6, 100, 'open air barn', 'sawdust', 'freestall',
-                                      "manual scraping", "screw press", "slurry storage outdoor",
-                                      Pen.AnimalCombination.NONE, 1.2)
-                self.all_pens.append(new_default_pen)
 
     def init_animals(self, config, herd_data: Dict[str, Any]):
         """
@@ -420,7 +389,9 @@ class AnimalManagement:
             if pen.animal_combination.name == 'LAC_COW' or pen.animal_combination.name =='CLOSE_UP':
                 for animal in pen.animals_in_pen:
                     animal.milk_production_reduction = 0.0
+
                     
+
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
         Updates the entire animal_to_pen_id_map dictionary so that each animal's ID is
@@ -624,9 +595,9 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> AnimalManagement._calc_max_animal_spaces_per_pen(num_stalls=10, max_stocking_density=1.5)
+        >>> AnimalManager._calc_max_animal_spaces_per_pen(num_stalls=10, max_stocking_density=1.5)
         15
-        >>> AnimalManagement._calc_max_animal_spaces_per_pen(num_stalls=5, max_stocking_density=2.0)
+        >>> AnimalManager._calc_max_animal_spaces_per_pen(num_stalls=5, max_stocking_density=2.0)
         10
 
         """
@@ -687,7 +658,7 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> pen = AnimalManagement._create_default_pen(pen_id=1, \
+        >>> pen = AnimalManager._create_default_pen(pen_id=1, \
         animal_combination=Pen.AnimalCombination.CALF, num_stalls=10, max_stocking_density=1.5)
         >>> pen.id
         1
@@ -934,13 +905,13 @@ class AnimalManagement:
 
         Examples
         --------
-        >>> AnimalManagement.plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManager.plan_animal_allocation(num_animals=90, max_spaces_in_pens=[50, 30, 20])
         [45, 27, 18]
 
-        >>> AnimalManagement.plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManager.plan_animal_allocation(num_animals=70, max_spaces_in_pens=[50, 30, 20])
         [35, 21, 14]
 
-        >>> AnimalManagement.plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
+        >>> AnimalManager.plan_animal_allocation(num_animals=47, max_spaces_in_pens=[50, 30, 20])
         [22, 15, 10]
 
         """
@@ -965,42 +936,6 @@ class AnimalManagement:
         return num_animals_in_pens
 
     def allocate_animals_to_pens(self) -> None:
-        """
-        Allocate animals to pens based on the current animal population and the number of pens available.
-
-        New default pens will be created if necessary. This method distributes the animals among the pens,
-        ensuring that the animal density of each pen matches the overall density as closely as possible.
-
-        Returns
-        -------
-        None
-
-        """
-
-        self.pens_by_animal_combination = self._group_pens_by_animal_combination(self.all_pens)
-
-        # For now, we are only considering the following animal combinations:
-        animals_by_combination = {
-            Pen.AnimalCombination.CALF: self.calves,
-            Pen.AnimalCombination.GROWING: self.heiferIs + self.heiferIIs,
-            Pen.AnimalCombination.CLOSE_UP: self.heiferIIIs + self._get_dry_cows(self.cows),
-            Pen.AnimalCombination.LAC_COW: self._get_lactating_cows(self.cows),
-        }
-
-        for animal_combination, animals in animals_by_combination.items():
-            new_default_pens = self._create_default_pens_for_potential_space_shortage(
-                num_animals=len(animals),
-                pens=self.pens_by_animal_combination[animal_combination],
-                animal_combination=animal_combination,
-                start_pen_id=len(self.all_pens)
-            )
-            self.all_pens.extend(new_default_pens)
-            self.pens_by_animal_combination[animal_combination].extend(new_default_pens)
-            self._allocate_animals_to_pens_helper(animals, self.pens_by_animal_combination[animal_combination])
-
-        self.fully_update_animal_to_pen_id_map()
-
-    def allocate_animals_to_pens2(self) -> None:
         """
         Allocate animals to pens based on the current animal population and the number of pens available.
         New default pens will be created if necessary. This method distributes the animals among the pens,    ensuring that the animal density of each pen matches the overall density as closely as possible.
@@ -1094,7 +1029,7 @@ class AnimalManagement:
         Parameters
         ----------
         cows: List
-            the list of cows in the animal management class
+            the list of cows in the animal manager class
 
         Returns
         -------
@@ -1176,62 +1111,6 @@ class AnimalManagement:
         for pen in self.all_pens:
             if pen.populated:
                 pen.daily_p_update()
-
-    
-    def daily_updates(self, feed, weather, time):
-        """
-        Executes the daily routines relating to Animals. All animals are
-        updated through the life_cycle_manager's daily_update() method. The
-        daily phosphorus calculations are also done. If it is the end of the
-        ration interval, the animals are allocated to new pens and the ration &
-        manure calculations are done.
-
-        Args:
-            feed: instance of the Feed class defined in feed.py
-            weather: instance of the Weather class defined in classes.py
-            time: instance of the Time class defined in classes.py
-        """
-        if self.simulate_animals:
-            for pen in self.all_pens:
-                pen.populated = len(pen.animals_in_pen) > 0
-
-            if self.end_ration_interval():
-                self.reset_milk_production_reduction()
-
-            animals_added, animals_removed, calves_born, self.calves, self.heiferIs, \
-                self.heiferIIs, self.heiferIIIs, self.cows = \
-                self.life_cycle_manager.daily_update(self.simulation_day,
-                                                     self.calves,
-                                                     self.heiferIs,
-                                                     self.heiferIIs,
-                                                     self.heiferIIIs, self.cows)
-            temp = weather.T_avg[time.year - 1][time.day - 1]
-            self.daily_update_id_map(animals_added, animals_removed, calves_born, feed, temp)
-
-            # phosphorus requirements for daily updates
-            self.calc_p_rqmts()  # per animal
-
-            if self.end_ration_interval():
-                self.reset_milk_production_reduction()
-                self.calc_nutrient_rqmts(feed, temp)  # per animal
-                self.clear_pens()
-                self.allocate_animals_to_pens()
-                self.calc_ration(feed)  # per pen
-                self.calc_avg_growth()  # per pen
-                for pen in self.all_pens:
-                    if pen.animal_combination.name == 'LAC_COW':
-                        for animal in pen.animals_in_pen:
-                            animal.update_milk_production_history(self.simulation_day)
-
-            # manure excretion
-            self.calc_manure_excretion(feed, self.methane_model)  # per animal
-
-            self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-            # phosphorus updates
-            self.daily_p_update()  # per animal
-            self.calc_all_p_conc()  # per animal
-
-            self.record_pen_history()
 
     def end_ration_interval(self):
         """
@@ -1500,7 +1379,8 @@ class AnimalManagement:
                     counter += 1
                     if counter > 50:
                         raise Exception('Too many attempts at optimizing ration.')
-                
+
+                # recording ration nutrition information in pen
                 nutrient_amount, nutrient_conc = ration_driver.ration_report(ration_per_animal, feed.available_feeds)
                 pen.ration_nutrient_amount = nutrient_amount
                 pen.ration_nutrient_conc = nutrient_conc
@@ -1522,7 +1402,6 @@ class AnimalManagement:
                 pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
 
-                # TODO add in sim_day or other information to info_maps?
                 info_map = {"class": self.__class__.__name__,
                     "function": self._calc_ration_at_interval.__name__,
                     "available_feeds": available_feeds.feed_id, }
@@ -1737,7 +1616,7 @@ class AnimalManagement:
                                                  self.phosphorus_concentration_by_animal_class[type(animal)])
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
-    def daily_updates2(self, feed, weather, time):
+    def daily_updates(self, feed, weather, time):
         """
         Execute the daily routines relating to Animals. All animals are
         updated through the life_cycle_manager's daily_update() method. The
@@ -1793,12 +1672,11 @@ class AnimalManagement:
             self._update_phosphorus_concentrations()  # Average phosphorus concentration per animal type
             self.record_pen_history()
 
-
             if self.end_ration_interval():
                 self.reset_milk_production_reduction()
                 self.calc_nutrient_rqmts(feed, temp)  # per animal
                 self.clear_pens()
-                self.allocate_animals_to_pens2()
+                self.allocate_animals_to_pens()
                 self._calc_ration_at_interval(feed)  # per pen
                 self.calc_avg_growth()  # per pen
                 for pen in self.all_pens:
