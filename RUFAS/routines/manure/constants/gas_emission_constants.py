@@ -20,9 +20,7 @@ class GasEmissionConstants:
     """
 
     GAS_CONSTANT = 8.314
-    """
-    The ideal gas constant (J/mol :math:`\cdot` K).
-    """
+    """The ideal gas constant (J/mol :math:`\cdot` K)."""
 
     ACHIEVABLE_METHANE_EMISSION = 0.24
     """Achievable emission of methane (:math:`CH_4`) during anaerobic digestion (kg :math:`CH_4`/kg VS)."""
