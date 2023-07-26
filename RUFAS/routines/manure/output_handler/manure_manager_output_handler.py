@@ -672,8 +672,8 @@ class ManureManagerOutputHandler:
                     title=plot_name,
                 )
 
-    @classmethod
-    def _make_simple_scatter_plot_with_matplotlib(cls, output_path: Path, x: pd.Series, y: pd.Series, x_label: str,
+    @staticmethod
+    def _make_simple_scatter_plot_with_matplotlib(output_path: Path, x: pd.Series, y: pd.Series, x_label: str,
                                                   y_label: str, title: str) -> None:
         """
         Create a scatter plot from two data series using matplotlib.
@@ -701,6 +701,8 @@ class ManureManagerOutputHandler:
         None
 
         """
+        if x.empty or y.empty:
+            return
         if y.dtype.kind not in 'iuf' or y.hasnans:
             return
         small, medium, large = 10, 12, 16
