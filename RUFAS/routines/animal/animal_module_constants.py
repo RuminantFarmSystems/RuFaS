@@ -34,5 +34,5 @@ class AnimalModuleConstants:
     URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND = 12
     '''The upper bound of urine urea nitrogen concentration '''
 
-   
-    
+    DAILY_MILK_VARIATION_MEAN = 0
+    DAILY_MILK_VARIATION_STD_DEV = 1.0

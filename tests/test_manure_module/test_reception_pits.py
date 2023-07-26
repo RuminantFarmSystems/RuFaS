@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
 
@@ -124,7 +124,7 @@ def test_daily_update(mocker: MockerFixture) -> None:
     mock_manure_handler_daily_output.liquid_manure_potassium = K = 9.0
     mock_manure_handler_daily_output.total_daily_manure_volume = total_daily_manure_volume = 10.0
 
-    mock_pen = mocker.MagicMock(auto_spec=ManureManagementPen)
+    mock_pen = mocker.MagicMock(auto_spec=ManureManagerPen)
     mock_pen.num_animals = num_animals = 100
 
     mock_bedding = mocker.MagicMock(auto_spec=BaseBedding)

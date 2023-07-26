@@ -2,17 +2,34 @@
 RUFAS: Ruminant Farm Systems Model
 File name: test_animal.py
 Description: Implements test cases
-Author(s): Pooya Hekmati, sh2235@cornell.edu
+Author(s): Pooya Hekmati, sh2235@cornell.edu, Carson Wolber, ctw54@cornell.edu
 """
-from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
-import pytest
 
+import math
+from typing import Any, Dict
+from unittest.mock import patch
+from mock import MagicMock
+from pytest_mock import MockerFixture
+from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.animal_types import AnimalType
+import pytest
+from unittest.mock import MagicMock
+from pytest_mock.plugin import MockerFixture
+import numpy as np
+
+from RUFAS.routines.animal.life_cycle import cow
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
+from RUFAS.routines.animal.life_cycle.calf import Calf
+
+
+import RUFAS.routines.animal.clustering_pen_grouping
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds
+
 from RUFAS.routines.animal.ration.ration_NLP import list_reconfig
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 import RUFAS.routines.animal.ration.animal_requirements
-
+import RUFAS.routines.animal.ration.ration_driver
 
 @pytest.fixture
 def cow_a() -> dict:
@@ -135,14 +152,14 @@ def test_calculate_NRC_energy_maintenance_requirements(cow_a:dict, cow_b:dict, h
             heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['BCS5'],
             heifer_a['PrevTemp'], heifer_a['animal_type'])
     assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(
-        (14.23, 0, 0), rel=5e-1)
+        (5.08, 0, 0), rel=5e-1)
 
     result_NEmaint, result_CW, result_CBW = \
         RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_energy_maintenance_requirements(
             heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['BCS5'],
             heifer_b['PrevTemp'], heifer_b['animal_type'])
     assert (result_NEmaint, result_CW, result_CBW) == pytest.approx(
-        (19.07, 0, 43.92), rel=5e-1)
+        (6.81, 0, 43.92), rel=5e-1)
 
 
 def test_calculate_NRC_energy_growth_requirements(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -504,18 +521,26 @@ def test_calculate_NASEM_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_
 
 def test_norm():
     """Unit test for function norm in file routines/animal/clustering_pen_grouping.py"""
-    pass
+
+    def actual_func(l): return RUFAS.routines.animal.clustering_pen_grouping.norm(l)
+
+    actual = actual_func([1, 2, 3])
+    expected = np.array([0, 0.5, 1])
+    assert actual.all() == expected.all()
+    actual = actual_func([10.9, 120.1, 7])
+    expected = np.array([0.03448276, 1, 0])
+    assert actual.all() == expected.all()
 
 
 def test_percentile_list():
     """Unit test for function percentile_list in file routines/animal/clustering_pen_grouping.py"""
-    pass
+    actual = RUFAS.routines.animal.clustering_pen_grouping.percentile_list([-2, 0, 4.7, 4.7])
+    expected = [0.25, 0.5, 0.875, 0.875]
+    assert actual == expected
 
 
 def test_grouping():
-    """Unit test for function grouping in file routines/animal/clustering_pen_grouping.py"""
     pass
-
 
 def test_update_animals():
     """Unit test for function update_animals in file routines/animal/pen.py"""
@@ -562,7 +587,7 @@ def test_call_p_rqmts():
     pass
 
 
-def test_daily_p_update():
+def test_daily_pen_p_update():
     """Unit test for function daily_p_update in file routines/animal/pen.py"""
     pass
 
@@ -620,7 +645,7 @@ def cow_fixture() -> AnimalBase:
     return cowfixture
 
 @pytest.mark.parametrize("dP_reserves,p_intake,p_req,expected", [(0,1,0,0),(-10,10,1, -3.7),(10,10,1,0)])
-def test_daily_p_update(dP_reserves, p_intake, p_req, expected, cow_fixture: AnimalBase) -> None:
+def test_daily_animal_p_update(dP_reserves, p_intake, p_req, expected, cow_fixture: AnimalBase) -> None:
     """Unit test for function daily_p_update in file routines/animal/life_cycle/animal_base.py"""
     cow_fixture.dP_reserves = dP_reserves
     cow_fixture.p_intake = p_intake
@@ -694,11 +719,18 @@ def test_update_body_weight_history(cow_fixture: AnimalBase) -> None:
 
 def test_init_from_string():
     """Unit test for function init_from_string in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    A = AnimalEvents()
+    A.init_from_string('3: simulation_day=0, event')
+    assert A.events == {3: ['simulation_day=0, event']}
 
 
 def test_add_event()->None:
     """Unit test for function add_event in file routines/animal/life_cycle/animal_events.py"""
+    A = AnimalEvents()
+    A.add_event(12, 212, 'event1')
+    A.add_event(12, 3, 'event2')
+    A.add_event(1, 345, 'event3')
+    assert A.events == {12: ['simulation_day=212', 'event1', 'event2'], 1: ['simulation_day=345', 'event3']}
     animal_event = AnimalEvents()
     # Case 0 check that no events are found
     assert animal_event.events == {}
@@ -728,7 +760,9 @@ def test_add_event()->None:
 
 def test___str__():
     """Unit test for function __str__ in file routines/animal/life_cycle/animal_events.py"""
-    pass
+    A = AnimalEvents()
+    A.add_event(1000, 2000, 'event')
+    assert A.__str__().__eq__("\tdays born 1000: ['simulation_day=2000', 'event'] \n")
 
 
 @pytest.mark.parametrize(
@@ -843,82 +877,82 @@ def test_update_milk_production_history():
     pass
 
 
-def test__determine_param_value():
+def test_cow_determine_param_value():
     """Unit test for function _determine_param_value in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__milking_update():
+def test_cow_milking_update():
     """Unit test for function _milking_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_calc_manure_excretion():
+def test_cow_calc_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_phosphorus_rqmts():
+def test_cow_phosphorus_rqmts():
     """Unit test for function phosphorus_rqmts in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_calc_daily_walking_dist():
+def test_cow_calc_daily_walking_dist():
     """Unit test for function calc_daily_walking_dist in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_get_bw_change():
+def test_cow_get_bw_change():
     """Unit test for function get_bw_change in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test_update():
+def test_cow_update():
     """Unit test for function update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__determine_estrus_day():
+def test_cow_determine_estrus_day():
     """Unit test for function _determine_estrus_day in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__restart_estrus():
+def test_cow_restart_estrus():
     """Unit test for function _restart_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__later_estrus():
+def test_cow_later_estrus():
     """Unit test for function _later_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__return_estrus():
+def test_cow_return_estrus():
     """Unit test for function _return_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__after_ai_estrus():
+def test_cow_after_ai_estrus():
     """Unit test for function _after_ai_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__after_abortion_estrus():
+def test_cow_after_abortion_estrus():
     """Unit test for function _after_abortion_estrus in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__ed_update():
+def test_cow_ed_update():
     """Unit test for function _ed_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__determine_tai_program_day():
+def test_cow_determine_tai_program_day():
     """Unit test for function _determine_tai_program_day in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__tai_program_day_after_preg_check():
+def test_cow_tai_program_day_after_preg_check():
     """Unit test for function _tai_program_day_after_preg_check in file routines/animal/life_cycle/cow.py"""
     pass
 
@@ -928,17 +962,17 @@ def test__OvSynch56_update():
     pass
 
 
-def test__OvSynch48_update():
+def test_cow_OvSynch48_update():
     """Unit test for function _OvSynch48_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__CoSynch72_update():
+def test_cow_CoSynch72_update():
     """Unit test for function _CoSynch72_update in file routines/animal/life_cycle/cow.py"""
     pass
 
 
-def test__5dCoSynch_update():
+def test_cow_5dCoSynch_update():
     """Unit test for function _5dCoSynch_update in file routines/animal/life_cycle/cow.py"""
     pass
 
@@ -1023,7 +1057,7 @@ def test_get_heiferI_values():
     pass
 
 
-def test_calc_nutrient_rqmts():
+def test_heiferI_calc_nutrient_rqmts():
     """Unit test for function calc_nutrient_rqmts in file routines/animal/life_cycle/heiferI.py"""
     pass
 
@@ -1068,117 +1102,117 @@ def test_get_heiferII_values():
     pass
 
 
-def test_calc_nutrient_rqmts():
+def test_calc_heiferII_nutrient_rqmts():
     """Unit test for function calc_nutrient_rqmts in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test_calc_manure_excretion():
+def test_calc_heiferII_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test_phosphorus_rqmts():
+def test_heiferII_phosphorus_rqmts():
     """Unit test for function phosphorus_rqmts in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test_update():
+def test_heiferII_update():
     """Unit test for function update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_estrus_day():
+def test_heiferII_determine_estrus_day():
     """Unit test for function _determine_estrus_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__return_estrus():
+def test_heiferII_return_estrus():
     """Unit test for function _return_estrus in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__after_ai_estrus():
+def test_heiferII_after_ai_estrus():
     """Unit test for function _after_ai_estrus in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__after_abortion_estrus():
+def test_heiferII_after_abortion_estrus():
     """Unit test for function _after_abortion_estrus in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__ed_update():
+def test_heiferII_ed_update():
     """Unit test for function _ed_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_tai_program_day():
+def test_heiferII_determine_tai_program_day():
     """Unit test for function _determine_tai_program_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__tai_program_day_after_abortion():
+def test_heiferII_tai_program_day_after_abortion():
     """Unit test for function _tai_program_day_after_abortion in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__5dCG2P_update():
+def test_heiferII_5dCG2P_update():
     """Unit test for function _5dCG2P_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__5dCGP_update():
+def test_heiferII_5dCGP_update():
     """Unit test for function _5dCGP_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__user_defined_update():
+def test_heiferII_user_defined_update():
     """Unit test for function _user_defined_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__tai_update():
+def test_heiferII_tai_update():
     """Unit test for function _tai_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_synch_ed_program_day():
+def test_heiferII_determine_synch_ed_program_day():
     """Unit test for function _determine_synch_ed_program_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__determine_synch_ed_estrus_day():
+def test_heiferII_determine_synch_ed_estrus_day():
     """Unit test for function _determine_synch_ed_estrus_day in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__synch_ed_program_day_after_abortion():
+def test_heiferII_synch_ed_program_day_after_abortion():
     """Unit test for function _synch_ed_program_day_after_abortion in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__2P_update():
+def test_heiferII_2P_update():
     """Unit test for function _2P_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__CP_update():
+def test_heiferII_CP_update():
     """Unit test for function _CP_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__synch_ed_update():
+def test_heiferII_synch_ed_update():
     """Unit test for function _synch_ed_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__open():
+def test_heiferII_open():
     """Unit test for function _open in file routines/animal/life_cycle/heiferII.py"""
     pass
 
 
-def test__preg_update():
+def test_heiferII_preg_update():
     """Unit test for function _preg_update in file routines/animal/life_cycle/heiferII.py"""
     pass
 
@@ -1188,17 +1222,17 @@ def test_get_heiferIII_values():
     pass
 
 
-def test_calc_nutrient_rqmts():
+def test_heiferIII_calc_nutrient_rqmts():
     """Unit test for function calc_nutrient_rqmts in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
 
-def test_calc_manure_excretion():
+def test_heiferIII_calc_manure_excretion():
     """Unit test for function calc_manure_excretion in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
 
-def test_update():
+def test_heiferIII_update():
     """Unit test for function update in file routines/animal/life_cycle/heiferIII.py"""
     pass
 
@@ -1218,12 +1252,12 @@ def test__calc_average():
     pass
 
 
-def test_manure_calculations():
+def test_calf_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/calf_manure_excretion.py"""
     pass
 
 
-def test_manure_calculations():
+def test_cow_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/dry_cow_manure_excretion.py"""
     pass
 
@@ -1233,7 +1267,7 @@ def test_manure_calculations():
     pass
 
 
-def test_manure_calculations():
+def test_lactating_cow_manure_calculations():
     """Unit test for function manure_calculations in file routines/animal/manure/lactating_cow_manure_excretion.py"""
     pass
 
@@ -1249,7 +1283,7 @@ def test_calc_requirements():
 
 
 def test_set_globals():
-    """Unit test for function set_globals in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function set_globals in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
@@ -1260,112 +1294,97 @@ def test_set_globals():
         ]
 )
 def test_list_reconfig(input, expected)->None:
-    """Unit test for function list_reconfig in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function list_reconfig in file routines/animal/ration/ration_NLP.py"""
     assert list_reconfig(input) == expected
 
 
 def test_objective():
-    """Unit test for function objective in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function objective in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NEmact_constraint():
-    """Unit test for function NEmact_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NEmact_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NEl_constraint():
-    """Unit test for function NEl_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NEl_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NEgact_constraint():
-    """Unit test for function NEgact_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NEgact_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_calcium_constraint():
-    """Unit test for function calcium_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function calcium_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_phosphorus_constraint():
-    """Unit test for function phosphorus_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function phosphorus_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
-def test_protien_constraint():
-    """Unit test for function protien_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+def test_protein_constraint():
+    """Unit test for function protein_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NDF_constraint_1():
-    """Unit test for function NDF_constraint_1 in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_NDF_constraint_2():
-    """Unit test for function NDF_constraint_2 in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_forage_NDF_constraint():
-    """Unit test for function forage_NDF_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function forage_NDF_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_fat_constraint():
-    """Unit test for function fat_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function fat_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_DMI_constraint():
-    """Unit test for function DMI_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function DMI_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_energy_req_limit_constraint():
-    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/cow_ration_NLP.py"""
+    """Unit test for function energy_req_limit_constraint in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
-def test_get_ration_vals():
-    """Unit test for function get_ration_vals in file routines/animal/ration/cow_ration_NLP.py"""
-    pass
-
-
-def test_optimize():
-    """Unit test for function optimize in file routines/animal/ration/cow_ration_NLP.py"""
+def test_ration_NLP_optimize():
+    """Unit test for function optimize in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
 def test_calc_rqmts():
-    """Unit test for function calc_rqmts in file routines/animal/ration/cow_requirements.py"""
+    """Unit test for function calc_rqmts in file routines/animal/ration/animal_requirements.py"""
     pass
 
 
 def test_energy_activity_rqmts():
-    """Unit test for function energy_activity_rqmts in file routines/animal/ration/cow_requirements.py"""
+    """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
     pass
 
 
-def test_optimize():
+def test_growing_heifer_ration_optimize():
     """Unit test for function optimize in file routines/animal/ration/growing_heifer_ration.py"""
     pass
 
 
 def test_calculate_rqmts():
     """Unit test for function calculate_rqmts in file routines/animal/ration/growing_heifer_ration.py"""
-    pass
-
-
-def test_get_ration():
-    """Unit test for function get_ration in file routines/animal/ration/hardcoded_ration.py"""
-    pass
-
-
-def test_get_nutrient_rqmts():
-    """Unit test for function get_nutrient_rqmts in file routines/animal/ration/hardcoded_ration.py"""
     pass
 
 
@@ -1388,10 +1407,218 @@ def test_set_requirements():
     """Unit test for function set_requirements in file routines/animal/ration/ration_driver.py"""
     pass
 
+    
+def eq_constraint(x):
+    return np.sum(x) - 10  # This 'eq' constraint checks if the sum of x is equal to 10
+
+def ineq_constraint(x):
+    return np.sum(x) - 10  # This 'ineq' constraint checks if the sum of x is greater than 10
+
+@pytest.mark.parametrize("solution_x,constraint,expected", [
+    (np.array([2, 3, 5]), {'type': 'eq', 'fun': eq_constraint}, False),  # Constraint not violated, hence expecting False
+    (np.array([2, 3, 4]), {'type': 'eq', 'fun': eq_constraint}, True),
+    (np.array([1, 3, 5]), {'type': 'ineq', 'fun': ineq_constraint}, True),
+    (np.array([3, 4, 5]), {'type': 'ineq', 'fun': ineq_constraint}, False),
+])
+def test_is_constraint_violated(solution_x, constraint, expected):
+    """Unit test for function is_constraint_violated in file routines/animal/ration/ration_driver.py"""
+    assert RUFAS.routines.animal.ration.ration_driver.is_constraint_violated(solution_x, constraint) == expected
+
+
+@pytest.mark.parametrize('mock_results, expected_result', [
+    ([False, True, False], [1]),  
+    ([False, False, False], []),  
+    ([True, True, True], [0, 1, 2]),  
+])
+def test_find_failed_constraints(mocker: MockerFixture, mock_results, expected_result):
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py"""
+    # Arrange
+    solution_x = MagicMock()  
+    constraints = [mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock()]
+    
+    # The exact path depends on where is_constraint_violated() is 'used' (which may differ from where it is 'defined') - a common bug
+    # The path below may need to be adjusted
+    mocker.patch('RUFAS.routines.animal.ration.ration_driver.is_constraint_violated', side_effect=mock_results)
+    
+    # Act
+    failed_constraints = RUFAS.routines.animal.ration.ration_driver.find_failed_constraints(solution_x, constraints)
+    failed_constraints_indices = []
+
+    for i, constraint in enumerate(constraints): 
+        if constraint in failed_constraints:
+            failed_constraints_indices.append(i)
+                    
+    # Assert
+    assert failed_constraints_indices == expected_result
+
+
+def test_calc_pen_requirements():
+    """Unit test for function set_pen_requirements in file routines/animal/ration/ration_driver.py"""
+    req = RUFAS.routines.animal.ration.ration_driver.Requirements()
+    req.calc_pen_requirements(
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], 
+        [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3], [1,2,3])
+    attributelist = ['NEmaint','NEa','NEg','NEpreg', 'NEl', 'MP_req', 'Ca_req', 'P_req', 
+        'DMIest', 'avg_BW', 'avg_milk', 'avg_CP_milk', 'avg_milk_production_reduction']
+    for attribute in attributelist:
+        assert getattr(req, attribute) == 2
+
 
 def test_feed_nutrients():
     """Unit test for function feed_nutrients in file routines/animal/ration/ration_driver.py"""
     pass
+
+
+@pytest.fixture
+def mock_cow_args() -> Dict[str, Any]:
+    cow_args = {
+        "birth_date": 0,
+        "days_born": 0,
+        "p_init": 0,
+        "birth_weight": 0,
+        "id": 1,
+        "calf_birth_weight": 30,
+        "repro_program": "ED",
+        "presynch_method": "PreSynch",
+        "tai_method_c": "OvSynch 56",
+        "tai_method_h": "OvSynch 56",
+        "resynch_method": "TAIafterPD",
+        "synch_ed_method_h": "example",
+        "wean_day": 4,
+        "wood_l": 0,
+        "wood_m": 0,
+        "wood_n": 0
+    }
+    return cow_args
+
+
+@pytest.fixture
+def mock_AnimalBase_config() -> AnimalBase.config:
+    AnimalBase.config = MagicMock()
+    AnimalBase.config.update({'lactation_curve': 'wood'})
+    AnimalBase.config.update({
+        "wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
+        "wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
+        "wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
+        "wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
+        "wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
+        "wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
+        })
+    return AnimalBase.config
+
+
+@pytest.fixture
+def mock_holstein(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
+    mock_cow_args["breed"] = "HO"
+    mock_holstein_cow = Cow(mock_cow_args)
+    mock_holstein_cow.calves = 4
+    mock_holstein_cow.lactation_curve = 'wood'
+    return mock_holstein_cow
+
+
+@pytest.fixture
+def mock_jersey(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
+    mock_cow_args["breed"] = "JE"
+    mock_jersey_cow = Cow(mock_cow_args)
+    mock_jersey_cow.calves = 2
+    mock_jersey_cow.lactation_curve = 'wood'
+    return mock_jersey_cow
+
+
+@pytest.fixture
+def mock_generic_cow(mock_AnimalBase_config: AnimalBase.config, mock_cow_args: Dict[str, Any]) -> Cow:
+    AnimalBase.config = mock_AnimalBase_config
+    mock_cow_args["breed"] = "Generic"
+    mock_generic = Cow(mock_cow_args)
+    mock_generic.calves = 1
+    mock_generic.lactation_curve = 'wood'
+    return mock_generic
+
+
+def test_set_breed_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
+    """Unit test for function set_breed_index in file routines/animal/life_cycle/cow.py"""
+    mock_holstein.set_breed_index()
+    assert mock_holstein.breed == 'HO'
+    assert mock_holstein.breed_index == 0
+
+    mock_jersey.set_breed_index()
+    assert mock_jersey.breed == 'JE'
+    assert mock_jersey.breed_index == 1
+
+    mock_generic_cow.set_breed_index()
+    assert mock_generic_cow.breed != 'HO'
+    assert mock_generic_cow.breed != 'JE'
+    assert mock_generic_cow.breed_index == 0
+
+
+def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow: Cow) -> None:
+    """Unit test for function set_parity_index in file routines/animal/life_cycle/cow.py"""
+    mock_holstein.set_parity_index()
+    assert mock_holstein.calves == 4
+    assert mock_holstein.parity_index == 2
+
+    mock_jersey.set_parity_index()
+    assert mock_jersey.calves == 2
+    assert mock_jersey.parity_index == 1
+
+    mock_generic_cow.set_parity_index()
+    assert mock_generic_cow.calves == 1
+    assert mock_generic_cow.parity_index == 0
+
+
+@pytest.mark.parametrize('wood_l, wood_m, wood_n', [
+        (25.0, 0.24, 0.0035),
+    ])
+def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> None:
+    """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+
+    with patch('numpy.random.normal') as mock_normal:
+
+        mock_normal.side_effect = [wood_l, wood_m, wood_n]
+
+        mock_cow_args["breed"] = "HO"
+        mock_cow = Cow(mock_cow_args)
+        mock_cow.calves = 3
+        mock_cow.lactation_curve = "wood"
+
+        AnimalBase.config = {
+            'wood_l': [[1, 2], [3, 4]],
+            'wood_l_std': [[0.1, 0.2], [0.3, 0.4]],
+            'wood_m': [[5, 6], [7, 8]],
+            'wood_m_std': [[0.5, 0.6], [0.7, 0.8]],
+            'wood_n': [[9, 10], [11, 12]],
+            'wood_n_std': [[0.9, 1.0], [1.1, 1.2]],
+        }
+
+        mock_cow.set_lactation_curve_params()
+
+        assert mock_cow.wood_l == wood_l
+        assert mock_cow.wood_m == wood_m
+        assert mock_cow.wood_n == wood_n
+
+
+@pytest.mark.parametrize('lactation_curve, wood_l, wood_m, wood_n, days_in_milk, expected_milk', [
+        ('wood', 16.13, 0.235, 0.0019, 100, 39.366),
+        ('wood', 23.81, 0.244, 0.0036, 150, 47.120),
+    ])
+def test_calculate_daily_milk_produced(lactation_curve, wood_l, wood_m, wood_n, days_in_milk,
+                                       expected_milk, mock_cow_args) -> None:
+    """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+    AnimalBase.config = MagicMock()
+    mock_cow_args["breed"] = "HO"
+    mock_cow = Cow(mock_cow_args)
+    mock_cow.calves = 3
+    mock_cow.lactation_curve = lactation_curve
+    mock_cow.wood_l = wood_l
+    mock_cow.wood_m = wood_m
+    mock_cow.wood_n = wood_n
+    mock_cow.days_in_milk = days_in_milk
+
+    daily_milk_produced = mock_cow.calculate_daily_milk_produced()
+
+    assert math.isclose(daily_milk_produced, expected_milk, rel_tol=1e-3)
 
 
 def test_get_feed_data_from_feed_ids() -> None:

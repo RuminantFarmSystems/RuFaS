@@ -5,7 +5,7 @@ Description: The class which represents a pen on the farm. Each pen has
     operations as described in the Animal Module Information Flow document on
     Basecamp (such as calculating average nutrient requirements, ration,
     manure excretion, etc). Method calls cascade through from the animal
-    management class to pen to each individual animal in that pen.
+    manager class to pen to each individual animal in that pen.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
@@ -175,7 +175,6 @@ class Pen:
         LAC_COW = 3  # lactating cows
 
         GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
-        NONE = 5  # TODO: Remove this option after fixing _init_default_pens() in AnimalManagement
 
     def __init__(self, pen_id: int, vertical_dist_to_milking_parlor: float, horizontal_dist_to_milking_parlor: float,
                  number_of_stalls: int, housing_type: str, bedding_type: str, pen_type: str, manure_handling: str,
@@ -260,6 +259,7 @@ class Pen:
         self.avg_growth = 0.0
 
         self.MEdiet = 0.0
+        self.avg_milk_production_reduction = 0.0
 
         # template for manure, calf_total, etc.
         self._manure_dict_template = AnimalManureExcretions(
@@ -339,7 +339,7 @@ class Pen:
         self.avg_nutrient_rqmts = {key: value for (
             key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float) -> None:
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction:float) -> None:
         """
         Sets the pen's average milk and average CP milk
 
@@ -352,6 +352,7 @@ class Pen:
         """
         self.avg_milk = avg_milk
         self.avg_CP_milk = avg_CP_milk
+        self.avg_milk_production_reduction = avg_milk_production_reduction
 
     def add_new_animals(self, new_animals: List[Union[Calf, Cow, HeiferI, HeiferII, HeiferIII]]) -> None:
         """
@@ -483,7 +484,7 @@ class Pen:
         om.add_variable("ration_nutrient_conc", nutrient_conc, info_map)
         om.add_variable("MEdiet", self.MEdiet, info_map)
         om.add_variable("dry_matter_intake", self.dry_matter_intake, info_map)
-
+        om.add_variable(f'avg_rqmts_for pen {self.id}', self.avg_nutrient_rqmts, info_map)
         for animal in self.animals_in_pen:
             animal.set_ration(ration_per_animal, nutrient_amount['dm'])
             animal.set_p_intake(nutrient_amount['phosphorus'],
