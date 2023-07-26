@@ -22,7 +22,7 @@ to initial grouping.
 Figure 1. An illustration of how the Animal Groups used to assign
 animals to pens, relate to the Animal Classes.
 
-.. image:: media/image1.jpg
+.. image:: media/penAlloc.jpg
    :alt: Diagram Description automatically generated
    :width: 4.53646in
    :height: 3.56812in

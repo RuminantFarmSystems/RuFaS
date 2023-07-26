@@ -179,7 +179,11 @@ Kebreab et al. (2023) have recently built three empirical equations for
 accounting the mitigation potential (% of reduction) of 3-NOP for
 reducing CH\ :sub:`4` yield emissions CH\ :sub:`4`/DMI; g/kg).
 
-:math:`Change\ in\ {CH}_{4}\ yield\ (\%) = - 30.8 - 0.226 \times (3NOP - 70.5) + 0.906 \times (NDF - 32.9) + 3.871 \times (EE - 4.2) - 0.337 \times (Starch - 21.1)`
++--------------------------------------------------------------------------+
+| :math:`Change\ in\ {CH}_{4}\ yield\ (\%) = - 30.8 - 0.226 \times (3NOP - |
+| 70.5) + 0.906 \times (NDF - 32.9) + 3.871 \times (EE - 4.2) - 0.337 * (S |
+| tarch - 21.1)`                                                           |
++--------------------------------------------------------------------------+
 
    Eq. 1
 
@@ -249,7 +253,11 @@ CH\ :sub:`4` yield WITHOUT 3-NOP addition, g/kg DMI = 20.8
 
 By applying Eq. 1, we get: *-16.8 % reduction in CH\ 4 yield emissions.*
 
-:math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906 \times (45.4\ \%\ NDF - 32.9) + 3.871 \times (4.00\ \%\ EE - 4.2) - 0.337 \times (11.1\ \%\ Starch - 21.1) = \ `
++---------------------------------------------------------------------------+
+| :math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906 |
+| \times (45.4\ \%\ NDF - 32.9) + 3.871 \times (4.00\ \%\ EE - 4.2) - 0.337 |
+| \times (11.1\ \%\ Starch - 21.1) = \ `                                    |
++---------------------------------------------------------------------------+
 
 -16.8%
 
@@ -283,7 +291,11 @@ CH\ :sub:`4` yield WITHOUT -NOP addition, g/kg DMI = 16.7
 
 By applying Eq. 1, we get: *-25.6% reduction in CH\ 4 yield emissions.*
 
-:math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906 \times (36.7\ \%\ NDF - 32.9) + 3.871 \times (4.49\ \%\ EE - 4.2) - 0.337 \times (19.7\ \%\ Starch - 21.1) = \ `-25.6%
++---------------------------------------------------------------------------+
+| :math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906 |
+| \times (36.7\ \%\ NDF - 32.9) + 3.871 \times (4.49\ \%\ EE - 4.2) - 0.337 |
+| \times (19.7\ \%\ Starch - 21.1) = \ `-25.6%                              |
++---------------------------------------------------------------------------+
 
 Then, 16.7 - (16.7 × 25.6%) = 4.28 → 12.4 g/kg (CH\ :sub:`4` yield
 emission WITH 3-NOP added to the diet).
@@ -438,6 +450,6 @@ mitigation potential of 3-nitrooxypropanol in lactating cows is
 influenced by basal diet composition. J. Dairy Sci. 105:4064–4082.
 https://doi.org/10.3168/jds.2021-20782
 
-.. |image1| image:: media/image1.png
+.. |image1| image:: media/3NOP.png
    :width: 6in
    :height: 6in

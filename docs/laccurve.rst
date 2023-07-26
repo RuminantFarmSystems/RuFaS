@@ -4,7 +4,7 @@
 **Lactation Curve Parameters**
 ==============================
 
-.. image:: media/image1.png
+.. image:: media/lacCurvePreview.png
    :width: 8.16149in
    :height: 3.42188in
 

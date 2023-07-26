@@ -1439,13 +1439,13 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       If days in pregnancy = 0:
 
-      .. image:: media/image1.png
+      .. image:: media/lcimage1.png
          :width: 4.42415in
          :height: 1.20505in
 
       If days in pregnancy > 0:
 
-      .. image:: media/image2.png
+      .. image:: media/lcimage2.png
          :width: 4.36928in
          :height: 0.98215in
 
@@ -1485,19 +1485,17 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       During lactation:
 
-   .. image:: media/image3.png
+   .. image:: media/lcimage3.png
       :width: 6.5in
       :height: 0.68056in
 
-   .. image:: media/image4.png
-      :alt: A picture containing text Description automatically generated
+   .. image:: media/lcimage4.png
       :width: 4.35901in
       :height: 0.64128in
 
    During dry period:
 
-   .. image:: media/image5.png
-      :alt: Text Description automatically generated with medium confidence
+   .. image:: media/lcimage5.png
       :width: 3.89322in
       :height: 0.6401in
 
@@ -1647,15 +1645,15 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       [A.1A.E.2]
 
-.. |image5| image:: media/image5.png 
-.. |image6| image:: media/image6.png
-.. |image7| image:: media/image7.png
-.. |image8| image:: media/image8.png
-.. |image9| image:: media/image9.png
-.. |image10| image:: media/image10.png
-.. |image11| image:: media/image11.png
-.. |image12| image:: media/image12.png
-.. |image13| image:: media/image13.png
-.. |image14| image:: media/image14.png
-.. |image15| image:: media/image15.png
-.. |image16| image:: media/image16.png
+.. |image5| image:: media/lcimage5.png 
+.. |image6| image:: media/lcimage6.png
+.. |image7| image:: media/lcimage7.png
+.. |image8| image:: media/lcimage8.png
+.. |image9| image:: media/lcimage9.png
+.. |image10| image:: media/lcimage10.png
+.. |image11| image:: media/lcimage11.png
+.. |image12| image:: media/lcimage12.png
+.. |image13| image:: media/lcimage13.png
+.. |image14| image:: media/lcimage14.png
+.. |image15| image:: media/lcimage15.png
+.. |image16| image:: media/lcimage16.png

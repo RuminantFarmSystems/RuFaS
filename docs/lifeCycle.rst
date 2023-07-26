@@ -2,8 +2,8 @@ Life Cycle Submodule
 ====================
 
 .. toctree::
+    animalLifeCyclePseudo
     laccurve
-    pseudocode
-    herdsize
+    maintainHerdSize
     variables
-    output
+    animalOutputFiles

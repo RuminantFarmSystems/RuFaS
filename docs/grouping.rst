@@ -2,5 +2,5 @@ Grouping Submodule
 ==================
 
 .. toctree::
-    pen allocation
-    algoref
+    penAlloc
+    groupingAlgoRefNotes

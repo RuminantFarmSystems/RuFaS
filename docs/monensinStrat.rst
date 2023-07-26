@@ -453,6 +453,6 @@ Ramin, M., and P. Huhtanen. 2013. Development of equations for
 predicting methane emissions from ruminants. J. Dairy Sci. 96:2476–
 2493. https://doi.org/10.3168/jds.2012-6095
 
-.. |image1| image:: media/image1.png
+.. |image1| image:: media/monensin.png
    :width: 6in
    :height: 6in

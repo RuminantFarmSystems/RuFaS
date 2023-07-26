@@ -28,7 +28,7 @@ accompanying explanations:
 
 Block 1:
 
-.. image:: media/image3.png
+.. image:: media/rationcode3.png
    :width: 6.5in
    :height: 1.375in
 
@@ -42,7 +42,7 @@ this feed_id is also stored at index 1 in the self.price list.
 
 Block 2:
 
-.. image:: media/image2.png
+.. image:: media/rationcode2.png
    :width: 6.5in
    :height: 0.52778in
 
@@ -51,7 +51,7 @@ empty list in the returned data.
 
 Block 3:
 
-.. image:: media/image1.png
+.. image:: media/rationcode1.png
    :width: 6.5in
    :height: 0.88889in
 

@@ -15,7 +15,7 @@
   input JSON file, e.g. 14 days), the animals are grouped into pens and
   are assigned a ration.
 
-  .. image:: media/image4.jpg
+  .. image:: media/animalflow.jpg
      :width: 6.5in
      :height: 4.33333in
      :name: Figure 1
@@ -53,7 +53,7 @@
     has an instance of LifeCycleManager, which is where the daily
     update methods are stored.
 
-  .. image:: media/image6.png
+  .. image:: media/entityrel.png
      :width: 6.18229in
      :height: 4.46829in
      :name: Figure 2
@@ -66,7 +66,7 @@
   refers to the amount of cows that should be in the simulation at any one
   time, i.e. the target size.)
 
-  .. image:: media/image3.png
+  .. image:: media/herdinfocode.png
      :width: 2.95313in
      :height: 2.23377in
 
@@ -85,7 +85,7 @@
       example, the calves table looks like:
     ..
 
-    .. image:: media/image5.png
+    .. image:: media/calvesdropdown.png
        :width: 2.73958in
        :height: 2.21875in
       
@@ -175,7 +175,7 @@
        animals culled for each reason for which an animal can be culled) that 
        are written to the output.
 
-  .. image:: media/image2.jpg
+  .. image:: media/callstruct.jpg
    :width: 6.52604in
    :height: 4.93826in
    :name: Figure 3

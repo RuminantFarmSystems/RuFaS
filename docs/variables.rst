@@ -4,7 +4,7 @@
 **Variables of Interest for Life Cycle Sensitivity Analysis**
 =============================================================
 
-.. image:: media/image1.png
+.. image:: media/variables1.png
    :width: 5.96354in
    :height: 4.84947in
 
@@ -148,7 +148,7 @@ under different herd size conditions:
 
 Here is an example plot for illustration. In this case R was chosen to be 7:
 
-.. image:: media/image2.png
+.. image:: media/variables2.png
    :width: 5.3494in
    :height: 3.84896in
 

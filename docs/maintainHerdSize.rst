@@ -166,6 +166,6 @@ Text explanation:
 
    -  Loi: Start coding and make first PR by Apr. 18
 
-.. |image1| image:: media/image1.png
+.. |image1| image:: media/maintainHerdSize.png
    :width: 6.5in
    :height: 1.69444in

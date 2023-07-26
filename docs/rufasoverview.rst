@@ -60,7 +60,7 @@ images, and an SQL database. The model uses a daily time-step and is
 programmed in Python, an adaptable and easy to read computer programming
 language.
 
-   .. image:: media/image1.png
+   .. image:: media/modeloverview.png
       :width: 6.44167in
       :height: 3.77083in
 

@@ -4,6 +4,6 @@
 **Pen Allocation Image**
 ========================
 
-.. image:: media/image1.png
+.. image:: media/penalloc.png
    :width: 5.8in
    :height: 4in
