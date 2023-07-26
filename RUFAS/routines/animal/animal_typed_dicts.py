@@ -107,11 +107,11 @@ class HeiferIIValuesTypedDict(TypedDict):
 
 class AnimalConfigTypedDict(TypedDict):
     """Keeps track of all the attributes stored in the animal config object used
-    in `animal_management.py`.
+    in `animal_manager.py`.
 
     This list of attributes should also match the attributes provided by the
     `animal_management_animal.json`. To make it easier to access the attributes,
-    the animal config object in the AnimalManagement class has been flattened out
+    the animal config object in the AnimalManager class has been flattened out
     compared to the structure of the JSON object.
 
     """
