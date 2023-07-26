@@ -13,7 +13,7 @@ from SALib.sample import fast_sampler
 # running as script
 import sensitivity_analysis_helpers as SAH
 # running in window
-# import model_evaluation.sensitivity_analysis.sensitivity_analysis_helpers as SAH
+import model_evaluation.sensitivity_analysis.sensitivity_analysis_helpers as SAH
 
 with open('model_evaluation\sensitivity_analysis\config_inputs\sensitivity_analysis.json', 'r') as j:
      config_json = json.loads(j.read())
@@ -133,13 +133,15 @@ for i, p in enumerate(problem_list):
                 if j == settings_decoder[idx]:
                     params_subset.append(paramlist[idx])
             
-            json_to_print = 'input/' + json_to_modify[:-5] + '_' +  str(s).zfill(5) + '.json'
+            cutoff = json_to_modify.find('/')
+            jsonname = json_to_modify[cutoff+1:]
+            json_to_print = 'input/' + json_to_modify[:cutoff] + '/sensitivity/' + jsonname[:-5] + '_' +  str(s).zfill(5) + '.json'
             # populate input json with settings from samples
             SAH.json_populater_duplicate(params_subset, problem_a, json_to_modify, json_to_print)
 
-
-        
-        lifecyclereport_tomodify = str(os.getcwd() + '\input\output\\' + 'life_cycle_report' + '_' +  str(s).zfill(5) + '.json')
+        if not os.path.exists('input\\output\\sensitivity\\'):
+            os.mkdir('input\\output\\sensitivity\\')
+        lifecyclereport_tomodify = str(os.getcwd() + '\\input\\output\\sensitivity\\' + 'life_cycle_report' + '_' +  str(s).zfill(5) + '.json')
         
         SAH.anim_manag_modifier(inputJSONs_to_modify, s)
         

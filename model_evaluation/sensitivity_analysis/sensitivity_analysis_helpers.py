@@ -5,6 +5,7 @@ helpers for the SA methods generalized version
 import json
 import csv
 import ast
+import os
 
 def path_finder(json, key):
   """
@@ -309,6 +310,8 @@ def json_populater_duplicate(params, problem_x, json_to_modify, json_to_print, )
                 json_object[path_list[0]][path_list[1]][path_list[2]][path_list[3]][path_list[4]] = valtouse
                 #print(json_object[path_list[0]][path_list[1]][path_list[2]][path_list[3]][path_list[4]])
     # write updated values
+    if not os.path.exists(os.path.dirname(json_to_print)):
+        os.mkdir(os.path.dirname(json_to_print))
     file = open(json_to_print, 'w')
     json.dump(json_object, file, indent=4) # remove , indent=4 if causes problems!
     file.close()
@@ -551,7 +554,9 @@ def anim_manag_modifier(inputJSONs_to_modify, s):
         else:
             pass
     json_object['output'] = 'life_cycle_report_' + str(s).zfill(5) + '.json'
-    anim_manag_tomodify = str(os.getcwd() + '\input\\' + 'animal_management' + '_' +  str(s).zfill(5) + '.json')
+    if not os.path.exists('input\\sensitivity\\'):
+        os.mkdir('input\\sensitivity\\')
+    anim_manag_tomodify = str(os.getcwd() + '\input\\sensitivity\\' + 'animal_management' + '_' +  str(s).zfill(5) + '.json')
 
     file = open(anim_manag_tomodify, 'w')
     json.dump(json_object, file, indent=4) # remove , indent=4 if causes problems!
