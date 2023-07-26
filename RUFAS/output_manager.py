@@ -359,19 +359,9 @@ class OutputManager(object):
         if len(data_dict) == 0:
             return
 
-        variable_name = next(iter(data_dict))
         mandatory_fields = ["values"] if exclude_info_maps else ["values", "info_maps"]
-        if not all(key in data_dict[variable_name].keys() for key in mandatory_fields):
-            self.add_error(
-                "save_dict_file_try", f"Unable to save {path} due to missing values and/or info_maps.", info_map
-            )
-            return
-
-        data = data_dict[variable_name]
-        # preserve variable name in csv columns
-        data[variable_name] = data.pop("values")
-        mandatory_fields[0] = variable_name
-        csv_column_data = self._dict_to_csv_column_list(data, mandatory_fields)
+        (_, variable_data), = data_dict.items()
+        csv_column_data = self._dict_to_csv_column_list(variable_data, mandatory_fields)
 
         df = pd.DataFrame(dict(csv_column_data))
         try:
