@@ -1,5 +1,3 @@
-import collections
-
 import pytest
 from pytest_mock import MockFixture
 
@@ -36,10 +34,10 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         "RUFAS.routines.manure.manure_manager.ManureManagerConfigHandler",
         return_value=mock_manure_manager_config_handler,
     )
-    mock_manure_manager_output_handler = mocker.MagicMock()
-    patch_for_manure_manager_output_handler = mocker.patch(
-        "RUFAS.routines.manure.manure_manager.ManureManagerOutputHandler",
-        return_value=mock_manure_manager_output_handler,
+    mock_manure_nutrient_manager = mocker.MagicMock()
+    patch_for_manure_nutrient_manager = mocker.patch(
+        "RUFAS.routines.manure.manure_manager.ManureNutrientManager",
+        return_value=mock_manure_nutrient_manager,
     )
     patch_for_configure_manure_manager_components = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureManager."
@@ -63,19 +61,21 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
     assert manure_manager.manure_treatments == {}
     assert manure_manager.weather == mock_weather
     assert manure_manager.time == mock_time
-    assert manure_manager._all_data == collections.defaultdict(list)
 
     patch_for_manure_manager_config_handler.assert_called_once_with(mock_manure_manager_config)
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
-
-    patch_for_manure_manager_output_handler.assert_called_once()
-    assert manure_manager.manure_manager_output_handler == mock_manure_manager_output_handler
-
+    patch_for_manure_nutrient_manager.assert_called_once()
     patch_for_configure_manure_manager_components.assert_called_once_with(mock_animal_manager)
 
 
-def test_all_data_property(mocker: MockFixture) -> None:
-    """Unit test for all_data property of ManureManager in manure_manager.py"""
+def test_data_property(mocker: MockFixture) -> None:
+    """
+    Unit test for `data` property of ManureManager in manure_manager.py
+
+    This test verifies that the 'data' property correctly returns the '_daily_output_per_pen' value attribute
+    of the ManureManager object.
+
+    """
     # Arrange
     mock_animal_manager = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
@@ -94,14 +94,14 @@ def test_all_data_property(mocker: MockFixture) -> None:
         manure_manager_config=mock_manure_manager_config,
     )
 
-    mock_all_data = mocker.MagicMock()
-    manure_manager._all_data = mock_all_data
+    mock_daily_output_per_pen = mocker.MagicMock()
+    manure_manager._daily_output_per_pen = mock_daily_output_per_pen
 
     # Act
-    actual_all_data = manure_manager.all_data
+    actual_daily_output_per_pen = manure_manager.data
 
     # Assert
-    assert actual_all_data == mock_all_data
+    assert mock_daily_output_per_pen == actual_daily_output_per_pen
 
 
 @pytest.mark.parametrize(
@@ -284,7 +284,15 @@ def test_is_compound_anaerobic_manure_treatment(manure_treatment_type: ManureTre
 )
 def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_present: bool,
                                                          mocker: MockFixture) -> None:
-    """Unit test for _handle_daily_update_for_simple_manure_treatment() in manure_manager.py."""
+    """
+    Unit test for _handle_daily_update_for_simple_manure_treatment() in manure_manager.py.
+
+    This test checks the daily update functionality of a simple manure treatment process with and
+    without a manure separator. It verifies that the method correctly interacts with the manure
+    separator (if present), the manure handler, and the manure treatment, returning appropriate daily
+    outputs and accumulated output for the treatment.
+
+    """
     # Arrange
     simulation_day = 1
     mock_manure_manager_pen = mocker.MagicMock()
@@ -320,11 +328,14 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
 
     mock_manure_treatment = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
+
     mock_manure_treatment.daily_update.return_value = mock_manure_treatment_daily_output
+    mock_manure_treatment.accumulated_output = mock_manure_treatment_accumulated_output
     manure_manager.manure_treatments[pen_id] = mock_manure_treatment
 
     # Act
-    manure_separator_daily_output, manure_treatment_daily_output = \
+    manure_separator_daily_output, manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_manager._handle_daily_update_for_simple_manure_treatment(
             simulation_day=simulation_day,
             pen=mock_manure_manager_pen,
@@ -344,7 +355,6 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
             pen=mock_manure_manager_pen,
             sim_day=simulation_day
         )
-        assert manure_treatment_daily_output == mock_manure_treatment_daily_output
     else:
         assert manure_separator_daily_output is None
         mock_manure_treatment.daily_update.assert_called_once_with(
@@ -353,10 +363,19 @@ def test_handle_daily_update_for_simple_manure_treatment(is_manure_separator_pre
             pen=mock_manure_manager_pen,
             sim_day=simulation_day
         )
-        assert manure_treatment_daily_output == mock_manure_treatment_daily_output
+    assert manure_treatment_daily_output == mock_manure_treatment_daily_output
+    assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
 
 
 def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixture) -> None:
+    """
+    Unit test for _handle_daily_update_for_compound_anaerobic_manure_treatment() in manure_manager.py.
+
+    This test verifies the daily update functionality for a compound anaerobic manure treatment
+    process. It checks for the returned daily and accumulated outputs from the anaerobic
+    digestion process, manure separator, and overall manure treatment.
+
+    """
     # Arrange
     simulation_day = 1
     mock_manure_manager_pen = mocker.MagicMock()
@@ -383,9 +402,11 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     manure_manager.manure_separators = {pen_id: mock_manure_separator}
 
     mock_manure_treatment = mocker.MagicMock()
-
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
+
     mock_manure_treatment.daily_update.return_value = mock_manure_treatment_daily_output
+    mock_manure_treatment.accumulated_output = mock_manure_treatment_accumulated_output
 
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_manure_treatment.anaerobic_digestion_daily_output = mock_anaerobic_digestion_daily_output
@@ -396,7 +417,8 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     manure_manager.manure_treatments = {pen_id: mock_manure_treatment}
 
     # Act
-    anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output = \
+    anaerobic_digestion_daily_output, manure_separator_daily_output, \
+        manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_manager._handle_daily_update_for_compound_anaerobic_manure_treatment(simulation_day=simulation_day,
                                                                                     pen=mock_manure_manager_pen,
                                                                                     manure_handler_daily_output=mock_manure_handler_daily_output,
@@ -413,6 +435,7 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
     assert manure_treatment_daily_output == mock_manure_treatment_daily_output
     assert anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
     assert manure_separator_daily_output == mock_manure_separator_daily_output
+    assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
 
 
 @pytest.mark.parametrize(
@@ -424,6 +447,15 @@ def test_handle_update_for_compound_anaerobic_manure_treatment(mocker: MockFixtu
 )
 def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manure_treatment: bool,
                                                       mocker: MockFixture) -> None:
+    """
+    Unit test for _pen_daily_update_for_separator_and_treatment() in manure_manager.py.
+
+    This test checks whether the daily updates for the manure separator and treatment are correctly
+    executed depending on the manure treatment type (compound anaerobic or simple). It verifies the
+    correct execution of either '_handle_daily_update_for_compound_anaerobic_manure_treatment' or
+    '_handle_daily_update_for_simple_manure_treatment', based on the manure treatment type.
+
+    """
     # Arrange
     simulation_day = 1
     mock_manure_manager_pen = mocker.MagicMock()
@@ -441,20 +473,24 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     mock_manure_separator_daily_output_2 = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output_2 = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output_2 = mocker.MagicMock()
 
     patch_for_handle_daily_update_for_compound_anaerobic_manure_treatment = mocker.patch(
         'RUFAS.routines.manure.manure_manager.ManureManager.'
         '_handle_daily_update_for_compound_anaerobic_manure_treatment',
         return_value=(mock_anaerobic_digestion_daily_output,
                       mock_manure_separator_daily_output,
-                      mock_manure_treatment_daily_output),
+                      mock_manure_treatment_daily_output,
+                      mock_manure_treatment_accumulated_output),
     )
 
     patch_for_handle_daily_update_for_simple_manure_treatment = mocker.patch(
         'RUFAS.routines.manure.manure_manager.ManureManager.'
         '_handle_daily_update_for_simple_manure_treatment',
         return_value=(mock_manure_separator_daily_output_2,
-                      mock_manure_treatment_daily_output_2),
+                      mock_manure_treatment_daily_output_2,
+                      mock_manure_treatment_accumulated_output_2),
     )
 
     mock_animal_manager = mocker.MagicMock()
@@ -473,7 +509,8 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
     )
 
     # Act
-    anaerobic_digestion_daily_output, manure_separator_daily_output, manure_treatment_daily_output = \
+    anaerobic_digestion_daily_output, manure_separator_daily_output, \
+        manure_treatment_daily_output, manure_treatment_accumulated_output = \
         manure_manager._pen_daily_update_for_separator_and_treatment(
             simulation_day=simulation_day,
             pen=mock_manure_manager_pen,
@@ -493,6 +530,7 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         assert anaerobic_digestion_daily_output == mock_anaerobic_digestion_daily_output
         assert manure_separator_daily_output == mock_manure_separator_daily_output
         assert manure_treatment_daily_output == mock_manure_treatment_daily_output
+        assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output
     else:
         patch_for_handle_daily_update_for_simple_manure_treatment.assert_called_once_with(
             simulation_day=simulation_day,
@@ -503,15 +541,25 @@ def test_pen_daily_update_for_separator_and_treatment(is_compound_anaerobic_manu
         assert anaerobic_digestion_daily_output is None
         assert manure_separator_daily_output == mock_manure_separator_daily_output_2
         assert manure_treatment_daily_output == mock_manure_treatment_daily_output_2
+        assert manure_treatment_accumulated_output == mock_manure_treatment_accumulated_output_2
 
 
 def test_pen_daily_update(mocker: MockFixture) -> None:
-    """Unit test for _pen_daily_update() in manure_manager.py."""
+    """
+    Unit test for the _pen_daily_update() method in ManureManager class found in manure_manager.py.
+
+    This test verifies that the _pen_daily_update() method correctly performs the daily
+    updates for a given pen. Specifically, it checks that the method creates a ManureManagerPen instance,
+    calls the daily_update() method on manure_handler and reception_pit, and calls the
+    _pen_daily_update_for_separator_and_treatment() method.
+
+    """
     # Arrange
     simulation_day = 1
     mock_pen = mocker.MagicMock()
     mock_manure_manager_pen = mocker.MagicMock()
     mock_manure_manager_pen.id = pen_id = 1
+    mock_manure_manager_pen.manure = mock_pen_manure = mocker.MagicMock()
     patch_for_manure_manager_pen_init = mocker.patch(
         'RUFAS.routines.manure.manure_manager.ManureManagerPen',
         return_value=mock_manure_manager_pen,
@@ -530,22 +578,27 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
     mock_manure_separator_daily_output = mocker.MagicMock()
     mock_manure_treatment_daily_output = mocker.MagicMock()
+    mock_manure_treatment_accumulated_output = mocker.MagicMock()
     patch_for_pen_daily_update_for_separator_and_treatment = mocker.patch(
         'RUFAS.routines.manure.manure_manager.ManureManager.'
         '_pen_daily_update_for_separator_and_treatment',
         return_value=(mock_anaerobic_digestion_daily_output,
                       mock_manure_separator_daily_output,
-                      mock_manure_treatment_daily_output),
+                      mock_manure_treatment_daily_output,
+                      mock_manure_treatment_accumulated_output),
     )
 
-    expected_daily_update_output = (
-        mock_manure_manager_pen,
-        mock_manure_handler_daily_output,
-        mock_reception_pit_daily_output,
-        mock_manure_separator_daily_output,
-        mock_manure_treatment_daily_output,
-        mock_anaerobic_digestion_daily_output,
-    )
+    expected_daily_output_data = {
+        'simulation_day': simulation_day,
+        'pen': mock_manure_manager_pen,
+        'animal_manure_excretions': mock_pen_manure,
+        'manure_handler_daily_output': mock_manure_handler_daily_output,
+        'reception_pit_daily_output': mock_reception_pit_daily_output,
+        'manure_separator_daily_output': mock_manure_separator_daily_output,
+        'manure_treatment_daily_output': mock_manure_treatment_daily_output,
+        'manure_treatment_accumulated_output': mock_manure_treatment_accumulated_output,
+        'anaerobic_digestion_daily_output': mock_anaerobic_digestion_daily_output
+    }
 
     mock_animal_manager = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
@@ -564,10 +617,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
     manure_manager.beddings = {pen_id: mock_bedding}
     manure_manager.manure_handlers = {pen_id: mock_manure_handler}
     manure_manager.reception_pits = {pen_id: mock_reception_pit}
-    manure_manager._all_data = {pen_id: []}
-    mock_manure_manager_output_handler = mocker.MagicMock()
-    mock_manure_manager_output_handler.append_daily_update_output_for_pen.return_value = None
-    manure_manager.manure_manager_output_handler = mock_manure_manager_output_handler
+    manure_manager._daily_output_per_pen = []
 
     patch_for_add_manure_nutrients = mocker.patch.object(
         manure_manager, '_add_manure_nutrients', return_value=None
@@ -597,25 +647,20 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         manure_handler_daily_output=mock_manure_handler_daily_output,
         reception_pit_daily_output=mock_reception_pit_daily_output,
     )
-    assert manure_manager._all_data[pen_id] == [expected_daily_update_output]
-    mock_manure_manager_output_handler.append_daily_update_output_for_pen.assert_called_once_with(
-        simulation_day=simulation_day,
-        data=expected_daily_update_output,
-    )
+    assert manure_manager.data == [expected_daily_output_data]
     patch_for_add_manure_nutrients.assert_called_once_with(mock_manure_manager_pen,
                                                            mock_manure_treatment_daily_output)
 
 
-@pytest.mark.parametrize(
-    'is_last_day_of_simulation',
-    [
-        True,
-        False,
-    ])
-def test_manure_manager_daily_update(is_last_day_of_simulation: bool,
-                                     mocker: MockFixture) -> None:
-    # Arrange
+def test_manure_manager_daily_update(mocker: MockFixture) -> None:
+    """
+    Unit test for the daily_update() method in ManureManager class found in manure_manager.py.
 
+    This test verifies that the daily_update() method correctly performs the daily updates for all pens
+    by calling the _pen_daily_update() method for each pen returned by the AnimalManager.
+
+    """
+    # Arrange
     mock_animal_manager = mocker.MagicMock()
     mock_animal_manager.simulation_day = simulation_day = 1
     num_pens = 10
@@ -625,7 +670,6 @@ def test_manure_manager_daily_update(is_last_day_of_simulation: bool,
     mock_animal_manager_init = mocker.MagicMock()
     mock_weather = mocker.MagicMock()
     mock_time = mocker.MagicMock()
-    mock_time.is_last_day_of_simulation = is_last_day_of_simulation
     mock_manure_manager_config = mocker.MagicMock()
     mocker.patch(
         'RUFAS.routines.manure.manure_manager.ManureManager.__init__',
@@ -642,10 +686,6 @@ def test_manure_manager_daily_update(is_last_day_of_simulation: bool,
         '_pen_daily_update',
         return_value=None,
     )
-    mock_manure_manager_output_handler = mocker.MagicMock()
-    mock_manure_manager_output_handler.sort_by_pen_id_and_simulation_day.return_value = None
-    mock_manure_manager_output_handler.export_to_csv.return_value = None
-    manure_manager.manure_manager_output_handler = mock_manure_manager_output_handler
     manure_manager.time = mock_time
 
     # Act
@@ -654,13 +694,6 @@ def test_manure_manager_daily_update(is_last_day_of_simulation: bool,
     # Assert
     assert patch_for_pen_daily_update.call_count == num_pens
     assert patch_for_pen_daily_update.call_args_list == [mocker.call(simulation_day, pen) for pen in mock_all_pens]
-
-    if is_last_day_of_simulation:
-        mock_manure_manager_output_handler.sort_by_pen_id_and_simulation_day.assert_called_once()
-        mock_manure_manager_output_handler.export_to_csv.assert_called_once()
-    else:
-        mock_manure_manager_output_handler.sort_by_pen_id_and_simulation_day.assert_not_called()
-        mock_manure_manager_output_handler.export_to_csv.assert_not_called()
 
 
 @pytest.mark.parametrize(
