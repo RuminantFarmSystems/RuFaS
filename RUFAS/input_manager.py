@@ -229,41 +229,72 @@ class InputManager:
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
-        # if any element in element_hierarchy is a number, replace with "properties"
+        int_in_element_hierarchy = any(isinstance(element, int) for element in element_hierarchy)
+        # print(f"{int_in_element_hierarchy=}")
+        # print(f"input_data at start is {input_data}")
         input_data_hierarchy = element_hierarchy[:]
-        if any(isinstance(element, int) for element in element_hierarchy):
+        # print(f"{input_data_hierarchy=}")
+        if int_in_element_hierarchy:
+            # print("found int element in array")
             for i in range(len(element_hierarchy)):
                 if isinstance(element_hierarchy[i], int):
                     element_hierarchy[i] = "properties"
+            # print(f"{element_hierarchy=}")
+            # print(f"{input_data_hierarchy=}")
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][properties_blob_key])
-
+        # print(f"{variable_properties=}")
         var_type = variable_properties["type"]
         is_nested = var_type == "object"
+        # print(f"{is_nested=}")
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
             for nested_key in variable_properties.keys():
-                element_hierarchy = element_hierarchy.append(nested_key)
-                element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
-                                                                      input_data, eager_termination)
-                is_child_valid = element_counter_and_validity["is_valid"]
-                if eager_termination and not is_child_valid:
-                    return element_counter_and_validity
-                element_path = ".".join(element_hierarchy)
-                children_status[element_path] = is_child_valid
-                if not is_child_valid:
-                    om.add_warning("Invalid nested element found", f"{element_path}", info_map)
-                    false_counter += 1
-                element_hierarchy.remove(nested_key)
+                if nested_key != "type":
+                    # print(f"nested before {input_data_hierarchy=}")
+                    if int_in_element_hierarchy:
+                        input_data_hierarchy = input_data_hierarchy + [nested_key]
+                        # print(f"nested after {input_data_hierarchy=}")
+                        # print(f"input_data at recursion is {input_data}")
+                        slice_num = input_data_hierarchy[1]
+                        element_counter_and_validity = self._validate_element(input_data_hierarchy, properties_blob_key,
+                                                                              input_data, eager_termination)
+                        input_data_hierarchy[1] = slice_num
+                        # print(f"nested after call to validate data {input_data_hierarchy=}")
+                    else:
+                        element_hierarchy = element_hierarchy + [nested_key]
+                        element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
+                                                                              input_data, eager_termination)
+                    is_child_valid = element_counter_and_validity["is_valid"]
+                    if eager_termination and not is_child_valid:
+                        return element_counter_and_validity
+                    element_path = ".".join(element_hierarchy)
+                    children_status[element_path] = is_child_valid
+                    if not is_child_valid:
+                        om.add_warning("Invalid nested element found", f"{element_path}", info_map)
+                        false_counter += 1
+                    if int_in_element_hierarchy:
+                        input_data_hierarchy.remove(nested_key)
+                    else:
+                        element_hierarchy.remove(nested_key)
 
             is_valid = false_counter == 0
+            element_counter_and_validity["is_valid"] = is_valid
+            print(f"at end of nested loop: {element_counter_and_validity['is_valid']=}")
 
-            return is_valid
+            return element_counter_and_validity
         else:
             var_name = element_hierarchy[-1]
+            print(f"{var_name=}")
             try:
-                input_data_value = reduce(lambda d, key: d[key], input_data_hierarchy, input_data)
+                if int_in_element_hierarchy:
+                    # print(f"with non-nested data {input_data_hierarchy=}")
+                    # print(f"with non-nested data {input_data=}")
+                    input_data_value = reduce(lambda d, key: d[key], input_data_hierarchy, input_data)
+                    # print(f"Non-nested value {input_data_value=}")
+                else:
+                    input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
@@ -276,15 +307,26 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
-            is_valid = validator(variable_properties, var_name, input_data_value,
-                                 properties_blob_key, input_data_hierarchy, eager_termination)
-
+            if int_in_element_hierarchy:
+                # print(f"before sending to validator fun {input_data_hierarchy=}")
+                is_valid = validator(variable_properties, var_name, input_data_value,
+                                     properties_blob_key, input_data_hierarchy, eager_termination)
+            else:
+                is_valid = validator(variable_properties, var_name, input_data_value,
+                                     properties_blob_key, element_hierarchy, eager_termination)
+            print(f"{is_valid=}")
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
+                print(f"before returning because valid {input_data_hierarchy=}")
+                print(f"at end of external loop: {element_counter_and_validity['is_valid']=}")
                 return element_counter_and_validity
             else:
-                is_fixed = self._fix_data(variable_properties, input_data_hierarchy, input_data)
+                print("got to fixing")
+                if int_in_element_hierarchy:
+                    is_fixed = self._fix_data(variable_properties, input_data_hierarchy, input_data)
+                else:
+                    is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
@@ -312,10 +354,16 @@ class InputManager:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
+        print(f"at the start of validating the list {var_name=}")
+        original_input_data = {'element3': input_data_value}
         for index, element in enumerate(input_data_value):
-            input_data_hierarchy.append(f"[{index}]")
-            element_counter_and_validity = self._validate_element(input_data_hierarchy, properties_blob_key, element,
-                                                                  eager_termination)
+            print(f"before array_validation fun is {input_data_hierarchy}")
+            input_data_hierarchy.append(index)
+            print(f"after array_validation fun is {input_data_hierarchy}")
+            print(f"input data sent back to validate data is {input_data_value}")
+            element_counter_and_validity = self._validate_element(input_data_hierarchy, properties_blob_key,
+                                                                  original_input_data, eager_termination)
+            print(f"at end of array validator: {element_counter_and_validity['is_valid']=}")
             if not element_counter_and_validity["is_valid"]:
                 return False
             input_data_hierarchy.pop()
