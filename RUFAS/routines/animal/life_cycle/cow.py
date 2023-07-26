@@ -323,14 +323,6 @@ class Cow(HeiferIII):
                                                               AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV)
             estimated_daily_milk_produced += daily_milk_variation
 
-            estimated_daily_milk_produced = \
-                l * math.pow(self.days_in_milk, m) * \
-                math.exp((0 - n) * self.days_in_milk)
-        elif AnimalBase.config['lactation_curve'] == 'milkbot':
-            estimated_daily_milk_produced = AnimalBase.config['a'] * \
-                (1 - math.exp((AnimalBase.config['c'] - self.days_in_milk) /
-                              AnimalBase.config['b']) / 2) * \
-                math.exp((0 - AnimalBase.config['d']) * self.days_in_milk)
         if self.milking:
             self.estimated_daily_milk_produced = estimated_daily_milk_produced
         else:
