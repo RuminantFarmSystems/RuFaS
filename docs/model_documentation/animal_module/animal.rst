@@ -2,7 +2,7 @@ Animal Module
 =============
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     animalbackground
     grouping/grouping
