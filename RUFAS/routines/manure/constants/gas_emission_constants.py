@@ -1,27 +1,28 @@
 class GasEmissionConstants:
     """Constants used in gas emission calculations."""
 
-    b1 = 1.0
-    """Rate correcting factor (unitless)."""
+    METHANE_EMISSION_COEFFICIENT = 24
+    """Methane emission coefficient, used in calculation of slurry storage methane emission (unitless)."""
 
-    b2 = 0.01
-    """Rate correcting factor (unitless)."""
+    DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR = 1.0
+    """Rate correcting factor for degradable volatile solids, used in calculation of slurry storage methane emission (unitless)."""
 
-    lnA = 43.33
-    """Natural log of Arrhenius constant (unitless)."""
+    NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR = 0.01
+    """Rate correcting factor for non-degradable volatile solids, used in calculation of slurry storage methane emission (unitless)."""
 
-    E = 112700.0
+    NATURAL_LOG_ARRHENIUS_CONSTANT = 43.33
+    """Natural log of the Arrhenius constant (unitless)."""
+
+    ACTIVATION_ENERGY = 112700.0
     """
     Activation energy (joules per mole, J/mol). The activation energy is the
     minimum energy that must be available to molecules for a reaction to occur.
     """
 
-    R = 8.314
-    """
-    The ideal gas constant (J/mol :math:`\cdot` K).
-    """
+    GAS_CONSTANT = 8.314
+    """The ideal gas constant (J/mol :math:`\cdot` K)."""
 
-    Bo = 0.24
+    ACHIEVABLE_METHANE_EMISSION = 0.24
     """Achievable emission of methane (:math:`CH_4`) during anaerobic digestion (kg :math:`CH_4`/kg VS)."""
 
     METHANE_CONVERSION_FACTOR = 0.79
@@ -106,3 +107,23 @@ class GasEmissionConstants:
     """
     Default proportion of carbon available in bedding, (unitless, [0, 1]). Default is set to 0.35.
     """
+    GENERAL_LOWER_BOUND_TEMPERATURE = -40.0
+    """General temperature lower bound (:math:`^{\circ}C`). Default is set to -40.0."""
+
+    GENERAL_UPPER_BOUND_TEMPERATURE = 60.0
+    """General temperature upper bound (:math:`^{\circ}C`). Default is set to 60.0."""
+
+    SOLID_AND_SEMI_SOLID_MANURE_HSC = 10.0
+    """Housing specific constant for solid and semi-solid manure (s/m)."""
+
+    SLURRY_MANURE_HSC = 19.0
+    """Housing specific constant for slurry manure (s/m)."""
+
+    LIQUID_MANURE_HSC = 4.1
+    """Housing specific constant for liquid manure (s/m)."""
+
+    SOLID_MANURE_THRESHOLD = 8.0
+    """Dry matter threshold for classifying solid and semi-solid manure."""
+
+    SLURRY_MANURE_THRESHOLD = 5.0
+    """Dry matter threshold for classifying slurry manure."""
