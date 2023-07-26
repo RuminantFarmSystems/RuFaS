@@ -88,10 +88,7 @@ class ManureManager:
         self.time = time
         self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
         self._daily_output_per_pen = []
-
         self._manure_nutrient_manager = ManureNutrientManager()
-
-        # Set up the manure manager components for each animal pen.
         self._configure_manure_manager_components(animal_manager)
 
     @property

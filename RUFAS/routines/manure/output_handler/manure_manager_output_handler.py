@@ -52,7 +52,7 @@ class ManureManagerOutputHandler:
         Convert a dataclass object into a formatted dictionary with values stored in lists.
 
         This method converts a dataclass object from any manure component into a dictionary with keys
-        formatted as "<prefix><delimiter><field_name><delimiter><unit>". The values are stored in lists to ease the
+        formatted as "<prefix><delimiter><field_name><delimiter>(<unit>)". The values are stored in lists to ease the
         conversion to a pandas dataframe. The method uses a prefix, delimiter and field names from the dataclass fields to
         construct the dictionary keys.
 
@@ -70,13 +70,13 @@ class ManureManagerOutputHandler:
         Returns
         -------
         dict[str, list[Any]]
-            A dictionary with keys formatted as per the above scheme and values encapsulated in lists.
+            A dictionary with keys formatted as per the above scheme and values stored in lists.
 
         """
         dataframe_dict = collections.defaultdict(list)
         for field in data_fields:
             unit = vars(Units).get(field.name, '')
-            key_name_parts = [prefix, cls._capitalize_first_letters(field.name, "_"), f"({unit})" if unit else ""]
+            key_name_parts = [prefix, cls._capitalize_first_letters(field.name, '_'), f'({unit})' if unit else '']
             key_name = delimiter.join(part for part in key_name_parts if part)
             value = getattr(dataclass_obj, field.name, np.nan)
             dataframe_dict[key_name].append(round(value, 6))
@@ -199,12 +199,12 @@ class ManureManagerOutputHandler:
                                                               extra_prefix=prefix).items()
 
                 for k, v in items:
-                    dataframe_dict[k].append(*v)
+                    dataframe_dict[k] += v
 
         return pd.DataFrame(dataframe_dict)
 
     @classmethod
-    def produce_csv(cls, csv_dir: str | Path, manure_manager) -> None:
+    def produce_csv(cls, csv_dir_path: str | Path, manure_manager) -> None:
         """
         Generate a series of CSV files from the given manure manager's data.
 
@@ -216,7 +216,7 @@ class ManureManagerOutputHandler:
 
         Parameters
         ----------
-        csv_dir : str or pathlib.Path
+        csv_dir_path : str or pathlib.Path
             The directory where the CSV files will be written.
 
         manure_manager :
@@ -235,15 +235,15 @@ class ManureManagerOutputHandler:
         non_sorting_cols = [col for col in df.columns if not any(sorting_col.lower() in col.lower() for sorting_col in sorting_cols)]
         df = df[sorting_cols + non_sorting_cols]
 
-        csv_dir = Path(csv_dir) / cls._DEFAULT_OUTPUT_DIR_NAME
-        csv_dir.mkdir(parents=True, exist_ok=True)
-        all_data_file_path = csv_dir / f'all_manure_module_data_{cls._get_formatted_current_time()}.csv'
+        csv_dir_path = Path(csv_dir_path) / cls._DEFAULT_OUTPUT_DIR_NAME
+        csv_dir_path.mkdir(parents=True, exist_ok=True)
+        all_data_file_path = csv_dir_path / f'all_manure_module_data_{cls._get_formatted_current_time()}.csv'
         df.to_csv(all_data_file_path, index=False)
 
         for col in non_sorting_cols:
             temp_df = df[[*sorting_cols, col]]
             temp_df.columns = [*sorting_cols, cls._format_col_name(col)]
-            sub_dir_path = csv_dir / f'{cls._extract_dir_name_from_col_name(col)}'
+            sub_dir_path = csv_dir_path / f'{cls._extract_dir_name_from_col_name(col)}'
             sub_dir_path.mkdir(parents=True, exist_ok=True)
             file_path = sub_dir_path / f'{cls._format_csv_filename(col)}.csv'
             temp_df.to_csv(file_path, index=False)
@@ -265,9 +265,21 @@ class ManureManagerOutputHandler:
         str
             The processed column name.
 
+        Raises
+        ------
+        TypeError
+            If any of the methods in the pipeline is not callable.
+        Exception
+            If any of the methods in the pipeline raises an exception.
+
         """
-        for method in pipeline:
-            col_name = method(col_name)
+        for i, method in enumerate(pipeline):
+            if not callable(method):
+                raise TypeError(f'Method {i} in the pipeline is not callable.')
+            try:
+                col_name = method(col_name)
+            except Exception as e:
+                raise Exception(f'Error applying method {i} in the pipeline.') from e
         return col_name
 
     @classmethod
@@ -339,13 +351,16 @@ class ManureManagerOutputHandler:
         pipeline = [cls._remove_prefix, cls._remove_units, str.lower]
         return cls._apply_pipeline_to_col_name(col_name, pipeline)
 
-    @classmethod
-    def _drop_all_zeros_nan_none_columns(cls, df: DataFrame) -> DataFrame:
+    @staticmethod
+    def _drop_all_zeros_nan_none_columns(df: DataFrame) -> DataFrame:
         """
         Drop all columns from a DataFrame that only contain zeros, NaNs, or None.
 
         This method checks each column of the input DataFrame and drops any
         columns that contain only zeros, NaNs, or None.
+
+        A column that contains a mix of NaN and None values will get dropped because
+        the DataFrame's fillna() method converts None values to NaNs.
 
         Parameters
         ----------
@@ -355,7 +370,7 @@ class ManureManagerOutputHandler:
         Returns
         -------
         DataFrame
-            The DataFrame with the specified columns dropped.
+            The DataFrame with the columns that only contain zeros, NaNs, or None dropped.
 
         """
         temp_df = df.fillna(value=np.nan)
@@ -389,8 +404,8 @@ class ManureManagerOutputHandler:
             return s
         return delimiter.join(word[0].upper() + word[1:] for word in s.split(delimiter))
 
-    @classmethod
-    def _get_formatted_current_time(cls) -> str:
+    @staticmethod
+    def _get_formatted_current_time() -> str:
         """
         Get the current time and format it into a string.
 
@@ -405,8 +420,8 @@ class ManureManagerOutputHandler:
         """
         return datetime.now().strftime('%Y_%m_%d__%H_00')
 
-    @classmethod
-    def _get_full_prefix(cls, prefix: str) -> str:
+    @staticmethod
+    def _get_full_prefix(prefix: str) -> str:
         """
         Translate a short prefix to its more descriptive version.
 
@@ -492,6 +507,12 @@ class ManureManagerOutputHandler:
         enclosed in parentheses, including the parentheses themselves, from the
         input string. This is intended to remove units from a header string.
 
+        Notes
+        -----
+        The regular expression used in this function, rf"{cls._HEADER_PRIMARY_DELIMITER}\([^()]*\)$", is
+        designed to match the rightmost occurrence of a substring enclosed in parentheses. This substring is
+        assumed to represent units. The rf denotes a raw, formatted string.
+
         Parameters
         ----------
         header : str
@@ -503,7 +524,7 @@ class ManureManagerOutputHandler:
             The processed header string with units removed.
 
         """
-        return re.sub(rf"{cls._HEADER_PRIMARY_DELIMITER}\(.*\)", '', header)
+        return re.sub(rf"{cls._HEADER_PRIMARY_DELIMITER}\([^()]*\)$", '', header)
 
     @classmethod
     def _replace_secondary_header_delimiters_with_spaces(cls, header: str) -> str:
