@@ -2,6 +2,7 @@ Model Documentation
 ====================
 
 .. toctree::
+    :maxdepth: 1
 
-    rufasoverview
-    animal
+    model_overview/rufasoverview
+    animal_module/animal
