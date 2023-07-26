@@ -247,7 +247,8 @@ class InputManager:
                     if int_in_element_hierarchy:
                         input_data_hierarchy = input_data_hierarchy + [nested_key]
                         slice_num = input_data_hierarchy[1]
-                        element_counter_and_validity = self._validate_element(input_data_hierarchy, properties_blob_key,
+                        element_counter_and_validity = self._validate_element(input_data_hierarchy,
+                                                                              properties_blob_key,
                                                                               input_data, eager_termination)
                         input_data_hierarchy[1] = slice_num
                     else:
