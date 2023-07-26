@@ -29,7 +29,7 @@ class AnimalModuleConstants:
     """Standard deviation of the parameter value for l, m, n in wood's model"""
 
     DMI_CONSTRAINT_PERCENT = 0.20
-    """ The +/- percentage of DMI estimated allowed for ration formulation"""
+    """The +/- percentage of DMI estimated allowed for ration formulation"""
     MINIMUM_DMI = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
     MINIMUM_DMI_PERCENTAGE = 0.01
