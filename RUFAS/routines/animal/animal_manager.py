@@ -200,9 +200,6 @@ class AnimalManager:
         self.methane_mitigation_method = data['methane_mitigation_method']
         self.methane_mitigation_additive_amount = data['methane_mitigation_additive_amount']
 
-        # Minimum number of pens in the simulation (for default pen initialization)
-        self.MIN_NUM_PENS = 3
-
         self.init_pens(data['pen_information'], data['herd_information'], data['manure_management_scenarios'])
 
         if self.simulate_animals:
