@@ -49,26 +49,26 @@ def test_calc_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> 
 
 
 def test_calc_mcf() -> None:
-    """Tests calc_mcf() in gas_emissions.py."""
-    assert GasEmissions.calc_mcf(1.0) == \
+    """Tests _calc_methane_conversion_factor() in gas_emissions.py."""
+    assert GasEmissions._calc_methane_conversion_factor(1.0) == \
         pytest.approx((GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B)))
 
 
 def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
-    """Tests calc_ifsm_methane_emission() in gas_emissions.py."""
+    """Tests _calc_ifsm_methane_emission() in gas_emissions.py."""
 
     # Arrange
     ambient_barn_temp = 1.0
     mcf = 1.0
     patch_for_calc_ifsm_methane_emission = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions.calc_mcf',
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_methane_conversion_factor',
         return_value=mcf
     )
     manure_volatile_solids = 1000.0
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
     # Actual
-    actual = GasEmissions.calc_ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
+    actual = GasEmissions._calc_ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
 
     # Assert
     patch_for_calc_ifsm_methane_emission.assert_called_once_with(mcf)
@@ -77,25 +77,25 @@ def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
 
 @pytest.mark.parametrize("temperature", [-10.0, 0.0, 10.0])
 def test_microbial_decomp_rate(temperature: float) -> None:
-    """Tests _microbial_decomp_rate() in gas_emissions.py."""
-    assert GasEmissions._microbial_decomp_rate(temperature) == \
+    """Tests _calc_microbial_decomp_rate() in gas_emissions.py."""
+    assert GasEmissions._calc_microbial_decomp_rate(temperature) == \
         pytest.approx(2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50))))
 
 
 @pytest.mark.parametrize("days_since_last_tillage, lag", [(1, 1), (10, 2), (1, 3)])
 def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillage: int, lag: int) -> None:
-    """Tests _carbon_decomposition_rate() in gas_emissions.py."""
+    """Tests _calc_carbon_decomposition_rate() in gas_emissions.py."""
 
     # Arrange
     max_decomp_rate = 2.0
     min_decomp_rate = 1.0
-    _ = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._microbial_decomp_rate',
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_microbial_decomp_rate',
         side_effect=[max_decomp_rate, min_decomp_rate]
     )
     expected = math.exp(0.1 * (days_since_last_tillage - lag))
 
-    assert GasEmissions._carbon_decomposition_rate(days_since_last_tillage, lag) == \
+    assert GasEmissions._calc_carbon_decomposition_rate(days_since_last_tillage, lag) == \
         pytest.approx(expected)
 
 
@@ -111,10 +111,10 @@ def test_aneerobic_coefficient(
     oxygen_ambient_air_mole_fraction: float,
     should_throw: bool
 ) -> None:
-    """Tests _aneerobic_coefficient() in gas_emissions.py."""
+    """Tests _calc_aneerobic_coefficient() in gas_emissions.py."""
     if should_throw:
         with pytest.raises(ValueError):
-            GasEmissions._anaerobic_effect(
+            GasEmissions._calc_anaerobic_effect(
                 oxygen_mole_fraction=oxygen_mole_fraction,
                 oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
             )
@@ -123,26 +123,26 @@ def test_aneerobic_coefficient(
             (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction))
             * ((0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
         )
-        assert GasEmissions._anaerobic_effect(
+        assert GasEmissions._calc_anaerobic_effect(
                 oxygen_mole_fraction=oxygen_mole_fraction,
                 oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
             ) == pytest.approx(expected)
 
 
 def test_calc_total_carbon_decomposition(mocker: MockerFixture) -> None:
-    """Tests _aneerobic_coefficient() in gas_emissions.py."""
+    """Tests calc_total_carbon_decomposition() in gas_emissions.py."""
     total_solids = 10.0
     bedding_mass = 100.0
     days_since_last_tillage = 1
     lag = 1
     c_decomp_rate = 1.0
     anaerobic_effect = 1.0
-    _ = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._carbon_decomposition_rate',
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_carbon_decomposition_rate',
         return_value=c_decomp_rate
     )
-    _ = mocker.patch(
-        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._anaerobic_effect',
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_anaerobic_effect',
         return_value=anaerobic_effect
     )
     expected = (total_solids * 0.5 + bedding_mass * 0.35) * c_decomp_rate * 0.65 * anaerobic_effect
