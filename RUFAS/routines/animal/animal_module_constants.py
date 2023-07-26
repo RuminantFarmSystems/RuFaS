@@ -26,7 +26,7 @@ class AnimalModuleConstants:
     DAILY_MILK_VARIATION_MEAN = 0
     """ mean of the parameter value for l, m, n in wood's model"""
     DAILY_MILK_VARIATION_STD_DEV = 1.0
-    """ standard deviation of the parameter value for l, m, n in wood's model"""
+    """Standard deviation of the parameter value for l, m, n in wood's model"""
 
     DMI_CONSTRAINT_PERCENT = 0.20
     """ The +/- percentage of DMI estimated allowed for ration formulation"""
