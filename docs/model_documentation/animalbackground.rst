@@ -57,7 +57,8 @@
      :width: 6.18229in
      :height: 4.46829in
      :name: Figure 2
-  `Figure 2`_  provides an overview Entity Relationship Diagram of the Animal Module
+
+   `Figure 2`_  provides an overview Entity Relationship Diagram of the Animal Module
 
 **Initialization**
 

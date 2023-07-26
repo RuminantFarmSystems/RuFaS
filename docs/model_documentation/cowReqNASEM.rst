@@ -644,6 +644,7 @@ Maintenance
 +-----------------------+------------------+-------------+
  
    *this equation applies to all metabolic stages*
+
 ..
 
    Ca_main = Calcium requirement for maintenance, g/day

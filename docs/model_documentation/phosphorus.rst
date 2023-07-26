@@ -1,6 +1,5 @@
-=======================
-**Phosphorus tracking**
-=======================
+Phosphorus tracking
+===================
 
 **Integrated phosphorus balance equations in animal module:**
 Description of equations to track phosphorus within the animal module.
@@ -175,6 +174,7 @@ B. **Phosphorus requirements for the animal**
 |                            | :math:`0.001 * dm\_intake * 1000\ g/kg\ ` |[A..1E-F.E.1]|
 |                            | :math:`if\ class\ =\ cow`                 |             |                             
 +----------------------------+-------------------------------------------+-------------+
+
 ..
 
    P maint feces = amount of P required for endogenous losses (g)
