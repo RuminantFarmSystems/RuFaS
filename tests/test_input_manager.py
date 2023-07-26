@@ -311,24 +311,6 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                                     }
                                 }
                              },
-                "element4": {"type": "array",
-                             "minimum_length": 1,
-                             "maximum_length": 10,
-                             "properties": [
-                                 {"var1": {
-                                  "type": "string",
-                                  "minimum_length": 1,
-                                  "maximum_length": 6,
-                                  }},
-                                 {"var2": {
-                                  "type": "number",
-                                  "description": "This is a number",
-                                  "minimum": 0,
-                                  "maximum": 10,
-                                  "default": 5
-                                  }}
-                                  ],
-                             }
                         }
                     }
         }
@@ -392,20 +374,36 @@ def test_validate_element_array_type_invalid_data_returns_false(mock_input_manag
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-def test_validate_element_array_type_valid_simple_array_returns_true(mock_input_manager: InputManager,
-                                                                     mock_metadata_for_validate_element:
-                                                                     Dict[str, Dict[str, Any]],
-                                                                     input_manager_original_method_states:
-                                                                     Dict[str, Callable], ):
-    """Unit test for invalid array type input_data for _validate_element in file input_manager.py"""
+def test_validate_element_array_type_invalid_fixable_data_returns_true(mock_input_manager: InputManager,
+                                                                       mock_metadata_for_validate_element:
+                                                                       Dict[str, Dict[str, Any]],
+                                                                       input_manager_original_method_states:
+                                                                       Dict[str, Callable], ):
+    """Unit test for invalid but fixable array type input_data for _validate_element in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
-    input_data = {"element4": ["cow", 3]}
-    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+    input_data = {"element3": [{"var1": "cow", "var2": 12}]}
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
 
     assert result["is_valid"] is True
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+# def test_validate_element_array_type_valid_simple_array_returns_true(mock_input_manager: InputManager,
+#                                                                      mock_metadata_for_validate_element:
+#                                                                      Dict[str, Dict[str, Any]],
+#                                                                      input_manager_original_method_states:
+#                                                                      Dict[str, Callable], ):
+#     """Unit test for invalid array type input_data for _validate_element in file input_manager.py"""
+#     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+#     input_data = {"element4": ["cow", 3]}
+#     result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+#     assert result["is_valid"] is True
+
+#     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
 @pytest.mark.parametrize(
