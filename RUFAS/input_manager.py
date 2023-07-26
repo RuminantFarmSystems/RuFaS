@@ -229,9 +229,9 @@ class InputManager:
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
-        int_in_element_hierarchy = any(isinstance(element, int) for element in element_hierarchy)
-        input_data_hierarchy = element_hierarchy[:]
-        if int_in_element_hierarchy:
+        is_int_in_element_hierarchy = any(isinstance(element, int) for element in element_hierarchy)
+        array_element_hierarchy = element_hierarchy[:]
+        if is_int_in_element_hierarchy:
             for i in range(len(element_hierarchy)):
                 if isinstance(element_hierarchy[i], int):
                     element_hierarchy[i] = "properties"
@@ -244,13 +244,13 @@ class InputManager:
             false_counter = 0
             for nested_key in variable_properties.keys():
                 if nested_key != "type":
-                    if int_in_element_hierarchy:
-                        input_data_hierarchy = input_data_hierarchy + [nested_key]
-                        slice_num = input_data_hierarchy[1]
-                        element_counter_and_validity = self._validate_element(input_data_hierarchy,
+                    if is_int_in_element_hierarchy:
+                        array_element_hierarchy = array_element_hierarchy + [nested_key]
+                        array_index = array_element_hierarchy[1]
+                        element_counter_and_validity = self._validate_element(array_element_hierarchy,
                                                                               properties_blob_key,
                                                                               input_data, eager_termination)
-                        input_data_hierarchy[1] = slice_num
+                        array_element_hierarchy[1] = array_index
                     else:
                         element_hierarchy = element_hierarchy + [nested_key]
                         element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
@@ -263,8 +263,8 @@ class InputManager:
                     if not is_child_valid:
                         om.add_warning("Invalid nested element found", f"{element_path}", info_map)
                         false_counter += 1
-                    if int_in_element_hierarchy:
-                        input_data_hierarchy.remove(nested_key)
+                    if is_int_in_element_hierarchy:
+                        array_element_hierarchy.remove(nested_key)
                     else:
                         element_hierarchy.remove(nested_key)
 
@@ -275,8 +275,8 @@ class InputManager:
         else:
             var_name = element_hierarchy[-1]
             try:
-                if int_in_element_hierarchy:
-                    input_data_value = reduce(lambda d, key: d[key], input_data_hierarchy, input_data)
+                if is_int_in_element_hierarchy:
+                    input_data_value = reduce(lambda d, key: d[key], array_element_hierarchy, input_data)
                 else:
                     input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
@@ -291,9 +291,9 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
-            if int_in_element_hierarchy:
+            if is_int_in_element_hierarchy:
                 is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, input_data_hierarchy, eager_termination)
+                                     properties_blob_key, is_int_in_element_hierarchy, eager_termination)
             else:
                 is_valid = validator(variable_properties, var_name, input_data_value,
                                      properties_blob_key, element_hierarchy, eager_termination)
@@ -302,8 +302,8 @@ class InputManager:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                if int_in_element_hierarchy:
-                    is_fixed = self._fix_data(variable_properties, input_data_hierarchy, input_data)
+                if is_int_in_element_hierarchy:
+                    is_fixed = self._fix_data(variable_properties, array_element_hierarchy, input_data)
                 else:
                     is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
                 if is_fixed:
