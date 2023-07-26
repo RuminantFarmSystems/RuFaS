@@ -42,6 +42,16 @@ class ManureManagerOutputHandler:
         ManureSeparatorDailyOutput: 'sep',
         ManureTreatmentDailyOutput: 'tx'
     }
+    _HEADER_PREFIX_NAMES = {
+        'pen': 'Pen Info',
+        'manure': 'Animal Module Input',
+        'handler': 'Manure Handler',
+        'rp': 'Reception Pit',
+        'sep': 'Manure Separator',
+        'tx': 'Manure Treatment',
+        'tx_acc': 'Accumulated Manure Treatment',
+        'tx_ad': 'Anaerobic Digester',
+    }
     _HEADER_PRIMARY_DELIMITER = '__'
     _HEADER_SECONDARY_DELIMITER = '_'
 
@@ -228,11 +238,14 @@ class ManureManagerOutputHandler:
 
         """
         df = cls._create_dataframe_from_manure_manager_data(manure_manager)
+        if df.empty:
+            return
         sorting_cols = ['pen_id', 'simulation_day']
         df.sort_values(by=sorting_cols, inplace=True)
         df = cls._drop_all_zeros_nan_none_columns(df)
 
-        non_sorting_cols = [col for col in df.columns if not any(sorting_col.lower() in col.lower() for sorting_col in sorting_cols)]
+        non_sorting_cols = [col for col in df.columns if
+                            not any(sorting_col.lower() in col.lower() for sorting_col in sorting_cols)]
         df = df[sorting_cols + non_sorting_cols]
 
         csv_dir_path = Path(csv_dir_path) / cls._DEFAULT_OUTPUT_DIR_NAME
@@ -420,8 +433,8 @@ class ManureManagerOutputHandler:
         """
         return datetime.now().strftime('%Y_%m_%d__%H_00')
 
-    @staticmethod
-    def _get_full_prefix(prefix: str) -> str:
+    @classmethod
+    def _get_full_prefix(cls, prefix: str) -> str:
         """
         Translate a short prefix to its more descriptive version.
 
@@ -439,16 +452,7 @@ class ManureManagerOutputHandler:
             The translated (more descriptive) version of the given prefix.
 
         """
-        return {
-            'pen': 'Pen Info',
-            'manure': 'Input Manure',
-            'handler': 'Handler',
-            'rp': 'Reception Pit',
-            'sep': 'Separator',
-            'tx': 'Treatment',
-            'tx_acc': 'Treatment Accumulated',
-            'tx_ad': 'Digester',
-        }.get(prefix, prefix)
+        return cls._HEADER_PREFIX_NAMES.get(prefix, prefix)
 
     @classmethod
     def _remove_prefix(cls, header: str) -> str:
@@ -646,7 +650,8 @@ class ManureManagerOutputHandler:
         simulation_day = 'simulation_day'
         plot_file_extension = '.png'
         fixed_cols = [pen_id, simulation_day]
-        non_fixed_cols = [col for col in df.columns if all(fixed_col.lower() not in col.lower() for fixed_col in fixed_cols)]
+        non_fixed_cols = [col for col in df.columns if
+                          all(fixed_col.lower() not in col.lower() for fixed_col in fixed_cols)]
 
         for col in non_fixed_cols:
             output_dir = graphics_dir / cls._extract_dir_name_from_col_name(col)
@@ -700,7 +705,7 @@ class ManureManagerOutputHandler:
             return
         small, medium, large = 10, 12, 16
         plt.style.use('ggplot')
-        plt.scatter(x, y, alpha=0.7, c='#1746A2', s=25)
+        plt.plot(x, y, color='#1746A2', linewidth=1.5)
         plt.xlabel(x_label, fontsize=small)
         plt.ylabel(y_label, fontsize=small)
         plt.title(title, fontsize=medium)

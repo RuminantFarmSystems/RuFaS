@@ -341,91 +341,65 @@ def test_get_formatted_current_time(mocker: MockFixture, mock_current_datetime: 
 
 
 @pytest.mark.parametrize(
-    'sorting_cols_data, non_sorting_cols_data',
+    'sorting_cols_data, non_sorting_cols_data, expected',
     [
-        (  # Simple DataFrame with one non-sorting column
-                {
-                    'pen_id': [1, 2, 3],
-                    'simulation_day': [1, 2, 3],
-                },
-                {
-                    'other_col': [4, 5, 6]
-                }
-        ),
-        (  # DataFrame with multiple non-sorting columns
-                {
-                    'pen_id': [1, 2, 3],
-                    'simulation_day': [1, 2, 3],
-                },
-                {
-                    'first_col': [4, 5, 6],
-                    'second_col': [7, 8, 9]
-                }
-        ),
-        (  # DataFrame with sorting columns having same values
-                {
-                    'pen_id': [1, 1, 1],
-                    'simulation_day': [1, 1, 1],
-                },
-                {
-                    'other_col': [4, 5, 6]
-                }
-        ),
-        (  # Empty DataFrame
+        # Empty DataFrame
+        (
                 {
                     'pen_id': [],
                     'simulation_day': [],
                 },
-                {}
+                {},
+                False
         ),
-        (  # DataFrame with only sorting columns
+        # DataFrame with a single row
+        (
                 {
-                    'pen_id': [1, 2, 3],
-                    'simulation_day': [1, 2, 3],
-                },
-                {}
-        ),
-        (  # DataFrame with NaN values
-                {
-                    'pen_id': [1, 2, 3],
-                    'simulation_day': [1, 2, 3],
+                    'pen_id': [1],
+                    'simulation_day': [1],
                 },
                 {
-                    'other_col': [np.nan, 5, 6]
-                }
+                    'manure_kg': [100],
+                    'phosphorus_kg': [10],
+                    'ammonia_kg': [5],
+                },
+                True
         ),
-        (  # DataFrame with different datatypes
+        # DataFrame with multiple rows
+        (
                 {
-                    'pen_id': [1, 2, 3],
-                    'simulation_day': ['day1', 'day2', 'day3'],
+                    'pen_id': [1, 2, 1, 2],
+                    'simulation_day': [1, 1, 2, 2],
                 },
                 {
-                    'other_col': [4.1, '5', pd.Timestamp('2023-01-02')]
-                }
+                    'manure_kg': [100, 200, 150, 250],
+                    'phosphorus_kg': [10, 20, 15, 25],
+                    'ammonia_kg': [5, 10, 7, 12],
+                },
+                True
         ),
-        (  # DataFrame with duplicate values in non-sorting columns
+        # DataFrame with multiple rows and NaN/None/0 values
+        (
                 {
-                    'pen_id': [1, 2, 3],
-                    'simulation_day': [1, 2, 3],
+                    'pen_id': [1, 2, 1, 2],
+                    'simulation_day': [1, 1, 2, 2],
                 },
                 {
-                    'other_col': [4, 4, 4]
-                }
-        ),
-        (  # DataFrame with non-unique sorting column combinations
-                {
-                    'pen_id': [1, 1, 2],
-                    'simulation_day': [1, 1, 2],
+                    'manure_kg': [100, None, 0, 250],
+                    'phosphorus_kg': [10, 20, np.nan, 25],
+                    'ammonia_kg': [5, 10, 7, 12],
+                    'none_value_col': [None, None, None, None],
+                    'nan_value_col': [np.nan, np.nan, np.nan, np.nan],
+                    'zero_value_col': [0, 0, 0, 0],
                 },
-                {
-                    'other_col': [4, 5, 6]
-                }
+                True
         ),
     ]
 )
 def test_produce_csv(mocker: MockFixture, tmpdir,
                      sorting_cols_data: dict[str, list[int]],
-                     non_sorting_cols_data: dict[str, list[int]]) -> None:
+                     non_sorting_cols_data: dict[str, list[int]],
+                     expected: bool) -> None:
     """
     Unit test for produce_csv() in manure_manager_output_handler.py.
 
@@ -486,8 +460,12 @@ def test_produce_csv(mocker: MockFixture, tmpdir,
     ManureManagerOutputHandler.produce_csv(temp_dir_path, mock_manure_manager)
 
     # Assert
-    assert csv_dir_path.is_dir()
-    assert all_data_file_path.is_file()
+    assert csv_dir_path.is_dir() == expected
+    assert all_data_file_path.is_file() == expected
+
+    if not expected:
+        return
+
     patch_for_formatted_current_time.assert_called_once()
     patch_for_create_dataframe.assert_called_once_with(mock_manure_manager)
     patch_for_drop_all_zeros.assert_called_once_with(df)
@@ -771,13 +749,13 @@ def test_capitalize_first_letters(s: str, delimiter: str, expected: str) -> None
     'prefix, expected',
     [
         ('pen', 'Pen Info'),
-        ('manure', 'Input Manure'),
-        ('handler', 'Handler'),
+        ('manure', 'Animal Module Input'),
+        ('handler', 'Manure Handler'),
         ('rp', 'Reception Pit'),
-        ('sep', 'Separator'),
-        ('tx', 'Treatment'),
-        ('tx_acc', 'Treatment Accumulated'),
-        ('tx_ad', 'Digester'),
+        ('sep', 'Manure Separator'),
+        ('tx', 'Manure Treatment'),
+        ('tx_acc', 'Accumulated Manure Treatment'),
+        ('tx_ad', 'Anaerobic Digester'),
         ('dummy_prefix', 'dummy_prefix')
     ]
 )
