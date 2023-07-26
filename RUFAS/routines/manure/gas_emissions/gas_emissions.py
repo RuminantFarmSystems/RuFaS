@@ -3,7 +3,6 @@ import math
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
-from RUFAS.routines.manure.constants.bedding_constants import BeddingConstants
 
 
 class GasEmissions:
@@ -650,7 +649,7 @@ class GasEmissions:
         return Bo * MCF * MS * MF * manure_volatile_solids
 
     @classmethod
-    def calc_mcf(cls, ambient_barn_temp: float) -> float:
+    def _calc_methane_conversion_factor(cls, ambient_barn_temp: float) -> float:
         """
         Calculate the Methane Conversion Factor (MCF) using the exponential function:
 
@@ -670,7 +669,7 @@ class GasEmissions:
         return GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B * ambient_barn_temp)
 
     @classmethod
-    def calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+    def _calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
         """Calculates emission of methane for a day using an adaptation of the tier 2 approach
         of the IPCC(2006), given ambient barn temperature and a methane conversion factor for the manure
         management.
@@ -692,14 +691,14 @@ class GasEmissions:
 
         """
         if manure_volatile_solids < 0:
-            raise ValueError("Mass must be positive.")
-        methane_conversion_factor = GasEmissions.calc_mcf(ambient_barn_temp)
+            raise ValueError(f"{manure_volatile_solids=} mass must be positive.")
+        methane_conversion_factor = GasEmissions._calc_methane_conversion_factor(ambient_barn_temp)
         methane_emissions_in_kg = (manure_volatile_solids * GasEmissionConstants.Bo *
                                    GasEmissionConstants.METHANE_FACTOR * methane_conversion_factor) / 100
         return methane_emissions_in_kg
 
     @classmethod
-    def _microbial_decomp_rate(cls, temperature: float) -> float:
+    def _calc_microbial_decomp_rate(cls, temperature: float) -> float:
         """
         Calculates the microbial decomposition (unitless) rate per day:
 
@@ -720,7 +719,7 @@ class GasEmissions:
             (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
 
     @classmethod
-    def _carbon_decomposition_rate(cls, days_since_last_tillage: int = 1, lag: int = 2) -> float:
+    def _calc_carbon_decomposition_rate(cls, days_since_last_tillage: int = 1, lag: int = 2) -> float:
         """
         Calculates the carbon decomposition taking place in the composting process of
         the manure-bedding mix due to microbial activity.
@@ -746,8 +745,8 @@ class GasEmissions:
         compost_bed_pack_temp = 30
         decay = 0.1
 
-        max_microbial_decom_rate = cls._microbial_decomp_rate(decomposition_temp)
-        slow_decomp_rate = cls._microbial_decomp_rate(compost_bed_pack_temp)
+        max_microbial_decom_rate = cls._calc_microbial_decomp_rate(decomposition_temp)
+        slow_decomp_rate = cls._calc_microbial_decomp_rate(compost_bed_pack_temp)
         exponent_coeff = decay * (days_since_last_tillage - lag)
 
         c_decomp_rate = (
@@ -758,7 +757,7 @@ class GasEmissions:
         return c_decomp_rate
 
     @classmethod
-    def _anaerobic_effect(
+    def _calc_anaerobic_effect(
         cls,
         oxygen_mole_fraction: float = 0.15,
         oxygen_half_saturation_constant: float = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT,
@@ -811,7 +810,7 @@ class GasEmissions:
         lag: int,
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
         carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_AVAILABLE_IN_MANURE,
-        carbon_available_in_bedding: float = BeddingConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING
+        carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING
     ) -> float:
         """Calculates the carbon decomposition from the composting process of the manure-bed mixture
         due to microbial activity (decomposition, consumption, respiration).
@@ -843,8 +842,8 @@ class GasEmissions:
         carbon_from_bedding = bedding_total_mass * carbon_available_in_bedding
         total_carbon = carbon_from_manure + carbon_from_bedding
 
-        microbial_decomp_rate = cls._carbon_decomposition_rate(days_since_last_tillage, lag)
-        microbial_decomp_anaerobic_conditions_effect = cls._anaerobic_effect()
+        microbial_decomp_rate = cls._calc_carbon_decomposition_rate(days_since_last_tillage, lag)
+        microbial_decomp_anaerobic_conditions_effect = cls._calc_anaerobic_effect()
         total_carbon_decomposition = (
             total_carbon
             * microbial_decomp_rate
