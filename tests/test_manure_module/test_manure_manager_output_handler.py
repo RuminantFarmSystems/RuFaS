@@ -1091,8 +1091,8 @@ def test_produce_graphics(mocker: MockFixture, tmpdir,
         ([], [], 'x', 'y', 'title'),  # empty lists
     ]
 )
-def test__make_simple_scatter_plot_with_matplotlib(tmpdir, x_values: list[int], y_values: list[int | None | float],
-                                                   x_label: str, y_label: str, title: str) -> None:
+def test_make_simple_scatter_plot_with_matplotlib(tmpdir, x_values: list[int], y_values: list[int | None | float],
+                                                  x_label: str, y_label: str, title: str) -> None:
     """
     Unit test for _make_simple_scatter_plot_with_matplotlib() in manure_manager_output_handler.py.
 
@@ -1109,7 +1109,9 @@ def test__make_simple_scatter_plot_with_matplotlib(tmpdir, x_values: list[int], 
     ManureManagerOutputHandler._make_simple_scatter_plot_with_matplotlib(output_path, x, y, x_label, y_label, title)
 
     # Assert
-    if None in y_values or np.nan in y_values:
+    if not x_values or not y_values:
+        assert not output_path.exists()
+    elif None in y_values or np.nan in y_values:
         assert not output_path.exists()
     else:
         assert output_path.exists()
