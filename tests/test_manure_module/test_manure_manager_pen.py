@@ -4,11 +4,11 @@ from pytest_mock import MockerFixture
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-from RUFAS.routines.manure.pen.manure_management_pen import ManureManagementPen
+from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
 
 
-def test_manure_management_pen_init(mocker: MockerFixture) -> None:
-    """Unit test for function __init__ in file manure_management_pen.py"""
+def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
+    """Unit test for function __init__ in file manure_manager_pen.py"""
 
     # Arrange
     mock_pen: Pen = mocker.MagicMock(autospec=Pen)
@@ -30,14 +30,14 @@ def test_manure_management_pen_init(mocker: MockerFixture) -> None:
     mock_pen.manure = mocker.MagicMock(autospec=True)
     expected_pen_manure = mocker.MagicMock(autospec=PenManure)
     patch_for_pen_manure_get_instance = mocker.patch(
-        'RUFAS.routines.manure.pen.manure_management_pen.PenManure.get_instance',
+        'RUFAS.routines.manure.pen.manure_manager_pen.PenManure.get_instance',
         return_value=expected_pen_manure)
     patch_for_count_lactating_cows = mocker.patch(
-        'RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.count_lactating_cows',
+        'RUFAS.routines.manure.pen.manure_manager_pen.ManureManagerPen.count_lactating_cows',
         return_value=expected_num_animals)
 
     # Act
-    pen = ManureManagementPen(mock_pen)
+    pen = ManureManagerPen(mock_pen)
 
     # Assert
     assert pen.id == expected_pen_id
@@ -64,14 +64,14 @@ def test_manure_management_pen_init(mocker: MockerFixture) -> None:
 ])
 def test_count_lactating_cows(mocker: MockerFixture, animal_combination: Pen.AnimalCombination,
                               expected_num_lactating_cows: int) -> None:
-    """Unit test for function count_lactating_cows in file manure_management_pen.py"""
+    """Unit test for function count_lactating_cows in file manure_manager_pen.py"""
 
     # Arrange
     mocker.patch('RUFAS.routines.animal.life_cycle.cow.Cow.__init__', return_value=None)
     mock_cows = [Cow(args=mocker.MagicMock()) for _ in range(10)]
 
     # Act
-    actual_num_lactating_cows = ManureManagementPen.count_lactating_cows(animal_combination, mock_cows)
+    actual_num_lactating_cows = ManureManagerPen.count_lactating_cows(animal_combination, mock_cows)
 
     # Assert
     assert actual_num_lactating_cows == expected_num_lactating_cows
@@ -93,13 +93,13 @@ def test_barn_area_from_pen_type(pen_type: str,
                                  expected_area: float,
                                  mocker: MockerFixture
                                  ) -> None:
-    """Unit test for function barn_area_from_pen_type in file manure_management_pen.py"""
+    """Unit test for function barn_area_from_pen_type in file manure_manager_pen.py"""
 
     # Arrange
     mocker.patch(
-        'RUFAS.routines.manure.pen.manure_management_pen.ManureManagementPen.__init__',
+        'RUFAS.routines.manure.pen.manure_manager_pen.ManureManagerPen.__init__',
         return_value=None)
-    mock_pen = ManureManagementPen(mocker.MagicMock(autospec=Pen))
+    mock_pen = ManureManagerPen(mocker.MagicMock(autospec=Pen))
     mock_pen.pen_type = pen_type
     mock_pen.classes_in_pen = {'Cow'} if has_cows else {'Calf'}
 
