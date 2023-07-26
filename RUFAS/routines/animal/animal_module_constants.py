@@ -24,7 +24,7 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
 
     DAILY_MILK_VARIATION_MEAN = 0
-    """ mean of the parameter value for l, m, n in wood's model"""
+    """Mean of the parameter value for l, m, n in wood's model"""
     DAILY_MILK_VARIATION_STD_DEV = 1.0
     """Standard deviation of the parameter value for l, m, n in wood's model"""
 
