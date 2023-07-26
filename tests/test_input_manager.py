@@ -310,7 +310,7 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                                     "default": 5
                                     }
                                 }
-                             },
+                             }
                         }
                     }
         }
@@ -351,6 +351,22 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
 
     input_data = {"element3": [{"var1": "cow", "var2": 3}]}
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_array_type_multiple_valid_elements_returns_true(mock_input_manager: InputManager,
+                                                                          mock_metadata_for_validate_element:
+                                                                          Dict[str, Dict[str, Any]],
+                                                                          input_manager_original_method_states:
+                                                                          Dict[str, Callable], ):
+    """Unit test for array type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element3": [{"var1": "cow", "var2": 3}, {"var1": "pig", "var2": 7}]}
     result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
 
     assert result["is_valid"] is True
