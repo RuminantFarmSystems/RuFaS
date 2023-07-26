@@ -406,22 +406,6 @@ def test_validate_element_array_type_invalid_fixable_data_returns_true(mock_inpu
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
-# def test_validate_element_array_type_valid_simple_array_returns_true(mock_input_manager: InputManager,
-#                                                                      mock_metadata_for_validate_element:
-#                                                                      Dict[str, Dict[str, Any]],
-#                                                                      input_manager_original_method_states:
-#                                                                      Dict[str, Callable], ):
-#     """Unit test for invalid array type input_data for _validate_element in file input_manager.py"""
-#     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-
-#     input_data = {"element4": ["cow", 3]}
-#     result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
-
-#     assert result["is_valid"] is True
-
-#     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
-
-
 @pytest.mark.parametrize(
     "input_data_value, expected_result",
     [
