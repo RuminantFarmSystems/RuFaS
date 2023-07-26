@@ -333,16 +333,11 @@ class InputManager:
                 warning_string = f"Array length more than {maximum_length}."
                 om.add_warning(warning_string, f"{var_name=}", info_map)
                 return False
-        print(f"at the start of validating the list {var_name=}")
         original_input_data = {var_name: input_data_value}
         for index, element in enumerate(input_data_value):
-            print(f"before array_validation fun is {input_data_hierarchy}")
             input_data_hierarchy.append(index)
-            print(f"after array_validation fun is {input_data_hierarchy}")
-            print(f"input data sent back to validate data is {input_data_value}")
             element_counter_and_validity = self._validate_element(input_data_hierarchy, properties_blob_key,
                                                                   original_input_data, eager_termination)
-            print(f"at end of array validator: {element_counter_and_validity['is_valid']=}")
             if not element_counter_and_validity["is_valid"]:
                 return False
             input_data_hierarchy.pop()
