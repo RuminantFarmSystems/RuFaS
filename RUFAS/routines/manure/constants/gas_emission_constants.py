@@ -91,3 +91,18 @@ class GasEmissionConstants:
 
     GENERAL_UPPER_BOUND_TEMPERATURE = 60.0
     """General temperature upper bound (:math:`^{\circ}C`). Default is set to 60.0."""
+
+    SOLID_AND_SEMI_SOLID_MANURE_HSC = 10.0
+    """Housing specific constant for solid and semi-solid manure (s/m)."""
+
+    SLURRY_MANURE_HSC = 19.0
+    """Housing specific constant for slurry manure (s/m)."""
+
+    LIQUID_MANURE_HSC = 4.1
+    """Housing specific constant for liquid manure (s/m)."""
+
+    SOLID_MANURE_THRESHOLD = 8.0
+    """Dry matter threshold for classifying solid and semi-solid manure."""
+
+    SLURRY_MANURE_THRESHOLD = 5.0
+    """Dry matter threshold for classifying slurry manure."""
