@@ -306,24 +306,9 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            # is_valid = self.get_validity(variable_properties, var_name, input_data_value, var_type,
-            #                              properties_blob_key, is_int_in_element_hierarchy,
-            #                              element_hierarchy, eager_termination)
-            data_type_to_validator_map = {"string": self._string_type_validator,
-                                          "number": self._num_type_validator,
-                                          "array": self._array_type_validator,
-                                          "bool": self._bool_type_validator, }
-            try:
-                validator = data_type_to_validator_map[var_type]
-            except KeyError:
-                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
-
-            if is_int_in_element_hierarchy:
-                is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, is_int_in_element_hierarchy, eager_termination)
-            else:
-                is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, element_hierarchy, eager_termination)
+            is_valid = self.get_validity(variable_properties, var_name, input_data_value, var_type,
+                                         properties_blob_key, is_int_in_element_hierarchy,
+                                         element_hierarchy, eager_termination)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
