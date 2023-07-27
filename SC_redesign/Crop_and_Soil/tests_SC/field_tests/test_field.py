@@ -807,14 +807,16 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
             crop.growth_constraints.constrain_growth = MagicMock()
             crop.leaf_area_index.grow_canopy = MagicMock()
             crop.biomass_allocation.allocate_biomass = MagicMock()
-
-        incorp._execute_daily_processes(current_weather)
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "year", 2023)
+        setattr(mocked_time, "day", 178)
+        incorp._execute_daily_processes(current_weather, mocked_time)
 
         incorp._determine_total_above_ground_biomass.assert_called_once()
         incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(light, mean_temp, min_temp,
                                                                                     max_temp, 89 + residue, 0,
                                                                                     annual_mean_temp)
-        incorp._cycle_water.assert_called_once_with(current_weather)
+        incorp._cycle_water.assert_called_once_with(current_weather, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
                 crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
@@ -884,12 +886,16 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         crop_2.water_dynamics.set_maximum_transpiration = MagicMock()
         crop_2.water_dynamics.cycle_water = MagicMock()
         crop_2.water_uptake.uptake_water = MagicMock()
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "year", 2023)
+        setattr(mocked_time, "day", 178)
 
-        incorp._cycle_water(current_weather)
-
-        incorp._determine_watering_amount.assert_called_once_with(rainfall, 0.0)
+        incorp._cycle_water(current_weather, mocked_time)
+        incorp._determine_watering_amount.assert_called_once_with(rainfall=rainfall, year=mocked_time.year,
+                                                                  day=mocked_time.day, irrigation=0.0)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
-        incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp, mean_temp)
+        incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp,
+                                                                               mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
         incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
@@ -936,6 +942,9 @@ def test_determine_watering_amount(rainfall: float, days_into_interval: int, wat
                                    old_method: bool) -> None:
     """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
         totals are updated correctly."""
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "year", 2023)
+    setattr(mocked_time, "day", 178)
     data = FieldData(watering_amount_in_liters=50_000, watering_interval=5,
                      days_into_watering_interval=days_into_interval)
     data.watering_amount_in_mm = 5.0
@@ -945,10 +954,10 @@ def test_determine_watering_amount(rainfall: float, days_into_interval: int, wat
 
     if should_fail:
         with pytest.raises(ValueError) as e:
-            incorp._determine_watering_amount(rainfall, irrigation)
+            incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
             assert str(e) == "Expected to use hardcoded irrigation data or specified amount, but tried to use both"
     else:
-        actual = incorp._determine_watering_amount(rainfall, irrigation)
+        actual = incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
         if old_method:
             assert actual == irrigation
         else:
