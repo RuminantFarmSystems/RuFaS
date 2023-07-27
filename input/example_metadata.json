@@ -199,34 +199,58 @@
       "harvest_days": {
         "type": "array",
         "description": "Julian day(s) of year to harvest",
-        "minimum_length": 1
+        "minimum_length": 0,
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "harvest_years": {
         "type": "array",
         "description": "Calendar years in which the harvesting occurs",
-        "minimum_length": 1
+        "minimum_length": 0,
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "harvest_operations": {
         "type": "array",
         "description": "Operation(s) with which this crop will be harvested.",
-        "minimum_length": 1,
-        "default": ["default"]
+        "properties": {
+          "type": "string",
+          "pattern": "^{default|no_kill}$",
+          "default": ["default"]
+        }
       },
       "harvest_type": {
         "type": "array",
         "description": "Whether the crop uses scheduled harvests or optimal harvests",
-        "minimum_length": 1,
-        "default": ["scheduled"]
+        "properties": {
+          "type": "string",
+          "pattern": "^{scheduled|optimal}$",
+          "default": ["scheduled"]
+        }
       },
       "planting_days": {
         "type": "array",
         "description": "Julian day(s) of year to plant",
-        "minimum_length": 1
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "planting_years": {
         "type": "array",
         "description": "Calendar years in which the planting occurs",
-        "minimum_length": 1
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "pattern_repeat": {
         "type": "number",
