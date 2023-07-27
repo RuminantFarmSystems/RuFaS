@@ -6,7 +6,197 @@ from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 
 
 class GasEmissions:
-    # TODO: review docstring
+    @classmethod
+    def calc_methane_emission_from_slurry_storage(cls, total_volatile_solids: float,
+                                                  temp=GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
+                                                  ) -> float:
+        """
+        Calculate the methane emission from manure storage using total volatile solids.
+
+        Notes
+        -----
+        The equation used to calculate the methane emission from manure storage is as follows:
+
+        .. math::
+
+            E_{CH_4} = 24 \\cdot VS_{d} \\cdot b_{1} \\cdot e^{lnA - \\frac{E}{RT}} + 24 \\cdot VS_{nd} \\cdot b_{2} \\cdot e^{lnA - \\frac{E}{RT}}
+
+        where:
+
+            :math:`E_{CH_4}` is the methane emission from manure storage (kg :math:`CH_4`/day),
+
+            :math:`VS_{d}` is the degradable volatile solids in manure (kg),
+
+            :math:`b_{1}` is the degradable volatile solids rate correcting factor (1.0, unitless),
+
+            :math:`VS_{nd}` is the non-degradable volatile solids in manure (kg),
+
+            :math:`b_{2}` is the non-degradable volatile solids rate correcting factor (0.01, unitless),
+
+            :math:`lnA` is the natural log of the Arrhenius constant (43.33, unitless),
+
+            :math:`E` is the activation energy (112700.0 J/mol),
+
+            :math:`R` is the ideal gas constant (8.314 J/mol :math:`\\cdot` K),
+
+            :math:`T` is the temperature in Kelvin (:math:`K`).
+
+        The degradable and non-degradable volatile solids are calculated using the following equations:
+
+        .. math::
+
+            VS_d = \\frac{VS \\cdot B_o}{E_{CH_4,pot}}
+
+            VS_{nd} = VS - VS_d
+
+        where:
+
+            :math:`VS` is the total volatile solids in manure (kg),
+
+            :math:`VS_d` is the degradable volatile solids in manure (kg),
+
+            :math:`VS_{nd}` is the non-degradable volatile solids in manure (kg),
+
+            :math:`B_o` is the achievable methane emission (0.24 kg :math:`CH_4`/kg VS),
+
+            :math:`E_{CH_4,pot}` is the potential methane production (0.48 kg :math:`CH_4`/kg VS).
+
+        Parameters
+        ----------
+        total_volatile_solids : float
+            Total volatile solids in manure (kg).
+        temp : float
+            Temperature in Celsius (:math:`^\circ C`). Default is set to 20 degrees Celsius. This value is
+            listed as :attr:`DEFAULT_SLURRY_STORAGE_TEMPERATURE` in :class:`GasEmissionConstants`.
+
+        Returns
+        -------
+        float
+            Methane emission from manure storage (kg :math:`CH_4`/day).
+
+        """
+        if total_volatile_solids < 0:
+            raise ValueError(
+                f'Total volatile solids must be greater than 0. Total volatile solids provided: {total_volatile_solids}')
+
+        arrhenius_exponent = cls._calc_arrhenius_exponent(temp)
+
+        degradable_volatile_solids, non_degradable_volatile_solids = cls._calc_volatile_solid_components(
+            total_volatile_solids)
+
+        methane_emission_from_degradable_volatile_solids = (GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
+                                                            * degradable_volatile_solids
+                                                            * GasEmissionConstants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+                                                            * arrhenius_exponent)
+        methane_emission_from_non_degradable_volatile_solids = (GasEmissionConstants.METHANE_EMISSION_COEFFICIENT
+                                                                * non_degradable_volatile_solids
+                                                                * GasEmissionConstants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+                                                                * arrhenius_exponent)
+
+        methane_emission = methane_emission_from_degradable_volatile_solids + methane_emission_from_non_degradable_volatile_solids
+
+        return methane_emission
+
+    @classmethod
+    def _calc_arrhenius_exponent(cls, temp: float) -> float:
+        """
+        Calculate the Arrhenius exponent.
+
+        Notes
+        -----
+        The Arrhenius exponent is calculated as follows:
+
+        .. math::
+
+            e^{lnA - \\frac{E}{RT}}
+
+        where:
+
+            :math:`lnA` is the natural log of the Arrhenius constant (unitless),
+
+            :math:`E` is the activation energy (joules per mol, J/mol),
+
+            :math:`R` is the universal gas constant (joules per mol Kelvin, J/mol :math:`\\cdot` K),
+
+            :math:`T` is the temperature in Kelvin (K).
+
+        Parameters
+        ----------
+        temp : float
+            Temperature in Celsius (:math:`^\circ C`).
+
+        Returns
+        -------
+        float
+            Arrhenius exponent (unitless).
+
+        Raises
+        ------
+        ValueError
+            If the temperature is not between -40 and 50 degrees Celsius.
+
+        """
+        if not GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE <= temp <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE:
+            raise ValueError(f'Temperature must be between -40 and 60 degrees Celsius. Temperature provided: {temp}')
+
+        temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
+        return math.exp(GasEmissionConstants.NATURAL_LOG_ARRHENIUS_CONSTANT -
+                        (GasEmissionConstants.ACTIVATION_ENERGY / (GasEmissionConstants.GAS_CONSTANT * temp_kelvin)))
+
+    @classmethod
+    def _calc_volatile_solid_components(cls, total_volatile_solids: float) -> tuple[float, float]:
+        """
+        Calculate the degradable and non-degradable volatile solids.
+
+        Notes
+        -----
+        The degradable and non-degradable volatile solids are calculated as follows:
+
+        .. math::
+
+            VS_d = \\frac{VS \\cdot B_o}{E_{CH_4,pot}}
+
+            VS_{nd} = VS - VS_d
+
+        where:
+
+            :math:`VS_d` is the degradable volatile solids (kg),
+
+            :math:`VS_{nd}` is the non-degradable volatile solids (kg),
+
+            :math:`VS` is the total volatile solids (kg),
+
+            :math:`B_o` is the achievable methane emission (kg :math:`CH_4`/kg VS),
+
+            :math:`E_{CH_4,pot}` is the potential methane yield of manure (kg :math:`CH_4`/kg VS).
+
+        Parameters
+        ----------
+        total_volatile_solids : float
+            Total volatile solids in manure (kg).
+
+        Returns
+        -------
+        tuple[float, float]
+            Degradable volatile solids (kg) and non-degradable volatile solids (kg).
+
+        Raises
+        ------
+        ValueError
+            If the total volatile solids is negative.
+
+        """
+        if total_volatile_solids < 0:
+            raise ValueError(
+                f'Total volatile solids must be non-negative. Total volatile solids provided: {total_volatile_solids}')
+
+        degradable_volatile_solids = (total_volatile_solids
+                                      * GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
+                                      / GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE)
+        non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
+        return degradable_volatile_solids, non_degradable_volatile_solids
+
+    # TODO: to be removed in the next PR while refactoring slurry storage treatments
     @classmethod
     def calc_methane_emission_for_slurry_storage(cls,
                                                  manure_total_solids: float,
@@ -32,12 +222,12 @@ class GasEmissions:
         VS_tot = manure_total_solids * manure_volatile_solids_fraction
 
         constants = GasEmissionConstants
-        b1 = constants.b1
-        b2 = constants.b2
-        lnA = constants.lnA
-        E = constants.E
-        R = constants.R
-        Bo = constants.Bo
+        b1 = constants.DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+        b2 = constants.NON_DEGRADABLE_VOLATILE_SOLIDS_RATE_CORRECTING_FACTOR
+        lnA = constants.NATURAL_LOG_ARRHENIUS_CONSTANT
+        E = constants.ACTIVATION_ENERGY
+        R = constants.GAS_CONSTANT
+        Bo = constants.ACHIEVABLE_METHANE_EMISSION
         E_CH4_pot = constants.POTENTIAL_METHANE_YIELD_OF_MANURE
 
         tempK = cls._convert_temperature_celsius_to_kelvin(temperature_celsius)
@@ -52,45 +242,103 @@ class GasEmissions:
         else:
             return E_CH4_open_air * (1 - efficiency_fraction)
 
-    # TODO: Be more descriptive
     @classmethod
     def _calc_modified_hours(cls, hours: float) -> float:
-        """Calculates modified hours.
+        """
+        Calculate modified hours based on the specific conditions.
 
-        Args:
-            hours: number of hours.
+        Notes
+        -----
+        The modified hours is calculated using a piecewise-defined hyperbolic tangent function as follows:
 
-        Returns:
-            modified hours.
+        .. math::
+
+            \\begin{cases}
+                \\frac{-\\tanh(hours - 21.5)}{3.5} & \\text{if } hours > 14 \\\\
+                \\frac{\\tanh(hours - 9.5)}{2.5} & \\text{if } 4 < hours \\leq 14 \\\\
+                \\frac{-\\tanh(hours + 3.5)}{3.5} & \\text{if } hours \\leq 4
+            \\end{cases}
+
+        where:
+
+            :math:`hours` is the input hour(s) of the day.
+
+        Parameters
+        ----------
+        hours : float
+            The input hour(s) of the day, must be in the range of [0, 24].
+
+        Returns
+        -------
+        float
+            The modified hours as calculated using the piecewise-defined hyperbolic tangent function.
+
+        Raises
+        ------
+        ValueError
+            If the input `hours` is not in the range [0, 24].
 
         """
+        if not 0 <= hours <= 24:
+            raise ValueError(f'Hours must be in the range of [0, 24]. Hours provided: {hours}')
 
         if hours > 14:
-            modified_hours = - math.tanh(hours - 21.5) / 3.5
+            return - math.tanh(hours - 21.5) / 3.5
         elif hours > 4:
-            modified_hours = math.tanh(hours - 9.5) / 2.5
+            return math.tanh(hours - 9.5) / 2.5
         else:
-            modified_hours = - math.tanh(hours + 3.5) / 3.5
+            return - math.tanh(hours + 3.5) / 3.5
 
-        return modified_hours
-
-    # TODO: Be more descriptive
     @classmethod
-    def _calc_ambient_temp(cls, hours: float, temperature_min: float, temperature_max: float) -> float:
-        """Calculates ambient temperature.
+    def _calc_ambient_temperature(cls, hours: float, min_temp: float, max_temp: float) -> float:
+        """
+        Calculate the ambient temperature based on the time of the day and the minimum and maximum barn temperatures.
 
-        Args:
-            hours: hours of the day from 1 to 24.
-            temperature_min: Minimum barn temperature, C.
-            temperature_max: Maximum barn temperature, C.
+        Notes
+        -----
+        The ambient temperature is calculated as follows:
 
-        Returns:
-            Ambient temperature, °C.
+        .. math::
+
+            T_{ambient} = modified\\_hours \\cdot \\frac{T_{max} - T_{min}}{2} + \\frac{T_{max} + T_{min}}{2}
+
+        where:
+
+            :math:`T_{ambient}` is the ambient temperature,
+
+            :math:`T_{min}` and :math:`T_{max}` are the minimum and maximum barn temperatures, respectively,
+
+            :math:`modified_{hours}` is the result of the :func:`_calc_modified_hours` function.
+
+        Parameters
+        ----------
+        hours : float
+            The hour(s) of the day, must be in the range of [0, 24].
+        min_temp : float
+            The minimum barn temperature (:math:`^{\circ}C`).
+        max_temp : float
+            The maximum barn temperature (:math:`^{\circ}C`). Must be greater than or equal to `min_temp`.
+
+        Returns
+        -------
+        float
+            The ambient temperature (:math:`^{\circ}C`).
+
+        Raises
+        ------
+        ValueError
+            If the input `hours` is not in the range [0, 24],
+            If `min_temp` is greater than `max_temp`.
 
         """
+        if not 0 <= hours <= 24:
+            raise ValueError(f'Hours should be between 0 and 24. Hours provided: {hours}')
+        if min_temp > max_temp:
+            raise ValueError(
+                f'Minimum temperature cannot be greater than maximum temperature: min_temp = {min_temp}, max_temp = {max_temp}')
+
         modified_hours = cls._calc_modified_hours(hours)
-        t_ambient = modified_hours * (temperature_max - temperature_min) / 2 + (temperature_max + temperature_min) / 2
-        return t_ambient
+        return modified_hours * (max_temp - min_temp) / 2 + (max_temp + min_temp) / 2
 
     @classmethod
     def calc_housing_methane_emission(cls, num_animals: int, barn_area: float, barn_temp: float) -> float:
@@ -416,7 +664,8 @@ class GasEmissions:
         )
 
     @classmethod
-    def _calc_ammonia_barn_resistance(cls, temp: float, hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
+    def _calc_ammonia_barn_resistance(cls, temp: float,
+                                      hsc=GasEmissionConstants.DEFAULT_HOUSING_SPECIFIC_CONSTANT) -> float:
         """
         Calculate resistance of :math:`NH_3` transport to the atmosphere in a barn.
 
@@ -642,7 +891,7 @@ class GasEmissions:
             Methane emission from anaerobic lagoon (kg :math:`CH_4`-N/day).
 
         """
-        Bo = GasEmissionConstants.Bo
+        Bo = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
         MCF = GasEmissionConstants.METHANE_CONVERSION_FACTOR
         MS = GasEmissionConstants.FRACTION_OF_HANDLED_MANURE
         MF = GasEmissionConstants.METHANE_FACTOR
