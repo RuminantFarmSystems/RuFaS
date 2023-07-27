@@ -60,7 +60,7 @@ def test_manage_field() -> None:
     field._check_fertilizer_application_schedule.assert_called_once_with(mocked_time)
     field._check_manure_application_schedule.assert_called_once_with(mocked_time)
     field._check_tillage_schedule.assert_called_once_with(mocked_time)
-    field._execute_daily_processes.assert_called_once_with(mocked_weather)
+    field._execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
     field._assess_dormancy.assert_called_once_with(12)
     field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
     field._check_crop_harvest_schedule.assert_called_once_with(mocked_time)
