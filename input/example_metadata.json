@@ -270,8 +270,7 @@
     "fertilizer_schedule_properties": {
       "available_fertilizer_mixes": {
         "type": "object",
-        "description": "All the available fertilizer mixes that are available besides the default ones.",
-        "default": {}
+        "description": "All the available fertilizer mixes that are available besides the default ones."
       },
       "mix_names": {
         "type": "array",
