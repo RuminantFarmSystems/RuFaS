@@ -203,6 +203,7 @@
         "properties": {
           "type": "number",
           "minimum": 1,
+          "maximum": 366,
           "default": []
         }
       },
@@ -240,6 +241,7 @@
         "properties": {
           "type": "number",
           "minimum": 1,
+          "maximum": 366,
           "default": []
         }
       },
@@ -294,6 +296,7 @@
         "properties": {
           "type": "number",
           "minimum": 1,
+          "maximum": 366,
           "default": []
         }
       },
@@ -376,6 +379,7 @@
         "properties": {
           "type": "number",
           "minimum": 1,
+          "maximum": 366,
           "default": []
         }
       },
@@ -456,28 +460,51 @@
       "years": {
         "type": "array",
         "description": "List of years in which manure will be applied.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "days": {
         "type": "array",
         "description": "List of days on which manure will be applied.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 366,
+          "default": []
+        }
       },
       "tillage_depths": {
         "type": "array",
         "description": "List of depths that the corresponding tillage applications reach.",
         "units": "mm",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.1,
+          "default": []
+        }
       },
       "incorporation_fractions": {
         "type": "array",
         "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": []
+        }
       },
       "mixing_fractions": {
         "type": "array",
         "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": []
+        }
       },
       "pattern_repeat": {
         "type": "number",
