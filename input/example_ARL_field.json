@@ -1,7 +1,9 @@
 {
   "soil_specification": "soil/ARL_soil.json",
   "crop_specification": "crop/ARL_rotation.json",
-  "field_management_specification": "field_management/ARL_field_management_1.json",
+  "fertilizer_management_specification": "fertilizer_schedules/ARL_fertilizer_schedule_1.json",
+  "manure_management_specification": "manure_schedules/ARL_manure_schedule_1.json",
+  "tillage_management_specification": "tillage_schedules/ARL_tillage_schedule_1.json",
   "field_size": 1.0,
   "absolute_latitude": 43.304346,
   "longitude": null,
