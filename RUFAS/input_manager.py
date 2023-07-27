@@ -1,10 +1,12 @@
 # !/usr/bin/env python3
 
+from functools import reduce
 import json
+import re
 
 import pandas as pd
 from RUFAS.output_manager import OutputManager
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
 
 om = OutputManager()
@@ -27,7 +29,29 @@ class InputManager:
         self.__metadata: Dict[str, Any] = {}
         self.__pool: Dict[str, Any] = {}
 
-    def _load_metadata(self, metadata_path: str = "input/example_metadata.json") -> None:
+    def start_data_processing(self, metadata_path: str,
+                              eager_termination: bool = True) -> bool:
+        """
+        Starts the pipeline for organizing metadata and input data processing.
+
+        Parameters
+        ----------
+        metadata_path : str
+            File path to the metadata.
+        eager_termination : bool, default=True
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+            If False, the process will be terminated after going through and validating the entire data.
+
+        Returns
+        -------
+        bool
+            True if data is valid, otherwise False.
+        """
+        self._load_metadata(metadata_path)
+        is_input_data_valid = self._populate_pool(eager_termination)
+        return is_input_data_valid
+
+    def _load_metadata(self, metadata_path: str) -> None:
         """
         Loads metadata from json file to IM metadata dict.
 
@@ -53,144 +77,369 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _load_data(self) -> None:
+    def _load_data_from_json(self, file_path: str) -> Dict[str, Any]:
         """
-        Loads data from JSON or CSV file.
-
-        Raises
-        ------
-        Exception
-            If an error occurs while opening or reading a data file.
-        """
-
-        files_details = self.__metadata["files"]
-        path_key = "path"
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._load_data.__name__,
-                    }
-        for key, details in files_details.items():
-            file_path = details[path_key]
-            om.add_log("load_data_attempt", f"Attempting to load data for {key} from {file_path}.", info_map)
-            try:
-                if details["type"] == "json":
-                    with open(file_path) as json_file:
-                        data = json.load(json_file)
-                        self.__pool[key] = data
-                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
-                                   info_map)
-                elif details["type"] == "csv":
-                    with open(file_path, "r") as csv_file:
-                        data_frame = pd.read_csv(csv_file)
-                        data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
-                        self.__pool[key] = data_dict
-                        om.add_log("load_data_successful", f"Successfully loaded data for {key} from {file_path}.",
-                                   info_map)
-                else:
-                    om.add_warning("InputManager load data file is not csv/json",
-                                   f"{key} data must be available in either csv or json file type.",
-                                   info_map)
-            except Exception as e:
-                raise e
-
-    def _validate_data(self, eager_termination: bool = True) -> bool:
-        """
-        Validates input data and attempts to fix any invalid input data.
+        Loads data from input json file.
 
         Parameters
         ----------
-        eager_termination : bool, default=True
+        file_path : str
+            Path to the input file to load.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The data dictionary loaded from the json file.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_data_from_json.__name__,
+                    }
+        om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
+        try:
+            with open(file_path) as json_file:
+                data = json.load(json_file)
+                om.add_log("load_data_successful", f"Successfully loaded data from {file_path}.", info_map)
+                return data
+        except Exception as e:
+            raise e
+
+    def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
+        """
+        Loads data from input csv file.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to the input file to load.
+
+        Returns
+        -------
+        Dict[str, Any]
+            The data dictionary loaded from the json file.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._load_data_from_csv.__name__,
+                    }
+        om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
+        try:
+            with open(file_path, "r") as csv_file:
+                data_frame = pd.read_csv(csv_file)
+                data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
+                if not data_frame.empty:
+                    om.add_log("load_data_successful",
+                               f"Successfully loaded data from {file_path}.",
+                               info_map)
+                return data_dict
+        except Exception as e:
+            raise e
+
+    def _populate_pool(self, eager_termination: bool) -> bool:
+        """
+        Loads input files, runs validations on the data from the input files, attempts to fix invalid data,
+        then adds data to the pool.
+
+        Parameters
+        ----------
+        eager_termination : bool
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+            If False, the process will be terminated after going through and validating the entire data,
+            if invalid data is found.
+
+        Returns
+        -------
+        bool
+            True if data is valid, otherwise False.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._populate_pool.__name__,
+                    }
+        valid_elements_counter = 0
+        invalid_elements_counter = 0
+        total_elements_counter = 0
+        fixed_elements_counter = 0
+
+        data_type_to_loader_map = {"json": self._load_data_from_json,
+                                   "csv": self._load_data_from_csv}
+
+        for file_blob_key, file_details in self.__metadata["files"].items():
+            file_path = file_details["path"]
+
+            try:
+                data_loader = data_type_to_loader_map[file_details["type"]]
+                data = data_loader(file_path)
+            except KeyError:
+                raise KeyError(f"Faulty data type in {file_blob_key},"
+                               f"supported types are: {data_type_to_loader_map.keys()}")
+
+            # counter_dict = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0}
+            properties_blob_key = file_details["properties"]
+            properties = self.__metadata["properties"][properties_blob_key]
+            for property in properties.keys():
+                element_counter_and_validity = self._validate_element([property], properties_blob_key, data,
+                                                                      eager_termination)
+                fixed_elements_counter += element_counter_and_validity["fixed_elements"]
+                valid_elements_counter += element_counter_and_validity["valid_elements"]
+                total_elements_counter += element_counter_and_validity["total_elements"]
+                if element_counter_and_validity["is_valid"]:
+                    self.__pool[file_blob_key] = data
+                else:
+                    if not eager_termination:
+                        invalid_elements_counter += element_counter_and_validity["invalid_elements"]
+                    else:
+                        return False
+
+        om.add_log("Total Valid Items", f"{valid_elements_counter=}", info_map)
+        om.add_log("Total Checked Items", f"{total_elements_counter=}", info_map)
+        om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
+        om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
+        return invalid_elements_counter == 0
+
+    def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
+                          input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
+        """
+        Receives data loaded from input file, recursively finds and then validates nested elements,
+        attempts to fix any invalid elements, and tracks the number of how many valid, invalid, fixed,
+        and total elements from the input data are checked.
+
+        Parameters
+        ----------
+        element_hierarchy : List[str]
+            A list of strings representing the path to the data being validated.
+
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+
+        input_data : Dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
+
+        eager_termination : bool
             If true, the process will be terminated upon finding invalid data.
 
         Returns
         -------
-        bool
-            True if all data is valid; False otherwise.
+        dict
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
+
+
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_data.__name__,
+                    "function": self._validate_element.__name__,
                     }
-        valid_elements_counter = 0
-        invalid_elements_counter = 0
-        fixed_elements_counter = 0
-        invalid_critical_elements_counter = 0
-        total_elements_checked_counter = 0
+        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                        "invalid_elements": 0, "is_valid": True}
+        variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
+                                     self.__metadata["properties"][properties_blob_key])
+        var_type = variable_properties["type"]
+        is_nested = var_type == "object"
+        if is_nested:
+            children_status: Dict[str, bool] = {}
+            false_counter = 0
+            for nested_key in variable_properties.keys():
+                element_hierarchy.append(nested_key)
+                element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
+                                                                      input_data, eager_termination)
+                is_child_valid = element_counter_and_validity["is_valid"]
+                if eager_termination and not is_child_valid:
+                    return element_counter_and_validity
+                element_path = ".".join(element_hierarchy)
+                children_status[element_path] = is_child_valid
+                if not is_child_valid:
+                    om.add_warning("Invalid nested element found", f"{element_path}", info_map)
+                    false_counter += 1
+                element_hierarchy.remove(nested_key)
 
-        for key in self.__pool.keys():
-            for variable, value in self.__pool[key].items():
-                total_elements_checked_counter += 1
-                if self._validate_element(variable, value):
-                    valid_elements_counter += 1
+            is_valid = false_counter == 0
+
+            return is_valid
+        else:
+            var_name = element_hierarchy[-1]
+            try:
+                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
+            except KeyError:
+                raise KeyError(f"Key {var_name} not found in input data")
+
+            data_type_to_validator_map = {"string": self._string_type_validator,
+                                          "number": self._num_type_validator,
+                                          "array": self._array_type_validator,
+                                          "bool": self._bool_type_validator, }
+            try:
+                validator = data_type_to_validator_map[var_type]
+            except KeyError:
+                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+
+            is_valid = validator(variable_properties, var_name, input_data_value)
+
+            element_counter_and_validity["total_elements"] += 1
+            if is_valid:
+                element_counter_and_validity["valid_elements"] += 1
+                return element_counter_and_validity
+            else:
+                is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
+                if is_fixed:
+                    element_counter_and_validity["fixed_elements"] += 1
                 else:
-                    invalid_elements_counter += 1
-                    is_data_fixed = self._fix_data(variable, value)
-                    if is_data_fixed:
-                        fixed_elements_counter += 1
-                    elif not is_data_fixed and eager_termination:
-                        invalid_critical_elements_counter += 1
-                        return False
-                    else:
-                        invalid_critical_elements_counter += 1
+                    element_counter_and_validity["invalid_elements"] += 1
+                    element_counter_and_validity["is_valid"] = False
+                return element_counter_and_validity
 
-        om.add_log("Total Valid Elements", f"{valid_elements_counter=}", info_map)
-        om.add_log("Total Invalid Elements", f"{invalid_elements_counter=}", info_map)
-        om.add_log("Total Fixed Elements", f"{fixed_elements_counter=}", info_map)
-        om.add_log("Total Checked Elements", f"{total_elements_checked_counter=}", info_map)
-        om.add_log("Total Invalid Critical Elements", f"{invalid_critical_elements_counter=}", info_map)
+    def _array_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: list) -> bool:
+        """Validates an input data element of type array."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._array_type_validator.__name__,
+                    }
+        maximum_length = variable_properties.get("maximum_length")
+        minimum_length = variable_properties.get("minimum_length")
+        if minimum_length is not None:
+            is_in_range = variable_properties["minimum_length"] <= len(input_data_value)
+            if not is_in_range:
+                warning_string = f"Array length less than {minimum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
+        if maximum_length is not None:
+            is_in_range = len(input_data_value) <= variable_properties["maximum_length"]
+            if not is_in_range:
+                warning_string = f"Array length more than {maximum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
+        return True
 
-        if invalid_critical_elements_counter > 0:
-            return False
+    def _num_type_validator(self, variable_properties: Dict[str, Any], var_name: str,
+                            input_data_value: Union[int, float]) -> bool:
+        """Validates an input data number element."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._num_type_validator.__name__,
+                    }
+        minimum_value = variable_properties.get("minimum")
+        maximum_value = variable_properties.get("maximum")
+        if minimum_value is not None:
+            is_in_range = minimum_value <= input_data_value
+            if not is_in_range:
+                warning_string = f"Value less than {minimum_value}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
+        if maximum_value is not None:
+            is_in_range = input_data_value <= maximum_value
+            if not is_in_range:
+                warning_string = f"Value greater than {maximum_value}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
 
         return True
 
-    def _validate_element(self, key: str, value: Any) -> bool:
-        """
-        Perform data validation checks.
+    def _string_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: str) -> bool:
+        """Validates an input data string element."""
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._string_type_validator.__name__,
+                    }
+        pattern_check = variable_properties.get("pattern")
+        if pattern_check is not None:
+            is_valid_string = bool(re.match(pattern_check, input_data_value))
+            if not is_valid_string:
+                warning_string = f"String variable must match pattern {variable_properties['pattern']}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
 
-        Parameters
-        ----------
-        key : str
-            The key of the data to validate.
+        minimum_length = variable_properties.get("minimum_length")
+        maximum_length = variable_properties.get("maximum_length")
+        if minimum_length is not None:
+            is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
+            if not is_valid_string:
+                warning_string = f"String length less than {minimum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
+        if maximum_length is not None:
+            is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
+            if not is_valid_string:
+                warning_string = f"String length more than {maximum_length}."
+                om.add_warning(warning_string, f"{var_name=}", info_map)
+                return False
 
-        value : Any
-            The value of the data to validate.
+        return True
 
+    def _bool_type_validator(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: bool) -> bool:
+        """Validates an input data bool element."""
+        return input_data_value in (True, False)
 
-        Returns
-        -------
-        bool
-            True if the data is valid, False otherwise.
-        """
-        # Perform data validation checks
-        # Return True if the data is valid, False otherwise
-
-        # TODO in validate_element fun branch
-        # where element is found to be invalid, place this warning:
-        # om.add_warning("Invalid data", f"Invalid data found: {key=}; {value=}", info_map)
-        pass
-
-    def _fix_data(self, key: str, value: Any) -> bool:
+    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
+                  input_data: dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
 
         Parameters
         ----------
-        key : str
-            The key of the data to fix.
+        variable_properties : dict[str, Any]
+            The properties for the variable of interest.
 
-        value : Any
-            The value of the data to fix.
+        element_hierarchy: List[str]
+            A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+
+        input_data: dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
 
         Returns
         -------
         bool
             True if the data is fixed, False otherwise.
         """
-        # Attempt to fix the invalid data
-        # Return True if the data is fixed, False otherwise
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._fix_data.__name__,
+                    }
 
-        # TODO in fix_data fun branch
-        # where element is fixed, place this warning:
-        # om.add_warning("Data fixed", f"Invalid data fixed: {key=}; {value=}", info_map)
-        # where data is not fixable:
-        # om.add_error("Data not fixable.", f"Unable to fix the invalid data: {key=}, {value=}.", info_map)
-        pass
+        if 'default' not in variable_properties.keys():
+            return False
+        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1],
+                                 input_data)
+        variable_parent[element_hierarchy[-1]] = variable_properties['default']
+        om.add_warning("Data fixed",
+                       f"Invalid data fixed: {element_hierarchy[-1]} => {variable_properties['default']}",
+                       info_map)
+        return True
+
+    def get_data(self, data_address: str) -> Any:
+        """
+        Get the requested data from the pool
+
+        Parameters
+        ----------
+        data_address : str
+            The address of the requested data.
+
+        Returns
+        -------
+        Any
+            The requested data if found.
+
+        Raises
+        -------
+        KeyError
+            If the requested data is not found.
+
+        Examples
+        -------
+        >>> input_manager = InputManager()
+        >>> input_manager.get_data('animal.herd.calf_num')
+        This will return the value of `calf_num` of the `herd` section in the `animal` module.
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.get_data.__name__,
+                    }
+
+        element_hierarchy = data_address.split('.')
+
+        try:
+            data_value = reduce(lambda d, key: d[key], element_hierarchy,
+                                self.__pool)
+            return data_value
+
+        except KeyError as key_error:
+            invalid_key = str(key_error).strip("\'")
+            parent_address = str(data_address.split("." + invalid_key)[0])
+
+            om.add_error("Data not found:", f"Cannot find \"{data_address}\", "
+                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                            info_map)
+
+            raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
+                           f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
