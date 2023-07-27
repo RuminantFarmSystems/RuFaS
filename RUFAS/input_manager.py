@@ -212,18 +212,11 @@ class InputManager:
             return validator(variable_properties, var_name, input_data_value,
                              properties_blob_key, element_hierarchy, eager_termination)
 
-    def get_input_data_value(self, array_element_hierarchy, element_hierarchy, input_data, is_int_in_element_hierarchy):
-        if is_int_in_element_hierarchy:
-            return reduce(lambda d, key: d[key], array_element_hierarchy, input_data)
-        else:
-            return reduce(lambda d, key: d[key], element_hierarchy, input_data)
-
-    # def get_fixed(self, is_int_in_element_hierarchy, variable_properties, array_element_hierarchy,
-    #               element_hierarchy, input_data):
+    # def get_input_data_value(self, array_element_hierarchy, element_hierarchy, input_data, is_int_in_element_hierarchy):
     #     if is_int_in_element_hierarchy:
-    #         return self._fix_data(variable_properties, array_element_hierarchy, input_data)
+    #         return reduce(lambda d, key: d[key], array_element_hierarchy, input_data)
     #     else:
-    #         return self._fix_data(variable_properties, element_hierarchy, input_data)
+    #         return reduce(lambda d, key: d[key], element_hierarchy, input_data)
 
     def update_element_hierarchy(self, element_hierarchy, is_int_in_element_hierarchy):
         if is_int_in_element_hierarchy:
@@ -312,8 +305,12 @@ class InputManager:
         else:
             var_name = element_hierarchy[-1]
             try:
-                input_data_value = self.get_input_data_value(array_element_hierarchy, element_hierarchy,
-                                                             input_data, is_int_in_element_hierarchy)
+                # input_data_value = self.get_input_data_value(array_element_hierarchy, element_hierarchy,
+                #                                              input_data, is_int_in_element_hierarchy)
+                if is_int_in_element_hierarchy:
+                    input_data_value = reduce(lambda d, key: d[key], array_element_hierarchy, input_data)
+                else:
+                    input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
@@ -326,8 +323,6 @@ class InputManager:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                # is_fixed = self.get_fixed(is_int_in_element_hierarchy, variable_properties,
-                #                           array_element_hierarchy, element_hierarchy, input_data)
                 if is_int_in_element_hierarchy:
                     is_fixed = self._fix_data(variable_properties, array_element_hierarchy, input_data)
                 else:
