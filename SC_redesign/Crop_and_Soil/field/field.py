@@ -304,7 +304,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
-                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
                  "potassium": potassium_mass}
@@ -411,7 +411,7 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
-                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
                  field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
