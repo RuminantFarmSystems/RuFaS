@@ -303,18 +303,20 @@ def test_determine_adjusted_sediment_yield(sediment_yield: float, snow_content: 
 
 
 # --- Integration tests ---
-@pytest.mark.parametrize("field_size,min_cover_factor,residue,rainfall", [
-    (1, 0.2, 800, 10.2),
-    (3, 0.001, 500, 3.6),
-    (4.69, 0.003, 80, 6.77),
-    (0.891, 0.01, 0, 0.0),
-    (0.956, 0.05, 928.948569, 15.9),
+@pytest.mark.parametrize("field_size,min_cover_factor,residue,rainfall,accumulated_runoff,should_fail", [
+    (1, 0.2, 800, 10.2, 13, False),
+    (3, 0.001, 500, 3.6, 13, False),
+    (4.69, 0.003, 80, 6.77, 13, False),
+    (0.891, 0.01, 0, 0.0, 13, False),
+    (0.956, 0.05, 928.948569, 15.9, 13, False),
+    (1, 0.2, 800, 10.2, None, True)
 ])
-def test_erode(field_size: float, min_cover_factor: float, residue: float, rainfall: float) -> None:
+def test_erode(field_size: float, min_cover_factor: float, residue: float, rainfall: float, should_fail: bool,
+               accumulated_runoff: float) -> None:
     """Tests that erode() properly calls methods and stores values"""
 
     # Initialize objects
-    data = SoilData(accumulated_runoff=13, field_size=1.33)
+    data = SoilData(accumulated_runoff=accumulated_runoff, field_size=1.33)
     incorp = SoilErosion(data)
 
     # Mock helper function
@@ -326,20 +328,31 @@ def test_erode(field_size: float, min_cover_factor: float, residue: float, rainf
     incorp._determine_peak_runoff_rate = MagicMock(return_value=0.15)
     incorp._determine_sediment_yield = MagicMock(return_value=0.05)
     incorp._determine_adjusted_sediment_yield = MagicMock(return_value=0.0498)
+    if should_fail:
+        with pytest.raises(TypeError) as e:
+            incorp.erode(field_size, min_cover_factor, residue, rainfall)
+            assert str(e) == "SoilData accumulated_runoff cannot be NoneType"
+    else:
+        # Run method
+        incorp.erode(field_size, min_cover_factor, residue, rainfall)
 
-    # Run method
-    incorp.erode(field_size, min_cover_factor, residue, rainfall)
+        # Check everything
+        incorp._determine_soil_erodibility_factor.assert_called_once()
+        incorp._determine_cover_management_factor.assert_called_once()
+        incorp._determine_support_practice_factor.assert_called_once()
+        incorp._determine_topographic_factor.assert_called_once()
+        incorp._determine_coarse_fragment_factor.assert_called_once()
+        incorp._determine_peak_runoff_rate.assert_called_once()
+        incorp._determine_sediment_yield.assert_called_once()
+        incorp._determine_adjusted_sediment_yield.assert_called_once()
+        assert incorp.data.eroded_sediment == 0.0498
+        assert incorp.data.annual_eroded_sediment_total == 0.0498
+        assert incorp.data.surface_runoff_volume == incorp.data.accumulated_runoff / field_size
+        assert incorp.data.annual_surface_runoff_total == incorp.data.accumulated_runoff / field_size
 
-    # Check everything
-    incorp._determine_soil_erodibility_factor.assert_called_once()
-    incorp._determine_cover_management_factor.assert_called_once()
-    incorp._determine_support_practice_factor.assert_called_once()
-    incorp._determine_topographic_factor.assert_called_once()
-    incorp._determine_coarse_fragment_factor.assert_called_once()
-    incorp._determine_peak_runoff_rate.assert_called_once()
-    incorp._determine_sediment_yield.assert_called_once()
-    incorp._determine_adjusted_sediment_yield.assert_called_once()
-    assert incorp.data.eroded_sediment == 0.0498
-    assert incorp.data.annual_eroded_sediment_total == 0.0498
-    assert incorp.data.surface_runoff_volume == incorp.data.accumulated_runoff / field_size
-    assert incorp.data.annual_surface_runoff_total == incorp.data.accumulated_runoff / field_size
+
+def test_determine_support_practice_factor() -> None:
+    """Test that the support factor is returned correctly"""
+    data = SoilData(accumulated_runoff=13, field_size=1.33)
+    erosion = SoilErosion(data, field_size=0.65)
+    assert erosion._determine_support_practice_factor() == 1
