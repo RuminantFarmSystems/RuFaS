@@ -591,6 +591,200 @@ class GasEmissions:
         return max(0.0, total_ammonia_loss)
 
     @classmethod
+    def calc_storage_ammonia_emission(cls, num_animals: int, storage_area_per_animal: float,
+                                      manure_total_ammoniacal_nitrogen: float,
+                                      manure_volume: float, manure_density: float,
+                                      total_solids: float, temp: float,
+                                      pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA) -> float:
+        """
+        Calculate storage ammonia emissions for manure treatments.
+
+        Notes
+        -----
+        The equation used to calculate storage ammonia emission is:
+
+        .. math::
+
+            E_{NH_3} = total\\_storage\\_area \\cdot \\frac{TAN \\cdot c \\cdot \gamma}{r \\cdot M \\cdot Q}
+
+        where:
+
+            :math:`E_{NH_3}` is the storage ammonia emission in kg :math:`NH_3`/day,
+
+            :math:`total\\_storage\\_area` is the total storage area in :math:`m^2`, calculated as :math:`num\\_animals \\times storage\\_area\\_per\\_animal`,
+
+            :math:`TAN` is the total ammoniacal nitrogen in manure in kg,
+
+            :math:`c` is the number of seconds in a day (86400 s),
+
+            :math:`\gamma` is the manure density in kg/:math:`m^3`,
+
+            :math:`r` is the resistance of :math:`NH_3` transport to the atmosphere in s/m,
+
+            :math:`M` is the manure mass excluding solids per area of exposed surface in kg/:math:`m^2`, calculated as :math:`(total\\_manure\\_mass - total\\_solids) / total\\_storage\\_area`,
+
+            :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless).
+
+        The value of :math:`r` is calculated as:
+
+        .. math::
+
+            r_{storage} = HSC \\cdot [1 - 0.027 \\cdot (20 - T)]
+
+        where:
+
+            :math:`r_{storage}` is the resistance of :math:`NH_3` transport to the atmosphere (s/m),
+
+            :math:`HSC` is the housing-specific constant (s/m, default is 260 s/m),
+
+            :math:`T` is the storage area temperature (:math:`^{\circ}C`).
+
+        The value of :math:`Q` is calculated as:
+
+        .. math::
+
+            Q = K_h \\cdot K_a
+
+        where:
+
+            :math:`Q` is the equilibrium coefficient for the :math:`NH_3` gas in the air (unitless),
+
+            :math:`K_h` is the Henry's law coefficient of :math:`NH_3` (unitless),
+
+            :math:`K_a` is the dissociation coefficient of ammonium ion (unitless).
+
+        The value of :math:`K_h` is calculated as:
+
+        .. math::
+
+            K_h = 10^{1478 / T - 1.69}
+
+        where:
+
+            :math:`K_h` is the Henry's law coefficient of :math:`NH_3` (unitless),
+
+            :math:`T` is the storage area temperature in Kelvin.
+
+        The value of :math:`K_a` is calculated as:
+
+        .. math::
+
+            K_a = 1 + 10^{0.09018 + 2729.9 / T - pH}
+
+        where:
+
+            :math:`K_a` is the dissociation coefficient of ammonium ion (unitless),
+
+            :math:`T` is the storage area temperature in Kelvin,
+
+            :math:`pH` is the manure solution acidity (unitless).
+
+        Parameters
+        ----------
+        num_animals : int
+            Number of animals in the storage area (unitless).
+        storage_area_per_animal : float
+            Storage area per animal based on manure type (:math:`m^2`).
+        manure_total_ammoniacal_nitrogen : float
+            Total ammoniacal nitrogen in manure (kg).
+        manure_volume : float
+            Total volume of the manure produced by the animals in the storage area (:math:`m^3`).
+        manure_density : float
+            Density of the manure (kg/:math:`m^3`).
+        total_solids : float
+            Total solids present in the manure (kg).
+        temp : float
+            Current storage area temperature (:math:`^{\circ}C`).
+        pH : float, optional
+            pH value for storage ammonia emission (unitless). Default is set to a value listed as
+            :attr:`DEFAULT_PH_FOR_STORAGE_AMMONIA` in :class:`GasEmissionConstants`.
+
+        Returns
+        -------
+        float
+            Storage ammonia emission (kg :math:`NH_3`/day).
+
+        Raises
+        ------
+        ValueError
+            If the number of animals, storage area, manure total ammoniacal nitrogen, manure volume, manure density or
+            total solids in manure are less than 0.
+
+        """
+        if num_animals < 0:
+            raise ValueError('Number of animals must be greater than or equal to 0.')
+        if storage_area_per_animal < 0:
+            raise ValueError('Storage area per animal must be greater than or equal to 0.')
+        if manure_total_ammoniacal_nitrogen < 0:
+            raise ValueError('Manure total ammoniacal nitrogen must be greater than or equal to 0.')
+        if manure_volume < 0:
+            raise ValueError('Manure volume must be greater than or equal to 0.')
+        if manure_density < 0:
+            raise ValueError('Manure density must be greater than or equal to 0.')
+        if total_solids < 0:
+            raise ValueError('Total solids must be greater than or equal to 0.')
+
+        # If any of the input parameters is 0, then the result will be 0.
+        if any(param == 0 for param in [num_animals, storage_area_per_animal, manure_total_ammoniacal_nitrogen,
+                                        manure_volume, manure_density, total_solids]):
+            return 0.0
+
+        total_storage_area = num_animals * storage_area_per_animal
+        temp_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
+        total_manure_mass = manure_volume * manure_density
+        housing_specific_constant = cls._calc_housing_specific_constant(total_manure_mass, total_solids)
+        storage_area_resistance = cls._calc_ammonia_barn_resistance(temp, housing_specific_constant)
+        manure_mass_excluding_solids = total_manure_mass - total_solids
+        equilibrium_coefficient = cls._calc_equilibrium_coefficient(temp_kelvin, pH)
+        ammonia_loss = (manure_total_ammoniacal_nitrogen * GeneralConstants.SECONDS_PER_DAY * manure_density) / \
+                       (storage_area_resistance * manure_mass_excluding_solids * equilibrium_coefficient)
+        total_ammonia_loss = ammonia_loss * total_storage_area
+        return max(0.0, total_ammonia_loss)
+
+    @classmethod
+    def _calc_housing_specific_constant(cls, manure_mass: float, total_solids: float) -> float:
+        """
+        Calculate housing specific constant.
+
+        The housing-specific constant represents the resistance of ammonia transport to the atmosphere,
+        and its value depends on the type of manure being considered. The different types of manure
+        include solid and semi-solid manure, slurry manure, and liquid manure.
+
+        Parameters
+        ----------
+        manure_mass : float
+            Total manure mass (kg). Must be greater than or equal to 0.
+        total_solids : float
+            Total solids in manure (kg). Must be greater than or equal to 0.
+
+        Returns
+        -------
+        float
+            Housing specific constant, s/m.
+
+        Raises
+        ------
+        ValueError
+            If manure_mass or total_solids are less than 0.
+
+        """
+        if manure_mass < 0.0:
+            raise ValueError('Manure mass must be greater than or equal to 0.')
+        elif total_solids < 0.0:
+            raise ValueError('Total solids must be greater than or equal to 0.')
+        elif manure_mass == 0.0 or total_solids == 0.0:
+            return GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC
+
+        dry_matter = manure_mass / total_solids
+
+        if dry_matter >= GasEmissionConstants.SOLID_MANURE_THRESHOLD:
+            return GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC
+        elif dry_matter >= GasEmissionConstants.SLURRY_MANURE_THRESHOLD:
+            return GasEmissionConstants.SLURRY_MANURE_HSC
+        else:
+            return GasEmissionConstants.LIQUID_MANURE_HSC
+
+    @classmethod
     def calc_ammonia_emission(cls,
                               num_animals: int,
                               barn_area: float,
