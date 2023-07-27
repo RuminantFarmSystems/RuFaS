@@ -194,6 +194,36 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
+    def get_validity(self, variable_properties, var_name, input_data_value, var_type,
+                     properties_blob_key, is_int_in_element_hierarchy, element_hierarchy, eager_termination):
+        data_type_to_validator_map = {"string": self._string_type_validator,
+                                          "number": self._num_type_validator,
+                                          "array": self._array_type_validator,
+                                          "bool": self._bool_type_validator, }
+        try:
+            validator = data_type_to_validator_map[var_type]
+        except KeyError:
+            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+
+        if is_int_in_element_hierarchy:
+            return validator(variable_properties, var_name, input_data_value,
+                             properties_blob_key, is_int_in_element_hierarchy, eager_termination)
+        else:
+            return validator(variable_properties, var_name, input_data_value,
+                             properties_blob_key, element_hierarchy, eager_termination)
+
+    def get_input_data_value(self, array_element_hierarchy, element_hierarchy, input_data, is_int_in_element_hierarchy):
+        if is_int_in_element_hierarchy:
+            return reduce(lambda d, key: d[key], array_element_hierarchy, input_data)
+        else:
+            return reduce(lambda d, key: d[key], element_hierarchy, input_data)
+    
+    def get_fixed(self, is_int_in_element_hierarchy, variable_properties, array_element_hierarchy, element_hierarchy, input_data):
+        if is_int_in_element_hierarchy:
+            return self._fix_data(variable_properties, array_element_hierarchy, input_data)
+        else:
+            return self._fix_data(variable_properties, element_hierarchy, input_data)
+
     def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
                           input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
@@ -275,37 +305,20 @@ class InputManager:
         else:
             var_name = element_hierarchy[-1]
             try:
-                if is_int_in_element_hierarchy:
-                    input_data_value = reduce(lambda d, key: d[key], array_element_hierarchy, input_data)
-                else:
-                    input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
+                input_data_value = self.get_input_data_value(array_element_hierarchy, element_hierarchy, input_data, is_int_in_element_hierarchy)
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            data_type_to_validator_map = {"string": self._string_type_validator,
-                                          "number": self._num_type_validator,
-                                          "array": self._array_type_validator,
-                                          "bool": self._bool_type_validator, }
-            try:
-                validator = data_type_to_validator_map[var_type]
-            except KeyError:
-                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+            is_valid = self.get_validity(variable_properties, var_name, input_data_value, var_type,
+                                         properties_blob_key, is_int_in_element_hierarchy,
+                                         element_hierarchy, eager_termination)
 
-            if is_int_in_element_hierarchy:
-                is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, is_int_in_element_hierarchy, eager_termination)
-            else:
-                is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, element_hierarchy, eager_termination)
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
                 return element_counter_and_validity
             else:
-                if is_int_in_element_hierarchy:
-                    is_fixed = self._fix_data(variable_properties, array_element_hierarchy, input_data)
-                else:
-                    is_fixed = self._fix_data(variable_properties, element_hierarchy, input_data)
+                is_fixed = self.get_fixed(is_int_in_element_hierarchy, variable_properties, array_element_hierarchy, element_hierarchy, input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
