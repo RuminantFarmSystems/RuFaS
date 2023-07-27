@@ -5,6 +5,6 @@ Ration Formulation (NASEM 2021) - on going
     :maxdepth: 1
 
     feedlibNASEMUnsorted
-    userFeedsCombNRCNASEM
+    feedLibraryComb
     cowReqNASEM
     heiferReqNASEM
