@@ -3,6 +3,8 @@
 Cow Pen Grouping Algorithm Method Module
 ========================================
 
+    | Last Updated: December 16, 2019
+
 **Overview:** The pen allocation grouping algorithm (take from R) utilizes
 K-means clustering to effectively group cows based on many factors such
 as body weight, Days in Milk, weight of milk production, nutritional

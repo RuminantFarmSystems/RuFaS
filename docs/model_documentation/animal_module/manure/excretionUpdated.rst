@@ -3,7 +3,7 @@
 Manure Excretion
 ================
 
-Updated by Haowen Hu, 3/30/23
+   | Last Updated: March 30, 2023 (by Haowen Hu)
 
 Manure subroutine of the animal module
 
@@ -347,7 +347,9 @@ dry_cow_manure_excretion.py
       dry matter excreted (kg/d). Fecal dry matter is assumed to be equivalent 
       to total solids.
 
-         :math:`fecal\ solids = - 0.576 + 0.370 \times dm\_ intake + 0.059 \times adf\_ conc - 0.075 \times cp\_ conc`\ (Appuhamy et al., 2014)
+         :math:`fecal\ solids = - 0.576 + 0.370 \times dm\_ intake + 0.059 \times adf\_ conc`
+
+            :math:`- 0.075 \times cp\_ conc`\ (Appuhamy et al., 2014)
 
             [A.3E.A.2]
 

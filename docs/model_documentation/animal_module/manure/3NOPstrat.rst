@@ -1,8 +1,8 @@
 .. _3NOP_design :
 
 
-A method for accounting the enteric methane mitigation potential of 3-nitrooxypropanol (3-NOP) within RuFaS
-===========================================================================================================
+Enteric Methane Mitigation: 3-NOP
+=================================
 
 Date created: May 4, 2023
 

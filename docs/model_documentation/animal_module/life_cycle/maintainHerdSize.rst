@@ -1,8 +1,12 @@
 .. _Update-method-of-maintaining-herd-size :
 
 
-Update method of maintaining herd size
-======================================
+Update to Method of Maintaining Herd Size
+=========================================
+
+   | Date Created: March 22, 2023
+
+   | Last Updated: March 22, 2023
 
 **People**
 

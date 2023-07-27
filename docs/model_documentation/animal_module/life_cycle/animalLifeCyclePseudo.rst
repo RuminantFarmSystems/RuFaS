@@ -3,6 +3,11 @@
 Animal Life Cycle Pseudocode
 ============================
 
+   | Date Created: June 6, 2023
+
+   | Last Updated: June 6, 2023
+
+
 **Animal life cycle:** This is a simulating process that simulates
 individual animals’ life events and herd dynamics. This simulation is a
 Monte Carlo stochastic process that simulates the growth, production,
@@ -345,21 +350,22 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       When DIP < 50,
 
-      conceptus growth = 0;
+         conceptus growth = 0;
 
       When 50 < DIP < gestation length,
 
-      conceptus growth =
-      :math:`\mathbf{3 \times}{\mathbf{conceptus\ parameter}^{\mathbf{3}}\mathbf{\times (DIP - 50}\mathbf{)}^{\mathbf{2}}}^{}`
+         conceptus growth =
+         :math:`3 \times {conceptus\ parameter}^{3} \times (DIP - 50)^{2}`
 
       When DIP = gestation length,
 
-      conceptus growth = - total conceptus weight
+         conceptus growth = - total conceptus weight
 
       Where
-      :math:`total\ conceptus\ weight\  = 0.0148 \times gestation\ length\  - \ 2.408 \times calf\ birth\ weight`
 
-      :math:`conceptus\ parameter\  = \ {total\ conceptus\ weight}^{1/3}/gestation\ length\  - \ 50`
+         :math:`total\ conceptus\ weight\  = 0.0148 \times gestation\ length\  - \ 2.408 \times calf\ birth\ weight`
+
+         :math:`conceptus\ parameter\  = \ {total\ conceptus\ weight}^{1/3}/gestation\ length\  - \ 50`
 
       [A.1A.C.10]
 

@@ -1,5 +1,9 @@
-Ruminant Farm Systems Model: Development Progress and Applications
-==================================================================
+.. _model-overview :
+
+Ruminant Farm Systems Model Overview
+====================================
+
+Last Updated: October 19, 2021
 
    | K. F. Reed
    | Department of Animal Science
@@ -50,15 +54,13 @@ biophysical modules (animal, manure handling, crop + soil, and feed
 storage) that represent the main components of a dairy farm as shown in
 Figure 1. The simulation inputs include the desired length of the
 simulation, herd characteristics, manure management strategy, crop
-characteristics, and other elements of farm management. We
-
-use a tiered file structure for inputs that separates inputs that
-designate whole farm and simulation structure from inputs specific to
-each of the modules with increasing level of detail associated with
-inputs at lower tiers. Model outputs are exported to CSV files, graphic
-images, and an SQL database. The model uses a daily time-step and is
-programmed in Python, an adaptable and easy to read computer programming
-language.
+characteristics, and other elements of farm management. We use a tiered 
+file structure for inputs that separates inputs that designate whole farm
+and simulation structure from inputs specific to each of the modules with 
+increasing level of detail associated with inputs at lower tiers. Model 
+outputs are exported to CSV files, graphic images, and an SQL database. 
+The model uses a daily time-step and is programmed in Python, an adaptable
+and easy to read computer programming language.
 
    .. image:: modeloverview.png
       :width: 6.44167in
@@ -88,10 +90,8 @@ efficiency, and probability of disease.
 The model user defines a manure management strategy for each animal pen
 to provide the flexibility to represent different manure compositions
 and handling methods based on the animal group. The method and frequency
-of manure collection, treatment
-
-and processing methods, and storage length and type are all set by the
-user for each pen or group of pens.
+of manure collection, treatment and processing methods, and storage length 
+and type are all set by the user for each pen or group of pens.
 
 The Crop and Soil Module has similar flexibility to represent a range of
 crop production practices. The user can specify any number of fields,
@@ -201,59 +201,49 @@ animals, herd dynamics, and downstream farm management choices.
 
 **References**
 
-Cabrera, V. E., P. E. Hildebrand, J. W. Jones, D. Letson and A. De
-Vries. 2006. "An integrated north florida dairy farm model to reduce
-environmental impacts under seasonal climate variability." Ag., Ecosys.,
-and Environ. 113: 82-97.
+Cabrera, V. E., P. E. Hildebrand, J. W. Jones, D. Letson and A. De Vries. 2006. "An 
+   integrated north florida dairy farm model to reduce environmental impacts under 
+   seasonal climate variability." Ag., Ecosys., and Environ. 113: 82-97.  
 
-Del Grosso, S. J., Parton, W. J., Mosier, A. R., Hartman, M. D.,
-Brenner, J., Ojima, D.
+Del Grosso, S. J., Parton, W. J., Mosier, A. R., Hartman, M. D., Brenner, J., Ojima, D. 
+   S., & Schimel, D. S. 2001. Simulated interation of carbon dynamics and nitrogen 
+   trace gas fluxes using the DAYCENT model. In M. Schaffer, L. Ma, & S. Hansen 
+   (Eds.), Modeling Carbon and Nitrogen Dynamics for Soil Management. (pp. 303-
+   332). CRC Press. 
 
-   S., & Schimel, D. S. 2001. Simulated interation of carbon dynamics
-   and nitrogen trace gas fluxes using the DAYCENT model. In M.
-   Schaffer, L. Ma, & S. Hansen (Eds.), *Modeling Carbon and Nitrogen
-   Dynamics for Soil Management.* (pp. 303-332). CRC Press.
+Del Prado, A., T. Misselbrook, D. Chadwick, A. Hopkins, R. Dewhurst, P. Davison, A. 
+   Butler, J. Schröder and D. Scholefield. 2011. Simsdairy: A modelling framework 
+   to identify sustainable dairy farms in the uk. Framework description and test for 
+   organic systems and n fertiliser optimisation. Sci. Tot. Environ. 409: 3993-4009. 
 
-Del Prado, A., T. Misselbrook, D. Chadwick, A. Hopkins, R. Dewhurst, P.
-Davison, A.
+Hansen, T.L., M. Li, J. Li, C.J. Vankerhove, M.A. Sortirova, J.M. Tricarico, V.E. Cabrera, 
+   E. Kebreab, K.F. Reed. 2021. The Ruminant Farm Systems Animal Module: A 
+   biophysical description of animal management. Animals. 11:1373. 
+   https://doi.org/10.3390/ani11051373. 
 
-Butler, J. Schröder and D. Scholefield. 2011. Simsdairy: A modelling
-framework to identify sustainable dairy farms in the uk. Framework
-description and test for organic systems and n fertiliser optimisation.
-Sci. Tot. Environ. 409: 3993-4009. Hansen, T.L., M. Li, J. Li, C.J.
-Vankerhove, M.A. Sortirova, J.M. Tricarico, V.E. Cabrera, E. Kebreab,
-K.F. Reed. 2021. The Ruminant Farm Systems Animal Module: A nagement.
-Animals. 11:1373.
+Johnson, I., D. Chapman, V. Snow, R. Eckard, A. Parsons, M. Lambert and B. Cullen. 
+   2008. "Dairymod and ecomod: Biophysical pasture-simulation models for 
+   australia and new zealand." Aust. J. Exp. Ag. 48: 621-31. 
 
-   .
+Jones, J. W., J. M. Antle, B. Basso, K. J. Boote, R. T. Conant, I. Foster, H. C. J. 
+   Godfray, M. Herrero, R. E. Howitt, S. Janssen, et al. 2017. Brief history of 
+   agricultural systems modeling. Agric Syst 155: 240-54. 
+   10.1016/j.agsy.2016.05.014. https://www.ncbi.nlm.nih.gov/pubmed/28701816. 
 
-Johnsoard, A. Parsons, M. Lambert and B. Cullen.
+Kebreab, E., K.F.Reed, V.E. Cabrera, P.A. Vadas, G. Thoma, J. Tricarico. 2019. A new 
+   modeling environment for integrated dairy system management. Animal 
+   Frontiers.9: doi: 10.1093/af/vfz004 
 
-   2008. "Dairymod and ecomod: Biophysical pasture-simulation models for
-   australia and new zealand." Aust. J. Exp. Ag. 48: 621-31.
+Neitsch, S.L., J.G. Arnold, J.R. Kiniry, and J.R. Williams. 2011. Soil and Water 
+   Assessment Tool Theoretical Documentation: Version 2009. Texas Water 
+   Resources Institute Technical Report No. 406.  
 
-Jones, J. W., J. M. Antle, B. Basso, K. J. Boote, R. T. Conant, I.
-Foster, H. C. J.
+NRC. Nutrient requirements of dairy cattle seventh revised edition. 2001. Washington, 
+   D.C.: The National Academies Press. 
 
-   Godfray, M. Herrero, R. E. Howitt, S. Janssen\ *, et al.* 2017. Brief
-   history of agricultural systems modeling
+Rotz, C., B. Isenberg, K. Stackhouse-Lawson and E. Pollak. 2013. "A simulation-based 
+   approach for evaluating and comparing the environmental footprints of beef 
+   production systems." J Anim. Sci. 91 : 5427-37. 
 
-   10.1016/j.agsy.2016.05.014.
-
-| Kebreab, E., K.F.Reed, V.E. Cabrerew modeling environment for
-  integrated dairy system management. Animal
-| Frontiers.9: doi: 10.1093/af/vfz004
-| Neitsch, S.L., J.G. Arnold, J.R. Kiniry, and J.R. Williams. 2011. Soil
-  and Water
-| Assessment Tool Theoretical Documentation: Version 2009. Texas Water
-  Resources Institute Technical Report No. 406.
-
-NRC. Nutrient requirements of dairy cattle seventh revised edition.
-2001. Washington, D.C.: The National Academies Press.
-
-Rotz, C., B. Isenberg, K. Stackhouse-Lawson and E. Pollak. 2013. "A
-simulation-based approach for evaluating and comparing the environmental
-footprints of beef production systems." J Anim. Sci. 91 : 5427-37.
-
-Vadas, P. A. 2009. Surface Phosphorus and Runoff Model: Theorhetical
-Documentation. Madison, WI: US Dairy Forage Research Center.
+Vadas, P. A. 2009. Surface Phosphorus and Runoff Model: Theorhetical 
+   Documentation. Madison, WI: US Dairy Forage Research Center

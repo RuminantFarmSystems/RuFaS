@@ -1,7 +1,9 @@
 .. _Heifers-requirements-pseudocode-NASEM :
 
-Dairy Cattle Ration NASEM 2021 (Heifers)
-========================================
+Heifer Ration NASEM 2021
+========================
+
+   | Last Updated: January 17, 2023
 
 **# of Subroutine and Name:** Description of equations used to calculate
 nutrient requirements of heifers according to equations provided within

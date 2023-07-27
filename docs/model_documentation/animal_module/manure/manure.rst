@@ -1,5 +1,5 @@
-Manure Submodule
-================
+Manure Excretion and Methane Emission Submodule
+===============================================
 
 .. toctree::
     :maxdepth: 1

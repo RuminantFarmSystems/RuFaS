@@ -1,7 +1,7 @@
 .. _Monensin_design :
 
-A method for accounting the enteric methane mitigation potential of monensin within RuFaS
-=========================================================================================
+Enteric Methane Mitigation: Monensin
+====================================
 
 Date created: May 4, 2023
 

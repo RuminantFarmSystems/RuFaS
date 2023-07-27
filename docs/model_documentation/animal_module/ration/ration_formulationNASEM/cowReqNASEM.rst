@@ -1,7 +1,9 @@
 .. _Cow-requirements-pseudocode-NASEM :
 
-Dairy Cattle Ration NASEM 2021 (Lactation and Dry Cows)
-=======================================================
+Lactating and Dry Cow Ration NASEM 2021
+=======================================
+
+   | Last Updated: January 11, 2023
 
 **# of Subroutine and Name:** Description of equations used to calculate
 nutrient requirements of cows according to equations provided within

@@ -3,6 +3,8 @@
 User-defined ration (udr) user manual
 =====================================
 
+   | Last updated: April 3, 2023
+
 **Brief workflow is as follows:**
 
 **Step 1:** Note the supplied udr.json and associated feed & animal

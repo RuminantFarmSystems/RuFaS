@@ -1,10 +1,8 @@
-Ration Formulation (NASEM 2021) - on going
-==========================================
+Ration Formulation (NASEM 2021)
+===============================
 
 .. toctree::
     :maxdepth: 1
 
-    feedlibNASEMUnsorted
-    feedLibraryComb
     cowReqNASEM
     heiferReqNASEM

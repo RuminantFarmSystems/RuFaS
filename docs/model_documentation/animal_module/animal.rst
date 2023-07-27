@@ -9,4 +9,3 @@ Animal Module
     life_cycle/lifeCycle
     manure/manure
     ration/ration
-    phosphorus

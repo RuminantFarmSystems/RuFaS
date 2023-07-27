@@ -1,6 +1,8 @@
 Ration Class Variables
 ======================
 
+  | Last Updated: January 28, 2021 
+
 Nutrient Amounts in the Ration
 
 From the optimized ration, we will calculate nutrients amounts and

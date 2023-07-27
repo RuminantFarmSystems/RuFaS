@@ -3,6 +3,10 @@
 Animal Module Background - Read First
 =====================================
 
+| Last Updated: June 12, 2023
+
+| Date Created: October 7, 2020
+
 **Overview**
 
   We keep track of the animals in the herd based on the stage of life they
@@ -52,7 +56,7 @@ Animal Module Background - Read First
     has an instance of LifeCycleManager, which is where the daily
     update methods are stored.
 
-  .. image:: media/entityrel.png
+   .. image:: media/entityrel.png
      :width: 6.18229in
      :height: 4.46829in
      :name: Figure 2
@@ -66,9 +70,13 @@ Animal Module Background - Read First
   refers to the amount of cows that should be in the simulation at any one
   time, i.e. the target size.)
 
+..
+
   .. image:: media/herdinfocode.png
      :width: 2.95313in
      :height: 2.23377in
+
+..
 
   We have a database file (animals.sqlite) from which we draw basic animal
   information to create the initial herd. The class AnimalInitialization
@@ -83,13 +91,10 @@ Animal Module Background - Read First
       each table has a column for each characteristic of that animal
       stage. There is also a table for the replacement market. For
       example, the calves table looks like:
-    ..
 
-    .. image:: media/calvesdropdown.png
-       :width: 2.73958in
-       :height: 2.21875in
-      
-    ..
+         .. image:: media/calvesdropdown.png
+            :width: 2.73958in
+            :height: 2.21875in
 
       As the animals get older, there are more characteristics that are
       necessary to describe the animal, so there are more columns for the
@@ -123,6 +128,7 @@ Animal Module Background - Read First
     (1) The animals are updated (more on that below).
 
     (2) The animal ID to the pen dictionary is updated.
+    
       * The AnimalManagement class stores a dictionary with the animal IDs as 
         keys and the pen they are in as values in pen.id_pen.
       * Animal ID - Pen ID pairs are updated daily. New born calves or purchased
@@ -130,12 +136,12 @@ Animal Module Background - Read First
         the lowest stocking density
 
     (3) We iterate through each animal to calculate specific nutrient requirements, 
-    nutrient updates, and nutrient compositions. We do this on a pen-by-pen basis, 
-    using logic found within the  ration_driver.py file. There is logic within this 
-    file to calculate average requirements for specific pens, as well as 
-    supporting logic to gather the feed information needed to fulfill/output those 
-    requirements. The pseudocode document for the ration_driver file can be found 
-    here: :ref:`ration_driver_logic` 
+        nutrient updates, and nutrient compositions. We do this on a pen-by-pen basis, 
+        using logic found within the  ration_driver.py file. There is logic within this 
+        file to calculate average requirements for specific pens, as well as 
+        supporting logic to gather the feed information needed to fulfill/output those 
+        requirements. The pseudocode document for the ration_driver file can be found 
+        here: :ref:`ration_driver_logic` 
 
     (4) If it is the end of a ration_interval, we:
       #. Iterate through each animal to calculate the animals’ general nutrient 
@@ -151,12 +157,16 @@ Animal Module Background - Read First
       #. Iterate through each animal to calculate the manure excreted.
       #. Calculate animal averages for particular values for each pen (e.g. growth).
 
-  The AnimalManagement class calls the daily updates by passing the animal lists to the LifeCycleManager’s daily_update() function, which returns the updated lists.
+..
+
+  The AnimalManagement class calls the daily updates by passing the animal lists to the
+  LifeCycleManager’s daily_update() function, which returns the updated lists.
 
   Animal daily update routines update:
 
     *  Attributes related to the animal’s age, body weight and composition, 
-       reproductive status, and health on a daily basis (See the :ref:`animal-life-cycle-pseudocode` for more information). The daily updates are performed 
+       reproductive status, and health on a daily basis (See the :ref:`animal-life-cycle-pseudocode` 
+       for more information). The daily updates are performed 
        by iterating through each animal list and calling the update functions 
        for that animal instance based on its Class.
 
@@ -182,7 +192,8 @@ Animal Module Background - Read First
   
   `Figure 3`_ Provides the call structure of of the Animal Module
 
-  Each animal object stores, along with its characteristics, four dictionaries that use the simulation days as keys:
+  Each animal object stores, along with its characteristics, four dictionaries
+  that use the simulation days as keys:
 
     (1) *Animal Events* - appended to only when a significant life cycle event happens to the animal
 
@@ -190,4 +201,5 @@ Animal Module Background - Read First
 
     (3) *Body Weight History* - appended to every day
 
-    (4) *Milk History* - appended to every day (only cows produce milk, so only Cow instances have a Milk History)
+    (4) *Milk History* - appended to every day (only cows produce milk, so only Cow instances have
+        a Milk History)
