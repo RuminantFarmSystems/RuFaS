@@ -504,373 +504,431 @@
       "description": "Manure Storage and Handling Data",
       "manure_management_scenario": {
         "type": "array",
-        "description": "Manure Management Scenarios",
-        "properties": {
+        "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
+        "manure_pen_id": {
+          "type": "number",
+          "description": "Manure Pen ID -- An identification number for livestock enclosures.",
+          "minimum": 0
+        },
+        "manure_handling": {
           "type": "object",
-          "compost": {
-            "type": "object",
-            "description": "Compost Management",
-            "bedding_type": {
+          "description": "Manure Handling",
+          "manure_handling_method": {
+            "type": "string",
+            "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
+            "pattern": "^{Flushing|Auto Alley scraping|Manual Skid Steer Scraping}$"
+          },
+          "water_type": {
+            "type": "string",
+            "description": "Water Type -- The type of water used for cleaning barn alleyways.",
+            "pattern": "^{fresh|recycled}$"
+          },
+          "flushing_water_usage": {
+            "type": "number",
+            "description": "Water Usage for Flushing (gal/animal/day). -- Water Usage for Flushing (gal/animal/day).",
+            "minimum": 50,
+            "maximum": 200,
+            "default": 150
+          },
+          "auto_scraping_water_usage": {
+            "type": "number",
+            "description": "Water Usage for Auto Alley Scraping (gal/animal/day). -- Water Usage for Auto Alley Scraping (gal/animal/day).",
+            "minimum": 0,
+            "maximum": 50,
+            "default": 1
+          },
+          "manual_scraping_water_usage": {
+            "type": "number",
+            "description": "Water Usage for Manual Skid Steer Scraping (gal/animal/day). -- Water Usage for Manual Skid Steer Scraping (gal/animal/day).",
+            "minimum": 0,
+            "maximum": 50,
+            "default": 1
+          },
+          "flushing_cleaning_frequency": {
+            "type": "number",
+            "description": "Cleaning Frequency for Flushing (times/day). -- Cleaning Frequency for Flushing (times/day).",
+            "minimum": 1,
+            "maximum": 3,
+            "default": 3
+          },
+          "auto_scraping_cleaning_frequency": {
+            "type": "number",
+            "description": "Cleaning Frequency for Auto Alley Scraping (times/day). -- Cleaning Frequency for Auto Alley Scraping (times/day).",
+            "minimum": 1,
+            "maximum": 12,
+            "default": 5
+          },
+          "manual_scraping_cleaning_frequency": {
+            "type": "number",
+            "description": "Cleaning Frequency for Manual Skid Steer Scraping (times/day). -- Cleaning Frequency for Manual Skid Steer Scraping (times/day).",
+            "minimum": 1,
+            "maximum": 12,
+            "default": 6
+          }
+        },
+        "bedding": {
+          "type": "object",
+          "description": "Bedding",
+          "bedding_type": {
+            "type": "string",
+            "description": "Bedding Type -- The material used for bedding pack.",
+            "pattern": "^{sand|straw|sawdust|manure_solids|other}$"
+          },
+          "amount_of_sand_used": {
+            "type": "number",
+            "description": "Amount of Sand Used (kg/animal/day) -- Average amount of Sand added.",
+            "minimum": 18,
+            "maximum": 25,
+            "default": 25
+          },
+          "amount_of_straw_used": {
+            "type": "number",
+            "description": "Amount of Straw Used (kg/animal/day) -- Average amount of Straw added.",
+            "minimum": 1.5,
+            "maximum": 3,
+            "default": 2.1
+          },
+          "amount_of_sawdust_used": {
+            "type": "number",
+            "description": "Amount of Sawdust Used (kg/animal/day) -- Average amount of Sawdust added.",
+            "minimum": 1.5,
+            "maximum": 3,
+            "default": 1.97
+          },
+          "amount_of_manure_solids_used": {
+            "type": "number",
+            "description": "Amount of Manure Solids Used (kg/animal/day) -- Average amount of Bedding added.",
+            "minimum": 2,
+            "maximum": 5,
+            "default": 2.5
+          },
+          "other_bedding_type": {
+            "type": "string",
+            "description": "Other Bedding Type -- If selected 'other' in \"Bedding Type\", write bedding type here."
+          },
+          "amount_of_other_bedding_used": {
+            "type": "number",
+            "description": "Amount of Other Bedding Used (kg/animal/day) -- Average amount of Manure Solids added."
+          },
+          "bedding_addition_frequency": {
+            "type": "string",
+            "description": "Bedding Addition Frequency -- ",
+            "pattern": "^{weekly|bi-weekly|other}$"
+          },
+          "other_bedding_addition_frequency": {
+            "type": "string",
+            "description": "Other Bedding Addition Frequency -- If selected 'other' in \"Bedding Addition Frequency\", write bedding addition frequency here."
+          },
+          "tillage_frequency": {
+            "type": "number",
+            "description": "Tillage Frequency (times/day). -- Turning activity of compost bedded pack (times/day).",
+            "minimum": 1,
+            "maximum": 3,
+            "default": 1
+          }
+        },
+        "water_usage": {
+          "type": "object",
+          "description": "Water Usage",
+          "milking_center_water_usage": {
+            "type": "number",
+            "description": "Milking Center Water Usage (gal/animal/day) -- The rate of water usage for cleaning in the milking parlor (gal/animal/day).",
+            "minimum": 0,
+            "maximum": 50,
+            "default": 25
+          },
+          "milking_center_water_type": {
+            "type": "string",
+            "description": "Milking Center Water Type -- The type of water used for cleaning in the milking parlor.",
+            "default": "fresh",
+            "pattern": "^{fresh|recycled}$"
+          },
+          "holding_center_water_usage": {
+            "type": "number",
+            "description": "Holding Center Water Usage (gal/animal/day) -- The rate of water usage for cleaning in the holding area (gal/animal/day).",
+            "minimum": 0,
+            "maximum": 50,
+            "default": 10
+          },
+          "holding_center_water_type": {
+            "type": "string",
+            "description": "Holding Center Water Type -- The type of water used for cleaning in the holding area.",
+            "default": "fresh",
+            "pattern": "^{fresh|recycled}$"
+          },
+          "sprinkler_water_usage": {
+            "type": "number",
+            "description": "Sprinkler Water Usage (gal/animal/day) -- The rate of water usage for the sprinklers (gal/animal/day).",
+            "minimum": 0,
+            "maximum": 10,
+            "default": 3
+          },
+          "is_sprinkler_water_usage_animal_dependent": {
+            "type": "boolean",
+            "description": "Is Sprinkler Water Usage animal dependent? -- Whether the sprinkler water usage varies according to the animal type."
+          },
+          "is_sprinkler_water_usage_calc_on_yearly_basis": {
+            "type": "boolean",
+            "description": "Is Sprinkler Water Usage calculated on a yearly basis? -- Whether the sprinkler water usage is calculated on a yearly basis."
+          }
+        },
+        "compost_bedding_pack_barn": {
+          "type": "object",
+          "description": "Compost Bedding Pack Barn",
+          "bedding_type": {
+            "type": "string",
+            "description": "Bedding Type -- The material used for bedding pack.",
+            "pattern": "^{straw|sawdust|compost}$"
+          },
+          "amount_of_straw_used": {
+            "type": "number",
+            "description": "Amount of Straw Used (kg/animal/day) -- Average amount of Straw added.",
+            "minimum": 4.5,
+            "maximum": 12,
+            "default": 12
+          },
+          "amount_of_sawdust_used": {
+            "type": "number",
+            "description": "Amount of Sawdust Used (kg/animal/day) -- Average amount of Sawdust added.",
+            "minimum": 4.5,
+            "maximum": 12,
+            "default": 11.3
+          },
+          "amount_of_compost_used": {
+            "type": "number",
+            "description": "Amount of Compost Used (kg/animal/day) -- Average amount of Sand added.",
+            "minimum": 4.5,
+            "maximum": 12,
+            "default": 11.3
+          },
+          "tillage_frequency": {
+            "type": "number",
+            "description": "Tillage Frequency (times/day). -- Turning activity of compost bedded pack (times/day).",
+            "minimum": 1,
+            "maximum": 3,
+            "default": 1
+          }
+        },
+        "manure_treatment_and_storage": {
+          "type": "object",
+          "description": "Manure Treatment and Storage Process",
+          "manure_treatment_methods": {
+            "type": "array",
+            "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
+            "uniqueItems": "True",
+            "properties": {
               "type": "string",
-              "description": "Bedding Type",
-              "pattern": "^{sand|straw|sawdust|manure_solids|other}$"
-            },
-            "amount_of_sand_used": {
-              "type": "number",
-              "minimum": 18,
-              "maximum": 25,
-              "default": 25,
-              "description": "Amount of Sand Used (kg/animal/day)"
-            },
-            "amount_of_straw_used": {
-              "type": "number",
-              "minimum": 1.5,
-              "maximum": 3,
-              "default": 2.1,
-              "description": "Amount of Straw Used (kg/animal/day)"
-            },
-            "amount_of_sawdust_used": {
-              "type": "number",
-              "minimum": 1.5,
-              "maximum": 3,
-              "default": 1.97,
-              "description": "Amount of Sawdust Used (kg/animal/day)"
-            },
-            "amount_of_manure_solids_used": {
-              "type": "number",
-              "minimum": 2,
-              "maximum": 5,
-              "default": 2.5,
-              "description": "Amount of Manure Solids Used (kg/animal/day)"
-            },
-            "other_bedding_type": {
-              "type": "string",
-              "description": "Other Bedding Type"
-            },
-            "amount_of_other_bedding_used": {
-              "type": "number",
-              "description": "Amount of Other Bedding Used (kg/animal/day)"
-            },
-            "bedding_addition_frequency": {
-              "type": "string",
-              "description": "Bedding Addition Frequency",
-              "pattern": "^{weekly|bi-weekly|other}$"
-            },
-            "other_bedding_addition_frequency": {
-              "type": "string",
-              "description": "Other Bedding Addition Frequency"
+              "pattern": "^{slurry_storage_underfloor|slurry_storage_outdoor|open_lots|composting|anaerobic_lagoon|anaerobic_digestion|other}$"
             }
           },
-          "manure_handling": {
-            "manure_handling_method": {
-              "type": "string",
-              "description": "Manure Handling Method",
-              "pattern": "^{Alley Flushing|Auto Alley scraping|Manual Skid Steer Scraping}$"
-            },
-            "alley_flushing_clean_water_usage": {
-              "type": "number",
-              "minimum": 50,
-              "maximum": 200,
-              "default": 150,
-              "description": "Clean Water Usage for Alley Flushing (gal/animal/day)."
-            },
-            "auto_scraping_clean_water_usage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 50,
-              "default": 1,
-              "description": "Clean Water Usage for Auto Alley Scraping (gal/animal/day)."
-            },
-            "manual_scraping_clean_water_usage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 50,
-              "default": 1,
-              "description": "Clean Water Usage for Manual Skid Steer Scraping (gal/animal/day)."
-            },
-            "alley_flushing_cleaning_frequency": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 3,
-              "default": 3,
-              "description": "Cleaning Frequency for Alley Flushing (times/day)."
-            },
-            "auto_scraping_cleaning_frequency": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 12,
-              "default": 5,
-              "description": "Cleaning Frequency for Auto Alley Scraping (times/day)."
-            },
-            "manual_scraping_cleaning_frequency": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 12,
-              "default": 6,
-              "description": "Cleaning Frequency for Manual Skid Steer Scraping (times/day)."
-            },
-            "tillage_frequency": {
-              "type": "number",
-              "minimum": 1,
-              "maximum": 3,
-              "default": 1,
-              "description": "Tillage Frequency (times/day)."
-            }
+          "other_manure_treatment_method": {
+            "type": "string",
+            "description": "Other Manure Treatment Methods -- If 'other' is selected in \"Manure Treatment Methods\", write manure treatment method here."
           },
-          "water_usage": {
-            "milking_center_water_usage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 50,
-              "default": 25,
-              "description": "Milking Center Water Usage (gal/animal/day)"
-            },
-            "milking_center_water_type": {
-              "type": "string",
-              "default": "fresh",
-              "description": "Milking Center Water Type",
-              "pattern": "^{fresh|recycled}$"
-            },
-            "holding_center_water_usage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 50,
-              "default": 10,
-              "description": "Holding Center Water Usage (gal/animal/day)"
-            },
-            "holding_center_water_type": {
-              "type": "string",
-              "default": "fresh",
-              "description": "Holding Center Water Type",
-              "pattern": "^{fresh|recycled}$"
-            },
-            "sprinkler_water_usage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 10,
-              "default": 3,
-              "description": "Sprinkler Water Usage (gal/animal/day)"
-            },
-            "is_sprinkler_water_usage_animal_dependent": {
-              "type": "boolean",
-              "description": "Is Sprinkler Water Usage animal dependent?"
-            },
-            "is_sprinkler_water_usage_calc_on_yearly_basis": {
-              "type": "boolean",
-              "description": "Is Sprinkler Water Usage calculated on a yearly basis?"
-            }
+          "manure_removal_frequency_for_storage_under_floor": {
+            "type": "number",
+            "description": "Manure Removal Frequency for \"slurry_storage_underfloor\" (months) -- The frequency to remove manure when storing in slurry pit under floor (months).",
+            "minimum": 0,
+            "maximum": 10,
+            "default": 3
           },
-          "manure_treatment_and_storage": {
-            "manure_treatment_methods": {
-              "type": "array",
-              "description": "Manure Treatment Methods",
-              "properties": {
-                "type": "string",
-                "pattern": "^{slurry_storage_underfloor|slurry_storage_outdoor|dry_lots|composting|anaerobic_lagoon|anaerobic_digestion|other}$"
-              }
-            },
-            "other_manure_treatment_method": {
-              "type": "string",
-              "description": "Other Manure Treatment Methods"
-            },
-            "manure_removal_frequency_for_storage_under_floor": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 10,
-              "default": 3,
-              "description": "Manure Removal Frequency for \"slurry_storage_underfloor\" (months)"
-            },
-            "manure_removal_frequency_for_storage_outdoor": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 12,
-              "default": 6,
-              "description": "Manure Removal Frequency for \"slurry_storage_outdoor\" (months)"
-            },
-            "manure_removal_frequency_for_composting": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 12,
-              "default": 6,
-              "description": "Manure Removal Frequency for \"composting\" (months)"
-            },
-            "manure_removal_frequency_for_dry_lots": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 12,
-              "default": 6,
-              "description": "Manure Removal Frequency for \"dry_lots\" (months)"
-            },
-            "effluent_removal_frequency": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 12,
-              "default": 12,
-              "description": "Effluent Removal Frequency (months)"
-            },
-            "sludge_removal_frequency": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 15,
-              "default": 10,
-              "description": "Sludge Removal Frequency (years)"
-            },
-            "manure_separator_type": {
-              "type": "string",
-              "description": "Manure Separator Type",
-              "pattern": "^{screw_press|sand_lane|rotary_screen|none|other}$"
-            },
-            "other_manure_separator": {
-              "type": "string",
-              "description": "Other Manure Separator"
-            },
-            "dry_solids_percentage_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.35,
-              "description": "Dry Solids Percentage for \"screw_press\""
-            },
-            "dry_solids_percentage_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.2,
-              "description": "Dry Solids Percentage for \"rotary_screen\""
-            },
-            "dry_solids_percentage_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": " Dry  Solids  Percentage  for  \"sand_lane\""
-            },
-            "total_solids_removal_efficiency_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.25,
-              "description": "Total Solids Removal Efficiency for \"screw_press\""
-            },
-            "total_solids_removal_efficiency_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.35,
-              "description": "Total Solids Removal Efficiency for \"rotary_screen\""
-            },
-            "total_solids_removal_efficiency_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": "Total Solids Removal Efficiency for \"sand_lane\""
-            },
-            "volatile_solids_removal_efficiency_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.3,
-              "description": "Volatile Solids Removal Efficiency for \"screw_press\""
-            },
-            "volatile_solids_removal_efficiency_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.4,
-              "description": "Volatile Solids Removal Efficiency for \"rotary_screen\""
-            },
-            "volatile_solids_removal_efficiency_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": "Volatile Solids Removal Efficiency for \"sand_lane\""
-            },
-            "nitrogen_removal_efficiency_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.3,
-              "description": "Nitrogen Removal Efficiency for \"screw_press\""
-            },
-            "nitrogen_removal_efficiency_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.3,
-              "description": "Nitrogen Removal Efficiency for \"rotary_screen\""
-            },
-            "nitrogen_removal_efficiency_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": "Nitrogen Removal Efficiency for \"sand_lane\""
-            },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.1,
-              "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\""
-            },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.15,
-              "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"rotary_screen\""
-            },
-            "total_ammoniacal_nitrogen_removal_efficiency_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"sand_lane\""
-            },
-            "phosphorus_removal_efficiency_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.2,
-              "description": "Phosphorus Removal Efficiency for \"screw_press\""
-            },
-            "phosphorus_removal_efficiency_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.4,
-              "description": "Phosphorus Removal Efficiency for \"rotary_screen\""
-            },
-            "phosphorus_removal_efficiency_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": "Phosphorus Removal Efficiency for \"sand_lane\""
-            },
-            "potassium_removal_efficiency_for_screw_press": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.23,
-              "description": "Potassium Removal Efficiency for \"screw_press\""
-            },
-            "potassium_removal_efficiency_for_rotary_screen": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0.15,
-              "description": "Potassium Removal Efficiency for \"rotary_screen\""
-            },
-            "potassium_removal_efficiency_for_sand_lane": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 1,
-              "default": 0,
-              "description": "Potassium Removal Efficiency for \"sand_lane\""
-            }
+          "manure_removal_frequency_for_storage_outdoor": {
+            "type": "number",
+            "description": "Manure Removal Frequency for \"slurry_storage_outdoor\" (months) -- The frequency to remove manure when storing in slurry pit outdoor (months).",
+            "minimum": 0,
+            "maximum": 12,
+            "default": 6
+          },
+          "manure_removal_frequency_for_composting": {
+            "type": "number",
+            "description": "Manure Removal Frequency for \"composting\" (months) -- The frequency to remove manure when composting bedded pack (months).",
+            "minimum": 0,
+            "maximum": 12,
+            "default": 6
+          },
+          "manure_removal_frequency_for_open_lots": {
+            "type": "number",
+            "description": "Manure Removal Frequency for \"open_lots\" (months) -- The frequency to remove manure when storing in open lots (months).",
+            "minimum": 0,
+            "maximum": 12,
+            "default": 6
+          },
+          "effluent_removal_frequency": {
+            "type": "number",
+            "description": "Effluent Removal Frequency (months) -- The frequency to remove effluent for \"anaerobic_lagoon\" (months).",
+            "minimum": 0,
+            "maximum": 12,
+            "default": 12
+          },
+          "sludge_removal_frequency": {
+            "type": "number",
+            "description": "Sludge Removal Frequency (years) -- The frequency to remove sludge for \"anaerobic_lagoon\" (years).",
+            "minimum": 0,
+            "maximum": 15,
+            "default": 10
+          },
+          "manure_separator_type": {
+            "type": "string",
+            "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
+            "pattern": "^{screw_press|sand_lane|rotary_screen|none|other}$"
+          },
+          "other_manure_separator": {
+            "type": "string",
+            "description": "Other Manure Separator -- If selected 'other' in \"Manure Separator Type\", write manure separator type here"
+          },
+          "fraction_of_sand_removed": {
+            "type": "number",
+            "description": "Fraction of Sand Removed for \"sand_lane\" -- Fraction of Sand Removed for \"sand_lane\".",
+            "minimum": 0.7,
+            "maximum": 0.95,
+            "default": 0.9
+          },
+          "dry_solids_percentage_for_screw_press": {
+            "type": "number",
+            "description": "Dry Solids Percentage for \"screw_press\" -- Final dry solids percentage for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.35
+          },
+          "dry_solids_percentage_for_rotary_screen": {
+            "type": "number",
+            "description": "Dry Solids Percentage for \"rotary_screen\" -- Final dry solids percentage for \"rotary_screen\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.2
+          },
+          "dry_solids_percentage_for_sand_lane": {
+            "type": "number",
+            "description": " Dry  Solids  Percentage  for  \"sand_lane\" -- Final dry solids percentage for \"sand_lane\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
+          },
+          "total_solids_removal_efficiency_for_screw_press": {
+            "type": "number",
+            "description": "Total Solids Removal Efficiency for \"screw_press\" -- Total Solids Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.25
+          },
+          "total_solids_removal_efficiency_for_rotary_screen": {
+            "type": "number",
+            "description": "Total Solids Removal Efficiency for \"rotary_screen\" -- Total Solids Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.35
+          },
+          "total_solids_removal_efficiency_for_sand_lane": {
+            "type": "number",
+            "description": "Total Solids Removal Efficiency for \"sand_lane\" -- Total Solids Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
+          },
+          "volatile_solids_removal_efficiency_for_screw_press": {
+            "type": "number",
+            "description": "Volatile Solids Removal Efficiency for \"screw_press\" -- Volatile Solids Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.3
+          },
+          "volatile_solids_removal_efficiency_for_rotary_screen": {
+            "type": "number",
+            "description": "Volatile Solids Removal Efficiency for \"rotary_screen\" -- Volatile Solids Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.4
+          },
+          "volatile_solids_removal_efficiency_for_sand_lane": {
+            "type": "number",
+            "description": "Volatile Solids Removal Efficiency for \"sand_lane\" -- Volatile Solids Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
+          },
+          "nitrogen_removal_efficiency_for_screw_press": {
+            "type": "number",
+            "description": "Nitrogen Removal Efficiency for \"screw_press\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.3
+          },
+          "nitrogen_removal_efficiency_for_rotary_screen": {
+            "type": "number",
+            "description": "Nitrogen Removal Efficiency for \"rotary_screen\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.3
+          },
+          "nitrogen_removal_efficiency_for_sand_lane": {
+            "type": "number",
+            "description": "Nitrogen Removal Efficiency for \"sand_lane\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
+          },
+          "total_ammoniacal_nitrogen_removal_efficiency_for_screw_press": {
+            "type": "number",
+            "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\" -- Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.1
+          },
+          "total_ammoniacal_nitrogen_removal_efficiency_for_rotary_screen": {
+            "type": "number",
+            "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"rotary_screen\" -- Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.15
+          },
+          "total_ammoniacal_nitrogen_removal_efficiency_for_sand_lane": {
+            "type": "number",
+            "description": "Total Ammoniacal Nitrogen Removal Efficiency for \"sand_lane\" -- Total Ammoniacal Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
+          },
+          "phosphorus_removal_efficiency_for_screw_press": {
+            "type": "number",
+            "description": "Phosphorus Removal Efficiency for \"screw_press\" -- Phosphorus Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.2
+          },
+          "phosphorus_removal_efficiency_for_rotary_screen": {
+            "type": "number",
+            "description": "Phosphorus Removal Efficiency for \"rotary_screen\" -- Phosphorus Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.4
+          },
+          "phosphorus_removal_efficiency_for_sand_lane": {
+            "type": "number",
+            "description": "Phosphorus Removal Efficiency for \"sand_lane\" -- Phosphorus Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
+          },
+          "potassium_removal_efficiency_for_screw_press": {
+            "type": "number",
+            "description": "Potassium Removal Efficiency for \"screw_press\" -- Potassium Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.23
+          },
+          "potassium_removal_efficiency_for_rotary_screen": {
+            "type": "number",
+            "description": "Potassium Removal Efficiency for \"rotary_screen\" -- Nitrogen Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.15
+          },
+          "potassium_removal_efficiency_for_sand_lane": {
+            "type": "number",
+            "description": "Potassium Removal Efficiency for \"sand_lane\" -- Potassium Removal Efficiency for \"screw_press\".",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0
           }
         }
       }
