@@ -223,6 +223,15 @@ class InputManager:
             return self._fix_data(variable_properties, array_element_hierarchy, input_data)
         else:
             return self._fix_data(variable_properties, element_hierarchy, input_data)
+    
+    def update_element_hierarchy(self, element_hierarchy, is_int_in_element_hierarchy):
+        if is_int_in_element_hierarchy:
+            for i in range(len(element_hierarchy)):
+                    if isinstance(element_hierarchy[i], int):
+                        element_hierarchy[i] = "properties"
+            return element_hierarchy
+        else:
+            return element_hierarchy
 
     def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
                           input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
@@ -261,10 +270,7 @@ class InputManager:
                                         "invalid_elements": 0, "is_valid": True}
         is_int_in_element_hierarchy = any(isinstance(element, int) for element in element_hierarchy)
         array_element_hierarchy = element_hierarchy[:]
-        if is_int_in_element_hierarchy:
-            for i in range(len(element_hierarchy)):
-                if isinstance(element_hierarchy[i], int):
-                    element_hierarchy[i] = "properties"
+        element_hierarchy = self.update_element_hierarchy(element_hierarchy, is_int_in_element_hierarchy)
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][properties_blob_key])
         var_type = variable_properties["type"]
