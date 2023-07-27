@@ -24,9 +24,9 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
 
     DAILY_MILK_VARIATION_MEAN = 0
-    """Mean of the parameter value for l, m, n in wood's model"""
+    """Mean of the daily milk production variation from the estimated milk production, kg/day"""
     DAILY_MILK_VARIATION_STD_DEV = 1.0
-    """Standard deviation of the parameter value for l, m, n in wood's model"""
+    """Standard deviation of the daily milk production variation from the estimated milk production, kg/day"""
 
     DMI_CONSTRAINT_PERCENT = 0.20
     """The +/- percentage of DMI estimated allowed for ration formulation"""
