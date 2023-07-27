@@ -1192,7 +1192,7 @@ class Field:
         return
 
     def _record_field_watering(self, year: int, day: int, watering_amount: float):
-        info_map = {"class": self.__class__.__name__, "function": self._record_manure_application.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self._record_field_watering.__name__,
                     "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
         value = {"watering_amount": watering_amount}
