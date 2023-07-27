@@ -171,7 +171,6 @@ class InputManager:
                 raise KeyError(f"Faulty data type in {file_blob_key},"
                                f"supported types are: {data_type_to_loader_map.keys()}")
 
-            # counter_dict = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0}
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
             for property in properties.keys():
@@ -193,6 +192,87 @@ class InputManager:
         om.add_log("Total Fixed Items", f"{fixed_elements_counter=}", info_map)
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
+
+    def get_validity(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
+                     var_type: str, properties_blob_key: str, array_element_hierarchy: list,
+                     is_int_in_element_hierarchy: bool, element_hierarchy: list, eager_termination: bool
+                     ) -> bool:
+        """Helper function to route correct arguments to type validator functions.
+        Removes levels of complexity from _validate_element().
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            The metadata properties of the variable being validated.
+        var_name : str
+            The name of the variable being validated.
+        input_data_value : Any
+            The value of the variable being validated.
+        var_type : str
+            The type of the variable being validated.
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+        array_element_hierarchy : Dict[str, Any]
+            A list of strings representing the path to the data being validated if data is in an array.
+        is_int_in_element_hierarchy : bool
+            If true, data being validated is in an array.
+        element_hierarchy : list
+            A list of strings representing the path to the data being validated if data is not in an array.
+        eager_termination : bool
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        bool
+            True if element is valid.
+
+        Raises
+        ------
+        KeyError
+            Raised if the variable type is not one of the 4 currently supported for validation.
+        """
+        data_type_to_validator_map = {"string": self._string_type_validator,
+                                      "number": self._num_type_validator,
+                                      "array": self._array_type_validator,
+                                      "bool": self._bool_type_validator, }
+        try:
+            validator = data_type_to_validator_map[var_type]
+        except KeyError:
+            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+
+        if is_int_in_element_hierarchy:
+            return validator(variable_properties, var_name, input_data_value,
+                             properties_blob_key, array_element_hierarchy, eager_termination)
+        else:
+            return validator(variable_properties, var_name, input_data_value,
+                             properties_blob_key, element_hierarchy, eager_termination)
+
+    def update_element_hierarchy(self, element_hierarchy: list, is_int_in_element_hierarchy: bool
+                                 ) -> list:
+        """If the element hierarchy path to the data being validated contains an int,
+        this function replaces indices containing ints with "properties".
+
+        Parameters
+        ----------
+        element_hierarchy : list
+            A list of strings representing the path to the data being validated.
+
+        is_int_in_element_hierarchy : bool
+            If true, data being validated is in an array.
+
+        Returns
+        -------
+        list
+            An updated version of the element_hierarchy with the correct metadata
+            path to get validation guidelines for data being validated.
+        """
+        if is_int_in_element_hierarchy:
+            for i in range(len(element_hierarchy)):
+                if isinstance(element_hierarchy[i], int):
+                    element_hierarchy[i] = "properties"
+            return element_hierarchy
+        else:
+            return element_hierarchy
 
     def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
                           input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
@@ -231,10 +311,7 @@ class InputManager:
                                         "invalid_elements": 0, "is_valid": True}
         is_int_in_element_hierarchy = any(isinstance(element, int) for element in element_hierarchy)
         array_element_hierarchy = element_hierarchy[:]
-        if is_int_in_element_hierarchy:
-            for i in range(len(element_hierarchy)):
-                if isinstance(element_hierarchy[i], int):
-                    element_hierarchy[i] = "properties"
+        element_hierarchy = self.update_element_hierarchy(element_hierarchy, is_int_in_element_hierarchy)
         variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                      self.__metadata["properties"][properties_blob_key])
         var_type = variable_properties["type"]
@@ -282,21 +359,10 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            data_type_to_validator_map = {"string": self._string_type_validator,
-                                          "number": self._num_type_validator,
-                                          "array": self._array_type_validator,
-                                          "bool": self._bool_type_validator, }
-            try:
-                validator = data_type_to_validator_map[var_type]
-            except KeyError:
-                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+            is_valid = self.get_validity(variable_properties, var_name, input_data_value, var_type,
+                                         properties_blob_key, array_element_hierarchy, is_int_in_element_hierarchy,
+                                         element_hierarchy, eager_termination)
 
-            if is_int_in_element_hierarchy:
-                is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, is_int_in_element_hierarchy, eager_termination)
-            else:
-                is_valid = validator(variable_properties, var_name, input_data_value,
-                                     properties_blob_key, element_hierarchy, eager_termination)
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
