@@ -1246,3 +1246,23 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
         assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
     elif interval < 0:
         assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)
+
+@pytest.mark.parametrize("field_name,field_size,day,year,watering_amount,expected_info_map,expected_value", [
+    ("name_1", 100, 120, 1993, 135.6,
+     {"prefix": "field_name:'name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100},
+     {"watering_amount": 135.6}),
+    ("name_2", 14.65, 3, 1996, 1.2,
+     {"prefix": "field_name:'name_2'", "date": {"year": 1996, "day": 3}, "field_size": 14.65},
+     {"watering_amount": 1.2}),
+    ("name_2", 14.65, 48, 2023, 1.2,
+     {"prefix": "field_name:'name_2'", "date": {"year": 2023, "day": 48}, "field_size": 14.65},
+     {"watering_amount": 1.2})
+])
+def test_record_field_watering(field_name: str, field_size: float, day: int, year: int, watering_amount: float,
+                               expected_info_map: Dict, expected_value: Dict) -> None:
+    field = Field(field_data=FieldData(name=field_name, field_size=field_size), manure_manager=MagicMock(ManureManager))
+    field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
+
+    actual = om.variables_pool[f"field_name:'{field_name}'.field_watering"]
+    assert actual["info_maps"].__contains__(expected_info_map)
+    assert actual["values"].__contains__(expected_value)
