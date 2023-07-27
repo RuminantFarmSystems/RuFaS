@@ -49,6 +49,109 @@ def test_calc_E_CH4_slurry_storage(is_enclosed: bool, mocker: MockerFixture) -> 
         assert actual == expected_E_CH4_open_air
 
 
+def test_calc_mcf() -> None:
+    """Tests _calc_methane_conversion_factor() in gas_emissions.py."""
+    assert GasEmissions._calc_methane_conversion_factor(1.0) == \
+        pytest.approx((GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B)))
+
+
+def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
+    """Tests _calc_ifsm_methane_emission() in gas_emissions.py."""
+
+    # Arrange
+    ambient_barn_temp = 1.0
+    mcf = 1.0
+    patch_for_calc_ifsm_methane_emission = mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_methane_conversion_factor',
+        return_value=mcf
+    )
+    manure_volatile_solids = 1000.0
+    expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
+
+    # Actual
+    actual = GasEmissions._calc_ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
+
+    # Assert
+    patch_for_calc_ifsm_methane_emission.assert_called_once_with(mcf)
+    assert actual == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("temperature", [-10.0, 0.0, 10.0])
+def test_microbial_decomp_rate(temperature: float) -> None:
+    """Tests _calc_microbial_decomp_rate() in gas_emissions.py."""
+    assert GasEmissions._calc_microbial_decomp_rate(temperature) == \
+        pytest.approx(2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50))))
+
+
+@pytest.mark.parametrize("days_since_last_tillage, lag", [(1, 1), (10, 2), (1, 3)])
+def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillage: int, lag: int) -> None:
+    """Tests _calc_carbon_decomposition_rate() in gas_emissions.py."""
+
+    # Arrange
+    max_decomp_rate = 2.0
+    min_decomp_rate = 1.0
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_microbial_decomp_rate',
+        side_effect=[max_decomp_rate, min_decomp_rate]
+    )
+    expected = math.exp(0.1 * (days_since_last_tillage - lag))
+
+    assert GasEmissions._calc_carbon_decomposition_rate(days_since_last_tillage, lag) == \
+        pytest.approx(expected)
+
+
+@pytest.mark.parametrize("oxygen_mole_fraction, oxygen_ambient_air_mole_fraction, should_throw", [
+    (-1.0, 0.21, True),
+    (2.0, 0.21, True),
+    (0.15, -1.0, True),
+    (0.15, 2.0, True),
+    (0.15, 0.21, False)
+])
+def test_aneerobic_coefficient(
+    oxygen_mole_fraction: float,
+    oxygen_ambient_air_mole_fraction: float,
+    should_throw: bool
+) -> None:
+    """Tests _calc_aneerobic_coefficient() in gas_emissions.py."""
+    if should_throw:
+        with pytest.raises(ValueError):
+            GasEmissions._calc_anaerobic_effect(
+                oxygen_mole_fraction=oxygen_mole_fraction,
+                oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
+            )
+    else:
+        expected = (
+            (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction))
+            * ((0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
+        )
+        assert GasEmissions._calc_anaerobic_effect(
+                oxygen_mole_fraction=oxygen_mole_fraction,
+                oxygen_ambient_air_mole_fraction=oxygen_ambient_air_mole_fraction
+            ) == pytest.approx(expected)
+
+
+def test_calc_total_carbon_decomposition(mocker: MockerFixture) -> None:
+    """Tests calc_total_carbon_decomposition() in gas_emissions.py."""
+    total_solids = 10.0
+    bedding_mass = 100.0
+    days_since_last_tillage = 1
+    lag = 1
+    c_decomp_rate = 1.0
+    anaerobic_effect = 1.0
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_carbon_decomposition_rate',
+        return_value=c_decomp_rate
+    )
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_anaerobic_effect',
+        return_value=anaerobic_effect
+    )
+    expected = (total_solids * 0.5 + bedding_mass * 0.35) * c_decomp_rate * 0.65 * anaerobic_effect
+
+    assert GasEmissions.calc_total_carbon_decomposition(total_solids, bedding_mass, days_since_last_tillage, lag) \
+        == pytest.approx(expected)
+
+
 @pytest.mark.parametrize('hours', [hour for hour in range(0, 24)])
 def test_calc_modified_hours(hours: float) -> None:
     """Tests _calc_modified_hours() in gas_emissions.py."""
@@ -500,3 +603,87 @@ def test_calc_methane_emission_from_slurry_storage(mocker: MockerFixture, total_
         patch_for_arrhenius_exponent.assert_called_once_with(
             temp if temp is not None else GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE)
         patch_for_volatile_solid_components.assert_called_once_with(total_volatile_solids)
+
+
+@pytest.mark.parametrize(
+    'num_animals, storage_area, manure_tan, manure_volume, manure_density, total_solids, temp, pH, expected, error_message',
+    [
+        # Standard case
+        (10, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 62.315518096348924, None),
+        # Edge cases: Zero input values for num_animals, storage_area, manure_tan, manure_volume, manure_density, total_solids
+        (0, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
+        (10, 0.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 0.0, 30.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 0.0, 1200.0, 5.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 30.0, 0.0, 5.0, 20.0, 7.7, 0.0, None),
+        (10, 100.0, 25.0, 30.0, 1200.0, 0.0, 20.0, 7.7, 0.0, None),
+        # Exception cases: Negative input values for num_animals, storage_area, manure_tan, manure_volume, manure_density, total_solids
+        (-1, 100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, ValueError,
+         'Number of animals must be greater than or equal to 0.'),
+        (10, -100.0, 25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, ValueError,
+         'Storage area per animal must be greater than or equal to 0.'),
+        (10, 100.0, -25.0, 30.0, 1200.0, 5.0, 20.0, 7.7, ValueError,
+         'Manure total ammoniacal nitrogen must be greater than or equal to 0.'),
+        (10, 100.0, 25.0, -30.0, 1200.0, 5.0, 20.0, 7.7, ValueError,
+         'Manure volume must be greater than or equal to 0.'),
+        (10, 100.0, 25.0, 30.0, -1200.0, 5.0, 20.0, 7.7, ValueError,
+         'Manure density must be greater than or equal to 0.'),
+        (10, 100.0, 25.0, 30.0, 1200.0, -5.0, 20.0, 7.7, ValueError,
+         'Total solids must be greater than or equal to 0.'),
+    ]
+)
+def test_calc_storage_ammonia_emission(num_animals: int, storage_area: float, manure_tan: float, manure_volume: float,
+                                       manure_density: float, total_solids: float, temp: float, pH: float,
+                                       expected: float | Exception, error_message: str | None) -> None:
+    """
+    Unit test for calc_storage_ammonia_emission() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the ammonia storage emissions
+    given the number of animals, the storage area, manure total ammoniacal nitrogen, manure volume,
+    manure density, total solids, temperature, and pH.
+
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):  # type: ignore
+            GasEmissions.calc_storage_ammonia_emission(num_animals, storage_area, manure_tan,
+                                                       manure_volume, manure_density, total_solids, temp, pH)
+    else:
+        actual = GasEmissions.calc_storage_ammonia_emission(num_animals, storage_area, manure_tan,
+                                                            manure_volume, manure_density, total_solids, temp, pH)
+        assert actual == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    'manure_mass, total_solids, expected, error_message',
+    [
+        # Test when manure_mass and total_solids are 0
+        (0.0, 0.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
+        # Test when dry matter >= SOLID_MANURE_THRESHOLD
+        (1000.0, 1.0, GasEmissionConstants.SOLID_AND_SEMI_SOLID_MANURE_HSC, None),
+        # Test when dry matter >= SLURRY_MANURE_THRESHOLD
+        (10.0, 2.0, GasEmissionConstants.SLURRY_MANURE_HSC, None),
+        # Test when dry matter < SLURRY_MANURE_THRESHOLD (i.e., liquid manure)
+        (10.0, 20.0, GasEmissionConstants.LIQUID_MANURE_HSC, None),
+        # Test when manure_mass < 0
+        (-1.0, 20.0, ValueError, 'Manure mass must be greater than or equal to 0.'),
+        # Test when total_solids < 0
+        (10.0, -1.0, ValueError, 'Total solids must be greater than or equal to 0.'),
+    ]
+)
+def test_calc_housing_specific_constant(manure_mass: float, total_solids: float, expected: float | Exception,
+                                        error_message: str | None) -> None:
+    """
+    Unit test for _calc_housing_specific_constant() method in gas_emissions.py.
+
+    This test verifies that the method correctly calculates the housing-specific constant given
+    the total manure mass and total solids in manure.
+
+    """
+    # Act and assert
+    if isinstance(expected, type) and issubclass(expected, Exception):
+        with pytest.raises(expected, match=error_message):
+            GasEmissions._calc_housing_specific_constant(manure_mass, total_solids)
+    else:
+        actual = GasEmissions._calc_housing_specific_constant(manure_mass, total_solids)
+        assert actual == expected
