@@ -53,7 +53,7 @@ class WaterUptake:
         )
         self.crop_data.potential_water_uptakes = self._adjust_water_uptakes(
             potential_uptakes=self.crop_data.potential_water_uptakes, unmet_demands=self.crop_data.unmet_water_demands,
-            uptake_compensation=self.crop_data.water_compensation_factor, water_availabilities=water_availabilities)
+            uptake_compensation=self.crop_data.water_compensation_factor)
         self.crop_data.potential_water_uptakes = self._reduce_efficiency_of_uptake(
             potential_uptakes=self.crop_data.potential_water_uptakes,
             water_availabilities=water_availabilities,
@@ -194,8 +194,8 @@ class WaterUptake:
         return potential_uptake
 
     @staticmethod
-    def _adjust_water_uptakes(potential_uptakes: List[float], water_availabilities: List[float],
-                              unmet_demands: List[float], uptake_compensation: float) -> List[float]:
+    def _adjust_water_uptakes(potential_uptakes: List[float], unmet_demands: List[float],
+                              uptake_compensation: float) -> List[float]:
         """adjusts the potential water uptakes from each layer based by drawing from deeper layeres when possible.
 
         References

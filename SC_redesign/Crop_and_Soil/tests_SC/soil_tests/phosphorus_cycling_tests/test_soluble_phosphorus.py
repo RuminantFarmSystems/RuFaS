@@ -1,3 +1,4 @@
+
 import pytest
 from unittest.mock import MagicMock, patch
 from math import exp
@@ -59,16 +60,21 @@ def test_determine_isotherm_intercept(slope: float) -> None:
     assert observed == expected
 
 
-@pytest.mark.parametrize("phosphorus,slope,intercept", [
-    (28, 60.29, 194),
-    (12, 33.294, 145.56),
-    (86, 46.792, 167.398),
+@pytest.mark.parametrize("phosphorus,slope,intercept,overflow", [
+    (28, 60.29, 194, False, ),
+    (12, 33.294, 145.56, False),
+    (86, 46.792, 167.398, False),
+    (2000000000000000000000000000000000000000000000000000000000, 0.00001, 1, True)
 ])
-def test_determine_dissolved_reactive_phosphorus_leachate(phosphorus: float, slope: float, intercept: float) -> float:
+def test_determine_dissolved_reactive_phosphorus_leachate(phosphorus: float, slope: float, intercept: float,
+                                                          overflow: bool) -> float:
     """Tests that the amount of phosphorus calculated to leach out of the layer is correct."""
     observed = SolublePhosphorus._determine_dissolved_reactive_phosphorus_leachate(phosphorus, slope, intercept)
-    expected = min(20.0, exp(((phosphorus * 1.5) - intercept) / slope))
-    assert observed == expected
+    if overflow:
+        assert observed == 20
+    else:
+        expected = min(20.0, exp(((phosphorus * 1.5) - intercept) / slope))
+        assert observed == expected
 
 
 @pytest.mark.parametrize("percolated_water,area", [
