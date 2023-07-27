@@ -274,46 +274,78 @@
       "mix_names": {
         "type": "array",
         "description": "List of the mix names that will be used for the corresponding fertilizer application.",
-        "default": []
+        "properties": {
+          "type": "string",
+          "default": []
+        }
       },
       "years": {
         "type": "array",
         "description": "List of years in which fertilizer will be applied.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "days": {
         "type": "array",
         "description": "List of days on which fertilizer will be applied.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 1,
+          "default": []
+        }
       },
       "nitrogen_masses": {
         "type": "array",
         "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.",
         "units": "kg",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "default": []
+        }
       },
       "phosphorus_masses": {
         "type": "array",
         "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.",
         "units": "kg",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "default": []
+        }
       },
       "potassium_masses": {
         "type": "array",
         "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.",
         "units": "kg",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "default": []
+        }
       },
       "application_depths": {
         "type": "array",
         "description": "List of depths at which the fertilizer is injected into the soil.",
         "units": "mm",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "default": []
+        }
       },
       "surface_remainder_fractions": {
         "type": "array",
         "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
-        "default": []
+        "properties": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": []
+        }
       },
       "pattern_repeat": {
         "type": "number",
