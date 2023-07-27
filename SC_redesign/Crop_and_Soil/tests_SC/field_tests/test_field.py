@@ -1247,6 +1247,7 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
     elif interval < 0:
         assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)
 
+
 @pytest.mark.parametrize("field_name,field_size,day,year,watering_amount,expected_info_map,expected_value", [
     ("name_1", 100, 120, 1993, 135.6,
      {"prefix": "field_name:'name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100},
