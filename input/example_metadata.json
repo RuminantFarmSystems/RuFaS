@@ -63,12 +63,26 @@
       "type": "json",
       "properties": "soil_profile_properties"
     },
-    "field_management": {
-      "title": "Field Management Configuration",
-      "description": "Fertilizer, manure, and tillage application schedules",
-      "path": "field_management/example_field_management.json",
+    "fertilizer_schedule": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer is like butter, you can never have too much.",
+      "path": "fertilizer_schedule/example_fertilizer_schedule.json",
       "type": "json",
-      "properties": "field_management_properties"
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule": {
+      "title": "Manure schedule.",
+      "description": "Crappier than having 7:45 am classes Monday - Friday.",
+      "path": "manure_schedule/example_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule": {
+      "title": "Tillage schedule.",
+      "description": "Requires the will to till.",
+      "path": "tillage_schedule/example_tillage_schedule.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
     },
     "field": {
       "title": "Field specification",
@@ -227,174 +241,166 @@
         "default": 0
       }
     },
-    "field_management_properties": {
-      "fertilizer_schedule_properties": {
+    "fertilizer_schedule_properties": {
+      "available_fertilizer_mixes": {
         "type": "object",
-        "description": "Defines the schedule of fertilizer applications for a field.",
-        "available_fertilizer_mixes": {
-          "type": "object",
-          "description": "All the available fertilizer mixes that are available besides the default ones.",
-          "default": {}
-        },
-        "mix_names": {
-          "type": "array",
-          "description": "List of the mix names that will be used for the corresponding fertilizer application.",
-          "default": []
-        },
-        "years": {
-          "type": "array",
-          "description": "List of years in which fertilizer will be applied.",
-          "default": []
-        },
-        "days": {
-          "type": "array",
-          "description": "List of days on which fertilizer will be applied.",
-          "default": []
-        },
-        "nitrogen_masses": {
-          "type": "array",
-          "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.",
-          "units": "kg",
-          "default": []
-        },
-        "phosphorus_masses": {
-          "type": "array",
-          "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.",
-          "units": "kg",
-          "default": []
-        },
-        "potassium_masses": {
-          "type": "array",
-          "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.",
-          "units": "kg",
-          "default": []
-        },
-        "application_depths": {
-          "type": "array",
-          "description": "List of depths at which the fertilizer is injected into the soil.",
-          "units": "mm",
-          "default": []
-        },
-        "surface_remainder_fractions": {
-          "type": "array",
-          "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
-          "default": []
-        },
-        "pattern_repeat": {
-          "type": "number",
-          "description": "Number of times that this fertilizer application schedule should be repeated.",
-          "minimum": 0,
-          "default": 0
-        },
-        "pattern_skip": {
-          "type": "number",
-          "description": "Number of years to be skipped between schedule repetitions.",
-          "minimum": 0,
-          "default": 0
-        }
+        "description": "All the available fertilizer mixes that are available besides the default ones.",
+        "default": {}
       },
-      "manure_schedule_properties": {
-        "type": "object",
-        "description": "Defines the schedule of manure applications for a field.",
-        "years": {
-          "type": "array",
-          "description": "List of years in which manure will be applied.",
-          "default": []
-        },
-        "days": {
-          "type": "array",
-          "description": "List of days on which manure will be applied.",
-          "default": []
-        },
-        "nitrogen_masses": {
-          "type": "array",
-          "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.",
-          "units": "kg",
-          "default": []
-        },
-        "phosphorus_masses": {
-          "type": "array",
-          "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.",
-          "units": "kg",
-          "default": []
-        },
-        "potassium_masses": {
-          "type": "array",
-          "description": "List of minimum potassium masses that the corresponding manure applications should contain.",
-          "units": "kg",
-          "default": []
-        },
-        "coverage_fractions": {
-          "type": "array",
-          "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
-          "default": []
-        },
-        "application_depths": {
-          "type": "array",
-          "description": "List of depths at which the manure is injected into the soil.",
-          "units": "mm",
-          "default": []
-        },
-        "surface_remainder_fractions": {
-          "type": "array",
-          "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
-          "default": []
-        },
-        "pattern_repeat": {
-          "type": "number",
-          "description": "Number of times that this manure application schedule should be repeated.",
-          "minimum": 0,
-          "default": 0
-        },
-        "pattern_skip": {
-          "type": "number",
-          "description": "Number of years to be skipped between schedule repetitions.",
-          "minimum": 0,
-          "default": 0
-       }
+      "mix_names": {
+        "type": "array",
+        "description": "List of the mix names that will be used for the corresponding fertilizer application.",
+        "default": []
       },
-      "tillage_schedule_properties": {
-        "type": "object",
-        "description": "Defines the schedule of tillage applications for a field.",
-        "years": {
-          "type": "array",
-          "description": "List of years in which manure will be applied.",
-          "default": []
-        },
-        "days": {
-          "type": "array",
-          "description": "List of days on which manure will be applied.",
-          "default": []
-        },
-        "tillage_depths": {
-          "type": "array",
-          "description": "List of depths that the corresponding tillage applications reach.",
-          "units": "mm",
-          "default": []
-        },
-        "incorporation_fractions": {
-          "type": "array",
-          "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
-          "default": []
-        },
-        "mixing_fractions": {
-          "type": "array",
-          "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
-          "default": []
-        },
-        "pattern_repeat": {
-          "type": "number",
-          "description": "Number of times that this tillage schedule should be repeated.",
-          "minimum": 0,
-          "default": 0
-        },
-        "pattern_skip": {
-          "type": "number",
-          "description": "Number of years to be skipped between schedule repetitions.",
-          "minimum": 0,
-          "default": 0
-       }
+      "years": {
+        "type": "array",
+        "description": "List of years in which fertilizer will be applied.",
+        "default": []
+      },
+      "days": {
+        "type": "array",
+        "description": "List of days on which fertilizer will be applied.",
+        "default": []
+      },
+      "nitrogen_masses": {
+        "type": "array",
+        "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.",
+        "units": "kg",
+        "default": []
+      },
+      "phosphorus_masses": {
+        "type": "array",
+        "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.",
+        "units": "kg",
+        "default": []
+      },
+      "potassium_masses": {
+        "type": "array",
+        "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.",
+        "units": "kg",
+        "default": []
+      },
+      "application_depths": {
+        "type": "array",
+        "description": "List of depths at which the fertilizer is injected into the soil.",
+        "units": "mm",
+        "default": []
+      },
+      "surface_remainder_fractions": {
+        "type": "array",
+        "description": "List of fractions of fertilizer which remain on the soil surface when applied via injection.",
+        "default": []
+      },
+      "pattern_repeat": {
+        "type": "number",
+        "description": "Number of times that this fertilizer application schedule should be repeated.",
+        "minimum": 0,
+        "default": 0
+      },
+      "pattern_skip": {
+        "type": "number",
+        "description": "Number of years to be skipped between schedule repetitions.",
+        "minimum": 0,
+        "default": 0
       }
+    },
+    "manure_schedule_properties": {
+      "years": {
+        "type": "array",
+        "description": "List of years in which manure will be applied.",
+        "default": []
+      },
+      "days": {
+        "type": "array",
+        "description": "List of days on which manure will be applied.",
+        "default": []
+      },
+      "nitrogen_masses": {
+        "type": "array",
+        "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.",
+        "units": "kg",
+        "default": []
+      },
+      "phosphorus_masses": {
+        "type": "array",
+        "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.",
+        "units": "kg",
+        "default": []
+      },
+      "potassium_masses": {
+        "type": "array",
+        "description": "List of minimum potassium masses that the corresponding manure applications should contain.",
+        "units": "kg",
+        "default": []
+      },
+      "coverage_fractions": {
+        "type": "array",
+        "description": "List of fractions of how much of the field is covered by the corresponding manure application.",
+        "default": []
+      },
+      "application_depths": {
+        "type": "array",
+        "description": "List of depths at which the manure is injected into the soil.",
+        "units": "mm",
+        "default": []
+      },
+      "surface_remainder_fractions": {
+        "type": "array",
+        "description": "List of fractions of manure which remain on the soil surface when applied via injection.",
+        "default": []
+      },
+      "pattern_repeat": {
+        "type": "number",
+        "description": "Number of times that this manure application schedule should be repeated.",
+        "minimum": 0,
+        "default": 0
+      },
+      "pattern_skip": {
+        "type": "number",
+        "description": "Number of years to be skipped between schedule repetitions.",
+        "minimum": 0,
+        "default": 0
+     }
+    },
+    "tillage_schedule_properties": {
+      "years": {
+        "type": "array",
+        "description": "List of years in which manure will be applied.",
+        "default": []
+      },
+      "days": {
+        "type": "array",
+        "description": "List of days on which manure will be applied.",
+        "default": []
+      },
+      "tillage_depths": {
+        "type": "array",
+        "description": "List of depths that the corresponding tillage applications reach.",
+        "units": "mm",
+        "default": []
+      },
+      "incorporation_fractions": {
+        "type": "array",
+        "description": "List of fractions of surface pools that get incorporated into the soil during applications.",
+        "default": []
+      },
+      "mixing_fractions": {
+        "type": "array",
+        "description": "List of fractions of soil layer pools that are available to mix into other soil layers.",
+        "default": []
+      },
+      "pattern_repeat": {
+        "type": "number",
+        "description": "Number of times that this tillage schedule should be repeated.",
+        "minimum": 0,
+        "default": 0
+      },
+      "pattern_skip": {
+        "type": "number",
+        "description": "Number of years to be skipped between schedule repetitions.",
+        "minimum": 0,
+        "default": 0
+     }
     },
     "economic_properties": {
       "diesel_cost_gal": {
@@ -723,9 +729,19 @@
         "description": "Path to the crop schedule specification for this field.",
         "pattern": "*.json$"
       },
-      "field_management_specification": {
+      "fertilizer_management_specification": {
         "type": "string",
-        "description": "Path to the field management schedule specification for this field.",
+        "description": "Path to the fertilizer schedule specification for this field.",
+        "pattern": "*.json$"
+      },
+      "manure_management_specification": {
+        "type": "string",
+        "description": "Path to the manure schedule specification for this field.",
+        "pattern": "*.json$"
+      },
+      "tillage_management_specification": {
+        "type": "string",
+        "description": "Path to the tillage schedule specification for this field.",
         "pattern": "*.json$"
       },
       "field_size": {
