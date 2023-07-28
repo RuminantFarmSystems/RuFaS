@@ -19,7 +19,8 @@ class CropSpecies(Enum):
     SOYBEAN = "soybean"
     SUGAR_BEET = "sugar_beet"
     POTATO = "potato"
-    TRITICALE = "triticale"
+    TRITICALE = "durum_wheat"
+    CornSilage = "corn_silage"
 
 
 class CropSpeciesDataFactory:
