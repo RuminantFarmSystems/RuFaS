@@ -1211,5 +1211,4 @@ class Field:
         info_map = {"class": self.__class__.__name__, "function": self._record_field_watering.__name__,
                     "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size, "units": "mm"}
-        value = {"watering_amount": watering_amount}
-        om.add_variable("field_watering", value, info_map)
+        om.add_variable("field_watering", watering_amount, info_map)
