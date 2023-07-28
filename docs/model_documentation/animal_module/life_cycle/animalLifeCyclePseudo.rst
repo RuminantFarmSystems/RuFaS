@@ -231,8 +231,7 @@ information flow in lifecycle submodel, 1:1st function in the code
       average daily gain(ADG), targeting at doubling the birth weight by
       wean.*
 
-      :math:`{Bodyweight}_{i}` = :math:`{Bodyweight}_{i - 1}` + calf
-      targeted ADG
+      :math:`{Bodyweight}_{i}` = :math:`{Bodyweight}_{i - 1} +\ calf\ targeted\ ADG`
 
       Where calf targeted ADG = birth weight/wean day
 
@@ -271,7 +270,7 @@ information flow in lifecycle submodel, 1:1st function in the code
    The ADG of nonpregnant heifers is calculated based on the target
    heifer's pregnancy time and body weight.*
 
-   Nonpregnant heifer ADG = :math:`\frac{\mathbf{0.55 \times MSBW - SBW}}{\mathbf{abs}\mathbf{(}\mathbf{target\ heifer\ pregnant\ age - age}\mathbf{)}\mathbf{\ }}`
+   Nonpregnant heifer ADG = :math:`\frac{0.55 \times MSBW - SBW}{abs({target\ heifer\ pregnant\ age - age})}`
 
    Where MSBW is shrunk mature bodyweight (0.96*mature bodyweight) and
    SBW is shrunk bodyweight (0.96*bodyweight)
@@ -337,7 +336,7 @@ information flow in lifecycle submodel, 1:1st function in the code
       weight, gestation length, and days in pregnancy.*
 
       Pregnant heifer ADG =
-      :math:`\frac{\mathbf{0.82 \times MSBW - SBW}}{\mathbf{gestation\ leng}th\mathbf{\ }\mathbf{- \ days\ in\ pregnancy}}`
+      :math:`\frac{0.82 \times MSBW - SBW}{gestation\ length - \ days\ in\ pregnancy}`
 
       Where MSBW is shrunk mature bodyweight (0.96*mature bodyweight) and
       SBW is shrunk bodyweight (0.96*bodyweight)
@@ -403,9 +402,9 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       If days born >= breeding start day for heifers,
 
-      reproduction method = Heifer reproduction method
+         reproduction method = Heifer reproduction method
 
-      Pregnancy updates follow the reproduction method
+         Pregnancy updates follow the reproduction method
 
       [A.1A.C.12]
 
@@ -416,7 +415,7 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       When DIP = gestation length - prefresh day,
 
-      Third stage = True
+         Third stage = True
 
       [A.1A.C.13]
 
@@ -426,7 +425,7 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       When days born > heifer repro cull time,
 
-      Cull stage = True
+         Cull stage = True
 
       [A.1A.C.14]
 
@@ -528,7 +527,7 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       When days born = TAI program start day for heifer
 
-      Call TAI method for heifer
+         Call TAI method for heifer
 
       [A.1A.C.19]
 
@@ -591,7 +590,9 @@ information flow in lifecycle submodel, 1:1st function in the code
 
                   Else:
 
-                     synch ED stop day = synch-ED program start day + 21**
+                     synch ED stop day = synch-ED program 
+                     
+                     start day + 21
 
                      TAI start day = synch ED stop day
 
@@ -871,7 +872,7 @@ information flow in lifecycle submodel, 1:1st function in the code
 |           |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    
 +-----------+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 | Disease   | 0  |0.04|0.12|0.24|0.34|0.42|0.50|0.57|0.64|0.72|0.81|0.89|0.95| 1  |
-| DCF       |    |    |    |    |    |    |    |    |    |    |    |    |    |    |     
+| CDF       |    |    |    |    |    |    |    |    |    |    |    |    |    |    |     
 +-----------+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
 | Udder CDF | 0  |0.12|0.24|0.33|0.41|0.48|0.55|0.62|0.68|0.76|0.82|0.89|0.95| 1  |
 |           |    |    |    |    |    |    |    |    |    |    |    |    |    |    |     
@@ -893,7 +894,7 @@ information flow in lifecycle submodel, 1:1st function in the code
       happens, pregnancy terminates, lactations start, and the estrus cycle
       restarts.*
 
-      When preg = True* and days in preg = gestation length,
+      When preg = True and days in preg = gestation length,
 
          Calves += 1
 
@@ -929,8 +930,9 @@ information flow in lifecycle submodel, 1:1st function in the code
       heifers. The BW change due to tissue mobilization is modeled with a
       parametric equation of DIM.*
 
-      :math:`{Bodyweight}_{{i}}` =
-      :math:`{Bodyweight}_{{i - 1}}` + average daily gain + conceptus growth + lactation body weight change
+     | :math:`Bodyweight_{i} = Bodyweight_{i - 1} + average\ daily\ gain\ `
+      
+                  | :math:`+\ conceptus\ growth\ + lactation\ body\ weight\ change`
 
       [A.1A.C.33]
 
@@ -1192,6 +1194,9 @@ information flow in lifecycle submodel, 1:1st function in the code
       **5.3.5.2 TAI after Pregnancy Check:**
 
          |image14|
+      
+         | Tai program start day for cow = abortion day +1
+         | Conception rate -= conception rate decrease
 
       **5.3.5.3 TAI before Pregnancy Check:**
 
@@ -1235,7 +1240,7 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       When days born = AI day:
 
-         If RandomUni** < conception rate: Preg = True
+         If RandomUni < conception rate: Preg = True
 
             Days in preg = 1
 
@@ -1477,7 +1482,7 @@ information flow in lifecycle submodel, 1:1st function in the code
 
       Where :math:`total\ conceptus\ weight\  = 0.0148 \times gestation\ length\  - \ 2.408 \times calf\ birth\ weight`
 
-      :math:`conceptus\ parameter\  = \ {total\ conceptus\ weight}^{1/3}/gestation\ length\  - \ 50`
+      :math:`conceptus\ parameter\  = \ {total\ conceptus\ weight}^{1/3} / gestation\ length\  - \ 50`
 
       [A.1A.C.57]
 
@@ -1649,6 +1654,10 @@ information flow in lifecycle submodel, 1:1st function in the code
       the market.
 
       [A.1A.E.2]
+
+Updates to Functionality:
+
+- :ref:`Update-method-of-maintaining-herd-size`
 
 .. |image5| image:: ../media/lcimage5.png 
 .. |image6| image:: ../media/lcimage6.png
