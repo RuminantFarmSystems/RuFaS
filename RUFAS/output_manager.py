@@ -342,7 +342,7 @@ class OutputManager(object):
                     column_list.append((column_title, pd.Series(csv_column_lists[subkey], dtype=object)))
             else:
                 column_list.append((field, pd.Series(data_dict[field], dtype=object)))
-            
+
         return column_list
 
     def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str, exclude_info_maps: bool) -> None:

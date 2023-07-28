@@ -357,33 +357,38 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     ({"var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}},
      f"values,info_maps_map1{os.linesep}1,value1{os.linesep},value2{os.linesep}",
      False, True),
-    ({"var1": {"values": [{'v1': 1, 'v2': 1}, {'v1': 2, 'v2': 2}], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]}},
+    ({"var1":
+      {
+        "values": [{'v1': 1, 'v2': 1}, {'v1': 2, 'v2': 2}],
+        "info_maps": [{"map1": "value1"}, {"map1": "value2"}]
+      }
+      },
      f"v1,v2,info_maps_map1{os.linesep}1,1,value1{os.linesep}2,2,value2{os.linesep}",
      False, True),
     ({
         "simple_key": {
-        "values": [{"key1": 1, "key2": [1, 1]}, {"key1": 2, "key2": [2,2]}, {"key1": 3, "key2": [3,3]}],
-         "info_maps": [
-            {
-                "subkey1": 1,
-                "subkey2": "Hello",
-                "subkey3": [1, 2, 3],
-                "subkey4": {
-                    "nestedkey1": "World",
-                    "nestedkey2": [4, 5, 6]
+            "values": [{"key1": 1, "key2": [1, 1]}, {"key1": 2, "key2": [2, 2]}, {"key1": 3, "key2": [3, 3]}],
+            "info_maps": [
+                {
+                    "subkey1": 1,
+                    "subkey2": "Hello",
+                    "subkey3": [1, 2, 3],
+                    "subkey4": {
+                        "nestedkey1": "World",
+                        "nestedkey2": [4, 5, 6]
+                    }
+                },
+                {
+                    "subkey1": 2,
+                    "subkey2": "Hi",
+                    "subkey3": [4, 5, 6],
+                    "subkey4": {
+                        "nestedkey1": "There",
+                        "nestedkey2": [7, 8, 9]
+                    }
                 }
-            },
-            {
-                "subkey1": 2,
-                "subkey2": "Hi",
-                "subkey3": [4, 5, 6],
-                "subkey4": {
-                    "nestedkey1": "There",
-                    "nestedkey2": [7, 8, 9]
-                }
-            }
             ]
-        }   
+        }
     },
      """key1,key2,info_maps_subkey1,info_maps_subkey2,info_maps_subkey3,info_maps_subkey4
 1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}\"
