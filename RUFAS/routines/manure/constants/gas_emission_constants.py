@@ -123,7 +123,7 @@ class GasEmissionConstants:
     """Housing specific constant for liquid manure (s/m)."""
 
     SOLID_MANURE_THRESHOLD = 8.0
-    """Dry matter threshold for classifying solid and semi-solid manure."""
+    """Dry matter threshold for classifying solid and semi-solid manure (unitless)."""
 
     SLURRY_MANURE_THRESHOLD = 5.0
-    """Dry matter threshold for classifying slurry manure."""
+    """Dry matter threshold for classifying slurry manure (unitless)."""
