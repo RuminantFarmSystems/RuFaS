@@ -27,5 +27,13 @@
             "initial_dry_matter": 0
         }
 
-    }
+    },
+    "user_defined_ration_percentages": {
+        "calf": {},
+        "growing_heifers": {},
+        "close_up": {},
+        "cow_lactating": {},
+    "tolerance": 0.0,
+    "milk_reduction_percent": 0.0
+}
 }

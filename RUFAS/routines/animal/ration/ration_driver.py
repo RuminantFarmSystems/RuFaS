@@ -270,7 +270,6 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
 
             # if reduction limit reached, break and use fixed ration
             if average_running_milk < starting_milk_average - udrv.milk_reduction_percent*starting_milk_average or \
-
                average_running_milk < 1.0:
                 fixed_ration = True
                 solution.success = True
