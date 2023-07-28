@@ -1223,3 +1223,15 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
         assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
     elif interval < 0:
         assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)
+
+
+@pytest.mark.parametrize("annual_irrigation_water_use_total,expected", [
+    (1500, 0),
+    (063.25,  0),
+    (0, 0)
+])
+def test_field_data_perform_annual_field_reset(annual_irrigation_water_use_total: float, expected: float) -> None:
+    """Tests that annual variable was reset correctly."""
+    data = FieldData(annual_irrigation_water_use_total=annual_irrigation_water_use_total)
+    data.perform_annual_field_reset()
+    assert expected == data.annual_irrigation_water_use_total
