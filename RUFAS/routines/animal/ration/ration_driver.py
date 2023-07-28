@@ -133,7 +133,7 @@ def find_failed_constraints(solution_x: npt.NDArray, constraints: List[dict[str,
 def ration_formulation(pen, available_feeds, animal_grouping_scenario):
     """
     Function that links the ration_driver file with the calc_ration function in
-    pen.py. Returns a dictionary of the rations by feed and status of the NLP
+    animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
     optimization.
 
     Args:
