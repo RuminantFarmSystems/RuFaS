@@ -546,14 +546,14 @@ def anim_manag_modifier(inputJSONs_to_modify, s):
         cutoff = json_to_print.find('/')
         jsonname = json_to_print[cutoff+1:]
         if inputJSON == 'animal/animal_management_animal.json':
-            json_object['farm']['animal'] = jsonname
+            json_object['farm']['animal'] = 'sensitivity/' + jsonname
         elif jsonname == 'feed/purchased_feed.json':
-            json_object['farm']['feed'] = jsonname
+            json_object['farm']['feed'] = 'sensitivity/' + jsonname
         elif jsonname == 'manure/manure_management.json':
-            json_object['farm']['manure'] = jsonname
+            json_object['farm']['manure'] = 'sensitivity/' + jsonname
         else:
             pass
-    json_object['output'] = 'life_cycle_report_' + str(s).zfill(5) + '.json'
+    #json_object['output'] = 'sensitivity/life_cycle_report_' + str(s).zfill(5) + '.json'
     if not os.path.exists('input\\sensitivity\\'):
         os.mkdir('input\\sensitivity\\')
     anim_manag_tomodify = str(os.getcwd() + '\input\\sensitivity\\' + 'animal_management' + '_' +  str(s).zfill(5) + '.json')
