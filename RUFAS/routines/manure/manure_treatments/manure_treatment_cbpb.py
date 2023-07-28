@@ -29,7 +29,7 @@ class CompostBeddedPackBarn(BaseManureTreatment):
 
         super().__init__(weather, time, manure_treatment_config)
       
-    def calc_bedding_potassium_content(
+    def _calc_bedding_potassium_content(
         self,
         current_manure_bedding_mix_potassium: float,
         additional_potassium_in_manure: float,
