@@ -17,7 +17,8 @@ from dataclasses import asdict
     ("soybean", CropSpecies.SOYBEAN),
     ("sugar_beet", CropSpecies.SUGAR_BEET),
     ("potato", CropSpecies.POTATO),
-    ("triticale", CropSpecies.TRITICALE),
+    ("durum_wheat", CropSpecies.TRITICALE),
+    ("corn_silage", CropSpecies.CornSilage)
 ])
 def test_crop_species_enum(species, expected):
     """ensure that CropSpecies correctly enumerates the accepted species names"""
