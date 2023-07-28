@@ -1,7 +1,7 @@
 # !/usr/bin/env python3
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import datetime
 import json
 import os
@@ -308,36 +308,76 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str) -> None:
+    def _dict_to_csv_column_list(self, data_dict: Dict[str, List[Any]], mandatory_fields: List[str]
+                                 ) -> List[Tuple[str, pd.Series]]:
+        """Turns a dictionary to a list of csv columns.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, List[Any]]
+            The dictionary to read from
+
+        mandatory_fields : List[str]
+            which fields of the data_dict to include in the csv columns
+
+        Returns
+        -------
+        List[Tuple[str, pd.Series]]
+            A list of (column_name, column_data) tuples.
+
+        """
+        column_list = []
+        for field in mandatory_fields:
+            data_list = data_dict[field]
+            if len(data_list) != 0 and isinstance(data_list[0], dict):
+                csv_column_lists: Dict[str, List[Any]] = {}
+                for data_dictionary in data_list:
+                    for subkey, value in data_dictionary.items():
+                        if subkey in csv_column_lists:
+                            csv_column_lists[subkey].append(value)
+                        else:
+                            csv_column_lists[subkey] = [value]
+                for subkey in csv_column_lists.keys():
+                    column_title = f"{field}_{subkey}" if field == "info_maps" else subkey
+                    column_list.append((column_title, pd.Series(csv_column_lists[subkey], dtype=object)))
+            else:
+                column_list.append((field, pd.Series(data_dict[field], dtype=object)))
+            
+        return column_list
+
+    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str, exclude_info_maps: bool) -> None:
         """Saves a dictionary to a csv file.
 
         Parameters
         ----------
         data_dict : Dict[str, Any]
             The dictionary to be saved
+
         path : str
             The path to the file to be saved
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to include info_maps data in their results files.
 
         Raises
         ------
         Exception
             If an error occurs while writting to the file
+
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self._dict_to_file_csv.__name__,
                     }
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
 
-        if all("values" not in v for v in data_dict.values()):
-            self.add_error("save_dict_file_try", f"Unable to save {path} due to missing values.", info_map)
+        if len(data_dict) == 0:
             return
 
-        value = data_dict[next(iter(data_dict))]
-        if isinstance(value["values"][0], dict):
-            df = pd.DataFrame(value['values'], dtype=object)
-        else:
-            df = pd.DataFrame({k: pd.Series(v['values'], dtype=object) for k, v in data_dict.items()})
+        mandatory_fields = ["values"] if exclude_info_maps else ["values", "info_maps"]
+        (_, variable_data), = data_dict.items()
+        csv_column_data = self._dict_to_csv_column_list(variable_data, mandatory_fields)
 
+        df = pd.DataFrame(dict(csv_column_data))
         try:
             df.to_csv(path, index=False)
         except Exception as e:
@@ -525,7 +565,7 @@ class OutputManager(object):
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
             self._dict_to_file_json(filtered_pool, file_path)
 
-    def save_variables_to_csv_files(self, path: str) -> None:
+    def save_variables_to_csv_files(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves the variables_pool into one csv file per variable in the given path to a directory.
 
@@ -533,6 +573,9 @@ class OutputManager(object):
         ----------
         path : str
             Path to the output directory for the OutputManager.
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to include info_maps data in their results files.
 
         """
         pool = self.variables_pool
@@ -542,8 +585,8 @@ class OutputManager(object):
             raise e
 
         for key in pool.keys():
-            csv_file_path = os.path.join(path, self._generate_file_name(key, "csv"))
-            self._dict_to_file_csv({key: pool[key]}, csv_file_path)
+            variable_csv_file_path = os.path.join(path, self._generate_file_name(key, "csv"))
+            self._dict_to_file_csv({key: pool[key]}, variable_csv_file_path, exclude_info_maps)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
@@ -667,7 +710,7 @@ class OutputManager(object):
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
-        self.save_variables_to_csv_files(str(Path(path) / "CSVs" / "om" / "variables"))
+        self.save_variables_to_csv_files(str(Path(path) / "CSVs" / "om" / "variables"), exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)

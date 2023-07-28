@@ -23,7 +23,18 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_SEPARATOR = 'screw press'
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
 
-    DMI_CONSTRAINT_PERCENT = 0.20
-
     DAILY_MILK_VARIATION_MEAN = 0
+    """Mean of the daily milk production variation from the estimated milk production, kg/day"""
     DAILY_MILK_VARIATION_STD_DEV = 1.0
+    """Standard deviation of the daily milk production variation from the estimated milk production, kg/day"""
+
+    DMI_CONSTRAINT_PERCENT = 0.20
+    """The +/- percentage of DMI estimated allowed for ration formulation"""
+    MINIMUM_DMI = 1.0
+    """Minimum estimated DMI instituted for all animals, kg/day"""
+    MINIMUM_DMI_PERCENTAGE = 0.01
+    """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
+    MINIMUM_PHOSPHORUS = 0.0
+    """Minimum phosphorus estimate, g/day"""
+    MINIMUM_CALCIUM = 0.0
+    """Minimum calcium estimate, g/day"""
