@@ -33,10 +33,10 @@ def main_loop(target_input):
     return(target_input)
 
 start = 0
-stop = 160
+stop = 1280
 
 a = Parallel(n_jobs=6)(delayed(main_loop)(
     'input/sensitivity/animal_management_' + str(i).zfill(5) + '.json'
     ) for i in range(start,stop))
 
-main_loop('input/sensitivity/animal_management_00042.json')
+# main_loop('input/sensitivity/animal_management_00042.json')
