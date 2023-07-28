@@ -65,8 +65,7 @@ dry_cow_manure_excretion.py
 
 -  urine_urea_conc: urinary urea N concentration (g N/L)
 
--  total_ammonical_n_conc: total ammoniacal N concentration in slurry (g
-      N/L)
+-  total_ammonical_n_conc: total ammoniacal N concentration in slurry (g N/L)
 
 (1) **Calf Manure Excretion:** Equations for manure production specific to calves.
 
@@ -116,7 +115,7 @@ dry_cow_manure_excretion.py
 
       **Non-degradable volatile solids excretion (kg/d)**
 
-         :math:`non\_ degradable\_ volatile\_ solids = total\_ volatile\_ solids\  - degradable\_ volatile\_ solids\ `
+         :math:`non\_ degradable\_ volatile\_ solids = total\_ volatile\_ solids\  - degradable\_ volatile\_ solids`
 
             [A.3A.A.6]
 
@@ -220,7 +219,7 @@ dry_cow_manure_excretion.py
 
       **Non-degradable volatile solids excretion (kg/d)**
 
-         :math:`non\_ degradable\_ volatile\_ solids = total\_ volatile\_ solids\  - degradable\_ volatile\_ solids\ `
+         :math:`non\_ degradable\_ volatile\_ solids = total\_ volatile\_ solids\  - degradable\_ volatile\_ solids`
 
             [A.3A.A.6]
 
@@ -296,7 +295,9 @@ dry_cow_manure_excretion.py
       Gross energy in the diet is calculated from diet nutrient composition
       (Moraes et al. 2014).
 
-         :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\ conc\  + \ 0.522\  \times EE\ conc\  + \ 0.198\  \times NDF\ conc\  + \ 0.160\  \times soluble\ residue\ `
+         :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\ conc\  + \ 0.522\  \times EE\ conc`
+                  
+            | :math:`+ \ 0.198\  \times NDF\ conc\  + \ 0.160\  \times soluble\ residue`
 
             [A.3B.C.2]
 
@@ -327,7 +328,9 @@ dry_cow_manure_excretion.py
 
       **Fecal water (kg/d):** Calculate the amount of fecal water excreted (kg/d)
 
-         :math:`fecal\_ water = 1.987 \times dm\_ intake + 0.348 \times adf\_ conc - 0.412 \times cp\_ conc - 0.074 \times dm\_ conc - 0.0057 \times days\_ milk` (Appuhamy et al., 2014)
+         :math:`fecal\_ water = 1.987 \times dm\_ intake + 0.348 \times adf\_ conc - 0.412` 
+               
+               | :math:`\times cp\_ conc - 0.074 \times dm\_ conc - 0.0057 \times days\_ milk` (Appuhamy et al., 2014)
 
             [A.3E.A.1]
 
@@ -349,7 +352,7 @@ dry_cow_manure_excretion.py
 
          :math:`fecal\ solids = - 0.576 + 0.370 \times dm\_ intake + 0.059 \times adf\_ conc`
 
-            :math:`- 0.075 \times cp\_ conc`\ (Appuhamy et al., 2014)
+            :math:`- 0.075 \times cp\_ conc` (Appuhamy et al., 2014)
 
             [A.3E.A.2]
 
@@ -404,7 +407,9 @@ dry_cow_manure_excretion.py
 
       **Degradable volatile solids (kg/d)**
 
-         :math:`degradable\_ volatile\_ solids = - 1.017 + 0.364 \times om\ intake + 0.029 \times ndf\_ conc - 0.023 \times cp\_ conc\ `\ (Appuhamy et al., 2018)
+         :math:`degradable\_ volatile\_ solids = - 1.017 + 0.364 \times om\ intake + 0.029`
+         
+            | :math:`\times ndf\_ conc - 0.023 \times cp\_ conc` (Appuhamy et al., 2018)
 
             [A.3E.A.5]
 
@@ -418,7 +423,9 @@ dry_cow_manure_excretion.py
 
       **Total volatile solids excreted by a lactating cow (kg/d)**
 
-         :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036 \times ndf\_ conc - 0.024 \times cp\_ conc\ ` (Appuhamy et al., 2018)
+         :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036 \times ndf\_ conc`
+         
+            | :math:`- 0.024 \times cp\_ conc` (Appuhamy et al., 2018)
 
             [A.3E.A.6]
 
@@ -442,7 +449,9 @@ dry_cow_manure_excretion.py
 
       **Total manure nitrogen (kg/d)**
 
-         :math:`N\_ manure\  = \ (20.3\  + \ 0.654\  \times \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})/1000\ (Reed\ et\ al.,\ 2015)`
+         :math:`N\_ manure\  = \ (20.3\  + \ 0.654\  \times \ (dm\_ intake\  \times \ 1000)`
+         
+            | :math:`\times \ \frac{cp\_ conc/6.25}{100}) / 1000` (Reed et al., 2015)
 
             [A.3E.B.1]
 
@@ -454,7 +463,9 @@ dry_cow_manure_excretion.py
 
             Urinary nitrogen (kg/d)
 
-         :math:`N\_ urine = (12.0\  + \ 0.333\  \times \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})/1000\ (Reed\ et\ al.,\ 2015)`
+         :math:`N\_ urine = (12.0\  + \ 0.333\  \times \ (dm\_ intake\  \times \ 1000)`
+         
+            | :math:`\times \ \frac{cp\_ conc/6.25}{100}) / 1000` (Reed et al., 2015)
 
             [A.3E.B.2]
 
@@ -496,7 +507,9 @@ dry_cow_manure_excretion.py
       user has an input option to select which methane model they want to
       use for methane emissions calculations. Mutian (Dairy cows, US Animal Model)
 
-      :math:`methane\_ emis\  = \  - 126\  + \ 11.3\  \times \ dm\_ intake\  + 2.30\  \times \ ndf\_ conc\  + 28.8\  \times \ milk\_ fat\  + \ 0.148\  \times \ bw`
+      :math:`methane\_ emis\  = \  - 126\  + \ 11.3\  \times \ dm\_ intake\  + 2.30\  \times \ ndf\_ conc\  + 28.8`
+      
+         | :math:`\times \ milk\_ fat\  + \ 0.148\  \times \ bw`
 
       [A.3E.C.1]
 
@@ -516,7 +529,9 @@ dry_cow_manure_excretion.py
       nonlinear model of methane emissions. The CNCPS and IFSM models use
       the Mitscherlich 3 equation.
 
-      :math:`methane\ emis\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{adf\_ conc})\  + \ 0.0045\rbrack \times \ me\_ intake\  \times 4.184))/0.05565`
+      :math:`methane\ emis\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{adf\_ conc})\  + \ 0.0045\rbrack`
+      
+         | :math:`\times \ me\_ intake\  \times 4.184)) / 0.05565`
 
          [A.3E.C.2]
 
@@ -535,7 +550,9 @@ dry_cow_manure_excretion.py
       the diet is calculated from diet nutrient composition (Moraes et al.
       2014).
 
-      :math:`gross\ energy\ conc\  = \ 0.263\  \times cp\ conc\  + \ 0.522\  \times ee\ conc\  + \ 0.198\  \times ndf\ conc\  + \ 0.160\  \times soluble\ residue\ `
+      :math:`gross\ energy\ conc\  = \ 0.263\  \times cp\ conc\  + \ 0.522\  \times ee\ conc\  + \ 0.198`
+      
+         | :math:`\times ndf\ conc\  + \ 0.160\  \times soluble\ residue`
 
          [A.3B.C.2]
 
@@ -598,10 +615,10 @@ dry_cow_manure_excretion.py
             dm intake = dry matter intake (kg)
 
       **Total and degradable volatile solids (kg/d)**
-      **Amount of total and degradable volatile solids excreted by dry cows (kg/d).**
-      Equations for lactating cows (Appuhamy et al., 2018) are used for dry
-      cows because the range of intake covers that is typically seen in dry
-      cows.
+
+         - Amount of total and degradable volatile solids excreted by dry cows (kg/d).
+         - Equations for lactating cows (Appuhamy et al., 2018) are used for dry
+           cows because the range of intake covers that is typically seen in dry cows.
 
       **Organic matter intake (kg/d):** Estimate Organic matter intake (kg/d) as a required input:
 
@@ -617,7 +634,9 @@ dry_cow_manure_excretion.py
 
       **Degradable volatile solids (kg/d)**
 
-         :math:`degradable\_ volatile\_ solids = - 1.017 + 0.364 \times om\ intake + 0.029 \times ndf\_ conc - 0.023 \times cp\_ conc\ `\ (Appuhamy et al., 2018)
+         :math:`degradable\_ volatile\_ solids = - 1.017 + 0.364 \times om\ intake + 0.029`
+         
+            | :math:`\times ndf\_ conc - 0.023 \times cp\_ conc` (Appuhamy et al., 2018)
 
             [A.3E.A.5]
 
@@ -631,7 +650,9 @@ dry_cow_manure_excretion.py
 
       **Total volatile solids (kg/d)**
 
-         :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036 \times ndf\_ conc - 0.024 \times cp\_ conc\ ` (Appuhamy et al., 2018)
+         :math:`total\_ volatile\_ solids = \  - 1.201 + 0.402 \times om\_ intake + 0.036`
+         
+            | :math:`\times ndf\_ conc - 0.024 \times cp\_ conc` (Appuhamy et al., 2018)
 
             [A.3E.A.6]
 
@@ -642,6 +663,7 @@ dry_cow_manure_excretion.py
             ndf conc = neutral detergent fiber concentration (%)
 
             cp conc = crude protein concentration (%)
+
       **Non-degradable volatile solids excretion (kg/d)**
 
          :math:`non\_ degradable\_ volatile\_ solids = total\_ volatile\_ solids\  - degradable\_ volatile\_ solids\ `
@@ -653,7 +675,9 @@ dry_cow_manure_excretion.py
       **Manure N excretion (kg/d):** Amount of nitrogen excreted by a dry cow (kg/d). This is the same
       equation used for heifers.
 
-         :math:`N\_ manure = (15.1 + 0.83\  \times \ \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000` (Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
+         :math:`N\_ manure = (15.1 + 0.83\  \times \ \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000` 
+         
+         (Reed et al., 2015; Johnson et al., 2016; NASEM, 2021)
 
             [A.3B.B.1]
 
@@ -665,7 +689,9 @@ dry_cow_manure_excretion.py
 
       **Urine N excretion (kg/d):** Amount of urine nitrogen excreted by a dry cow (kg/d).
 
-         :math:`N\_ urine = (14.3 + 0.510 \times \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000` (Reed et al., 2015)
+         :math:`N\_ urine = (14.3 + 0.510 \times \ (dm\_ intake\  \times \ 1000) \times \ \frac{cp\_ conc/6.25}{100})\ /\ 1000` 
+         
+         (Reed et al., 2015)
 
             [A.3B.B.2]
 
@@ -684,6 +710,7 @@ dry_cow_manure_excretion.py
             N feces = amount of nitrogen excreted in feces (kg/d)
 
       **Manure K excretion (g/d)**
+
       **Amount of potassium excreted by a dry cow (g/d).**
 
          :math:`K\_ manure = 1000\  \times \ dm\_ intake \times \ \frac{K\_ conc}{100}` (ASABE, 2005)
@@ -708,11 +735,11 @@ dry_cow_manure_excretion.py
       nonlinear model of methane emissions. The CNCPS and IFSM models use
       the Mitscherlich 3 equation.
 
-+-----------------------------------------------------------------------+
-| :math:`methane\ emis\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( -| 
-| 0.0011 \times \frac{starch\_ conc}{adf\_ conc})\  + \ 0.0045\rbrack   |
-| \times \ me\_ intake\  \times 4.184))/0.05565`                        |
-+-----------------------------------------------------------------------+
+
+      :math:`methane\ emis\  = (45.98\  - \ 45.98\  \times exp( - \lbrack( - 0.0011 \times \frac{starch\_ conc}{adf\_ conc})\  + \ 0.0045\rbrack`
+
+         | :math:`\times \ me\_ intake\  \times 4.184))/0.05565`
+
 
       [A.3E.C.2]
 
@@ -731,11 +758,9 @@ dry_cow_manure_excretion.py
 
       Gross energy in the diet is calculated from diet nutrient composition (Moraes et al. 2014).
 
-+-----------------------------------------------------------------------+
-| :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\ conc\  + \ 0.522\ |
-|  \times EE\ conc\  + \ 0.198\  \times NDF\ conc\  + \ 0.160\  \times  |
-| soluble\ residue\ `                                                   |
-+-----------------------------------------------------------------------+
+      :math:`gross\ energy\ conc\  = \ 0.263\  \times CP\ conc\  + \ 0.522 \times EE\ conc\  + \ 0.198\  \times NDF\ conc` 
+         
+         | :math:`+ \ 0.160 \times soluble\ residue`   
 
       [A.3B.C.2]
 
@@ -820,64 +845,63 @@ dry_cow_manure_excretion.py
 **References**
 
 Appuhamy, J. A. D. R. N., L. E. Moraes, C. Wagner-Riddle, D. P. Casper,
-J. France, and E. Kebreab. 2014. Development of mathematical models to
-predict volume and nutrient composition of fresh manure from lactating
-Holstein cows. Animal Production Science 54(12).
+   J.France, and E. Kebreab. 2014. Development of mathematical models to
+   predict volume and nutrient composition of fresh manure from lactating
+   Holstein cows. Animal Production Science 54(12).
 
 Appuhamy, J. A. D. R. N., Moraes, L. E., Wagner-Riddle, C., Casper, D.
-P., & Kebreab, E. (2018). Predicting manure volatile solid output of
-lactating dairy cows. Journal of dairy science, 101(1), 820-829.
+   P., & Kebreab, E. (2018). Predicting manure volatile solid output of
+   lactating dairy cows. Journal of dairy science, 101(1), 820-829.
 
 ASABE. 2005. Manure Production and Characteristics. Pages 1-32. ASABE,
-ed. ASABE, St. Joseph, MN.
+   ed. ASABE, St. Joseph, MN.
 
-A. Bannink, H. Valk, A.M. Van Vuuren. Intake and excretion of sodium,
-potassium, and nitrogen and the effects on urine production by lactating
-dairy cows. Journal of Dairy Science, 82 (1999), pp. 1008-1018
+A.Bannink, H. Valk, A.M. Van Vuuren. Intake and excretion of sodium,
+   potassium, and nitrogen and the effects on urine production by lactating
+   dairy cows. Journal of Dairy Science, 82 (1999), pp. 1008-1018
 
-D. Boadi, C. Benchaar, J. Chiquette, and D. Massé. Mitigation strategies
-to reduce enteric methane emissions from dairy cows: Update review.
-*Canadian Journal of Animal Science*. **84**\ (3): 319-335.
-https://doi.org/10.4141/A03-109
+D.Boadi, C. Benchaar, J. Chiquette, and D. Massé. Mitigation strategies
+   to reduce enteric methane emissions from dairy cows: Update review.
+   *Canadian Journal of Animal Science*. **84**\ (3): 319-335.
+   https://doi.org/10.4141/A03-109
 
 de Boer IJ, Smits MC, Mollenhorst H, van Duinkerken G, Monteny GJ.
-Prediction of ammonia emission from dairy barns using feed
-characteristics part 1: Relation between feed characteristics and
-urinary urea concentration. J Dairy Sci. 2002 Dec;85(12):3382-8. doi:
-10.3168/jds.s0022-0302(02)74425-1. PMID: 12512610.
+   Prediction of ammonia emission from dairy barns using feed
+   characteristics part 1: Relation between feed characteristics and
+   urinary urea concentration. J Dairy Sci. 2002 Dec;85(12):3382-8. doi:
+   10.3168/jds.s0022-0302(02)74425-1. PMID: 12512610.
 
 Johnson ACB, Reed KF, Kebreab E. Short communication: Evaluation of
-nitrogen excretion equations from cattle. J Dairy Sci. 2016
-Sep;99(9):7669-7678. doi: 10.3168/jds.2015-10730. Epub 2016 Jun 16.
-PMID: 27320670.
+   nitrogen excretion equations from cattle. J Dairy Sci. 2016
+   Sep;99(9):7669-7678. doi: 10.3168/jds.2015-10730. Epub 2016 Jun 16.
+   PMID: 27320670.
 
-J. A. N. Mills, E. Kebreab, C. M. Yates, L. A. Crompton, S. B. Cammell,
-M. S. Dhanoa, R. E. Agnew, J. France, Alternative approaches to
-predicting methane emissions from dairy cows, *Journal of Animal
-Science*, Volume 81, Issue 12, December 2003, Pages 3141–3150,
-https://doi.org/10.2527/2003.81123141x
+J.A. N. Mills, E. Kebreab, C. M. Yates, L. A. Crompton, S. B. Cammell,
+   M.S. Dhanoa, R. E. Agnew, J. France, Alternative approaches to
+   predicting methane emissions from dairy cows, *Journal of Animal
+   Science*, Volume 81, Issue 12, December 2003, Pages 3141–3150,
+   https://doi.org/10.2527/2003.81123141x
 
 Moraes, L.E., Strathe, A.B., Fadel, J.G., Casper, D.P. and Kebreab, E.
-(2014), Prediction of enteric methane emissions from cattle. Glob Change
-Biol, 20: 2140-2148. https://doi.org/10.1111/gcb.12471
+   (2014), Prediction of enteric methane emissions from cattle. Glob Change
+   Biol, 20: 2140-2148. https://doi.org/10.1111/gcb.12471
 
 Monteny GJ, Smits MC, van Duinkerken G, Mollenhorst H, de Boer IJ.
-Prediction of ammonia emission from dairy barns using feed
-characteristics part II: Relation between urinary urea concentration and
-ammonia emission. J Dairy Sci. 2002 Dec;85(12):3389-94. doi:
-10.3168/jds.S0022-0302(02)74426-3. PMID: 12512611.
+   Prediction of ammonia emission from dairy barns using feed
+   characteristics part II: Relation between urinary urea concentration and
+   ammonia emission. J Dairy Sci. 2002 Dec;85(12):3389-94. doi:
+   10.3168/jds.S0022-0302(02)74426-3. PMID: 12512611.
 
 Nennich TD, Harrison JH, VanWieringen LM, Meyer D, Heinrichs AJ, Weiss
-WP, St-Pierre NR, Kincaid RL, Davidson DL, Block E. Prediction of manure
-and nutrient excretion from dairy cattle. J Dairy Sci. 2005
-Oct;88(10):3721-33. doi: 10.3168/jds.S0022-0302(05)73058-7. PMID:
-16162547.
+   WP, St-Pierre NR, Kincaid RL, Davidson DL, Block E. Prediction of manure
+   and nutrient excretion from dairy cattle. J Dairy Sci. 2005
+   Oct;88(10):3721-33. doi: 10.3168/jds.S0022-0302(05)73058-7. PMID:16162547.
 
 Niu, M, Kebreab, E, Hristov, AN, et al. Prediction of enteric methane
-production, yield, and intensity in dairy cattle using an
-intercontinental database. *Glob Change Biol*. 2018; 24: 3368– 3389.
-https://doi.org/10.1111/gcb.14094
+   production, yield, and intensity in dairy cattle using an
+   intercontinental database. *Glob Change Biol*. 2018; 24: 3368– 3389.
+   https://doi.org/10.1111/gcb.14094
 
 Reed, K. F., Moraes, L. E., Casper, D. P., & Kebreab, E. (2015).
-Predicting nitrogen excretion from cattle. Journal of dairy science,
-98(5), 3025-3035.
+   Predicting nitrogen excretion from cattle. Journal of dairy science,
+   98(5), 3025-3035.
