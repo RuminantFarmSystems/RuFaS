@@ -922,13 +922,7 @@ class Field:
 
         """
         # Old method that uses hard coded irrigation amount from the weather data
-        if self.field_data.watering_occurs and irrigation > 0:
-            raise ValueError("Expected to use hardcoded irrigation data or specified amount, but tried to use both")
-        elif not self.field_data.watering_occurs and irrigation > 0:
-            self.field_data.annual_irrigation_water_use_total += irrigation
-            self._record_field_watering(year=year, day=day, watering_amount=irrigation)
-            return irrigation
-        elif self.field_data.watering_occurs and irrigation == 0:
+        if self.field_data.watering_occurs:
             self.field_data.current_water_deficit -= rainfall
             self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
 
@@ -941,6 +935,10 @@ class Field:
                 return water_applied_this_interval
             self.field_data.days_into_watering_interval += 1
             return 0.0
+        elif not self.field_data.watering_occurs and irrigation > 0:
+            self.field_data.annual_irrigation_water_use_total += irrigation
+            self._record_field_watering(year=year, day=day, watering_amount=irrigation)
+            return irrigation
         else:
             return 0.0
 

@@ -925,21 +925,20 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
             assert crop_2.data.cumulative_potential_evapotranspiration == 0
 
 
-@pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,should_fail,old_method",
+@pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,old_method",
                          [
-                             (3.4, 3, 1.5, False, 0, False, False),  # No watering because water_occurs is False
-                             (3.1, 5, 2.3, True, 0, False, False),
+                             (3.4, 3, 1.5, False, 0, False),  # No watering because water_occurs is False
+                             (3.1, 5, 2.3, True, 0, False),
                              # No watering because rainfall takes care of watering
-                             (0.2, 5, 3.6, True, 0, False, False),
+                             (0.2, 5, 3.6, True, 0, False),
                              # Watering occurs because water deficit has not been met
-                             (0.19, 4, 2.8, True, 0, False, False),
+                             (0.19, 4, 2.8, True, 0, False),
                              # No watering occurs because interval has not been met
-                             (0.2, 5, 3.6, True, 9.24, True, False),
-                             (0.2, 5, 3.6, False, 77.7, False, True)
+                             (0.2, 5, 3.6, True, 9.24, False),
+                             (0.2, 5, 3.6, False, 77.7, True)
                          ])
 def test_determine_watering_amount(rainfall: float, days_into_interval: int, water_deficit: float,
-                                   watering_occurs: float, irrigation: float, should_fail: bool,
-                                   old_method: bool) -> None:
+                                   watering_occurs: float, irrigation: float, old_method: bool) -> None:
     """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
         totals are updated correctly."""
     mocked_time = MagicMock(Time)
@@ -952,29 +951,24 @@ def test_determine_watering_amount(rainfall: float, days_into_interval: int, wat
     data.current_water_deficit = water_deficit
     incorp = Field(field_data=data, manure_manager=MagicMock(ManureManager))
 
-    if should_fail:
-        with pytest.raises(ValueError) as e:
-            incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
-            assert str(e) == "Expected to use hardcoded irrigation data or specified amount, but tried to use both"
+    actual = incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
+    if old_method:
+        assert actual == irrigation
     else:
-        actual = incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
-        if old_method:
-            assert actual == irrigation
+        if not watering_occurs:
+            assert actual == 0.0
+            assert incorp.field_data.days_into_watering_interval == days_into_interval
+            assert incorp.field_data.annual_irrigation_water_use_total == 0
+        elif days_into_interval == incorp.field_data.watering_interval:
+            assert actual == max(0.0, water_deficit - rainfall)
+            assert incorp.field_data.days_into_watering_interval == 0
+            assert incorp.field_data.current_water_deficit == 5.0
+            assert incorp.field_data.annual_irrigation_water_use_total == actual
         else:
-            if not watering_occurs:
-                assert actual == 0.0
-                assert incorp.field_data.days_into_watering_interval == days_into_interval
-                assert incorp.field_data.annual_irrigation_water_use_total == 0
-            elif days_into_interval == incorp.field_data.watering_interval:
-                assert actual == max(0.0, water_deficit - rainfall)
-                assert incorp.field_data.days_into_watering_interval == 0
-                assert incorp.field_data.current_water_deficit == 5.0
-                assert incorp.field_data.annual_irrigation_water_use_total == actual
-            else:
-                assert actual == 0.0
-                assert incorp.field_data.days_into_watering_interval == days_into_interval + 1
-                assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall)
-                assert incorp.field_data.annual_irrigation_water_use_total == 0
+            assert actual == 0.0
+            assert incorp.field_data.days_into_watering_interval == days_into_interval + 1
+            assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall)
+            assert incorp.field_data.annual_irrigation_water_use_total == 0
 
 
 @pytest.mark.parametrize("precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
