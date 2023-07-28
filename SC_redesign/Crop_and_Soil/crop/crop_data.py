@@ -838,9 +838,41 @@ class Potato(CropData):
 
 @dataclass(kw_only=True)
 class Triticale(CropData):
-    """crop data class with default values for triticale"""
-    # TODO: triticale has unknown parameters, since it is not present in SWAT database.
-    #     Durum wheat is likely the closest analog.
+    """crop data class with default values for triticale
+    Notes
+    -------
+    We use the closest analog data available which is the Durum Wheat data
+    """
+    species: str = "durum_wheat"
+    name: str = "default durum_wheat"
+    plant_code: str = "DWHT"
+    scientific_name: str = "Triticum durum"
+    plant_category: PlantCategory = PlantCategory("cool_annual")
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 0.0
+    optimal_temperature: float = 15.0
+
+    max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 30.0
+
+    emergence_nitrogen_fraction: float = 0.0600
+    half_mature_nitrogen_fraction: float = 0.0231
+    mature_nitrogen_fraction: float = 0.0130
+    emergence_phosphorus_fraction: float = 0.0084
+    half_mature_phosphorus_fraction: float = 0.0032
+    mature_phosphorus_fraction: float = 0.0019
+
+    optimal_harvest_index: float = 0.40
+    min_harvest_index: float = 0.20
+    yield_nitrogen_fraction: float = 0.0263
+    yield_phosphorus_fraction: float = 0.0057
 
 
 @dataclass(kw_only=True)
@@ -856,7 +888,7 @@ class CornSilage(CropData):
     minimum_temperature: float = 8.0
     optimal_temperature: float = 25.0
 
-    max_leaf_area_index: float = 3.0
+    max_leaf_area_index: float = 4.0
     first_heat_fraction_point: float = 0.15
     first_leaf_fraction_point: float = 0.05
     second_heat_fraction_point: float = 0.50
@@ -872,7 +904,7 @@ class CornSilage(CropData):
     half_mature_phosphorus_fraction: float = 0.0018
     mature_phosphorus_fraction: float = 0.0014
 
-    optimal_harvest_index: float = 0.50
-    min_harvest_index: float = 0.30
+    optimal_harvest_index: float = 0.90
+    min_harvest_index: float = 0.90
     yield_nitrogen_fraction: float = 0.0140
     yield_phosphorus_fraction: float = 0.0016
