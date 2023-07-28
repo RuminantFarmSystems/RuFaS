@@ -841,3 +841,38 @@ class Triticale(CropData):
     """crop data class with default values for triticale"""
     # TODO: triticale has unknown parameters, since it is not present in SWAT database.
     #     Durum wheat is likely the closest analog.
+
+
+@dataclass(kw_only=True)
+class CornSilage(CropData):
+    """crop data class with default values for corn silage"""
+    species: str = "corn_silage"
+    name: str = "default corn_silage"
+    plant_code: str = "CSIL"
+    scientific_name: str = "Zea mays"
+    plant_category: PlantCategory = PlantCategory("warm_annual")
+    is_nitrogen_fixer: bool = False
+
+    minimum_temperature: float = 8.0
+    optimal_temperature: float = 25.0
+
+    max_leaf_area_index: float = 3.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.05
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
+    senescent_heat_fraction: float = 0.90
+
+    light_use_efficiency: float = 39.0
+
+    emergence_nitrogen_fraction: float = 0.0470
+    half_mature_nitrogen_fraction: float = 0.0177
+    mature_nitrogen_fraction: float = 0.0138
+    emergence_phosphorus_fraction: float = 0.0048
+    half_mature_phosphorus_fraction: float = 0.0018
+    mature_phosphorus_fraction: float = 0.0014
+
+    optimal_harvest_index: float = 0.50
+    min_harvest_index: float = 0.30
+    yield_nitrogen_fraction: float = 0.0140
+    yield_phosphorus_fraction: float = 0.0016
