@@ -24,7 +24,8 @@ class FertilizerApplication:
         self.soil = soil or Soil(field_size=field_size)
 
     def apply_fertilizer(self, phosphorus_applied: float, fertilizer_mass: float, inorganic_nitrogen_fraction: float,
-                         ammonium_fraction: float, organic_nitrogen_fraction: float, field_size: float) -> None:
+                         ammonium_fraction: float, organic_nitrogen_fraction: float, application_depth: float,
+                         surface_remainder_fraction: float, field_size: float) -> None:
         """
         Applies nutrients to the soil through fertilizer.
 
@@ -40,6 +41,10 @@ class FertilizerApplication:
             Fraction of inorganic nitrogen mass applied that is ammonium (unitless)
         organic_nitrogen_fraction : float
             Fraction of fertilizer mass applied that is organic nitrogen (unitless)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application.
         field_size : float
             Size of the field (ha)
 
