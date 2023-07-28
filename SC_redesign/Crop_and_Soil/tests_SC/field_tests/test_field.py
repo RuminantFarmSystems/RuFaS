@@ -1242,6 +1242,7 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
         assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)
 
 
+
 @pytest.mark.parametrize("field_name,field_size,day,year,watering_amount,expected_info_map,expected_value", [
     ("name_1", 100, 120, 1993, 135.6,
      {"prefix": "field_name:'name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100},
@@ -1261,3 +1262,15 @@ def test_record_field_watering(field_name: str, field_size: float, day: int, yea
     actual = om.variables_pool[f"field_name:'{field_name}'.field_watering"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
+
+
+@pytest.mark.parametrize("annual_irrigation_water_use_total,expected", [
+    (1500, 0),
+    (063.25,  0),
+    (0, 0)
+])
+def test_field_data_perform_annual_field_reset(annual_irrigation_water_use_total: float, expected: float) -> None:
+    """Tests that annual variable was reset correctly."""
+    data = FieldData(annual_irrigation_water_use_total=annual_irrigation_water_use_total)
+    data.perform_annual_field_reset()
+    assert expected == data.annual_irrigation_water_use_total
