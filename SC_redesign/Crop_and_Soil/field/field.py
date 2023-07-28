@@ -925,7 +925,6 @@ class Field:
         user-specified data provided, the hard-coded irrigation will be ignored and only uses the new method.
 
         """
-        # Old method that uses hard coded irrigation amount from the weather data
         if self.field_data.watering_occurs:
             self.field_data.current_water_deficit -= rainfall
             self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
