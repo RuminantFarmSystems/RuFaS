@@ -580,7 +580,8 @@ class OutputManager(object):
         """
         dumps all pool into the given path to a directory.
         """
-        input_path_num = input_path[-10:-5]
+        
+        input_path_num = 'sensitivity/' + input_path[-10:-5]
         self.dump_variables(path, input_path_num, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
         self.dump_errors(path)
