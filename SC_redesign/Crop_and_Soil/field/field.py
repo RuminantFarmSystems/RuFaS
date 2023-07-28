@@ -137,7 +137,8 @@ class Field:
 
     # <editor-fold desc="--- Soil Management Methods ---">
     def _execute_fertilizer_application(self, mix_name: str, requested_nitrogen: float, requested_phosphorus: float,
-                                        year: int, day: int) -> None:
+                                        application_depth: float, surface_remainder_fraction: float, year: int,
+                                        day: int) -> None:
         """
         Executes a fertilizer application based on the requested amounts of nutrients.
 
@@ -146,9 +147,13 @@ class Field:
         mix_name : str
             The name of the mix this fertilizer application should be composed of.
         requested_nitrogen : float
-            Minimum amount of nitrogen to be included in this fertilizer application.
+            Minimum amount of nitrogen to be included in this fertilizer application (kg).
         requested_phosphorus : float
-            Minimum amount of phosphorus to be included in this fertilizer application.
+            Minimum amount of phosphorus to be included in this fertilizer application (kg).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application.
         year : int
             Calendar year in which the fertilizer application is occurring.
         day : int
@@ -170,6 +175,18 @@ class Field:
         """
         if requested_nitrogen == requested_phosphorus == 0.0:
             return
+
+        impossible_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
+                                                  (application_depth > 0.0 and surface_remainder_fraction == 1.0)
+        if impossible_depth_and_remainder_fraction:
+            info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
+                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+            error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction" \
+                            f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a surface" \
+                            f" remainder fraction of 1.0."
+            om.add_error("fertilizer_application_error", error_message, info_map)
+            application_depth = 0.0
+            surface_remainder_fraction = 1.0
 
         try:
             fertilizer_mix = self.available_fertilizer_mixes[mix_name]
@@ -194,11 +211,11 @@ class Field:
         organic_nitrogen_fraction = 0.0
 
         self.fertilizer_applicator.apply_fertilizer(phosphorus_applied, total_mass_applied, inorganic_nitrogen_fraction,
-                                                    ammonium_fraction, organic_nitrogen_fraction,
-                                                    self.field_data.field_size)
+                                                    ammonium_fraction, organic_nitrogen_fraction, application_depth,
+                                                    surface_remainder_fraction, self.field_data.field_size)
 
         self._record_fertilizer_application(mix_name, total_mass_applied, nitrogen_applied, phosphorus_applied,
-                                            potassium_applied, year, day)
+                                            potassium_applied, application_depth, surface_remainder_fraction, year, day)
 
     @staticmethod
     def _determine_optimal_fertilizer_mix(requested_nitrogen: float, requested_phosphorus: float,
@@ -281,7 +298,8 @@ class Field:
                 "potassium_mass": potassium_mass}
 
     def _record_fertilizer_application(self, mix_name: str, total_mass: float, nitrogen_mass: float,
-                                       phosphorus_mass: float, potassium_mass: float, year: int, day: int) -> None:
+                                       phosphorus_mass: float, potassium_mass: float, application_depth: float,
+                                       surface_remainder_fraction: float, year: int, day: int) -> None:
         """
         Records a fertilizer application and saves it to the Output manager.
 
@@ -297,6 +315,10 @@ class Field:
             The mass of phosphorus applied (kg)
         potassium_mass : float
             The mass of potassium applied (kg)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application.
         year : int
             Calendar year in which the fertilizer application is occurring.
         day : int
@@ -307,7 +329,8 @@ class Field:
                     "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "mix_name": mix_name, "field_size": self.field_data.field_size}
         value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
-                 "potassium": potassium_mass}
+                 "potassium": potassium_mass, "application_depth": application_depth,
+                 "surface_remainder_fraction": surface_remainder_fraction}
         om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
@@ -447,8 +470,8 @@ class Field:
         """
         self.fertilizer_events, todays_fertilizer_events = self._filter_events(self.fertilizer_events, time)
         for event in todays_fertilizer_events:
-            self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass, event.year,
-                                                 event.day)
+            self._execute_fertilizer_application(event.mix_name, event.nitrogen_mass, event.phosphorus_mass,
+                                                 event.depth, event.surface_remainder_fraction, event.year, event.day)
 
     def _check_tillage_schedule(self, time) -> None:
         """
