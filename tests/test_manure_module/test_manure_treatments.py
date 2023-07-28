@@ -520,7 +520,7 @@ def test_manure_treatment_factory_get_instance(manure_treatment_type_name: str,
             'anaerobic lagoon',
             'anaerobic digestion and lagoon',
             'anaerobic digestion and lagoon with split',
-            'cbpb',
+            'compost bedded pack barn',
         ])
 def test_initialize_private_attributes_during_update(manure_treatment_type_name: str,
                                                      mocker: MockFixture) -> None:
@@ -561,7 +561,7 @@ def test_initialize_private_attributes_during_update(manure_treatment_type_name:
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
-            'cbpb',
+            'compost bedded pack barn',
         ])
 def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
                                                mocker: MockFixture) -> None:
@@ -637,7 +637,7 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
             'anaerobic lagoon',
             'anaerobic digestion and lagoon',
             'anaerobic digestion and lagoon with split',
-            'cbpb',
+            'compost bedded pack barn',
         ])
 def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: str,
                                                   mocker: MockFixture) -> None:
@@ -679,7 +679,7 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
             'anaerobic lagoon',
             'anaerobic digestion and lagoon',
             'anaerobic digestion and lagoon with split',
-            'cbpb',
+            'compost bedded pack barn',
         ])
 def test_accumulate_daily_output(manure_treatment_type_name: str,
                                  mocker: MockFixture) -> None:
@@ -2573,4 +2573,4 @@ def test_compost_bedded_pack_barn_calc_bedding_potassium_content(mocker: MockFix
             manure_treatment_config=mock_manure_treatment_config
     )
 
-    assert cbpb.calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(6.0)
+    assert cbpb._calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(6.0)
