@@ -1407,7 +1407,6 @@ def test_save_variables(
     mock_output_manager._dict_to_file_json.assert_not_called()
     mock_output_manager._save_variables_to_csv_files.assert_not_called()
 
-
     # test case for when exclude_info_maps flag set to False
     mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=[
         "json_dummy_input_filepath.txt",
@@ -1417,7 +1416,8 @@ def test_save_variables(
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
     mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
     mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/csv_dummy_input_filepath.txt")
-    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_json_dummy_input_filepath.txt", "json")
+    mock_output_manager._generate_file_name.assert_called_once_with(
+        "saved_variables_json_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
@@ -1425,7 +1425,6 @@ def test_save_variables(
     mock_output_manager._save_variables_to_csv_files.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables"), False
     )
-
 
     # test case for when exclude_info_maps flag set to True
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})

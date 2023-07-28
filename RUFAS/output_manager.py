@@ -573,7 +573,9 @@ class OutputManager(object):
             else:
                 self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
 
-    def _save_variables_to_csv_files(self, data_dict: Dict[str, Any], path: str, exclude_info_maps: bool = False) -> None:
+    def _save_variables_to_csv_files(
+            self, data_dict: Dict[str, Any], path: str, exclude_info_maps: bool = False
+    ) -> None:
         """
         Saves the variables_pool into one csv file per variable in the given path to a directory.
 
