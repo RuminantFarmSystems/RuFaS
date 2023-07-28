@@ -139,14 +139,14 @@ for i, p in enumerate(problem_list):
             # populate input json with settings from samples
             SAH.json_populater_duplicate(params_subset, problem_a, json_to_modify, json_to_print)
 
-        if not os.path.exists('input\\output\\sensitivity\\'):
-            os.mkdir('input\\output\\sensitivity\\')
-        lifecyclereport_tomodify = str(os.getcwd() + '\\input\\output\\sensitivity\\' + 'life_cycle_report' + '_' +  str(s).zfill(5) + '.json')
+        # if not os.path.exists('input\\output\\sensitivity\\'):
+        #     os.mkdir('input\\output\\sensitivity\\')
+        # lifecyclereport_tomodify = str(os.getcwd() + '\\input\\output\\sensitivity\\' + 'life_cycle_report' + '_' +  str(s).zfill(5) + '.json')
         
         SAH.anim_manag_modifier(inputJSONs_to_modify, s)
         
-        herdreportname = 'herd_report_' + str(s).zfill(5)
-        SAH.lifecycle_modifier(lifecyclereport_tomodify, herdreportname)
+        #herdreportname = 'herd_report_' + str(s).zfill(5)
+        #SAH.lifecycle_modifier(lifecyclereport_tomodify, herdreportname)
 
 
 

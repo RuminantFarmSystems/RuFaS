@@ -32,8 +32,11 @@ def main_loop(target_input):
     run_rufas(input_path = target_input)
     return(target_input)
 
-a = Parallel(n_jobs=6)(delayed(main_loop)(
-    'input/animal_management_' + str(i).zfill(5) + '.json'
-    ) for i in range(120,160))
+start = 0
+stop = 160
 
-# main_loop('input/animal_management_00042.json')
+a = Parallel(n_jobs=6)(delayed(main_loop)(
+    'input/sensitivity/animal_management_' + str(i).zfill(5) + '.json'
+    ) for i in range(start,stop))
+
+main_loop('input/sensitivity/animal_management_00042.json')
