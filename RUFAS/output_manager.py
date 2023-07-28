@@ -329,10 +329,10 @@ class OutputManager(object):
         column_list = []
         for field in mandatory_fields:
             data_list = data_dict[field]
-            if len(data_list) != 0 and isinstance(data_list[0], dict):
+            if data_list and isinstance(data_list[0], dict):
                 csv_column_lists: Dict[str, List[Any]] = {}
-                for data_dictionary in data_list:
-                    for subkey, value in data_dictionary.items():
+                for nested_dictionary in data_list:
+                    for subkey, value in nested_dictionary.items():
                         if subkey in csv_column_lists:
                             csv_column_lists[subkey].append(value)
                         else:
@@ -341,7 +341,7 @@ class OutputManager(object):
                     column_title = f"{field}_{subkey}" if field == "info_maps" else subkey
                     column_list.append((column_title, pd.Series(csv_column_lists[subkey], dtype=object)))
             else:
-                column_list.append((field, pd.Series(data_dict[field], dtype=object)))
+                column_list.append((field, pd.Series(data_list, dtype=object)))
 
         return column_list
 

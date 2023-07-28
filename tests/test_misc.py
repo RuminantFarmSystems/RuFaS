@@ -331,12 +331,26 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
 
     result = mock_output_manager._dict_to_csv_column_list(data, ["values", "info_maps"])
     assert len(result) == 3
-    (_, data_series) = result[0]
-    (_, map1_series) = result[1]
-    (_, map2_series) = result[2]
-    assert data_series.to_list() == data['values'] \
-        and map1_series.to_list() == ['value1', 'value2'] \
-        and map2_series.to_list() == [1, 2]
+    (title1, data_series) = result[0]
+    (title2, map1_series) = result[1]
+    (title3, map2_series) = result[2]
+    assert title1 == 'values'
+    assert data_series.to_list() == data['values']
+    assert title2 == "info_maps_map1"
+    assert map1_series.to_list() == ['value1', 'value2']
+    assert title3 == "info_maps_map2"
+    assert map2_series.to_list() == [1, 2]
+
+
+def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) -> None:
+    """Unit test for the function _dict_to_csv_column_list in the file output_manager.py"""
+    data = {"info_maps": []}
+    result = mock_output_manager._dict_to_csv_column_list(data, ["info_maps"])
+
+    assert len(result) == 1
+    (title, data_series) = result[0]
+    assert title == "info_maps"
+    assert data_series.to_list() == []
 
 
 @pytest.mark.parametrize("data, expected_result, exclude_info_maps, should_write", [
