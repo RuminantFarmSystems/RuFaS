@@ -327,8 +327,6 @@ def test_dict_to_csv_column_list(mock_output_manager: OutputManager) -> None:
     }
     result = mock_output_manager._dict_to_csv_column_list(data, ["values"])
     (_, v) = result[0]
-    print(v.to_list())
-    print(data['values'])
     assert v.to_list() == data['values']
 
     result = mock_output_manager._dict_to_csv_column_list(data, ["values", "info_maps"])
