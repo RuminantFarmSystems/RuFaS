@@ -6,4 +6,3 @@ Life Cycle Submodule
     
     animalLifeCyclePseudo
     laccurve
-    maintainHerdSize

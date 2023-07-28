@@ -178,11 +178,12 @@ Kebreab et al. (2023) have recently built three empirical equations for
 accounting the mitigation potential (% of reduction) of 3-NOP for
 reducing CH\ :sub:`4` yield emissions CH\ :sub:`4`/DMI; g/kg).
 
-+--------------------------------------------------------------------------+
-| :math:`Change\ in\ {CH}_{4}\ yield\ (\%) = - 30.8 - 0.226 \times (3NOP - |
-| 70.5) + 0.906 \times (NDF - 32.9) + 3.871 \times (EE - 4.2) - 0.337 * (S |
-| tarch - 21.1)`                                                           |
-+--------------------------------------------------------------------------+
+
+ :math:`Change\ in\ {CH}_{4}\ yield\ (\%) = - 30.8 - 0.226 \times (3NOP - 70.5)` 
+     
+       | :math:`+ 0.906 \times (NDF - 32.9) + 3.871 \times (EE - 4.2) - 0.337`  
+      
+       | :math:`\times\ Starch - 21.1`     
 
    Eq. 1
 
@@ -252,11 +253,11 @@ CH\ :sub:`4` yield WITHOUT 3-NOP addition, g/kg DMI = 20.8
 
 By applying Eq. 1, we get: *-16.8 % reduction in CH\ 4 yield emissions.*
 
-+---------------------------------------------------------------------------+
-| :math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906 |
-| \times (45.4\ \%\ NDF - 32.9) + 3.871 \times (4.00\ \%\ EE - 4.2) - 0.337 |
-| \times (11.1\ \%\ Starch - 21.1) =  -16.8%\ `                             |
-+---------------------------------------------------------------------------+
+:math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906`\
+
+   | :math:`\times (45.4\ \%\ NDF - 32.9) + 3.871 \times (4.00\ \%\ EE - 4.2) - 0.337`
+   
+   | :math:`\times (11.1\ \%\ Starch - 21.1) =  -16.8%`
 
 
 Then, 20.8 – (20.8 × 16.8%) = 3.49 → 17.3 g/kg (CH\ :sub:`4` yield
@@ -289,11 +290,13 @@ CH\ :sub:`4` yield WITHOUT -NOP addition, g/kg DMI = 16.7
 
 By applying Eq. 1, we get: *-25.6% reduction in CH\ 4 yield emissions.*
 
-+---------------------------------------------------------------------------+
-| :math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906 |
-| \times (36.7\ \%\ NDF - 32.9) + 3.871 \times (4.49\ \%\ EE - 4.2) - 0.337 |
-| \times (19.7\ \%\ Starch - 21.1) = \ `-25.6%                              |
-+---------------------------------------------------------------------------+
+
+:math:`CH4\ yield\ red.\ (\%) = - 30.8 - 0.226 \times (70 - 70.5) + 0.906`
+
+   | :math:`\times (36.7\ \%\ NDF - 32.9) + 3.871 \times (4.49\ \%\ EE - 4.2) - 0.337`
+   
+   | :math:`\times (19.7\ \%\ Starch - 21.1) = -25.6%`                            
+
 
 Then, 16.7 - (16.7 × 25.6%) = 4.28 → 12.4 g/kg (CH\ :sub:`4` yield
 emission WITH 3-NOP added to the diet).
@@ -315,10 +318,11 @@ And to obtain the mitigation potential for total CH\ :sub:`4` emissions
        CH\ :sub:`4` intensity for carbon footprint estimations is only
        applicable for lactating cows.
 
-+-----------------------------------------------------------------------------------------------------+
-| :math:`Change\ in\ Total\ {CH}_{4}\ production\ (\%) = \  - 32.4 - 0.282 \times (3NOP - 70.5) + 0.9 |
-| 15 \times (NDF - 32.9) + 3.080 \times (EE - 4.2)`                                                   |
-+-----------------------------------------------------------------------------------------------------+
+
+:math:`Change\ in\ Total\ {CH}_{4}\ production\ (\%) = \  - 32.4 - 0.282 \times (3NOP - 70.5)`
+ 
+   | :math:`+ 0.915 \times (NDF - 32.9) + 3.080 \times (EE - 4.2)`                                                   
+
    Eq. 2
 
 :math:`Change\ in\ {CH}_{4}\ intensity\ (\%) = \  - 33.0 - 0.275 \times (3NOP - 70.5) + 0.723 \times (NDF - 32.9)`
@@ -427,28 +431,28 @@ mitigation strategy within the RuFaS model.
 --------------
 
 Kebreab E., Bannink A., Pressman E. M., Walker N., Karagiannis A., van
-Gastelen S., Dijkstra J. 2023. A meta-analysis of effects of
-3-nitrooxypropanol on methane production, yield, and intensity in dairy
-cattle. J. Dairy Sci.106:927–936. https://doi.org/10.3168/jds.2022-22211
+   Gastelen S., Dijkstra J. 2023. A meta-analysis of effects of
+   3-nitrooxypropanol on methane production, yield, and intensity in dairy
+   cattle. J. Dairy Sci.106:927–936. https://doi.org/10.3168/jds.2022-22211
 
 Melgar, A., Lage, C. F. A., Nedelkov, K., Räisänen, S. E., Stefenoni,
-H., Fetter, M. E., Chen, X., Oh, J., Duval, S., Kindermann, M., Walker,
-N. D., Hristov, A. N. 2021. Enteric methane emission, milk production,
-and composition of dairy cows fed 3-nitrooxypropanol. J. Dairy Sci.
-104:357–366. https://doi.org/10.3168/jds.2020-18908
+   H., Fetter, M. E., Chen, X., Oh, J., Duval, S., Kindermann, M., Walker,
+   N. D., Hristov, A. N. 2021. Enteric methane emission, milk production,
+   and composition of dairy cows fed 3-nitrooxypropanol. J. Dairy Sci.
+   104:357–366. https://doi.org/10.3168/jds.2020-18908
 
 NASEM (National Academies of Sciences, Engineering, and Medicine). 2021.
-Nutrient Requirements of Dairy Cattle. 8th rev. ed. The National
-Academies Press. https://doi.org/10.17226/25806.
+   Nutrient Requirements of Dairy Cattle. 8th rev. ed. The National
+   Academies Press. https://doi.org/10.17226/25806.
 
 NRC (National Research Council). 2001. Nutrient Requirements of Dairy
-Cattle. 7th rev. ed. Natl. Acad. Sci., Washington, DC.
+   Cattle. 7th rev. ed. Natl. Acad. Sci., Washington, DC.
 
 van Gastelen, S., Dijkstra, J., Heck, J. M. L., Kindermann, M., Klop,
-A., de Mol, R., Rijnders, D., Walker, N., Bannink, A. 2022. Methane
-mitigation potential of 3-nitrooxypropanol in lactating cows is
-influenced by basal diet composition. J. Dairy Sci. 105:4064–4082.
-https://doi.org/10.3168/jds.2021-20782
+   A., de Mol, R., Rijnders, D., Walker, N., Bannink, A. 2022. Methane
+   mitigation potential of 3-nitrooxypropanol in lactating cows is
+   influenced by basal diet composition. J. Dairy Sci. 105:4064–4082.
+   https://doi.org/10.3168/jds.2021-20782
 
 .. |image1| image:: ../media/3NOP.png
    :width: 6in

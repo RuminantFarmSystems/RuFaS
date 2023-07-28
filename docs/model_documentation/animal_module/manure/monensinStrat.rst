@@ -295,7 +295,9 @@ Example 2.
        milk produced). The metric for CH\ :sub:`4` intensity for carbon
        footprint estimations is only applicable for lactating cows.
 
-:math:`Change\ in\ Total\ {CH}_{4}\ production\ (\%) = \  - 0.15827\  - \ 0.00591\ \  \times \ \ Monensin\  + \ 0.00918\  \times \ DMI`
+:math:`Change\ in\ Total\ {CH}_{4}\ production\ (\%) = \  - 0.15827\  - \ 0.00591` 
+
+   | :math:`\times \ \ Monensin\  + \ 0.00918\  \times \ DMI`
 
    Eq. 2
 
@@ -417,40 +419,40 @@ CH\ :sub:`4` mitigation strategy within the RuFaS model.
 ---------------
 
 Appuhamy, J. A. D., A. B. Strathe, S. Jayasundara, C. Wagner-Riddle, J.
-Dijkstra, J. France, and E. Kebreab. 2013. Anti-methanogenic effects of
-monensin in dairy and beef cattle: A meta-analysis. J. Dairy Sci.
-96:5161–5173. https://doi.org/10 .3168/jds.2012-5923
+   Dijkstra, J. France, and E. Kebreab. 2013. Anti-methanogenic effects of
+   monensin in dairy and beef cattle: A meta-analysis. J. Dairy Sci.
+   96:5161–5173. https://doi.org/10 .3168/jds.2012-5923
 
 Capelari, M., Powers, W. 2017. The effect of nitrate and monensin on in
-vitro ruminal fermentation. J. Anim. Sci. 95: 5112-5123.
-https://doi.org/10.2527/jas2017.1657
+   vitro ruminal fermentation. J. Anim. Sci. 95: 5112-5123.
+   https://doi.org/10.2527/jas2017.1657
 
 Marumo, J. L., LaPierre, P. A., Van Amburgh, M. E. 2023. Enteric Methane
-Emissions Prediction in Dairy Cattle and Effects of Monensin on Methane
-Emissions: A Meta-Analysis. Animals 13: 1392.
-https://doi.org/10.3390/ani13081392
+   Emissions Prediction in Dairy Cattle and Effects of Monensin on Methane
+   Emissions: A Meta-Analysis. Animals 13: 1392.
+   https://doi.org/10.3390/ani13081392
 
 NASEM (National Academies of Sciences, Engineering, and Medicine). 2021.
-Nutrient Requirements of Dairy Cattle. 8th rev. ed. The National
-Academies Press. https://doi.org/10.17226/25806.
+   Nutrient Requirements of Dairy Cattle. 8th rev. ed. The National
+   Academies Press. https://doi.org/10.17226/25806.
 
 Niu, M., E. Kebreab, A. N. Hristov, J. Oh, C. Arndt, A. Bannink, A. R.
-Bayat, A. F. Brito, T. Boland, D. Casper, L. A. Crompton, J. Dijkstra,
-M. A. Eugène, P. C. Garnsworthy, M. N. Haque, A. L. F. Hellwing, P.
-Huhtanen, M. Kreuzer, B. Kuhla, P. Lund, J. Madsen, C. Martin, S. C.
-McClelland, M. McGee, P. J. Moate, S. Muetzel, C. Muñoz, P. O’Kiely, N.
-Peiren, C. K. Reynolds, A. Schwarm, K. J. Shingfield, T. M. Storlien, M.
-R. Weisbjerg, D. R. Yáñez-Ruiz, and Z. Yu. 2018. Prediction of enteric
-methane produc[1]tion, yield, and intensity in dairy cattle using an
-intercontinental database. Glob. Chang. Biol. 24: 3368–3389.
-https://doi.org/10.1111/gcb.14094
+   Bayat, A. F. Brito, T. Boland, D. Casper, L. A. Crompton, J. Dijkstra,
+   M. A. Eugène, P. C. Garnsworthy, M. N. Haque, A. L. F. Hellwing, P.
+   Huhtanen, M. Kreuzer, B. Kuhla, P. Lund, J. Madsen, C. Martin, S. C.
+   McClelland, M. McGee, P. J. Moate, S. Muetzel, C. Muñoz, P. O’Kiely, N.
+   Peiren, C. K. Reynolds, A. Schwarm, K. J. Shingfield, T. M. Storlien, M.
+   R. Weisbjerg, D. R. Yáñez-Ruiz, and Z. Yu. 2018. Prediction of enteric
+   methane produc[1]tion, yield, and intensity in dairy cattle using an
+   intercontinental database. Glob. Chang. Biol. 24: 3368–3389.
+   https://doi.org/10.1111/gcb.14094
 
 NRC (National Research Council). 2001. Nutrient Requirements of Dairy
-Cattle. 7th rev. ed. Natl. Acad. Sci., Washington, DC.
+   Cattle. 7th rev. ed. Natl. Acad. Sci., Washington, DC.
 
 Ramin, M., and P. Huhtanen. 2013. Development of equations for
-predicting methane emissions from ruminants. J. Dairy Sci. 96:2476–
-2493. https://doi.org/10.3168/jds.2012-6095
+   predicting methane emissions from ruminants. J. Dairy Sci. 96:2476–
+   2493. https://doi.org/10.3168/jds.2012-6095
 
 .. |image1| image:: ../media/monensin.png
    :width: 6in
