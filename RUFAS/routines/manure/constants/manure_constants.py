@@ -33,3 +33,11 @@ class ManureConstants:
     LIQUID_MANURE_DENSITY = 990.0
     SLURRY_MANURE_DENSITY = 1400
     SOLID_MANURE_DENSITY = 1250
+    DEFAULT_CARBON_AVAILABLE_IN_MANURE = 0.5
+    """
+    Default proportion of carbon available in manure, (unitless, [0, 1]). Default is set to 0.5.
+    """
+    EFFECTIVE_MICROBIAL_DECOMP_RATE = 2.37e-3
+    """The effectiveness of microbial decomposition rate (unitless)"""
+    DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP = 0.65
+    """The effect of moisture on microbial decomposition"""
