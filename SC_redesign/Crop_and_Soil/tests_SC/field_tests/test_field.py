@@ -1244,14 +1244,11 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
 
 @pytest.mark.parametrize("field_name,field_size,day,year,watering_amount,expected_info_map,expected_value", [
     ("name_1", 100, 120, 1993, 135.6,
-     {"prefix": "field:'name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100, "units": "mm"},
-     {"watering_amount": 135.6}),
+     {"prefix": "field:'name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100, "units": "mm"}, 135.6),
     ("name_2", 14.65, 3, 1996, 1.2,
-     {"prefix": "field:'name_2'", "date": {"year": 1996, "day": 3}, "field_size": 14.65, "units": "mm"},
-     {"watering_amount": 1.2}),
+     {"prefix": "field:'name_2'", "date": {"year": 1996, "day": 3}, "field_size": 14.65, "units": "mm"}, 1.2),
     ("name_2", 14.65, 48, 2023, 1.2,
-     {"prefix": "field:'name_2'", "date": {"year": 2023, "day": 48}, "field_size": 14.65, "units": "mm"},
-     {"watering_amount": 1.2})
+     {"prefix": "field:'name_2'", "date": {"year": 2023, "day": 48}, "field_size": 14.65, "units": "mm"}, 1.2)
 ])
 def test_record_field_watering(field_name: str, field_size: float, day: int, year: int, watering_amount: float,
                                expected_info_map: Dict, expected_value: Dict) -> None:
