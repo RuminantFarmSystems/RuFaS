@@ -195,6 +195,13 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     pen.py. Returns a dictionary of the rations by feed and status of the NLP
     optimization.
 
+    There are multiple outcomes here.
+    1: User has defined a lactation reduction percent of 0.0, and tolerance of 0.0, thus the fixed ration is used.
+    2: Optimization is a success, and optimized solution (within the tolerance bounds) is used.
+    3: Optimization fails
+        3a: If lactation reduction is set to 0.0, no reattempt is made
+        3b: Optimization reattempted until lactation reduction threshold is reached. 
+            (e.g. starting_milk - starting_milk *milk_reduction_percent)
     
     Parameters
     ----------
@@ -217,61 +224,77 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     info_map = {"class": "no_caller_class",
                 "function": get_user_defined_ration.__name__,
                 }
-    sim_day = pen.animals_in_pen[0].body_weight_history[-1].simulation_day
+    ration_percents = UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
     fixed_ration = False
-    ration_percents =UserDefinedRationManager.ration_to_use(pen.animal_combination, available_feeds)
+    num_reattempts = 0
+    failed_constraints = []
+    constraints_failed_list = []
+
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
+    failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+    if failed_constraints:
+        for constr in failed_constraints:
+            constraints_failed_list.append(constr["fun"].__name__)
+        # TODO: is there a better way to get the simulation day?
+        fail_summary = {'simulation day' : pen.animals_in_pen[0].body_weight_history[-1].simulation_day,
+                    'reattempt number' : num_reattempts,
+                    'constraints_failed_dict': constraints_failed_list, 
+                    'ration_attempted': make_ration_from_solution(available_feeds, solution),
+                    'pen requirements' : pen.avg_nutrient_rqmts}
+        om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
+    
+    if udrv.milk_reduction_percent == 0.0 and udrv.tolerance == 0.0 and not solution.success:
+        ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
+        ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
+        return ration, ration_vals
+
+    # No method to reduce requirements for non-lactating animals, so fixed ration is used
     if str(pen.animal_combination) not in ['AnimalCombination.LAC_COW'] and not solution.success:
         fixed_ration = True
-        constraints_failed_list = []
-        failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
-        if failed_constraints:
-            for constr in failed_constraints:
-                constraints_failed_list.append(constr["fun"].__name__)
-            fail_summary = {'simulation day' : sim_day,
-                                'reattempt number' : 0,
-                                'constraints_failed_dict': constraints_failed_list, 
-                                'ration_attempted': make_ration_from_solution(available_feeds, solution),
-                                'pen requirements' : pen.avg_nutrient_rqmts}
-            om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
-    failed_list = []
+
+
+    # Follow method to reduce requirements for lactating animals
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
-        num_reattempts = 0
-        
         starting_milk_average = calc_starting_milk_average(pen)
         while not solution.success:
+            # if lactation reduction "not allowed", use fixed ration
+            if udrv.milk_reduction_percent == 0.0:
+                fixed_ration = True
+                solution.success = True
+                break
+            # reattempt optimization
             num_reattempts += 1
-            constraints_failed_list = []
-            failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
-            if failed_constraints:
-                for constr in failed_constraints:
-                    constraints_failed_list.append(constr["fun"].__name__)
             reduction = 0.25
             running_total_milk = reduce_milk_production(pen, reduction)
             average_running_milk = running_total_milk / len(pen.animals_in_pen)
-            # recalculating requirements after reduction
-            req.set_requirements(pen, animal_grouping_scenario, True)
-            solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-            
-            # TODO: find a better way to get the current day! import Time from classes.py?
-            
-            fail_summary = {'simulation day' : sim_day,
-                            'reattempt number' : num_reattempts,
-                            'constraints_failed_dict': constraints_failed_list, 
-                            'ration_attempted': make_ration_from_solution(available_feeds, solution),
-                            'pen requirements' : pen.avg_nutrient_rqmts}
-            om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
 
-            if average_running_milk < udrv.milk_reduction_percent*starting_milk_average or \
+            # if reduction limit reached, break and use fixed ration
+            if average_running_milk < starting_milk_average - udrv.milk_reduction_percent*starting_milk_average or \
+
                average_running_milk < 1.0:
                 fixed_ration = True
                 solution.success = True
                 break
-            
+            # recalculating requirements after reduction
+            req.set_requirements(pen, animal_grouping_scenario, True)
+            solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
+            failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+            if failed_constraints:
+                for constr in failed_constraints:
+                    constraints_failed_list.append(constr["fun"].__name__)
+                # TODO: is there a better way to get the simulation day?
+                fail_summary = {'simulation day' : pen.animals_in_pen[0].body_weight_history[-1].simulation_day,
+                    'reattempt number' : num_reattempts,
+                    'constraints_failed_dict': constraints_failed_list, 
+                    'ration_attempted': make_ration_from_solution(available_feeds, solution),
+                    'pen requirements' : pen.avg_nutrient_rqmts}
+                om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
+    
     if fixed_ration:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
         ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
-    elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
+    elif solution is not None:
+        #elif solution is not None and not fixed_ration and str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
         ration = make_ration_from_solution(available_feeds, solution)
         ration_vals = NLP.get_ration_vals(solution.x)
     else:
