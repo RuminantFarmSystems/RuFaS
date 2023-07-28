@@ -557,11 +557,6 @@ def test_calc_avg_nutrient_rqmts():
     pass
 
 
-def test_calc_ration():
-    """Unit test for function calc_ration in file routines/animal/pen.py"""
-    pass
-
-
 def test_calc_manure():
     """Unit test for function calc_manure in file routines/animal/pen.py"""
     pass
