@@ -893,7 +893,7 @@ class Field:
                 crop.data.cumulative_transpiration = 0.0
                 crop.data.cumulative_potential_evapotranspiration = 0.0
 
-    def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation=0.0) -> float:
+    def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation: float) -> float:
         """Manages watering of the field.
 
         Parameters
@@ -904,7 +904,8 @@ class Field:
             Year in which this watering occurs.
         day : int
             Julian day on which this watering occurs.
-        irrigation
+        irrigation : float
+            The amount of hard-coded irrigation in the weather data (mm)
 
         Returns
         -------
@@ -919,6 +920,9 @@ class Field:
         user). The counter that tracks how where in the interval the simulation is and the amount of water that still
         needs to be applied are reset at the end of every interval. The water that is added to the field from the farm's
         resources is tracked on an annual basis, so that water budgeting may be accurately predicted.
+
+        Old method of using hard-coded irrigation data will be used if there's no user specified data. If there's any
+        user-specified data provided, the hard-coded irrigation will be ignored and only uses the new method.
 
         """
         # Old method that uses hard coded irrigation amount from the weather data
@@ -1189,10 +1193,24 @@ class Field:
         self.field_data.perform_annual_field_reset()
         return
 
-    def _record_field_watering(self, year: int, day: int, watering_amount: float):
-        """Records a watering event to the OutputManager."""
+    def _record_field_watering(self, year: int, day: int, watering_amount: float) -> None:
+        """Record the day, year and amount of irrigation
+
+        Parameters
+        ----------
+        year : int
+            Year in which this watering occurs.
+        day : int
+            Julian day on which this watering occurs.
+        watering_amount : float
+            The amount of hard-coded irrigation in the weather data (mm)
+
+        Returns
+        -------
+        None
+        """
         info_map = {"class": self.__class__.__name__, "function": self._record_field_watering.__name__,
-                    "prefix": f"field_name:'{self.field_data.name}'", "date": {"year": year, "day": day},
-                    "field_size": self.field_data.field_size}
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "field_size": self.field_data.field_size, "units": "mm"}
         value = {"watering_amount": watering_amount}
         om.add_variable("field_watering", value, info_map)
