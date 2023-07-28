@@ -274,6 +274,7 @@ class OutputManager(object):
         ----------
         data_dict : Dict[str, Any]
             The dictionary to be saved
+
         path : str
             The path to the file to be saved
 
@@ -560,17 +561,27 @@ class OutputManager(object):
             input_path = os.path.join(dir_path, filter_file)
             filter_patterns = self._load_txt_file_to_list(input_path)
             filtered_pool = self._filter_variables_pool(filter_patterns, filter_file)
-            if exclude_info_maps:
-                filtered_pool = self._exclude_info_maps(filtered_pool)
-            file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
-            self._dict_to_file_json(filtered_pool, file_path)
+            if filter_file.startswith("json_"):
+                if exclude_info_maps:
+                    filtered_pool = self._exclude_info_maps(filtered_pool)
+                file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
+                self._dict_to_file_json(filtered_pool, file_path)
+            elif filter_file.startswith("csv_"):
+                self._save_variables_to_csv_files(
+                    filtered_pool, str(Path(save_path) / "CSVs" / "om" / "variables"), exclude_info_maps
+                )
+            else:
+                self.add_warning("invalid filter file", f"{filter_file} must be prefixed with csv_ or json_", info_map)
 
-    def save_variables_to_csv_files(self, path: str, exclude_info_maps: bool = False) -> None:
+    def _save_variables_to_csv_files(self, data_dict: Dict[str, Any], path: str, exclude_info_maps: bool = False) -> None:
         """
         Saves the variables_pool into one csv file per variable in the given path to a directory.
 
         Parameters
         ----------
+        data_dict : Dict[str, Any]
+            The dictionary to be saved
+
         path : str
             Path to the output directory for the OutputManager.
 
@@ -578,15 +589,14 @@ class OutputManager(object):
             Flag for whether or not the user wants to include info_maps data in their results files.
 
         """
-        pool = self.variables_pool
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
         except Exception as e:
             raise e
 
-        for key in pool.keys():
+        for key in data_dict.keys():
             variable_csv_file_path = os.path.join(path, self._generate_file_name(key, "csv"))
-            self._dict_to_file_csv({key: pool[key]}, variable_csv_file_path, exclude_info_maps)
+            self._dict_to_file_csv({key: data_dict[key]}, variable_csv_file_path, exclude_info_maps)
 
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
@@ -710,7 +720,6 @@ class OutputManager(object):
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
-        self.save_variables_to_csv_files(str(Path(path) / "CSVs" / "om" / "variables"), exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)

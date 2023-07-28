@@ -445,10 +445,10 @@ def test_save_variables_to_csv_files_exceptions(
     mock_output_manager: OutputManager,
     mocker: MockerFixture
 ) -> None:
-    """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
+    """Unit test for the function _save_variables_to_csv_files() in the file output_manager.py"""
     mocker.patch("pathlib.Path.mkdir", side_effect=IOError)
     with raises(Exception):
-        mock_output_manager.save_variables_to_csv_files("test_dir", False)
+        mock_output_manager._save_variables_to_csv_files("test_dir", False)
 
 
 def test_generate_key(mocker: MockerFixture) -> None:
@@ -690,17 +690,18 @@ def output_manager_original_method_states(
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of OutputManager"""
     return {
-        "_get_timestamp": mock_output_manager._get_timestamp,
+        "_add_to_pool": mock_output_manager._add_to_pool,
+        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
+        "_dict_to_file_json": mock_output_manager._dict_to_file_json,
+        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
+        "_filter_variables_pool": mock_output_manager._filter_variables_pool,
         "_generate_file_name": mock_output_manager._generate_file_name,
         "_generate_key": mock_output_manager._generate_key,
-        "_dict_to_file_json": mock_output_manager._dict_to_file_json,
-        "_dict_to_file_csv": mock_output_manager._dict_to_file_csv,
+        "_get_timestamp": mock_output_manager._get_timestamp,
         "_list_to_file_txt": mock_output_manager._list_to_file_txt,
-        "_add_to_pool": mock_output_manager._add_to_pool,
-        "_exclude_info_maps": mock_output_manager._exclude_info_maps,
-        "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
         "_list_txt_file_names_in_dir": mock_output_manager._list_txt_file_names_in_dir,
-        "_filter_variables_pool": mock_output_manager._filter_variables_pool,
+        "_load_txt_file_to_list": mock_output_manager._load_txt_file_to_list,
+        "_save_variables_to_csv_files ": mock_output_manager._save_variables_to_csv_files,
         "save_variables": mock_output_manager.save_variables,
         "add_variable": mock_output_manager.add_variable,
         "add_error": mock_output_manager.add_error,
@@ -711,7 +712,6 @@ def output_manager_original_method_states(
         "dump_warnings": mock_output_manager.dump_warnings,
         "dump_errors": mock_output_manager.dump_errors,
         "dump_variable_names_and_contexts": mock_output_manager.dump_variable_names_and_contexts,
-        "save_variables_to_csv_files ": mock_output_manager.save_variables_to_csv_files,
     }
 
 
@@ -726,7 +726,6 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs = MagicMock()
     mock_output_manager.dump_variables = MagicMock()
     mock_output_manager.dump_variable_names_and_contexts = MagicMock()
-    mock_output_manager.save_variables_to_csv_files = MagicMock()
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=False)
 
@@ -735,9 +734,6 @@ def test_dump_all_pools(
     mock_output_manager.dump_logs.assert_called_once_with(path)
     mock_output_manager.dump_variables.assert_called_once_with(path, False)
     mock_output_manager.dump_variable_names_and_contexts.assert_called_once_with(path, False)
-    mock_output_manager.save_variables_to_csv_files.assert_called_once_with(
-        os.path.join(path, "CSVs", "om", "variables"), False
-    )
 
     mock_output_manager.dump_all_pools(path, exclude_info_maps=True)
     mock_output_manager.dump_variables.assert_called_with(path, True)
@@ -746,7 +742,6 @@ def test_dump_all_pools(
     assert mock_output_manager.dump_warnings.call_count == 2
     assert mock_output_manager.dump_errors.call_count == 2
     assert mock_output_manager.dump_variables.call_count == 2
-    assert mock_output_manager.save_variables_to_csv_files.call_count == 2
 
     # Restore original methods
     mock_output_manager.dump_variables = output_manager_original_method_states[
@@ -761,9 +756,6 @@ def test_dump_all_pools(
     ]
     mock_output_manager.dump_variable_names_and_contexts = output_manager_original_method_states[
         "dump_variable_names_and_contexts"
-    ]
-    mock_output_manager.save_variables_to_csv_files = output_manager_original_method_states[
-        "save_variables_to_csv_files "
     ]
 
 
@@ -810,33 +802,31 @@ def test_save_variables_to_csv_files(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
-    """Test case for function save_variables_to_csv_files in output_manager.py"""
+    """Test case for function _save_variables_to_csv_files in output_manager.py"""
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_csv = MagicMock()
-    original_variables_pool = mock_output_manager.variables_pool
-    mock_output_manager.variables_pool = {"var1": {"values": [1]}}
+    mock_variable_pool = {"var1": {"values": [1], "info_maps": []}}
 
     with patch('pathlib.Path.mkdir') as mock_mkdir:
         mock_mkdir.return_value = None
-        mock_output_manager.save_variables_to_csv_files("dummy_path", True)
+        mock_output_manager._save_variables_to_csv_files(mock_variable_pool, "dummy_path", True)
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
     mock_output_manager._generate_file_name.assert_called_once_with("var1", "csv")
     mock_output_manager._dict_to_file_csv.assert_called_once_with(
-        mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name"), True
+        mock_variable_pool, os.path.join("dummy_path", "dummy_name"), True
     )
 
-    mock_output_manager.save_variables_to_csv_files("dummy_path", False)
+    mock_output_manager._save_variables_to_csv_files(mock_variable_pool, "dummy_path", False)
     mock_output_manager._generate_file_name.assert_has_calls([
         call("var1", "csv"),
         call("var1", "csv"),
     ])
     mock_output_manager._dict_to_file_csv.assert_has_calls([
-        call(mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name"), True),
-        call(mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name"), False),
+        call(mock_variable_pool, os.path.join("dummy_path", "dummy_name"), True),
+        call(mock_variable_pool, os.path.join("dummy_path", "dummy_name"), False),
     ])
 
-    mock_output_manager.variables_pool = original_variables_pool
     # Restore original methods
     mock_output_manager._generate_file_name = output_manager_original_method_states[
         "_generate_file_name"
@@ -1405,6 +1395,7 @@ def test_save_variables(
     mock_output_manager._dict_to_file_json = MagicMock()
     mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager._exclude_info_maps = MagicMock()
+    mock_output_manager._save_variables_to_csv_files = MagicMock()
 
     # test case for when there are no filter keys txt files in output_inclusion_filters directory:
     mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=[])
@@ -1414,28 +1405,53 @@ def test_save_variables(
     mock_output_manager._generate_file_name.assert_not_called()
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_not_called()
+    mock_output_manager._save_variables_to_csv_files.assert_not_called()
+
 
     # test case for when exclude_info_maps flag set to False
-    mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=["dummy_input_filepath.txt"])
+    mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=[
+        "json_dummy_input_filepath.txt",
+        "csv_dummy_input_filepath.txt",
+    ])
+    mock_output_manager._load_txt_file_to_list = MagicMock()
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", False)
     mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
-    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
-    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_dummy_input_filepath.txt", "json")
+    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/csv_dummy_input_filepath.txt")
+    mock_output_manager._generate_file_name.assert_called_once_with("saved_variables_json_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
+    mock_output_manager._save_variables_to_csv_files.assert_called_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables"), False
+    )
+
 
     # test case for when exclude_info_maps flag set to True
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
     mock_output_manager._list_txt_file_names_in_dir.assert_called_with("dummy_dir_path/")
-    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/dummy_input_filepath.txt")
-    mock_output_manager._generate_file_name.assert_called_with("saved_variables_dummy_input_filepath.txt", "json")
+    mock_output_manager._load_txt_file_to_list.assert_called_with("dummy_dir_path/csv_dummy_input_filepath.txt")
+    mock_output_manager._generate_file_name.assert_called_with("saved_variables_json_dummy_input_filepath.txt", "json")
     mock_output_manager._exclude_info_maps.assert_called_once_with({})
     mock_output_manager._dict_to_file_json.assert_called_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
     )
+    mock_output_manager._save_variables_to_csv_files.assert_called_with(
+        mock_output_manager.variables_pool, os.path.join("dummy_path", "CSVs", "om", "variables"), True
+    )
+
+    # test case for when the filter files to don start with csv_ or json_
+    mock_output_manager._list_txt_file_names_in_dir = MagicMock(return_value=[
+        "dummy_input_filepath.txt",
+        "csvdummy_input_filepath.txt",
+        "jsondummy_input_filepath.txt",
+    ])
+    mock_output_manager._save_variables_to_csv_files = MagicMock()
+    mock_output_manager._dict_to_file_json = MagicMock()
+    mock_output_manager.save_variables("dummy_path", "dummy_dir_path/", True)
+    mock_output_manager._save_variables_to_csv_files.assert_not_called()
+    mock_output_manager._dict_to_file_json.assert_not_called()
 
     # Restore original method
     mock_output_manager.save_variables = output_manager_original_method_states[
