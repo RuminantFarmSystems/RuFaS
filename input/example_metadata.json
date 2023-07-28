@@ -220,6 +220,7 @@
       "harvest_operations": {
         "type": "array",
         "description": "Operation(s) with which this crop will be harvested.",
+        "minimum_length": 1,
         "properties": {
           "type": "string",
           "pattern": "^{default|no_kill}$",
@@ -301,8 +302,7 @@
       },
       "nitrogen_masses": {
         "type": "array",
-        "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.",
-        "units": "kg",
+        "description": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -311,8 +311,7 @@
       },
       "phosphorus_masses": {
         "type": "array",
-        "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.",
-        "units": "kg",
+        "description": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -321,8 +320,7 @@
       },
       "potassium_masses": {
         "type": "array",
-        "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.",
-        "units": "kg",
+        "description": "List of minimum potassium masses that the corresponding fertilizer applications should contain.\nUnits: kg.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -331,8 +329,7 @@
       },
       "application_depths": {
         "type": "array",
-        "description": "List of depths at which the fertilizer is injected into the soil.",
-        "units": "mm",
+        "description": "List of depths at which the fertilizer is injected into the soil.\nUnits: mm.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -384,8 +381,7 @@
       },
       "nitrogen_masses": {
         "type": "array",
-        "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.",
-        "units": "kg",
+        "description": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -394,8 +390,7 @@
       },
       "phosphorus_masses": {
         "type": "array",
-        "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.",
-        "units": "kg",
+        "description": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -404,8 +399,7 @@
       },
       "potassium_masses": {
         "type": "array",
-        "description": "List of minimum potassium masses that the corresponding manure applications should contain.",
-        "units": "kg",
+        "description": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -424,8 +418,7 @@
       },
       "application_depths": {
         "type": "array",
-        "description": "List of depths at which the manure is injected into the soil.",
-        "units": "mm",
+        "description": "List of depths at which the manure is injected into the soil.\nUnits: mm.",
         "properties": {
           "type": "number",
           "minimum": 0.0,
@@ -477,8 +470,7 @@
       },
       "tillage_depths": {
         "type": "array",
-        "description": "List of depths that the corresponding tillage applications reach.",
-        "units": "mm",
+        "description": "List of depths that the corresponding tillage applications reach.\nUnits: mm.",
         "properties": {
           "type": "number",
           "minimum": 0.1,
@@ -596,64 +588,43 @@
     "soil_profile_properties": {
       "second_moisture_condition_parameter": {
         "type": "number",
-        "description": "Curve number parameter for average moisture condition equation.",
-        "units": "unitless",
-        "reference": "SWAT Input: .MGT - CN2",
+        "description": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2.",
         "minimum": 30,
         "maximum": 100,
         "default": 85
       },
       "average_subbasin_slope": {
         "type": "number",
-        "description": "Slope of the field, measured as rise over run.",
-        "units": "meters / meters or unitless",
-        "reference": "SWAT Input: .HRU - HRU_SLP",
+        "description": "Slope of the field, measured as rise over run.\nUnits: meters / meters or unitless.\nReference: SWAT Input .HRU - HRU_SLP.",
         "default": 0.05
       },
       "manning_roughness_coefficient": {
         "type": "number",
-        "description": "Manning's \"n\" value for overland flow.",
-        "units": "unitless",
-        "reference": "SWAT Input: .HRU - OV_N",
+        "description": "Manning's \"n\" value for overland flow.\nUnitless.\nReference: SWAT Input .HRU - OV_N.",
         "minimum": 0.001,
         "default": 0.4
       },
       "support_practice_factor": {
         "type": "number",
-        "description": "Ratio of soil loss with a specific support practice based on slope characteristics.",
-        "units": "unitless",
-        "reference": "SWAT Input: .MGT - USLE_P",
-        "notes": "This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used.",
+        "description": "Ratio of soil loss with a specific support practice based on slope characteristics.This value adjusts for terracing, contouring, and stripcropping, and these features are not present in V1, so this value IS NOT used.\nUnitless.\nReference: SWAT Input .MGT - USLE_P.",
         "default": 0.08
       },
       "albedo": {
         "type": "number",
-        "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.",
-        "reference": "SWAT Input: .SOL - SOL_ALB",
-        "units": "unitless",
+        "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.\nUnitless.\nReference: SWAT Input .SOL - SOL_ALB",
         "minimum": 0.0,
         "maximum": 1.0,
         "default": 0.16
       },
       "initial_residue": {
         "type": "number",
-        "description": "Amount of residue present on the soil surface at the start of the simulation.",
-        "units": "kg / ha",
+        "description": "Amount of residue present on the soil surface at the start of the simulation.\nUnits: kg / ha.",
         "minimum": 0.0,
         "default": 0.0
       },
-      "soil_cover_type": {
-        "type": "string",
-        "description": "Type of soil cover at the beginning of the simulation.",
-        "reference": "SurPhos Theoretical documentation eqn. [14].",
-        "pattern": "^(BARE|RESIDUE_COVER|GRASSED)$",
-        "default": "BARE"
-      },
       "soil_evaporation_compensation_coefficient": {
         "type": "number",
-        "description": "Modifies depth distribution used to meet soil evaporative demand.",
-        "reference": "SWAT Input: .HRU, .BSN - ESCO",
-        "units": "unitless",
+        "description": "Modifies depth distribution used to meet soil evaporative demand.\nUnitless.\nReference: SWAT Input .HRU, .BSN - ESCO",
         "minimum": 0.01,
         "maximum": 1.0,
         "default": 0.95
@@ -668,167 +639,136 @@
         "description": "This represents a single soil layer.",
         "bottom_depth": {
           "type": "number",
-          "description": "Bottom depth of this soil layer.",
-          "units": "millimeters",
+          "description": "Bottom depth of this soil layer.\nUnits: mm.",
           "minimum": 20
         },
         "soil_water_concentration": {
           "type": "number",
-          "description": "Concentration of water in this layer at the beginning of the simulation.",
-          "units": "mm water / mm soil",
+          "description": "Concentration of water in this layer at the beginning of the simulation.\nUnits: mm water / mm soil.",
           "minimum": 0.0,
           "maximum": 0.95,
           "default": 0.25
         },
         "field_capacity_water_concentration": {
           "type": "number",
-          "description": "Concentration of water in this layer when at field capacity.",
-          "units": "mm water / mm soil",
+          "description": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil.",
           "minimum": 0.0,
           "maximum": 0.95,
           "default": 0.3
         },
         "wilting_point_water_concentration": {
           "type": "number",
-          "description": "Concentration of water in this layer when at field capacity.",
-          "units": "mm water / mm soil",
+          "description": "Concentration of water in this layer when at field capacity.\nUnits: mm water / mm soil.",
           "minimum": 0.0,
           "maximum": 0.95,
-          "default": 0.3
+          "default": 0.2
         },
         "saturation_point_water_concentration": {
           "type": "number",
-          "description": "Concentration of water in a layer when it has become saturated.",
-          "units": "mm water / mm soil",
+          "description": "Concentration of water in a layer when it has become saturated.\nUnits: mm water / mm soil.",
           "minimum": 0.0,
           "maximum": 0.95,
-          "default": 0.58
+          "default": 0.5
         },
         "temperature": {
           "type": "number",
-          "description": "Temperature of the layer at the beginning of the simulation.",
-          "units": "degrees Celsius",
+          "description": "Temperature of the layer at the beginning of the simulation.\nUnits: degrees Celsius.",
           "default": 15.05
         },
         "saturated_hydraulic_conductivity": {
           "type": "number",
-          "description": "Measure of ease of water movement through the soil.",
-          "reference": "SWAT Input: .SOL - SOL_K",
-          "units": "mm / hour",
+          "description": "Measure of ease of water movement through the soil.\nUnits: mm / hour.\nReference: SWAT Input .SOL - SOL_K.",
           "minimum": 0.01,
           "default": 9.5
         },
         "bulk_density": {
           "type": "number",
-          "description": "Ratio of mass of solid particles to total volume of soil.",
-          "units": "Megagrams / cubic meter or grams / cubic centimeter",
+          "description": "Ratio of mass of solid particles to total volume of soil.\nUnits: Megagrams / cubic meter or grams / cubic centimeter.",
           "minimum": 1.1,
           "maximum": 1.9,
           "default": 1.4
         },
         "percent_organic_carbon_content": {
           "type": "number",
-          "description": "Percent of soil weight that is organic carbon.",
-          "reference": "SWAT Input: .SOL - SOL_CBN",
-          "units": "unitless",
+          "description": "Percent of soil weight that is organic carbon.\nUnitless.\nReference: SWAT Input .SOL - SOL_CBN.",
           "minimum": 0.0,
           "maximum": 100.0,
           "default": 1.2
         },
         "percent_clay_content": {
           "type": "number",
-          "description": "Percent of soil weight that is clay.",
-          "reference": "SWAT Input: .SOL - SOL_CLAY",
-          "units": "unitless",
+          "description": "Percent of soil weight that is clay.\nUnitless.\nReference: SWAT Input .SOL - SOL_CLAY.",
           "minimum": 0.0,
           "maximum": 100.0,
           "default": 22.5
         },
         "percent_silt_content": {
           "type": "number",
-          "description": "Percent of soil weight that is silt.",
-          "reference": "SWAT Input: .SOL - SOL_SILT",
-          "units": "unitless",
+          "description": "Percent of soil weight that is silt.\nUnitless.\nReference: SWAT Input .SOL - SOL_SILT.",
           "minimum": 0.0,
           "maximum": 100.0,
           "default": 62.5
         },
         "percent_sand_content": {
           "type": "number",
-          "description": "Percent of soil weight that is sand.",
-          "reference": "SWAT Input: .SOL - SOL_SAND",
-          "units": "unitless",
+          "description": "Percent of soil weight that is sand.\nUnitless.\nReference: SWAT Input .SOL - SOL_SAND.",
           "minimum": 0.0,
           "maximum": 100.0,
           "default": 12.5
         },
         "percent_rock_content": {
           "type": "number",
-          "description": "Percent of soil weight that is rock.",
-          "reference": "SWAT Input: .SOL - SOL_ROCK",
-          "units": "unitless",
+          "description": "Percent of soil weight that is rock.\nUnitless.\nReference: SWAT Input .SOL - SOL_ROCK.",
           "minimum": 0.0,
           "maximum": 100.0,
           "default": 1.3
         },
         "initial_labile_inorganic_phosphorus_concentration": {
           "type": "number",
-          "description": "Concentration of labile inorganic phosphorus at the beginning of the simulation.",
-          "units": "milligrams / kilogram soil",
+          "description": "Concentration of labile inorganic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
           "default": null
         },
         "initial_fresh_organic_phosphorus_concentration": {
           "type": "number",
-          "description": "Concentration of fresh organic phosphorus at the beginning of the simulation.",
-          "units": "milligrams / kilogram soil",
+          "description": "Concentration of fresh organic phosphorus at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
           "default": 0.0
         },
         "initial_soil_nitrate_concentration": {
           "type": "number",
-          "description": "Concentration of nitrate in the layer at the beginning of the simulation.",
-          "units": "milligrams / kilogram soil",
+          "description": "Concentration of nitrate in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
           "default": null
         },
         "initial_soil_ammonium_concentration": {
           "type": "number",
-          "description": "Concentration of ammonium in the layer at the beginning of the simulation.",
-          "units": "milligrams / kilogram soil",
+          "description": "Concentration of ammonium in the layer at the beginning of the simulation.\nUnits: milligrams / kilogram soil.",
           "minimum": 0.0,
           "default": null
         },
         "humus_mineralization_rate_factor": {
           "type": "number",
-          "description": "Rate factor for humus mineralization of active organic nutrients (N and P).",
-          "reference": "SWAT Input: .BSN - CMN",
-          "units": "unitless",
+          "description": "Rate factor for humus mineralization of active organic nutrients (N and P).\nUnitless.\nReference: SWAT Input .BSN - CMN.",
           "minimum": 0.0,
           "default": 0.0003
         },
         "denitrification_rate_coefficient": {
           "type": "number",
-          "description": "Controls the rate of denitrification.",
-          "reference": "SWAT Input: .BSN - CDN",
-          "units": "unitless",
+          "description": "Controls the rate of denitrification.\nUnitless.\nReference: SWAT Input .BSN - CDN.",
           "minimum": 0.0,
           "maximum": 3.0,
           "default": 1.4
         },
         "denitrification_threshold_water_content": {
           "type": "number",
-          "description": "Fraction of field capacity water content above which denitrification takes place.",
-          "reference": "SWAT Input: .BSN - SDNCO",
-          "units": "unitless",
+          "description": "Fraction of field capacity water content above which denitrification takes place.\nUnitless.\nReference: SWAT Input .BSN - SDNCO",
           "minimum": 0.0,
           "default": 1.1
         },
         "residue_fresh_organic_mineralization_rate": {
           "type": "number",
-          "description": "Fraction of residue that will decompose in a day given optimal conditions.",
-          "reference": "SWAT Input: .BSN - RSDCO",
-          "units": "unitless",
+          "description": "Fraction of residue that will decompose in a day given optimal conditions.\nUnitless.\nReference SWAT Input: .BSN - RSDCO.",
           "minimum": 0.0,
           "default": 0.05
         }
@@ -837,28 +777,23 @@
     "field_properties": {
       "soil_specification": {
         "type": "string",
-        "description": "Path to the soil profile specification for this field.",
-        "pattern": "*.json$"
+        "description": "Name of the metadata blob that contains the data for this field's soil specification."
       },
       "crop_specification": {
         "type": "string",
-        "description": "Path to the crop schedule specification for this field.",
-        "pattern": "*.json$"
+        "description": "Name of the metadata blob that contains the data for this field's crop schedule specification."
       },
       "fertilizer_management_specification": {
         "type": "string",
-        "description": "Path to the fertilizer schedule specification for this field.",
-        "pattern": "*.json$"
+        "description": "Name of the metadata blob that contains the data for this field's fertilizer application schedule specification."
       },
       "manure_management_specification": {
         "type": "string",
-        "description": "Path to the manure schedule specification for this field.",
-        "pattern": "*.json$"
+        "description": "Name of the metadata blob that contains the data for this field's manure application schedule specification."
       },
       "tillage_management_specification": {
         "type": "string",
-        "description": "Path to the tillage schedule specification for this field.",
-        "pattern": "*.json$"
+        "description": "Name of the metadata blob that contains the data for this field's tillage application schedule specification."
       },
       "field_size": {
         "type": "number",
@@ -868,46 +803,39 @@
       },
       "absolute_latitude": {
         "type": "number",
-        "description": "The absolute latitude of the center of this field.",
-        "units": "degrees",
+        "description": "The absolute latitude of the center of this field.\nUnits: degrees.",
         "minimum": 0.0,
         "maximum": 90.0,
         "default": 43.5
       },
       "longitude": {
         "type": "number",
-        "description": "The longitude of the center of this field.",
-        "units": "degrees",
+        "description": "The longitude of the center of this field.\nUnits: degrees.",
         "minimum": -180.0,
         "maximum": 180.0,
         "default": -89.4
       },
       "minimum_daylength": {
         "type": "number",
-        "description": "Length of the shortest day of the year for watershed the field is located in.",
-        "units": "hours",
+        "description": "Length of the shortest day of the year for watershed the field is located in.\nUnits: hours.",
         "minimum": 0.0,
         "maximum": 24.0,
         "default": 9.0
       },
       "seasonal_high_water_table": {
         "type": "bool",
-        "description": "True if the HRU that contains the field has a high seasonal water table, false otherwise.",
-        "reference": "SWAT Theoretical documentation: section 2:3.2, SWAT Input: .HRU - IWATABLE",
-        "units": "unitless",
+        "description": "True if the HRU that contains the field has a high seasonal water table, false otherwise.\nUnitless.\nReference: SWAT Theoretical documentation section 2:3.2, SWAT Input .HRU - IWATABLE.",
         "default": false
       },
       "watering_amount_in_liters": {
         "type": "number",
-        "description": "Amount of water to be applied as irrigation at the end of a specified interval.",
-        "units": "liters",
+        "description": "Amount of water to be applied as irrigation at the end of a specified interval.\nUnits: liters.",
         "minimum": 0.0,
         "default": 0.0
       },
       "watering_interval": {
         "type": "number",
-        "description": "Number of days that make up the irrigation interval.",
-        "units": "days",
+        "description": "Number of days that make up the irrigation interval.\nUnits: days.",
         "minimum": 0,
         "default": 0
       }
