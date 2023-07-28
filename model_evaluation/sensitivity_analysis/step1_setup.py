@@ -57,7 +57,7 @@ else:
 problem_list = [problem_a]
 xkey = []
 for x, value in enumerate(problem_list):
-    #print(value)
+    print(value)
     if value == 'NA':
         xkey.append(x)
         #problem_list=problem_list[0:x]
@@ -82,6 +82,12 @@ steady_state_day = config_json['steady_state_day']
 ######################
 # iterating this over each "problem"
 problem_a
+config_json['problem'] = [problem_a]
+
+# write config_json with problem added
+
+with open('model_evaluation\sensitivity_analysis\config_inputs\sensitivity_analysis.json', 'w') as w:
+     json.dump(config_json, w, indent=4)
 
 for i, p in enumerate(problem_list):
     if analysis_type =="ff":
@@ -110,6 +116,8 @@ for i, p in enumerate(problem_list):
     #     pass # shutil.rmtree(dir_path)
     # else:
     #     os.mkdir(dir_path)
+    if not os.path.exists('output\\sensitivity\\'):
+        os.mkdir('output\\sensitivity\\')
     settings_decoder = []
     for i, filename in enumerate(inputJSONs_to_modify):
         for j in range(0, len(config_json['input_files_to_modify'][filename])):
