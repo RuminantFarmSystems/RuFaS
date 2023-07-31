@@ -294,6 +294,19 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                 "element2": {"type": "number", "minimum": 0, "maximum": 150},
                 "element3": {"type": "array",
                              "minimum_length": 1, "maximum_length": 5},
+                "element4": {"type": "object",
+                             "description": "dummy_description",
+                             "nested_element1": {
+                                 "type": "string",
+                                 "minimum_length": 1,
+                                 "maximum_length": 20
+                                },
+                             "nested_element2": {
+                                 "type": "number",
+                                 "minimum": 0,
+                                 "maximum": 250
+                                }
+                             }
             }
         }
     }
@@ -341,6 +354,20 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
+def test_validate_element_object_type(mock_input_manager: InputManager,
+                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                      input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for nested object type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    
+    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
 @pytest.mark.parametrize(
     "input_data_value, expected_result",
     [
@@ -361,21 +388,6 @@ def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock
     result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
 
     assert result == expected_result
-
-
-def test_validate_element_object_type(mock_input_manager: InputManager, mocker: MockerFixture,
-                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                      input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for nested object type input_data for _validate_element in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
-    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data)
-
-    assert result is True
-
-    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
 def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: InputManager,

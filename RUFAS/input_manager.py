@@ -253,8 +253,9 @@ class InputManager:
                     element_hierarchy.remove(nested_key)
 
             is_valid = false_counter == 0
+            element_counter_and_validity["is_valid"] = is_valid
 
-            return is_valid
+            return element_counter_and_validity
         else:
             var_name = element_hierarchy[-1]
             try:
