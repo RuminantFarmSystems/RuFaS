@@ -11,7 +11,7 @@ from SALib.analyze import sobol
 from SALib.sample import fast_sampler
 
 # running as script
-import sensitivity_analysis_helpers as SAH
+# import sensitivity_analysis_helpers as SAH
 # running in window
 import model_evaluation.sensitivity_analysis.sensitivity_analysis_helpers as SAH
 
@@ -136,16 +136,19 @@ for i, p in enumerate(problem_list):
             
             # whichparams = [paramlist for x in settings_decoder if x==json_to_modify]
             paramlist = list(param_values[s])
-            params_subset=[]
+            params_subset = []
+            problem_names_subset = []
             for idx, j in enumerate(settings_decoder):
-                if j == settings_decoder[idx]:
+                if j == json_to_modify:
                     params_subset.append(paramlist[idx])
+                    problem_names_subset.append(problem_a['names'][idx])
             
             cutoff = json_to_modify.find('/')
             jsonname = json_to_modify[cutoff+1:]
             json_to_print = 'input/' + json_to_modify[:cutoff] + '/sensitivity/' + jsonname[:-5] + '_' +  str(s).zfill(5) + '.json'
             # populate input json with settings from samples
-            SAH.json_populater_duplicate(params_subset, problem_a, json_to_modify, json_to_print)
+            # problem_names_subset = 
+            SAH.json_populater_duplicate(params_subset, problem_names_subset, json_to_modify, json_to_print)
 
         # if not os.path.exists('input\\output\\sensitivity\\'):
         #     os.mkdir('input\\output\\sensitivity\\')

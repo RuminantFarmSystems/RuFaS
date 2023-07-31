@@ -583,10 +583,10 @@ class OutputManager(object):
         
         input_path_num = 'sensitivity/' + input_path[-10:-5]
         self.dump_variables(path, input_path_num, exclude_info_maps)
-        self.dump_variable_names_and_contexts(path, exclude_info_maps)
-        self.dump_errors(path)
-        self.dump_logs(path)
-        self.dump_warnings(path)
+        # self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        # self.dump_errors(path)
+        # self.dump_logs(path)
+        # self.dump_warnings(path)
 
     def flush_pools(self) -> None:
         """
