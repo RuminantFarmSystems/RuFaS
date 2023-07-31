@@ -544,15 +544,15 @@ def test_make_crop_from_config_dict(config: dict):
 
 @pytest.mark.parametrize("mix_name,requested_n,requested_p,depth,remainder,year,day,field_size,fertilizer_applied,"
                          "invalid_depth_fraction", {
-    ("test_mix_1", 80.0, 30.0, 0.0, 1.0, 1993, 100, 3.1, True, False),
-    ("test_mix_2", 150.0, 89.0, 25.0, 0.89, 2001, 240, 1.3, True, False),
-    ("test_mix_3", 10.0, 90.33, 100.0, 0.5, 1992, 30, 2.44, True, False),
-    ("test_mix_4", 0.0, 50.0, 0.0, 1.0, 1996, 60, 1.45, True, False),
-    ("test_mix_5", 67.5, 0.0, 0.0, 1.0, 1998, 200, 2.3, True, False),
-    ("test_mix_6", 0.0, 0.0, 0.0, 1.0, 1988, 120, 0.5, False, False),
-    ("test_mix_7", 50.0, 50.0, 20.0, 1.0, 1988, 125, 0.8, True, True),
-    ("test_mix_8", 70.0, 70.0, 0.0, 0.85, 1998, 130, 0.95, True, True),
-})
+                             ("test_mix_1", 80.0, 30.0, 0.0, 1.0, 1993, 100, 3.1, True, False),
+                             ("test_mix_2", 150.0, 89.0, 25.0, 0.89, 2001, 240, 1.3, True, False),
+                             ("test_mix_3", 10.0, 90.33, 100.0, 0.5, 1992, 30, 2.44, True, False),
+                             ("test_mix_4", 0.0, 50.0, 0.0, 1.0, 1996, 60, 1.45, True, False),
+                             ("test_mix_5", 67.5, 0.0, 0.0, 1.0, 1998, 200, 2.3, True, False),
+                             ("test_mix_6", 0.0, 0.0, 0.0, 1.0, 1988, 120, 0.5, False, False),
+                             ("test_mix_7", 50.0, 50.0, 20.0, 1.0, 1988, 125, 0.8, True, True),
+                             ("test_mix_8", 70.0, 70.0, 0.0, 0.85, 1998, 130, 0.95, True, True),
+                         })
 def test_execute_fertilizer_application(mix_name: str, requested_n: float, requested_p: float, depth: float,
                                         remainder: float, year: int, day: int, field_size: float,
                                         fertilizer_applied: bool, invalid_depth_fraction: bool) -> None:
@@ -573,12 +573,12 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
         if invalid_depth_fraction:
             expected_depth = 0.0
             expected_remainder = 1.0
-            expected_info_map = {"prefix": f"field:'test'", "date": {"year": year, "day": day},
+            expected_info_map = {"prefix": "field:'test'", "date": {"year": year, "day": day},
                                  "timestamp": "00-Jan-1970_Thu_00-00-00"}
             expected_error_message = f"Invalid application depth ({depth}) and surface remainder fraction " \
                                      f"({remainder}). Defaulting to application depth of 0.0 mm and a surface " \
                                      f"remainder fraction of 1.0."
-            actual = om.errors_pool[f"field:'test'.fertilizer_application_error"]
+            actual = om.errors_pool["field:'test'.fertilizer_application_error"]
             assert actual["info_maps"].__contains__(expected_info_map)
             assert actual["values"].__contains__(expected_error_message)
         else:
@@ -588,9 +588,9 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
         if fertilizer_applied:
             expected_nitrogen_fraction = 0.2
             field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
-            field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0,
-                                                                                 0.0, expected_depth, expected_remainder,
-                                                                                 field_size)
+            field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction,
+                                                                                 0.0, 0.0, expected_depth,
+                                                                                 expected_remainder, field_size)
             field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, expected_depth,
                                                                          expected_remainder, year, day)
         else:
