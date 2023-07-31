@@ -16,34 +16,6 @@ from typing import List, Dict
 from unittest.mock import MagicMock, patch
 
 
-@pytest.mark.parametrize("year, day, expected_month", [
-    (2000, 366, 12),  # leap year
-    (2001, 365, 12),  # normal year
-    (2000, 60, 2),
-    (2001, 60, 3)
-])
-def test_date_conversion_month(year: int, day: int, expected_month: int):
-    """Tests that number of days were converted into months correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert FieldManager._date_conversion_month(mocked_time) == expected_month
-
-
-@pytest.mark.parametrize("year, day, expected_day", [
-    (2000, 366, 31),  # leap year
-    (2001, 365, 31),  # normal year
-    (2000, 60, 29),
-    (2001, 60, 1)
-])
-def test_date_conversion_day(year: int, day: int, expected_day: int):
-    """Tests that number of days were converted into day of the month correctly"""
-    mocked_time = MagicMock(Time)
-    setattr(mocked_time, "calendar_year", year)
-    setattr(mocked_time, "day", day)
-    assert FieldManager._date_conversion_day(mocked_time) == expected_day
-
-
 @pytest.mark.parametrize("year,day,expected", [
     (1, 3, CurrentWeather(incoming_light=3, min_air_temperature=3, mean_air_temperature=3, max_air_temperature=3,
                           annual_mean_air_temperature=1, rainfall=3, irrigation=3, daylength=15.5)),
@@ -73,6 +45,34 @@ def test_create_current_weather(year: int, day: int, expected) -> None:
     CurrentWeather.determine_daylength.assert_called_once()
 
 
+@pytest.mark.parametrize("year, day, expected_month", [
+    (2000, 366, 12),  # leap year
+    (2001, 365, 12),  # normal year
+    (2000, 60, 2),
+    (2001, 60, 3)
+])
+def test_date_conversion_month(year: int, day: int, expected_month: int):
+    """Tests that number of days were converted into months correctly"""
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+    assert FieldManager._date_conversion_month(mocked_time) == expected_month
+
+
+@pytest.mark.parametrize("year, day, expected_day", [
+    (2000, 366, 31),  # leap year
+    (2001, 365, 31),  # normal year
+    (2000, 60, 29),
+    (2001, 60, 1)
+])
+def test_date_conversion_day(year: int, day: int, expected_day: int):
+    """Tests that number of days were converted into day of the month correctly"""
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "calendar_year", year)
+    setattr(mocked_time, "day", day)
+    assert FieldManager._date_conversion_day(mocked_time) == expected_day
+
+
 @pytest.mark.parametrize("fields", [
     [Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
      Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
@@ -94,8 +94,10 @@ def test_daily_update_routine(fields: List[Field]) -> None:
     setattr(mocked_weather, "T_avg_annual", 3)
     setattr(mocked_weather, "rainfall", 3)
     setattr(mocked_weather, "irrigation", 3)
+
     mocked_manure_manager = MagicMock(ManureManager)
     fm = FieldManager({}, mocked_manure_manager)
+
     fm.fields = fields
     for field in fields:
         field.manage_field = MagicMock()

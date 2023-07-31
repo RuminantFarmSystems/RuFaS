@@ -28,10 +28,6 @@ class OutputGatherer:
                             info_map)
             om.add_variable("eroded_sediment", field.soil.data.eroded_sediment, info_map)
             om.add_variable("accumulated_runoff", field.soil.data.accumulated_runoff, info_map)
-
-            om.add_variable("available_phosphorus_pool", field.soil.data.available_phosphorus_pool, info_map)
-            om.add_variable("runoff_phosphorus_pool", field.soil.data.runoff_phosphorus_pool, info_map)
-            om.add_variable("days_since_application", field.soil.data.days_since_application, info_map)
             om.add_variable("cover_type",
                             field.soil.data.cover_type,
                             info_map)

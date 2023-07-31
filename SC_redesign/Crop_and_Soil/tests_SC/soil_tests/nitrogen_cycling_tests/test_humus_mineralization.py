@@ -43,15 +43,16 @@ def test_determine_organic_to_nitrate_mineralization(active: float, temp_factor:
 
 
 # --- Main routine test ---
-@pytest.mark.parametrize("active_to_stable,active_to_nitrate", [
-    (3, 2),
-    (0, 0),
-    (2, 6),
-    (-4, 4)
+@pytest.mark.parametrize("active_to_stable,active_to_nitrate,temp", [
+    (3, 2, 3),
+    (0, 0, 35),
+    (2, 6, 18),
+    (-4, 4, 19),
+    (3, 2, -32)
 ])
-def test_mineralize_organic_nitrogen(active_to_stable: float, active_to_nitrate: float) -> None:
+def test_mineralize_organic_nitrogen(active_to_stable: float, active_to_nitrate: float, temp: float) -> None:
     """Tests that the main routine of HumusMineralization correctly transfers nitrogen between the right pools."""
-    layer = LayerData(top_depth=0, bottom_depth=20, field_size=1.5)
+    layer = LayerData(top_depth=0, bottom_depth=20, field_size=1.5, temperature=temp)
     soil = SoilData(soil_layers=[layer], field_size=1.5)
     incorp = HumusMineralization(soil)
     incorp.data.soil_layers[0].active_organic_nitrogen_content = 15
@@ -61,14 +62,22 @@ def test_mineralize_organic_nitrogen(active_to_stable: float, active_to_nitrate:
 
     incorp._determine_intra_organic_mineralization = MagicMock(return_value=active_to_stable)
     incorp._determine_organic_to_nitrate_mineralization = MagicMock(return_value=active_to_nitrate)
+
     with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
                         nutrient_cycling_temp_factor=PropertyMock(return_value=0.5),
                         nutrient_cycling_water_factor=PropertyMock(return_value=0.4)):
         incorp.mineralize_organic_nitrogen()
-
-        incorp._determine_intra_organic_mineralization.assert_called_once_with(15, 12)
-        incorp._determine_organic_to_nitrate_mineralization.assert_called_once_with(15 - active_to_stable, 0.5, 0.4,
-                                                                                    0.00035)
-        assert incorp.data.soil_layers[0].active_organic_nitrogen_content == 15 - active_to_stable - active_to_nitrate
-        assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == 12 + active_to_stable
-        assert incorp.data.soil_layers[0].nitrate_content == 25 + active_to_nitrate
+        if temp <= 0:
+            assert not incorp._determine_intra_organic_mineralization.called
+            assert not incorp._determine_organic_to_nitrate_mineralization.called
+            assert incorp.data.soil_layers[0].active_organic_nitrogen_content == 15
+            assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == 12
+            assert incorp.data.soil_layers[0].nitrate_content == 25
+        else:
+            incorp._determine_intra_organic_mineralization.assert_called_once_with(15, 12)
+            incorp._determine_organic_to_nitrate_mineralization.assert_called_once_with(15 - active_to_stable, 0.5, 0.4,
+                                                                                        0.00035)
+            assert incorp.data.soil_layers[0].active_organic_nitrogen_content == 15 - active_to_stable - \
+                active_to_nitrate
+            assert incorp.data.soil_layers[0].stable_organic_nitrogen_content == 12 + active_to_stable
+            assert incorp.data.soil_layers[0].nitrate_content == 25 + active_to_nitrate
