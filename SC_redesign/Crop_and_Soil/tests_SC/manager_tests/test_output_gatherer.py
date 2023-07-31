@@ -21,8 +21,8 @@ def test_send_daily_variables(runoff_values: List[float],
     """Tests that daily variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")
-    crop_data_1 = CropData(name="crop 1")
-    crop_data_2 = CropData(name="crop 2")
+    crop_data_1 = CropData(name="crop 1", planting_day=100, planting_year=1993)
+    crop_data_2 = CropData(name="crop 2", planting_day=215, planting_year=1993)
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
@@ -48,7 +48,6 @@ def test_send_daily_variables(runoff_values: List[float],
         for index, crop in enumerate(field_2.crops):
             crop.data.root_depth = root_depths[index]
         og.send_daily_variables()
-    print(om.variables_pool)
     pool = om.variables_pool
 
     # Testing layer variables
@@ -66,8 +65,8 @@ def test_send_daily_variables(runoff_values: List[float],
     assert pool["field:'name 2'.accumulated_runoff"]['values'] == [1.3, 2.4, 1.22]
 
     # Testing vadose data
-    assert len(pool["field:'name 1_vadose_layer'.active_organic_nitrogen_content"]['info_maps']) == 3
-    assert pool["field:'name 1_vadose_layer'.active_organic_nitrogen_content"]['values'] == [0, 0, 0]
+    assert len(pool["field:'name 1',vadose_zone_layer.active_organic_nitrogen_content"]['info_maps']) == 3
+    assert pool["field:'name 1',vadose_zone_layer.active_organic_nitrogen_content"]['values'] == [0, 0, 0]
 
     # Testing layer data
     assert len(pool["field:'name 1',layer_index:'0'.percolated_water"]['info_maps']) == 3
@@ -88,14 +87,14 @@ def test_send_daily_variables(runoff_values: List[float],
     assert pool["field:'name 2',layer_index:'3'.percolated_water"]['values'] == [50, 50, 50]
 
     # Testing crop data
-    assert len(pool["field:'name 1',crop:'crop 1'.root_depth"]['info_maps']) == 3
-    assert len(pool["field:'name 1',crop:'crop 2'.root_depth"]['info_maps']) == 3
-    assert len(pool["field:'name 2',crop:'crop 1'.root_depth"]['info_maps']) == 3
-    assert len(pool["field:'name 2',crop:'crop 2'.root_depth"]['info_maps']) == 3
-    assert pool["field:'name 1',crop:'crop 1'.root_depth"]['values'] == [18.7, 18.7, 18.7]
-    assert pool["field:'name 1',crop:'crop 2'.root_depth"]['values'] == [20.5, 20.5, 20.5]
-    assert pool["field:'name 2',crop:'crop 1'.root_depth"]['values'] == [18.7, 18.7, 18.7]
-    assert pool["field:'name 2',crop:'crop 2'.root_depth"]['values'] == [20.5, 20.5, 20.5]
+    assert len(pool["field:'name 1',crop:'crop 1',planted:100,1993.root_depth"]['info_maps']) == 3
+    assert len(pool["field:'name 1',crop:'crop 2',planted:215,1993.root_depth"]['info_maps']) == 3
+    assert len(pool["field:'name 2',crop:'crop 1',planted:100,1993.root_depth"]['info_maps']) == 3
+    assert len(pool["field:'name 2',crop:'crop 2',planted:215,1993.root_depth"]['info_maps']) == 3
+    assert pool["field:'name 1',crop:'crop 1',planted:100,1993.root_depth"]['values'] == [18.7, 18.7, 18.7]
+    assert pool["field:'name 1',crop:'crop 2',planted:215,1993.root_depth"]['values'] == [20.5, 20.5, 20.5]
+    assert pool["field:'name 2',crop:'crop 1',planted:100,1993.root_depth"]['values'] == [18.7, 18.7, 18.7]
+    assert pool["field:'name 2',crop:'crop 2',planted:215,1993.root_depth"]['values'] == [20.5, 20.5, 20.5]
 
 
 @pytest.mark.parametrize("annual_irrigation_water_use_total, annual_soil_evaporation_total,"

@@ -122,7 +122,7 @@ class Field:
 
         # --- Whole-Field Methods ---
         # Allow non-management field processes (water/nutrient cycling) to occur
-        self._execute_daily_processes(current_weather)
+        self._execute_daily_processes(current_weather, time)
         # ... Other ...
 
         # --- Crop Management ---
@@ -622,6 +622,8 @@ class Field:
             crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
+        crop.data.planting_year = time.calendar_year
+        crop.data.planting_day = time.day
 
         self.crops.append(crop)
 
@@ -648,9 +650,10 @@ class Field:
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._plant_crop.__name__,
-                    "prefix": f"field_name:'{self.field_data.name}'", "field_size": self.field_data.field_size,
-                    "date": {"year": year, "day": day}, "species": species}
-        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest}
+                    "prefix": f"field:'{self.field_data.name}'", "field_size": self.field_data.field_size,
+                    "species": species}
+        value = {"crop_reference": crop_reference, "heat_scheduled_harvest": heat_scheduled_harvest,
+                 "date": {"year": year, "day": day}}
         om.add_variable("crop_planting", value, info_map)
 
     def _harvest_crop(self, crop_reference: str, harvest_operation: str, time) -> None:
@@ -789,13 +792,15 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_weather: CurrentWeather) -> None:
+    def _execute_daily_processes(self, current_weather: CurrentWeather, time) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
         ----------
         current_weather : CurrentWeather
             Object containing the environment conditions on this day.
+        time : Time
+            Object containing the current year and day of the simulation.
 
         Notes
         -----
@@ -814,7 +819,7 @@ class Field:
                                                           snow_cover,
                                                           current_weather.annual_mean_air_temperature)
 
-        self._cycle_water(current_weather)
+        self._cycle_water(current_weather, time)
 
         for crop in self.crops:
             if crop.data.is_mature or crop.data.is_dormant:
@@ -829,12 +834,14 @@ class Field:
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_weather.incoming_light)
 
-    def _cycle_water(self, current_weather: CurrentWeather):
+    def _cycle_water(self, current_weather: CurrentWeather, time):
         """allow the water to cycle through the field.
 
         Args:
             current_weather: a CurrentWeather object, containing a collection of today's weather variables needed
                 for field processes.
+        time : Time
+            Object containing the current year and day of the simulation.
 
         Details: This method executes all water-related processes that occur within Crop and Soil objects. Having a
             separate method to handle water processes altogether is necessary because processes that effect water in the
@@ -851,7 +858,8 @@ class Field:
             of processes. This is necessary because there is not necessarily one correct order for processes to run in.
 
         """
-        watering_amount = self._determine_watering_amount(current_weather.rainfall)
+        watering_amount = self._determine_watering_amount(rainfall=current_weather.rainfall, year=time.year,
+                                                          day=time.day, irrigation=current_weather.irrigation)
         total_precipitation = current_weather.rainfall + watering_amount
         precipitation_reaching_soil = self._handle_water_in_crop_canopies(total_precipitation)
 
@@ -911,13 +919,19 @@ class Field:
                 crop.data.cumulative_transpiration = 0.0
                 crop.data.cumulative_potential_evapotranspiration = 0.0
 
-    def _determine_watering_amount(self, rainfall: float) -> float:
+    def _determine_watering_amount(self, rainfall: float, year: int, day: int, irrigation: float) -> float:
         """Manages watering of the field.
 
         Parameters
         ----------
         rainfall : float
             Amount of rainfall that occurs on this day (mm)
+        year : int
+            Year in which this watering occurs.
+        day : int
+            Julian day on which this watering occurs.
+        irrigation : float
+            The amount of hard-coded irrigation in the weather data (mm)
 
         Returns
         -------
@@ -933,22 +947,29 @@ class Field:
         needs to be applied are reset at the end of every interval. The water that is added to the field from the farm's
         resources is tracked on an annual basis, so that water budgeting may be accurately predicted.
 
+        Old method of using hard-coded irrigation data will be used if there's no user specified data. If there's any
+        user-specified data provided, the hard-coded irrigation will be ignored and only uses the new method.
+
         """
-        if not self.field_data.watering_occurs:
+        if self.field_data.watering_occurs:
+            self.field_data.current_water_deficit -= rainfall
+            self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
+
+            if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
+                self.field_data.days_into_watering_interval = 0
+                water_applied_this_interval = self.field_data.current_water_deficit
+                self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
+                self.field_data.annual_irrigation_water_use_total += water_applied_this_interval
+                self._record_field_watering(year=year, day=day, watering_amount=water_applied_this_interval)
+                return water_applied_this_interval
+            self.field_data.days_into_watering_interval += 1
             return 0.0
-
-        self.field_data.current_water_deficit -= rainfall
-        self.field_data.current_water_deficit = max(0.0, self.field_data.current_water_deficit)
-
-        if self.field_data.days_into_watering_interval == self.field_data.watering_interval:
-            self.field_data.days_into_watering_interval = 0
-            water_applied_this_interval = self.field_data.current_water_deficit
-            self.field_data.current_water_deficit = self.field_data.watering_amount_in_mm
-            self.field_data.annual_irrigation_water_use_total += water_applied_this_interval
-            return water_applied_this_interval
-
-        self.field_data.days_into_watering_interval += 1
-        return 0.0
+        elif not self.field_data.watering_occurs and irrigation > 0:
+            self.field_data.annual_irrigation_water_use_total += irrigation
+            self._record_field_watering(year=year, day=day, watering_amount=irrigation)
+            return irrigation
+        else:
+            return 0.0
 
     def _handle_water_in_crop_canopies(self, precipitation_total: float) -> float:
         """Adds water to canopies of all the crops in the field and removes any excess water from them.
@@ -1196,3 +1217,24 @@ class Field:
         self.soil.data.do_annual_reset()
         self.field_data.perform_annual_field_reset()
         return
+
+    def _record_field_watering(self, year: int, day: int, watering_amount: float) -> None:
+        """Record the day, year and amount of irrigation
+
+        Parameters
+        ----------
+        year : int
+            Year in which this watering occurs.
+        day : int
+            Julian day on which this watering occurs.
+        watering_amount : float
+            The amount of hard-coded irrigation in the weather data (mm)
+
+        Returns
+        -------
+        None
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._record_field_watering.__name__,
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
+                    "field_size": self.field_data.field_size, "units": "mm"}
+        om.add_variable("field_watering", watering_amount, info_map)
