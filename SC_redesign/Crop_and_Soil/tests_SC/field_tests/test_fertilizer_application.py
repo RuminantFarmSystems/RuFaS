@@ -1,6 +1,6 @@
 import pytest
 from typing import List
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 
 from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
@@ -8,7 +8,7 @@ from SC_redesign.Crop_and_Soil.soil.soil import Soil
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
-@pytest.mark.parametrize("depth,bottom_depths,expected",[
+@pytest.mark.parametrize("depth,bottom_depths,expected", [
     (15.0, [20.0, 70.0, 200.0], [1.0]),
     (0.0, [20.0, 70.0, 200.0], [1.0]),
     (40.0, [20.0, 70.0, 200.0], [0.5, 0.5]),
@@ -58,13 +58,15 @@ def test_apply_subsurface_fertilizer(nutrient_amounts: float, depth: float, subs
 
 
 @pytest.mark.parametrize("phosphorus,fertilizer,inorganic_nitrogen_frac,ammonium_frac,organic_nitrogen_frac,depth,"
-                         "remainder,expected", [
-                             (15, 90, 0.15, 0.44, 0.09, 0.0, 1.0, [7.56, 5.94, 4.05]),
-                             (22.1, 144, 0.33, 0.2, 0.06, 40.0, 0.88, [38.016, 9.504, 4.32]),
-                             (0, 0, 0, 0, 0, 0.0, 1.0, [0, 0, 0])
+                         "remainder,expected,subsurface_app_call", [
+                             (15, 90, 0.15, 0.44, 0.09, 0.0, 1.0, [15, 4.44705882, 3.49411765, 2.38235294], None),
+                             (22.1, 144, 0.33, 0.2, 0.06, 40.0, 0.88, [19.448, 19.6788706, 4.91971765, 2.23623529],
+                              (13, 22.3623529, 5.5905882, 2.5411764, 40.0, 0.12)),
+                             (0, 0, 0, 0, 0, 0.0, 1.0, [0, 0, 0, 0], None)
                          ])
 def test_apply_fertilizer(phosphorus: float, fertilizer: float, inorganic_nitrogen_frac: float, ammonium_frac: float,
-                          organic_nitrogen_frac: float, depth: float, remainder: float, expected: List[float]) -> None:
+                          organic_nitrogen_frac: float, depth: float, remainder: float, expected: List[float],
+                          subsurface_app_call: tuple[float]) -> None:
     """Tests that fertilizer is applied correctly."""
     field_size = 1.7
     fert_app = FertilizerApplication(field_size=field_size)
@@ -73,13 +75,24 @@ def test_apply_fertilizer(phosphorus: float, fertilizer: float, inorganic_nitrog
     fert_app.soil.data.soil_layers[0].fresh_organic_nitrogen_content = 0
     fert_app.soil.data.soil_layers[0].active_organic_nitrogen_content = 0
 
-    fert_app.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus = MagicMock()
+    with patch(
+            "SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication._apply_subsurface_fertilizer",
+            new_callable=MagicMock) as patched_subsurface_applicator, \
+        patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer.Fertilizer.add_fertilizer_phosphorus",
+              new_callable=MagicMock) as patched_phosphorus_applicator:
+        fert_app.apply_fertilizer(phosphorus, fertilizer, inorganic_nitrogen_frac, ammonium_frac, organic_nitrogen_frac,
+                                  depth, remainder, field_size)
 
-    fert_app.apply_fertilizer(phosphorus, fertilizer, inorganic_nitrogen_frac, ammonium_frac, organic_nitrogen_frac,
-                              depth, remainder, field_size)
-
-    fert_app.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus.assert_called_once_with(phosphorus)
-    assert pytest.approx(fert_app.soil.data.soil_layers[0].nitrate_content) == expected[0] / field_size
-    assert pytest.approx(fert_app.soil.data.soil_layers[0].ammonium_content) == expected[1] / field_size
-    assert pytest.approx(fert_app.soil.data.soil_layers[0].fresh_organic_nitrogen_content) == expected[2] / field_size
-    assert pytest.approx(fert_app.soil.data.soil_layers[0].active_organic_nitrogen_content) == expected[2] / field_size
+        patched_phosphorus_applicator.assert_called_once_with(expected[0])
+        assert pytest.approx(fert_app.soil.data.soil_layers[0].nitrate_content) == expected[1]
+        assert pytest.approx(fert_app.soil.data.soil_layers[0].ammonium_content) == expected[2]
+        assert pytest.approx(fert_app.soil.data.soil_layers[0].fresh_organic_nitrogen_content) == expected[3]
+        assert pytest.approx(fert_app.soil.data.soil_layers[0].active_organic_nitrogen_content) == expected[3]
+        if subsurface_app_call is not None:
+            patched_subsurface_applicator.assert_called_once_with(pytest.approx(subsurface_app_call[0]),
+                                                                  pytest.approx(subsurface_app_call[1]),
+                                                                  pytest.approx(subsurface_app_call[2]),
+                                                                  pytest.approx(subsurface_app_call[3]),
+                                                                  subsurface_app_call[4], subsurface_app_call[5])
+        else:
+            patched_subsurface_applicator.assert_not_called()

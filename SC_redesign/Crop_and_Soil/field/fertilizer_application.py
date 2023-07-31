@@ -77,7 +77,7 @@ class FertilizerApplication:
         self.soil.data.soil_layers[0].active_organic_nitrogen_content += \
             (organic_nitrogen_applied * surface_remainder_fraction)
 
-        if surface_remainder_fraction == 1.0:
+        if application_depth == 0.0 and surface_remainder_fraction == 1.0:
             return
 
         subsurface_fraction = 1.0 - surface_remainder_fraction
