@@ -179,9 +179,9 @@ class Field:
         impossible_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
                                                   (application_depth > 0.0 and surface_remainder_fraction == 1.0)
         if impossible_depth_and_remainder_fraction:
-            info_map = {"class": self.__class__.__name__, "function": self._record_fertilizer_application.__name__,
+            info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
                         "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
-            error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction" \
+            error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
                             f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a surface" \
                             f" remainder fraction of 1.0."
             om.add_error("fertilizer_application_error", error_message, info_map)
