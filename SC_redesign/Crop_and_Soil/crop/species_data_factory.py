@@ -20,6 +20,7 @@ class CropSpecies(Enum):
     SUGAR_BEET = "sugar_beet"
     POTATO = "potato"
     TRITICALE = "triticale"
+    CORN_SILAGE = "corn_silage"
 
 
 class CropSpeciesDataFactory:
