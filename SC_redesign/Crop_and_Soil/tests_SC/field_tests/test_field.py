@@ -60,7 +60,7 @@ def test_manage_field() -> None:
     field._check_fertilizer_application_schedule.assert_called_once_with(mocked_time)
     field._check_manure_application_schedule.assert_called_once_with(mocked_time)
     field._check_tillage_schedule.assert_called_once_with(mocked_time)
-    field._execute_daily_processes.assert_called_once_with(mocked_weather)
+    field._execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
     field._assess_dormancy.assert_called_once_with(12)
     field._check_crop_planting_schedule.assert_called_once_with(mocked_time)
     field._check_crop_harvest_schedule.assert_called_once_with(mocked_time)
@@ -296,6 +296,8 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
     assert field.crops[0].data.id == expected_crop.data.id
     assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
     assert field.crops[0].data.species == expected_crop.data.species
+    assert field.crops[0].data.planting_year == year
+    assert field.crops[0].data.planting_day == day
     field._record_planting.assert_called_once_with(crop_reference, heat_scheduled, expected_crop.data.species,
                                                    year, day)
 
@@ -303,17 +305,17 @@ def test_plant_crop(crop_reference: str, heat_scheduled: bool, custom_crop_specs
 @pytest.mark.parametrize("crop_reference,heat_scheduled,species,year,day,field_name,field_size,expected_info_map,"
                          "expected_value", [
                              ("ref_1", False, "species_1", 1993, 100, "name_1", 1.3,
-                              {"prefix": "field_name:'name_1'", "field_size": 1.3, "date": {"year": 1993, "day": 100},
-                               "species": "species_1"},
-                              {"crop_reference": "ref_1", "heat_scheduled_harvest": False}),
+                              {"prefix": "field:'name_1'", "field_size": 1.3, "species": "species_1"},
+                              {"crop_reference": "ref_1", "heat_scheduled_harvest": False,
+                               "date": {"year": 1993, "day": 100}}),
                              ("ref_2", True, "custom_alien_species", 1996, 120, "name_2", 2.55,
-                              {"prefix": "field_name:'name_2'", "field_size": 2.55, "date": {"year": 1996, "day": 120},
-                               "species": "custom_alien_species"},
-                              {"crop_reference": "ref_2", "heat_scheduled_harvest": True}),
+                              {"prefix": "field:'name_2'", "field_size": 2.55, "species": "custom_alien_species"},
+                              {"crop_reference": "ref_2", "heat_scheduled_harvest": True,
+                               "date": {"year": 1996, "day": 120}}),
                              ("ref_3", False, "custom_corn", 2008, 122, "name_3", 0.95,
-                              {"prefix": "field_name:'name_3'", "field_size": 0.95, "date": {"year": 2008, "day": 122},
-                               "species": "custom_corn"},
-                              {"crop_reference": "ref_3", "heat_scheduled_harvest": False})
+                              {"prefix": "field:'name_3'", "field_size": 0.95, "species": "custom_corn"},
+                              {"crop_reference": "ref_3", "heat_scheduled_harvest": False,
+                               "date": {"year": 2008, "day": 122}})
                          ])
 def test_record_planting(crop_reference: str, heat_scheduled: bool, species: str, year: int, day: int, field_name: str,
                          field_size: float, expected_info_map: Dict, expected_value: Dict) -> None:
@@ -321,7 +323,7 @@ def test_record_planting(crop_reference: str, heat_scheduled: bool, species: str
     field = Field(field_data=FieldData(name=field_name, field_size=field_size), manure_manager=MagicMock(ManureManager))
     field._record_planting(crop_reference, heat_scheduled, species, year, day)
 
-    actual = om.variables_pool[f"field_name:'{field_name}'.crop_planting"]
+    actual = om.variables_pool[f"field:'{field_name}'.crop_planting"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
@@ -830,14 +832,16 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
             crop.growth_constraints.constrain_growth = MagicMock()
             crop.leaf_area_index.grow_canopy = MagicMock()
             crop.biomass_allocation.allocate_biomass = MagicMock()
-
-        incorp._execute_daily_processes(current_weather)
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "year", 2023)
+        setattr(mocked_time, "day", 178)
+        incorp._execute_daily_processes(current_weather, mocked_time)
 
         incorp._determine_total_above_ground_biomass.assert_called_once()
         incorp.soil.soil_temp.daily_soil_temperature_update.assert_called_once_with(light, mean_temp, min_temp,
                                                                                     max_temp, 89 + residue, 0,
                                                                                     annual_mean_temp)
-        incorp._cycle_water.assert_called_once_with(current_weather)
+        incorp._cycle_water.assert_called_once_with(current_weather, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
                 crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
@@ -907,12 +911,16 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
         crop_2.water_dynamics.set_maximum_transpiration = MagicMock()
         crop_2.water_dynamics.cycle_water = MagicMock()
         crop_2.water_uptake.uptake_water = MagicMock()
+        mocked_time = MagicMock(Time)
+        setattr(mocked_time, "year", 2023)
+        setattr(mocked_time, "day", 178)
 
-        incorp._cycle_water(current_weather)
-
-        incorp._determine_watering_amount.assert_called_once_with(rainfall)
+        incorp._cycle_water(current_weather, mocked_time)
+        incorp._determine_watering_amount.assert_called_once_with(rainfall=rainfall, year=mocked_time.year,
+                                                                  day=mocked_time.day, irrigation=0.0)
         incorp._handle_water_in_crop_canopies.assert_called_once_with(rainfall)
-        incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp, mean_temp)
+        incorp._determine_potential_evapotranspiration.assert_called_once_with(light, max_temp, min_temp,
+                                                                               mean_temp)
         incorp._evaporate_from_crop_canopies.assert_called_once_with(33.5)
         incorp.soil.infiltration.infiltrate.assert_called_once_with(2.0, 1, 33.5)
         incorp.soil.percolation.percolate.assert_called_once_with(high_water_table)
@@ -942,16 +950,25 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
             assert crop_2.data.cumulative_potential_evapotranspiration == 0
 
 
-@pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs", [
-    (3.4, 3, 1.5, False),  # No watering because water_occurs is False
-    (3.1, 5, 2.3, True),  # No watering because rainfall takes care of watering
-    (0.2, 5, 3.6, True),  # Watering occurs because water deficit has not been met
-    (0.19, 4, 2.8, True)  # No watering occurs because interval has not been met
-])
+@pytest.mark.parametrize("rainfall,days_into_interval,water_deficit,watering_occurs,irrigation,old_method",
+                         [
+                             (3.4, 3, 1.5, False, 0, False),  # No watering because water_occurs is False
+                             (3.1, 5, 2.3, True, 0, False),
+                             # No watering because rainfall takes care of watering
+                             (0.2, 5, 3.6, True, 0, False),
+                             # Watering occurs because water deficit has not been met
+                             (0.19, 4, 2.8, True, 0, False),
+                             # No watering occurs because interval has not been met
+                             (0.2, 5, 3.6, True, 9.24, False),
+                             (0.2, 5, 3.6, False, 77.7, True)
+                         ])
 def test_determine_watering_amount(rainfall: float, days_into_interval: int, water_deficit: float,
-                                   watering_occurs: float) -> None:
+                                   watering_occurs: float, irrigation: float, old_method: bool) -> None:
     """Tests that the correct amount of water to be used to water is field is calculated, and that the counters and
         totals are updated correctly."""
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "year", 2023)
+    setattr(mocked_time, "day", 178)
     data = FieldData(watering_amount_in_liters=50_000, watering_interval=5,
                      days_into_watering_interval=days_into_interval)
     data.watering_amount_in_mm = 5.0
@@ -959,22 +976,24 @@ def test_determine_watering_amount(rainfall: float, days_into_interval: int, wat
     data.current_water_deficit = water_deficit
     incorp = Field(field_data=data, manure_manager=MagicMock(ManureManager))
 
-    actual = incorp._determine_watering_amount(rainfall)
-
-    if not watering_occurs:
-        assert actual == 0.0
-        assert incorp.field_data.days_into_watering_interval == days_into_interval
-        assert incorp.field_data.annual_irrigation_water_use_total == 0
-    elif days_into_interval == incorp.field_data.watering_interval:
-        assert actual == max(0.0, water_deficit - rainfall)
-        assert incorp.field_data.days_into_watering_interval == 0
-        assert incorp.field_data.current_water_deficit == 5.0
-        assert incorp.field_data.annual_irrigation_water_use_total == actual
+    actual = incorp._determine_watering_amount(rainfall, mocked_time.year, mocked_time.day, irrigation)
+    if old_method:
+        assert actual == irrigation
     else:
-        assert actual == 0.0
-        assert incorp.field_data.days_into_watering_interval == days_into_interval + 1
-        assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall)
-        assert incorp.field_data.annual_irrigation_water_use_total == 0
+        if not watering_occurs:
+            assert actual == 0.0
+            assert incorp.field_data.days_into_watering_interval == days_into_interval
+            assert incorp.field_data.annual_irrigation_water_use_total == 0
+        elif days_into_interval == incorp.field_data.watering_interval:
+            assert actual == max(0.0, water_deficit - rainfall)
+            assert incorp.field_data.days_into_watering_interval == 0
+            assert incorp.field_data.current_water_deficit == 5.0
+            assert incorp.field_data.annual_irrigation_water_use_total == actual
+        else:
+            assert actual == 0.0
+            assert incorp.field_data.days_into_watering_interval == days_into_interval + 1
+            assert incorp.field_data.current_water_deficit == max(0.0, water_deficit - rainfall)
+            assert incorp.field_data.annual_irrigation_water_use_total == 0
 
 
 @pytest.mark.parametrize("precipitation,canopy_capacity,first_canopy_amount,second_canopy_amount,expected_return,"
@@ -1246,6 +1265,24 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
         assert f"Expected watering amount to be >= 0, received '{watering_amount}'." == str(e.value)
     elif interval < 0:
         assert f"Expected watering interval to be >= 0, received '{interval}'." == str(e.value)
+
+
+@pytest.mark.parametrize("field_name,field_size,day,year,watering_amount,expected_info_map,expected_value", [
+    ("name_1", 100, 120, 1993, 135.6,
+     {"prefix": "field:'name_1'", "date": {"year": 1993, "day": 120}, "field_size": 100, "units": "mm"}, 135.6),
+    ("name_2", 14.65, 3, 1996, 1.2,
+     {"prefix": "field:'name_2'", "date": {"year": 1996, "day": 3}, "field_size": 14.65, "units": "mm"}, 1.2),
+    ("name_2", 14.65, 48, 2023, 1.2,
+     {"prefix": "field:'name_2'", "date": {"year": 2023, "day": 48}, "field_size": 14.65, "units": "mm"}, 1.2)
+])
+def test_record_field_watering(field_name: str, field_size: float, day: int, year: int, watering_amount: float,
+                               expected_info_map: Dict, expected_value: Dict) -> None:
+    field = Field(field_data=FieldData(name=field_name, field_size=field_size), manure_manager=MagicMock(ManureManager))
+    field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
+
+    actual = om.variables_pool[f"field:'{field_name}'.field_watering"]
+    assert actual["info_maps"].__contains__(expected_info_map)
+    assert actual["values"].__contains__(expected_value)
 
 
 @pytest.mark.parametrize("annual_irrigation_water_use_total,expected", [
