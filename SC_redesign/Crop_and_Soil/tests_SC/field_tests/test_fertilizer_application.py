@@ -1,6 +1,6 @@
 import pytest
 from typing import List
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
