@@ -670,25 +670,25 @@ def test_formulate_fertilizer_required(nitrogen_frac: float, phosphorus_frac: fl
     assert actual == expected
 
 
-@pytest.mark.parametrize("mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,year,day,field_name,"
-                         "field_size", [
-                             ("mix_1", 100, 20, 20, 20, 1992, 90, "field_1", 1.4),
-                             ("mix_2", 30, 10, 3, 3, 1994, 120, "field_2", 4.3)
+@pytest.mark.parametrize("mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,depth,remainder,year,day,"
+                         "field_name,field_size", [
+                             ("mix_1", 100, 20, 20, 20, 35.0, 0.8, 1992, 90, "field_1", 1.4),
+                             ("mix_2", 30, 10, 3, 3, 0.0, 1.0, 1994, 120, "field_2", 4.3)
                          ])
 def test_record_fertilizer_application(mix_name: str, total_mass: float, nitrogen_mass: float, phosphorus_mass: float,
-                                       potassium_mass: float, year: int, day: int, field_name: str,
-                                       field_size: float) -> None:
+                                       potassium_mass: float, depth: float, remainder: float, year: int, day: int,
+                                       field_name: str, field_size: float) -> None:
     """Tests that fertilizer applications are correctly recorded in the OutputManager."""
     field = Field(field_data=FieldData(name=field_name, field_size=field_size),
                   manure_manager=MagicMock(ManureManager))
 
-    field._record_fertilizer_application(mix_name, total_mass, nitrogen_mass, phosphorus_mass, potassium_mass, year,
-                                         day)
+    field._record_fertilizer_application(mix_name, total_mass, nitrogen_mass, phosphorus_mass, potassium_mass, depth,
+                                         remainder, year, day)
 
     expected_info_map = {"prefix": f"field:'{field_name}'", "date": {"year": year, "day": day},
                          "mix_name": mix_name, "field_size": field_size}
     expected_value = {"mass": total_mass, "nitrogen": nitrogen_mass, "phosphorus": phosphorus_mass,
-                      "potassium": potassium_mass}
+                      "potassium": potassium_mass, "application_depth": depth, "surface_remainder_fraction": remainder}
     actual = om.variables_pool[f"field:'{field_name}'.fertilizer_application"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
