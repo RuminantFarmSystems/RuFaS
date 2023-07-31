@@ -1,10 +1,13 @@
 from typing import Optional
 
 from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from RUFAS.output_manager import OutputManager
 
 """
 This module provides a way for Field to apply fertilizer, based on SWAT Theoretical documentation section 6:1.7.
 """
+
+om = OutputManager()
 
 
 class FertilizerApplication:
@@ -60,13 +63,57 @@ class FertilizerApplication:
         """
         # TODO: move application functionality from soil/phosphorus_cycling up to this module, and increase
         #  functionality of this module - issue #492
-        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(phosphorus_applied)
+        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(phosphorus_applied *
+                                                                          surface_remainder_fraction)
 
         nitrates_applied = (fertilizer_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
         ammonium_applied = (fertilizer_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
         organic_nitrogen_applied = (fertilizer_mass * organic_nitrogen_fraction * 0.5) / field_size
 
-        self.soil.data.soil_layers[0].nitrate_content += nitrates_applied
-        self.soil.data.soil_layers[0].ammonium_content += ammonium_applied
-        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += organic_nitrogen_applied
-        self.soil.data.soil_layers[0].active_organic_nitrogen_content += organic_nitrogen_applied
+        self.soil.data.soil_layers[0].nitrate_content += (nitrates_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].ammonium_content += (ammonium_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += \
+            (organic_nitrogen_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].active_organic_nitrogen_content += \
+            (organic_nitrogen_applied * surface_remainder_fraction)
+
+    @staticmethod
+    def _generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
+        """
+        Generates a list of fractions that partitions sub-surface nutrients between the different layers soil.
+
+        Parameters
+        ----------
+        application_depth : float
+            Bottom depth of nutrient application (mm).
+        soil_layer_bottom_depths : list[float]
+            List of bottom depths of soil layers in the soil profile (mm).
+
+        Returns
+        -------
+        list[float]
+            List of fractions that determine the distribution of nutrients between different soil layers when subsurface
+            nutrients are applied.
+
+        References
+        ----------
+        pseudocode_field_management [FM.3.B.3 - 5]
+
+        Notes
+        -----
+        This method of distributing nutrients between soil layers originates with Pete Vadas' SurPhos model. Its p is
+        to proportionally distribute nutrients to layers within the soil profile.
+
+        """
+        depth_factors_sum = 0.0
+        depth_factors = []
+        for depth in soil_layer_bottom_depths:
+            if depth < application_depth:
+                depth_factor = depth / application_depth
+                depth_factors_sum += depth_factor
+                depth_factors.append(depth_factor)
+            else:
+                depth_factor = 1.0 - depth_factors_sum
+                depth_factors.append(depth_factor)
+                break
+        return depth_factors

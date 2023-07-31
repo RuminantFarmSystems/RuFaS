@@ -5,6 +5,20 @@ from unittest.mock import MagicMock
 from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 
 
+@pytest.mark.parametrize("depth,bottom_depths,expected",[
+    (15.0, [20.0, 70.0, 200.0], [1.0]),
+    (0.0, [20.0, 70.0, 200.0], [1.0]),
+    (40.0, [20.0, 70.0, 200.0], [0.5, 0.5]),
+    (65.0, [20.0, 70.0, 200.0], [0.30769231, 0.69230769]),
+    (70.0, [20.0, 70.0, 200.0], [0.28571429, 0.71428571]),
+    (120.0, [20.0, 70.0, 200.0], [0.16666667, 0.58333333, 0.25]),
+])
+def test_generate_depth_factors(depth: float, bottom_depths: list[float], expected: list[float]) -> None:
+    """Tests that the depth factors are correctly calculated for subsurface nutrient applications."""
+    actual = FertilizerApplication._generate_depth_factors(depth, bottom_depths)
+    assert pytest.approx(actual) == expected
+
+
 @pytest.mark.parametrize("phosphorus,fertilizer,inorganic_nitrogen_frac,ammonium_frac,organic_nitrogen_frac,depth,"
                          "remainder,expected", [
                              (15, 90, 0.15, 0.44, 0.09, 0.0, 1.0, [7.56, 5.94, 4.05]),
