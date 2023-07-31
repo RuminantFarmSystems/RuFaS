@@ -269,19 +269,11 @@ def json_populater_duplicate(params, problem_x, json_to_modify, json_to_print, )
     # would have to be something like the pens being decided on with a followup variable, or that those need to be generated manually
     pen_wanted = 8
     pennamechange = 'pen' + str(pen_wanted)
-    for j in range(len(problem_x['names'])):
-
-        if problem_x['names'][j][0:5] == 'dummy':
+    for j in range(len(problem_x)):
+        if problem_x[j][0:5] == 'dummy':
             pass
-        else:
-            # find if it actually is inside the json!!!
-            assert problem_x['names'][j] in potential_inputs, f"Incorrect input! The following isn't in the list!: {problem_x['names'][j]}"
-            # Correct input is something like: assert 'unkown_cull_prob' in potential_inputs, f"Incorrect input!"
-
-        if problem_x['names'][j][0:5] == 'dummy':
-            pass
-        else:
-            full_path = get_full_path(json_object, problem_x['names'][j])
+        elif problem_x[j] in potential_inputs:
+            full_path = get_full_path(json_object, problem_x[j])
             # found_variable can be shown in comparisons if needed: 
             # found_value = find_value_at_path(json_object, path_list)
             # e.g. print('previous value was ' + str(found_value))
@@ -309,6 +301,35 @@ def json_populater_duplicate(params, problem_x, json_to_modify, json_to_print, )
             if llen==5:
                 json_object[path_list[0]][path_list[1]][path_list[2]][path_list[3]][path_list[4]] = valtouse
                 #print(json_object[path_list[0]][path_list[1]][path_list[2]][path_list[3]][path_list[4]])
+        else:
+            try:
+                if type(eval(problem_x[j]))==list:
+                    valtouse = params[j]
+                    list_obj = eval(problem_x[j])
+                    if '=' in list_obj:
+                        # ['manure_handler_configs', 'manure_handler_type', '=', 'flush system']
+                        # find which of these
+                        # json_object['manure_handler_configs']
+                        for j in range(len(json_object[list_obj[0]])):
+                            if json_object[list_obj[0]][j][list_obj[1]]==list_obj[3]:
+                                        json_object[list_obj[0]][j][list_obj[4]] = valtouse
+                    else:
+                        # e.g. "['pen_information']['pen0'][vertical_dist_to_milking_parlor]", 0.1]
+                        if len(list_obj)==1:
+                            json_object[list_obj[0]] = valtouse
+                        if len(list_obj)==2:
+                            json_object[list_obj[0]][list_obj[1]] = valtouse
+                        if len(list_obj)==3:
+                            json_object[list_obj[0]][list_obj[1]][list_obj[2]] = valtouse
+                        if len(list_obj)==4:
+                            json_object[list_obj[0]][list_obj[1]][list_obj[2]][list_obj[3]] = valtouse
+                        if len(list_obj)==5:
+                            json_object[list_obj[0]][list_obj[1]][list_obj[2]][list_obj[3]][list_obj[4]] = valtouse
+            except:
+                pass            
+                # find if it actually is inside the json!!!
+                assert problem_x[j] in potential_inputs, f"Incorrect input! The following isn't in the list!: {problem_x[j]}"
+                # Correct input is something like: assert 'unkown_cull_prob' in potential_inputs, f"Incorrect input!"
     # write updated values
     if not os.path.exists(os.path.dirname(json_to_print)):
         os.mkdir(os.path.dirname(json_to_print))
@@ -542,14 +563,15 @@ def anim_manag_modifier(inputJSONs_to_modify, s):
     file.close()
 
     for inputJSON in inputJSONs_to_modify:
+        # inputJSON=inputJSONs_to_modify[1]
         json_to_print = inputJSON[:-5] + '_' +  str(s).zfill(5) + '.json'
         cutoff = json_to_print.find('/')
         jsonname = json_to_print[cutoff+1:]
         if inputJSON == 'animal/animal_management_animal.json':
             json_object['farm']['animal'] = 'sensitivity/' + jsonname
-        elif jsonname == 'feed/purchased_feed.json':
+        elif inputJSON == 'feed/purchased_feed.json':
             json_object['farm']['feed'] = 'sensitivity/' + jsonname
-        elif jsonname == 'manure/manure_management.json':
+        elif inputJSON == 'manure/manure_management.json':
             json_object['farm']['manure'] = 'sensitivity/' + jsonname
         else:
             pass

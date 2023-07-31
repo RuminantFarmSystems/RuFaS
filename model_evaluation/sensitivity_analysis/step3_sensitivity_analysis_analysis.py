@@ -8,6 +8,7 @@ from SALib.sample import ff as ff_s
 from SALib.sample import saltelli
 from SALib.analyze import sobol
 from SALib.sample import fast_sampler
+import numpy as np
 
 
 # load config json
@@ -38,67 +39,97 @@ elif analysis_type == 'FAST':
     param_values = fast_sampler.sample(p, saltelli_num)
 
 
+
 # WORKING ZONE
 # COLLECTING THE OUTPUTS TO USE INSTEAD OF CURR COL IN ANALYSIS LISTS
 collect_all_outputs = {}
-for output_variables_of_interest in config_json['output_variables_of_interest']:
-    print(output_variables_of_interest)
+for output_variable_of_interest in config_json['output_variables_of_interest']:
+    #output_variable_of_interest = output_variables_of_interest[2]
+    #output_variable_of_interest = "LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: PGF_injection_num"
+
+    print(output_variable_of_interest)
     output_variable_list = []
     total_num_runs = len(param_values)
-    for every_run in total_num_runs:
+    for every_run in range(total_num_runs):
+        if every_run > 50:
+            break
+        print(f'run={every_run}')
         # get first file with the correct prefix
         for f_name in os.listdir('output/sensitivity/'):
             if f_name.startswith(str(every_run).zfill(5)) and f_name.endswith('.json'):
+                f_name_full = 'output\\sensitivity\\' + f_name
                 break
-        with open('output\\sensitivity\\00000_28-Jul-2023_Fri_12-48-33.json', 'r') as f:
+        with open(f_name_full, 'r') as f:
             output_json = json.load(f)
-        
-        output_variable_list.append(output_json[output_variables_of_interest])
-    collect_all_outputs[output_variables_of_interest] = collect_all_outputs
+            print(f_name_full)
+        # APPEND TO LIST IN DICT
+        # E.G. all_outputs['output_variable_of_interest'] = output_json[variableparsed]
+        # the = term has to use pase_output_location(output_json, variable_of_interest)
+        if ':' not in output_variable_of_interest:
+            analysis_time = len(output_json[output_variable_of_interest]['values'])/4
+            output_variable_mean = np.mean(output_json[output_variable_of_interest]['values'][-int(analysis_time):])
+            output_variable_list.append(output_variable_mean)
+        else:
+            string_split = output_variable_of_interest.split(':')
+            string_split_0 = string_split[0]
+            if string_split_0[-6:] == 'values':
+                key_name = string_split_0[:-7]
+                value_name = string_split[1][1:]
+                values_found = output_json[key_name]['values']
+                # values_found = 
+                if type(values_found[0])==dict:
+                    values_found_list = [field[value_name] for field in values_found]
+                    len(values_found_list)
+                    output_variable_list.append(np.mean(values_found_list[-int(len(values_found_list)/4):]))
+                elif type(values_found[0])==list:
+                    pass
+    collect_all_outputs[output_variable_of_interest] = output_variable_list
 
 
-list_of_variable = output_json['MilkingParlor.__init__.fresh_water_use_rate']['values']
-type(list_of_variable)
-type(list_of_variable[0])
+for idx, name in enumerate(output_variables_of_interest):
+    print(idx)
+    print(name)
+    print(collect_all_outputs[name])
+    concatenated_output = np.concatenate(collect_all_outputs[name], axis=None)
+    if analysis_type =="ff":
+        analysis = ff_a.analyze(p, param_values, collect_all_outputs[name], second_order=True)
+        analysis = SAH.rewrite_ff_analysis(analysis) #
+    if analysis_type =="saltellisobol":
+        analysis = sobol.analyze(p, concatenated_output) #sobol
+        analysis = SAH.rewrite_sobol_analysis(analysis) #
+    # SALib.analyze.sobol.analyze(problem, Y, calc_second_order=True, num_resamples=100, conf_level=0.95, print_to_console=False, parallel=False, n_processors=None, keep_resamples=False, seed=None)
+    # analysis = sol_a.analyze(p, [r[curr_col] for r in analysis_lists])
 
-#####################
-# if it's just a normal list
-# this gets simple values out! for monthly data
-# 386 in total
-len(output_json['LifeCycleManager.daily_update.life_cycle_daily_herd_update']['values'])
-oo = output_json['LifeCycleManager.daily_update.life_cycle_daily_herd_update']['values']
-type(oo)
-# THIS IS A LIST
-ooout = [field['culled_cow_num'] for field in oo]
-len(ooout)
-
-
-############################################
-# if it's a list of lists
-stringin = 'LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: culled_cow_num'
-string_split = stringin.split(':')
-string_split_0 = string_split[0]
-if string_split_0[-6:] == 'values':
-    #go ahead
-    string_split_0 = string_split_0[:-7]
-
-string_split_1 = string_split[1][1:]
-
-
-oo = output_json[string_split_0]['values']
-ooout = [field[string_split_1] for field in oo]
-len(ooout)
+    # HOW TO WRITE THESE? 
+    # file = open(analysis_file, 'w', newline='')
+    # with file:
+    #     write = csv.writer(file)
+    #     write.writerows(analysis)
 
 
 
-import numpy as np
-np.mean(ooout[-60:])
+##################################################
+##################################################
+##################################################
+##################################################
+##################################################
+##################################################
 
 ##################################################
 # if it's a dict: it means there are individuals
 if type(output_json['Cow.milking_update.milk_data_at_milk_update']['values'][0])==dict:
     pass
-output_json['Cow.milking_update.milk_data_at_milk_update']['days_in_milk']
+key_name = 'Cow.milking_update.milk_data_at_milk_update'
+value_name = 'estimated_daily_milk_produced'
+['days_in_milk']
+
+
+
+
+key_name = 'LifeCycleManager.daily_update.life_cycle_daily_herd_update'
+type(output_json[key_name]['values'][0])
+
+
 
 
 
