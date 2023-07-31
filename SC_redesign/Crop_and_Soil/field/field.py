@@ -188,6 +188,14 @@ class Field:
             application_depth = 0.0
             surface_remainder_fraction = 1.0
 
+        if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
+            info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+            error_message = f"Invalid application depth ({application_depth}) is lower than the bottom depth of the " \
+                            f"soil profile, setting the application depth to be at the bottom of the soil profile."
+            om.add_error("fertilizer_application_error", error_message, info_map)
+            application_depth = self.soil.data.soil_layers[-1].bottom_depth
+
         try:
             fertilizer_mix = self.available_fertilizer_mixes[mix_name]
         except KeyError:

@@ -544,61 +544,40 @@ def test_make_crop_from_config_dict(config: dict):
         Field._make_custom_crop.assert_called_once()
 
 
-@pytest.mark.parametrize("mix_name,requested_n,requested_p,depth,remainder,year,day,field_size,fertilizer_applied,"
-                         "invalid_depth_fraction", {
-                             ("test_mix_1", 80.0, 30.0, 0.0, 1.0, 1993, 100, 3.1, True, False),
-                             ("test_mix_2", 150.0, 89.0, 25.0, 0.89, 2001, 240, 1.3, True, False),
-                             ("test_mix_3", 10.0, 90.33, 100.0, 0.5, 1992, 30, 2.44, True, False),
-                             ("test_mix_4", 0.0, 50.0, 0.0, 1.0, 1996, 60, 1.45, True, False),
-                             ("test_mix_5", 67.5, 0.0, 0.0, 1.0, 1998, 200, 2.3, True, False),
-                             ("test_mix_6", 0.0, 0.0, 0.0, 1.0, 1988, 120, 0.5, False, False),
-                             ("test_mix_7", 50.0, 50.0, 20.0, 1.0, 1988, 125, 0.8, True, True),
-                             ("test_mix_8", 70.0, 70.0, 0.0, 0.85, 1998, 130, 0.95, True, True),
+@pytest.mark.parametrize("mix_name,requested_n,requested_p,depth,remainder,year,day,field_size,fertilizer_applied", {
+                             ("test_mix_1", 80.0, 30.0, 0.0, 1.0, 1993, 100, 3.1, True),
+                             ("test_mix_2", 150.0, 89.0, 25.0, 0.89, 2001, 240, 1.3, True),
+                             ("test_mix_3", 10.0, 90.33, 100.0, 0.5, 1992, 30, 2.44, True),
+                             ("test_mix_4", 0.0, 50.0, 0.0, 1.0, 1996, 60, 1.45, True),
+                             ("test_mix_5", 67.5, 0.0, 0.0, 1.0, 1998, 200, 2.3, True),
+                             ("test_mix_6", 0.0, 0.0, 0.0, 1.0, 1988, 120, 0.5, False),
                          })
 def test_execute_fertilizer_application(mix_name: str, requested_n: float, requested_p: float, depth: float,
                                         remainder: float, year: int, day: int, field_size: float,
-                                        fertilizer_applied: bool, invalid_depth_fraction: bool) -> None:
+                                        fertilizer_applied: bool) -> None:
     """Tests that fertilizer applications are being correctly executed and recorded."""
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"):
-        field_data = FieldData(name="test", field_size=field_size)
-        field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}},
-                      manure_manager=MagicMock(ManureManager))
-        field._formulate_fertilizer_required = MagicMock(return_value={"total_mass": 100, "nitrogen_mass": 20,
-                                                                       "phosphorus_mass": 15,
-                                                                       "potassium_mass": 10})
-        field.fertilizer_applicator.apply_fertilizer = MagicMock()
-        field._record_fertilizer_application = MagicMock()
+    field_data = FieldData(name="test", field_size=field_size)
+    field = Field(field_data=field_data, fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}},
+                  manure_manager=MagicMock(ManureManager))
+    field._formulate_fertilizer_required = MagicMock(return_value={"total_mass": 100, "nitrogen_mass": 20,
+                                                                   "phosphorus_mass": 15,
+                                                                   "potassium_mass": 10})
+    field.fertilizer_applicator.apply_fertilizer = MagicMock()
+    field._record_fertilizer_application = MagicMock()
 
-        field._execute_fertilizer_application(mix_name, requested_n, requested_p, depth, remainder, year, day)
+    field._execute_fertilizer_application(mix_name, requested_n, requested_p, depth, remainder, year, day)
 
-        if invalid_depth_fraction:
-            expected_depth = 0.0
-            expected_remainder = 1.0
-            expected_info_map = {"prefix": "field:'test'", "date": {"year": year, "day": day},
-                                 "timestamp": "00-Jan-1970_Thu_00-00-00"}
-            expected_error_message = f"Invalid application depth ({depth}) and surface remainder fraction " \
-                                     f"({remainder}). Defaulting to application depth of 0.0 mm and a surface " \
-                                     f"remainder fraction of 1.0."
-            actual = om.errors_pool["field:'test'.fertilizer_application_error"]
-            assert actual["info_maps"].__contains__(expected_info_map)
-            assert actual["values"].__contains__(expected_error_message)
-        else:
-            expected_depth = depth
-            expected_remainder = remainder
-
-        if fertilizer_applied:
-            expected_nitrogen_fraction = 0.2
-            field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
-            field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction,
-                                                                                 0.0, 0.0, expected_depth,
-                                                                                 expected_remainder, field_size)
-            field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, expected_depth,
-                                                                         expected_remainder, year, day)
-        else:
-            field._formulate_fertilizer_required.assert_not_called()
-            field.fertilizer_applicator.apply_fertilizer.assert_not_called()
-            field._record_fertilizer_application.assert_not_called()
+    if fertilizer_applied:
+        expected_nitrogen_fraction = 0.2
+        field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
+        field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction,
+                                                                             0.0, 0.0, depth, remainder, field_size)
+        field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, depth, remainder, year,
+                                                                     day)
+    else:
+        field._formulate_fertilizer_required.assert_not_called()
+        field.fertilizer_applicator.apply_fertilizer.assert_not_called()
+        field._record_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize("field_name,mix_name,available_mixes,expected_message", [
@@ -618,6 +597,47 @@ def test_execute_fertilizer_application_error(field_name: str, mix_name: str, av
     with pytest.raises(KeyError) as e:
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 0.0, 1.0, 1994, 120)
     assert str(e.value) == expected_message
+
+
+@pytest.mark.parametrize("depth,remainder,expected_depth,expected_remainder,expected_info_map,expected_error_message", [
+    (1000.0, 0.1, 950.0, 0.1,
+     {"prefix": "field:'test'", "date": {"year": 1994, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     "Invalid application depth (1000.0) is lower than the bottom depth of the soil profile, setting the application "
+     "depth to be at the bottom of the soil profile."),
+    (100.0, 1.0, 0.0, 1.0,
+     {"prefix": "field:'test'", "date": {"year": 1994, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
+     "mm and a surface remainder fraction of 1.0."),
+    (0.0, 0.9, 0.0, 1.0,
+     {"prefix": "field:'test'", "date": {"year": 1994, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     "Invalid application depth (0.0) and surface remainder fraction (0.9). Defaulting to application depth of 0.0 mm "
+     "and a surface remainder fraction of 1.0.")
+])
+def test_execute_fertilizer_application_with_invalid_args(depth: float, remainder: float, expected_depth: float,
+                                                          expected_remainder: float, expected_info_map: dict,
+                                                          expected_error_message: str) -> None:
+    """Tests that fertilizer applications with invalid arguments are caught, recorded in the OutputManager and execution
+        with corrected values takes place."""
+    field = Field(field_data=FieldData(name="test", field_size=1.2), manure_manager=MagicMock(ManureManager))
+    field.soil.data.soil_layers[-1].bottom_depth = 950.0
+    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
+               return_value="00-Jan-1970_Thu_00-00-00"), \
+            patch("SC_redesign.Crop_and_Soil.field.field.Field._formulate_fertilizer_required", new_callable=MagicMock,
+                  return_value={"total_mass": 100.0, "phosphorus_mass": 50.0, "nitrogen_mass": 50.0,
+                                "potassium_mass": 0.0}) as patched_formulator, \
+            patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication.apply_fertilizer",
+                  new_callable=MagicMock) as patched_applicator, \
+            patch("SC_redesign.Crop_and_Soil.field.field.Field._record_fertilizer_application",
+                  new_callable=MagicMock) as patched_recorder:
+        field._execute_fertilizer_application("26_4_24", 50.0, 50.0, depth, remainder, 1994, 200)
+
+        actual = om.errors_pool["field:'test'.fertilizer_application_error"]
+        assert actual["info_maps"].__contains__(expected_info_map)
+        assert actual["values"].__contains__(expected_error_message)
+        patched_formulator.assert_called_once_with(0.26, 0.04, 0.24, 50.0, 50.0)
+        patched_applicator.assert_called_once_with(50.0, 100.0, 0.5, 0.0, 0.0, expected_depth, expected_remainder, 1.2)
+        patched_recorder.assert_called_once_with("26_4_24", 100.0, 50.0, 50.0, 0.0, expected_depth, expected_remainder,
+                                                 1994, 200)
 
 
 @pytest.mark.parametrize("nitrogen,phosphorus,mixes,expected", [
