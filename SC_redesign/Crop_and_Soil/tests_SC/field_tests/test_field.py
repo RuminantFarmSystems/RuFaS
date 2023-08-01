@@ -565,19 +565,27 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     field.fertilizer_applicator.apply_fertilizer = MagicMock()
     field._record_fertilizer_application = MagicMock()
 
-    field._execute_fertilizer_application(mix_name, requested_n, requested_p, depth, remainder, year, day)
+    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
+               return_value="00-Jan-1970_Thu_00-00-00"):
+        field._execute_fertilizer_application(mix_name, requested_n, requested_p, depth, remainder, year, day)
 
-    if fertilizer_applied:
-        expected_nitrogen_fraction = 0.2
-        field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
-        field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction,
-                                                                             0.0, 0.0, depth, remainder, field_size)
-        field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, depth, remainder, year,
-                                                                     day)
-    else:
-        field._formulate_fertilizer_required.assert_not_called()
-        field.fertilizer_applicator.apply_fertilizer.assert_not_called()
-        field._record_fertilizer_application.assert_not_called()
+        if fertilizer_applied:
+            expected_nitrogen_fraction = 0.2
+            field._formulate_fertilizer_required.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p)
+            field.fertilizer_applicator.apply_fertilizer.assert_called_once_with(15, 100, expected_nitrogen_fraction,
+                                                                                 0.0, 0.0, depth, remainder, field_size)
+            field._record_fertilizer_application.assert_called_once_with(mix_name, 100, 20, 15, 10, depth, remainder,
+                                                                         year, day)
+        else:
+            expected_info_map = {"prefix": "field:'test'", "date": {"year": year, "day": day},
+                                 "timestamp": "00-Jan-1970_Thu_00-00-00"}
+            expected_log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
+            actual = om.logs_pool["field:'test'.fertilizer_application_log"]
+            assert actual["info_maps"].__contains__(expected_info_map)
+            assert actual["values"].__contains__(expected_log_message)
+            field._formulate_fertilizer_required.assert_not_called()
+            field.fertilizer_applicator.apply_fertilizer.assert_not_called()
+            field._record_fertilizer_application.assert_not_called()
 
 
 @pytest.mark.parametrize("field_name,mix_name,available_mixes,expected_message", [
