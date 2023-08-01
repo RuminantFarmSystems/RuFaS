@@ -396,16 +396,14 @@ class ManureApplication:
         bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
         depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
         water_extractable_inorganic_phosphorus = (total_phosphorus_mass *
-                                                  water_extractable_inorganic_phosphorus_fraction * subsurface_fraction)
+                                                  water_extractable_inorganic_phosphorus_fraction)
         water_extractable_organic_phosphorus = (total_phosphorus_mass * water_extractable_organic_phosphorus_fraction *
-                                                subsurface_fraction * 0.95)
-        stable_inorganic_phosphorus = (total_phosphorus_mass * stable_inorganic_phosphorus_fraction *
-                                       subsurface_fraction)
-        stable_organic_phosphorus = (total_phosphorus_mass * stable_organic_phosphorus_fraction * subsurface_fraction *
-                                     0.95)
+                                                0.95)
+        stable_inorganic_phosphorus = (total_phosphorus_mass * stable_inorganic_phosphorus_fraction)
+        stable_organic_phosphorus = (total_phosphorus_mass * stable_organic_phosphorus_fraction * 0.95)
         labile_phosphorus_addition = (water_extractable_inorganic_phosphorus + water_extractable_organic_phosphorus +
-                                      stable_organic_phosphorus)
-        active_phosphorus_addition = stable_inorganic_phosphorus
+                                      stable_organic_phosphorus) * subsurface_fraction
+        active_phosphorus_addition = stable_inorganic_phosphorus * subsurface_fraction
         for index, depth_factor in enumerate(depth_factors):
             labile_phosphorus_added_to_layer = labile_phosphorus_addition * depth_factor
             active_phosphorus_added_to_layer = active_phosphorus_addition * depth_factor

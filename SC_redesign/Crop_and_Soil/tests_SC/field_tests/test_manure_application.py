@@ -1,4 +1,5 @@
 import pytest
+from pytest import approx
 from unittest.mock import MagicMock, patch, call
 from typing import List
 
@@ -162,10 +163,10 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
 
 @pytest.mark.parametrize("dry_mass,dry_frac,phosphorus_mass,coverage,area,weiP_frac,inorganic_frac,ammonium_frac,"
                          "organic_frac", [
-                            (1000, 0.15, 122, 0.88, 1.94, 0.4, 0.3, 0.39, 0.044),
-                            (1230, 0.115, 180, 0.97, 2.45, 0.356, 0.14, 0.5, 0.018),
-                            (2015, 0.0911, 233.2, 0.66, 4.8, 0.22, 0.2, 0.51, 0.023),
-                            (1780, 0.056, 345, 0.93, 3.81, 0.623, 0.18, 0.6, 0.033),
+                             (1000, 0.15, 122, 0.88, 1.94, 0.4, 0.3, 0.39, 0.044),
+                             (1230, 0.115, 180, 0.97, 2.45, 0.356, 0.14, 0.5, 0.018),
+                             (2015, 0.0911, 233.2, 0.66, 4.8, 0.22, 0.2, 0.51, 0.023),
+                             (1780, 0.056, 345, 0.93, 3.81, 0.623, 0.18, 0.6, 0.033),
                          ])
 def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphorus_mass: float, coverage: float,
                                      area: float, weiP_frac: float, inorganic_frac: float, ammonium_frac: float,
@@ -221,6 +222,47 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     assert incorp.data.machine_water_extractable_organic_phosphorus == expect_water_extractable_organic
     assert incorp.data.machine_stable_inorganic_phosphorus == expect_stable_inorganic
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
+
+
+@pytest.mark.parametrize("total_phosphorus,wip_frac,wop_frap,sip_frac,sop_frac,dry_matter,inorganic_frac,ammonium_frac,"
+                         "organic_frac,depth,subsurface_frac,area,expected_labile_calls,expected_active_calls,"
+                         "expected_nitrogen_calls", [
+                             (50.0, 0.5, 0.05, 0.33, 0.12, 100.0, 0.4, 0.5, 0.1, 65.0, 0.5, 1.5,
+                              [call(approx(0.826875), 1.5), call(approx(5.788125), 1.5), call(approx(9.9225), 1.5)],
+                              [call(approx(0.4125), 1.5), call(approx(2.8875), 1.5), call(approx(4.95), 1.5)],
+                              [call(0, 2.5, 0.4, 0.5, 0.1, 1.5), call(1, 17.5, 0.4, 0.5, 0.1, 1.5),
+                               call(2, 30, 0.4, 0.5, 0.1, 1.5)]),
+                             (70.0, 0.6, 0.03, 0.28, 0.09, 125.0, 0.5, 0.3, 0.08, 100.0, 0.8, 2.1,
+                              [call(approx(1.9992), 2.1), call(approx(13.9944), 2.1), call(approx(23.9904), 2.1)],
+                              [call(approx(0.784), 2.1), call(approx(5.488), 2.1), call(approx(9.408), 2.1)],
+                              [call(0, 5, 0.5, 0.3, 0.08, 2.1), call(1, 35, 0.5, 0.3, 0.08, 2.1),
+                               call(2, 60, 0.5, 0.3, 0.08, 2.1)])
+                         ])
+def test_apply_subsurface_manure(total_phosphorus: float, wip_frac: float, wop_frap: float, sip_frac: float,
+                                 sop_frac: float, dry_matter: float, inorganic_frac: float, ammonium_frac: float,
+                                 organic_frac: float, depth: float, subsurface_frac: float, area: float,
+                                 expected_labile_calls: list, expected_active_calls: list,
+                                 expected_nitrogen_calls: list) -> None:
+    """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
+    manure_app = ManureApplication(field_size=area)
+    with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.get_vectorized_layer_attribute",
+               new_callable=MagicMock, return_value=[20.0, 50.0, 200.0, 400.0]) as layer, \
+            patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
+                  new_callable=MagicMock, return_value=[0.05, 0.35, 0.6]) as depth_factors, \
+            patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_labile_phosphorus",
+                  new_callable=MagicMock) as labile, \
+            patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_active_phosphorus",
+                  new_callable=MagicMock) as active, \
+            patch("SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication._add_nitrogen_to_soil_layer",
+                  new_callable=MagicMock) as nitrogen:
+        manure_app._apply_subsurface_manure(total_phosphorus, wip_frac, wop_frap, sip_frac, sop_frac, dry_matter,
+                                            inorganic_frac, ammonium_frac, organic_frac, depth, subsurface_frac, area)
+
+        layer.assert_called_once_with("bottom_depth")
+        depth_factors.assert_called_once_with(depth, [20.0, 50.0, 200.0, 400.0])
+        labile.assert_has_calls(expected_labile_calls)
+        active.assert_has_calls(expected_active_calls)
+        nitrogen.assert_has_calls(expected_nitrogen_calls)
 
 
 @pytest.mark.parametrize("index,mass,inorganic_frac,ammonium_frac,organic_frac,field_size,expected", [
@@ -287,11 +329,11 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
 
 @pytest.mark.parametrize("dry_mass,dry_fraction,total_phosphorus_mass,coverage,depth,remainder,area,inorganic_frac,"
                          "ammonium_frac,organic_frac,weiP_frac,source_animal,should_fail", [
-                            (1000, 0.75, 200, 0.85, 0.0, 1.0, 1.835, 0.11, 0.55, 0.01, 0.5, None, False),
-                            (3000, 0.10, 150, 0.975, 150.0, 0.55, 2.2254, 0.2, 0.6, 0.03, None, "CATTLE", False),
-                            (2000, 0.44, 103.5, 0.88, 0.0, 1.0, 0.8898, 0.14, 0.44, 0.06, 0.25, "SWINE", False),
-                            (2500, 0.08, 175, 0.79, 0.0, 1.0, 3.4453, 0.33, 0.39, 0.09, None, None, False),
-                            (2500, 0.08, 175, 0.79, 50.0, 0.92, 3.4453, 0.33, 0.39, 0.09, 1.8, None, True),
+                             (1000, 0.75, 200, 0.85, 0.0, 1.0, 1.835, 0.11, 0.55, 0.01, 0.5, None, False),
+                             (3000, 0.10, 150, 0.975, 150.0, 0.55, 2.2254, 0.2, 0.6, 0.03, None, "CATTLE", False),
+                             (2000, 0.44, 103.5, 0.88, 0.0, 1.0, 0.8898, 0.14, 0.44, 0.06, 0.25, "SWINE", False),
+                             (2500, 0.08, 175, 0.79, 0.0, 1.0, 3.4453, 0.33, 0.39, 0.09, None, None, False),
+                             (2500, 0.08, 175, 0.79, 50.0, 0.92, 3.4453, 0.33, 0.39, 0.09, 1.8, None, True),
                          ])
 def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosphorus_mass: float, coverage: float,
                               depth: float, remainder: float, area: float, inorganic_frac: float, ammonium_frac: float,
