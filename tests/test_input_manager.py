@@ -459,7 +459,8 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
     assert result["is_valid"] is False
 
     input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
-                               "nested_element3": {"nested_sub_element1": "invalid_cows", "nested_sub_element2": [1, 2, 3]}}}
+                               "nested_element3": {"nested_sub_element1": "invalid_cows",
+                                                   "nested_sub_element2": [1, 2, 3]}}}
     result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
 
     assert result["is_valid"] is False

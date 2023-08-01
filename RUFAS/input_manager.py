@@ -422,8 +422,23 @@ class InputManager:
         Examples
         -------
         >>> input_manager = InputManager()
-        >>> input_manager.get_data('animal.herd.calf_num')
-        This will return the value of `calf_num` of the `herd` section in the `animal` module.
+        >>> input_manager.get_data('animal.herd_information.calf_num')
+        This will return the value of `calf_num` of the `herd_information` section in the `animal` module.
+
+        If a broader spectrum of data is needed, the user can expand the query to get_data
+        by shortening the data_address:
+        >>> input_manager.get_data('animal.herd_information')
+        This will return the full herd_information object:
+        {
+        calf_num: 8,
+        heiferI_num: 44,
+        heiferII_num: 38,
+        heiferIII_num_springers: 5,
+        cow_num: 100,
+        herd_num: 187,
+        herd_init: False,
+        breed: HO
+        }
         """
         info_map = {"class": self.__class__.__name__,
                     "function": self.get_data.__name__,
@@ -445,4 +460,67 @@ class InputManager:
                                             info_map)
 
             raise KeyError(f"Data not found: Cannot find \"{data_address}\", "
+                           f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
+
+    def get_metadata(self, metadata_address: str) -> Any:
+        """
+        Get the requested data from the pool
+
+        Parameters
+        ----------
+        metadata_address : str
+            The address of the requested data.
+
+        Returns
+        -------
+        Any
+            The requested data if found.
+
+        Raises
+        -------
+        KeyError
+            If the requested data is not found.
+
+        Examples
+        -------
+        >>> input_manager = InputManager()
+        >>> input_manager.get_metadata('properties.soil_profile_properties.albedo.type')
+
+        This will return the type for albedo in the soil_profile_properties section of the metadata's properties.
+
+        If a broader spectrum of the metadata is needed, the user can expand the query to get_metadata
+        by shortening the metadata_address:
+        >>> input_manager.get_metadata('properties.soil_profile_properties.albedo')
+
+        This will return the full 'albedo' object containing its type, description, minimum, maximum, and default.
+
+        {
+        "type": "number",
+        "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.
+        \nUnitless.\nReference: SWAT Input .SOL - SOL_ALB",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.16
+        }
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self.get_metadata.__name__,
+                    }
+
+        element_hierarchy = metadata_address.split('.')
+
+        try:
+            data_value = reduce(lambda d, key: d[key], element_hierarchy,
+                                self.__metadata)
+            return data_value
+
+        except KeyError as key_error:
+            invalid_key = str(key_error).strip("\'")
+            parent_address = str(metadata_address.split("." + invalid_key)[0])
+
+            om.add_error("Data not found:", f"Cannot find \"{metadata_address}\", "
+                                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
+                                            info_map)
+
+            raise KeyError(f"Data not found: Cannot find \"{metadata_address}\", "
                            f"\"{parent_address}\" does not have attribute \"{invalid_key}\".")
