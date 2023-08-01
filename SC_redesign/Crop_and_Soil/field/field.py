@@ -365,7 +365,9 @@ class Field:
 
         Notes
         -----
-        Because potassium is not currently specified in the manure request results, it is recorded as None.
+        Because potassium is not currently specified in the manure request results, it is recorded as None. This method
+        also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
+        are corrected, an error is raised to the OutputManager, and execution continues with the new values.
 
         """
         if requested_nitrogen == requested_phosphorus == 0.0:
@@ -383,6 +385,25 @@ class Field:
                 (manure_supplied.nitrogen / manure_supplied.dry_matter) * manure_supplied.inorganic_nitrogen_fraction
             total_organic_nitrogen_fraction = \
                 (manure_supplied.nitrogen / manure_supplied.dry_matter) * manure_supplied.organic_nitrogen_fraction
+
+            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+            invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
+                                                   (application_depth > 0.0 and surface_remainder_fraction == 1.0)
+            if invalid_depth_and_remainder_fraction:
+                error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
+                                f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a " \
+                                f"surface remainder fraction of 1.0."
+                om.add_error("manure_application_error", error_message, info_map)
+                application_depth = 0.0
+                surface_remainder_fraction = 1.0
+
+            if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
+                error_message = f"Invalid application depth ({application_depth}) is lower than the bottom depth of " \
+                                f"the soil profile, setting the application depth to be at the bottom of the soil " \
+                                f"profile."
+                om.add_error("manure_application_error", error_message, info_map)
+                application_depth = self.soil.data.soil_layers[-1].bottom_depth
 
             self.manure_applicator.apply_machine_manure(
                 dry_matter_mass=manure_supplied.dry_matter,
