@@ -324,7 +324,7 @@ class Field:
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
-            Fraction of fertilizer applied that remains on the soil surface after application.
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which the fertilizer application is occurring.
         day : int
@@ -340,7 +340,8 @@ class Field:
         om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
-                                    year: int, day: int) -> None:
+                                    application_depth: float, surface_remainder_fraction: float, year: int,
+                                    day: int) -> None:
         """
         Builds a manure application from the requested nutrient amounts and passes that application to the
         ManureApplication module.
@@ -353,6 +354,10 @@ class Field:
             Mass of phosphorus requested to be in this manure application (kg)
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which this manure application occurs.
         day : int
@@ -411,7 +416,8 @@ class Field:
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
                                                                  self.available_fertilizer_mixes)
-        self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand, year, day)
+        self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand,
+                                             application_depth, surface_remainder_fraction, year, day)
 
     def _record_manure_application(self, dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
                                    nitrogen: float, phosphorus: float, year: int, day: int,
@@ -507,7 +513,8 @@ class Field:
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
         for event in todays_manure_events:
             self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
-                                             event.year, event.day)
+                                             event.application_depth, event.surface_remainder_fraction, event.year,
+                                             event.day)
 
     def _check_crop_harvest_schedule(self, time) -> None:
         """

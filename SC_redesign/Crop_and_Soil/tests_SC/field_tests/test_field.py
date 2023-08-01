@@ -167,7 +167,8 @@ def test_check_manure_application_schedule(events: List[ManureEvent], remaining_
     expected_execution_calls = []
     for event in current_events:
         expected_execution_calls.append(call(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
-                                             event.year, event.day))
+                                             event.application_depth, event.surface_remainder_fraction, event.year,
+                                             event.day))
     field._filter_events.assert_called_once_with(events, mocked_time)
     assert field.manure_events == remaining_events
     field._execute_manure_application.assert_has_calls(expected_execution_calls)
