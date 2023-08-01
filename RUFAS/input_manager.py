@@ -514,9 +514,9 @@ class InputManager:
                                 self.__metadata)
             return data_value
 
-        except KeyError as key_error:
-            invalid_key = str(key_error).strip("\'")
-            parent_address = str(metadata_address.split("." + invalid_key)[0])
+        except KeyError:
+            invalid_key = element_hierarchy[-1]
+            parent_address = ".".join(element_hierarchy[:-1])
 
             om.add_error("Data not found:", f"Cannot find \"{metadata_address}\", "
                                             f"\"{parent_address}\" does not have attribute \"{invalid_key}\".",
