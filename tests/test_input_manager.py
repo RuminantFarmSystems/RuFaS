@@ -47,6 +47,7 @@ def input_manager_original_method_states(
         "_bool_type_validator": mock_input_manager._bool_type_validator,
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
+        "get_metadata": mock_input_manager.get_metadata,
     }
 
 
@@ -1241,3 +1242,107 @@ def test_get_data_raises_exception(dummy_data_path: str,
                                     f"\"{expected_error_parent_address}\" does not have attribute " \
                                     f"\"{expected_error_invalid_key}\"."
             assert add_error.call_count == expected_warning_call_count
+
+
+@pytest.fixture
+def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+    return {
+        "properties": {
+            "dummy_animal_properties": {
+                "type": "object",
+                "description": "Animal data",
+                "herd_information": {
+                    "type": "object",
+                    "description": "Herd Demographics",
+                    "calf_num": {
+                        "type": "number",
+                        "description": "Number of Calves (head)",
+                        "default": 8,
+                        "minimum": 0
+                        },
+                    "cow_repro_method": {
+                        "type": "string",
+                        "description": "Cow Reproductive Program (select one)",
+                        "default": "ED",
+                        "pattern": "^{TAI|ED|ED-TAI}$"
+                        },
+                    "simulate_animals": {
+                        "type": "boolean",
+                        "description": "Whether or not to simulate animals during the simulation",
+                        "default": True
+                        },
+                    "dummy_cow_array": {
+                        "type": "array",
+                        "description": "dummy array for testing purposes",
+                        "default": [1, 2, 3, 4],
+                        "maximum_length": 7
+                        }
+                    }
+                },
+            "dummy_crop_properties": {
+                "crop_species": {
+                    "type": "string",
+                    "description": "Name of the crop being grown.",
+                    "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$"
+                    },
+                "harvest_years": {
+                    "type": "array",
+                    "description": "Calendar years in which the harvesting occurs",
+                    "minimum_length": 0,
+                    "default": [],
+                    "properties": {
+                        "type": "number",
+                        "minimum": 1
+                        }
+                    },
+                "pattern_skip": {
+                    "type": "number",
+                    "description": "Number of years to be skipped between schedule repetitions.",
+                    "minimum": 0,
+                    "default": 0
+                    },
+                "simulate_crops": {
+                    "type": "boolean",
+                    "description": "Dummy boolean variable for testing",
+                    "default": False
+                    }
+                }
+            }
+        }
+
+
+@pytest.mark.parametrize(
+    'dummy_metadata_path, expected_result, expected_warning_call_count',
+    [
+        ("properties.dummy_animal_properties.herd_information.calf_num.default", 8, 0),
+        ("properties.dummy_animal_properties.herd_information.calf_num",
+         {"type": "number", "description": "Number of Calves (head)", "default": 8, "minimum": 0}, 0),
+        ("properties.dummy_animal_properties.herd_information.cow_repro_method.type", "string", 0),
+        ("properties.dummy_animal_properties.herd_information.cow_repro_method.pattern", "^{TAI|ED|ED-TAI}$", 0),
+        ("properties.dummy_animal_properties.herd_information.simulate_animals.type", "boolean", 0),
+        ("properties.dummy_animal_properties.herd_information.dummy_cow_array",
+         {"type": "array", "description": "dummy array for testing purposes", "default": [1, 2, 3, 4],
+          "maximum_length": 7}, 0),
+        ("properties.dummy_crop_properties.crop_species.description", "Name of the crop being grown.", 0),
+        ("properties.dummy_crop_properties.harvest_years.type", "array", 0),
+        ("properties.dummy_crop_properties.harvest_years",
+         {"type": "array", "description": "Calendar years in which the harvesting occurs", "minimum_length": 0,
+          "default": [], "properties": {"type": "number", "minimum": 1}}, 0),
+        ("properties.dummy_crop_properties.pattern_skip.minimum", 0, 0),
+        ("properties.dummy_crop_properties.simulate_crops",
+         {"type": "boolean", "description": "Dummy boolean variable for testing", "default": False}, 0),
+    ]
+)
+def test_get_metadata_with_valid_key(dummy_metadata_path: str,
+                                     mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+                                     expected_result: Any, expected_warning_call_count: int,
+                                     mock_input_manager: InputManager) -> None:
+    """Unit test for get_data function in file input_manager.py with a valid data_path key"""
+
+    mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager.get_metadata(dummy_metadata_path)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
