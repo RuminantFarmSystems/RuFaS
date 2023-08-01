@@ -231,7 +231,11 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     constraints_failed_list = []
 
     solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
-    failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+    if str(pen.animal_combination) in ['AnimalCombination.LAC_COW']:
+        failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
+    else:
+        failed_constraints = find_failed_constraints(solution.x, NLP.heifer_cons)
+    
     if failed_constraints:
         for constr in failed_constraints:
             constraints_failed_list.append(constr["fun"].__name__)
@@ -277,6 +281,8 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
+            failed_constraints = []
+            constraints_failed_list = []
             failed_constraints = find_failed_constraints(solution.x, NLP.cow_cons)
             if failed_constraints:
                 for constr in failed_constraints:
