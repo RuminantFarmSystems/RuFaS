@@ -18,7 +18,7 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 ])
 def test_generate_depth_factors(depth: float, bottom_depths: list[float], expected: list[float]) -> None:
     """Tests that the depth factors are correctly calculated for subsurface nutrient applications."""
-    actual = FertilizerApplication._generate_depth_factors(depth, bottom_depths)
+    actual = FertilizerApplication.generate_depth_factors(depth, bottom_depths)
     assert pytest.approx(actual) == expected
 
 
