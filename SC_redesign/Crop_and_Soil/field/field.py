@@ -314,13 +314,13 @@ class Field:
         mix_name : str
             The name of the mix this fertilizer application is composed of.
         total_mass : float
-            The total mass of phosphorus applied (kg)
+            The total mass of phosphorus applied (kg).
         nitrogen_mass : float
-            The mass of nitrogen applied (kg)
+            The mass of nitrogen applied (kg).
         phosphorus_mass : float
-            The mass of phosphorus applied (kg)
+            The mass of phosphorus applied (kg).
         potassium_mass : float
-            The mass of potassium applied (kg)
+            The mass of potassium applied (kg).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
