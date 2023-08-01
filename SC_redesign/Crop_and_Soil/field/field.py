@@ -173,11 +173,13 @@ class Field:
         without applying any fertilizer.
 
         """
-        if requested_nitrogen == requested_phosphorus == 0.0:
-            return
-
         info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
                     "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+        if requested_nitrogen == requested_phosphorus == 0.0:
+            log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
+            om.add_log("fertilizer_application_log", log_message, info_map)
+            return
+
         invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
                                                (application_depth > 0.0 and surface_remainder_fraction == 1.0)
         if invalid_depth_and_remainder_fraction:
@@ -314,13 +316,13 @@ class Field:
         mix_name : str
             The name of the mix this fertilizer application is composed of.
         total_mass : float
-            The total mass of phosphorus applied (kg)
+            The total mass of phosphorus applied (kg).
         nitrogen_mass : float
-            The mass of nitrogen applied (kg)
+            The mass of nitrogen applied (kg).
         phosphorus_mass : float
-            The mass of phosphorus applied (kg)
+            The mass of phosphorus applied (kg).
         potassium_mass : float
-            The mass of potassium applied (kg)
+            The mass of potassium applied (kg).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
