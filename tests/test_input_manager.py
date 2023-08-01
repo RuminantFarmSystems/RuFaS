@@ -1080,6 +1080,18 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
         ("module1.submodule1.nested_var", "dummyvalue2", 0),
         ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3", 0),
         ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4", 0),
+        ("module1", {
+            "integer_var": 5,
+            "float_var": 0.5,
+            "string_var": "dummyvalue1",
+            "boolean_var": True,
+            "integer_array_var": [1, 2, 3],
+            "float_array_var": [0.1, 0.2, 3.14159],
+            "string_array_var": ["1", "2", "3", "4", "5"],
+            "boolean_array_var": [True, False],
+            "submodule1": {
+                "nested_var": "dummyvalue2"
+            }}, 0),
     ]
 )
 def test_get_data_with_valid_key(dummy_data_path: str,
