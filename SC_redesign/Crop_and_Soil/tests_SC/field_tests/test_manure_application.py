@@ -170,23 +170,26 @@ def test_apply_solid_machine_manure(dry_mass: float, dry_fraction: float, phosph
                                                                 expected_stable_organic_frac, dry_mass, inorganic_frac,
                                                                 ammonium_frac, organic_frac, depth,
                                                                 expected_subsurface_frac, 1.1)
+    else:
+        incorp._apply_subsurface_manure.assert_not_called()
 
 
-@pytest.mark.parametrize("dry_mass,dry_frac,phosphorus_mass,coverage,area,weiP_frac,inorganic_frac,ammonium_frac,"
-                         "organic_frac", [
-                             (1000, 0.15, 122, 0.88, 1.94, 0.4, 0.3, 0.39, 0.044),
-                             (1230, 0.115, 180, 0.97, 2.45, 0.356, 0.14, 0.5, 0.018),
-                             (2015, 0.0911, 233.2, 0.66, 4.8, 0.22, 0.2, 0.51, 0.023),
-                             (1780, 0.056, 345, 0.93, 3.81, 0.623, 0.18, 0.6, 0.033),
+@pytest.mark.parametrize("dry_mass,dry_frac,phosphorus_mass,coverage,depth,remainder,area,weiP_frac,inorganic_frac,"
+                         "ammonium_frac,organic_frac,subsurface_app", [
+                             (1000, 0.15, 122, 0.88, 0.0, 1.0, 1.94, 0.4, 0.3, 0.39, 0.044, False),
+                             (1230, 0.115, 180, 0.97, 0.0, 1.0, 2.45, 0.356, 0.14, 0.5, 0.018, False),
+                             (2015, 0.0911, 233.2, 0.66, 100.0, 0.2, 4.8, 0.22, 0.2, 0.51, 0.023, True),
+                             (1780, 0.056, 345, 0.93, 80.0, 0.44, 3.81, 0.623, 0.18, 0.6, 0.033, True)
                          ])
 def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphorus_mass: float, coverage: float,
-                                     area: float, weiP_frac: float, inorganic_frac: float, ammonium_frac: float,
-                                     organic_frac: float) -> None:
+                                     depth: float, remainder: float, area: float, weiP_frac: float,
+                                     inorganic_frac: float, ammonium_frac: float, organic_frac: float,
+                                     subsurface_app: bool) -> None:
     """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
         sets surface pool characteristics.
     """
     data = SoilData(machine_manure_dry_mass=1000, machine_manure_moisture_factor=0.8, machine_manure_field_coverage=0.9,
-                    field_size=1.1)
+                    field_size=area)
     incorp = ManureApplication(data)
     incorp._determine_wet_rate_factor = MagicMock(return_value=2000)
     incorp._determine_infiltration_factor = MagicMock(return_value=0.5)
@@ -196,29 +199,35 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
                                                                            "new_moisture_factor": 0.93,
                                                                            "new_field_coverage": 0.98})
     incorp._add_nitrogen_to_soil_layer = MagicMock()
+    incorp._apply_subsurface_manure = MagicMock()
 
-    incorp._apply_liquid_machine_manure(dry_mass, dry_frac, phosphorus_mass, coverage, area, weiP_frac, inorganic_frac,
-                                        ammonium_frac, organic_frac)
+    incorp._apply_liquid_machine_manure(dry_mass, dry_frac, phosphorus_mass, coverage, depth, remainder, area,
+                                        weiP_frac, inorganic_frac, ammonium_frac, organic_frac)
 
-    expect_adjusted_dry_mass = dry_mass * 0.8
+    expect_surface_dry_mass = dry_mass * remainder
+    expect_adjusted_dry_mass = expect_surface_dry_mass * 0.8
     expect_adjusted_coverage = coverage * 0.5
-    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.5
-    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.5
-    expect_stable_inorganic = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5
-    expect_stable_organic = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5
+    expect_water_extractable_inorganic = phosphorus_mass * weiP_frac * 0.5 * remainder
+    expect_water_extractable_organic = phosphorus_mass * 0.05 * 0.5 * remainder
+    expect_stable_inorganic_frac = (1 - (weiP_frac + 0.05)) * 0.25
+    expect_stable_inorganic = phosphorus_mass * expect_stable_inorganic_frac * 0.5 * remainder
+    expect_stable_organic_frac = (1 - (weiP_frac + 0.05)) * 0.75
+    expect_stable_organic = phosphorus_mass * expect_stable_organic_frac * 0.5 * remainder
     expect_labile = phosphorus_mass * weiP_frac * 0.5
     expect_labile += phosphorus_mass * 0.05 * 0.5 * 0.95
     expect_labile += phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.75 * 0.5 * 0.95
-    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5
+    expect_labile *= remainder
+    expect_active = phosphorus_mass * (1 - (weiP_frac + 0.05)) * 0.25 * 0.5 * remainder
 
-    expected_mass = dry_mass * 0.5
+    expected_mass = expect_surface_dry_mass * 0.5
     expected_inorganic_frac = inorganic_frac * 0.5
     expected_organic_frac = organic_frac * 0.5
     expected_nitrogen_calls = [
         call(0, expected_mass, expected_inorganic_frac, ammonium_frac, expected_organic_frac, area),
         call(1, expected_mass, expected_inorganic_frac, ammonium_frac, expected_organic_frac, area)]
+    expected_subsurface_frac = 1.0 - remainder
 
-    incorp._determine_wet_rate_factor.assert_called_once_with(dry_mass, dry_frac, coverage, area)
+    incorp._determine_wet_rate_factor.assert_called_once_with(expect_surface_dry_mass, dry_frac, coverage, area)
     incorp._determine_infiltration_factor.assert_called_once_with(2000)
     incorp._determine_weighted_manure_attributes.assert_called_once_with(1000, 0.8, 0.9, expect_adjusted_dry_mass,
                                                                          dry_frac, expect_adjusted_coverage)
@@ -233,6 +242,14 @@ def test_apply_liquid_machine_manure(dry_mass: float, dry_frac: float, phosphoru
     assert incorp.data.machine_water_extractable_organic_phosphorus == expect_water_extractable_organic
     assert incorp.data.machine_stable_inorganic_phosphorus == expect_stable_inorganic
     assert incorp.data.machine_stable_organic_phosphorus == expect_stable_organic
+    if subsurface_app:
+        incorp._apply_subsurface_manure.assert_called_once_with(phosphorus_mass, weiP_frac, 0.05,
+                                                                expect_stable_inorganic_frac,
+                                                                expect_stable_organic_frac, dry_mass, inorganic_frac,
+                                                                ammonium_frac, organic_frac, depth,
+                                                                expected_subsurface_frac, area)
+    else:
+        incorp._apply_subsurface_manure.assert_not_called()
 
 
 @pytest.mark.parametrize("total_phosphorus,wip_frac,wop_frap,sip_frac,sop_frac,dry_matter,inorganic_frac,ammonium_frac,"
