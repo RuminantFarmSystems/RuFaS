@@ -153,7 +153,7 @@ class Field:
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
-            Fraction of fertilizer applied that remains on the soil surface after application.
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which the fertilizer application is occurring.
         day : int
@@ -176,11 +176,11 @@ class Field:
         if requested_nitrogen == requested_phosphorus == 0.0:
             return
 
-        impossible_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
-                                                  (application_depth > 0.0 and surface_remainder_fraction == 1.0)
-        if impossible_depth_and_remainder_fraction:
-            info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
-                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+        invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
+                                               (application_depth > 0.0 and surface_remainder_fraction == 1.0)
+        if invalid_depth_and_remainder_fraction:
             error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
                             f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a surface" \
                             f" remainder fraction of 1.0."
@@ -189,8 +189,6 @@ class Field:
             surface_remainder_fraction = 1.0
 
         if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
-            info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
-                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
             error_message = f"Invalid application depth ({application_depth}) is lower than the bottom depth of the " \
                             f"soil profile, setting the application depth to be at the bottom of the soil profile."
             om.add_error("fertilizer_application_error", error_message, info_map)

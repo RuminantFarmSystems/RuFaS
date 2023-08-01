@@ -44,7 +44,7 @@ class FertilizerApplication:
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
-            Fraction of fertilizer applied that remains on the soil surface after application.
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
             Size of the field (ha)
 
@@ -74,7 +74,8 @@ class FertilizerApplication:
         self.soil.data.soil_layers[0].active_organic_nitrogen_content += \
             (organic_nitrogen_applied * surface_remainder_fraction)
 
-        if application_depth == 0.0 and surface_remainder_fraction == 1.0:
+        non_injection_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
+        if non_injection_application:
             return
 
         subsurface_fraction = 1.0 - surface_remainder_fraction
@@ -90,17 +91,23 @@ class FertilizerApplication:
         Parameters
         ----------
         phosphorus : float
-            Amount of phosphorus applied below the surface in this application of fertilizer (kg / ha).
+            Amount of phosphorus applied in this application of fertilizer (kg / ha).
         nitrates : float
-            Amount of nitrates applied below the surface in this application of fertilizer (kg / ha).
+            Amount of nitrates applied in this application of fertilizer (kg / ha).
         ammonium : float
-            Amount of ammonium applied below the surface in this application of fertilizer (kg / ha).
+            Amount of ammonium applied in this application of fertilizer (kg / ha).
         organic_nitrogen : float
-            Amount of organic nitrogen applied below the surface in this application of fertilizer (kg / ha).
+            Amount of organic nitrogen applied in this application of fertilizer (kg / ha).
         application_depth : float
             Bottom depth of this fertilizer application (mm).
         subsurface_fraction : float
             Fraction of total fertilizer application that is applied below the soil surface (unitless).
+
+        Notes
+        -----
+        This implementation applies all nutrients from the fertilizer application to subsurface soil layers in the same
+        manner. In previous implementations of RuFaS, only phosphorus was added to layers below the surface when
+        injection applications occurred.
 
         """
         bottom_depths = self.soil.data.get_vectorized_layer_attribute("bottom_depth")
@@ -131,7 +138,7 @@ class FertilizerApplication:
         -------
         list[float]
             List of fractions that determine the distribution of nutrients between different soil layers when subsurface
-            nutrients are applied.
+            nutrients are applied (unitless).
 
         References
         ----------
