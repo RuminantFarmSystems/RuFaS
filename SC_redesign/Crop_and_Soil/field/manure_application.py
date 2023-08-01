@@ -75,7 +75,8 @@ class ManureApplication:
                                          organic_nitrogen_fraction, field_size)
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                             total_phosphorus_mass: float, field_coverage: float, field_size: float,
+                             total_phosphorus_mass: float, field_coverage: float, application_depth: float,
+                             surface_remainder_fraction: float, field_size: float,
                              inorganic_nitrogen_fraction: float, ammonium_fraction: float,
                              organic_nitrogen_fraction: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
@@ -93,6 +94,10 @@ class ManureApplication:
             Total mass of phosphorus in this application of manure (kg)
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
             Size of the field (ha)
         inorganic_nitrogen_fraction : float

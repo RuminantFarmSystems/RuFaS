@@ -389,6 +389,8 @@ class Field:
                 dry_matter_fraction=manure_supplied.dry_matter_fraction,
                 total_phosphorus_mass=manure_supplied.phosphorus,
                 field_coverage=field_coverage,
+                application_depth=application_depth,
+                surface_remainder_fraction=surface_remainder_fraction,
                 field_size=self.field_data.field_size,
                 inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
                 ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
@@ -401,6 +403,8 @@ class Field:
                                             nitrogen=manure_supplied.nitrogen,
                                             phosphorus=manure_supplied.phosphorus,
                                             potassium=None,
+                                            application_depth=application_depth,
+                                            surface_remainder_fraction=surface_remainder_fraction,
                                             year=year,
                                             day=day)
         else:
@@ -420,7 +424,8 @@ class Field:
                                              application_depth, surface_remainder_fraction, year, day)
 
     def _record_manure_application(self, dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
-                                   nitrogen: float, phosphorus: float, year: int, day: int,
+                                   nitrogen: float, phosphorus: float, application_depth: float,
+                                   surface_remainder_fraction: float, year: int, day: int,
                                    potassium: Optional[float] = None) -> None:
         """
         Records the amount of manure and related values for an individual manure application.
@@ -437,6 +442,10 @@ class Field:
             Mass of nitrogen in the manure applied (kg)
         phosphorus : float
             Mass of phosphorus in the manure applied (kg)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which this manure application occurs.
         day : int
@@ -449,7 +458,9 @@ class Field:
                     "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
-                 field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
+                 field_coverage, "application_depth": application_depth,
+                 "surface_remainder_fraction": surface_remainder_fraction, "nitrogen": nitrogen,
+                 "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
 
     # </editor-fold>
