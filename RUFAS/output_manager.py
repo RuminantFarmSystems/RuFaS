@@ -364,6 +364,7 @@ class OutputManager(object):
         self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
 
         if len(data_dict) == 0:
+            self.add_log("save_dict_file_try", f"Nothing to save to {path}. Data dictionary is empty.", info_map)
             return
 
         (_, variable_data), = data_dict.items()
