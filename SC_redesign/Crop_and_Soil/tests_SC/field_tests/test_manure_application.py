@@ -291,7 +291,7 @@ def test_apply_grazing_manure(dry_mass: float, dry_fraction: float, phosphorus_m
                             (3000, 0.10, 150, 0.975, 150.0, 0.55, 2.2254, 0.2, 0.6, 0.03, None, "CATTLE", False),
                             (2000, 0.44, 103.5, 0.88, 0.0, 1.0, 0.8898, 0.14, 0.44, 0.06, 0.25, "SWINE", False),
                             (2500, 0.08, 175, 0.79, 0.0, 1.0, 3.4453, 0.33, 0.39, 0.09, None, None, False),
-                            (2500, 0.08, 175, 0.79, 50.0, 0.92,3.4453, 0.33, 0.39, 0.09, 1.8, None, True),
+                            (2500, 0.08, 175, 0.79, 50.0, 0.92, 3.4453, 0.33, 0.39, 0.09, 1.8, None, True),
                          ])
 def test_apply_machine_manure(dry_mass: float, dry_fraction: float, total_phosphorus_mass: float, coverage: float,
                               depth: float, remainder: float, area: float, inorganic_frac: float, ammonium_frac: float,
