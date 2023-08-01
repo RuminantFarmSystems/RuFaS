@@ -1229,19 +1229,15 @@ def test_get_data_raises_exception(dummy_data_path: str,
 
     mock_input_manager._InputManager__pool = mock_pool_for_get_data
 
-    mock_open_func = Mock()
-    mock_open_func.side_effect = KeyError()
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(KeyError) as key_error:
+            mock_input_manager.get_data(dummy_data_path)
 
-    with patch("builtins.open", mock_open_func):
-        with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-            with pytest.raises(KeyError) as key_error:
-                mock_input_manager.get_data(dummy_data_path)
-
-            error_message = key_error.value.__str__().strip("\'")
-            assert error_message == f"Data not found: Cannot find \"{dummy_data_path}\", " \
-                                    f"\"{expected_error_parent_address}\" does not have attribute " \
-                                    f"\"{expected_error_invalid_key}\"."
-            assert add_error.call_count == expected_warning_call_count
+        error_message = key_error.value.__str__().strip("\'")
+        assert error_message == f"Data not found: Cannot find \"{dummy_data_path}\", " \
+                                f"\"{expected_error_parent_address}\" does not have attribute " \
+                                f"\"{expected_error_invalid_key}\"."
+        assert add_error.call_count == expected_warning_call_count
 
 
 @pytest.fixture
@@ -1337,7 +1333,7 @@ def test_get_metadata_with_valid_key(dummy_metadata_path: str,
                                      mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
                                      expected_result: Any, expected_warning_call_count: int,
                                      mock_input_manager: InputManager) -> None:
-    """Unit test for get_data function in file input_manager.py with a valid data_path key"""
+    """Unit test for get_metadata function in file input_manager.py with a valid metadata_path key"""
 
     mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
 
@@ -1346,3 +1342,35 @@ def test_get_metadata_with_valid_key(dummy_metadata_path: str,
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_metadata_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count',
+    [
+        ("dummy_animal_properties.herd_information.calf_num.dummy_key",
+         "dummy_animal_properties.herd_information.calf_num", "dummy_key", 1),
+        ("dummy_animal_properties.herd_information.dummy_key",
+         "dummy_animal_properties.herd_information", "dummy_key", 1),
+        ("dummy_crop_properties.crop_species.dummy_key", "dummy_crop_properties.crop_species", "dummy_key", 1),
+        ("dummy_crop_properties.dummy_key", "dummy_crop_properties", "dummy_key", 1),
+        ("dummy_crop_properties.pattern_skip.dummy_key", "dummy_crop_properties.pattern_skip", "dummy_key", 1)
+    ]
+)
+def test_get_metadata_raises_exception(dummy_metadata_path: str,
+                                       expected_error_parent_address: str, expected_error_invalid_key: str,
+                                       mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+                                       expected_warning_call_count: int,
+                                       mock_input_manager: InputManager) -> None:
+    """Unit test for function _load_metadata raising an exception in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(KeyError) as key_error:
+            mock_input_manager.get_metadata(dummy_metadata_path)
+
+        error_message = key_error.value.__str__().strip("\'")
+        assert error_message == f"Data not found: Cannot find \"{dummy_metadata_path}\", " \
+                                f"\"{expected_error_parent_address}\" does not have attribute " \
+                                f"\"{expected_error_invalid_key}\"."
+        assert add_error.call_count == expected_warning_call_count
