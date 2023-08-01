@@ -1348,13 +1348,13 @@ def test_protein_constraint():
     pass
 
 
-def test_NDF_constraint_1():
-    """Unit test for function NDF_constraint_1 in file routines/animal/ration/ration_NLP.py"""
+def test_NDF_constraint_lower():
+    """Unit test for function test_NDF_constraint_lower in file routines/animal/ration/ration_NLP.py"""
     pass
 
 
-def test_NDF_constraint_2():
-    """Unit test for function NDF_constraint_2 in file routines/animal/ration/ration_NLP.py"""
+def test_NDF_constraint_upper():
+    """Unit test for function NDF_constraint_upper in file routines/animal/ration/ration_NLP.py"""
     pass
 
 

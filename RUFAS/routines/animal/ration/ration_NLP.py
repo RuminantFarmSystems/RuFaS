@@ -398,7 +398,7 @@ def protein_constraint(x):
     return (MP_supply - (MP_req / 1000))
 
 
-def NDF_constraint_1(x):
+def NDF_constraint_lower(x):
     """
     Sets up the RHS multipliers for each feed to instill an overall NDF percent
     constraint. This is a lower bound constraint on overall NDF percent.
@@ -412,7 +412,7 @@ def NDF_constraint_1(x):
         return (sum(np.multiply(x, NDF)) / DMI) - 25
 
 
-def NDF_constraint_2(x):
+def NDF_constraint_upper(x):
     """
     Sets up the RHS multipliers for each feed to instill an overall NDF percent
     constraint. This is an upper bound constraint on overall NDF percent.
@@ -570,8 +570,8 @@ constraint_functions = [
     calcium_constraint,
     phosphorus_constraint,
     protein_constraint,
-    NDF_constraint_1,
-    NDF_constraint_2,
+    NDF_constraint_lower,
+    NDF_constraint_upper,
     forage_NDF_constraint,
     fat_constraint,
     DMI_constraint_upper,
