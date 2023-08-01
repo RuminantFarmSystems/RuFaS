@@ -32,25 +32,25 @@ class FertilizerApplication:
         Parameters
         ----------
         phosphorus_applied : float
-            Mass of phosphorus applied to the soil (kg)
+            Mass of phosphorus applied to the soil (kg).
         fertilizer_mass : float
-            Total mass of fertilizer application (kg)
+            Total mass of fertilizer application (kg).
         inorganic_nitrogen_fraction : float
-            Fraction of fertilizer mass applied that is inorganic nitrogen (unitless)
+            Fraction of fertilizer mass applied that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen mass applied that is ammonium (unitless)
+            Fraction of inorganic nitrogen mass applied that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of fertilizer mass applied that is organic nitrogen (unitless)
+            Fraction of fertilizer mass applied that is organic nitrogen (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
             Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         References
         ----------
-        SWAT Theoretical documentation section 6:1.7
+        SWAT Theoretical documentation section 6:1.7.
 
         Notes
         -----
@@ -125,7 +125,7 @@ class FertilizerApplication:
     @staticmethod
     def _generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
         """
-        Generates a list of fractions that partitions sub-surface nutrients between the different layers soil.
+        Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
 
         Parameters
         ----------
