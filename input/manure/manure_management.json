@@ -72,6 +72,7 @@
       "bedding_dry_matter_content": 0.9,
       "bedding_cleaned_fraction": 1.0,
       "bedding_carbon_fraction": 0.0,
+      "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 0.0
     },
     {
@@ -81,6 +82,7 @@
       "bedding_dry_matter_content": 0.9,
       "bedding_cleaned_fraction": 1.0,
       "bedding_carbon_fraction": 0.35,
+      "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 0.0
     },
     {
@@ -90,6 +92,7 @@
       "bedding_dry_matter_content": 0.9,
       "bedding_cleaned_fraction": 1.0,
       "bedding_carbon_fraction": 0.0,
+      "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 0.0
     },
     {
@@ -99,6 +102,7 @@
       "bedding_dry_matter_content": 0.9,
       "bedding_cleaned_fraction": 1.0,
       "bedding_carbon_fraction": 0.35,
+      "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 0.0
     },
     {
@@ -108,6 +112,7 @@
       "bedding_dry_matter_content": 0.9,
       "bedding_cleaned_fraction": 1.0,
       "bedding_carbon_fraction": 0.0,
+      "bedding_phosphorus_content": 0.0,
       "sand_removal_efficiency": 1.0
     }
   ],
