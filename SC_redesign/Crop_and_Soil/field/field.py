@@ -372,7 +372,11 @@ class Field:
         are corrected, an error is raised to the OutputManager, and execution continues with the new values.
 
         """
+        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
         if requested_nitrogen == requested_phosphorus == 0.0:
+            log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
+            om.add_log("manure_application_log", log_message, info_map)
             return
 
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
@@ -388,8 +392,6 @@ class Field:
             total_organic_nitrogen_fraction = \
                 (manure_supplied.nitrogen / manure_supplied.dry_matter) * manure_supplied.organic_nitrogen_fraction
 
-            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
-                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
             invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
                                                    (application_depth > 0.0 and surface_remainder_fraction == 1.0)
             if invalid_depth_and_remainder_fraction:
