@@ -1,3 +1,5 @@
+from typing import Type
+
 import pytest
 from pytest import approx
 
@@ -92,21 +94,36 @@ def test_default_bedding_config_values(bedding_config,
 
 
 @pytest.mark.parametrize(
-    "bedding_type, expected_default_bedding_config",
-    [(BeddingType.SAWDUST, DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG),
-     (BeddingType.CBPB_SAWDUST, DefaultBeddingConfigFactory.CBPB_SAWDUST_BEDDING_CONFIG),
-     (BeddingType.MANURE_SOLIDS, DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG),
-     (BeddingType.STRAW, DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG),
-     (BeddingType.SAND, DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG)
-     ])
-def test_default_bedding_config_factory_get_instance(bedding_type, expected_default_bedding_config) -> None:
-    """Unit test for class DefaultBeddingConfigFactory in file bedding_classes.py"""
+    "bedding_type, expected_default_bedding_config, expected_exception",
+    [
+        (BeddingType.SAWDUST, DefaultBeddingConfigFactory.SAWDUST_BEDDING_CONFIG, None),
+        (BeddingType.CBPB_SAWDUST, DefaultBeddingConfigFactory.CBPB_SAWDUST_BEDDING_CONFIG, None),
+        (BeddingType.MANURE_SOLIDS, DefaultBeddingConfigFactory.MANURE_SOLIDS_BEDDING_CONFIG, None),
+        (BeddingType.STRAW, DefaultBeddingConfigFactory.STRAW_BEDDING_CONFIG, None),
+        (BeddingType.SAND, DefaultBeddingConfigFactory.SAND_BEDDING_CONFIG, None),
+        ("Dummy bedding type", None, ValueError)
+    ])
+def test_default_bedding_config_factory_get_instance(bedding_type: BeddingType,
+                                                     expected_default_bedding_config: BeddingConfig,
+                                                     expected_exception: Type[Exception]) -> None:
+    """
+    Unit test for class DefaultBeddingConfigFactory in file bedding_classes.py
 
-    # Act
-    default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
+    This test checks whether the 'get_instance' class method of the DefaultBeddingConfigFactory
+    returns the expected default bedding configurations for valid bedding types, and throws
+    a ValueError with an appropriate message when an invalid bedding type is provided.
 
-    # Assert
-    assert default_bedding_config == expected_default_bedding_config
+    """
+    if expected_exception is None:
+        # Act
+        default_bedding_config = DefaultBeddingConfigFactory.get_instance(bedding_type)
+
+        # Assert
+        assert default_bedding_config == expected_default_bedding_config
+    else:
+        with pytest.raises(expected_exception, match="Bedding type .* is not recognized"):
+            # Act
+            DefaultBeddingConfigFactory.get_instance(bedding_type)
 
 
 @pytest.fixture

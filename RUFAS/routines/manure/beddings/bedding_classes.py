@@ -389,6 +389,11 @@ class DefaultBeddingConfigFactory:
         BeddingConfig
             Default bedding configuration for the given bedding type.
 
+        Raises
+        ------
+        ValueError
+            If the given bedding type is invalid.
+
         """
         bedding_config_by_type = {
             BeddingType.SAWDUST: cls.SAWDUST_BEDDING_CONFIG,
@@ -397,6 +402,12 @@ class DefaultBeddingConfigFactory:
             BeddingType.STRAW: cls.STRAW_BEDDING_CONFIG,
             BeddingType.SAND: cls.SAND_BEDDING_CONFIG
         }
+
+        if bedding_type not in bedding_config_by_type:
+            raise ValueError(f"Bedding type {bedding_type} is not recognized. "
+                             f"It may be a new bedding type that has not been added "
+                             f"to the 'get_instance' method.")
+
         return bedding_config_by_type[bedding_type]
 
 
