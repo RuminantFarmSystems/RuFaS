@@ -1225,7 +1225,7 @@ def test_get_data_raises_exception(dummy_data_path: str,
                                    mock_pool_for_get_data: Dict[str, Dict[str, Any]],
                                    expected_warning_call_count: int,
                                    mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_metadata raising an exception in file input_manager.py"""
+    """Unit test for function get_data raising an exception in file input_manager.py"""
 
     mock_input_manager._InputManager__pool = mock_pool_for_get_data
 
@@ -1361,7 +1361,7 @@ def test_get_metadata_raises_exception(dummy_metadata_path: str,
                                        mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
                                        expected_warning_call_count: int,
                                        mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_metadata raising an exception in file input_manager.py"""
+    """Unit test for function get_metadata raising an exception in file input_manager.py"""
 
     mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
 
