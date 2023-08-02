@@ -47,7 +47,7 @@ class ManureManagementOutputHandler:
     def __init__(self) -> None:
         """Initializes a ManureManagementOutputHandler object."""
         self._df: Optional[DataFrame] = None
-        self.empty_main_output_directory()
+        # self.empty_main_output_directory()
 
     @property
     def data(self) -> Optional[DataFrame]:

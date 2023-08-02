@@ -14,7 +14,7 @@ def main_loop(target_input):
     return(target_input)
 
 start = 0
-stop = 1280
+stop = 384
 
 a = Parallel(n_jobs=6)(delayed(main_loop)(
     'input/sensitivity/animal_management_' + str(i).zfill(5) + '.json'
