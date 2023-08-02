@@ -698,7 +698,7 @@
       },
       "calf_feeds": {
         "type": "array",
-        "description": "Calf Feeds (raised off farm - 24 hrs of age) -- Add as many calf feeds as needed",
+        "description": "Calf Feeds (raised off farm - 24 hrs of age).",
         "properties": {
           "type": "number",
           "minimum": 1,
