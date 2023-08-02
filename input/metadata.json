@@ -735,7 +735,7 @@
       },
       "purchased_feeds": {
         "type": "array",
-        "description": "Purchased Feeds -- Select one purchased feed at a time and add the cost per kg of dry matter",
+        "description": "Purchased Feeds.",
         "properties": {
           "type": "object",
           "purchased_feed": {
