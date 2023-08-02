@@ -5,6 +5,7 @@ Description: Determines manure excretion with information from the ration
     formulation, outputs used by the manure module.
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
+           Haowen Hu, hh598@cornell.edu
 """
 import math
 from typing import Tuple
@@ -13,6 +14,56 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+
+def methane_mitigation(NDF_concentration: float,
+                       EE_concentration: float,
+                       starch_concentration: float,
+                       CP_concentration: float,
+                       methane_mitigation_method: str,
+                       methane_mitigation_additive_amount: float) -> float:
+    """Calculates reduction in methane yield (%) due to addition of certain methane mitigation feed additive.
+
+    Parameters
+    ----------
+    NDF_concentration : float
+        Concentration of neutral detergent fiber (NDF) in the ration.
+    EE_concentration : float
+        Concentration of ether extract (EE) in the ration.
+    starch_concentration : float
+        Concentration of starch in the ration.
+    CP_concentration : float
+        Concentration of crude protein (CP) in the ration.
+    methane_mitigation_method: str 
+        Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin", "Essential Oils", and "Seaweed". 
+    methane_mitigation_additive_amount: float 
+        The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI). The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI. 
+
+    Returns
+    -------
+    float 
+        Reduction in methane yield (methane production/DMI), %.   
+    """
+
+    methane_yield_reduction = 0.0
+    Monensin_CP_lower_bound = AnimalModuleConstants.MONENSIN_CP_LOWER_BOUND 
+    Monensin_CP_upper_bound = AnimalModuleConstants.MONENSIN_CP_UPPER_BOUND
+
+    if methane_mitigation_method == "3-NOP":
+        methane_yield_reduction = -30.8 - 0.226 * (methane_mitigation_additive_amount - 70.5) + 0.906 * (
+            NDF_concentration - 32.9) + 3.871 * (EE_concentration - 4.2) - 0.337 * (starch_concentration - 21.1)
+    elif methane_mitigation_method == "Monensin":    
+        if Monensin_CP_lower_bound <= CP_concentration <= Monensin_CP_upper_bound:
+            methane_yield_reduction = (0.30054 - 0.00377 *
+                                       methane_mitigation_additive_amount - 1.57832 * CP_concentration/100) * 100
+        else:
+            methane_yield_reduction = (
+                0.03223 - 0.00410 * methane_mitigation_additive_amount) * 100
+    elif methane_mitigation_method == "Essential Oils":
+        methane_yield_reduction = 0.0
+    elif methane_mitigation_method == "Seaweed":
+        methane_yield_reduction = 0.0
+    return methane_yield_reduction
 
 
 def manure_calculations(ration_formulation,
@@ -24,6 +75,8 @@ def manure_calculations(ration_formulation,
                         fecal_phosphorus: float,
                         urine_phosphorus_required: float,
                         methane_model: str,
+                        methane_mitigation_method: str,
+                        methane_mitigation_additive_amount: float,
                         milk_fat: float,
                         metabolizable_energy_intake: float) \
         -> Tuple[float, AnimalManureExcretions]:
@@ -48,7 +101,7 @@ def manure_calculations(ration_formulation,
     urine_phosphorus_required : float
         Amount of phosphorus required for urine production, g.
     methane_model : str
-        Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
+        Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
     milk_fat : float
         Milk fat (from animal input), % of milk.
     metabolizable_energy_intake : float
@@ -144,8 +197,8 @@ def manure_calculations(ration_formulation,
         0.86 * urinary_nitrogen_concentration
 
     # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = 2
-    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
+    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
     urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
         urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
 
@@ -187,6 +240,16 @@ def manure_calculations(ration_formulation,
         methane_emission = 0.065 * gross_energy_concentration * \
             dry_matter_intake / 0.05565  # [A.3B.C.3]
 
+    # Methane Mitigation
+    methane_yield = 0.0
+    methane_yield_reduction = 0.0
+    if dry_matter_intake != 0:
+        methane_yield = methane_emission/dry_matter_intake
+        methane_yield_reduction = methane_mitigation(
+            NDF_concentration, EE_concentration, starch_concentration, CP_concentration, methane_mitigation_method, methane_mitigation_additive_amount)
+
+    methane_emission = methane_yield * \
+        (1 + methane_yield_reduction/100) * dry_matter_intake
 
     phosphorus_excretion_values = calculate_phosphorus_excretion_values(
         daily_milk_production=daily_milk_production,

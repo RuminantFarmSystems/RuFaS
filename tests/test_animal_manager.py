@@ -1511,6 +1511,8 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     mock_animal_manager.heiferIIIs = mock_heiferIIIs = mocker.MagicMock()
     mock_animal_manager.cows = mock_cows = mocker.MagicMock()
     mock_animal_manager.methane_model = mock_methane_model = mocker.MagicMock()
+    mock_animal_manager.methane_mitigation_method = mock_methane_mitigation_method = mocker.MagicMock()
+    mock_animal_manager.methane_mitigation_additive_amount = mock_methane_mitigation_additive_amount = mocker.MagicMock()
     patch_for_end_ration_interval = mocker.patch.object(
         AnimalManager, 'end_ration_interval', return_value=is_end_ration_interval)
     patch_for_reset_milk_production_reduction = mocker.patch.object(
@@ -1605,7 +1607,9 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_get_classes_in_pen.assert_has_calls([mocker.call(mock_pen) for mock_pen in mock_all_pens])
 
     for mock_pen in mock_all_pens:
-        mock_pen.calc_total_manure.assert_called_once_with(mock_feed, mock_methane_model)
+        mock_pen.calc_total_manure.assert_called_once_with(mock_feed, mock_methane_model,
+                                                           mock_methane_mitigation_method,
+                                                           mock_methane_mitigation_additive_amount)
         mock_pen.call_p_rqmts.assert_called_once()
         mock_pen.daily_p_update.assert_called_once()
 
