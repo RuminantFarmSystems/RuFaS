@@ -295,7 +295,7 @@ class BeddingConfig:
     """Quantity of phosphorus in the bedding (kg)."""
 
     bedding_type: BeddingType
-    """Type of bedding as a string."""
+    """Type of bedding."""
 
     sand_removal_efficiency: float
     """
