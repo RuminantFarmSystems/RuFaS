@@ -1327,6 +1327,67 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
         ("properties.dummy_crop_properties.pattern_skip.minimum", 0, 0),
         ("properties.dummy_crop_properties.simulate_crops",
          {"type": "boolean", "description": "Dummy boolean variable for testing", "default": False}, 0),
+        ("properties", {
+            "dummy_animal_properties": {
+                "type": "object",
+                "description": "Animal data",
+                "herd_information": {
+                    "type": "object",
+                    "description": "Herd Demographics",
+                    "calf_num": {
+                        "type": "number",
+                        "description": "Number of Calves (head)",
+                        "default": 8,
+                        "minimum": 0
+                        },
+                    "cow_repro_method": {
+                        "type": "string",
+                        "description": "Cow Reproductive Program (select one)",
+                        "default": "ED",
+                        "pattern": "^{TAI|ED|ED-TAI}$"
+                        },
+                    "simulate_animals": {
+                        "type": "boolean",
+                        "description": "Whether or not to simulate animals during the simulation",
+                        "default": True
+                        },
+                    "dummy_cow_array": {
+                        "type": "array",
+                        "description": "dummy array for testing purposes",
+                        "default": [1, 2, 3, 4],
+                        "maximum_length": 7
+                        }
+                    }
+                },
+            "dummy_crop_properties": {
+                "crop_species": {
+                    "type": "string",
+                    "description": "Name of the crop being grown.",
+                    "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$"
+                    },
+                "harvest_years": {
+                    "type": "array",
+                    "description": "Calendar years in which the harvesting occurs",
+                    "minimum_length": 0,
+                    "default": [],
+                    "properties": {
+                        "type": "number",
+                        "minimum": 1
+                        }
+                    },
+                "pattern_skip": {
+                    "type": "number",
+                    "description": "Number of years to be skipped between schedule repetitions.",
+                    "minimum": 0,
+                    "default": 0
+                    },
+                "simulate_crops": {
+                    "type": "boolean",
+                    "description": "Dummy boolean variable for testing",
+                    "default": False
+                    }
+                }
+            }, 0)
     ]
 )
 def test_get_metadata_with_valid_key(dummy_metadata_path: str,
