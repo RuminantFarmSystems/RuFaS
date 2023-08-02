@@ -12,25 +12,26 @@ from RUFAS.routines.manure.default_enum.default_enum import DefaultEnum
 
 class BeddingType(DefaultEnum):
     """
-    A class used to enumerate the different types of bedding.
+    Enumerate the different types of bedding.
 
-    This class is derived from the `DefaultEnum` base class. It provides a set of predefined constants
-    that represent different types of bedding, such as sawdust, straw, and sand. The default type is sand.
+    This class, derived from the `DefaultEnum` base class, provides a set of predefined constants
+    that represent different types of bedding such as sawdust, straw, and sand. The default type is sand.
 
     Attributes
     ----------
     SAWDUST : str
-        Represents the 'sawdust' type of bedding.
+        Represent the 'sawdust' type of bedding.
     CBPB_SAWDUST : str
-        Represents the 'CBPB sawdust' type of bedding.
+        Represent the 'CBPB sawdust' type of bedding.
     MANURE_SOLIDS : str
-        Represents the 'manure solids' type of bedding.
+        Represent the 'manure solids' type of bedding.
     STRAW : str
-        Represents the 'straw' type of bedding.
+        Represent the 'straw' type of bedding.
     SAND : str
-        Represents the 'sand' type of bedding.
+        Represent the 'sand' type of bedding.
     DEFAULT : str
         The default type of bedding is 'sand' if none is specified.
+
     """
     SAWDUST = 'sawdust'
     CBPB_SAWDUST = 'CBPB sawdust'
