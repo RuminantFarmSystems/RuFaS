@@ -149,7 +149,9 @@
           "description": "Initialize Herd? -- Only check box if cow body weight and milk production exceedingly abnormal"
         },
         "breed": {
-          "type": "radio",
+          "type": "string",
+          "default": "HO",
+          "pattern": "^{HO|JE}$"
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
