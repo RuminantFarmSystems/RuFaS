@@ -12,6 +12,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 from RUFAS.routines.animal.ration.ration_driver import ration_report
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 def manure_calculations(ration_formulation,
@@ -104,8 +105,8 @@ def manure_calculations(ration_formulation,
         0.86 * urinary_nitrogen_concentration
 
     # Clamp the urine urea nitrogen concentration to be between 2 and 12 g urea-N/L
-    urine_urea_nitrogen_concentration_lower_bound = 2
-    urine_urea_nitrogen_concentration_upper_bound = 12
+    urine_urea_nitrogen_concentration_lower_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND
+    urine_urea_nitrogen_concentration_upper_bound = AnimalModuleConstants.URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND
     urine_urea_nitrogen_concentration = max(urine_urea_nitrogen_concentration_lower_bound, min(
         urine_urea_nitrogen_concentration, urine_urea_nitrogen_concentration_upper_bound))
 
