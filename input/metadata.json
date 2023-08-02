@@ -877,7 +877,7 @@
         },
         "cow_lactating": {
           "type": "array",
-          "description": "Lactating Cow",
+          "description": "Lactating Cow Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
