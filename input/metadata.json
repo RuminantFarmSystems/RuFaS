@@ -609,7 +609,7 @@
       },
       "pen_information": {
         "type": "array",
-        "description": "Pen Information -- Add as many different pens as needed.",
+        "description": "Pen Information.",
         "properties": {
           "type": "object",
           "id": {
