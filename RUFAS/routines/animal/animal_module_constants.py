@@ -48,9 +48,6 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE = 'slurry storage outdoor'
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
-    DMI_CONSTRAINT_PERCENT = 0.20
-    """The Dry Matter Intake constraint percentage. This percentage represents a limit on the feed intake, relative to the animal's body weight."""
-
     MONENSIN_CP_LOWER_BOUND = 15
     """The lower bound of the dietary Crude Protein (CP) level (% Dry Matter) that should be considered when calculating the mitigation effects of monensin."""
 
@@ -64,7 +61,21 @@ class AnimalModuleConstants:
     """The upper bound of the urine urea nitrogen concentration."""
 
     DAILY_MILK_VARIATION_MEAN = 0
-    """The mean value of daily milk production variation. This value is used for normal distribution when simulating daily milk production variation."""
-
+    """Mean of the daily milk production variation from the estimated milk production, kg/day"""
     DAILY_MILK_VARIATION_STD_DEV = 1.0
-    """The standard deviation of daily milk production variation. This value is used for normal distribution when simulating daily milk production variation."""
+    """Standard deviation of the daily milk production variation from the estimated milk production, kg/day"""
+
+    DMI_CONSTRAINT_PERCENT = 0.20
+    """The +/- percentage of DMI estimated allowed for ration formulation"""
+
+    MINIMUM_DMI = 1.0
+    """Minimum estimated DMI instituted for all animals, kg/day"""
+
+    MINIMUM_DMI_PERCENTAGE = 0.01
+    """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
+
+    MINIMUM_PHOSPHORUS = 0.0
+    """Minimum phosphorus estimate, g/day"""
+
+    MINIMUM_CALCIUM = 0.0
+    """Minimum calcium estimate, g/day"""
