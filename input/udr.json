@@ -17,7 +17,7 @@
         "fields": {
         },
         "animal": "animal_user_defined_ration.json",
-        "feed": "user_defined_ration_feed.json",
+        "feed": "NE_NRC_feed.json",
         "manure": "manure_management.json"
     }
 }

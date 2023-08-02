@@ -462,7 +462,7 @@ def DMI_constraint_lower(x):
     Args:
         x: The decision vector of the NLP
     """
-    return (sum(x)) - DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    return (sum(x)) - (DMIest*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
 
 def DMI_constraint_upper(x):
@@ -473,7 +473,7 @@ def DMI_constraint_upper(x):
     Args:
         x: The decision vector of the NLP
     """
-    return -(sum(x)) + DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    return -(sum(x)) + (DMIest*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT))
 
 
 def energy_req_limit_constraint(x):
@@ -530,8 +530,8 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
-    DMIest_lower = DMIest-DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
-    DMIest_upper = DMIest+DMIest*AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    DMIest_lower = DMIest*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
+    DMIest_upper = DMIest*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
     ration_key_list = sorted([int(key) for key in ration_percents.keys()])
     for key in ration_key_list:
         # target = ration_percents[str(key)]/100*(DMIest_upper+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
