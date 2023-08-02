@@ -173,27 +173,24 @@ class Field:
         without applying any fertilizer.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
-                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
         if requested_nitrogen == requested_phosphorus == 0.0:
+            info_map = {"class": self.__class__.__name__, "function": self._execute_fertilizer_application.__name__,
+                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
             log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
             om.add_log("fertilizer_application_log", log_message, info_map)
             return
 
         invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
                                                (application_depth > 0.0 and surface_remainder_fraction == 1.0)
+        error_message = "fertilizer_application_error"
         if invalid_depth_and_remainder_fraction:
-            error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
-                            f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a surface" \
-                            f" remainder fraction of 1.0."
-            om.add_error("fertilizer_application_error", error_message, info_map)
+            self._record_nutrient_application_error(application_depth, surface_remainder_fraction, error_message, year,
+                                                    day)
             application_depth = 0.0
             surface_remainder_fraction = 1.0
 
         if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
-            error_message = f"Invalid application depth ({application_depth}) is lower than the bottom depth of the " \
-                            f"soil profile, setting the application depth to be at the bottom of the soil profile."
-            om.add_error("fertilizer_application_error", error_message, info_map)
+            self._record_nutrient_application_error(application_depth, None, error_message, year, day)
             application_depth = self.soil.data.soil_layers[-1].bottom_depth
 
         try:
@@ -326,7 +323,7 @@ class Field:
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
-            Fraction of fertilizer applied that remains on the soil surface after application.
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which the fertilizer application is occurring.
         day : int
@@ -342,7 +339,8 @@ class Field:
         om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(self, requested_nitrogen: float, requested_phosphorus: float, field_coverage: float,
-                                    year: int, day: int) -> None:
+                                    application_depth: float, surface_remainder_fraction: float, year: int,
+                                    day: int) -> None:
         """
         Builds a manure application from the requested nutrient amounts and passes that application to the
         ManureApplication module.
@@ -355,6 +353,10 @@ class Field:
             Mass of phosphorus requested to be in this manure application (kg)
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which this manure application occurs.
         day : int
@@ -362,10 +364,16 @@ class Field:
 
         Notes
         -----
-        Because potassium is not currently specified in the manure request results, it is recorded as None.
+        Because potassium is not currently specified in the manure request results, it is recorded as None. This method
+        also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
+        are corrected, an error is logged to the OutputManager, and execution continues with the new values.
 
         """
         if requested_nitrogen == requested_phosphorus == 0.0:
+            info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                        "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+            log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
+            om.add_log("manure_application_log", log_message, info_map)
             return
 
         nutrient_request = NutrientRequest(nitrogen=requested_nitrogen, phosphorus=requested_phosphorus)
@@ -381,11 +389,27 @@ class Field:
             total_organic_nitrogen_fraction = \
                 (manure_supplied.nitrogen / manure_supplied.dry_matter) * manure_supplied.organic_nitrogen_fraction
 
+            invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or \
+                                                   (application_depth > 0.0 and surface_remainder_fraction == 1.0)
+
+            error_name = "manure_application_error"
+            if invalid_depth_and_remainder_fraction:
+                self._record_nutrient_application_error(application_depth, surface_remainder_fraction, error_name, year,
+                                                        day)
+                application_depth = 0.0
+                surface_remainder_fraction = 1.0
+
+            if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
+                self._record_nutrient_application_error(application_depth, None, error_name, year, day)
+                application_depth = self.soil.data.soil_layers[-1].bottom_depth
+
             self.manure_applicator.apply_machine_manure(
                 dry_matter_mass=manure_supplied.dry_matter,
                 dry_matter_fraction=manure_supplied.dry_matter_fraction,
                 total_phosphorus_mass=manure_supplied.phosphorus,
                 field_coverage=field_coverage,
+                application_depth=application_depth,
+                surface_remainder_fraction=surface_remainder_fraction,
                 field_size=self.field_data.field_size,
                 inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
                 ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
@@ -398,6 +422,8 @@ class Field:
                                             nitrogen=manure_supplied.nitrogen,
                                             phosphorus=manure_supplied.phosphorus,
                                             potassium=None,
+                                            application_depth=application_depth,
+                                            surface_remainder_fraction=surface_remainder_fraction,
                                             year=year,
                                             day=day)
         else:
@@ -413,10 +439,12 @@ class Field:
         else:
             optimal_mix = self._determine_optimal_fertilizer_mix(unmet_nitrogen_demand, unmet_phosphorus_demand,
                                                                  self.available_fertilizer_mixes)
-        self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand, year, day)
+        self._execute_fertilizer_application(optimal_mix, unmet_nitrogen_demand, unmet_phosphorus_demand,
+                                             application_depth, surface_remainder_fraction, year, day)
 
     def _record_manure_application(self, dry_matter_mass: float, dry_matter_fraction: float, field_coverage: float,
-                                   nitrogen: float, phosphorus: float, year: int, day: int,
+                                   nitrogen: float, phosphorus: float, application_depth: float,
+                                   surface_remainder_fraction: float, year: int, day: int,
                                    potassium: Optional[float] = None) -> None:
         """
         Records the amount of manure and related values for an individual manure application.
@@ -433,6 +461,10 @@ class Field:
             Mass of nitrogen in the manure applied (kg)
         phosphorus : float
             Mass of phosphorus in the manure applied (kg)
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         year : int
             Calendar year in which this manure application occurs.
         day : int
@@ -445,9 +477,44 @@ class Field:
                     "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size}
         value = {"dry_matter_mass": dry_matter_mass, "dry_matter_fraction": dry_matter_fraction, "field_coverage":
-                 field_coverage, "nitrogen": nitrogen, "phosphorus": phosphorus, "potassium": potassium}
+                 field_coverage, "application_depth": application_depth,
+                 "surface_remainder_fraction": surface_remainder_fraction, "nitrogen": nitrogen,
+                 "phosphorus": phosphorus, "potassium": potassium}
         om.add_variable("manure_application", value, info_map)
 
+    def _record_nutrient_application_error(self, application_depth: float, surface_remainder_fraction: Optional[float],
+                                           error_name: str, year: int, day: int) -> None:
+        """
+        Logs errors to the OutputManager when attempting injection applications of manure or fertilizer.
+
+        Parameters
+        ----------
+        application_depth : float
+            Depth of the manure or fertilizer application (mm).
+        surface_remainder_fraction : Optional[float]
+            Fraction of manure or fertilizer applied that remains on the soil surface after application (unitless).
+        error_name : str
+            Name of the error, indicating whether it occurred during manure or fertilizer application.
+
+        Notes
+        -----
+        There are two possible errors that this method can log. One is an invalid combination of application depth and
+        surface remainder fraction, the other is an application depth deeper than the bottom of the soil profile. The
+        two are differentiated by what is passed for `surface_remainder_fraction`. If it is a number, it is the former,
+        and if None, then it is the latter.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,
+                    "prefix": f"field:'{self.field_data.name}'", "date": {"year": year, "day": day}}
+        if surface_remainder_fraction is not None:
+            error_message = f"Invalid application depth ({application_depth}) and surface remainder fraction " \
+                            f"({surface_remainder_fraction}). Defaulting to application depth of 0.0 mm and a " \
+                            f"surface remainder fraction of 1.0."
+        else:
+            error_message = f"Invalid application depth ({application_depth}) is lower than the bottom depth of " \
+                            f"the soil profile, setting the application depth to be at the bottom of the soil " \
+                            f"profile."
+        om.add_error(error_name, error_message, info_map)
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
@@ -509,7 +576,8 @@ class Field:
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
         for event in todays_manure_events:
             self._execute_manure_application(event.nitrogen_mass, event.phosphorus_mass, event.field_coverage,
-                                             event.year, event.day)
+                                             event.application_depth, event.surface_remainder_fraction, event.year,
+                                             event.day)
 
     def _check_crop_harvest_schedule(self, time) -> None:
         """

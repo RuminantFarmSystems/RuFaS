@@ -18,7 +18,7 @@ from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 ])
 def test_generate_depth_factors(depth: float, bottom_depths: list[float], expected: list[float]) -> None:
     """Tests that the depth factors are correctly calculated for subsurface nutrient applications."""
-    actual = FertilizerApplication._generate_depth_factors(depth, bottom_depths)
+    actual = FertilizerApplication.generate_depth_factors(depth, bottom_depths)
     assert pytest.approx(actual) == expected
 
 
@@ -43,7 +43,7 @@ def test_apply_subsurface_fertilizer(nutrient_amounts: float, depth: float, subs
     soil = Soil(soil_data=SoilData(soil_layers=soil_layers, field_size=field_size))
     fert_app = FertilizerApplication(soil=soil)
 
-    with patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication._generate_depth_factors",
+    with patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
                new_callable=MagicMock, return_value=[0.1, 0.4, 0.5]) as patched_depth_factor_generator:
         fert_app._apply_subsurface_fertilizer(nutrient_amounts, nutrient_amounts, nutrient_amounts, nutrient_amounts,
                                               depth, subsurface_frac)
