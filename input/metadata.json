@@ -184,7 +184,7 @@
             "type": "string",
             "default": "sexed",
             "pattern": "^{sexed|conventional}$",
-            "description": "Semen Type (select one) -- Please choose whichever semen selection type makes up a majority of your breedings"
+            "description": "The semen type that makes up a majority of the farm's breedings"
           },
           "days_in_preg_when_dry": {
             "type": "number",
