@@ -230,6 +230,9 @@ def NEl_constraint(x):
         multiplier.append(1)
         multiplier.append(0)
     # returning the NElact constraint in the NLP
+    # print(f'NEl_firstterm = {sum(np.multiply(x, np.multiply(multiplier, NElact)))}')
+    # print(f'NEpreg = {NEpreg}')
+    # print(f'NEl = {NEl}')
     return sum(np.multiply(x, np.multiply(multiplier, NElact))) - (NEpreg + NEl)
 
 
@@ -260,6 +263,8 @@ def NEgact_constraint(x):
         multiplier.append(0)
         multiplier.append(1)
     # returning the NEgact constraint in the NLP
+    # print(f'NEgact_firstterm = {sum(np.multiply(x, np.multiply(multiplier, NEgact)))}')
+    # print(f'NEg = {NEg}')
     return sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg
 
 
