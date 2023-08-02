@@ -410,11 +410,18 @@ class ManureApplication:
         field_size : float
             Size of the field (ha).
 
+        Notes
+        -----
+        Only 95% of water extractable organic and stable organic phosphorus are put into their corresponding pools
+        because that is how SurPhos transfers organic phosphorus, as an approximation for organic phosphorus loss. This
+        practice will be changed when issue #444 is addressed.
+
         """
         bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
         depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
         water_extractable_inorganic_phosphorus = (total_phosphorus_mass *
                                                   water_extractable_inorganic_phosphorus_fraction)
+        # TODO: put subsurface organic phosphorus into corresponding soil pools - issue #444
         water_extractable_organic_phosphorus = (total_phosphorus_mass * water_extractable_organic_phosphorus_fraction *
                                                 0.95)
         stable_inorganic_phosphorus = (total_phosphorus_mass * stable_inorganic_phosphorus_fraction)

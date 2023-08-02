@@ -608,29 +608,19 @@ def test_execute_fertilizer_application_error(field_name: str, mix_name: str, av
     assert str(e.value) == expected_message
 
 
-@pytest.mark.parametrize("depth,remainder,expected_depth,expected_remainder,expected_info_map,expected_error_message", [
-    (1000.0, 0.1, 950.0, 0.1,
-     {"prefix": "field:'test'", "date": {"year": 1994, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
-     "Invalid application depth (1000.0) is lower than the bottom depth of the soil profile, setting the application "
-     "depth to be at the bottom of the soil profile."),
-    (100.0, 1.0, 0.0, 1.0,
-     {"prefix": "field:'test'", "date": {"year": 1994, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
-     "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
-     "mm and a surface remainder fraction of 1.0."),
-    (0.0, 0.9, 0.0, 1.0,
-     {"prefix": "field:'test'", "date": {"year": 1994, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
-     "Invalid application depth (0.0) and surface remainder fraction (0.9). Defaulting to application depth of 0.0 mm "
-     "and a surface remainder fraction of 1.0.")
+@pytest.mark.parametrize("depth,remainder,expected_depth,expected_remainder,invalid_combination", [
+    (1000.0, 0.1, 950.0, 0.1, False),
+    (100.0, 1.0, 0.0, 1.0, True),
+    (0.0, 0.9, 0.0, 1.0, True)
 ])
 def test_execute_fertilizer_application_with_invalid_args(depth: float, remainder: float, expected_depth: float,
-                                                          expected_remainder: float, expected_info_map: dict,
-                                                          expected_error_message: str) -> None:
+                                                          expected_remainder: float, invalid_combination: bool) -> None:
     """Tests that fertilizer applications with invalid arguments are caught, recorded in the OutputManager and execution
         with corrected values takes place."""
     field = Field(field_data=FieldData(name="test", field_size=1.2), manure_manager=MagicMock(ManureManager))
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"), \
+    with patch("SC_redesign.Crop_and_Soil.field.field.Field._record_nutrient_application_error",
+               new_callable=MagicMock) as patched_error, \
             patch("SC_redesign.Crop_and_Soil.field.field.Field._formulate_fertilizer_required", new_callable=MagicMock,
                   return_value={"total_mass": 100.0, "phosphorus_mass": 50.0, "nitrogen_mass": 50.0,
                                 "potassium_mass": 0.0}) as patched_formulator, \
@@ -640,9 +630,10 @@ def test_execute_fertilizer_application_with_invalid_args(depth: float, remainde
                   new_callable=MagicMock) as patched_recorder:
         field._execute_fertilizer_application("26_4_24", 50.0, 50.0, depth, remainder, 1994, 200)
 
-        actual = om.errors_pool["field:'test'.fertilizer_application_error"]
-        assert actual["info_maps"].__contains__(expected_info_map)
-        assert actual["values"].__contains__(expected_error_message)
+        if invalid_combination:
+            patched_error.assert_called_once_with(depth, remainder, "fertilizer_application_error", 1994, 200)
+        else:
+            patched_error.assert_called_once_with(depth, None, "fertilizer_application_error", 1994, 200)
         patched_formulator.assert_called_once_with(0.26, 0.04, 0.24, 50.0, 50.0)
         patched_applicator.assert_called_once_with(50.0, 100.0, 0.5, 0.0, 0.0, expected_depth, expected_remainder, 1.2)
         patched_recorder.assert_called_once_with("26_4_24", 100.0, 50.0, 50.0, 0.0, expected_depth, expected_remainder,
@@ -754,7 +745,7 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
         if nitrogen == phosphorus == 0.0:
             expected_info_map = {"prefix": "field:'test'", "date": {"year": year, "day": day},
                                  "timestamp": "00-Jan-1970_Thu_00-00-00"}
-            expected_log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
+            expected_log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             actual = om.logs_pool["field:'test'.manure_application_log"]
             assert actual["info_maps"].__contains__(expected_info_map)
             assert actual["values"].__contains__(expected_log_message)
@@ -812,23 +803,13 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
                 field._execute_fertilizer_application.assert_not_called()
 
 
-@pytest.mark.parametrize("depth,remainder,expected_depth,expected_remainder,expected_info_map,expected_error_message", [
-    (100.0, 1.0, 0.0, 1.0,
-     {"prefix": "field:'test'", "date": {"year": 2000, "day": 133}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
-     "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
-     "mm and a surface remainder fraction of 1.0."),
-    (0.0, 0.76, 0.0, 1.0,
-     {"prefix": "field:'test'", "date": {"year": 2000, "day": 133}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
-     "Invalid application depth (0.0) and surface remainder fraction (0.76). Defaulting to application depth of 0.0 "
-     "mm and a surface remainder fraction of 1.0."),
-    (1000.0, 0.2, 950.0, 0.2,
-     {"prefix": "field:'test'", "date": {"year": 2000, "day": 133}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
-     "Invalid application depth (1000.0) is lower than the bottom depth of the soil profile, setting the application "
-     "depth to be at the bottom of the soil profile.")
+@pytest.mark.parametrize("depth,remainder,expected_depth,expected_remainder,invalid_combination", [
+    (100.0, 1.0, 0.0, 1.0, True),
+    (0.0, 0.76, 0.0, 1.0, True),
+    (1000.0, 0.2, 950.0, 0.2, False)
 ])
 def test_execute_manure_application_with_invalid_args(depth: float, remainder: float, expected_depth: float,
-                                                      expected_remainder: float, expected_info_map: dict,
-                                                      expected_error_message: str) -> None:
+                                                      expected_remainder: float, invalid_combination: bool) -> None:
     """Tests that the manure application executor raises errors and runs correctly when invalid arguments are passed."""
     mocked_manure_manager = MagicMock(ManureManager)
     mocked_manure_manager.request_nutrients = MagicMock(return_value=NutrientRequestResults(nitrogen=50.0,
@@ -838,8 +819,8 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
                                                                                             dry_matter_fraction=0.66))
     field = Field(field_data=FieldData(name="test", field_size=1.89), manure_manager=mocked_manure_manager)
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"), \
+    with patch("SC_redesign.Crop_and_Soil.field.field.Field._record_nutrient_application_error",
+               new_callable=MagicMock) as patched_error, \
             patch("SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication.apply_machine_manure",
                   new_callable=MagicMock) as patched_manure_applicator, \
             patch("SC_redesign.Crop_and_Soil.field.field.Field._record_manure_application",
@@ -850,9 +831,10 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
                   new_callable=MagicMock) as patched_fertilizer_applicator:
         field._execute_manure_application(50.0, 50.0, 0.8, depth, remainder, 2000, 133)
 
-        actual = om.errors_pool["field:'test'.manure_application_error"]
-        assert actual["info_maps"].__contains__(expected_info_map)
-        assert actual["values"].__contains__(expected_error_message)
+        if invalid_combination:
+            patched_error.assert_called_once_with(depth, remainder, "manure_application_error", 2000, 133)
+        else:
+            patched_error.assert_called_once_with(depth, None, "manure_application_error", 2000, 133)
         mocked_manure_manager.request_nutrients.assert_called_once_with(NutrientRequest(nitrogen=50.0, phosphorus=50.0))
         patched_manure_applicator.assert_called_once_with(
             dry_matter_mass=100.0,
@@ -911,6 +893,30 @@ def test_record_manure_application(field_name: str, field_size: float, dry_mass:
     actual = om.variables_pool[f"field:'{field_name}'.manure_application"]
     assert actual["info_maps"].__contains__(expected_info)
     assert actual["values"].__contains__(expected_values)
+
+
+@pytest.mark.parametrize("depth,remainder,name,year,day,expected_info_map,expected_error_message", [
+    (100.0, 1.0, "manure_application_error", 1998, 200,
+     {"prefix": "field:'test'", "date": {"year": 1998, "day": 200}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting to application depth of 0.0 "
+     "mm and a surface remainder fraction of 1.0."),
+    (800.0, None, "fertilizer_application_error", 2005, 100,
+     {"prefix": "field:'test'", "date": {"year": 2005, "day": 100}, "timestamp": "00-Jan-1970_Thu_00-00-00"},
+     "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting the application "
+     "depth to be at the bottom of the soil profile.")
+])
+def test_record_nutrient_application_error(depth: float, remainder: float, name: str, year: int, day: int,
+                                           expected_info_map: dict, expected_error_message: str) -> None:
+    """Tests that manure and fertilizer application errors are correctly recorded to the OutputManager."""
+    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
+               return_value="00-Jan-1970_Thu_00-00-00"):
+        field = Field(field_data=FieldData(name="test"), manure_manager=MagicMock(ManureManager))
+        field._record_nutrient_application_error(depth, remainder, name, year, day)
+
+        expected_error_name = expected_info_map["prefix"] + "." + name
+        actual = om.errors_pool[expected_error_name]
+        assert actual["info_maps"].__contains__(expected_info_map)
+        assert actual["values"].__contains__(expected_error_message)
 
 
 @pytest.mark.parametrize("field_size,crops_growing,residue,light,mean_temp,min_temp,max_temp,annual_mean_temp,"
