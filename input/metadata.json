@@ -116,7 +116,7 @@
         },
         "heiferI_num": {
           "type": "number",
-          "description": "Number of HeiferIs (head) -- HeiferI is the number of youngstock post-weaning and before breeding (default is ~23% of herd number)",
+          "description": "Number of HeiferIs (head) -- HeiferI is the number of youngstock post-weaning and before breeding",
           "default": 44,
           "minimum": 0
         },
