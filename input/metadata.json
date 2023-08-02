@@ -265,7 +265,7 @@
             "milk_type": {
               "type": "string",
               "default": "whole",
-              "pattern": "^{whole|replacement}$",
+              "pattern": "^{whole|replacer}$",
               "description": "Milk Type (select one) -- The type of milk that is used to feed calves (Whole or Replacer)"
             }
           },
