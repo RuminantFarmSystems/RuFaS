@@ -717,7 +717,7 @@
       },
       "close_up_feeds": {
         "type": "array",
-        "description": "Close Up Feeds (HeiferIII and Dry Cows) -- Add as many close feeds as needed. HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
+        "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
         "properties": {
           "type": "number",
           "minimum": 1,
