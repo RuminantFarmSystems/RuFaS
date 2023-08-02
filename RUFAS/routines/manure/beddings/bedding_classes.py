@@ -192,7 +192,7 @@ class SawdustBedding(BaseOrganicBedding):
 
 class CBPBSawdustBedding(BaseOrganicBedding):
     """
-    A concrete class representing CBPB (compressed wood particles) sawdust bedding.
+    A concrete class representing sawdust bedding type for compost bedded pack barns.
 
     All attributes and methods are inherited from BaseOrganicBedding.
     """
