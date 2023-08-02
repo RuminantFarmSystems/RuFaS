@@ -1308,9 +1308,9 @@ class GasEmissions:
         Parameters
         ----------
         daily_nitrogen_input : float
-            The mass of nitrogen present in the manure excreted by animals (in kg)
+            The mass of nitrogen present in the manure excreted by animals (kg)
         existing_nitrogen_mass : float
-            The mass of nitrogen already present in the manure-bedding mixture (in kg)
+            The mass of nitrogen already present in the manure-bedding mixture (kg)
         is_bedding_tilled : bool
             Indicator for if the beddint is tilled for the current simulation day.
 
