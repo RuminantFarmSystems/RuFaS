@@ -40,10 +40,10 @@
     },
     "user_defined_ration_percentages": {
         "calf": {},
-        "growing_heifers": {},
+        "growing": {},
         "close_up": {},
-        "cow_lactating": {},
+        "lac_cow": {},
     "tolerance": 0.0,
-    "milk_reduction_percent": 0.0
+    "milk_reduction_maximum": 0.0
 }
 }

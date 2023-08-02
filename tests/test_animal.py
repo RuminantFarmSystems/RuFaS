@@ -1408,8 +1408,8 @@ def test_optimization():
     pass
 
 
-def test_calc_starting_milk_average() -> None:
-    """Unit test for function calc_starting_milk_average in file routines/animal/ration/ration_driver.py"""
+def test_calc_milk_average() -> None:
+    """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
     mockpen = MagicMock()
     mockpen.animals_in_pen = [MagicMock(),
                               MagicMock(),
@@ -1419,7 +1419,7 @@ def test_calc_starting_milk_average() -> None:
     production = [1,2,3,4,5]
     for i in range(len(production)):
         mockpen.animals_in_pen[i].estimated_daily_milk_produced = production[i]
-    result = ration_driver.calc_starting_milk_average(mockpen)
+    result = ration_driver.calc_milk_average(mockpen)
     assert result == sum(production)/len(production)
 
 def test_reduce_milk_production() -> None:
@@ -1810,7 +1810,7 @@ def test_ration_to_use(mock_user_defined_ration_manager: UserDefinedRationManage
     #udrv = MagicMock()
     mock_user_defined_ration_manager.lactating_cow_ration = {'1': 100, '2': 200, '3': 300}
     mock_user_defined_ration_manager.close_up_ration = {'1': 10, '2': 20, '3': 30}
-    mock_user_defined_ration_manager.heifer_ration = {'1': 1, '2': 2, '3': 3}
+    mock_user_defined_ration_manager.growing_ration = {'1': 1, '2': 2, '3': 3}
     mock_user_defined_ration_manager.calf_ration = {'1': 0.1, '2': 0.2, '3': 0.3}
 
     pen_animal_combo = MagicMock()

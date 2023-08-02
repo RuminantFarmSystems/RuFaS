@@ -30,13 +30,13 @@ class UserDefinedRationManager(object):
             
             self.udr_or_not = None
 
-            self.lactating_cow_ration = []
-            self.heifer_ration = []
             self.calf_ration = []
+            self.growing_ration = []
             self.close_up_ration = []
+            self.lactating_cow_ration = []
 
             self.tolerance = []
-            self.milk_reduction_percent = []
+            self.milk_reduction_maximum = []
 
     def feed_quality_fix(ration_percents: Dict, available_feeds: Dict) -> Dict:
         """
@@ -88,7 +88,7 @@ class UserDefinedRationManager(object):
             ration_percents = udrv.lactating_cow_ration
         # elif pen.classes
         elif group == 'GROWING':
-            ration_percents = udrv.heifer_ration
+            ration_percents = udrv.growing_ration
         elif group == 'CLOSE_UP':
             ration_percents = udrv.close_up_ration
         else: 

@@ -198,9 +198,6 @@ def NEmact_constraint(x):
         multiplier.append(0)
         multiplier.append(0)
     # returning the NEm_act constraint in the NLP
-    # print(f'NEmactconstraint={(sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))}')
-    # print(f'NEmaint={NEmaint}')
-    # print(f'NEa={NEa}')
     return (sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))
 
 
@@ -233,9 +230,6 @@ def NEl_constraint(x):
         multiplier.append(1)
         multiplier.append(0)
     # returning the NElact constraint in the NLP
-    # print(f'NElconstraint={sum(np.multiply(x, np.multiply(multiplier, NElact)))}')
-    # print(f'NEpreg={NEpreg}')
-    # print(f'NEl{NEl}')
     return sum(np.multiply(x, np.multiply(multiplier, NElact))) - (NEpreg + NEl)
 
 
@@ -266,7 +260,6 @@ def NEgact_constraint(x):
         multiplier.append(0)
         multiplier.append(1)
     # returning the NEgact constraint in the NLP
-    # print(f'NEgact_constraint={sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg}')
     return sum(np.multiply(x, np.multiply(multiplier, NEgact))) - NEg
 
 
@@ -421,14 +414,7 @@ def NDF_constraint_upper(x):
         x: The decision vector of the NLP
     """
     # From E/D: OTHER REQUIREMENTS
-    # print(f'NDF={NDF}')
-    # #print(f'NDFcosntraint2 = {-(sum(np.multiply(x, NDF)) / DMI)}')
-    # print(len(NDF))
-    # print(x)
-    # print(len(x))
     DMI = sum(x)
-    # conss = (sum(np.multiply(x, NDF)) / DMI)
-    # print(f'NDFconstraint2={conss}')
     if DMI != 0:
         return (-(sum(np.multiply(x, NDF)) / DMI) + 45)
 

@@ -90,9 +90,9 @@ def optimization(requirements, available_feeds, animal_combination):
     return solution, ration_vals
 
 
-def calc_starting_milk_average(pen) -> float:
+def calc_milk_average(pen) -> float:
     """
-    Calculates starting average milk produced in a pen.
+    Calculates average milk produced in a pen.
     
     Parameters
     ----------
@@ -107,10 +107,10 @@ def calc_starting_milk_average(pen) -> float:
     for animal in pen.animals_in_pen:
         total_milk_in_pen += animal.estimated_daily_milk_produced
     num_animals = len(pen.animals_in_pen)
-    starting_milk_average = total_milk_in_pen/num_animals
-    return starting_milk_average
+    milk_average = total_milk_in_pen/num_animals
+    return milk_average
 
-def reduce_milk_production(pen, reduction: float) -> float:
+def reduce_milk_production(pen, reduction: float) -> None:
     """
     Reduces milk production for all animals in a pen.
     Only does so if post-reduction production would be above 1.0.
@@ -123,11 +123,6 @@ def reduce_milk_production(pen, reduction: float) -> float:
     reduction: float
         The kg amount of lactation should be reduced in each loop, per animal
     
-    Returns
-    -------
-    float
-        running total of milk produced daily in pen
-    
     """
     running_total_milk = 0.0
     for animal in pen.animals_in_pen:
@@ -135,7 +130,6 @@ def reduce_milk_production(pen, reduction: float) -> float:
             animal.estimated_daily_milk_produced -= reduction
             animal.milk_production_reduction -= reduction
         running_total_milk += animal.estimated_daily_milk_produced
-    return running_total_milk
 
 def make_ration_from_solution(available_feeds: Dict, solution: scipy.optimize.OptimizeResult) -> dict:
     """
@@ -201,7 +195,7 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
     3: Optimization fails
         3a: If lactation reduction is set to 0.0, no reattempt is made
         3b: Optimization reattempted until lactation reduction threshold is reached. 
-            (e.g. starting_milk - starting_milk *milk_reduction_percent)
+            (e.g. milk_reduction_maximum)
     
     Parameters
     ----------
@@ -247,7 +241,7 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
                     'pen requirements' : pen.avg_nutrient_rqmts}
         om.add_variable(f'failed_constraint_summary_for_pen_{pen.id}', fail_summary, info_map)
     
-    if udrv.milk_reduction_percent == 0.0 and udrv.tolerance == 0.0 and not solution.success:
+    if udrv.milk_reduction_maximum == 0.0 and udrv.tolerance == 0.0 and not solution.success:
         ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
         ration_vals = NLP.get_ration_vals(make_solution_from_fixed_ration(ration))
         return ration, ration_vals
@@ -259,25 +253,24 @@ def get_user_defined_ration(req: animal_requirements, pen, available_feeds, anim
 
     # Follow method to reduce requirements for lactating animals
     if str(pen.animal_combination) in ['AnimalCombination.LAC_COW'] and solution is not None:
-        starting_milk_average = calc_starting_milk_average(pen)
+        running_milk_reduction = 0.0
         while not solution.success:
-            # if lactation reduction "not allowed", use fixed ration
-            if udrv.milk_reduction_percent == 0.0:
+            running_average_milk = calc_milk_average(pen)
+            reduction = 0.25
+            # if lactation reduction "not allowed", or max or min milk production reached, use fixed ration
+            if udrv.milk_reduction_maximum == 0.0 or \
+                running_milk_reduction + reduction > udrv.milk_reduction_maximum or\
+                    running_average_milk - reduction < 1.0:
                 fixed_ration = True
                 solution.success = True
                 break
+            
             # reattempt optimization
             num_reattempts += 1
-            reduction = 0.25
-            running_total_milk = reduce_milk_production(pen, reduction)
-            average_running_milk = running_total_milk / len(pen.animals_in_pen)
+            running_milk_reduction += reduction
+            reduce_milk_production(pen, reduction)
+            running_average_milk = calc_milk_average(pen)
 
-            # if reduction limit reached, break and use fixed ration
-            if average_running_milk < starting_milk_average - udrv.milk_reduction_percent*starting_milk_average or \
-               average_running_milk < 1.0:
-                fixed_ration = True
-                solution.success = True
-                break
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
