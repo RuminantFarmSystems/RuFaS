@@ -1,6 +1,6 @@
 {
     "sensitivity_method": "saltellisobol",
-    "saltelli_or_fast_num": 64,
+    "saltelli_or_fast_num": 16,
     "saltelli_skip": 2,
     "input_files_to_modify": {
         "animal/animal_management_animal.json": [
@@ -67,7 +67,8 @@
     "output_variables_of_interest": [
         "MilkingParlor.__init__.fresh_water_use_rate",
         "LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: culled_cow_num",
-        "LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: daily_milk_production"
+        "LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: daily_milk_production",
+        "Cow.milking_update.milk_data_at_milk_update.values: estimated_daily_milk_produced"
     ],
     "problem": [
         {

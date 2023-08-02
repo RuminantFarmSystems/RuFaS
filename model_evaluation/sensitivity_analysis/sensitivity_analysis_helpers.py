@@ -530,7 +530,7 @@ def rewrite_sobol_analysis(analysis, p):
     """
     intnames = p['names']
     colnames = ['S1:'+x for x in intnames] + ['ST:'+str(x) for x in intnames] + ['S2:'+str(x) for x in intnames] + ['S1_conf:'+x for x in intnames] + ['ST_conf:'+str(x) for x in intnames] + ['S2_conf:'+str(x) for x in intnames]
-    rowvalues = list(analysis['S1']) + list(analysis['ST']) + list(analysis['S2']) 
+    rowvalues = list(analysis['S1']) + list(analysis['ST']) + list(analysis['S2']) + list(analysis['S1_conf']) + list(analysis['ST_conf']) + list(analysis['S2_conf']) 
     len(rowvalues)
     rowvalues[21]
     

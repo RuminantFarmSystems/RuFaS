@@ -38,7 +38,7 @@ elif analysis_type =="saltellisobol":
 elif analysis_type == 'FAST':
     param_values = fast_sampler.sample(p, saltelli_num)
 
-
+len(param_values)
 
 # WORKING ZONE
 # COLLECTING THE OUTPUTS TO USE INSTEAD OF CURR COL IN ANALYSIS LISTS
@@ -51,8 +51,8 @@ for output_variable_of_interest in config_json['output_variables_of_interest']:
     output_variable_list = []
     total_num_runs = len(param_values)
     for every_run in range(total_num_runs):
-        if every_run > 50:
-            break
+        # if every_run > 50:
+        #     break
         print(f'run={every_run}')
         # get first file with the correct prefix
         for f_name in os.listdir('output/sensitivity/'):
@@ -85,10 +85,12 @@ for output_variable_of_interest in config_json['output_variables_of_interest']:
                     pass
     collect_all_outputs[output_variable_of_interest] = output_variable_list
 
-
+import csv
 for idx, name in enumerate(output_variables_of_interest):
     print(idx)
     print(name)
+    # if idx==1:
+    #     break
     print(collect_all_outputs[name])
     concatenated_output = np.concatenate(collect_all_outputs[name], axis=None)
     if analysis_type =="ff":
@@ -96,15 +98,15 @@ for idx, name in enumerate(output_variables_of_interest):
         analysis = SAH.rewrite_ff_analysis(analysis) #
     if analysis_type =="saltellisobol":
         analysis = sobol.analyze(p, concatenated_output) #sobol
-        analysis = SAH.rewrite_sobol_analysis(analysis) #
+        analysis = SAH.rewrite_sobol_analysis(analysis, p) #
     # SALib.analyze.sobol.analyze(problem, Y, calc_second_order=True, num_resamples=100, conf_level=0.95, print_to_console=False, parallel=False, n_processors=None, keep_resamples=False, seed=None)
     # analysis = sol_a.analyze(p, [r[curr_col] for r in analysis_lists])
 
     # HOW TO WRITE THESE? 
-    # file = open(analysis_file, 'w', newline='')
-    # with file:
-    #     write = csv.writer(file)
-    #     write.writerows(analysis)
+    file = open(f'sensitivity_analysis_var_{idx}.csv', 'w', newline='')
+    with file:
+        write = csv.writer(file)
+        write.writerows(analysis)
 
 
 
