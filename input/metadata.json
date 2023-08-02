@@ -762,7 +762,7 @@
       },
       "storage_options": {
         "type": "array",
-        "description": "Storage Options -- Add as many storage options as needed",
+        "description": "Storage Options.",
         "properties": {
           "type": "object",
           "storage_type": {
