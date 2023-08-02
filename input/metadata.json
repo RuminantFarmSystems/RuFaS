@@ -726,7 +726,7 @@
       },
       "lac_cow_feeds": {
         "type": "array",
-        "description": "Lactating Cow Feeds -- Add as many lactating cow feeds as needed",
+        "description": "Lactating Cow Feeds",
         "properties": {
           "type": "number",
           "minimum": 1,
