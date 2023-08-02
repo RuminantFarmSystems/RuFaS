@@ -363,7 +363,7 @@
               "description": "Cow Reproductive programs",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animalss that would be detected in the ED (Estrus Detection) programs (default is 0.65)",
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.65)",
                 "default": 0.65,
                 "minimum": 0,
                 "maximum": 1
