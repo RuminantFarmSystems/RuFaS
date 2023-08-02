@@ -236,23 +236,26 @@ class InputManager:
         if is_nested:
             children_status: Dict[str, bool] = {}
             false_counter = 0
+            variable_properties_to_ignore = ["type", "description"]
             for nested_key in variable_properties.keys():
-                element_hierarchy.append(nested_key)
-                element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
-                                                                      input_data, eager_termination)
-                is_child_valid = element_counter_and_validity["is_valid"]
-                if eager_termination and not is_child_valid:
-                    return element_counter_and_validity
-                element_path = ".".join(element_hierarchy)
-                children_status[element_path] = is_child_valid
-                if not is_child_valid:
-                    om.add_warning("Invalid nested element found", f"{element_path}", info_map)
-                    false_counter += 1
-                element_hierarchy.remove(nested_key)
+                if nested_key not in variable_properties_to_ignore:
+                    element_hierarchy.append(nested_key)
+                    element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
+                                                                          input_data, eager_termination)
+                    is_child_valid = element_counter_and_validity["is_valid"]
+                    if eager_termination and not is_child_valid:
+                        return element_counter_and_validity
+                    element_path = ".".join(element_hierarchy)
+                    children_status[element_path] = is_child_valid
+                    if not is_child_valid:
+                        om.add_warning("Invalid nested element found", f"{element_path}", info_map)
+                        false_counter += 1
+                    element_hierarchy.remove(nested_key)
 
             is_valid = false_counter == 0
+            element_counter_and_validity["is_valid"] = is_valid
 
-            return is_valid
+            return element_counter_and_validity
         else:
             var_name = element_hierarchy[-1]
             try:

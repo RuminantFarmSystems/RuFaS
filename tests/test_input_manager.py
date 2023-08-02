@@ -294,6 +294,46 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                 "element2": {"type": "number", "minimum": 0, "maximum": 150},
                 "element3": {"type": "array",
                              "minimum_length": 1, "maximum_length": 5},
+                "element4": {"type": "object",
+                             "description": "dummy_description",
+                             "nested_element1": {
+                                 "type": "string",
+                                 "minimum_length": 1,
+                                 "maximum_length": 20
+                                },
+                             "nested_element2": {
+                                 "type": "number",
+                                 "minimum": 0,
+                                 "maximum": 250
+                                }
+                             },
+                "element5": {"type": "object",
+                             "description": "dummy_description",
+                             "nested_element1": {
+                                 "type": "string",
+                                 "minimum_length": 1,
+                                 "maximum_length": 20
+                                },
+                             "nested_element2": {
+                                 "type": "number",
+                                 "minimum": 0,
+                                 "maximum": 250
+                                },
+                             "nested_element3": {
+                                 "type": "object",
+                                 "description": "dummy_description",
+                                 "nested_sub_element1": {
+                                    "type": "string",
+                                    "minimum_length": 1,
+                                    "maximum_length": 5
+                                 },
+                                 "nested_sub_element2": {
+                                    "type": "array",
+                                    "minimum_length": 1,
+                                    "maximum_length": 5
+                                 },
+                                }
+                             }
             }
         }
     }
@@ -310,6 +350,11 @@ def test_validate_element_string_type(mock_input_manager: InputManager,
 
     assert result["is_valid"] is True
 
+    input_data = {"element1": "invalid_value"}
+    result = mock_input_manager._validate_element(["element1"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
@@ -324,6 +369,11 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
 
     assert result["is_valid"] is True
 
+    input_data = {"element2": 500}
+    result = mock_input_manager._validate_element(["element2"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
@@ -337,6 +387,82 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
 
     assert result["is_valid"] is True
+
+    input_data = {"element3": [1, 2, 3, 6, 7, 8, 10]}
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_valid_object_type(mock_input_manager: InputManager,
+                                            mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                            input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for valid nested object type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_invalid_object_type(mock_input_manager: InputManager,
+                                              mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                              input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for nested invalid object type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 500}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    input_data = {"element4": {"nested_element1": "value123456789value123456789", "nested_element2": 123}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_valid_nested_object_type(mock_input_manager: InputManager,
+                                                   mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                                   input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for valid object nested within another object type
+    input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
+                               "nested_element3": {"nested_sub_element1": "cows", "nested_sub_element2": [1, 2, 3]}}}
+    result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_invalid_nested_object_type(mock_input_manager: InputManager,
+                                                     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                                     input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid object nested within another object type
+    input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
+                               "nested_element3": {"nested_sub_element1": "cows", "nested_sub_element2": []}}}
+    result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
+                               "nested_element3": {"nested_sub_element1": "invalid_cows", "nested_sub_element2": [1, 2, 3]}}}
+    result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
@@ -361,21 +487,6 @@ def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock
     result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
 
     assert result == expected_result
-
-
-def test_validate_element_object_type(mock_input_manager: InputManager, mocker: MockerFixture,
-                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                      input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for nested object type input_data for _validate_element in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
-    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data)
-
-    assert result is True
-
-    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
 def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: InputManager,
@@ -1068,6 +1179,18 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
         ("module1.submodule1.nested_var", "dummyvalue2", 0),
         ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3", 0),
         ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4", 0),
+        ("module1", {
+            "integer_var": 5,
+            "float_var": 0.5,
+            "string_var": "dummyvalue1",
+            "boolean_var": True,
+            "integer_array_var": [1, 2, 3],
+            "float_array_var": [0.1, 0.2, 3.14159],
+            "string_array_var": ["1", "2", "3", "4", "5"],
+            "boolean_array_var": [True, False],
+            "submodule1": {
+                "nested_var": "dummyvalue2"
+            }}, 0),
     ]
 )
 def test_get_data_with_valid_key(dummy_data_path: str,
