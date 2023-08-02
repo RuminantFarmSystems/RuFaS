@@ -260,6 +260,8 @@ class ManureApplication:
         the Fortran code was sent to the RuFaS team.
 
         """
+        # TODO: evaluate how to best apply subsurface liquid manure, it is likely more complicated than how this method
+        #   accomplishes it - issue #713
         surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
         wet_rate = self._determine_wet_rate_factor(surface_dry_matter_mass, dry_matter_fraction, field_coverage,
                                                    field_size)
