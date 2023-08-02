@@ -793,7 +793,8 @@
           "inoculation": {
             "type": "string",
             "description": "Inoculation",
-            "pattern": "^{None|heterofermentative|homofermentative}$"
+            "pattern": "^{None|heterofermentative|homofermentative}$",
+            "default": "None",
           },
           "ventilation": {
             "type": "boolean",
