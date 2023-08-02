@@ -111,7 +111,7 @@ class FertilizerApplication:
 
         """
         bottom_depths = self.soil.data.get_vectorized_layer_attribute("bottom_depth")
-        depth_factors = self._generate_depth_factors(application_depth, bottom_depths)
+        depth_factors = self.generate_depth_factors(application_depth, bottom_depths)
         for index, depth_factor in enumerate(depth_factors):
             self.soil.data.soil_layers[index].labile_inorganic_phosphorus_content += (phosphorus * depth_factor *
                                                                                       subsurface_fraction)
@@ -123,7 +123,7 @@ class FertilizerApplication:
                                                                                   subsurface_fraction)
 
     @staticmethod
-    def _generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
+    def generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
         """
         Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
 
