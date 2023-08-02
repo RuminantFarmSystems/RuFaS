@@ -858,7 +858,7 @@
         },
         "close_up": {
           "type": "array",
-          "description": "Close UP",
+          "description": "Close UP Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
