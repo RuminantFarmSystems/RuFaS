@@ -184,7 +184,7 @@
             "type": "string",
             "default": "sexed",
             "pattern": "^{sexed|conventional}$",
-            "description": "Semen Type (select one) -- Please choose whichever semen selection type makes up a majority of your breedings"
+            "description": "The semen type that makes up a majority of the farm's breedings"
           },
           "days_in_preg_when_dry": {
             "type": "number",
@@ -265,7 +265,7 @@
             "milk_type": {
               "type": "string",
               "default": "whole",
-              "pattern": "^{whole|replacement}$",
+              "pattern": "^{whole|replacer}$",
               "description": "Milk Type (select one) -- The type of milk that is used to feed calves (Whole or Replacer)"
             }
           },
@@ -609,7 +609,7 @@
       },
       "pen_information": {
         "type": "array",
-        "description": "Pen Information -- Add as many different pens as needed.",
+        "description": "Pen Information.",
         "properties": {
           "type": "object",
           "id": {
@@ -698,7 +698,7 @@
       },
       "calf_feeds": {
         "type": "array",
-        "description": "Calf Feeds (raised off farm - 24 hrs of age) -- Add as many calf feeds as needed",
+        "description": "Calf Feeds (raised off farm - 24 hrs of age).",
         "properties": {
           "type": "number",
           "minimum": 1,
@@ -708,7 +708,7 @@
       },
       "growing_feeds": {
         "type": "array",
-        "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- Add as many growing feeds as needed. HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy",
+        "description": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy.",
         "properties": {
           "type": "number",
           "minimum": 1,
@@ -717,7 +717,7 @@
       },
       "close_up_feeds": {
         "type": "array",
-        "description": "Close Up Feeds (HeiferIII and Dry Cows) -- Add as many close feeds as needed. HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
+        "description": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows.",
         "properties": {
           "type": "number",
           "minimum": 1,
@@ -726,7 +726,7 @@
       },
       "lac_cow_feeds": {
         "type": "array",
-        "description": "Lactating Cow Feeds -- Add as many lactating cow feeds as needed",
+        "description": "Lactating Cow Feeds",
         "properties": {
           "type": "number",
           "minimum": 1,
@@ -735,7 +735,7 @@
       },
       "purchased_feeds": {
         "type": "array",
-        "description": "Purchased Feeds -- Select one purchased feed at a time and add the cost per kg of dry matter",
+        "description": "Purchased Feeds.",
         "properties": {
           "type": "object",
           "purchased_feed": {
@@ -762,7 +762,7 @@
       },
       "storage_options": {
         "type": "array",
-        "description": "Storage Options -- Add as many storage options as needed",
+        "description": "Storage Options.",
         "properties": {
           "type": "object",
           "storage_type": {
@@ -798,7 +798,8 @@
           },
           "ventilation": {
             "type": "boolean",
-            "description": "Ventilation -- True if the storage unit has appropriate ventilation."
+            "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
+            "default": true
           },
           "removal_rate": {
             "type": "number",
@@ -821,7 +822,7 @@
         "description": "User Defined Ration Percentages",
         "calf": {
           "type": "array",
-          "description": "Calf",
+          "description": "Calf Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
@@ -840,7 +841,7 @@
         },
         "growing_heifers": {
           "type": "array",
-          "description": "Growing Heifers",
+          "description": "Growing Heifers Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
@@ -859,7 +860,7 @@
         },
         "close_up": {
           "type": "array",
-          "description": "Close UP",
+          "description": "Close UP Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
@@ -878,7 +879,7 @@
         },
         "cow_lactating": {
           "type": "array",
-          "description": "Lactating Cow",
+          "description": "Lactating Cow Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
