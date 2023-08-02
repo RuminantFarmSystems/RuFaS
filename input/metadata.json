@@ -528,7 +528,7 @@
         "methane_mitigation_method": {
           "type": "string",
           "description": "Methane Mitigation Method -- The type of enteric methane mitigation supplement that is fed to the lactating dairy cattle",
-          "default": "None",
+          "default": null,
           "pattern": "^{None|3-NOP|monensin|essential_oils|seaweed}$"
         },
         "3-NOP_additive_amount": {
