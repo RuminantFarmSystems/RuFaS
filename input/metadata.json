@@ -352,7 +352,9 @@
                 "maximum": 1
               },
               "heifer_synchED_protocol": {
-                "type": "radio",
+                "type": "string",
+                "default": "2P",
+                "pattern": "^{2P|CP}$",
                 "description": "Heifer SynchED Protocol (select one) -- 2P: two injections of PGF (prostaglandin), watch for estrus after each injection with insemination upon heat detection; CP: 7 days CIDR implements, inject PGF upon removal, insemination upon heat detection"
               }
             },
