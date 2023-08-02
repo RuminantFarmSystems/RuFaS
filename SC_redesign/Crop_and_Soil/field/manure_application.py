@@ -1,5 +1,6 @@
 from typing import Optional, Dict
 
+from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
 from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 from SC_redesign.Crop_and_Soil.crop_and_soil_constants import KILOGRAMS_TO_GRAMS, SQUARE_CENTIMETERS_TO_HECTARES
 
@@ -21,7 +22,7 @@ class ManureApplication:
             provided.
         field_size : float, optional
             Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
+            not provided (ha).
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
@@ -35,19 +36,19 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -75,7 +76,8 @@ class ManureApplication:
                                          organic_nitrogen_fraction, field_size)
 
     def apply_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                             total_phosphorus_mass: float, field_coverage: float, field_size: float,
+                             total_phosphorus_mass: float, field_coverage: float, application_depth: float,
+                             surface_remainder_fraction: float, field_size: float,
                              inorganic_nitrogen_fraction: float, ammonium_fraction: float,
                              organic_nitrogen_fraction: float,
                              water_extractable_inorganic_phosphorus_fraction: float = None,
@@ -86,31 +88,35 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         water_extractable_inorganic_phosphorus_fraction : float, default=None
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
+            in the range [0.0, 1.0] (unitless).
         source_animal : str, default=None
-            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless)
+            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless).
 
         Raises
         ------
         ValueError
-            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95]
+            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95].
 
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
@@ -123,18 +129,20 @@ class ManureApplication:
 
         if dry_matter_fraction <= 0.15:
             self._apply_liquid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
-                                              field_coverage, field_size,
+                                              field_coverage, application_depth, surface_remainder_fraction, field_size,
                                               water_extractable_inorganic_phosphorus_fraction,
                                               inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction)
         else:
             self._apply_solid_machine_manure(dry_matter_mass, dry_matter_fraction, total_phosphorus_mass,
-                                             field_coverage, water_extractable_inorganic_phosphorus_fraction,
+                                             field_coverage, application_depth, surface_remainder_fraction,
+                                             water_extractable_inorganic_phosphorus_fraction,
                                              inorganic_nitrogen_fraction, ammonium_fraction, organic_nitrogen_fraction,
                                              field_size)
         self.data.machine_manure_applied_mass = dry_matter_mass
 
     def _apply_solid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                                    total_phosphorus_mass: float, field_coverage: float,
+                                    total_phosphorus_mass: float, field_coverage: float, application_depth: float,
+                                    surface_remainder_fraction: float,
                                     water_extractable_inorganic_phosphorus_fraction: float,
                                     inorganic_nitrogen_fraction: float, ammonium_fraction: float,
                                     organic_nitrogen_fraction: float, field_size: float) -> None:
@@ -144,51 +152,74 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
+            in the range [0.0, 1.0] (unitless).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         """
+        surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
         water_extractable_organic_phosphorus_fraction = 0.05
         stable_phosphorus_fraction = 1.0 - (water_extractable_organic_phosphorus_fraction +
                                             water_extractable_inorganic_phosphorus_fraction)
         stable_inorganic_phosphorus_fraction = 0.25 * stable_phosphorus_fraction
         stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
         self.data.machine_water_extractable_inorganic_phosphorus += (total_phosphorus_mass *
-                                                                     water_extractable_inorganic_phosphorus_fraction)
+                                                                     water_extractable_inorganic_phosphorus_fraction *
+                                                                     surface_remainder_fraction)
         self.data.machine_water_extractable_organic_phosphorus += (total_phosphorus_mass *
-                                                                   water_extractable_organic_phosphorus_fraction)
-        self.data.machine_stable_inorganic_phosphorus += (total_phosphorus_mass * stable_inorganic_phosphorus_fraction)
-        self.data.machine_stable_organic_phosphorus += (total_phosphorus_mass * stable_organic_phosphorus_fraction)
+                                                                   water_extractable_organic_phosphorus_fraction *
+                                                                   surface_remainder_fraction)
+        self.data.machine_stable_inorganic_phosphorus += (total_phosphorus_mass * stable_inorganic_phosphorus_fraction *
+                                                          surface_remainder_fraction)
+        self.data.machine_stable_organic_phosphorus += (total_phosphorus_mass * stable_organic_phosphorus_fraction *
+                                                        surface_remainder_fraction)
 
         new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
                                                               self.data.machine_manure_moisture_factor,
-                                                              self.data.machine_manure_field_coverage, dry_matter_mass,
-                                                              dry_matter_fraction, field_coverage)
+                                                              self.data.machine_manure_field_coverage,
+                                                              surface_dry_matter_mass, dry_matter_fraction,
+                                                              field_coverage)
         self.data.machine_manure_dry_mass = new_vals.get("new_dry_matter_mass")
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-        self._add_nitrogen_to_soil_layer(0, dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+        self._add_nitrogen_to_soil_layer(0, surface_dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
                                          organic_nitrogen_fraction, field_size)
 
+        is_not_injection_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
+        if is_not_injection_application:
+            return
+
+        subsurface_fraction = 1.0 - surface_remainder_fraction
+        self._apply_subsurface_manure(total_phosphorus_mass, water_extractable_inorganic_phosphorus_fraction,
+                                      water_extractable_organic_phosphorus_fraction,
+                                      stable_inorganic_phosphorus_fraction, stable_organic_phosphorus_fraction,
+                                      dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                      organic_nitrogen_fraction, application_depth, subsurface_fraction,
+                                      field_size)
+
     def _apply_liquid_machine_manure(self, dry_matter_mass: float, dry_matter_fraction: float,
-                                     total_phosphorus_mass: float, field_coverage: float, field_size: float,
+                                     total_phosphorus_mass: float, field_coverage: float, application_depth: float,
+                                     surface_remainder_fraction: float, field_size: float,
                                      water_extractable_inorganic_phosphorus_fraction: float,
                                      inorganic_nitrogen_fraction: float, ammonium_fraction: float,
                                      organic_nitrogen_fraction: float) -> None:
@@ -197,24 +228,28 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
+            in the range [0.0, 1.0] (unitless).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
 
         Notes
         -----
@@ -225,7 +260,11 @@ class ManureApplication:
         the Fortran code was sent to the RuFaS team.
 
         """
-        wet_rate = self._determine_wet_rate_factor(dry_matter_mass, dry_matter_fraction, field_coverage, field_size)
+        # TODO: evaluate how to best apply subsurface liquid manure, it is likely more complicated than how this method
+        #   accomplishes it - issue #713
+        surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
+        wet_rate = self._determine_wet_rate_factor(surface_dry_matter_mass, dry_matter_fraction, field_coverage,
+                                                   field_size)
         soil_infiltration = self._determine_infiltration_factor(wet_rate)
         surface_retention = (1.0 - soil_infiltration)
         water_extractable_organic_phosphorus_fraction = 0.05
@@ -235,13 +274,13 @@ class ManureApplication:
         stable_organic_phosphorus_fraction = 0.75 * stable_phosphorus_fraction
 
         self.data.machine_water_extractable_inorganic_phosphorus += total_phosphorus_mass * \
-            water_extractable_inorganic_phosphorus_fraction * surface_retention
+            water_extractable_inorganic_phosphorus_fraction * surface_retention * surface_remainder_fraction
         self.data.machine_water_extractable_organic_phosphorus += total_phosphorus_mass * \
-            water_extractable_organic_phosphorus_fraction * surface_retention
+            water_extractable_organic_phosphorus_fraction * surface_retention * surface_remainder_fraction
         self.data.machine_stable_inorganic_phosphorus += total_phosphorus_mass * \
-            stable_inorganic_phosphorus_fraction * surface_retention
+            stable_inorganic_phosphorus_fraction * surface_retention * surface_remainder_fraction
         self.data.machine_stable_organic_phosphorus += total_phosphorus_mass * \
-            stable_organic_phosphorus_fraction * surface_retention
+            stable_organic_phosphorus_fraction * surface_retention * surface_remainder_fraction
 
         # TODO: put infiltrated organic phosphorus into corresponding soil pools - issue #444
         mass_to_add_to_labile_P = total_phosphorus_mass * water_extractable_inorganic_phosphorus_fraction * \
@@ -249,13 +288,15 @@ class ManureApplication:
         mass_to_add_to_labile_P += total_phosphorus_mass * water_extractable_organic_phosphorus_fraction * \
             soil_infiltration * 0.95
         mass_to_add_to_labile_P += total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
+        mass_to_add_to_labile_P *= surface_remainder_fraction
         self.data.soil_layers[0].add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
-        mass_to_add_to_active_P = total_phosphorus_mass * stable_inorganic_phosphorus_fraction * soil_infiltration
+        mass_to_add_to_active_P = total_phosphorus_mass * stable_inorganic_phosphorus_fraction * soil_infiltration * \
+            surface_remainder_fraction
         self.data.soil_layers[0].add_to_active_phosphorus(mass_to_add_to_active_P, field_size)
 
         adjusted_field_coverage = field_coverage * 0.5
-        adjusted_dry_matter_mass = dry_matter_mass * 0.8
+        adjusted_dry_matter_mass = surface_dry_matter_mass * 0.8
         new_vals = self._determine_weighted_manure_attributes(self.data.machine_manure_dry_mass,
                                                               self.data.machine_manure_moisture_factor,
                                                               self.data.machine_manure_field_coverage,
@@ -265,16 +306,28 @@ class ManureApplication:
         self.data.machine_manure_moisture_factor = new_vals.get("new_moisture_factor")
         self.data.machine_manure_field_coverage = new_vals.get("new_field_coverage")
 
-        top_layer_mass = surface_retention * dry_matter_mass
+        top_layer_mass = surface_retention * surface_dry_matter_mass
         top_layer_inorganic_nitrogen_fraction = surface_retention * inorganic_nitrogen_fraction
         top_layer_organic_nitrogen_fraction = surface_retention * organic_nitrogen_fraction
         self._add_nitrogen_to_soil_layer(0, top_layer_mass, top_layer_inorganic_nitrogen_fraction, ammonium_fraction,
                                          top_layer_organic_nitrogen_fraction, field_size)
-        second_layer_mass = soil_infiltration * dry_matter_mass
+        second_layer_mass = soil_infiltration * surface_dry_matter_mass
         second_layer_inorganic_nitrogen_fraction = soil_infiltration * inorganic_nitrogen_fraction
         second_layer_organic_nitrogen_fraction = soil_infiltration * organic_nitrogen_fraction
         self._add_nitrogen_to_soil_layer(1, second_layer_mass, second_layer_inorganic_nitrogen_fraction,
                                          ammonium_fraction, second_layer_organic_nitrogen_fraction, field_size)
+
+        is_not_subsurface_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
+        if is_not_subsurface_application:
+            return
+
+        subsurface_fraction = 1.0 - surface_remainder_fraction
+        self._apply_subsurface_manure(total_phosphorus_mass, water_extractable_inorganic_phosphorus_fraction,
+                                      water_extractable_organic_phosphorus_fraction,
+                                      stable_inorganic_phosphorus_fraction, stable_organic_phosphorus_fraction,
+                                      dry_matter_mass, inorganic_nitrogen_fraction, ammonium_fraction,
+                                      organic_nitrogen_fraction, application_depth, subsurface_fraction,
+                                      field_size)
 
     def _add_nitrogen_to_soil_layer(self, layer_index: int, dry_matter_mass: float, inorganic_nitrogen_fraction: float,
                                     ammonium_fraction: float, organic_nitrogen_fraction: float,
@@ -285,17 +338,17 @@ class ManureApplication:
         Parameters
         ----------
         layer_index : int
-            Index of the soil layer to be added to (unitless)
+            Index of the soil layer to be added to (unitless).
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         References
         ----------
@@ -315,6 +368,76 @@ class ManureApplication:
         self.data.soil_layers[layer_index].ammonium_content += ammonium_added
         self.data.soil_layers[layer_index].fresh_organic_nitrogen_content += organic_nitrogen_added
         self.data.soil_layers[layer_index].active_organic_nitrogen_content += organic_nitrogen_added
+
+    def _apply_subsurface_manure(self, total_phosphorus_mass: float,
+                                 water_extractable_inorganic_phosphorus_fraction: float,
+                                 water_extractable_organic_phosphorus_fraction: float,
+                                 stable_inorganic_phosphorus_fraction: float, stable_organic_phosphorus_fraction: float,
+                                 dry_matter_mass: float, inorganic_nitrogen_fraction: float, ammonium_fraction: float,
+                                 organic_nitrogen_fraction: float, application_depth: float, subsurface_fraction: float,
+                                 field_size: float) -> None:
+        """
+        Applies subsurface nutrients to the soil profile.
+
+        Parameters
+        ----------
+        total_phosphorus_mass : float
+            Total mass of phosphorus in this application of manure (kg).
+        water_extractable_inorganic_phosphorus_fraction : float
+            Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
+            in the range [0.0, 1.0] (unitless).
+        water_extractable_organic_phosphorus_fraction : float
+            Fraction of total phosphorus in this application of manure that is water extractable organic phosphorus, in
+            the range [0.0, 1.0] (unitless).
+        stable_inorganic_phosphorus_fraction : float
+            Fraction of total phosphorus in this application of manure that is stable inorganic phosphorus, in the range
+            [0.0, 1.0] (unitless).
+        stable_organic_phosphorus_fraction : float
+            Fraction of total phosphorus in this application of manure that is stable organic phosphorus, in the range
+            [0.0, 1.0] (unitless).
+        dry_matter_mass : float
+            Dry weight equivalent of the manure application (kg).
+        inorganic_nitrogen_fraction : float
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen that is ammonium (unitless).
+        organic_nitrogen_fraction : float
+            Fraction of dry manure mass that is organic nitrogen (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        subsurface_fraction : float
+            Fraction of total manure application that is applied below the soil surface (unitless).
+        field_size : float
+            Size of the field (ha).
+
+        Notes
+        -----
+        Only 95% of water extractable organic and stable organic phosphorus are put into their corresponding pools
+        because that is how SurPhos transfers organic phosphorus, as an approximation for organic phosphorus loss. This
+        practice will be changed when issue #444 is addressed.
+
+        """
+        bottom_depths = self.data.get_vectorized_layer_attribute("bottom_depth")
+        depth_factors = FertilizerApplication.generate_depth_factors(application_depth, bottom_depths)
+        water_extractable_inorganic_phosphorus = (total_phosphorus_mass *
+                                                  water_extractable_inorganic_phosphorus_fraction)
+        # TODO: put subsurface organic phosphorus into corresponding soil pools - issue #444
+        water_extractable_organic_phosphorus = (total_phosphorus_mass * water_extractable_organic_phosphorus_fraction *
+                                                0.95)
+        stable_inorganic_phosphorus = (total_phosphorus_mass * stable_inorganic_phosphorus_fraction)
+        stable_organic_phosphorus = (total_phosphorus_mass * stable_organic_phosphorus_fraction * 0.95)
+        labile_phosphorus_addition = (water_extractable_inorganic_phosphorus + water_extractable_organic_phosphorus +
+                                      stable_organic_phosphorus) * subsurface_fraction
+        active_phosphorus_addition = stable_inorganic_phosphorus * subsurface_fraction
+        for index, depth_factor in enumerate(depth_factors):
+            labile_phosphorus_added_to_layer = labile_phosphorus_addition * depth_factor
+            active_phosphorus_added_to_layer = active_phosphorus_addition * depth_factor
+            self.data.soil_layers[index].add_to_labile_phosphorus(labile_phosphorus_added_to_layer, field_size)
+            self.data.soil_layers[index].add_to_active_phosphorus(active_phosphorus_added_to_layer, field_size)
+
+            dry_matter_added_to_layer = dry_matter_mass * subsurface_fraction * depth_factor
+            self._add_nitrogen_to_soil_layer(index, dry_matter_added_to_layer, inorganic_nitrogen_fraction,
+                                             ammonium_fraction, organic_nitrogen_fraction, field_size)
 
     # --- Static Methods ---
     @staticmethod
