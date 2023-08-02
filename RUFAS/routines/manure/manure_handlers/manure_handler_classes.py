@@ -242,7 +242,7 @@ class ManureHandlerConfig:
         cleaning_water_use_rate: Amount of cleaning water used per animal per day, L.
         minutes_per_cleaning: Number of minutes needed per animal per cleaning, minutes.
         cleanings_per_day: Number of cleanings per day.
-        daily_tillage_frequency: Number of times per day that tillage occurs.
+        daily_tillage_frequency: Number of times per day that compost bedding is tilled.
 
     """
     cleaning_water_use_rate: float = 0.0
