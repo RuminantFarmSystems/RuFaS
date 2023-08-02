@@ -797,7 +797,8 @@
           },
           "ventilation": {
             "type": "boolean",
-            "description": "Ventilation -- True if the storage unit has appropriate ventilation."
+            "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
+            "default": true
           },
           "removal_rate": {
             "type": "number",
