@@ -134,7 +134,7 @@
         },
         "cow_num": {
           "type": "number",
-          "description": "Number of Cows (head) -- The the initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
+          "description": "Number of Cows (head) -- The initial number of dry and lactating cows (all parities, default is ~51% of herd number).",
           "default": 100,
           "minimum": 0
         },
