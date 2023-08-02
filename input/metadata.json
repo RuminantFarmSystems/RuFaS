@@ -839,7 +839,7 @@
         },
         "growing_heifers": {
           "type": "array",
-          "description": "Growing Heifers",
+          "description": "Growing Heifers Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
