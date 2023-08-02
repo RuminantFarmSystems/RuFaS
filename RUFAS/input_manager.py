@@ -402,7 +402,7 @@ class InputManager:
 
     def get_data(self, data_address: str) -> Any:
         """
-        Get the requested data from the pool
+        Get the requested data from the pool.
 
         Parameters
         ----------
@@ -421,14 +421,18 @@ class InputManager:
 
         Examples
         -------
+        The user can request as broad or narrow a selection of the input data pool as is needed.
+
+        Input Manager must first be instantiated:
         >>> input_manager = InputManager()
+
+        This will return the value of `calf_num` of the `herd_information` section in the `animal` module:
         >>> input_manager.get_data('animal.herd_information.calf_num')
-        This will return the value of `calf_num` of the `herd_information` section in the `animal` module.
+        8
 
         If a broader spectrum of data is needed, the user can expand the query to get_data
-        by shortening the data_address:
+        by shortening the data_address. This will return the full herd_information object:
         >>> input_manager.get_data('animal.herd_information')
-        This will return the full herd_information object:
         {
         calf_num: 8,
         heiferI_num: 44,
@@ -464,36 +468,38 @@ class InputManager:
 
     def get_metadata(self, metadata_address: str) -> Any:
         """
-        Get the requested data from the pool
+        Get the requested metadata from the IM metadata dictionary.
 
         Parameters
         ----------
         metadata_address : str
-            The address of the requested data.
+            The address of the requested metadata.
 
         Returns
         -------
         Any
-            The requested data if found.
+            The requested metadata if found.
 
         Raises
         -------
         KeyError
-            If the requested data is not found.
+            If the requested metadata is not found.
 
         Examples
         -------
-        >>> input_manager = InputManager()
-        >>> input_manager.get_metadata('properties.soil_profile_properties.albedo.type')
+        The user can request as broad or narrow a selection of the metadata as is needed.
 
-        This will return the type for albedo in the soil_profile_properties section of the metadata's properties.
+        Input Manager must first be instantiated:
+        >>> input_manager = InputManager()
+
+        This will return the 'type' for albedo in the soil_profile_properties section of the metadata's properties:
+        >>> input_manager.get_metadata('properties.soil_profile_properties.albedo.type')
+        "number"
 
         If a broader spectrum of the metadata is needed, the user can expand the query to get_metadata
-        by shortening the metadata_address:
+        by shortening the metadata_address. This will return the full 'albedo' object containing its type,
+        description, minimum, maximum, and default:
         >>> input_manager.get_metadata('properties.soil_profile_properties.albedo')
-
-        This will return the full 'albedo' object containing its type, description, minimum, maximum, and default.
-
         {
         "type": "number",
         "description": "Ratio of solar radiation reflected by soil to amount of incident upon it.
