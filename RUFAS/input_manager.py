@@ -516,9 +516,9 @@ class InputManager:
         element_hierarchy = metadata_address.split('.')
 
         try:
-            data_value = reduce(lambda d, key: d[key], element_hierarchy,
-                                self.__metadata)
-            return data_value
+            metadata_value = reduce(lambda d, key: d[key], element_hierarchy,
+                                    self.__metadata)
+            return metadata_value
 
         except KeyError:
             invalid_key = element_hierarchy[-1]
