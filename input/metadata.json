@@ -146,7 +146,7 @@
         },
         "herd_init": {
           "type": "boolean",
-          "description": "Initialize Herd? -- Only check box if cow body weight and milk production exceedingly abnormal"
+          "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
         },
         "breed": {
           "type": "string",
