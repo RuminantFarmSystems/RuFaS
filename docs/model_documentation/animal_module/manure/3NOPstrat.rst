@@ -1,8 +1,8 @@
 .. _3NOP_design :
 
 
-Enteric Methane Mitigation: 3-NOP
-=================================
+Enteric Methane Mitigation: 3-Nitrooxypropanol
+==============================================
 
 Date created: May 4, 2023
 
