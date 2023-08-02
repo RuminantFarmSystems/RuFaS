@@ -146,6 +146,7 @@
         },
         "herd_init": {
           "type": "boolean",
+          "default": false,
           "description": "Initialize Herd? -- Whether to re-initialize the animal database, where the herd animals are selected from."
         },
         "breed": {
