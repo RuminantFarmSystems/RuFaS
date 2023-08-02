@@ -820,7 +820,7 @@
         "description": "User Defined Ration Percentages",
         "calf": {
           "type": "array",
-          "description": "Calf",
+          "description": "Calf Feeds.",
           "properties": {
             "feed_type": {
               "type": "number",
