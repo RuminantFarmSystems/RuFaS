@@ -369,7 +369,7 @@ class Field:
         -----
         Because potassium is not currently specified in the manure request results, it is recorded as None. This method
         also checks for invalid application depths and surface remainder fractions. If invalid values are found, they
-        are corrected, an error is raised to the OutputManager, and execution continues with the new values.
+        are corrected, an error is logged to the OutputManager, and execution continues with the new values.
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._execute_manure_application.__name__,

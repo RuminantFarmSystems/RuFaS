@@ -94,7 +94,7 @@ class ManureApplication:
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -156,7 +156,7 @@ class ManureApplication:
         dry_matter_fraction : float
             Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
             Fraction of the field this manure is applied to (unitless)
         application_depth : float
@@ -234,7 +234,7 @@ class ManureApplication:
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg)
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
