@@ -22,7 +22,7 @@ class ManureApplication:
             provided.
         field_size : float, optional
             Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is
-            not provided (ha)
+            not provided (ha).
 
         """
         self.data = soil_data or SoilData(field_size=field_size)
@@ -36,19 +36,19 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         Notes
         -----
@@ -88,11 +88,11 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
             Fraction of the field this manure is applied to (unitless).
         application_depth : float
@@ -100,23 +100,23 @@ class ManureApplication:
         surface_remainder_fraction : float
             Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         water_extractable_inorganic_phosphorus_fraction : float, default=None
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
+            in the range [0.0, 1.0] (unitless).
         source_animal : str, default=None
-            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless)
+            Type of animal that produced this manure (options are "CATTLE", "SWINE", or "POULTRY") (unitless).
 
         Raises
         ------
         ValueError
-            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95]
+            If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95].
 
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
@@ -152,28 +152,28 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
             Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
-            Fraction of the field this manure is applied to (unitless)
+            Fraction of the field this manure is applied to (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
             Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
+            in the range [0.0, 1.0] (unitless).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         """
         surface_dry_matter_mass = dry_matter_mass * surface_remainder_fraction
@@ -228,11 +228,11 @@ class ManureApplication:
         Parameters
         ----------
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         dry_matter_fraction : float
-            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless)
+            Fraction of this manure application that is dry matter, in the range (0.0, 1.0] (unitless).
         total_phosphorus_mass : float
-            Total mass of phosphorus in this application of manure (kg)
+            Total mass of phosphorus in this application of manure (kg).
         field_coverage : float
             Fraction of the field this manure is applied to (unitless).
         application_depth : float
@@ -240,16 +240,16 @@ class ManureApplication:
         surface_remainder_fraction : float
             Fraction of fertilizer applied that remains on the soil surface after application (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
         water_extractable_inorganic_phosphorus_fraction : float
             Fraction of total phosphorus in this application of manure that is water extractable inorganic phosphorus,
-            in the range [0.0, 1.0] (unitless)
+            in the range [0.0, 1.0] (unitless).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
 
         Notes
         -----
@@ -338,17 +338,17 @@ class ManureApplication:
         Parameters
         ----------
         layer_index : int
-            Index of the soil layer to be added to (unitless)
+            Index of the soil layer to be added to (unitless).
         dry_matter_mass : float
-            Dry weight equivalent of this application (kg)
+            Dry weight equivalent of this application (kg).
         inorganic_nitrogen_fraction : float
-            Fraction of dry manure mass that is inorganic nitrogen (unitless)
+            Fraction of dry manure mass that is inorganic nitrogen (unitless).
         ammonium_fraction : float
-            Fraction of inorganic nitrogen that is ammonium (unitless)
+            Fraction of inorganic nitrogen that is ammonium (unitless).
         organic_nitrogen_fraction : float
-            Fraction of dry manure mass that is organic nitrogen (unitless)
+            Fraction of dry manure mass that is organic nitrogen (unitless).
         field_size : float
-            Size of the field (ha)
+            Size of the field (ha).
 
         References
         ----------
