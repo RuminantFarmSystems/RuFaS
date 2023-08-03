@@ -1,6 +1,6 @@
 import pytest
-from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.dormancy import Dormancy
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
 # --- Static function tests ---

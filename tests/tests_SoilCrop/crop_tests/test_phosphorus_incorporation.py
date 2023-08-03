@@ -1,11 +1,11 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
-from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIncorporation
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.crop_data import CropData
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("old,new", [

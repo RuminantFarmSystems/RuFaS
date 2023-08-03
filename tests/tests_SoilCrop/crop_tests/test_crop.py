@@ -1,6 +1,6 @@
-from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.soil.soil_data import SoilData
 import pytest
 from unittest.mock import MagicMock
 
