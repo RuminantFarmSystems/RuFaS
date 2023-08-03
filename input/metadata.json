@@ -501,7 +501,7 @@
             "preg_check_day_1": {
               "type": "number",
               "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 43.9).",
-              "default": 43.9,
+              "default": 32,
               "minimum": 1
             },
             "preg_loss_rate_1": {
