@@ -1,20 +1,18 @@
 from __future__ import annotations
-from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
-from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
-from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
-from SC_redesign.Crop_and_Soil.crop.phosphorus_incorporation import PhosphorusIncorporation
-from SC_redesign.Crop_and_Soil.crop.water_uptake import WaterUptake
-from SC_redesign.Crop_and_Soil.crop.water_dynamics import WaterDynamics
-from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
-from SC_redesign.Crop_and_Soil.crop.leaf_area_index import LeafAreaIndex
-from SC_redesign.Crop_and_Soil.crop.root_development import RootDevelopment
-from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
-from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
-
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
+from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.water_uptake import WaterUptake
+from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
+from RUFAS.routines.field.crop.heat_units import HeatUnits
+from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
+from RUFAS.routines.field.crop.root_development import RootDevelopment
+from RUFAS.routines.field.crop.crop_management import CropManagement
+from RUFAS.routines.field.crop.dormancy import Dormancy
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.soil.soil_data import SoilData
 from typing import Optional
-
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
 
 
 class Crop:

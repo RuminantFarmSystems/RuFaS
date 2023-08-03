@@ -1,6 +1,6 @@
 from math import exp, log, sqrt
 from typing import List, Optional
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_data import CropData
 
 
 """

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 """
 This module is based on the "Dormancy" section of SWAT (5:1.2)

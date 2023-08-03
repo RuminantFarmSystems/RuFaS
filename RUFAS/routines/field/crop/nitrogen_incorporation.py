@@ -1,8 +1,8 @@
 from math import log, exp
 from bisect import bisect
 from typing import List, Optional
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module is based upon the 'Nitrogen Uptake" section (5:2.3.1) of of the SWAT model documentation

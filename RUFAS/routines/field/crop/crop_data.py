@@ -2,7 +2,7 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, List, Any
 
-from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
 class PlantCategory(Enum):

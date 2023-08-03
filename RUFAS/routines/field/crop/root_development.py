@@ -1,5 +1,5 @@
 from typing import Optional
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_data import CropData
 
 """
 This module is based upon the "Root Development" section of the SWAT model (5.2.1.3)

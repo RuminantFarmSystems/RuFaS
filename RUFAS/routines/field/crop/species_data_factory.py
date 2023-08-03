@@ -1,8 +1,8 @@
 from enum import Enum
 import dataclasses
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, Corn, Alfalfa, CerealRye, FallOats, Potato, Soybean
-from SC_redesign.Crop_and_Soil.crop.crop_data import SpringBarley, SpringWheat, SugarBeet, TallFescue, Triticale
-from SC_redesign.Crop_and_Soil.crop.crop_data import WinterWheat
+from RUFAS.routines.field.crop.crop_data import CropData, Corn, Alfalfa, CerealRye, FallOats, Potato, Soybean
+from RUFAS.routines.field.crop.crop_data import SpringBarley, SpringWheat, SugarBeet, TallFescue, Triticale
+from RUFAS.routines.field.crop.crop_data import WinterWheat
 
 
 class CropSpecies(Enum):

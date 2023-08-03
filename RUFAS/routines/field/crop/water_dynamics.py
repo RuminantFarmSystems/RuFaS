@@ -1,5 +1,5 @@
 from typing import Optional
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_data import CropData
 
 
 # TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)

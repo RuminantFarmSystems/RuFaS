@@ -1,6 +1,6 @@
 from math import exp
 from typing import Optional
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_data import CropData
 
 """
 This module primarily follows the Growth Constraints section of the SWAT model (5:3.1)

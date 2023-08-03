@@ -1,8 +1,8 @@
 from math import exp
 from typing import Optional, List
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module is based upon the "Water Uptake By Plants" section of SWAT (5:2.2.1)
