@@ -1,19 +1,19 @@
 import math
 
-from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
-from SC_redesign.Crop_and_Soil.field.field_data import FieldData
-from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
-from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.species_data_factory import CropSpecies, CropSpeciesDataFactory
+from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
+from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
+from RUFAS.routines.field.field.tillage_application import TillageApplication
 from typing import Optional, List, Dict, Tuple
 from math import exp
-from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
-from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
-from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.field.manure_application import ManureApplication
+from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest

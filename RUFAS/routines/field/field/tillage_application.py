@@ -1,7 +1,7 @@
 from typing import Optional
 
-from SC_redesign.Crop_and_Soil.field.field_data import FieldData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
 """
