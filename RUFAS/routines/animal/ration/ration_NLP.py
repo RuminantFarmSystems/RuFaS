@@ -128,6 +128,153 @@ def objective(x):
     return sum(np.multiply(x, price))
 
 
+def total_energy(x):
+    """
+    Sets up the RHS multipliers for the maintenance and activity requirements
+    satisfied by the feed. Each equation has a reference to the respective
+    calculation in the pseudo code. The global variables defined in the begining
+    of this function are used in future functions.
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    global MEact
+    global TDNact
+    global DEact
+    # DMI calculated by the NLP
+    DMI = sum(x)
+    # Dietary TDN content, kg
+    TotalTDN = sum(np.multiply(x, TDN))
+    TotalTDN = np.multiply(TotalTDN, 0.01)
+    # [A.Cow.E.1]-[A.Heifer.E.1]
+    # TDN concentration, %
+    if DMI != 0:
+        TDNconc = (TotalTDN / DMI) * 100
+    else:
+        TDNconc = 0
+    SBW = BW * 0.96
+    # [A.Cow.E.2]-[A.Heifer.E.2]
+    # The amount of intake needed to meet the maintenance requirement, dimensionless
+    if TotalTDN < (0.035 * BW ** 0.75):
+        DMI_to_maint = 1
+    else:
+        DMI_to_maint = (TotalTDN / (0.035 * SBW ** 0.75))
+    # [A.Cow.E.3]-[A.Heifer.E.3]
+    # TDN discount, TDN digestibility decrease caused by DMI and TDNconc
+    if TDNconc < 60:
+        Discount = 1
+    else:
+        Discount = (TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))) / TDNconc
+    # [A.Cow.E.4]-[A.Heifer.E.4]
+    # Actual TDN content of feed i, %
+    TDNact = np.multiply(TDN, Discount)
+    # [A.Cow.E.5]-[A.Heifer.E.5]
+    # Actual digestible energy of feed i, Mcal/kg
+    DEact = np.multiply(DE, Discount)
+    # [A.Cow.E.6]-[A.Heifer.E.6]
+    # Actual metabolizable energy of feed i, Mcal/kg
+    MEact = []
+    for i in range(len(DEact)):
+        if type[i] == 'Mineral':
+            MEact.append(0)
+        elif is_fat[i] == 1:
+            MEact.append(DE[i])
+        elif EE[i] >= 3:
+            MEact.append(1.01 * DEact[i] - 0.45 + 0.0046 * (EE[i] - 3))
+        else:
+            MEact.append(1.01 * DEact[i] - 0.45)
+    # [A.Cow.E.8]-[A.Heifer.E.8]
+    # Actual net energy for maintenance of feed i, Mcal/kg
+    NEm_act = []
+    for i in range(len(MEact)):
+        if is_fat[i] == 1:
+            NEm_act.append(0.8 * MEact[i])
+        else:
+            NEm_act.append(1.37 * MEact[i] - 0.138 * MEact[i] ** 2 + 0.0105 * MEact[i] ** 3 - 1.12)
+    # Constraining to only allow each feed to only satisfy a single energy constraint
+    multiplier = []
+    for i in range(int(n / 3)):
+        multiplier.append(1)
+        multiplier.append(1)
+        multiplier.append(1)
+    
+
+    """
+    Sets up the RHS multipliers for the lactation and pregnancy requirements
+    satisfied by each feed. Each calculation has a reference to the respective
+    calculation in the pseudocode. Note to eliminate code repetition the global
+    variable MEact is used (calculated in NEmact_constraint).
+
+    Args:
+        x: The decision vector of the NLP
+"""
+    # Actual net energy for lactation of feed i, Mcal/kg
+    NElact = []
+    # [A.Cow.E.7]-[A.Heifer.E.7]
+    for i in range(len(MEact)):
+        if type[i] == 'Mineral':
+            NElact.append(0)
+        elif is_fat[i] == 1:
+            NElact.append(0.8 * DEact[i])
+        elif EE[i] >= 3:
+            NElact.append(0.703 * MEact[i] - 0.19 + ((0.097 * MEact[i] + 0.19) / 97) * (EE[i] - 3))
+        else:
+            NElact.append(0.703 * MEact[i] - 0.19)
+    # Constraining to only allow each feed to only satisfy a single energy constraint
+    multiplier = []
+    for i in range(int(n / 3)):
+        multiplier.append(1)
+        multiplier.append(1)
+        multiplier.append(1)
+    # returning the NElact constraint in the NLP
+    # print(f'NEl_firstterm = {sum(np.multiply(x, np.multiply(multiplier, NElact)))}')
+    # print(f'NEpreg = {NEpreg}')
+    # print(f'NEl = {NEl}')
+    
+
+    """
+    Sets up the RHS multipliers for the growth requirements satisfied by each
+    feed. Each calculation has a reference to the respective calculation in the
+    pseudocode. Note to eliminate code repetition the global variable MEact is
+    used (calculated in NEmact_constraint).
+
+    Args:
+        x: The decision vector of the NLP
+    """
+    # Actual net energy for growth of feed i, Mcal/kg
+    NEgact = []
+    # [A.Cow.E.9]-[A.Heifer.E.9]
+    for i in range(len(MEact)):
+        if type[i] == 'Mineral':
+            NEgact.append(0)
+        elif is_fat[i] == 1:
+            NEgact.append(0.55 * MEact[i])
+        else:
+            NEgact.append(1.42 * MEact[i] - 0.174 * MEact[i] ** 2 + 0.0122 * MEact[i] ** 3 - 1.65)
+    # Constraining to only allow each feed to only satisfy a single energy constraint
+    multiplier = []
+    for i in range(int(n / 3)):
+        multiplier.append(1)
+        multiplier.append(1)
+        multiplier.append(1)
+    # returning the NEgact constraint in the NLP
+    # print(f'NEgact_firstterm = {sum(np.multiply(x, np.multiply(multiplier, NEgact)))}')
+    # print(f'NEg = {NEg}')
+    #print(f'DMI={DMI}')
+    NEl_constraint= sum(np.multiply(x, np.multiply(multiplier, NElact))) 
+    # returning the NEm_act constraint in the NLP
+    NEm_act_constraint = (sum(np.multiply(x, np.multiply(multiplier, NEm_act))))
+    NEg_constraint =  sum(np.multiply(x, np.multiply(multiplier, NEgact)))
+    # all_constraints = NEl_constraint + NEm_act_constraint + NEg_constraint
+    all_req = NEg + NEmaint + NEa + NEpreg + NEl
+    # print(f'NEl_constraint = {NEl_constraint}')
+    # print(f'NEg_constraint = {NEg_constraint}')
+    # print(f'NEm_act_constraint = {NEm_act_constraint}')
+    # #print(f'all constraints = {max(all_constraints)}')
+    # print(f'all req = {all_req}')
+    return max(NEm_act_constraint, NEl_constraint, NEg_constraint) - all_req
+
+
 def NEmact_constraint(x):
     """
     Sets up the RHS multipliers for the maintenance and activity requirements
@@ -195,8 +342,8 @@ def NEmact_constraint(x):
     multiplier = []
     for i in range(int(n / 3)):
         multiplier.append(1)
-        multiplier.append(0)
-        multiplier.append(0)
+        multiplier.append(1)
+        multiplier.append(1)
     # returning the NEm_act constraint in the NLP
     return (sum(np.multiply(x, np.multiply(multiplier, NEm_act))) - (NEmaint + NEa))
 
@@ -226,9 +373,9 @@ def NEl_constraint(x):
     # Constraining to only allow each feed to only satisfy a single energy constraint
     multiplier = []
     for i in range(int(n / 3)):
-        multiplier.append(0)
         multiplier.append(1)
-        multiplier.append(0)
+        multiplier.append(1)
+        multiplier.append(1)
     # returning the NElact constraint in the NLP
     # print(f'NEl_firstterm = {sum(np.multiply(x, np.multiply(multiplier, NElact)))}')
     # print(f'NEpreg = {NEpreg}')
@@ -259,8 +406,8 @@ def NEgact_constraint(x):
     # Constraining to only allow each feed to only satisfy a single energy constraint
     multiplier = []
     for i in range(int(n / 3)):
-        multiplier.append(0)
-        multiplier.append(0)
+        multiplier.append(1)
+        multiplier.append(1)
         multiplier.append(1)
     # returning the NEgact constraint in the NLP
     # print(f'NEgact_firstterm = {sum(np.multiply(x, np.multiply(multiplier, NEgact)))}')
@@ -555,6 +702,7 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
 
 # establishing the constraints of the NLP
 constraint_functions = [
+    total_energy,
     NEmact_constraint,
     NEl_constraint,
     NEgact_constraint,
@@ -571,7 +719,9 @@ constraint_functions = [
 
 cow_cons = [{'type': 'ineq', 'fun': func} for func in constraint_functions]
 
-heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [NEl_constraint, DMI_constraint_lower]]
+heifer_cons = [cons for cons in cow_cons if cons['fun'] not in [total_energy, NEl_constraint, DMI_constraint_lower]]
+# heifer_cons.append()
+# heifer_cons.append()
 
 def optimize(animal_combination, available_feeds: Dict) -> None:
 
