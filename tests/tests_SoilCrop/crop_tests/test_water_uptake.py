@@ -4,10 +4,10 @@ from typing import List
 import pytest
 from unittest.mock import MagicMock, patch, call
 
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.crop.water_uptake import WaterUptake
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.water_uptake import WaterUptake
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 # TODO: Since, these will be updated/replaced along with Issue #450, these tests are simple and won't test wrappers
@@ -43,7 +43,7 @@ def test_correct_layer_for_efficiency(pot, avail, cap):
 def test_uptake_water(max_trans):
     """ensure that uptake_water can run without error"""
     # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
-    with patch("SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation."
+    with patch("RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation."
                "determine_layer_nutrient_demands", new_callable=MagicMock, return_value=[1, 2, 3, 4]):
         crop_data = CropData()
         crop_data.max_transpiration = max_trans

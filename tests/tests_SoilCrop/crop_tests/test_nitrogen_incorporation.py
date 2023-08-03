@@ -1,12 +1,12 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation import NitrogenIncorporation
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.crop_data import CropData
 from math import log, exp
 from pytest_mock import MockerFixture
 from unittest.mock import MagicMock, PropertyMock, patch
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- static function tests ----
@@ -470,9 +470,9 @@ def test_tally_total_nitrogen_uptake(uptakes):
 def test_try_fixation(fixer, nitrates, water, mocker: MockerFixture):
     """check that try_fixation calls its sub-functions if fixation occurs"""
     patch_update_fixation_attributes = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.update_fixation_attributes")
+        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation.update_fixation_attributes")
     patch_fix_nitrogen = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation.fix_nitrogen")
+        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation.fix_nitrogen")
     data = CropData(is_nitrogen_fixer=fixer)
     incorp = NitrogenIncorporation(data)
     incorp.try_fixation(nitrates, water)
@@ -488,9 +488,9 @@ def test_try_fixation(fixer, nitrates, water, mocker: MockerFixture):
 def test_update_fixation_attributes(mocker: MockerFixture):
     """"check that update_nitrate_attributes calls both its sub-functions"""
     patch_determine_nitrate_factor = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation._determine_nitrate_factor")
+        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation._determine_nitrate_factor")
     patch_determine_determine_fixation_stage_factor = mocker.patch(
-        "SC_redesign.Crop_and_Soil.crop.nitrogen_incorporation.NitrogenIncorporation._determine_fixation_stage_factor")
+        "RUFAS.routines.field.crop.nitrogen_incorporation.NitrogenIncorporation._determine_fixation_stage_factor")
     incorp = NitrogenIncorporation()
     incorp.update_fixation_attributes(100)
     patch_determine_nitrate_factor.assert_called_once()
@@ -567,7 +567,7 @@ def test_incorporate_nitrogen(nitrates, depths, water_factor, gate):
                     emergence_nitrogen_fraction=0.71, half_mature_nitrogen_fraction=0.68,
                     near_mature_nitrogen_fraction=0.62, mature_nitrogen_fraction=0.60,
                     biomass=122.8, previous_nitrogen=0, biomass_growth_max=999)
-    with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.soil_water_factor", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.soil.soil_data.SoilData.soil_water_factor", new_callable=PropertyMock,
                return_value=water_factor):
         soil = SoilData(field_size=1.3)
         # soil.soil_water_factor = mock.PropertyMock(return_value=water_factor)

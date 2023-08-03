@@ -1,5 +1,5 @@
-from SC_redesign.Crop_and_Soil.crop.growth_constraints import GrowthConstraints
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
+from RUFAS.routines.field.crop.crop_data import CropData
 import pytest
 from math import exp
 

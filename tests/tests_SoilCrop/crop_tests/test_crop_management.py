@@ -1,10 +1,10 @@
 import pytest
 from mock.mock import MagicMock
-from SC_redesign.Crop_and_Soil.crop.crop_management import CropManagement
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_management import CropManagement
+from RUFAS.routines.field.crop.crop_data import CropData
 from math import exp
-from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()

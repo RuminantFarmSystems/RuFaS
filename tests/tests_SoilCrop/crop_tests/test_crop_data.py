@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, PropertyMock
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 
 @pytest.mark.parametrize("frac,expect", [
@@ -25,7 +25,7 @@ def test_is_mature_property(frac, expect):
 ])
 def test_in_growing_season_property(mature: bool, dormant: bool, alive: bool, growing: bool, expected: bool) -> None:
     """Tests that crop's growth status is correctly determined."""
-    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.is_mature", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.crop.crop_data.CropData.is_mature", new_callable=PropertyMock,
                return_value=mature):
         data = CropData(is_dormant=dormant, is_alive=alive, is_growing=growing)
         assert data.in_growing_season == expected

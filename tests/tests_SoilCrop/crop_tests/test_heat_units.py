@@ -1,7 +1,7 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.heat_units import HeatUnits
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.heat_units import HeatUnits
+from RUFAS.routines.field.crop.crop_data import CropData
 from pytest_mock import MockerFixture
 
 
@@ -71,8 +71,8 @@ def test_check_absorb_heat_for_input_errors(use_alt, meant, min_t, max_t):
 @pytest.mark.parametrize("temp", [0, 20.5, None])
 def test_accumulate_heat_units(temp, mocker: MockerFixture):
     """check that accumulate_heat_units() calls the right functions"""
-    patch_a = mocker.patch("SC_redesign.Crop_and_Soil.crop.heat_units.HeatUnits.assign_new_heat_units")
-    patch_b = mocker.patch("SC_redesign.Crop_and_Soil.crop.heat_units.HeatUnits.add_heat_units")
+    patch_a = mocker.patch("RUFAS.routines.field.crop.heat_units.HeatUnits.assign_new_heat_units")
+    patch_b = mocker.patch("RUFAS.routines.field.crop.heat_units.HeatUnits.add_heat_units")
     heat = HeatUnits()
     expect = HeatUnits()
     heat.accumulate_heat_units(temp)

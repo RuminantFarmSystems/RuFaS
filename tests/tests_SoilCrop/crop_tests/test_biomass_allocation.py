@@ -1,7 +1,7 @@
 import pytest
 
-from SC_redesign.Crop_and_Soil.crop.biomass_allocation import BiomassAllocation
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
+from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
+from RUFAS.routines.field.crop.crop_data import CropData
 from math import exp
 
 
