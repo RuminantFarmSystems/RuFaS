@@ -1,5 +1,5 @@
 {
-  "blobs": {
+  "files": {
     "config": {
       "title": "Config Data",
       "description": "Configuration Information",
@@ -152,7 +152,7 @@
         "breed": {
           "type": "string",
           "default": "HO",
-          "pattern": "^{HO|JE}$",
+          "pattern": "{HO|JE}",
           "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein or Jersey)"
         }
       },
@@ -500,7 +500,7 @@
             "description": "Literature Repro Values",
             "preg_check_day_1": {
               "type": "number",
-              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 43.9).",
+              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32).",
               "default": 32,
               "minimum": 1
             },
@@ -698,7 +698,7 @@
         "type": "string",
         "description": "Nutrient Table",
         "pattern": "^{nutrients}$",
-        "default": "nutrients"
+        "default": "nutrients.csv"
       },
       "calf_feeds": {
         "type": "array",
@@ -933,30 +933,30 @@
             "manure_handling_method": {
               "type": "string",
               "description": "Manure Handling Method -- Method for cleaning barn alleyways.",
-              "pattern": "^{Flushing|Auto Alley scraping|Manual Skid Steer Scraping}$"
+              "pattern": "^{Flush System|Alley Scraper|Manual Scraping|Tillage|Manual Skid Steer Scraping}$"
             },
             "water_type": {
               "type": "string",
               "description": "Water Type -- The type of water used for cleaning barn alleyways.",
-              "pattern": "^{fresh|recycled}$"
+              "pattern": "^{Fresh|Recycled}$"
             },
-            "flushing_water_usage": {
+            "flushing_water_use_rate": {
               "type": "number",
-              "description": "Water Usage for Flushing (gal/animal/day). -- Water Usage for Flushing (gal/animal/day).",
+              "description": "Water Use Rate for Flushing (gal/animal/day). -- Water Use Rate for Flushing (gal/animal/day).",
               "minimum": 50,
               "maximum": 200,
               "default": 150
             },
-            "auto_scraping_water_usage": {
+            "auto_scraping_water_use_rate": {
               "type": "number",
-              "description": "Water Usage for Auto Alley Scraping (gal/animal/day). -- Water Usage for Auto Alley Scraping (gal/animal/day).",
+              "description": "Water Use Rate for Auto Alley Scraping (gal/animal/day). -- Water Use Rate for Auto Alley Scraping (gal/animal/day).",
               "minimum": 0,
               "maximum": 50,
               "default": 1
             },
-            "manual_scraping_water_usage": {
+            "manual_scraping_water_use_rate": {
               "type": "number",
-              "description": "Water Usage for Manual Skid Steer Scraping (gal/animal/day). -- Water Usage for Manual Skid Steer Scraping (gal/animal/day).",
+              "description": "Water Use Rate for Manual Skid Steer Scraping (gal/animal/day). -- Water Use Rate for Manual Skid Steer Scraping (gal/animal/day).",
               "minimum": 0,
               "maximum": 50,
               "default": 1
@@ -989,7 +989,7 @@
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^{sand|straw|sawdust|manure_solids|other}$"
+              "pattern": "^{Sand|Straw|Sawdust|Manure_solids|Other}$"
             },
             "amount_of_sand_used": {
               "type": "number",
@@ -1030,7 +1030,7 @@
             "bedding_addition_frequency": {
               "type": "string",
               "description": "Bedding Addition Frequency -- ",
-              "pattern": "^{weekly|bi-weekly|other}$"
+              "pattern": "^{Weekly|Bi-weekly|Other}$"
             },
             "other_bedding_addition_frequency": {
               "type": "string",
@@ -1044,25 +1044,25 @@
               "default": 1
             }
           },
-          "water_usage": {
+          "water_use_rate": {
             "type": "object",
-            "description": "Water Usage",
-            "milking_center_water_usage": {
+            "description": "Water Use Rate",
+            "milking_parlor_water_use_rate": {
               "type": "number",
-              "description": "Milking Center Water Usage (gal/animal/day) -- The rate of water usage for cleaning in the milking parlor (gal/animal/day).",
+              "description": "Milking Parlor Water Use Rate (gal/animal/day) -- The water use rate for cleaning in the milking parlor (gal/animal/day).",
               "minimum": 0,
               "maximum": 50,
               "default": 25
             },
-            "milking_center_water_type": {
+            "milking_parlor_water_type": {
               "type": "string",
-              "description": "Milking Center Water Type -- The type of water used for cleaning in the milking parlor.",
+              "description": "Milking Parlor Water Type -- The type of water used for cleaning in the milking parlor.",
               "default": "fresh",
-              "pattern": "^{fresh|recycled}$"
+              "pattern": "^{Fresh|Recycled}$"
             },
-            "holding_center_water_usage": {
+            "holding_center_water_use_rate": {
               "type": "number",
-              "description": "Holding Center Water Usage (gal/animal/day) -- The rate of water usage for cleaning in the holding area (gal/animal/day).",
+              "description": "Holding Center Water Use Rate (gal/animal/day) -- The water use rate for cleaning in the holding area (gal/animal/day).",
               "minimum": 0,
               "maximum": 50,
               "default": 10
@@ -1071,31 +1071,31 @@
               "type": "string",
               "description": "Holding Center Water Type -- The type of water used for cleaning in the holding area.",
               "default": "fresh",
-              "pattern": "^{fresh|recycled}$"
+              "pattern": "^{Fresh|Recycled}$"
             },
-            "sprinkler_water_usage": {
+            "sprinkler_water_use_rate": {
               "type": "number",
-              "description": "Sprinkler Water Usage (gal/animal/day) -- The rate of water usage for the sprinklers (gal/animal/day).",
+              "description": "Sprinkler Water Use Rate (gal/animal/day) -- The water use rate for the sprinklers (gal/animal/day).",
               "minimum": 0,
               "maximum": 10,
               "default": 3
             },
-            "is_sprinkler_water_usage_animal_dependent": {
+            "is_sprinkler_water_use_rate_animal_dependent": {
               "type": "boolean",
-              "description": "Is Sprinkler Water Usage animal dependent? -- Whether the sprinkler water usage varies according to the animal type."
+              "description": "Is Sprinkler Water Use Rate animal dependent? -- Whether the sprinkler water use rate varies according to the animal type."
             },
-            "is_sprinkler_water_usage_calc_on_yearly_basis": {
+            "is_sprinkler_water_use_rate_calc_on_yearly_basis": {
               "type": "boolean",
-              "description": "Is Sprinkler Water Usage calculated on a yearly basis? -- Whether the sprinkler water usage is calculated on a yearly basis."
+              "description": "Is Sprinkler Water Use Rate calculated on a yearly basis? -- Whether the sprinkler water use rate is calculated on a yearly basis."
             }
           },
-          "compost_bedding_pack_barn": {
+          "compost_bedded_pack_barn": {
             "type": "object",
             "description": "Compost Bedding Pack Barn",
             "bedding_type": {
               "type": "string",
               "description": "Bedding Type -- The material used for bedding pack.",
-              "pattern": "^{straw|sawdust|compost}$"
+              "pattern": "^{Straw|Sawdust|Compost}$"
             },
             "amount_of_straw_used": {
               "type": "number",
@@ -1135,14 +1135,14 @@
               "uniqueItems": "True",
               "properties": {
                 "type": "string",
-                "pattern": "^{slurry_storage_underfloor|slurry_storage_outdoor|open_lots|composting|anaerobic_lagoon|anaerobic_digestion|other}$"
+                "pattern": "^{Slurry Storage Underfloor|Slurry Storage Outdoor|Open Lots|Compost Bedded Pack Barn|Anaerobic Lagoon|Anaerobic Digestion|Other}$"
               }
             },
             "other_manure_treatment_method": {
               "type": "string",
               "description": "Other Manure Treatment Methods -- If 'other' is selected in \"Manure Treatment Methods\", write manure treatment method here."
             },
-            "manure_removal_frequency_for_storage_under_floor": {
+            "manure_removal_frequency_for_storage_underfloor": {
               "type": "number",
               "description": "Manure Removal Frequency for \"slurry_storage_underfloor\" (months) -- The frequency to remove manure when storing in slurry pit under floor (months).",
               "minimum": 0,
@@ -1156,9 +1156,9 @@
               "maximum": 12,
               "default": 6
             },
-            "manure_removal_frequency_for_composting": {
+            "manure_removal_frequency_for_compost_bedded_pack_barn": {
               "type": "number",
-              "description": "Manure Removal Frequency for \"composting\" (months) -- The frequency to remove manure when composting bedded pack (months).",
+              "description": "Manure Removal Frequency for \"Compost Bedded Pack Barn\" (months) -- The frequency to remove manure when composting bedded pack (months).",
               "minimum": 0,
               "maximum": 12,
               "default": 6
@@ -1187,15 +1187,15 @@
             "manure_separator_type": {
               "type": "string",
               "description": "Manure Separator Type -- The type of solid-liquid separator equipment to separate coarse fibrous solids/sand",
-              "pattern": "^{screw_press|sand_lane|rotary_screen|None|other}$"
+              "pattern": "^{Screw Press|Sand Lane|Rotary Screen|None|Other}$"
             },
             "other_manure_separator": {
               "type": "string",
               "description": "Other Manure Separator -- If selected 'other' in \"Manure Separator Type\", write manure separator type here"
             },
-            "fraction_of_sand_removed": {
+            "sand_removal_efficiency": {
               "type": "number",
-              "description": "Fraction of Sand Removed for \"sand_lane\" -- Fraction of Sand Removed for \"sand_lane\".",
+              "description": "Sand Removal Efficiency for \"sand_lane\" -- Fraction of Sand Removed for \"sand_lane\".",
               "minimum": 0.7,
               "maximum": 0.95,
               "default": 0.9
