@@ -389,8 +389,7 @@ def test_harvest_crop(crop_reference: str, harvest_op: str, field_name: str, fie
 ])
 def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expected_message: str) -> None:
     """Tests that warnings are raised correctly to the OutputManager."""
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"):
+    with patch.object(om, "_get_timestamp") as mocked_timestamp:
         for crop in crops:
             crop.data.id = "test"
             crop.crop_management.manage_harvest = MagicMock()
@@ -400,6 +399,7 @@ def test_harvest_crop_warnings(crops: List[Crop], expected_info_map: Dict, expec
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "day", 200)
         setattr(mocked_time, "calendar_year", 2000)
+        mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
 
         field._harvest_crop("test", "default", mocked_time)
 
@@ -565,8 +565,9 @@ def test_execute_fertilizer_application(mix_name: str, requested_n: float, reque
     field.fertilizer_applicator.apply_fertilizer = MagicMock()
     field._record_fertilizer_application = MagicMock()
 
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"):
+    with patch.object(om, "_get_timestamp") as mocked_timestamp:
+        mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
+
         field._execute_fertilizer_application(mix_name, requested_n, requested_p, depth, remainder, year, day)
 
         if fertilizer_applied:
@@ -737,8 +738,9 @@ def test_execute_manure_application(nitrogen: float, phosphorus: float, coverage
     field._determine_optimal_fertilizer_mix = MagicMock(return_value="expected_optimal_mix")
     field._execute_fertilizer_application = MagicMock()
 
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"):
+    with patch.object(om, "_get_timestamp") as mocked_timestamp:
+        mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
+
         field._execute_manure_application(nitrogen, phosphorus, coverage, depth, remainder, year, day)
 
         if nitrogen == phosphorus == 0.0:
@@ -907,9 +909,10 @@ def test_record_manure_application(field_name: str, field_size: float, dry_mass:
 def test_record_nutrient_application_error(depth: float, remainder: float, name: str, year: int, day: int,
                                            expected_info_map: dict, expected_error_message: str) -> None:
     """Tests that manure and fertilizer application errors are correctly recorded to the OutputManager."""
-    with patch("RUFAS.output_manager.OutputManager._get_timestamp", new_callable=MagicMock,
-               return_value="00-Jan-1970_Thu_00-00-00"):
+    with patch.object(om, "_get_timestamp") as mocked_timestamp:
         field = Field(field_data=FieldData(name="test"), manure_manager=MagicMock(ManureManager))
+        mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
+
         field._record_nutrient_application_error(depth, remainder, name, year, day)
 
         expected_error_name = expected_info_map["prefix"] + "." + name
