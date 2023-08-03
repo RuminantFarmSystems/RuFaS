@@ -1,8 +1,8 @@
 import pytest
 from typing import List
 
-from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
-from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.routines.field.manager.events import TillageEvent
 
 
 @pytest.mark.parametrize("name,years,days,depths,incorp_fracs,mix_fracs,expected", [

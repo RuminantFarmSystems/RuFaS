@@ -1,8 +1,8 @@
 import pytest
 from typing import List, Dict
 
-from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
-from SC_redesign.Crop_and_Soil.manager.events import PlantingEvent, HarvestEvent
+from RUFAS.routines.field.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.manager.events import PlantingEvent, HarvestEvent
 
 
 @pytest.mark.parametrize("name,crop_ref,plant_years,plant_days,harvest_years,harvest_days,harvest_ops,heat_sched,"

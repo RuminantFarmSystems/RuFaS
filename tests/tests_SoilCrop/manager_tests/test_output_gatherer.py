@@ -1,12 +1,12 @@
 import pytest
 from typing import List
 
-from SC_redesign.Crop_and_Soil.field.field import Field
-from SC_redesign.Crop_and_Soil.field.field_data import FieldData
-from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.manager.output_gatherer import om
+from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.manager.output_gatherer import om
 from RUFAS.routines.manure.manure_manager import ManureManager
 from unittest.mock import patch, PropertyMock, MagicMock
 
@@ -124,7 +124,7 @@ def test_send_annual_variables(annual_irrigation_water_use_total: List[float],
 
     og = OutputGatherer([field_1, field_2])
     for i in range(3):
-        with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData",
+        with patch.multiple("RUFAS.routines.field.soil.soil_data.SoilData",
                             profile_soil_water_content=PropertyMock(return_value=2),
                             profile_nitrates_total=PropertyMock(return_value=8.5)):
             field_1.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
