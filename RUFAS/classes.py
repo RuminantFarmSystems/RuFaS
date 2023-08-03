@@ -12,9 +12,10 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 import csv
 
+from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS import errors
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines import Fields, Feed
+from RUFAS.routines import Feed
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
@@ -49,7 +50,6 @@ class State:
             time: instance of the Time class containing information necessary to
                 initialize the state
         """
-        self.fields = Fields(data['fields'], time)
         input_dir = Utility.get_base_dir() / 'input'
         self.feed = Feed(Utility.read_json_file(
             input_dir / 'feed' / data['feed']))
@@ -59,20 +59,18 @@ class State:
         self.animal_manager = AnimalManager(animal_config, config, self.feed, weather, time)
         self.manure_storage = ManureStorage(self.animal_manager)
         self.manure_manager = ManureManager(self.animal_manager, weather, time, manure_manager_config)
+        self.field_manager = FieldManager(data['fields'], manure_manager=self.manure_manager)
 
     def annual_reset(self):
         """
         Description:
             Resets all annual variables that require reset
         """
-
-        self.fields.annual_reset()
+        self.field_manager.annual_update_routine()
         self.animal_manager.annual_reset()
         self.manure_storage.annual_reset()
 
     def annual_mass_balance(self, time):
-        for field in self.fields.fields.values():
-            field.soil.annual_mass_balance(field.field_management, time)
         self.manure_storage.annual_mass_balance()
 
 
@@ -511,7 +509,7 @@ class Time:
             else:
                 self.day = self.years[0][i]
                 break
-
+        self.index = 0
     def to_str(self):
         """
         Description:
@@ -529,6 +527,7 @@ class Time:
             Advances the time in the simulation by 1 day
             Automatically detects end of months and years
         """
+        self.index += 1
 
         if self.end_year():
             self.day = 1
@@ -576,7 +575,6 @@ class Time:
             return self.day == len(self.years[self.year - 1])
 
         return False
-
 
 def is_leap_year(year):
     """
