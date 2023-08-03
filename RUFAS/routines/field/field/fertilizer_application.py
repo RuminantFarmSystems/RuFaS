@@ -1,0 +1,164 @@
+from typing import Optional
+
+from RUFAS.routines.field.soil.soil import Soil
+
+"""
+This module provides a way for Field to apply fertilizer, based on SWAT Theoretical documentation section 6:1.7.
+"""
+
+
+class FertilizerApplication:
+
+    def __init__(self, soil: Optional[Soil] = None, field_size: Optional[float] = None):
+        """This method initializes the Soil object that this module will work with, or create one if none provided.
+
+        Parameters
+        ----------
+        soil : Soil, optional
+            Soil object to which fertilizer should be applied.
+        field_size : float, optional
+           Size of the field. Used to initialize a Soil object for this module to work with, if a pre-configured
+           SoilData object is not provided (ha)
+
+        """
+        self.soil = soil or Soil(field_size=field_size)
+
+    def apply_fertilizer(self, phosphorus_applied: float, fertilizer_mass: float, inorganic_nitrogen_fraction: float,
+                         ammonium_fraction: float, organic_nitrogen_fraction: float, application_depth: float,
+                         surface_remainder_fraction: float, field_size: float) -> None:
+        """
+        Applies nutrients to the soil through fertilizer.
+
+        Parameters
+        ----------
+        phosphorus_applied : float
+            Mass of phosphorus applied to the soil (kg).
+        fertilizer_mass : float
+            Total mass of fertilizer application (kg).
+        inorganic_nitrogen_fraction : float
+            Fraction of fertilizer mass applied that is inorganic nitrogen (unitless).
+        ammonium_fraction : float
+            Fraction of inorganic nitrogen mass applied that is ammonium (unitless).
+        organic_nitrogen_fraction : float
+            Fraction of fertilizer mass applied that is organic nitrogen (unitless).
+        application_depth : float
+            Depth at which fertilizer is injected into the soil (mm).
+        surface_remainder_fraction : float
+            Fraction of fertilizer applied that remains on the soil surface after application (unitless).
+        field_size : float
+            Size of the field (ha).
+
+        References
+        ----------
+        SWAT Theoretical documentation section 6:1.7.
+
+        Notes
+        -----
+        This method follows the SWAT model for applying nitrogen to the soil via fertilizer, but uses the fertilizer
+        phosphorus application method from SurPhos to apply phosphorus.
+
+        """
+        # TODO: move application functionality from soil/phosphorus_cycling up to this module, and increase
+        #  functionality of this module - issue #492
+        self.soil.phosphorus_cycling.fertilizer.add_fertilizer_phosphorus(phosphorus_applied *
+                                                                          surface_remainder_fraction)
+
+        nitrates_applied = (fertilizer_mass * inorganic_nitrogen_fraction * (1 - ammonium_fraction)) / field_size
+        ammonium_applied = (fertilizer_mass * inorganic_nitrogen_fraction * ammonium_fraction) / field_size
+        organic_nitrogen_applied = (fertilizer_mass * organic_nitrogen_fraction * 0.5) / field_size
+
+        self.soil.data.soil_layers[0].nitrate_content += (nitrates_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].ammonium_content += (ammonium_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].fresh_organic_nitrogen_content += \
+            (organic_nitrogen_applied * surface_remainder_fraction)
+        self.soil.data.soil_layers[0].active_organic_nitrogen_content += \
+            (organic_nitrogen_applied * surface_remainder_fraction)
+
+        non_injection_application = application_depth == 0.0 and surface_remainder_fraction == 1.0
+        if non_injection_application:
+            return
+
+        subsurface_fraction = 1.0 - surface_remainder_fraction
+        phosphorus_area_density = phosphorus_applied / field_size
+        self._apply_subsurface_fertilizer(phosphorus_area_density, nitrates_applied, ammonium_applied,
+                                          organic_nitrogen_applied, application_depth, subsurface_fraction)
+
+    def _apply_subsurface_fertilizer(self, phosphorus: float, nitrates: float, ammonium: float, organic_nitrogen: float,
+                                     application_depth: float, subsurface_fraction: float) -> None:
+        """
+        Applies subsurface nutrients to the soil profile.
+
+        Parameters
+        ----------
+        phosphorus : float
+            Amount of phosphorus applied in this application of fertilizer (kg / ha).
+        nitrates : float
+            Amount of nitrates applied in this application of fertilizer (kg / ha).
+        ammonium : float
+            Amount of ammonium applied in this application of fertilizer (kg / ha).
+        organic_nitrogen : float
+            Amount of organic nitrogen applied in this application of fertilizer (kg / ha).
+        application_depth : float
+            Bottom depth of this fertilizer application (mm).
+        subsurface_fraction : float
+            Fraction of total fertilizer application that is applied below the soil surface (unitless).
+
+        Notes
+        -----
+        This implementation applies all nutrients from the fertilizer application to subsurface soil layers in the same
+        manner. In previous implementations of RuFaS, only phosphorus was added to layers below the surface when
+        injection applications occurred.
+
+        """
+        bottom_depths = self.soil.data.get_vectorized_layer_attribute("bottom_depth")
+        depth_factors = self.generate_depth_factors(application_depth, bottom_depths)
+        for index, depth_factor in enumerate(depth_factors):
+            self.soil.data.soil_layers[index].labile_inorganic_phosphorus_content += (phosphorus * depth_factor *
+                                                                                      subsurface_fraction)
+            self.soil.data.soil_layers[index].nitrate_content += (nitrates * depth_factor * subsurface_fraction)
+            self.soil.data.soil_layers[index].ammonium_content += (ammonium * depth_factor * subsurface_fraction)
+            self.soil.data.soil_layers[index].fresh_organic_nitrogen_content += (organic_nitrogen * depth_factor *
+                                                                                 subsurface_fraction)
+            self.soil.data.soil_layers[index].active_organic_nitrogen_content += (organic_nitrogen * depth_factor *
+                                                                                  subsurface_fraction)
+
+    @staticmethod
+    def generate_depth_factors(application_depth: float, soil_layer_bottom_depths: list[float]) -> list[float]:
+        """
+        Generates a list of fractions that partitions sub-surface nutrients between the different soil layers.
+
+        Parameters
+        ----------
+        application_depth : float
+            Bottom depth of nutrient application (mm).
+        soil_layer_bottom_depths : list[float]
+            List of bottom depths of soil layers in the soil profile (mm).
+
+        Returns
+        -------
+        list[float]
+            List of fractions that determine the distribution of nutrients between different soil layers when subsurface
+            nutrients are applied (unitless).
+
+        References
+        ----------
+        pseudocode_field_management [FM.3.B.3 - 5]
+
+        Notes
+        -----
+        This method of distributing nutrients between soil layers originates with Pete Vadas' SurPhos model. Its purpose
+        is to proportionally distribute nutrients to layers within the soil profile.
+
+        """
+        depth_factors_sum = 0.0
+        depth_factors = []
+        for depth in soil_layer_bottom_depths:
+            if depth < application_depth:
+                depth_factor = depth / application_depth
+                depth_factors_sum += depth_factor
+                depth_factors.append(depth_factor)
+            else:
+                depth_factor = 1.0 - depth_factors_sum
+                depth_factors.append(depth_factor)
+                break
+        return depth_factors
