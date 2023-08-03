@@ -141,7 +141,7 @@
         "herd_num": {
           "type": "number",
           "description": "Herd Number (head) -- The target number of dry and lactating cows on farm.",
-          "default": 187,
+          "default": 100,
           "minimum": 0
         },
         "herd_init": {
@@ -165,7 +165,7 @@
           "breeding_start_day_h": {
             "type": "number",
             "description": "Breeding Start Day - Heifers (days) -- Days old when a heifer would be eligible for breeding (days)",
-            "default": 390,
+            "default": 380,
             "minimum": 0
           },
           "heifer_repro_method": {
@@ -177,12 +177,12 @@
           "cow_repro_method": {
             "type": "string",
             "description": "Cow Reproductive Program (select one) -- TAI - Timed Artificial Insemination; ED - Estrus Detection; ED-TAI -Combination of ED and TAI",
-            "default": "ED",
+            "default": "TAI",
             "pattern": "^{TAI|ED|ED-TAI}$"
           },
           "semen_type": {
             "type": "string",
-            "default": "sexed",
+            "default": "conventional",
             "pattern": "^{sexed|conventional}$",
             "description": "The semen type that makes up a majority of the farm's breedings"
           },
@@ -194,20 +194,20 @@
           },
           "heifer_repro_cull_time": {
             "type": "number",
-            "description": "Heifer Reproductive Cull Time (days) -- Days old when a heifer would be culled for unsuccessful in breeding (default is 480)",
-            "default": 480,
+            "description": "Heifer Reproductive Cull Time (days) -- Days old when a heifer would be culled for unsuccessful in breeding (default is 500)",
+            "default": 500,
             "minimum": 0
           },
           "do_not_breed_time": {
             "type": "number",
             "description": "Do Not Breed Time (days) -- The breeding period (days) for cows before reproductive programs stop if they fail to get pregnant (days)",
-            "default": 400,
+            "default": 185,
             "minimum": 0
           },
           "cull_milk_production": {
             "type": "number",
-            "description": "Cull Milk Production (kg/d) -- Minimum daily milk production for do-not breed cow to be culled (default is 22 kg/d)",
-            "default": 22,
+            "description": "Cull Milk Production (kg/d) -- Minimum daily milk production for do-not breed cow to be culled (default is 30 kg/d)",
+            "default": 30,
             "minimum": 0
           },
           "cow_times_milked_per_day": {
@@ -252,8 +252,8 @@
             },
             "wean_day": {
               "type": "number",
-              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 56)",
-              "default": 56,
+              "description": "Wean Day (days) -- Days the calf is fully weaned from milk or milk replace (default is 60",
+              "default": 60,
               "minimum": 0
             },
             "wean_length": {
@@ -275,7 +275,7 @@
             "voluntary_waiting_period": {
               "type": "number",
               "description": "Voluntary Waiting Period (days) -- If 'TAI' (Timed Artificial Insemination) is chosen for cow, it is days after parturition when the 1st hormonal injection is made in TAI programs. If 'ED' or 'ED-TAI' is chosen for cow, it is days after parturition when estrus is started to be monitored.",
-              "default": 74,
+              "default": 50,
               "minimum": 0
             },
             "conception_rate_decrease": {
@@ -299,14 +299,14 @@
             },
             "prefresh_day": {
               "type": "number",
-              "description": "Prefresh Day (days) -- length of period of the transition before calving (default is 21)",
-              "default": 21,
+              "description": "Prefresh Day (days) -- length of period of the transition before calving (default is 30)",
+              "default": 30,
               "minimum": 0
             },
             "calving_interval": {
               "type": "number",
               "description": "Calving Interval (days) -- current average calving interval (days), used for initial bodyweight adjustment and other calculations",
-              "default": 371,
+              "default": 400,
               "minimum": 0
             },
             "heifer_repro_programs": {
@@ -314,22 +314,22 @@
               "description": "Heifer Reproductive programs",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.65)",
-                "default": 0.65,
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_service_rate": {
                 "type": "number",
-                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 0.9)",
-                "default": 0.9,
+                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
+                "default": 1,
                 "minimum": 0,
                 "maximum": 1
               },
               "ed_conception_rate": {
                 "type": "number",
-                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.5)",
-                "default": 0.5,
+                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -341,8 +341,8 @@
               },
               "md5CG2P_conception_rate": {
                 "type": "number",
-                "description": "Heifer Conception Rate for md5CG2P Protocol -- The conception rate for md5CG2P protocol in heifer TAI (Timed Artificial Insemination) program (default is 0.7)",
-                "default": 0.7,
+                "description": "Heifer Conception Rate for md5CG2P Protocol -- The conception rate for md5CG2P protocol in heifer TAI (Timed Artificial Insemination) program (default is 0.6)",
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -350,7 +350,8 @@
                 "type": "number",
                 "description": "Heifer Conception Rate for md5CGP Protocol -- The conception rate for md5CGP protocol in heifer TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
-                "maximum": 1
+                "maximum": 1,
+                "default": 0.48
               },
               "heifer_synchED_protocol": {
                 "type": "string",
@@ -371,22 +372,22 @@
               "description": "Cow Reproductive programs",
               "estrus_detection_rate": {
                 "type": "number",
-                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.65)",
-                "default": 0.65,
+                "description": "Estrus Detection Rate -- The % of in-heat animals that would be detected in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
               "estrus_service_rate": {
                 "type": "number",
-                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 0.9)",
-                "default": 0.9,
+                "description": "Estrus Service Rate -- The % of detected in heat animals that would be serviced in the ED (Estrus Detection) programs (default is 1)",
+                "default": 1,
                 "minimum": 0,
                 "maximum": 1
               },
               "ed_conception_rate": {
                 "type": "number",
-                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.5)",
-                "default": 0.5,
+                "description": "ED Conception Rate -- The % of serviced animals that would be concepted in the ED (Estrus Detection) programs (default is 0.6)",
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -404,8 +405,8 @@
               },
               "ovsynch56_conception_rate": {
                 "type": "number",
-                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.5)",
-                "default": 0.5,
+                "description": "OvSynch56 Conception Rate -- The conception rate for OvSynch56 protocol (pre-breeding GnRH shot given 56hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program (default is 0.6)",
+                "default": 0.6,
                 "minimum": 0,
                 "maximum": 1
               },
@@ -413,19 +414,22 @@
                 "type": "number",
                 "description": "OvSynch48 Conception Rate -- The conception rate for OvSynch 48 protocol (pre-breeding GnRH shot given 48hrs post prostaglandin) in cow TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
-                "maximum": 1
+                "maximum": 1,
+                "default": 0.6
               },
               "cosynch72_conception_rate": {
                 "type": "number",
                 "description": "CoSynch72 Conception Rate -- The conception rate for CoSynch 72 protocol in cow TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
-                "maximum": 1
+                "maximum": 1,
+                "default": 0.6
               },
               "cosynch5d_conception_rate": {
                 "type": "number",
                 "description": "5d CoSynch Conception Rate -- The conception rate for 5d CoSynch protocol in cow TAI (Timed Artificial Insemination) program",
                 "minimum": 0,
-                "maximum": 1
+                "maximum": 1,
+                "default": 0.6
               },
               "cow_resynch_protocol": {
                 "type": "string",
@@ -446,8 +450,8 @@
             "description": "Bodyweight",
             "birth_weight_avg_ho": {
               "type": "number",
-              "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows (default is 82)",
-              "default": 82,
+              "description": "Average Holstein Birth Weight (kg/head) -- The average birthweight for Holstein cows (default is 43.9)",
+              "default": 43.9,
               "minimum": 0
             },
             "birth_weight_std_ho": {
@@ -458,14 +462,14 @@
             },
             "birth_weight_avg_je": {
               "type": "number",
-              "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows (default is 35.2)",
-              "default": 35.2,
+              "description": "Average Jersey Birth Weight (kg/head) -- The average birthweight for Jersey cows (default is 35)",
+              "default": 35,
               "minimum": 0
             },
             "birth_weight_std_je": {
               "type": "number",
-              "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Jersey cows (default is 0.9)",
-              "default": 0.9,
+              "description": "Jersey Birth Weight Standard Deviation (kg/head) -- The standard deviation birthweight for Jersey cows (default is 1)",
+              "default": 1,
               "minimum": 0
             },
             "target_heifer_preg_day": {
@@ -476,8 +480,8 @@
             },
             "mature_body_weight_avg": {
               "type": "number",
-              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows (default is 1200)",
-              "default": 1200,
+              "description": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows (default is 740.1)",
+              "default": 740.1,
               "minimum": 0
             },
             "mature_body_weight_std": {
@@ -496,8 +500,8 @@
             "description": "Literature Repro Values",
             "preg_check_day_1": {
               "type": "number",
-              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 32).",
-              "default": 32,
+              "description": "Pregnancy Check Day 1 (days) -- Days since last insemination to check whether the animal is pregnant or not for the first time (default is 43.9).",
+              "default": 43.9,
               "minimum": 1
             },
             "preg_loss_rate_1": {
