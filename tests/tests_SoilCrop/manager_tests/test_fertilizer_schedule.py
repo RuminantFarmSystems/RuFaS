@@ -1,8 +1,8 @@
 import pytest
 from typing import List, Any
 
-from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
-from SC_redesign.Crop_and_Soil.manager.events import FertilizerEvent
+from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.events import FertilizerEvent
 from RUFAS.output_manager import OutputManager
 
 om = OutputManager()

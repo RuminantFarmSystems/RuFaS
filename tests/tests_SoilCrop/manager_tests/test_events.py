@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, TillageEvent, ManureEvent, \
+from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, TillageEvent, ManureEvent, \
     FertilizerEvent
 
 

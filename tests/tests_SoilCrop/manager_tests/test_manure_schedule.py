@@ -1,8 +1,8 @@
 import pytest
 from typing import List, Union
 
-from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
-from SC_redesign.Crop_and_Soil.manager.events import ManureEvent
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.field.manager.events import ManureEvent
 
 
 @pytest.mark.parametrize("values,expected", [
