@@ -12,10 +12,10 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 import csv
 
-from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS import errors
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
+from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure_storage.manure_storage import ManureStorage
@@ -510,6 +510,7 @@ class Time:
                 self.day = self.years[0][i]
                 break
         self.index = 0
+
     def to_str(self):
         """
         Description:
