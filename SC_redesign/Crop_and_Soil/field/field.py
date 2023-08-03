@@ -1113,8 +1113,10 @@ class Field:
         for crop in self.crops:
             amount_evaporated = crop.water_dynamics.evaporate_from_canopy(remaining_evapotranspirative_demand)
             remaining_evapotranspirative_demand -= amount_evaporated
-            if remaining_evapotranspirative_demand == 0.0:
+            if remaining_evapotranspirative_demand - amount_evaporated <= 0.0:
                 break
+            else:
+                remaining_evapotranspirative_demand -= amount_evaporated
         return remaining_evapotranspirative_demand
 
     def _determine_total_above_ground_biomass(self) -> float:

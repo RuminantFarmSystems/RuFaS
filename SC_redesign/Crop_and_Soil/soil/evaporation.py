@@ -52,7 +52,7 @@ class Evaporation:
             amount_water_removed = min(amount_water_removed, amount_available_for_evaporation)
             layer.water_content -= amount_water_removed
             amount_available_for_evaporation -= amount_water_removed
-            if amount_available_for_evaporation == 0:
+            if amount_available_for_evaporation <= 0:
                 break
 
         total_evaporation_from_soil = maximum_soil_water_evaporation - amount_available_for_evaporation
