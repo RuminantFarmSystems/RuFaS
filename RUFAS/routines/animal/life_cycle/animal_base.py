@@ -59,7 +59,6 @@ class AnimalBase(object):
         self.birth_date = args['birth_date']
         self.days_born = args['days_born']
         self.semen_used = self.config['semen_type']
-
         self.culled = False
         self.do_not_breed = False
         self.body_weight_history = []
@@ -72,7 +71,7 @@ class AnimalBase(object):
         self.manure_excretion = {}
         self.ration_formulation = {'objective': 0.00}
         self.DMIest = 0
-        #self.DBW = 0
+        self.DBW = 0
         self.p_animal = 0
         self.p_intake = 0
         self.p_conc_ration = 0
@@ -89,7 +88,6 @@ class AnimalBase(object):
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
         self.tissue_changed = 0
-
         if 'body_weight_history' in args:
             self.body_weight_history = args['body_weight_history']
             self.pen_history = args['pen_history']
@@ -146,7 +144,7 @@ class AnimalBase(object):
 
         # amount of P in the animal (A.1G.A.3)
         self.p_animal = self.p_animal + self.p_gest + self.p_growth + \
-            (self.dP_reserves - dP_reserves_prev)
+                        (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self):
         """
@@ -163,17 +161,15 @@ class AnimalBase(object):
         # excess P in the diet (g) (A.1G.A.1)
         self.p_excess = max(self.p_intake - self.p_req, 0)
 
-
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
         elif self.dP_reserves < 0 and self.p_intake >= self.p_req and \
                 self.p_excess >= (-1) * self.dP_reserves / 0.7:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + \
-                self.dP_reserves / 0.7
+                            self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
-
 
         return p_urine, p_feces_excrt
 
@@ -183,7 +179,6 @@ class AnimalBase(object):
         """
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * 1000
-        
 
     def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
         """

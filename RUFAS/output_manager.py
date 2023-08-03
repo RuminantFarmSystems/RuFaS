@@ -1,11 +1,12 @@
 # !/usr/bin/env python3
 
 from pathlib import Path
-import re
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+import datetime
 import json
 import os
-import datetime
+import pandas as pd
+import re
 
 from RUFAS.util import Utility
 
@@ -307,6 +308,69 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
+    def _dict_to_csv_column_list(self, data_dict: Dict[str, List[Any]], mandatory_fields: List[str]
+                                 ) -> List[Tuple[str, pd.Series]]:
+        """Turns a dictionary to a list of csv columns.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, List[Any]]
+            The dictionary to read from
+
+        mandatory_fields : List[str]
+            which fields of the data_dict to include in the csv columns
+
+        Returns
+        -------
+        List[Tuple[str, pd.Series]]
+            A list of (column_name, column_data) tuples.
+
+        """
+        column_list = []
+        for field in mandatory_fields:
+            column_list.append((field, pd.Series(data_dict[field], dtype=object)))
+        return column_list
+
+    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: str, exclude_info_maps: bool) -> None:
+        """Saves a dictionary to a csv file.
+
+        Parameters
+        ----------
+        data_dict : Dict[str, Any]
+            The dictionary to be saved
+
+        path : str
+            The path to the file to be saved
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to include info_maps data in their results files.
+
+        Raises
+        ------
+        Exception
+            If an error occurs while writting to the file
+
+        """
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._dict_to_file_csv.__name__,
+                    }
+        self.add_log("save_dict_file_try", f"Attempting to save to {path}.", info_map)
+
+        if len(data_dict) == 0:
+            return
+
+        mandatory_fields = ["values"] if exclude_info_maps else ["values", "info_maps"]
+        (_, variable_data), = data_dict.items()
+        csv_column_data = self._dict_to_csv_column_list(variable_data, mandatory_fields)
+
+        df = pd.DataFrame(dict(csv_column_data))
+        try:
+            df.to_csv(path, index=False)
+        except Exception as e:
+            raise e
+
+        self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
+
     def _list_to_file_txt(self, data_list: List[str], path: str) -> None:
         """Saves a list into a text file
 
@@ -487,6 +551,29 @@ class OutputManager(object):
             file_path = os.path.join(save_path, self._generate_file_name(f"saved_variables_{filter_file}", "json"))
             self._dict_to_file_json(filtered_pool, file_path)
 
+    def save_variables_to_csv_files(self, path: str, exclude_info_maps: bool = False) -> None:
+        """
+        Saves the variables_pool into one csv file per variable in the given path to a directory.
+
+        Parameters
+        ----------
+        path : str
+            Path to the output directory for the OutputManager.
+
+        exclude_info_maps : bool
+            Flag for whether or not the user wants to include info_maps data in their results files.
+
+        """
+        pool = self.variables_pool
+        try:
+            Path(path).mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            raise e
+
+        for key in pool.keys():
+            variable_csv_file_path = os.path.join(path, self._generate_file_name(key, "csv"))
+            self._dict_to_file_csv({key: pool[key]}, variable_csv_file_path, exclude_info_maps)
+
     def dump_variables(self, path: str, exclude_info_maps: bool = False) -> None:
         """
         Dumps variables_pool into a json file in the given path to a directory.
@@ -504,8 +591,8 @@ class OutputManager(object):
         if exclude_info_maps:
             pool = self._exclude_info_maps(self.variables_pool)
 
-        file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
-        self._dict_to_file_json(pool, file_path)
+        json_file_path = os.path.join(path, self._generate_file_name("all_variables", "json"))
+        self._dict_to_file_json(pool, json_file_path)
 
     def dump_logs(self, path: str) -> None:
         """
@@ -609,6 +696,7 @@ class OutputManager(object):
         """
         self.dump_variables(path, exclude_info_maps)
         self.dump_variable_names_and_contexts(path, exclude_info_maps)
+        self.save_variables_to_csv_files(str(Path(path) / "CSVs" / "om" / "variables"), exclude_info_maps)
         self.dump_errors(path)
         self.dump_logs(path)
         self.dump_warnings(path)
