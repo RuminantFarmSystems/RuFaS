@@ -2,21 +2,20 @@ from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
-from SC_redesign.Crop_and_Soil.crop.crop import Crop
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.crop.harvest_operations import HarvestOperation
-from SC_redesign.Crop_and_Soil.crop.species_data_factory import CropSpecies
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from SC_redesign.Crop_and_Soil.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.field.field import Field
-from SC_redesign.Crop_and_Soil.field.field_data import FieldData
-from SC_redesign.Crop_and_Soil.crop.dormancy import Dormancy
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, \
-    HECTARES_TO_SQUARE_MILLIMETERS
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.crop.species_data_factory import CropSpecies
+from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.routines.field.manager.events import Event, PlantingEvent, HarvestEvent, FertilizerEvent, ManureEvent
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.crop.dormancy import Dormancy
+from RUFAS.routines.field.crop_and_soil_constants import LITERS_TO_CUBIC_MILLIMETERS, HECTARES_TO_SQUARE_MILLIMETERS
 from RUFAS.classes import Time
-from SC_redesign.Crop_and_Soil.manager.events import TillageEvent
+from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
@@ -619,14 +618,14 @@ def test_execute_fertilizer_application_with_invalid_args(depth: float, remainde
         with corrected values takes place."""
     field = Field(field_data=FieldData(name="test", field_size=1.2), manure_manager=MagicMock(ManureManager))
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
-    with patch("SC_redesign.Crop_and_Soil.field.field.Field._record_nutrient_application_error",
+    with patch("RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
                new_callable=MagicMock) as patched_error, \
-            patch("SC_redesign.Crop_and_Soil.field.field.Field._formulate_fertilizer_required", new_callable=MagicMock,
+            patch("RUFAS.routines.field.field.field.Field._formulate_fertilizer_required", new_callable=MagicMock,
                   return_value={"total_mass": 100.0, "phosphorus_mass": 50.0, "nitrogen_mass": 50.0,
                                 "potassium_mass": 0.0}) as patched_formulator, \
-            patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication.apply_fertilizer",
+            patch("RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.apply_fertilizer",
                   new_callable=MagicMock) as patched_applicator, \
-            patch("SC_redesign.Crop_and_Soil.field.field.Field._record_fertilizer_application",
+            patch("RUFAS.routines.field.field.field.Field._record_fertilizer_application",
                   new_callable=MagicMock) as patched_recorder:
         field._execute_fertilizer_application("26_4_24", 50.0, 50.0, depth, remainder, 1994, 200)
 
@@ -819,15 +818,15 @@ def test_execute_manure_application_with_invalid_args(depth: float, remainder: f
                                                                                             dry_matter_fraction=0.66))
     field = Field(field_data=FieldData(name="test", field_size=1.89), manure_manager=mocked_manure_manager)
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
-    with patch("SC_redesign.Crop_and_Soil.field.field.Field._record_nutrient_application_error",
+    with patch("RUFAS.routines.field.field.field.Field._record_nutrient_application_error",
                new_callable=MagicMock) as patched_error, \
-            patch("SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication.apply_machine_manure",
+            patch("RUFAS.routines.field.field.manure_application.ManureApplication.apply_machine_manure",
                   new_callable=MagicMock) as patched_manure_applicator, \
-            patch("SC_redesign.Crop_and_Soil.field.field.Field._record_manure_application",
+            patch("RUFAS.routines.field.field.field.Field._record_manure_application",
                   new_callable=MagicMock) as patched_recorder, \
-            patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_optimal_fertilizer_mix",
+            patch("RUFAS.routines.field.field.field.Field._determine_optimal_fertilizer_mix",
                   new_callable=MagicMock, return_value="26_4_24") as patched_optimizer, \
-            patch("SC_redesign.Crop_and_Soil.field.field.Field._execute_fertilizer_application",
+            patch("RUFAS.routines.field.field.field.Field._execute_fertilizer_application",
                   new_callable=MagicMock) as patched_fertilizer_applicator:
         field._execute_manure_application(50.0, 50.0, 0.8, depth, remainder, 2000, 133)
 
@@ -929,7 +928,7 @@ def test_execute_daily_processes(field_size: float, crops_growing: bool, residue
                                  min_temp: float, max_temp: float, annual_mean_temp: float,
                                  transpiration: float) -> None:
     """Tests that all component processes and subroutines are correctly called in Field."""
-    with patch.multiple("SC_redesign.Crop_and_Soil.crop.crop_data.CropData",
+    with patch.multiple("RUFAS.routines.field.crop.crop_data.CropData",
                         is_mature=PropertyMock(return_value=not crops_growing),
                         is_dormant=PropertyMock(return_value=not crops_growing)):
         field_data = FieldData(field_size=field_size, current_residue=residue)
@@ -992,7 +991,7 @@ def test_cycle_water(field_size: float, rainfall: float, runoff: float, high_wat
                      light: float, min_temp: float, max_temp: float, mean_temp: float, surface_residue: float,
                      crop_1_proportion: float, crop_2_proportion: float, crops_growing: bool) -> None:
     """Tests that cycle_water() correctly executes all water processes on its soil profile and the crops it contains."""
-    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.crop.crop_data.CropData.in_growing_season", new_callable=PropertyMock,
                return_value=crops_growing):
         soil_data = SoilData(field_size=field_size, accumulated_runoff=runoff, water_evaporated=3.5)
         soil_data.plant_surface_residue = surface_residue
@@ -1132,7 +1131,7 @@ def test_handle_water_in_crop_canopies(precipitation: float, canopy_capacity: fl
                                        second_canopy_amount: float, expected_return: float, expected_first: float,
                                        expected_second: float) -> None:
     """Tests that water is properly added and removed from the crop canopies of field objects."""
-    with patch("SC_redesign.Crop_and_Soil.crop.crop_data.CropData.water_canopy_storage_capacity",
+    with patch("RUFAS.routines.field.crop.crop_data.CropData.water_canopy_storage_capacity",
                new_callable=PropertyMock, return_value=canopy_capacity):
         crop_data1 = CropData(canopy_water=first_canopy_amount)
         crop1 = Crop(crop_data1)
@@ -1195,7 +1194,7 @@ def test_determine_total_above_ground_biomass(biomasses: List[float], expected: 
     (678.0098, 26.8896, 10.3339, 18.3345),
 ])
 def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
-    with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_latent_heat_vaporization",
+    with patch("RUFAS.routines.field.field.field.Field._determine_latent_heat_vaporization",
                new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
         if avg_temp is not None:
@@ -1238,7 +1237,7 @@ def test_determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomas
                                                              snow_water: float, potential_evapotrans_adj: float,
                                                              transpiration: float) -> None:
     """Tests that the amount of soil evaporation and sublimation is calculated correctly."""
-    with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_soil_cover_index", new_callable=MagicMock,
+    with patch("RUFAS.routines.field.field.field.Field._determine_soil_cover_index", new_callable=MagicMock,
                return_value=1.3) as mocked_soil_cover_index:
         actual = Field._determine_soil_evaporation_and_sublimation_adjusted(above_ground_biomass, residue, snow_water,
                                                                             potential_evapotrans_adj, transpiration)

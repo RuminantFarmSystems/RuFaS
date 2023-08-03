@@ -2,12 +2,12 @@ import pytest
 from unittest.mock import MagicMock, call
 from typing import List
 
-from SC_redesign.Crop_and_Soil.field.field import Field
-from SC_redesign.Crop_and_Soil.field.field_data import FieldData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.field.tillage_application import TillageApplication
-from SC_redesign.Crop_and_Soil.field.tillage_application import om
+from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.field.tillage_application import TillageApplication
+from RUFAS.routines.field.field.tillage_application import om
 from RUFAS.routines.manure.manure_manager import ManureManager
 
 
@@ -30,7 +30,7 @@ def test_remove_amount_incorporated(data: object, attr_name: str, attr_value: fl
 
 @pytest.mark.parametrize("data,expected", [
     ([1, 2, 3], "<class 'list'>"),
-    (Field(manure_manager=MagicMock(ManureManager)), "<class 'SC_redesign.Crop_and_Soil.field.field.Field'>")
+    (Field(manure_manager=MagicMock(ManureManager)), "<class 'RUFAS.routines.field.field.field.Field'>")
 ])
 def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
     """Test that errors are handled correctly when removing material from soil surface."""
