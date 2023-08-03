@@ -2,9 +2,9 @@ import pytest
 from unittest.mock import MagicMock, patch
 from math import exp, log
 
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
 
 
 # --- Static method tests ---
@@ -46,7 +46,7 @@ def test_determine_phosphorus_imbalance(labile: float, active: float, sorption_p
 ])
 def test_calculate_phosphorus_desorption(active_counter: int, sorption_parameter: float, balance: float) -> None:
     """Tests that the amount of phosphorus to be transferred from the active to labile pools is correctly calculated."""
-    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
+    with patch("RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
                "._determine_desorption_base", new_callable=MagicMock, return_value=0.5) as mocked_determine_base:
         observed = PhosphorusMineralization._calculate_phosphorus_desorption(active_counter, sorption_parameter,
                                                                              balance)
@@ -78,9 +78,9 @@ def test_determine_desorption_base(sorption_parameter: float) -> None:
 ])
 def test_calculate_phosphorus_sorption(labile_counter: int, sorption_parameter: float, balance: float) -> None:
     """Tests that the correct amount of phosphorus to remove from the labile inorganic pool is calculated."""
-    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
+    with patch("RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization.PhosphorusMineralization"
                "._determine_sorption_scalar", new_callable=MagicMock, return_value=0.4) as mocked_sorption:
-        with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization"
+        with patch("RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization"
                    ".PhosphorusMineralization._determine_sorption_exponent",
                    new_callable=MagicMock, return_value=-0.91) as mocked_exponent:
             observed = PhosphorusMineralization._calculate_phosphorus_sorption(labile_counter, sorption_parameter,
@@ -156,9 +156,9 @@ def test_mineralize_phosphorus(field_size: float) -> None:
     `mineralize_phosphorus()`
 
     """
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density",
                new_callable=MagicMock, return_value=20), \
-        patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.labile_inorganic_phosphorus_content",
+        patch("RUFAS.routines.field.soil.layer_data.LayerData.labile_inorganic_phosphorus_content",
               new_callable=MagicMock, return_value=20):
         # Case 1: tests that desorption occurs correctly
         LayerData.determine_soil_nutrient_concentration = MagicMock()

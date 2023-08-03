@@ -2,9 +2,9 @@ import pytest
 
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("soil_structural_slow_carbon_usage", [

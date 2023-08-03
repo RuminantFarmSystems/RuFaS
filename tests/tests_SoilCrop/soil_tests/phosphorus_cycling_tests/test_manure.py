@@ -2,10 +2,10 @@ import pytest
 from math import exp, sqrt
 from unittest.mock import patch, call, MagicMock, PropertyMock
 
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure import Manure
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 
 
 # --- Static Method tests ---
@@ -235,7 +235,7 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
     """Test that methods are called correctly on correct layers of soil profile."""
     data = SoilData(field_size=field_size)
     incorp = Manure(data)
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_labile_phosphorus",
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.add_to_labile_phosphorus",
                new_callable=PropertyMock) as mocked_add_to_labile_phosphorus:
         incorp._add_infiltrated_phosphorus_to_soil(amount_phosphorus, field_size)
         assert mocked_add_to_labile_phosphorus.call_count == 2
@@ -287,7 +287,7 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
 def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
     """Tests that the manure moisture factors of the different pools are correctly updated."""
     # Case 1: calculated moisture factor is negative
-    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+    with patch("RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
                new_callable=MagicMock, return_value=-1.0) as mocked_determine_moisture_change:
         data1 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
                          machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
@@ -304,7 +304,7 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         assert incorp1.data.grazing_manure_moisture_factor == 0.0
 
     # Case 2: calculated moisture factor is greater than upper bound
-    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+    with patch("RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
                new_callable=MagicMock, return_value=1.0) as mocked_determine_moisture_change:
         data2 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
                          machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,
@@ -320,7 +320,7 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         assert incorp2.data.grazing_manure_moisture_factor == 0.9
 
     # Case 3: calculated moisture factor is not reset due to being out of bounds
-    with patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+    with patch("RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
                new_callable=MagicMock, return_value=0.1) as mocked_determine_moisture_change:
         data3 = SoilData(machine_manure_dry_mass=1000, machine_manure_field_coverage=0.86,
                          machine_manure_moisture_factor=0.5, machine_manure_applied_mass=1100,

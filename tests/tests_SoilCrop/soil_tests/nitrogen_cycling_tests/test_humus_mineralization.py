@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import MagicMock, PropertyMock, patch
 
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.crop_and_soil_constants import FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
 
 
 # --- Static method tests ---
@@ -63,7 +63,7 @@ def test_mineralize_organic_nitrogen(active_to_stable: float, active_to_nitrate:
     incorp._determine_intra_organic_mineralization = MagicMock(return_value=active_to_stable)
     incorp._determine_organic_to_nitrate_mineralization = MagicMock(return_value=active_to_nitrate)
 
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+    with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
                         nutrient_cycling_temp_factor=PropertyMock(return_value=0.5),
                         nutrient_cycling_water_factor=PropertyMock(return_value=0.4)):
         incorp.mineralize_organic_nitrogen()

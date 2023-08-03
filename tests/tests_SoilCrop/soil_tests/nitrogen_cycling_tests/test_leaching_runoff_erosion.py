@@ -2,9 +2,9 @@ import pytest
 from math import exp, log
 from unittest.mock import MagicMock, call, PropertyMock, patch
 
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 @pytest.mark.parametrize("soluble_nitrogen_amount, soil_water_runoff_sum,saturation_content", [
@@ -185,7 +185,7 @@ def test_calculate_nitrogen_lost_to_leaching(nitrogen_content: float, field_capa
 def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: float, stable: float,
                         field_size: float) -> None:
     """Tests that nitrogen is properly eroded from the surface of the field."""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.saturation_content", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.saturation_content", new_callable=PropertyMock,
                return_value=8.8):
         layer = LayerData(top_depth=0, bottom_depth=20, field_size=field_size, bulk_density=1.6)
         layer.nitrate_content = nitrates
@@ -223,7 +223,7 @@ def test_erode_nitrogen(nitrates: float, ammonium: float, fresh: float, active: 
 
 def test_leach_nitrogen() -> None:
     """Tests that nitrogen is properly removed from a layer and percolated to the next during the leaching process."""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
                return_value=6.8):
         data = SoilData(field_size=2.0)
         incorp = LeachingRunoffErosion(data)

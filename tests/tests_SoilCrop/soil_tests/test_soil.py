@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
+from RUFAS.routines.field.soil.soil import Soil
 
 
 @pytest.mark.parametrize("solar_radiation,avg_temp,min_temp,max_temp,plant_cover,snow_cover,avg_annual_air_temp", [

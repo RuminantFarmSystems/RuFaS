@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
-from SC_redesign.Crop_and_Soil.soil.soil_temp import SoilTemp
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_temp import SoilTemp
+from RUFAS.routines.field.soil.soil_data import SoilData
 from math import exp, log
 
 

@@ -2,11 +2,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.denitrification import Denitrification
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrogen_cycling import NitrogenCycling
+from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
+from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrification
+from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
 
 
 @pytest.mark.parametrize("field_size", [

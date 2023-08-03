@@ -2,11 +2,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.manure import Manure
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_cycling import PhosphorusCycling
+from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
+from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
 
 
 @pytest.mark.parametrize("rainfall,runoff,field_size,mean_air_temperature", [

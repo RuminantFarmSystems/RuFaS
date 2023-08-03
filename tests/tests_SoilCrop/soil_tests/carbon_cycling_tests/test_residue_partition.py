@@ -1,10 +1,10 @@
 import pytest
 import math
 from unittest.mock import MagicMock
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
-from SC_redesign.Crop_and_Soil.crop.crop_data import CropData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("plant_residue_lignin_composition, rainfall", [

@@ -2,8 +2,8 @@ import pytest
 from unittest.mock import MagicMock
 from math import log, exp
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer import Fertilizer
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
 
 
 # --- Static method tests ---

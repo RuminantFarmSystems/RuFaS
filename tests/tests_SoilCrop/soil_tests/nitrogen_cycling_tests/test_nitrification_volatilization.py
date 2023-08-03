@@ -2,8 +2,8 @@ import pytest
 from math import exp
 from unittest.mock import MagicMock, patch, PropertyMock, call
 
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- Static method tests ---
@@ -116,7 +116,7 @@ def test_calculate_ammonium_lost_to_process(ammonium_lost: float, actual: float,
 # --- Main routine test ---
 def test_do_daily_nitrification_and_volatilization() -> None:
     """Tests that the main routine of NitrificationVolatilization correctly calculates and updates attributes."""
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+    with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
                         wilting_point_content=PropertyMock(return_value=2.33),
                         field_capacity_content=PropertyMock(return_value=5.77),
                         depth_of_layer_center=PropertyMock(return_value=57.89)):

@@ -2,8 +2,8 @@ import pytest
 from math import exp, log, atan, sin
 from unittest.mock import MagicMock, patch
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.soil_erosion import SoilErosion
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_erosion import SoilErosion
 
 
 # --- Static method tests ---
@@ -200,7 +200,7 @@ def test_determine_coarse_fragment_factor(percent_rock: float) -> None:
 def test_determine_peak_runoff_rate(runoff: float, rainfall: float, length: float, manning: float, average: float,
                                     area: float, expected: float) -> None:
     """Tests that the peak runoff rate is determined correctly."""
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_erosion.SoilErosion",
+    with patch.multiple("RUFAS.routines.field.soil.soil_erosion.SoilErosion",
                         _determine_runoff_coefficient=MagicMock(return_value=0.5),
                         _determine_rainfall_intensity=MagicMock(return_value=1.3)):
         actual = SoilErosion._determine_peak_runoff_rate(runoff, rainfall, length, manning, average, area)
@@ -225,7 +225,7 @@ def test_determine_runoff_coefficient(runoff: float, rainfall: float, expected: 
 def test_determine_rainfall_intensity(rainfall: float, length: float, manning: float, average: float,
                                       expected: float) -> None:
     """Tests that the rainfall intensity is calculated accurately."""
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_erosion.SoilErosion",
+    with patch.multiple("RUFAS.routines.field.soil.soil_erosion.SoilErosion",
                         _determine_time_of_concentration=MagicMock(return_value=1.5),
                         _determine_half_hour_rainfall_fraction=MagicMock(return_value=0.3),
                         _determine_fraction_rainfall_during_time_of_concentration=MagicMock(return_value=0.4)):

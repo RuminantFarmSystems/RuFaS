@@ -3,11 +3,11 @@ import pytest
 from unittest.mock import MagicMock, patch
 from math import exp
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
-    CUBIC_MILLIMETERS_TO_LITERS, MILLIGRAMS_TO_KILOGRAMS
-from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS, \
+    MILLIGRAMS_TO_KILOGRAMS
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
 
 
 # --- Static method tests ---
@@ -20,7 +20,7 @@ from SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.soluble_phosphorus import
 def test_determine_phosphorus_runoff_from_top_soil(runoff: float, field_size: float, phosphorus: float, density: float,
                                                    thickness: float) -> None:
     """Tests that the correct amount of phosphorus lost to runoff is calculated"""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_concentration",
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_concentration",
                new_callable=MagicMock, return_value=100) as mocked_soil_nutrient_concentration:
         expected_runoff_liters_per_ha = runoff * field_size * HECTARES_TO_SQUARE_MILLIMETERS * \
                                         CUBIC_MILLIMETERS_TO_LITERS / field_size

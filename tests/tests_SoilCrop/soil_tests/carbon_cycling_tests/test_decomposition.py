@@ -3,9 +3,9 @@ import math
 
 from unittest.mock import MagicMock
 
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.decomposition import Decomposition
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.carbon_cycling.decomposition import Decomposition
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("temp_average", [

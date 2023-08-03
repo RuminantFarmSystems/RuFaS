@@ -2,8 +2,8 @@ import pytest
 from math import exp
 from unittest.mock import patch, MagicMock, PropertyMock, call
 
-from SC_redesign.Crop_and_Soil.soil.nitrogen_cycling.denitrification import Denitrification
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrification
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("nitrates,denitrification_rate,temp_factor,percent_carbon", [
@@ -36,7 +36,7 @@ def test_denitrify() -> None:
     `nutrient_cycling_water_factor`, and above for the second.
 
     """
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+    with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
                         nutrient_cycling_water_factor=PropertyMock(return_value=0.91),
                         nutrient_cycling_temp_factor=PropertyMock(return_value=0.89)):
         data = SoilData(field_size=1.8)

@@ -4,10 +4,10 @@ from math import inf, log, exp
 from dataclasses import asdict
 from unittest.mock import patch, PropertyMock, MagicMock
 
-from SC_redesign.Crop_and_Soil.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
+from RUFAS.routines.field.soil.soil_config_factory import SoilConfiguration, SoilConfigFactory
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS
 
 
@@ -200,7 +200,7 @@ def test_annual_reset() -> None:
     soil_data.annual_eroded_stable_organic_nitrogen_total = 14
     soil_data.annual_eroded_active_organic_nitrogen_total = 15
 
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData",
+    with patch.multiple("RUFAS.routines.field.soil.soil_data.SoilData",
                         profile_soil_water_content=PropertyMock(return_value=1.05),
                         profile_nitrates_total=PropertyMock(return_value=2.83)):
         soil_data.do_annual_reset()
@@ -227,7 +227,7 @@ def test_annual_reset() -> None:
 def test_profile_soil_water_content() -> None:
     """Test that SoilData correctly calculates amount of water in the entire soil profile"""
     # Set water content and wilting point content of every soil layer to certain amount
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+    with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
                         soil_water_concentration=PropertyMock(return_value=0.87),
                         layer_thickness=PropertyMock(return_value=1),
                         wilting_point_content=PropertyMock(return_value=0.32)):
@@ -239,7 +239,7 @@ def test_profile_soil_water_content() -> None:
 
 def test_profile_saturation() -> None:
     """Test that SoilData correctly calculates the amount of water in soil profile when completely saturated"""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.saturation_content", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.saturation_content", new_callable=PropertyMock,
                return_value=0.98):
         soil_data = SoilData(field_size=1.83)
         observe = soil_data.profile_saturation
@@ -249,7 +249,7 @@ def test_profile_saturation() -> None:
 
 def test_profile_field_capacity() -> None:
     """Test that SoilData correctly calculates the amount of water in the soil profile when at field capacity"""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.field_capacity_content", new_callable=PropertyMock,
                return_value=0.67):
         soil_data = SoilData(field_size=1.223)
         observe = soil_data.profile_field_capacity
@@ -264,7 +264,7 @@ def test_profile_field_capacity() -> None:
 ])
 def test_soil_water_factor(profile_water: float, profile_field_capacity: float) -> None:
     """Test that SoilData correctly calculates the soil water factor for a soil profile"""
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData",
+    with patch.multiple("RUFAS.routines.field.soil.soil_data.SoilData",
                         profile_soil_water_content=PropertyMock(return_value=profile_water),
                         profile_field_capacity=PropertyMock(return_value=profile_field_capacity)):
         soil_data = SoilData(field_size=1.88)
@@ -351,13 +351,13 @@ def test_layer_thickness_error(top: float, bottom: float) -> None:
 ])
 def test_post_init(top: float, bottom: float, concentration: float) -> None:
     """Test that __post_init__() runs and correctly initializes attributes in LayerData"""
-    with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter',
+    with patch('RUFAS.routines.field.soil.layer_data.LayerData.calculate_phosphorus_sorption_parameter',
                new_callable=MagicMock, return_value=0.5) as calc_psp, \
-            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.determine_soil_nutrient_area_density',
+            patch('RUFAS.routines.field.soil.layer_data.LayerData.determine_soil_nutrient_area_density',
                   new_callable=MagicMock, return_value=22) as determine_nutrient_density, \
-            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData._initialize_nitrogen_pools',
+            patch('RUFAS.routines.field.soil.layer_data.LayerData._initialize_nitrogen_pools',
                   new_callable=MagicMock) as init_nitrogen_pools, \
-            patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData._initialize_carbon_pools',
+            patch('RUFAS.routines.field.soil.layer_data.LayerData._initialize_carbon_pools',
                   new_callable=MagicMock) as init_carbon_pools:
         # Initialize object
         layer = LayerData(top_depth=top, bottom_depth=bottom, soil_water_concentration=concentration,
@@ -440,7 +440,7 @@ def test_wilting_point_content(top: float, bottom: float, wilt_concentration: fl
 ])
 def test_saturation_content(saturation_concentration: float, layer_thickness: float) -> None:
     """Test that saturation_content() in LayerData calculates the saturation content of a soil layer correctly"""
-    with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.layer_thickness', new_callable=PropertyMock,
+    with patch('RUFAS.routines.field.soil.layer_data.LayerData.layer_thickness', new_callable=PropertyMock,
                return_value=layer_thickness):
         layer = LayerData(top_depth=0, bottom_depth=30, saturation_point_water_concentration=saturation_concentration,
                           field_size=1.61)
@@ -458,7 +458,7 @@ def test_saturation_content(saturation_concentration: float, layer_thickness: fl
 def test_excess_water_available(water_content: float, field_capacity_content: float) -> None:
     """Test that excess_water_available() in LayerData correctly calculates the amount of excess water available in a
         layer"""
-    with patch.multiple('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData',
+    with patch.multiple('RUFAS.routines.field.soil.layer_data.LayerData',
                         soil_water_concentration=PropertyMock(return_value=water_content),
                         layer_thickness=PropertyMock(return_value=1),
                         field_capacity_content=PropertyMock(return_value=field_capacity_content)):
@@ -480,7 +480,7 @@ def test_excess_water_available(water_content: float, field_capacity_content: fl
 def test_acceptable_percolation_amount(water_content: float, saturation_content: float) -> None:
     """Test that acceptable_percolation_amount() in LayerData correctly calculates the maximum amount of water that can
         be percolated into it"""
-    with patch.multiple("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData",
+    with patch.multiple("RUFAS.routines.field.soil.layer_data.LayerData",
                         soil_water_concentration=PropertyMock(return_value=water_content),
                         layer_thickness=PropertyMock(return_value=1),
                         saturation_content=PropertyMock(return_value=saturation_content)):
@@ -626,7 +626,7 @@ def test_nutrient_cycling_temp_factor(temp: float) -> None:
 ])
 def test_nutrient_cycling_water_factor(water_content: float, field_capacity: float) -> float:
     """Tests that the nutrient cycling water factor is correctly calculated as a property of LayerData."""
-    with patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.field_capacity_content",
+    with patch("RUFAS.routines.field.soil.layer_data.LayerData.field_capacity_content",
                new_callable=PropertyMock, return_value=field_capacity):
         layer = LayerData(top_depth=15, bottom_depth=40, field_size=1.8)
         layer.water_content = water_content
@@ -642,8 +642,8 @@ def test_nutrient_cycling_water_factor(water_content: float, field_capacity: flo
 ])
 def test_all_residue(plant_surface_residue: float, plant_root_residue: float, expected: float) -> None:
     """Tests the property method all_residue sums up the residues correctly"""
-    with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.plant_surface_residue", plant_surface_residue), \
-         patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.plant_root_residue", plant_root_residue):
+    with patch("RUFAS.routines.field.soil.soil_data.SoilData.plant_surface_residue", plant_surface_residue), \
+         patch("RUFAS.routines.field.soil.soil_data.SoilData.plant_root_residue", plant_root_residue):
         soil_data = SoilData(field_size=0.98)
         assert soil_data.all_residue == expected
 

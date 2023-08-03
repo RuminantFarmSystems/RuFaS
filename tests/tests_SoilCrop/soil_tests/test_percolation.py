@@ -2,9 +2,9 @@ from typing import List
 
 import pytest
 from unittest.mock import MagicMock, patch, PropertyMock
-from SC_redesign.Crop_and_Soil.soil.percolation import Percolation
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.percolation import Percolation
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
 from math import exp
 
 
@@ -81,9 +81,9 @@ def test_percolate_between_layers(time_step: float, excess_water_available: floa
     """this function tests _percolate_between_layers() in Percolation.py"""
     upper_data = LayerData(top_depth=0, bottom_depth=20, field_size=1.33)
     lower_data = LayerData(top_depth=20, bottom_depth=87, saturation_point_water_concentration=0.1, field_size=1.33)
-    with patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.excess_water_available', new_callable=PropertyMock,
+    with patch('RUFAS.routines.field.soil.layer_data.LayerData.excess_water_available', new_callable=PropertyMock,
                return_value=excess_water_available), \
-         patch('SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.acceptable_percolation_amount',
+         patch('RUFAS.routines.field.soil.layer_data.LayerData.acceptable_percolation_amount',
                new_callable=PropertyMock, return_value=acceptable_percolation_amount):
 
         Percolation._determine_percolation_travel_time = MagicMock()
