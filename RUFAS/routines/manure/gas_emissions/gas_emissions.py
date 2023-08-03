@@ -1263,16 +1263,22 @@ class GasEmissions:
         ----------
         manure_total_solids : float
             The total solids from the manure (in kg)
+
         bedding_total_mass : float
             The total mass of the bedding material (in kg)
+
         days_since_last_tillage : int
             The number of days since the last tillage event
+
         lag : int
             The lag time
+
         moisture_effect : float
             The effect of moisture on microbial decomposition
+
         carbon_available_in_manure : float
             the proportion of carbon available in manure (unitless)
+
         carbon_available_in_bedding : float
             the carbon available in the bedding (unitless)
 
