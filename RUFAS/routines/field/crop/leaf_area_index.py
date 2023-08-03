@@ -1,150 +1,191 @@
-"""
-RUFAS: Ruminant Farm Systems Model
-
-File name: leaf_area_index.py
-
-Author(s): Andy Achenreiner, achenreiner@wisc.edu
-
-Description: This module contains the necessary functions for calculating and
-             updating the Leaf Area Index of the current day. The only function
-             that is meant to be called outside of this module is update_all()
-
-CropType attribute definitions:
-
-    fr_PHU_1 = crop-specific curve point
-
-    fr_PHU_2 = crop-specific curve point
-
-    fr_LAI_1 = crop-specific curve point
-
-    fr_LAI_2 = crop-specific curve point
-
-    L1 = shape coefficient
-
-    L2 = shape coefficient
-
-    fr_PHU = Fraction of PHU accumulated by current day
-
-    fr_LAI_max = fraction of the plant's maximum leaf area index corresponding
-                 to a given fraction of potential heat units for the plant
-
-    prev_fr_LAI_max = fr_LAI_max leading up to the current day
-
-    LAI_max = Crop-specific maximum LAI
-
-    d_LAI_max = Maximum leaf area added on current day
-
-    d_LAI_actual = Actual leaf area added on current day
-
-
-CropType values updated by update_all():
-
-    prev_fr_LAI_max
-    fr_LAI_max
-    LAI_actual
-    prev_LAI_actual
-"""
-
 from math import exp, log, sqrt
+from typing import List, Optional
+from RUFAS.routines.field.crop.crop_data import CropData
 
 
-def update_all(crop_type):
-    """
-    Description:
-        Calls all the necessary functions to update information
-        related to the leaf area index for the given crop_type.
-
-    Args:
-        crop_type: an instance of a crop
-    """
-    L1, L2 = calculate_shape_coefficients(crop_type)
-    calc_fr_LAI_max(crop_type, L1, L2)
-    calculate_LAI_actual(crop_type)
+"""
+This module is based off of the 'Canopy Cover and Height' section of SWAT (5:2.1.2)
+"""
 
 
-def calculate_shape_coefficients(crop_type):
-    """
-    Description:
-        Calculate shape coefficients for LAI accumulation.
-        "pseudocode_crop" section C.8.A.1/2
+class LeafAreaIndex:
+    def __init__(self, crop_data: Optional[CropData] = None):
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    Args:
-        crop_type
-    Returns:
-        int: shape coefficients
-    """
-    # 8.A.1
-    L2_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
-    L2_part2 = (crop_type.fr_PHU_2 / crop_type.fr_LAI_2) - crop_type.fr_PHU_2
+    def grow_canopy(self) -> None:
+        """main leaf area index function"""
+        self.data._lai_shapes = self._determine_lai_shapes(self.data.first_heat_fraction_point,
+                                                           self.data.second_heat_fraction_point,
+                                                           self.data.first_leaf_fraction_point,
+                                                           self.data.second_leaf_fraction_point)
 
-    L2 = ((log(L2_part1) - log(L2_part2))
-          / (crop_type.fr_PHU_2 - crop_type.fr_PHU_1))
+        self.data.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(self.data.heat_fraction,
+                                                                                          self.data._lai_shapes[0],
+                                                                                          self.data._lai_shapes[1])
 
-    # C.8.A.2
-    L1_part1 = (crop_type.fr_PHU_1 / crop_type.fr_LAI_1) - crop_type.fr_PHU_1
+        self.data.canopy_height = self.determine_canopy_height(self.data.max_canopy_height,
+                                                               self.data.optimal_leaf_area_fraction)
+        if self.data.is_in_senescence:  # senescence
+            self.data.leaf_area_index = self._determine_senescent_leaf_area_index(self.data.heat_fraction,
+                                                                                  self.data.senescent_heat_fraction,
+                                                                                  self.data.optimal_leaf_area_fraction)
+        else:  # normal growth
+            self.check_previous_leaf_area_values()
+            self.data.optimal_leaf_area_change = self._determine_max_leaf_area_change(
+                self.data.optimal_leaf_area_fraction,
+                self.data.previous_optimal_leaf_area_fraction,
+                self.data.max_leaf_area_index,
+                self.data.previous_leaf_area_index
+            )
+            self.determine_leaf_area_added()
+            self.add_leaf_area()
+        self.shift_leaf_area_time()
 
-    L1 = log(L1_part1) + (L2 * crop_type.fr_PHU_1)
+    def shift_leaf_area_time(self) -> None:
+        """shifts the time window by one step for leaf area attributes"""
+        self.data.previous_leaf_area_index = self.data.leaf_area_index
+        self.data.previous_optimal_leaf_area_fraction = self.data.optimal_leaf_area_fraction
 
-    return L1, L2
+    def check_previous_leaf_area_values(self) -> None:
+        """check for previous LAI values and set them to 0 if none are present. This function handles the
+        initial time point in the simulation"""
+        if self.data.previous_optimal_leaf_area_fraction is None:
+            self.data.previous_optimal_leaf_area_fraction = 0
+        if self.data.previous_leaf_area_index is None:
+            self.data.previous_leaf_area_index = 0
 
+    def determine_leaf_area_added(self) -> None:
+        """sets actual leaf area added, by adjusting for the plant growth factor
+        SWAT Reference: 5:3.2.2
+        """
+        self.data.leaf_area_added = min(self.data.optimal_leaf_area_change * sqrt(self.data.growth_factor),
+                                        self.data.optimal_leaf_area_change)
 
-def calc_fr_LAI_max(crop_type, L1, L2):
-    """
-    Description:
-        Calculates the accumulated fraction of LAI maximum
-        accumulated including today for the given crop type.
-        "pseudocode_crop" section C.8.A.3
+    def add_leaf_area(self) -> None:
+        """add new leaf area to the plant
+        SWAT Reference: 5:2.1.18"""
+        self.data.leaf_area_index = max(0., self.data.previous_leaf_area_index + self.data.leaf_area_added)
 
-    Args:
-        crop_type
-        L1: first shape coefficient
-        L2: second shape coefficient
-    """
+    @staticmethod
+    def determine_canopy_height(max_canopy_height: float, optimal_leaf_area_fraction: float) -> float:
+        """sets the current height of the canopy, in meters
+        SWAT Reference: 5:2.1.14"""
+        if max_canopy_height < 0:
+            raise ValueError("max_canopy_height must be greater than 0")
+        if not 0 <= optimal_leaf_area_fraction <= 1:
+            raise ValueError("optimal_leaf_area_index must be >= 0 and <= 1")
+        return min(max_canopy_height, max_canopy_height * sqrt(optimal_leaf_area_fraction))
 
-    crop_type.prev_fr_LAI_max = crop_type.fr_LAI_max
+    @staticmethod
+    def _determine_lai_shapes(first_heat_fraction: float, second_heat_fraction: float,
+                              first_leaf_fraction: float, second_leaf_fraction: float) -> List[float]:
+        """
+        calculates the shape coefficients for optimal LAI formula
+        """
+        if first_heat_fraction <= 0:
+            raise ValueError("first_heat_fraction must be greater than 0")
+        if second_heat_fraction <= 0:
+            raise ValueError("second_heat_fraction must be greater than 0")
+        if not 0 < first_leaf_fraction < 1:
+            raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
+        if not 0 < second_leaf_fraction < 1:
+            raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
+        if first_heat_fraction == second_heat_fraction:
+            # TODO: perhaps a way to handle this instead of throwing an error would be better
+            #   something like: second_heat_fraction += 1e-9
+            raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
 
-    exp_part = exp(L1 - (L2 * crop_type.fr_PHU))
-    crop_type.fr_LAI_max = crop_type.fr_PHU / (crop_type.fr_PHU + exp_part)
+        # TODO: need to add any of these errors that get thrown when RuFaS runs to the  `OutputManager`.
+        #    This should probably be done in the `grow_canopy()` function
+        #    I'm still unsure how to do this effectively with warnings raised by static functions. - morrowcj
 
+        first_log = LeafAreaIndex._calc_shape_log(first_heat_fraction, first_leaf_fraction)
+        second_log = LeafAreaIndex._calc_shape_log(second_heat_fraction, second_leaf_fraction)
 
-def calculate_LAI_actual(crop_type):
-    """
-    Description:
-        This calculates LAI_actual for the given crop_type.
-        "pseudocode_crop" section C.8.A.4/6
+        second_shape = (first_log - second_log) / (second_heat_fraction - first_heat_fraction)
+        first_shape = first_log + (second_shape * first_heat_fraction)
 
-    Args:
-        crop_type
-    """
+        return [first_shape, second_shape]
 
-    # C.8.A.4
-    exp_part = exp(5 * (crop_type.LAI_actual - crop_type.LAI_max))
-    d_fr_LAI_max = (crop_type.fr_LAI_max - crop_type.prev_fr_LAI_max)
-    d_LAI_max = d_fr_LAI_max * crop_type.LAI_max * (1 - exp_part)
-    d_LAI_actual = calculate_d_LAI_actual(crop_type, d_LAI_max)
+    @staticmethod
+    def _determine_optimal_leaf_area_fraction(heat_fraction: float, shape1: float, shape2: float) -> float:
+        """calculates leaf area index fraction, from the optimal leaf area development curve, for the initial period of
+        plant growth
 
-    if crop_type.fr_PHU <= crop_type.fr_PHU_sen:
-        # C.8.A.6
-        crop_type.LAI_actual = crop_type.LAI_actual + d_LAI_actual
-        crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
-    else:
-        # C.8.A.6
-        crop_type.LAI_actual = crop_type.LAI_actual * (1 - crop_type.fr_PHU) / (1 - crop_type.fr_PHU_sen)
-        crop_type.LAI_actual = max(crop_type.LAI_actual, 0)
+        Args:
+            heat_fraction: fraction of potential heat units
+            shape1: first shape coefficient
+            shape2: second shape coefficient
 
+        Returns:
+            fraction of the plant's maximum leaf area index
 
-def calculate_d_LAI_actual(crop_type, d_LAI_max):
-    """
-    Description:
-        Calculates d_LAI_actual for use in calculating d_LAI_max and
-        LAI_actual on a given day for the given crop.
-        "pseudocode_crop" C.8.A.5
+        Details: specifically, the calculated value is the 'fraction of the plant's maximum leaf area index
+        corresponding to a given fraction of potential heat units for the plant' (heat_fraction), constrained to be
+        bounded at zero.
 
-    Args:
-        crop_type
-        d_LAI_max: change in LAI maximum
-    Returns:
-        float: change in LAI actual
-    """
+        SWAT Reference: 5:2.1.10
+        """
+        return max(heat_fraction / (heat_fraction + exp(shape1 - (shape2 * heat_fraction))), 0)
 
-    return d_LAI_max * sqrt(crop_type.gamma_reg)
+    @staticmethod
+    def _determine_max_leaf_area_change(leaf_area_fraction: float, previous_leaf_area_fraction: float,
+                                        max_leaf_area_index: float, previous_leaf_area_index: float) -> float:
+        """
+        calculates the maximum leaf area added during the day
+
+        replaces method calc_max_leaf_area_change
+
+        Args:
+            leaf_area_fraction: optimal leaf area fraction for the day
+            previous_leaf_area_fraction: previous day's optimal leaf area fraction
+            max_leaf_area_index: the maximum leaf area index achievable by the plant
+            previous_leaf_area_index: the previous day's leaf area index
+
+        Returns:
+            the maximum leaf area added during the day
+
+        Details: because actual leaf area index (LAI) is corrected for growth constraints, the previous
+        day's optimal leaf area fraction may not be the same as the previous day's LAI divided by the
+        max LAI.
+
+        SWAT Reference: 5:2.1.16
+        """
+        return (leaf_area_fraction - previous_leaf_area_fraction) * max_leaf_area_index * \
+            (1 - exp(5 * (previous_leaf_area_index - max_leaf_area_index)))
+
+    @staticmethod
+    def _determine_senescent_leaf_area_index(heat_fraction: float, senescent_heat_fraction: float,
+                                             optimal_leaf_area_fraction: float) -> float:
+        """calculates a plant's leaf area index during senescence
+
+        replaces method calc_senescent_leaf_area_index
+
+        Args:
+            heat_fraction: the current fraction of potential heat units
+            senescent_heat_fraction: the fraction of potential heat units at which senescence begins
+            optimal_leaf_area_fraction: the optimal leaf area fraction for the plant
+
+        Returns: the plant's leaf area index
+
+        SWAT Reference: 5:2.1.19
+        """
+        if senescent_heat_fraction >= 1:
+            raise ValueError("Senescent heat fraction must be less than 1")
+        else:
+            prop = (1 - heat_fraction) / (1 - senescent_heat_fraction)
+
+        return max(prop * optimal_leaf_area_fraction, 0)
+
+    @staticmethod
+    def _calc_shape_log(heat_fraction: float, leaf_area_fraction: float) -> float:
+        """calculates the log term of LAI shape parameter function
+
+        Args:
+            heat_fraction: fraction of heat units accumulated; must be greater than zero
+            leaf_area_fraction: fraction of max leaf area; must be greater than zero, less than one, and not
+                equal to heat_fraction
+
+        Details: used by determine_lai_shapes, where errors are handled
+        """
+        return log((heat_fraction / leaf_area_fraction) - heat_fraction)
