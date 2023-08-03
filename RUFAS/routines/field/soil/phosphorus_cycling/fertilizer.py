@@ -1,9 +1,9 @@
 from typing import Optional, Dict
 from math import log, exp
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
-    LITERS_TO_CUBIC_MILLIMETERS, KILOGRAMS_TO_MILLIGRAMS
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, LITERS_TO_CUBIC_MILLIMETERS, \
+    KILOGRAMS_TO_MILLIGRAMS
 
 """
 This module incorporates equations from the SurPhos model to simulate the leaching of Phosphorus from fertilizer applied

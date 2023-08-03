@@ -1,6 +1,6 @@
 from math import exp, log
 from typing import Optional
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module is based on the 'Runoff Volume: SCS Curve Number Procedure' (2:1.1) section of the SWAT model documentation

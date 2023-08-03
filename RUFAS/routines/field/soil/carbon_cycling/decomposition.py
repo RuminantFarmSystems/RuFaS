@@ -1,6 +1,6 @@
 import math
 from typing import Optional
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # TODO: the equations for this model, referenced in the soil psuedocode, are derived from the excel file

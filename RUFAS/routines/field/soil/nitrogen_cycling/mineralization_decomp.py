@@ -1,7 +1,7 @@
 from typing import Optional
 from math import exp, inf
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class MineralizationDecomposition:

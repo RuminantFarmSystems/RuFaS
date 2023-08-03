@@ -1,7 +1,7 @@
 from typing import Optional
 from math import exp, log
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module is based on the "Soil Temperature" section of SWAT (1:1.3.3)

@@ -1,7 +1,7 @@
 from typing import Optional
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.crop_and_soil_constants import FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
 
 """
 This module handles the mineralization operations for the active and stable organic nitrogen pools, based on SWAT

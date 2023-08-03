@@ -1,8 +1,8 @@
 from typing import Optional
 from math import exp
 
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module is based on the section 'Percolation' (2:3.2) in SWAT

@@ -1,12 +1,12 @@
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.decomposition import Decomposition
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
-from SC_redesign.Crop_and_Soil.soil.carbon_cycling.residue_partition import ResiduePartition
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS
+from RUFAS.routines.field.soil.carbon_cycling.decomposition import Decomposition
+from RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
+from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS
 
 
 from typing import Optional
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_CUBIC_METERS
 
 """

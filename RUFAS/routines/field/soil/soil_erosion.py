@@ -1,8 +1,8 @@
 from typing import Optional
 from math import exp, log, atan, sin
 
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module follows MUSLE (Modified Universal Soil Loss Equation) in section 4:1.1 of SWAT.

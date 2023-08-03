@@ -1,6 +1,6 @@
 from enum import Enum
 import dataclasses
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module serves as a way to easily create and modify SoilData objects based on a set of given configurations. It is

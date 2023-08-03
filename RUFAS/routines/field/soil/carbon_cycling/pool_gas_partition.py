@@ -1,5 +1,5 @@
 from typing import Optional
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module contains all necessary methods for updating all kinds of carbon in the field, based on the

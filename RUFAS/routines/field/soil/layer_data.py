@@ -2,7 +2,7 @@ from dataclasses import dataclass, field, InitVar
 from typing import Optional
 from math import log, exp
 
-from SC_redesign.Crop_and_Soil.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
+from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS, HECTARES_TO_SQUARE_MILLIMETERS, \
     CUBIC_MILLIMETERS_TO_CUBIC_METERS, KILOGRAMS_TO_MILLIGRAMS, MILLIGRAMS_TO_KILOGRAMS, \
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
 

@@ -2,7 +2,7 @@ from dataclasses import dataclass, InitVar
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.layer_data import LayerData
 
 """
 This is a data class that stores and tracks all Soil attributes that are given in input files as well as ones that are

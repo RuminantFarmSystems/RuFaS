@@ -1,7 +1,7 @@
 from typing import Optional
 from math import exp
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module handles the denitrification of nitrogen in the nitrates pool, based on SWAT section 3:1.4.

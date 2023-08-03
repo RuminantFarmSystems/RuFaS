@@ -1,6 +1,6 @@
 from math import exp
 from typing import Optional
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 """
 This module is based off of the 'Soil Water Evaporation' (2:2.3.3.2) section of the SWAT Theoretical documentation.
