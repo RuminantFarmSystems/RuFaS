@@ -2,10 +2,10 @@ import pytest
 from typing import List
 from unittest.mock import MagicMock, patch
 
-from SC_redesign.Crop_and_Soil.field.fertilizer_application import FertilizerApplication
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
+from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("depth,bottom_depths,expected", [
@@ -43,7 +43,7 @@ def test_apply_subsurface_fertilizer(nutrient_amounts: float, depth: float, subs
     soil = Soil(soil_data=SoilData(soil_layers=soil_layers, field_size=field_size))
     fert_app = FertilizerApplication(soil=soil)
 
-    with patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
+    with patch("RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
                new_callable=MagicMock, return_value=[0.1, 0.4, 0.5]) as patched_depth_factor_generator:
         fert_app._apply_subsurface_fertilizer(nutrient_amounts, nutrient_amounts, nutrient_amounts, nutrient_amounts,
                                               depth, subsurface_frac)
@@ -76,9 +76,9 @@ def test_apply_fertilizer(phosphorus: float, fertilizer: float, inorganic_nitrog
     fert_app.soil.data.soil_layers[0].active_organic_nitrogen_content = 0
 
     with patch(
-            "SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication._apply_subsurface_fertilizer",
+            "RUFAS.routines.field.field.fertilizer_application.FertilizerApplication._apply_subsurface_fertilizer",
             new_callable=MagicMock) as patched_subsurface_applicator, \
-        patch("SC_redesign.Crop_and_Soil.soil.phosphorus_cycling.fertilizer.Fertilizer.add_fertilizer_phosphorus",
+        patch("RUFAS.routines.field.soil.phosphorus_cycling.fertilizer.Fertilizer.add_fertilizer_phosphorus",
               new_callable=MagicMock) as patched_phosphorus_applicator:
         fert_app.apply_fertilizer(phosphorus, fertilizer, inorganic_nitrogen_frac, ammonium_frac, organic_nitrogen_frac,
                                   depth, remainder, field_size)

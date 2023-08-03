@@ -12,7 +12,7 @@ Author(s): Kass Chupongstimun, kass_c@hotmail.com
 
 import csv
 
-from SC_redesign.Crop_and_Soil.manager.field_manager import FieldManager
+from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS import errors
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed

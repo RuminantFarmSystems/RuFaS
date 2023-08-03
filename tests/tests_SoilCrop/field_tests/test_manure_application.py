@@ -3,8 +3,8 @@ from pytest import approx
 from unittest.mock import MagicMock, patch, call
 from typing import List
 
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.field.manure_application import ManureApplication
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.field.manure_application import ManureApplication
 
 
 # ---- Static method tests
@@ -58,7 +58,7 @@ def test_determine_weighted_manure_attributes(old_mass: float, old_moisture: flo
                                               app_mass: float, app_dry_fraction: float, app_coverage: float) -> None:
     """Tests that the new, weighted values for the manure phosphorus pools are calculated correctly."""
     with patch(
-            "SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication._determine_moisture_factor",
+            "RUFAS.routines.field.field.manure_application.ManureApplication._determine_moisture_factor",
             new=MagicMock(return_value=0.65)) as patched_moisture_factor:
         observe = ManureApplication._determine_weighted_manure_attributes(old_mass, old_moisture, old_coverage,
                                                                           app_mass, app_dry_fraction, app_coverage)
@@ -273,15 +273,15 @@ def test_apply_subsurface_manure(total_phosphorus: float, wip_frac: float, wop_f
                                  expected_nitrogen_calls: list) -> None:
     """Tests that nutrients from injection manure applications are correctly distributed between soil layers."""
     manure_app = ManureApplication(field_size=area)
-    with patch("SC_redesign.Crop_and_Soil.soil.soil_data.SoilData.get_vectorized_layer_attribute",
+    with patch("RUFAS.routines.field.soil.soil_data.SoilData.get_vectorized_layer_attribute",
                new_callable=MagicMock, return_value=[20.0, 50.0, 200.0, 400.0]) as layer, \
-            patch("SC_redesign.Crop_and_Soil.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
+            patch("RUFAS.routines.field.field.fertilizer_application.FertilizerApplication.generate_depth_factors",
                   new_callable=MagicMock, return_value=[0.05, 0.35, 0.6]) as depth_factors, \
-            patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_labile_phosphorus",
+            patch("RUFAS.routines.field.soil.layer_data.LayerData.add_to_labile_phosphorus",
                   new_callable=MagicMock) as labile, \
-            patch("SC_redesign.Crop_and_Soil.soil.layer_data.LayerData.add_to_active_phosphorus",
+            patch("RUFAS.routines.field.soil.layer_data.LayerData.add_to_active_phosphorus",
                   new_callable=MagicMock) as active, \
-            patch("SC_redesign.Crop_and_Soil.field.manure_application.ManureApplication._add_nitrogen_to_soil_layer",
+            patch("RUFAS.routines.field.field.manure_application.ManureApplication._add_nitrogen_to_soil_layer",
                   new_callable=MagicMock) as nitrogen:
         manure_app._apply_subsurface_manure(total_phosphorus, wip_frac, wop_frap, sip_frac, sop_frac, dry_matter,
                                             inorganic_frac, ammonium_frac, organic_frac, depth, subsurface_frac, area)
