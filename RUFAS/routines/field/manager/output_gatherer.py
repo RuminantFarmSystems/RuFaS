@@ -14,7 +14,7 @@ class OutputGatherer:
         """sends daily variables to the output manager"""
         info_map = {"class": self.__class__.__name__, "function": self.send_daily_variables.__name__}
         for field in self.fields:
-            info_map["prefix"] = "field:'" + field.field_data.name + "'"
+            info_map["prefix"] = "field='" + field.field_data.name + "'"
             # --------------------------adding field data
             om.add_variable("current_residue", field.field_data.current_residue, info_map)
             om.add_variable("evaporation", field.field_data.evaporation, info_map)
@@ -98,7 +98,7 @@ class OutputGatherer:
                             field.soil.data.grazing_stable_organic_phosphorus,
                             info_map)
             # Adding vadose zone layer data
-            info_map["prefix"] = "field:'" + field.field_data.name + "',vadose_zone_layer"
+            info_map["prefix"] = "field='" + field.field_data.name + "',vadose_zone_layer"
             om.add_variable("active_organic_nitrogen_content",
                             field.soil.data.vadose_zone_layer.active_organic_nitrogen_content, info_map)
             om.add_variable("stable_organic_nitrogen_content",
@@ -120,7 +120,7 @@ class OutputGatherer:
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["prefix"] = "field:'" + field.field_data.name + "',layer_index:'" + str(index) + "'"
+                info_map["prefix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
 
                 om.add_variable("temperature", layer.temperature, info_map)
                 om.add_variable("percolated_water", layer.percolated_water, info_map)
@@ -196,8 +196,8 @@ class OutputGatherer:
                 om.add_variable("fresh_organic_nitrogen_content", layer.fresh_organic_nitrogen_content, info_map)
 
             for crop in field.crops:
-                info_map["prefix"] = f"field:'{field.field_data.name}',crop:'{crop.data.name}'," \
-                                     f"planted:{crop.data.planting_day},{crop.data.planting_year}"
+                info_map["prefix"] = f"field='{field.field_data.name}',crop='{crop.data.name}'," \
+                                     f"planted={crop.data.planting_day},{crop.data.planting_year}"
                 om.add_variable("root_depth", crop.data.root_depth, info_map)
                 om.add_variable("biomass", crop.data.biomass, info_map)
                 om.add_variable("usable_light", crop.data.usable_light, info_map)
@@ -243,7 +243,7 @@ class OutputGatherer:
         # adding field variable
         for field in self.fields:
             # Adding field data
-            info_map["prefix"] = "field:'" + field.field_data.name + "'"
+            info_map["prefix"] = "field='" + field.field_data.name + "'"
             om.add_variable("annual_irrigation_water_use_total",
                             field.field_data.annual_irrigation_water_use_total, info_map)
 
@@ -295,7 +295,7 @@ class OutputGatherer:
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["prefix"] = "field:'" + field.field_data.name + "',layer_index:'" + str(index) + "'"
+                info_map["prefix"] = "field='" + field.field_data.name + "',layer_index='" + str(index) + "'"
 
                 om.add_variable("annual_denitrified_nitrogen_total", layer.annual_denitrified_nitrogen_total,
                                 info_map)
