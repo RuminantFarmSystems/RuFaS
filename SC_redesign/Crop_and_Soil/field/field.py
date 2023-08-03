@@ -1153,18 +1153,20 @@ class Field:
         Notes
         -----
         This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
-        method.
-
+        method.This method will also cap the minimum to zero if negative average values were inputted, which causes
+        nonsense negative evapotranspirative demand.
         """
+        if max_air_temp - min_air_temp < 0:
+            raise Exception
         if avg_air_temp is None:
             calculated_avg_air_temp = (max_air_temp + min_air_temp) / 2
             latent_heat_vaporization = Field._determine_latent_heat_vaporization(calculated_avg_air_temp)
-            return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
-                    * (calculated_avg_air_temp + 17.8)) / latent_heat_vaporization
+            return max(0, (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
+                           * (calculated_avg_air_temp + 17.8)) / latent_heat_vaporization)
         else:
             latent_heat_vaporization = Field._determine_latent_heat_vaporization(avg_air_temp)
-            return (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
-                    * (avg_air_temp + 17.8)) / latent_heat_vaporization
+            return max(0, (0.0023 * extra_terrestrial_radiation * ((max_air_temp - min_air_temp) ** (-0.5))
+                           * (avg_air_temp + 17.8)) / latent_heat_vaporization)
 
     @staticmethod
     def _determine_latent_heat_vaporization(avg_air_temp: float) -> float:
