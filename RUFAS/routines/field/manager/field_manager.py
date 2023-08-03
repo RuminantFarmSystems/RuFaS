@@ -1,17 +1,17 @@
-from SC_redesign.Crop_and_Soil.field.field import Field
-from SC_redesign.Crop_and_Soil.field.field_data import FieldData
+from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.util import Utility
-from SC_redesign.Crop_and_Soil.soil.soil import Soil
-from SC_redesign.Crop_and_Soil.soil.soil_data import SoilData
-from SC_redesign.Crop_and_Soil.soil.layer_data import LayerData
-from SC_redesign.Crop_and_Soil.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.manager.crop_schedule import CropSchedule
 from RUFAS.routines.manure.manure_manager import ManureManager
-from SC_redesign.Crop_and_Soil.manager.current_weather import CurrentWeather
-from SC_redesign.Crop_and_Soil.manager.output_gatherer import OutputGatherer
-from SC_redesign.Crop_and_Soil.manager.fertilizer_schedule import FertilizerSchedule
-from SC_redesign.Crop_and_Soil.manager.manure_schedule import ManureSchedule
-from SC_redesign.Crop_and_Soil.manager.tillage_schedule import TillageSchedule
-from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
+from RUFAS.routines.field.manager.current_weather import CurrentWeather
+from RUFAS.routines.field.manager.output_gatherer import OutputGatherer
+from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
+from RUFAS.routines.field.manager.schedule import Schedule
 from typing import Dict, List, Tuple, Any
 
 """

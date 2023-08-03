@@ -1,7 +1,7 @@
 from typing import List, Any
 
-from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
-from SC_redesign.Crop_and_Soil.manager.events import FertilizerEvent
+from RUFAS.routines.field.manager.schedule import Schedule
+from RUFAS.routines.field.manager.events import FertilizerEvent
 from RUFAS.output_manager import OutputManager
 
 """

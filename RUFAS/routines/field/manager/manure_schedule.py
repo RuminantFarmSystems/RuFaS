@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 
-from SC_redesign.Crop_and_Soil.manager.schedule import Schedule
-from SC_redesign.Crop_and_Soil.manager.events import ManureEvent
+from RUFAS.routines.field.manager.schedule import Schedule
+from RUFAS.routines.field.manager.events import ManureEvent
 
 """
 This module contains `ManureSchedule`, a `Schedule` child class that defines when and how much manure will be applied to
