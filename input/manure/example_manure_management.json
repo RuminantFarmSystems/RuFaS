@@ -1,0 +1,17 @@
+{
+    "manure_management_scenario": [
+        {
+            "manure_pen_id": 0,
+            "manure_handling": {
+                "manure_handling_method": "Manual Scraping",
+                "water_type": "Fresh",
+                "flushing_water_use_rate": 150,
+                "auto_scraping_water_use_rate": 1,
+                "manual_scraping_water_use_rate": 1,
+                "flushing_cleaning_frequency": 3,
+                "auto_scraping_cleaning_frequency": 5,
+                "manual_scraping_cleaning_frequency": 6
+            }
+        }
+    ]
+}
