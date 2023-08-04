@@ -536,6 +536,134 @@
               "default": 0.017,
               "minimum": 0,
               "maximum": 0.1
+            },
+            "avg_estrus_cycle_return": {
+              "type": "number",
+              "description": ""
+            },
+            "std_estrus_cycle_return": {
+              "type": "number",
+              "description": ""
+            },
+            "avg_estrus_cycle_cow": {
+              "type": "number",
+              "description": ""
+            },
+            "std_estrus_cycle_cow": {
+              "type": "number",
+              "description": ""
+            },
+            "avg_estrus_cycle_after_pgf": {
+              "type": "number",
+              "description": ""
+            },
+            "std_estrus_cycle_after_pgf": {
+              "type": "number",
+              "description": ""
+            }
+          },
+          "milking": {
+            "type": "object",
+            "description": "",
+            "wood_l": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "array",
+                "description": "",
+                "properties": {
+                  "type": "number",
+                  "description": ""
+                }
+              }
+            },
+            "wood_m": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "array",
+                "description": "",
+                "properties": {
+                  "type": "number",
+                  "description": ""
+                }
+              }
+            },
+            "wood_n": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "array",
+                "description": "",
+                "properties": {
+                  "type": "number",
+                  "description": ""
+                }
+              }
+            },
+            "wood_l_std": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "array",
+                "description": "",
+                "properties": {
+                  "type": "number",
+                  "description": ""
+                }
+              }
+            },
+            "wood_m_std": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "array",
+                "description": "",
+                "properties": {
+                  "type": "number",
+                  "description": ""
+                }
+              }
+            },
+            "wood_n_std": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "array",
+                "description": "",
+                "properties": {
+                  "type": "number",
+                  "description": ""
+                }
+              }
+            }
+          },
+          "culling": {
+            "type": "object",
+            "description": "",
+            "parity_death_prob": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "number",
+                "description": ""
+              }
+            },
+            "parity_cull_prob": {
+              "type": "array",
+              "description": "",
+              "properties": {
+                "type": "number",
+                "description": ""
+              }
+            },
+            "life_cycle": {
+              "type": "object",
+              "description": "",
+              "still_birth_rate": {
+                "type": "number",
+                "description": ""
+              }
             }
           }
         }
@@ -685,13 +813,12 @@
       "user_feeds_table": {
         "type": "object",
         "description": "Feeds Table",
-
         "entry": {
           "type": "number",
           "description": "",
           "minimum": 1
         },
-        "feed_name":  {
+        "feed_name": {
           "type": "string",
           "description": ""
         },
@@ -699,7 +826,7 @@
           "type": "string",
           "description": ""
         },
-        "feed_type":  {
+        "feed_type": {
           "type": "string",
           "description": "",
           "pattern": "{Forage|Conc|Mineral}"
