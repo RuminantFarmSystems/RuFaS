@@ -216,6 +216,8 @@ def test_reset_manure(pen: Pen) -> None:
         non_degradable_volatile_solids=0.0,
         inorganic_phosphorus_fraction=0.0,
         organic_phosphorus_fraction=0.0,
+        non_water_inorganic_phosphorus_fraction=0.0,
+        non_water_organic_phosphorus_fraction=0.0,
         phosphorus=0.0,
         phosphorus_fraction=0.0,
         potassium=0.0,
