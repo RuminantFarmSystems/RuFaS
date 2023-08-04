@@ -1193,17 +1193,18 @@ def test_determine_total_above_ground_biomass(biomasses: List[float], expected: 
     (568, 20, 14, None),
     (80, 14, 0, 8),
     (678.0098, 26.8896, 10.3339, 18.3345),
+    (678.0098, 26.8896, 10.3339, -100000)
 ])
 def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp):
     with patch("SC_redesign.Crop_and_Soil.field.field.Field._determine_latent_heat_vaporization",
                new_callable=MagicMock, return_value=1.3) as mocked_latent_heat:
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
         if avg_temp is not None:
-            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                      (avg_temp + 17.8)) / 1.3
+            expect = max(0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                             (avg_temp + 17.8)) / 1.3)
         else:
-            expect = (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                      (((max_temp + min_temp) / 2) + 17.8)) / 1.3
+            expect = max(0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
+                             (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
 
         if avg_temp is not None:
             mocked_latent_heat.assert_called_once_with(avg_temp)
