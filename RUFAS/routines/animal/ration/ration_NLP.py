@@ -468,14 +468,14 @@ def phosphorus_constraint(x):
     # ----------------------
     # [A.Cow.C.6]-[A.Heifer.C.5]
     # Phosphorus maintenance requirement (g)
-    if cow_type:
-        #lactating cows
-        P_maint = 1 * DMI + 0.002 * BW
-    else:
-        #all other animals
-        P_maint = 0.8 * DMI + 0.002 * BW
+    # if cow_type:
+    #     #lactating cows
+    #     P_maint = 1 * DMI + 0.002 * BW
+    # else:
+    #     #all other animals
+    #     P_maint = 0.8 * DMI + 0.002 * BW
     # [A.Cow.E.16]-[A.Heifer.16]
-    return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - ((P_req + P_maint) / 1000)
+    return sum(np.multiply(x, np.multiply(np.multiply(phosphorus, 0.01), dP))) - (P_req / 1000)
 
 
 def protein_constraint(x):
@@ -682,16 +682,16 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     tribounds = []
     # udr = user defined ration
     udr_tolerance = udrv.tolerance
-    DMIest_lower = DMIest*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
-    DMIest_upper = DMIest*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
+    # DMIest_lower = DMIest*(1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
+    # DMIest_upper = DMIest*(1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT)
     ration_key_list = sorted([int(key) for key in ration_percents.keys()])
     for key in ration_key_list:
         # target = ration_percents[str(key)]/100*(DMIest_upper+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
         # target = ration_percents[key]
-        targetlower = ration_percents[str(key)]/100*(DMIest_lower+0.0001)
-        targetupper = ration_percents[str(key)]/100*(DMIest_upper+0.0001)
-        targetbounds = ((targetlower-targetlower*udr_tolerance)/3,
-                        (targetupper+targetupper*udr_tolerance)/3)
+        targetlower = ration_percents[str(key)]/100*(DMIest+0.0001)
+        targetupper = ration_percents[str(key)]/100*(DMIest+0.0001)
+        targetbounds = ((targetlower*(1-udr_tolerance))/3,
+                        (targetupper*(1+udr_tolerance))/3)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
         tribounds.append(targetbounds)
@@ -766,8 +766,8 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         else:
             usermod = minimize(objective, x0, method='SLSQP', bounds=bnds, constraints=heifer_cons)
         # Uncomment to use
+        print(str(animal_combination))
         if usermod.success:
-            print(str(animal_combination))
             print('No constraints violated')
         return usermod
     # TODO: Put AnimalCombination enum in a separate file and import it here to avoid circular import

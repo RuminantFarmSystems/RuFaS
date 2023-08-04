@@ -599,7 +599,6 @@ class Requirements:
         milk = [0]
         milk_production_reduction = [0]
         CP_milk = [0]
-        milk_production_reduction = [0]
         if recalc:
             # iterating through each animal in the pen and calculating requirements
             # temp parameter for heifer is hardcoded because heifer req should

@@ -106,7 +106,7 @@
           "139": 3.5,
           "158": 18.5
          },
-  "tolerance": 0.1,
+  "tolerance": 0.2,
   "milk_reduction_maximum": 21.0
   }
 }

@@ -294,23 +294,23 @@ def test_calculate_NRC_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_a:
     """Unit test for function calculate_NRC_phosophorus_requirements in file routines/animal/ration/animal_requirements.py"""
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_a['body_weight'], cow_a['mature_body_weight'], cow_a['day_of_pregnancy'], cow_a['Milk'],
-        cow_a['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((33), rel=1e-1)
+        cow_a['animal_type'], 1, 25)
+    assert (result_P_req) == pytest.approx((59), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         cow_b['body_weight'], cow_b['mature_body_weight'], cow_b['day_of_pregnancy'], cow_b['Milk'],
-        cow_b['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((29), rel=1e-1)
+        cow_b['animal_type'], 1, 15)
+    assert (result_P_req) == pytest.approx((45), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_a['body_weight'], heifer_a['mature_body_weight'], heifer_a['day_of_pregnancy'], heifer_a['Milk'],
-        heifer_a['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((7.5), rel=1e-1)
+        heifer_a['animal_type'], 1, 5.0)
+    assert (result_P_req) == pytest.approx((12.5), rel=1e-1)
 
     result_P_req = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_phosphorus_requirements(
         heifer_b['body_weight'], heifer_b['mature_body_weight'], heifer_b['day_of_pregnancy'], heifer_b['Milk'],
-        heifer_b['animal_type'], 1)
-    assert (result_P_req) == pytest.approx((6.9), rel=1e-1)
+        heifer_b['animal_type'], 1, 7.0)
+    assert (result_P_req) == pytest.approx((13), rel=1e-1)
 
 
 def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
@@ -1839,8 +1839,8 @@ def test_make_user_bounds(mock_user_defined_ration_manager: UserDefinedRationMan
     """Unit test for function make_user_bounds in file routines/animal/ration/ration_NLP.py"""
     mock_user_defined_ration_manager.tolerance = 0.1
     ration_percents = {'1': 10, '2': 20}
-    low_offset = 1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
-    high_offset = 1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    low_offset = 1 #1-AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
+    high_offset = 1 #1+AnimalModuleConstants.DMI_CONSTRAINT_PERCENT
     predicted = [[9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], [9/3*low_offset,11/3*high_offset], \
                  [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset], [18/3*low_offset,22/3*high_offset]]
     result = RUFAS.routines.animal.ration.ration_NLP.make_user_bounds(ration_percents, 100)
