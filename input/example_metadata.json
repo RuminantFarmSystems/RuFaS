@@ -194,6 +194,7 @@
       "crop_species": {
         "type": "string",
         "description": "Name of the crop being grown.",
+
         "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley|fall_oats|tall_fescue|alfalfa|soybean|sugar_beet|potato}$"
       },
       "harvest_days": {
@@ -454,6 +455,7 @@
       "years": {
         "type": "array",
         "description": "List of years in which manure will be applied.",
+
         "default": [],
         "properties": {
           "type": "number",
@@ -463,6 +465,7 @@
       "days": {
         "type": "array",
         "description": "List of days on which manure will be applied.",
+
         "default": [],
         "properties": {
           "type": "number",
