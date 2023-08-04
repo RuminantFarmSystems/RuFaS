@@ -104,7 +104,7 @@ def test_manure_treatment_daily_output_add() -> None:
 
     # Act and Assert
     with pytest.raises(TypeError) as e:
-        sum_object = manure_treatment_daily_output + 1
+        manure_treatment_daily_output + 1
         # Check error message
         assert "Other must be of type ManureTreatmentDailyOutput" in str(e.value)
 
@@ -743,7 +743,7 @@ def test_daily_update(manure_treatment_type_name: str,
     )
 
     # Act
-    actual_manure_treatment_daily_output = manure_treatment.daily_update(
+    manure_treatment.daily_update(
             manure_handler_daily_output=mock_manure_handler_daily_output,
             manure_treatment_daily_input=mock_manure_treatment_daily_input,
             pen=mock_pen,
@@ -2521,6 +2521,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
 # Test CompostBeddedPackBarn specific methods
 # ==========================================
 
+
 def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
     """Unit test for __init__() in CompostBeddedPackBarn in manure_treatment_cbpb.py"""
     # Arrange
@@ -2549,6 +2550,7 @@ def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
     assert cbpb.weather == mock_weather
     assert cbpb.time == mock_time
 
+
 def test_compost_bedded_pack_barn_calc_bedding_potassium_content(mocker: MockFixture) -> None:
     """Unit test for calc_bedding_potassium_content() in CompostBeddedPackBarn in manure_treatment_cbpb.py"""
     # Arrange
@@ -2574,3 +2576,52 @@ def test_compost_bedded_pack_barn_calc_bedding_potassium_content(mocker: MockFix
     )
 
     assert cbpb._calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(6.0)
+
+
+def test_compost_bedded_pack_barn_(mocker: MockFixture) -> None:
+    """Unit test for """
+    mock_weather = mocker.MagicMock()
+    mock_time = mocker.MagicMock()
+    mock_manure_treatment_config = mocker.MagicMock()
+
+    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        self.weather = weather
+        self.time = time
+        self.config = manure_treatment_config
+
+    mocker.patch(
+        'RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__',
+        new=mock_base_manure_treatment
+    )
+    cbpb = CompostBeddedPackBarn(
+        weather=mock_weather,
+        time=mock_time,
+        manure_treatment_config=mock_manure_treatment_config
+    )
+
+    expected_methane_emission = 0.1
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.'
+            'GasEmissions.calc_ifsm_methane_emission',
+            return_value=expected_methane_emission
+    )
+    expected_carbon_decomposition = 0.2
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb.'
+            'GasEmissions.calc_total_carbon_decomposition',
+            return_value=expected_carbon_decomposition
+    )
+
+    temperature_celsius = 20.0
+    mocker.patch.object(
+            cbpb, '_get_current_day_average_temperature_celsius',
+            return_value=temperature_celsius
+    )
+
+    # Act
+    (actual_vs, actual_ts, actual_dm_loss) = \
+        cbpb._calc_dry_matter_changes(6.0, 6.0, 10.2, 1, 1, 1.0, 1.0, 1.0)
+
+    assert actual_vs == 10.1
+    assert actual_ts == 11.5
+    assert actual_dm_loss == 0.5

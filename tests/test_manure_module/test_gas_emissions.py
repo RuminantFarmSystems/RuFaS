@@ -56,7 +56,7 @@ def test_calc_mcf() -> None:
 
 
 def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
-    """Tests _calc_ifsm_methane_emission() in gas_emissions.py."""
+    """Tests calc_ifsm_methane_emission() in gas_emissions.py."""
 
     # Arrange
     ambient_barn_temp = 1.0
@@ -69,7 +69,7 @@ def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
     # Actual
-    actual = GasEmissions._calc_ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
+    actual = GasEmissions.calc_ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
 
     # Assert
     patch_for_calc_ifsm_methane_emission.assert_called_once_with(mcf)
