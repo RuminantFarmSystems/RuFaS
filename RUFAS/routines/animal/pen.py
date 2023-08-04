@@ -339,7 +339,7 @@ class Pen:
         self.avg_nutrient_rqmts = {key: value for (
             key, value) in avg_nutrient_rqmts.items()}
 
-    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction:float) -> None:
+    def set_milk_avgs(self, avg_milk: float, avg_CP_milk: float, avg_milk_production_reduction: float) -> None:
         """
         Sets the pen's average milk and average CP milk
 
@@ -601,14 +601,14 @@ class Pen:
 
             else:  # feeds and price
                 animal.ration_formulation[key] = self.ration[key] / \
-                    num_animals_before_additions
+                                                 num_animals_before_additions
 
         # set animal's manure to be the average manure of all other
         # animals in pen
         for key in self.manure.keys():
             if len(self.animals_in_pen) > 0:
                 animal.manure_excretion[key] = self.manure[key] / \
-                    (len(self.animals_in_pen))
+                                               (len(self.animals_in_pen))
 
         # since the manure attribute is a total from all animals in the pen,
         # we need to add the current animal's values to the total values for
@@ -686,11 +686,8 @@ class Pen:
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
 
-    # Refactoring Zone
-    # =========================================================================
-    # Manure-related methods
-    # ----------------------
-    def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str, methane_mitigation_additive_amount: float) -> None:
+    def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str,
+                          methane_mitigation_additive_amount: float) -> None:
         """
         Calculate the total manure excreted by all animals in the pen.
 
@@ -704,32 +701,77 @@ class Pen:
         methane_mitigation_additive_amount: float 
             The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI). The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is between 16 and 36 mg/kg DMI. 
 
-
         Returns
         -------
         None
 
         """
-
-        self.manure = get_default_animal_manure_excretions()
-
         if not self.is_populated:
             return
 
+        lactating_cow_str = 'LactatingCow'
+        animal_class_to_output_data_dict = {
+            Calf: {
+                'prefix': 'daily_aggregate_calf',
+                'manure': None,
+            },
+            HeiferI: {
+                'prefix': 'daily_aggregate_heifer',
+                'manure': None,
+            },
+            HeiferII: {
+                'prefix': 'daily_aggregate_heifer',
+                'manure': None,
+            },
+            HeiferIII: {
+                'prefix': 'daily_aggregate_heifer',
+                'manure': None,
+            },
+            Cow: {
+                'prefix': 'daily_aggregate_dry_cow',
+                'manure': None,
+            },
+            lactating_cow_str: {
+                'prefix': 'daily_aggregate_lactating_cow',
+                'manure': None,
+            },
+            self: {
+                'prefix': f'pen_{self.id}_daily',
+                'manure': self.manure,
+            },
+        }
+        self.manure = get_default_animal_manure_excretions()
         for animal in self.animals_in_pen:
-            if type(animal) == Cow:
-                animal.calc_manure_excretion(
-                    feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, self.MEdiet)
+            animal_class = type(animal)
+            if animal_class == Cow:
+                animal.calc_manure_excretion(feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, self.MEdiet)
+                if animal.is_lactating:
+                    animal_class = lactating_cow_str
             else:
                 animal.calc_manure_excretion(feed, methane_model)
 
-        for animal in self.animals_in_pen:
-            self.manure = add_animal_manure_excretions(
-                self.manure, animal.manure_excretion)
+            if animal_class not in animal_class_to_output_data_dict:
+                raise ValueError(f'Unrecognized animal type: {animal_class}')
 
-    # Ration-related methods
-    # ----------------------
-    # TODO: Review
+            if animal_class_to_output_data_dict[animal_class]['manure'] is None:
+                animal_class_to_output_data_dict[animal_class]['manure'] = get_default_animal_manure_excretions()
+
+            animal_class_to_output_data_dict[animal_class]['manure'] = add_animal_manure_excretions(
+                animal_class_to_output_data_dict[animal_class]['manure'], animal.manure_excretion)
+
+            self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
+
+        for animal_class, output_data_dict in animal_class_to_output_data_dict.items():
+            if output_data_dict['manure'] is None:
+                continue
+            for manure_property, manure_value in output_data_dict['manure'].items():
+                om.add_variable(f'{output_data_dict["prefix"]}_{str(manure_property)}',
+                                manure_value,
+                                info_map={
+                                    'class': self.__class__.__name__,
+                                    'function': self.calc_total_manure.__name__,
+                                })
+
     def _set_animal_nutrient_values(self, animal, animal_grouping_scenario,
                                     feed, temp, phosphorus_concentration) -> None:
         """
