@@ -1201,10 +1201,10 @@ def test_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_
         actual = Field._determine_potential_evapotranspiration(extraterrestrial_radiation, max_temp, min_temp, avg_temp)
         if avg_temp is not None:
             expect = max(0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                      (avg_temp + 17.8)) / 1.3)
+                             (avg_temp + 17.8)) / 1.3)
         else:
             expect = max(0, (0.0023 * extraterrestrial_radiation * ((max_temp - min_temp) ** (-0.5)) *
-                      (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
+                             (((max_temp + min_temp) / 2) + 17.8)) / 1.3)
 
         if avg_temp is not None:
             mocked_latent_heat.assert_called_once_with(avg_temp)
