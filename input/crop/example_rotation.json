@@ -1,0 +1,11 @@
+{
+    "crop_species": "generic",
+    "harvest_days": [],
+    "harvest_years": [],
+    "harvest_operations": ["default"],
+    "harvest_type": ["scheduled"],
+    "planting_days": [],
+    "planting_years": [],
+    "pattern_repeat": 0,
+    "pattern_skip": 0
+}
