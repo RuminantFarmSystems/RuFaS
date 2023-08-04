@@ -1153,7 +1153,7 @@ class Field:
         Notes
         -----
         This method calculates the evapotranspirative demand for the entire field on any given day using the Hargreaves
-        method.This method lower-bounds the potential evapotranspiration at 0.0 mm.
+        method. This method lower-bounds the potential evapotranspiration at 0.0 mm.
         """
         if avg_air_temp is None:
             calculated_avg_air_temp = (max_air_temp + min_air_temp) / 2
