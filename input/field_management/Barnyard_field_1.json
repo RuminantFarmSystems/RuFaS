@@ -1,0 +1,14 @@
+{
+    "soil_specification": "example_soil.json",
+    "crop_specification": "example_rotation.json",
+    "fertilizer_management_specification": "example_fertilizer_schedule.json",
+    "manure_management_specification": "example_manure_schedule.json",
+    "tillage_management_specification": "example_tillage_schedule.json",
+    "field_size": 0.0,
+    "absolute_latitude": 43.5,
+    "longitude": -89.4,
+    "minimum_daylength": 9.0,
+    "seasonal_high_water_table": false,
+    "watering_amount_in_liters": 0.0,
+    "watering_interval": 0
+}
