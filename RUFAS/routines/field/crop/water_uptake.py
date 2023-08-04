@@ -196,7 +196,7 @@ class WaterUptake:
     @staticmethod
     def _adjust_water_uptakes(potential_uptakes: List[float], unmet_demands: List[float],
                               uptake_compensation: float) -> List[float]:
-        """adjusts the potential water uptakes from each layer based by drawing from deeper layeres when possible.
+        """Adjusts the potential water uptakes for each layer based on drawing from deeper layers when possible.
 
         References
         ----------
