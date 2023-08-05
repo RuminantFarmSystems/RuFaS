@@ -547,7 +547,6 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     return tribounds
 
 
-
 # establishing the constraints of the NLP
 constraint_functions = [
     NEmact_constraint,

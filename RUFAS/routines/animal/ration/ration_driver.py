@@ -598,7 +598,7 @@ class Requirements:
         milk = [0]
         milk_production_reduction = [0]
         CP_milk = [0]
-        milk_production_reduction = [0]
+
         if recalc:
             # iterating through each animal in the pen and calculating requirements
             # temp parameter for heifer is hardcoded because heifer req should
@@ -681,7 +681,6 @@ class Requirements:
                     milk.append(animal.estimated_daily_milk_produced)
                     milk_production_reduction.append(animal.milk_production_reduction)
                     CP_milk.append(animal.CP_milk)
-                    milk_production_reduction.append(animal.milk_production_reduction)
                 else:
                     NEa_val = 0
 
@@ -697,8 +696,7 @@ class Requirements:
                 BW.append(animal.body_weight)
                 # milk.append(milk)
                 # CP_milk.append(CP_milk)
-        # populating the class variables as an average across cows for each requirement
-
+        
         self.calc_pen_requirements(NEmaint, NEa, NEg, NEpreg, NEl, MP_req, Ca_req, P_req, DMIest, BW, milk, CP_milk,
                                milk_production_reduction)
         
