@@ -380,14 +380,16 @@ def ration_formulation(pen, available_feeds, animal_grouping_scenario):
             # These values for reduction are not from pseudocode, but the values below
             # are based on fastest case runtime testing
             # TODO: continue testing for more efficient reductions
-            NEl_con = NLP.NEl_constraint(solution.x)
-            if NEl_con < -0.5:
-                reduction = 3 * (-NEl_con)
-            else:
-                reduction = 1.5
-            for animal in pen.animals_in_pen:
-                animal.estimated_daily_milk_produced -= reduction
-                animal.milk_production_reduction -= reduction
+            # NEl_con = NLP.NEl_constraint(solution.x)
+            # if NEl_con < -0.5:
+            #     reduction = 3 * (-NEl_con)
+            # else:
+            #     reduction = 1.5
+            # for animal in pen.animals_in_pen:
+            #     animal.estimated_daily_milk_produced -= reduction
+            #     animal.milk_production_reduction -= reduction
+            reduction = 0.5
+            reduce_milk_production(pen, reduction)
             # recalculating requirements after reduction
             req.set_requirements(pen, animal_grouping_scenario, True)
             solution, ration_vals = optimization(req, available_feeds, pen.animal_combination)
