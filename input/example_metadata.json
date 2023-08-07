@@ -464,7 +464,7 @@
       },
       "days": {
         "type": "array",
-        "description": "List of days on which manure will be applied.",
+        "description": "List of days on which tilling will occur.",
 
         "default": [],
         "properties": {
