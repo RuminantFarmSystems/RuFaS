@@ -1263,16 +1263,22 @@ class GasEmissions:
         ----------
         manure_total_solids : float
             The total solids from the manure (in kg)
+
         bedding_total_mass : float
             The total mass of the bedding material (in kg)
+
         days_since_last_tillage : int
             The number of days since the last tillage event
+
         lag : int
             The lag time
+
         moisture_effect : float
             The effect of moisture on microbial decomposition
+
         carbon_available_in_manure : float
             the proportion of carbon available in manure (unitless)
+
         carbon_available_in_bedding : float
             the carbon available in the bedding (unitless)
 
@@ -1295,3 +1301,106 @@ class GasEmissions:
             * microbial_decomp_anaerobic_conditions_effect
         )
         return total_carbon_decomposition
+
+    @classmethod
+    def _calc_nitrogen_loss_from_ammonia_emissions(
+        cls,
+        daily_nitrogen_input: float,
+        is_bedding_tilled: bool,
+    ) -> float:
+        """Calculates the emissions of ammonia in kg.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The mass of nitrogen present in the manure excreted by animals (kg)
+        is_bedding_tilled : bool
+            Indicator for if the beddint is tilled for the current simulation day.
+
+        Returns
+        -------
+        float
+            The nitrogen lost to ammonia emissions (in kg).
+
+        """
+        till_indicator = int(is_bedding_tilled)
+        return (
+            (0.5 * daily_nitrogen_input * till_indicator)
+            + (0.25 * daily_nitrogen_input * (1 - till_indicator))
+        )
+
+    @classmethod
+    def _calc_nitrogen_loss_to_leaching(cls, daily_nitrogen_input: float) -> float:
+        """Calculates the mass of nitrogen that leaches out of the manure-bedding mixture in kg.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The mass of nitrogen present in the manure excreted by animals (kg)
+
+        Returns
+        -------
+        float
+            The amount of nitrogen that leaches out of the bedding mixture (kg).
+
+        """
+        return 0.035 * daily_nitrogen_input
+
+    @classmethod
+    def _calc_nitrogen_loss_from_nitrous_oxide_emissions(
+        cls,
+        daily_nitrogen_input: float,
+        is_bedding_tilled: bool,
+    ) -> float:
+        """Calculates the nitrogen loss from nitrous oxide emissions in kg.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The mass of nitrogen present in the manure excreted by animals (kg)
+        is_bedding_tilled : bool
+            Indicator for if the bedding is tilled for the current simulation day.
+
+        Returns
+        -------
+        float
+            The nitrogen lost to nitrous oxide emissions (kg).
+
+        """
+        till_indicator = int(is_bedding_tilled)
+        return (
+            0.07 * daily_nitrogen_input * till_indicator
+            + 0.01 * daily_nitrogen_input * (1 - till_indicator)
+        )
+
+    @classmethod
+    def calc_nitrogen_losses(
+        cls,
+        daily_nitrogen_input: float,
+        is_bedding_tilled: bool,
+    ) -> float:
+        """Calculates the nitrogen loss from the manure_bedding mixture in kg.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The mass of nitrogen present in the manure excreted by animals (kg)
+        is_bedding_tilled : bool
+            Indicator for if the bedding is tilled for the current simulation day.
+
+        Returns
+        -------
+        float
+            The nitrogen lost from the compost bedded pack barn (kg).
+
+        """
+        if daily_nitrogen_input < 0.0:
+            raise ValueError(f"{daily_nitrogen_input=}. Mass must must be positive.")
+
+        return (
+            GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(
+                daily_nitrogen_input, is_bedding_tilled)
+            + GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(
+                daily_nitrogen_input, is_bedding_tilled)
+            + GasEmissions._calc_nitrogen_loss_to_leaching(daily_nitrogen_input)
+        )
