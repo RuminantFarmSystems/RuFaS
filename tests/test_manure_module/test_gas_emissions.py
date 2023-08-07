@@ -76,6 +76,74 @@ def test_calc_ifsm_methane_emission(mocker: MockerFixture) -> None:
     assert actual == pytest.approx(expected)
 
 
+def test_calc_nitrogen_loss_from_ammonia_emissions() -> None:
+    """Tests _calc_nitrogen_loss_from_ammonia_emissions() in gas_emissions.py"""
+    additional_n = 1.5
+    assert GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(additional_n, False) \
+        == pytest.approx(0.375)
+    assert GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(additional_n, True) \
+        == pytest.approx(0.75)
+
+
+def test_calc_nitrogen_loss_to_leaching() -> None:
+    """Tests _calc_nitrogen_loss_to_leaching() in gas_emissions.py"""
+    additional_n = 1.5
+    assert GasEmissions._calc_nitrogen_loss_to_leaching(additional_n) \
+        == pytest.approx(0.0525)
+
+
+def test_calc_nitrogen_loss_from_nitrous_oxide_emissions() -> None:
+    """Tests _calc_nitrogen_loss_from_nitrous_oxide_emissions() in gas_emissions.py"""
+    additional_n = 1.5
+    assert GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(additional_n, False) \
+        == pytest.approx(0.015)
+    assert GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(additional_n, True) \
+        == pytest.approx(0.105)
+
+
+def test_calc_nitrogen_losses(mocker: MockerFixture) -> None:
+    """Tests calc_nitrogen_losses() in gas_emissions.py"""
+    ammonia_loss = 1.0
+    leaching_loss = 2.0
+    nitrous_oxide_loss = 3.0
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_from_ammonia_emissions',
+        return_value=ammonia_loss
+    )
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_to_leaching',
+        return_value=leaching_loss
+    )
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.'
+        'GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions',
+        return_value=nitrous_oxide_loss
+    )
+    expected = ammonia_loss + leaching_loss + nitrous_oxide_loss
+
+    assert GasEmissions.calc_nitrogen_losses(1.0, True) == pytest.approx(expected)
+
+
+def test_calc_nitrogen_losses_invalid_mass(mocker: MockerFixture) -> None:
+    """Tests calc_nitrogen_losses() in gas_emissions.py"""
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_from_ammonia_emissions',
+        return_value=0.0
+    )
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.GasEmissions._calc_nitrogen_loss_to_leaching',
+        return_value=0.0
+    )
+    mocker.patch(
+        'RUFAS.routines.manure.gas_emissions.gas_emissions.'
+        'GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions',
+        return_value=0.0
+    )
+    invalid_negative_mass = -1.0
+    with pytest.raises(ValueError):
+        GasEmissions.calc_nitrogen_losses(invalid_negative_mass, True)
+
+
 @pytest.mark.parametrize("temperature", [-10.0, 0.0, 10.0])
 def test_microbial_decomp_rate(temperature: float) -> None:
     """Tests _calc_microbial_decomp_rate() in gas_emissions.py."""

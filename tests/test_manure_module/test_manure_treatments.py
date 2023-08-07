@@ -21,6 +21,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import Man
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb import CompostBeddedPackBarn
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 
@@ -519,6 +520,7 @@ def test_manure_treatment_factory_get_instance(manure_treatment_type_name: str,
             'anaerobic lagoon',
             'anaerobic digestion and lagoon',
             'anaerobic digestion and lagoon with split',
+            'compost bedded pack barn',
         ])
 def test_initialize_private_attributes_during_update(manure_treatment_type_name: str,
                                                      mocker: MockFixture) -> None:
@@ -559,6 +561,7 @@ def test_initialize_private_attributes_during_update(manure_treatment_type_name:
             'slurry storage outdoor',
             'anaerobic digestion',
             'anaerobic lagoon',
+            'compost bedded pack barn',
         ])
 def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
                                                mocker: MockFixture) -> None:
@@ -634,6 +637,7 @@ def test_initialize_daily_output_during_update(manure_treatment_type_name: str,
             'anaerobic lagoon',
             'anaerobic digestion and lagoon',
             'anaerobic digestion and lagoon with split',
+            'compost bedded pack barn',
         ])
 def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: str,
                                                   mocker: MockFixture) -> None:
@@ -675,6 +679,7 @@ def test_get_current_day_temperature_and_rainfall(manure_treatment_type_name: st
             'anaerobic lagoon',
             'anaerobic digestion and lagoon',
             'anaerobic digestion and lagoon with split',
+            'compost bedded pack barn',
         ])
 def test_accumulate_daily_output(manure_treatment_type_name: str,
                                  mocker: MockFixture) -> None:
@@ -2512,3 +2517,60 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         )
 
     assert actual_anaerobic_lagoon_daily_output == mock_anaerobic_lagoon_daily_output
+
+# Test CompostBeddedPackBarn specific methods
+# ==========================================
+
+def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
+    """Unit test for __init__() in CompostBeddedPackBarn in manure_treatment_cbpb.py"""
+    # Arrange
+    mock_weather = mocker.MagicMock()
+    mock_time = mocker.MagicMock()
+    mock_manure_treatment_config = mocker.MagicMock()
+
+    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        self.weather = weather
+        self.time = time
+        self.config = manure_treatment_config
+
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__',
+            new=mock_base_manure_treatment
+    )
+
+    # Act
+    cbpb = CompostBeddedPackBarn(
+            weather=mock_weather,
+            time=mock_time,
+            manure_treatment_config=mock_manure_treatment_config
+    )
+
+    # Assert
+    assert cbpb.weather == mock_weather
+    assert cbpb.time == mock_time
+
+def test_compost_bedded_pack_barn_calc_bedding_potassium_content(mocker: MockFixture) -> None:
+    """Unit test for calc_bedding_potassium_content() in CompostBeddedPackBarn in manure_treatment_cbpb.py"""
+    # Arrange
+    mock_weather = mocker.MagicMock()
+    mock_time = mocker.MagicMock()
+    mock_manure_treatment_config = mocker.MagicMock()
+
+    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+        self.weather = weather
+        self.time = time
+        self.config = manure_treatment_config
+
+    mocker.patch(
+            'RUFAS.routines.manure.manure_treatments.base_manure_treatment.BaseManureTreatment.__init__',
+            new=mock_base_manure_treatment
+    )
+
+    # Act
+    cbpb = CompostBeddedPackBarn(
+            weather=mock_weather,
+            time=mock_time,
+            manure_treatment_config=mock_manure_treatment_config
+    )
+
+    assert cbpb._calc_bedding_potassium_content(1.0, 2.0, 4.0, 1.0) == pytest.approx(6.0)
