@@ -1150,7 +1150,7 @@
     "tillage_schedule_properties": {
       "years": {
         "type": "array",
-        "description": "List of years in which manure will be applied.",
+        "description": "List of years in which tillage will occur.",
         "default": [],
         "properties": {
           "type": "number",
