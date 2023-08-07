@@ -10,7 +10,6 @@ from SALib.analyze import sobol
 from SALib.sample import fast_sampler
 import numpy as np
 
-
 # load config json
 with open('model_evaluation/sensitivity_analysis/config_inputs/sensitivity_analysis.json', 'r') as f:
     config_json = json.load(f)
@@ -31,14 +30,7 @@ problem_a = problem_list[0]
 
 p = problem_a
 
-if analysis_type =="ff":
-    param_values = ff_s.sample(p) #fractional factorial
-elif analysis_type =="saltellisobol":
-    param_values = saltelli.sample(p, saltelli_num, skip_values=saltelli_skip) 
-elif analysis_type == 'FAST':
-    param_values = fast_sampler.sample(p, saltelli_num)
-
-len(param_values)
+param_values = np.array(config_json['param_values'])
 
 # WORKING ZONE
 # COLLECTING THE OUTPUTS TO USE INSTEAD OF CURR COL IN ANALYSIS LISTS
@@ -79,12 +71,65 @@ for output_variable_of_interest in config_json['output_variables_of_interest']:
                 # values_found = 
                 if type(values_found[0])==dict:
                     values_found_list = [field[value_name] for field in values_found]
-                    len(values_found_list)
+                    #len(values_found_list)
                     output_variable_list.append(np.mean(values_found_list[-int(len(values_found_list)/4):]))
                 elif type(values_found[0])==list:
                     pass
     collect_all_outputs[output_variable_of_interest] = output_variable_list
 
+
+
+collect_all_outputs2 = {}
+output_variable_list = []
+total_num_runs = len(param_values)
+for every_run in range(total_num_runs):
+    # if every_run > 50:
+    #     break
+    print(f'run={every_run}')
+    # get first file with the correct prefix
+    for f_name in os.listdir('output/sensitivity/'):
+        if f_name.startswith(str(every_run).zfill(5)) and f_name.endswith('.json'):
+            f_name_full = 'output\\sensitivity\\' + f_name
+            break
+    with open(f_name_full, 'r') as f:
+        output_json = json.load(f)
+        print(f_name_full)
+    for output_variable_of_interest in config_json['output_variables_of_interest']:
+        #output_variable_of_interest = output_variables_of_interest[2]
+        #output_variable_of_interest = "LifeCycleManager.daily_update.life_cycle_daily_herd_update.values: PGF_injection_num"
+        print(output_variable_of_interest)
+        # APPEND TO LIST IN DICT
+        # E.G. all_outputs['output_variable_of_interest'] = output_json[variableparsed]
+        # the = term has to use pase_output_location(output_json, variable_of_interest)
+        if ':' not in output_variable_of_interest:
+            analysis_time = len(output_json[output_variable_of_interest]['values'])/4
+            output_variable_mean = np.mean(output_json[output_variable_of_interest]['values'][-int(analysis_time):])
+            output_variable_list.append(output_variable_mean)
+        else:
+            string_split = output_variable_of_interest.split(':')
+            string_split_0 = string_split[0]
+            if string_split_0[-6:] == 'values':
+                key_name = string_split_0[:-7]
+                value_name = string_split[1][1:]
+                values_found = output_json[key_name]['values']
+                # values_found = 
+                if type(values_found[0])==dict:
+                    values_found_list = [field[value_name] for field in values_found]
+                    #len(values_found_list)
+                    output_variable_mean = np.mean(values_found_list[-int(len(values_found_list)/4):])
+                    output_variable_list.append(output_variable_mean)
+                elif type(values_found[0])==list:
+                    pass
+        if output_variable_of_interest not in collect_all_outputs2.keys():        
+            collect_all_outputs2[output_variable_of_interest] = [output_variable_mean]
+        else:
+            collect_all_outputs2[output_variable_of_interest].append(output_variable_mean)
+
+
+x = [value[3] for value in param_values.tolist()]
+y = collect_all_outputs2[list(collect_all_outputs2.keys())[3]] 
+ 
+ 
 import csv
 for idx, name in enumerate(output_variables_of_interest):
     print(idx)
