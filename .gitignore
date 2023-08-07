@@ -7,7 +7,8 @@
 !example_list_of_regex_patterns.txt
 !example_list_of_exclude_regex_patterns.txt
 !example_list_of_exclude_filter_patterns.txt
-!default_filter.txt
+!csv_default_filter.txt
+!json_default_filter.txt
 !requirements.txt
 *.doc
 *.docx

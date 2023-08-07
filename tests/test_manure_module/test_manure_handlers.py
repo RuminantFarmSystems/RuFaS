@@ -4,9 +4,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.classes import Time
 from RUFAS.classes import Weather
-from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import AlleyScraper, Tillage
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseManureHandler
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import DefaultManureHandlerConfigFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
@@ -15,9 +14,6 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureH
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerFactory
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerType
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
-from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
-from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
 # Test ManureHandlerDailyOutput
@@ -111,18 +107,21 @@ def test_manure_handler_config() -> None:
     cleaning_water_use_rate = 20.0
     minutes_per_cleaning = 10
     cleanings_per_day = 3
+    daily_tillage_frequency = 1
 
     # Act
     manure_handler_config = ManureHandlerConfig(
         cleaning_water_use_rate=cleaning_water_use_rate,
         minutes_per_cleaning=minutes_per_cleaning,
         cleanings_per_day=cleanings_per_day,
+        daily_tillage_frequency=daily_tillage_frequency
     )
 
     # Assert
     assert manure_handler_config.cleaning_water_use_rate == approx(cleaning_water_use_rate)
     assert manure_handler_config.minutes_per_cleaning == minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == cleanings_per_day
+    assert manure_handler_config.daily_tillage_frequency == daily_tillage_frequency
 
 
 # Test DefaultManureHandlerConfigFactory
@@ -130,17 +129,21 @@ def test_manure_handler_config() -> None:
 
 @pytest.mark.parametrize(
     'manure_handler_type, expected_cleaning_water_use_rate, '
-    'expected_minutes_per_cleaning, expected_cleanings_per_day',
+    'expected_minutes_per_cleaning, expected_cleanings_per_day, '
+    'expected_daily_tillage_frequency',
     [
-        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2),
-        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2),
-        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2)
+        (ManureHandlerType.FLUSH_SYSTEM, 757.0, 8, 2, 0),
+        (ManureHandlerType.MANUAL_SCRAPING, 10.0, 8, 2, 0),
+        (ManureHandlerType.ALLEY_SCRAPER, 10.0, 8, 2, 0),
+        (ManureHandlerType.TILLAGE, 0.0, 8, 2, 1)
     ]
 )
 def test_default_manure_handler_config_factory_get_instance(manure_handler_type: ManureHandlerType,
                                                             expected_cleaning_water_use_rate: float,
                                                             expected_minutes_per_cleaning: int,
-                                                            expected_cleanings_per_day: int) -> None:
+                                                            expected_cleanings_per_day: int,
+                                                            expected_daily_tillage_frequency: int
+                                                            ) -> None:
     """Unit test for get_instance() of class DefaultManureHandlerConfigFactory"""
 
     # Act
@@ -150,6 +153,7 @@ def test_default_manure_handler_config_factory_get_instance(manure_handler_type:
     assert manure_handler_config.cleaning_water_use_rate == approx(expected_cleaning_water_use_rate)
     assert manure_handler_config.minutes_per_cleaning == expected_minutes_per_cleaning
     assert manure_handler_config.cleanings_per_day == expected_cleanings_per_day
+    assert manure_handler_config.daily_tillage_frequency == expected_daily_tillage_frequency
 
 
 # Test ManureHandlerType
@@ -162,6 +166,7 @@ def test_manure_handler_type_enum() -> None:
     assert ManureHandlerType.get_type('flush system') is ManureHandlerType.FLUSH_SYSTEM
     assert ManureHandlerType.get_type('manual scraping') is ManureHandlerType.MANUAL_SCRAPING
     assert ManureHandlerType.get_type('alley scraper') is ManureHandlerType.ALLEY_SCRAPER
+    assert ManureHandlerType.get_type('tillage') is ManureHandlerType.TILLAGE
     assert ManureHandlerType.get_type('default') is ManureHandlerType.DEFAULT
     assert ManureHandlerType.DEFAULT is ManureHandlerType.FLUSH_SYSTEM
     assert ManureHandlerType.get_type('dummy') is ManureHandlerType.FLUSH_SYSTEM
@@ -176,7 +181,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
     return ManureHandlerConfig(
         cleaning_water_use_rate=20.0,
         minutes_per_cleaning=10,
-        cleanings_per_day=3
+        cleanings_per_day=3,
+        daily_tillage_frequency=0
     )
 
 
@@ -190,6 +196,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
          DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
         ('alley scraper', None, AlleyScraper,
          DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
+        ('tillage', None, Tillage,
+         DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
         ('dummy', None, FlushSystem,
          DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
         ('flush system', None, FlushSystem,
@@ -198,6 +206,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
          DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
         ('alley scraper', None, AlleyScraper,
          DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
+        ('tillage', None, Tillage,
+         DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
         ('dummy', None, FlushSystem,
          DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
         ('flush system', None, FlushSystem,
@@ -206,6 +216,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
          DefaultManureHandlerConfigFactory.MANUAL_SCRAPING_CONFIG),
         ('alley scraper', None, AlleyScraper,
          DefaultManureHandlerConfigFactory.ALLEY_SCRAPER_CONFIG),
+        ('tillage', None, Tillage,
+         DefaultManureHandlerConfigFactory.TILLAGE_CONFIG),
         ('dummy', None, FlushSystem,
          DefaultManureHandlerConfigFactory.FLUSH_SYSTEM_CONFIG),
         ('flush system', mock_manure_handler_config,
@@ -214,6 +226,8 @@ def mock_manure_handler_config() -> ManureHandlerConfig:
          ManualScraping, mock_manure_handler_config),
         ('alley scraper', mock_manure_handler_config,
          AlleyScraper, mock_manure_handler_config),
+        ('tillage', mock_manure_handler_config,
+         Tillage, mock_manure_handler_config),
         ('dummy', mock_manure_handler_config,
          FlushSystem, mock_manure_handler_config),
     ])
