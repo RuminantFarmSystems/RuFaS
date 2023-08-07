@@ -602,8 +602,8 @@ def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
     for key in ration_key_list:
         # target = ration_percents[str(key)]/100*(DMIest_upper+0.0001) # change from percent to decimal percent, adding a little bit in case of 0 return
         # target = ration_percents[key]
-        targetlower = ration_percents[str(key)]/100*(DMIest+0.0001)
-        targetupper = ration_percents[str(key)]/100*(DMIest+0.0001)
+        targetlower = ration_percents[str(key)]/100*(DMIest*1.1+0.0001)
+        targetupper = ration_percents[str(key)]/100*(DMIest*1.1+0.0001)
         targetbounds = ((targetlower*(1-udr_tolerance))/3,
                         (targetupper*(1+udr_tolerance))/3)
         tribounds.append(targetbounds)
