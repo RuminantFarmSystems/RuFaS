@@ -55,9 +55,9 @@ class FieldManager:
         This method will run the annual routine in the field, which will be calling the perform_annual_reset() method
         on each field.
         """
+        self.output_gatherer.send_annual_variables()
         for field in self.fields:
             field.perform_annual_reset()
-        self.output_gatherer.send_annual_variables()
 
     @staticmethod
     def _date_conversion_month(time) -> int:
