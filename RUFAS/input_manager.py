@@ -426,11 +426,12 @@ class InputManager:
         Input Manager must first be instantiated:
         >>> input_manager = InputManager()
 
-        This will return the value of `calf_num` of the `herd_information` section in the `animal` module:
+        This will return the value of `calf_num` of the `herd_information` section in the `animal` blob
+        (in this example, the value for `calf_num` is 8):
         >>> input_manager.get_data('animal.herd_information.calf_num')
         8
 
-        If a broader spectrum of data is needed, the user can expand the query to get_data
+        If a broader range of data is needed, the user can expand the query to get_data
         by shortening the data_address. This will return the full herd_information object:
         >>> input_manager.get_data('animal.herd_information')
         {
@@ -492,11 +493,12 @@ class InputManager:
         Input Manager must first be instantiated:
         >>> input_manager = InputManager()
 
-        This will return the 'type' for albedo in the soil_profile_properties section of the metadata's properties:
+        This will return the 'type' for `albedo` in the `soil_profile_properties` section of the metadata's properties
+        (the type for `albedo` is `number`):
         >>> input_manager.get_metadata('properties.soil_profile_properties.albedo.type')
         "number"
 
-        If a broader spectrum of the metadata is needed, the user can expand the query to get_metadata
+        If a broader range of the metadata is needed, the user can expand the query to get_metadata
         by shortening the metadata_address. This will return the full 'albedo' object containing its type,
         description, minimum, maximum, and default:
         >>> input_manager.get_metadata('properties.soil_profile_properties.albedo')
