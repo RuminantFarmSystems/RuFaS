@@ -1519,6 +1519,16 @@ class AnimalManagement:
 
                 pen.ration = ration_per_pen
                 pen.ration_per_animal = ration_per_animal  # Important
+                
+                info_map = {"class": self.__class__.__name__,
+                    "function": self._calc_ration_at_interval.__name__,
+                    "available_feeds": available_feeds.feed_id, }
+                om.add_variable(f'ration_nutrient_amount_pen_{pen.id}', nutrient_amount, info_map)
+                om.add_variable(f'ration_nutrient_conc_pen_{pen.id}', nutrient_conc, info_map)
+                om.add_variable(f'MEdiet_pen_{pen.id}', pen.MEdiet, info_map)
+                om.add_variable(f'dry_matter_intake_pen_{pen.id}', pen.dry_matter_intake, info_map)
+                om.add_variable(f'avg_rqmts_pen_{pen.id}', pen.avg_nutrient_rqmts, info_map)
+                om.add_variable(f'methane_pen_{pen.id}', pen.manure, info_map)
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
