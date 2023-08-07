@@ -276,8 +276,8 @@
             "type": "string",
             "default": "NASEM",
             "pattern": "^{NASEM|NRC}$",
-            "description": "Energy and Nutrient Calculation Method -- The method used to calculate the animal nutrient requirements.",
-          },
+            "description": "Energy and Nutrient Calculation Method -- The method used to calculate the animal nutrient requirements."
+          }
         },
         "farm_level": {
           "type": "object",
@@ -420,8 +420,8 @@
                 "description": "ED Rate for SynchED Protocol -- The estrus detection rate of the SynchED protocol.",
                 "minimum": 0,
                 "maximum": 1,
-                "default": 0.7,
-              },
+                "default": 0.7
+              }
             },
             "cow_repro_programs": {
               "type": "object",
@@ -497,8 +497,8 @@
                 "type": "number",
                 "description": "TAI program start day for ED-TAI protocol -- The TAI program start day for ED-TAI protocol.",
                 "minimum": 0,
-                "default": 72,
-              },
+                "default": 72
+              }
             }
           },
           "bodyweight": {
@@ -595,27 +595,39 @@
             },
             "avg_estrus_cycle_return": {
               "type": "number",
-              "description": ""
+              "description": "Average days between calving and first estrus after calving.",
+              "minimum": 1,
+              "default": 23
             },
             "std_estrus_cycle_return": {
               "type": "number",
-              "description": ""
+              "description": "Standard deviation of days between calving and first estrus after calving.",
+              "minimum": 1,
+              "default": 6
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
-              "description": ""
+              "description": "Average length of estrus cycle for cows.",
+              "minimum": 1,
+              "default": 21
             },
             "std_estrus_cycle_cow": {
               "type": "number",
-              "description": ""
+              "description": "Standard deviation of the length of estrus cycle for cows.",
+              "minimum": 1,
+              "default": 4
             },
             "avg_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": ""
+              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol.",
+              "minimum": 1,
+              "default": 5
             },
             "std_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": ""
+              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol.",
+              "minimum": 1,
+              "default": 2
             }
           },
           "milking": {
@@ -623,73 +635,79 @@
             "description": "",
             "wood_l": {
               "type": "array",
-              "description": "",
+              "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level.",
               "properties": {
                 "type": "array",
-                "description": "",
+                "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level,",
                 "properties": {
                   "type": "number",
-                  "description": ""
+                  "description": "Parameter l in the Wood’s equation. It is a scale factor for the production level.",
+                  "minimum": 0
                 }
               }
             },
             "wood_m": {
               "type": "array",
-              "description": "",
+              "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
               "properties": {
                 "type": "array",
-                "description": "",
+                "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
                 "properties": {
                   "type": "number",
-                  "description": ""
+                  "description": "Parameter m in the Wood’s equation. It indicates the growth rate in milk yield until peak",
+                  "minimum": 0
                 }
               }
             },
             "wood_n": {
               "type": "array",
-              "description": "",
+              "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
               "properties": {
                 "type": "array",
-                "description": "",
+                "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
                 "properties": {
                   "type": "number",
-                  "description": ""
+                  "description": "Parameter n in the Wood’s equation. It describes the rate of decline after the peak",
+                  "minimum": 0
                 }
               }
             },
             "wood_l_std": {
               "type": "array",
-              "description": "",
+              "description": "Standard deviation of parameter l ",
               "properties": {
                 "type": "array",
-                "description": "",
+                "description": "Standard deviation of parameter l ",
                 "properties": {
                   "type": "number",
-                  "description": ""
+                  "description": "Standard deviation of parameter l ",
+                  "minimum": 0
                 }
               }
             },
             "wood_m_std": {
               "type": "array",
-              "description": "",
+              "description": "Standard deviation of parameter m",
               "properties": {
                 "type": "array",
-                "description": "",
+                "description": "Standard deviation of parameter m",
                 "properties": {
                   "type": "number",
-                  "description": ""
+                  "description": "Standard deviation of parameter m",
+                  "minimum": 0
                 }
               }
             },
             "wood_n_std": {
               "type": "array",
-              "description": "",
+              "description": "Standard deviation of parameter n",
               "properties": {
                 "type": "array",
-                "description": "",
+                "description": "Standard deviation of parameter n",
                 "properties": {
                   "type": "number",
-                  "description": ""
+                  "description": "Standard deviation of parameter n",
+                  "minimum": 0
                 }
               }
             }
@@ -699,18 +717,22 @@
             "description": "",
             "parity_death_prob": {
               "type": "array",
-              "description": "",
+              "description": "Death rate for first, second, third, and later lactations",
               "properties": {
                 "type": "number",
-                "description": ""
+                "description": "Death rate for first, second, third, and later lactations",
+                "minimum": 0,
+                "maximum": 1
               }
             },
             "parity_cull_prob": {
               "type": "array",
-              "description": "",
+              "description": "Culling rate for first, second, third, and later lactations",
               "properties": {
                 "type": "number",
-                "description": ""
+                "description": "Culling rate for first, second, third, and later lactations",
+                "minimum": 0,
+                "maximum": 1
               }
             },
             "life_cycle": {
@@ -718,7 +740,9 @@
               "description": "",
               "still_birth_rate": {
                 "type": "number",
-                "description": ""
+                "description": "Stillbirth rate",
+                "minimum": 0,
+                "maximum": 1
               }
             }
           }
@@ -766,13 +790,13 @@
         "type": "string",
         "description": "Housing -- The type of housing management for the herd.",
         "default": "barn",
-        "pattern": "^{barn|3-pasture|drylot}$",
+        "pattern": "^{barn|3-pasture|drylot}$"
       },
       "pasture_concentrate": {
         "description": "Pasture Concentration -- Amount of concentrate supplementation provided if animals are housed on pasture. (kg)",
         "type": "number",
         "minimum": 0,
-        "default": 0,
+        "default": 0
       },
       "methane_model": {
         "description": "Methane Model -- The method used to estimate enteric methane emissions.",
@@ -786,14 +810,14 @@
         "user_input": {
           "description": "User Input -- A boolean value indicating if the user will provide the ration or diet formulation they would like to feed to the cattle (true) or not (false).",
           "type": "boolean",
-          "default": false,
+          "default": false
         },
         "formulation_interval": {
           "description": "Formulation Interval -- The length of time in days between when the diets are reformulated.",
           "type": "number",
           "minimum": 1,
-          "default": 30,
-        },
+          "default": 30
+        }
       },
       "pen_information": {
         "type": "array",
@@ -802,68 +826,67 @@
           "type": "object",
           "id": {
             "description": "Pen ID -- The index of the pen.",
-            "type": "number",
+            "type": "number"
           },
           "pen_name": {
             "description": "Pen Name -- The name or identifier of a given pen.",
-            "type": "string",
+            "type": "string"
           },
           "animal_combination": {
             "description": "Animal Combination -- The valid combinations of animal types that can be in a pen.",
             "type": "string",
-            "pattern": "^{CALF|GROWING|CLOSE_UP|LAC_COW}$",
+            "pattern": "^{CALF|GROWING|CLOSE_UP|LAC_COW}$"
           },
           "vertical_dist_to_milking_parlor": {
             "description": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor.",
             "type": "number",
             "minimum": 0,
-            "default": 0.1,
+            "default": 0.1
           },
           "horizontal_dist_to_milking_parlor": {
             "description": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor.",
             "type": "number",
             "minimum": 0,
-            "default": 1.6,
+            "default": 1.6
           },
           "number_of_stalls": {
             "description": "Number of Stalls -- The number of stalls in the pen.",
             "type": "number",
             "minimum": 0,
-            "default": 1000,
+            "default": 1000
           },
           "housing_type": {
             "description": "Housing Type -- The type of barn the pen is in.",
             "type": "string",
             "pattern": "^{open air barn}$",
-            "default": "open air barn",
+            "default": "open air barn"
           },
           "pen_type": {
             "description": "Pen Type -- The type of stalls the pen has.",
             "type": "string",
             "pattern": "^{freestall|tilestall|drylot}$",
-            "default": "freestall",
+            "default": "freestall"
           },
           "max_stocking_density": {
             "description": "Max Stocking Density -- The maximum ration between the number of animals in the pen and the number of stalls in the pen.",
             "type": "number",
             "minimum": 0.5,
             "maximum": 2,
-            "default": 1.2,
+            "default": 1.2
           },
           "manure_management_scenario_id": {
             "description": "Manure Management Scenario ID -- The ID number of the manure management practices that are used for this pen.",
             "type": "number",
             "minimum": 0,
-            "default": 0,
-          },
-        },
+            "default": 0
+          }
+        }
       }
     },
     "crop_schedule_properties": {
       "crop_species": {
         "type": "string",
         "description": "Name of the crop being grown.",
-
         "pattern": "^{generic|corn|silage_corn|spring_wheat|winter_wheat|cereal_rye|spring_barley|fall_oats|tall_fescue|alfalfa|soybean|sugar_beet|potato|triticale}$"
       },
       "harvest_days": {
@@ -891,7 +914,9 @@
         "type": "array",
         "description": "Operation(s) with which this crop will be harvested.",
         "minimum_length": 1,
-        "default": ["default"],
+        "default": [
+          "default"
+        ],
         "properties": {
           "type": "string",
           "pattern": "^{default|no_kill}$",
@@ -901,7 +926,9 @@
       "harvest_type": {
         "type": "array",
         "description": "Whether the crop uses scheduled harvests or optimal harvests",
-        "default": ["scheduled"],
+        "default": [
+          "scheduled"
+        ],
         "properties": {
           "type": "string",
           "pattern": "^{scheduled|optimal}$",
@@ -1118,13 +1145,12 @@
         "description": "Number of years to be skipped between schedule repetitions.",
         "minimum": 0,
         "default": 0
-     }
+      }
     },
     "tillage_schedule_properties": {
       "years": {
         "type": "array",
-        "description": "List of years in which manure will be applied.",
-
+        "description": "List of years in which tillage will occur.",
         "default": [],
         "properties": {
           "type": "number",
@@ -1134,7 +1160,6 @@
       "days": {
         "type": "array",
         "description": "List of days on which tilling will occur.",
-
         "default": [],
         "properties": {
           "type": "number",
@@ -1182,7 +1207,7 @@
         "description": "Number of years to be skipped between schedule repetitions.",
         "minimum": 0,
         "default": 0
-     }
+      }
     },
     "economic_properties": {
       "diesel_cost_gal": {
@@ -1329,7 +1354,7 @@
             "type": "string",
             "description": "Inoculation",
             "pattern": "^{None|heterofermentative|homofermentative}$",
-            "default": "None",
+            "default": "None"
           },
           "ventilation": {
             "type": "boolean",
