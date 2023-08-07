@@ -90,16 +90,22 @@ with open('model_evaluation\sensitivity_analysis\config_inputs\sensitivity_analy
      json.dump(config_json, w, indent=4)
 
 for i, p in enumerate(problem_list):
-    if analysis_type =="ff":
-        param_values = ff_s.sample(problem_a) #fractional factorial
-    elif analysis_type =="saltellisobol":
-        param_values = saltelli.sample(problem_a, saltelli_or_fast_num, skip_values=saltelli_skip) 
-    elif analysis_type == 'FAST':
-        param_values = fast_sampler.sample(p, saltelli_or_fast_num)
-        # The Saltelli sampler generates N*(2D + 2) samples
-        # where N = argument in sampler, D = number of model inputs
-        # adding argument calc-second_order = False would generate N*(D + 2) samples
-    else: param_values=[]
+    
+    if 'param_values' not in config_json.keys():
+        if analysis_type =="ff":
+            param_values = ff_s.sample(problem_a) #fractional factorial
+        elif analysis_type =="saltellisobol":
+            param_values = saltelli.sample(problem_a, saltelli_or_fast_num, skip_values=saltelli_skip) 
+        elif analysis_type == 'FAST':
+            param_values = fast_sampler.sample(p, saltelli_or_fast_num)
+            # The Saltelli sampler generates N*(2D + 2) samples
+            # where N = argument in sampler, D = number of model inputs
+            # adding argument calc-second_order = False would generate N*(D + 2) samples
+        else: param_values=[]
+        
+        config_json['param_values'] = param_values.tolist()
+        with open('model_evaluation\sensitivity_analysis\config_inputs\sensitivity_analysis.json', 'w') as w:
+            json.dump(config_json, w, indent=4)
     # len(param_values)
     minutes_to_run = 5
     print("this problem's analysis will take approximately " + str(len(param_values)*minutes_to_run) + " minutes to run")
