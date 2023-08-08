@@ -1,159 +1,138 @@
+from typing import Optional
+from RUFAS.routines.field.crop.crop_data import CropData
+
 """
-RUFAS: Ruminant Farm Systems Model
-
-File name: heat_units.py
-
-Author(s): Andy Achenreiner, achenreiner@wisc.edu
-
-Description: This module contains the necessary functions for calculating and
-             updating a CropType's fr_PHU (fraction of PHU accumulated by
-             current day). Since this submodule does not depend on values
-             calculated in other crop submodules, heat_units.update_all() should
-             be the first function called in the daily_crop_routine.
-
-CropType attribute definitions:
-
-    * Note that all temperatures listed below are in degrees Celsius
-
-    T_min = Minimum temperature on current day
-
-    T_max = Maximum temperature on current day
-
-    T_base_min = Crop-specific minimum temperature required for growth
-
-    T_base_max = Crop-specific maximum temperature required to sustain growth.
-
-    T_HU_min = Minimum heat unit temperature on current day
-
-    T_HU_max = Maximum heat unit temperature on current day
-
-    T_HU = Mean heat unit temperature on current day
-
-    HU = Available heat units on current day
-
-    prev_accumulated_HU = Accumulated_HU leading up to today
-
-    accumulated_HU = Heat units accumulated up to and including today
-
-    PHU = Crop-specific total heat units required for maturity
-
-    prev_fr_PHU = Fraction of PHU accumulated up to today
-
-    fr_PHU = Fraction of PHU accumulated including today
-
-CropType values updated by calling calculate_frPHU():
-
-    prev_accumulated_HU
-    accumulated_HU
-    prev_fr_PHU
-    fr_PHU
+This module primarily follows the Heat Units section of the SWAT model (5:3.1)
 """
 
 
-def update_all(crop_type, weather, time):
-    """
-    Description:
-        Calls the functions necessary to update the current heat
-        unit information for the given crop_type.
+class HeatUnits:
+    def __init__(self, crop_data: Optional[CropData] = None):
+        self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-    Args:
-        crop_type: an instance of a crop class
-        weather: an instance of the Weather class specified in classes.py
-            containing environmental information
-        time: an instance of the Time class specified in classes.py
-    """
+    def absorb_heat_units(self, mean_air_temperature: float = None,
+                          min_air_temperature: float = None, max_air_temperature: float = None) -> None:
+        """main function for absorbing heat units during a day and accumulating them
 
-    calculate_fr_PHU(crop_type, weather, time)
+        Args:
+            mean_air_temperature: average air temperature for the day (C)
+            min_air_temperature: minimum air temperature for the day (C)
+            max_air_temperature: maximum air temperature for the day (C)
 
+        SWAT References: 5:1.1, 5:2.1.2,
 
-def calculate_fr_PHU(crop_type, weather, time):
-    """
-    Description:
-        Calculates the fraction of PHU accumulated up to and
-        including the given day for the given crop type.
-        "pseudocode_crop" C.2.B.1
+        Details: if the attribute use_heat_unit_temperature is false, both min_air_temperature and max_air_temperature
+        are optional. Otherwise, they are used to determine heat unit accumulation rather than average air temperature.
+        """
+        self._check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
 
-    Args:
-        crop_type
-        weather
-        time
-    """
+        if self.data.use_heat_unit_temperature:
+            self.data.maximum_heat_unit_temperature = \
+                HeatUnits._determine_maximum_heat_unit_temperature(max_air_temperature, self.data.maximum_temperature)
+            self.data.minimum_heat_unit_temperature = \
+                HeatUnits._determine_minimum_heat_unit_temperature(min_air_temperature, self.data.minimum_temperature)
+            self.data.heat_unit_temperature = \
+                (self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature) / 2
 
-    T_min = weather.T_min[time.year - 1][time.day - 1]
-    T_max = weather.T_max[time.year - 1][time.day - 1]
+        if self.data.use_heat_unit_temperature or mean_air_temperature is None:
+            use_temp = self.data.heat_unit_temperature
+        else:
+            use_temp = mean_air_temperature
+        self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
+        self.accumulate_heat_units(mean_air_temperature)
+        self.data.previous_heat_fraction = self.data.heat_fraction
+        self.data.heat_fraction = self.data.accumulated_heat_units / self.data.potential_heat_units
 
-    T_HU_min = calc_T_HU_min(crop_type, T_min)
-    T_HU_max = calc_T_HU_max(crop_type, T_max)
-    HU = calc_HU(crop_type, T_HU_min, T_HU_max)
+    def accumulate_heat_units(self, air_temperature: float = None) -> None:
+        """accumulates heat units during a day
 
-    crop_type.prev_accumulated_HU = crop_type.accumulated_HU
+        Args:
+            air_temperature: the average air temperature during the day (C)
 
-    crop_type.accumulated_HU = crop_type.accumulated_HU + HU
+        Details:
+            If the attribute use_heat_unit_temperature is False, then the main
+            accumulation method occurs (as in SWAT manual). This method accumulates every degree C above the crop's
+            minimum temperature for growth as heat units.
 
-    crop_type.prev_fr_PHU = crop_type.fr_PHU
+            If use_heat_unit_temperature is True (or air_temperature=None), then the alternative method is used. in this
+            method, the heat_unit_temperature attribute is used in place of average air temperature.
 
-    # Calculate accumulated fraction of potential Heat Units
-    # C.2.B.1
-    crop_type.fr_PHU = crop_type.accumulated_HU / crop_type.PHU
+            Whereas heat units accumulated by the main method are always equal to the average air temperature (when
+            above the minimum threshold), the alternative method is context dependent:
+                1. if the minimum and maximum air temperature are both **higher** than the crop's minimum and maximum
+                growth temperatures, then accumulation will be greater than with the main method
+                2. if the minimum and maximum air temperatures are both **lower** than the crop's minimum and maximum
+                temperatures, then accumulation will be greater than with the main method
+                3. if the air temperature window is entirely contained within the crop temperature window
+                (i.e., crop mint < air mint < air maxt < crop maxt), then accumulation will be equal to the middle of
+                the crop temperature window
+                4. if the crop temperature window is entirely contained withing the air temperature window, then
+                accumulation will equal the middle of the temperature window
+        """
+        self.assign_new_heat_units(air_temperature)
+        self.add_heat_units()
 
+    def assign_new_heat_units(self, air_temperature: float = None) -> None:
+        """assign new heat units based on if the alternative accumulation method is to be used"""
+        if self.data.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+            self.data.new_heat_units = self._determine_new_heat_units(self.data.heat_unit_temperature,
+                                                                      self.data.minimum_temperature)
+        else:  # main method
+            self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
 
-def calc_T_HU_min(crop_type, T_min):
-    """
-    Description:
-        Calculates minimum heat unit temperature on current day.
-        "pseudocode_crop" C.2.A.3
+    def add_heat_units(self) -> None:
+        """add newly acquired heat units to accumulated heat units"""
+        self.data.accumulated_heat_units += self.data.new_heat_units
 
-    Args:
-        crop_type
-        T_min: minimum temperature on the current day
-    Returns:
-        float: minimum heat unit temperature
-    """
+    # TODO: add these warnings to output manager at a later date.
+    def _check_absorb_heat_for_input_errors(self, mean_air_temperature: float = None,
+                                            min_air_temperature: float = None,
+                                            max_air_temperature: float = None):
+        """raises errors if inputs given for absorb_heat_units don't make sense with the value of the
+        use_heat_unit_temperature attribute"""
+        if self.data.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
+            raise ValueError("min_air_temperature and max_air_temperature must be provided" +
+                             " when use_heat_unit_temperature is True")
+        if not self.data.use_heat_unit_temperature and mean_air_temperature is None:
+            raise ValueError("mean_air_temperature must be provided when use_heat_temperature is False")
 
-    if T_min < crop_type.T_base_min:
-        return crop_type.T_base_min
-    else:
-        return T_min
+    @staticmethod
+    def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
+        """calculates the heat units that will be accumulated during a day
 
+        Args:
+            temperature: the temperature to be compared to min_temp for accumulating heat units (C)
+            min_temperature: the minimum temperature below which a crop cannot grow (C)
 
-def calc_T_HU_max(crop_type, T_max):
-    """
-    Description:
-        Calculates maximum heat unit temperature on current day.
-        "pseudocode_crop" C.2.A.4
+        SWAT Reference: 5:1.1
+        """
+        return max(temperature - min_temperature, 0)  # from SWAT:
 
-    Args:
-        crop_type
-        T_max: maximum temperature on the current day
-    Returns:
-        float: maximum heat unit temperature
-    """
+    @staticmethod
+    def _determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:
+        """ calculates minimum heat unit temperature on current day.
 
-    if T_max > crop_type.T_base_max:
-        return crop_type.T_base_max
-    else:
-        return T_max
+        Args:
+            min_air_temp: minimum temperature on the current day
+            min_growth_temp: minimum temperature at which a crop can grow_crop
 
+        Returns:
+            float: minimum heat unit temperature
+        """
+        return max(min_air_temp, min_growth_temp)
 
-def calc_HU(crop_type, T_HU_min, T_HU_max):
-    """
-    Description:
-        Calculates available heat units on current day.
-        "pseudocode_crop" C.2.A.1/2
+    @staticmethod
+    def _determine_maximum_heat_unit_temperature(max_air_temp: float, max_growth_temp: float) -> float:
+        """calculates maximum heat unit temperature on current day.
+            "pseudocode_crop" C.2.A.4
 
-    Args:
-        crop_type
-        T_HU_min: minimum heat unit temperature
-        T_HU_max: maximum heat unit temperature
-    Returns:
-        float: available heat units
-    """
+        Args:
+            max_air_temp: maximum temperature on the current day
+            max_growth_temp: maximum temperature at which a crop can grow_crop
 
-    # C.2.A.2
-    T_HU = (T_HU_min + T_HU_max) / 2
+        Returns:
+            maximum heat unit temperature
+        """
+        return min(max_air_temp, max_growth_temp)
 
-    # C.2.A.1
-    if T_HU < crop_type.T_base_min:
-        return 0.0
-    else:
-        return T_HU - crop_type.T_base_min
+    # TODO: Heat scheduling? SWAT 5:1.1.1 - GitHub Issue #368
