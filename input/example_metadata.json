@@ -169,13 +169,13 @@
         },
         "heiferII_num": {
           "type": "number",
-          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy (default is ~20% of herd number)",
+          "description": "Number of HeiferIIs (head) -- HeiferII is the number of heifers eligible for breeding and in early pregnancy",
           "default": 38,
           "minimum": 0
         },
         "heiferIII_num_springers": {
           "type": "number",
-          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers (default is ~3% of herd number)",
+          "description": "Number of HeiferIIIs (head) -- HeiferIII is the number of close-up heifers",
           "default": 5,
           "minimum": 0
         },
@@ -586,37 +586,37 @@
             },
             "avg_estrus_cycle_return": {
               "type": "number",
-              "description": "Average days between calving and first estrus after calving.",
+              "description": "Average days between calving and first estrus after calving (default is 23).",
               "minimum": 1,
               "default": 23
             },
             "std_estrus_cycle_return": {
               "type": "number",
-              "description": "Standard deviation of days between calving and first estrus after calving.",
+              "description": "Standard deviation of days between calving and first estrus after calving (default is 6).",
               "minimum": 1,
               "default": 6
             },
             "avg_estrus_cycle_cow": {
               "type": "number",
-              "description": "Average length of estrus cycle for cows.",
+              "description": "Average length of estrus cycle for cows (default is 21).",
               "minimum": 1,
               "default": 21
             },
             "std_estrus_cycle_cow": {
               "type": "number",
-              "description": "Standard deviation of the length of estrus cycle for cows.",
+              "description": "Standard deviation of the length of estrus cycle for cows (default is 4).",
               "minimum": 1,
               "default": 4
             },
             "avg_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol.",
+              "description": "Average days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 5).",
               "minimum": 1,
               "default": 5
             },
             "std_estrus_cycle_after_pgf": {
               "type": "number",
-              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol.",
+              "description": "Standard deviation of days between the injection of PGF and the occurrence of estrus in the ‘PGFatPD’ resynch protocol (default is 2).",
               "minimum": 1,
               "default": 2
             }
