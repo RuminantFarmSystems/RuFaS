@@ -179,7 +179,8 @@ class InputManager:
                     element_counter_and_validity = self._validate_json_element([property], properties_blob_key, data,
                                                                                eager_termination)
                 if file_type == "csv":
-                    pass
+                    element_counter_and_validity = self._validate_csv_element(property, properties_blob_key, data,
+                                                                              eager_termination)
 
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
@@ -198,12 +199,71 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
+    def _validate_csv_element(self, property: str, properties_blob_key: str, input_data: Dict[str, Any],
+                              eager_termination: bool) -> dict:
+        """
+        Receives data loaded from csv input file and the validates each row element in the csv column it's sent.
+        It attempts to fix any invalid elements and tracks the number of valid, invalid, fixed,
+        and total elements from the input file are checked.
+
+        Parameters
+        ----------
+        property : str
+            The name of the csv data element being validated.
+        properties_blob_key : str
+            The metadata properties section keyword for the data input file being checked.
+        input_data : Dict[str, Any]
+            A buffer dictionary that holds the input data for validation and fixing.
+        eager_termination : bool
+            If true, the process will be terminated upon finding invalid data.
+
+        Returns
+        -------
+        dict
+            A dictionary that collects the counts of total elements checked,
+            invalid elements, valid elements, and fixed elements as well as a boolean
+            which is True if the data is valid, False otherwise.
+        """
+        # property = column header/key in csv data dict ("diesel_cost_gal")
+        # input_data = {"diesel_cost_gal": [5, 10], "electricity_cost_kwh": [0.15], etc}
+        info_map = {"class": self.__class__.__name__,
+                    "function": self._validate_csv_element.__name__,
+                    }
+        element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
+                                        "invalid_elements": 0, "is_valid": True}
+        property_data = input_data["property"]  # get array of data to validate
+        variable_properties = reduce(lambda d, key: d[key], [property],
+                                     self.__metadata["properties"][properties_blob_key])
+        var_type = variable_properties["type"]
+        data_type_to_validator_map = {"string": self._string_type_validator,
+                                      "number": self._num_type_validator,
+                                      "array": self._array_type_validator,
+                                      "bool": self._bool_type_validator, }
+        try:
+            validator = data_type_to_validator_map[var_type]
+        except KeyError:
+            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+
+        for element in property_data:
+            element_counter_and_validity["total_elements"] += 1
+            is_valid = validator(variable_properties, property, element)
+            if is_valid:
+                element_counter_and_validity["valid_elements"] += 1
+            else:
+                is_fixed = self._fix_data(variable_properties, [property], input_data)
+                if is_fixed:
+                    element_counter_and_validity["fixed_elements"] += 1
+                else:
+                    element_counter_and_validity["invalid_elements"] += 1
+                    element_counter_and_validity["is_valid"] = False
+        return element_counter_and_validity
+
     def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,
                                input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
         Receives data loaded from json input file, recursively finds and then validates nested elements,
-        attempts to fix any invalid elements, and tracks the number of how many valid, invalid, fixed,
-        and total elements from the input data are checked.
+        attempts to fix any invalid elements, and tracks the number of valid, invalid, fixed,
+        and total elements from the input file are checked.
 
         Parameters
         ----------
