@@ -165,18 +165,22 @@ class InputManager:
             file_path = file_details["path"]
 
             try:
+                file_type = file_details["type"]
                 data_loader = data_type_to_loader_map[file_details["type"]]
                 data = data_loader(file_path)
             except KeyError:
                 raise KeyError(f"Faulty data type in {file_blob_key},"
                                f"supported types are: {data_type_to_loader_map.keys()}")
 
-            # counter_dict = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0, "invalid_elements": 0}
             properties_blob_key = file_details["properties"]
             properties = self.__metadata["properties"][properties_blob_key]
             for property in properties.keys():
-                element_counter_and_validity = self._validate_element([property], properties_blob_key, data,
-                                                                      eager_termination)
+                if file_type == "json":
+                    element_counter_and_validity = self._validate_json_element([property], properties_blob_key, data,
+                                                                               eager_termination)
+                if file_type == "csv":
+                    pass
+
                 fixed_elements_counter += element_counter_and_validity["fixed_elements"]
                 valid_elements_counter += element_counter_and_validity["valid_elements"]
                 total_elements_counter += element_counter_and_validity["total_elements"]
@@ -194,10 +198,10 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
-    def _validate_element(self, element_hierarchy: List[str], properties_blob_key: str,
-                          input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
+    def _validate_json_element(self, element_hierarchy: List[str], properties_blob_key: str,
+                               input_data: Dict[str, Any], eager_termination: bool, ) -> dict:
         """
-        Receives data loaded from input file, recursively finds and then validates nested elements,
+        Receives data loaded from json input file, recursively finds and then validates nested elements,
         attempts to fix any invalid elements, and tracks the number of how many valid, invalid, fixed,
         and total elements from the input data are checked.
 
@@ -225,7 +229,7 @@ class InputManager:
 
         """
         info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_element.__name__,
+                    "function": self._validate_json_element.__name__,
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
@@ -244,8 +248,8 @@ class InputManager:
             for nested_key in variable_properties.keys():
                 if nested_key not in variable_properties_to_ignore:
                     element_hierarchy.append(nested_key)
-                    element_counter_and_validity = self._validate_element(element_hierarchy, properties_blob_key,
-                                                                          input_data, eager_termination)
+                    element_counter_and_validity = self._validate_json_element(element_hierarchy, properties_blob_key,
+                                                                               input_data, eager_termination)
                     is_child_valid = element_counter_and_validity["is_valid"]
                     if eager_termination and not is_child_valid:
                         return element_counter_and_validity
