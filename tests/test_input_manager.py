@@ -407,6 +407,7 @@ def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
                                          valid_elements: int, invalid_elements: int, fixed_elements: int,
                                          input_manager_original_method_states: Dict[str, Callable],
                                          ) -> None:
+    """Unit test for _validate_csv_element function in file input_manager.py"""
     mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
     dummy_property = property
     properties_blob_key = "property_map_key1"
@@ -422,6 +423,36 @@ def test_validate_csv_element_valid_data(mock_input_manager: InputManager,
     assert result["fixed_elements"] == fixed_elements
 
     mock_input_manager._validate_csv_element = input_manager_original_method_states["_validate_csv_element"]
+
+
+@pytest.mark.parametrize(
+        "property, input_data, total_elements, valid_elements, invalid_elements, fixed_elements, eager_termination",
+        [
+            ("element1", {"element1": ["invalid1", "invalid2", "invalid3"]}, 3, 0, 3, 0, False),
+            ("element2", {"element2": [-6, 1149, 955, -22]}, 1, 0, 1, 0, True),
+        ]
+)
+def test_validate_csv_element_invalid_data(mock_input_manager: InputManager,
+                                           mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                           property: str, input_data: list, total_elements: int,
+                                           valid_elements: int, invalid_elements: int, fixed_elements: int,
+                                           input_manager_original_method_states: Dict[str, Callable],
+                                           eager_termination: bool,
+                                           ) -> None:
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    mock_input_manager._fix_data = MagicMock(return_value=False)
+    properties_blob_key = "property_map_key1"
+
+    result = mock_input_manager._validate_csv_element(property, properties_blob_key,
+                                                      input_data, eager_termination)
+    assert result["is_valid"] is False
+    assert result["total_elements"] == total_elements
+    assert result["valid_elements"] == valid_elements
+    assert result["invalid_elements"] == invalid_elements
+    assert result["fixed_elements"] == fixed_elements
+
+    mock_input_manager._validate_csv_element = input_manager_original_method_states["_validate_csv_element"]
+    mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
 
 
 def test_validate_json_element_string_type(mock_input_manager: InputManager,
@@ -568,7 +599,7 @@ def test_validate_element_invalid_nested_object_type(mock_input_manager: InputMa
     ],
 )
 def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock_input_manager: InputManager) -> None:
-    """Unit test for function _bool_type_validator function in file input_manager.py"""
+    """Unit test for function _bool_type_validator in file input_manager.py"""
     variable_properties = {}
     var_name = "dummy_var_name"
     result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
@@ -625,7 +656,7 @@ def test_validate_json_element_invalid_var_type_raises_keyerror(mock_input_manag
 )
 def test_array_type_validator(dummy_value: list, dummy_variable_to_check: Dict[str, int], expected_result: bool,
                               expected_warning_call_count: int, mock_input_manager: InputManager) -> None:
-    """Unit test for function _array_type_validator function in file input_manager.py"""
+    """Unit test for function _array_type_validator in file input_manager.py"""
     dummy_var_name = "dummy_array"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -651,7 +682,7 @@ def test_num_type_validator(dummy_value: int,
                             expected_result: bool,
                             expected_warning_call_count: int,
                             mock_input_manager: InputManager) -> None:
-    """Unit test for function _num_type_validator function in file input_manager.py"""
+    """Unit test for function _num_type_validator in file input_manager.py"""
     dummy_var_name = "dummy_num"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -677,7 +708,7 @@ def test_string_type_validator(dummy_value: int,
                                expected_result: bool,
                                expected_warning_call_count: int,
                                mock_input_manager: InputManager) -> None:
-    """Unit test for function _string_type_validator function in file input_manager.py"""
+    """Unit test for _string_type_validator function in file input_manager.py"""
     dummy_var_name = "dummy_var"
 
     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
