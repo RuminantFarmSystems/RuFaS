@@ -199,6 +199,40 @@ class InputManager:
         om.add_log("Total Invalid Items", f"{invalid_elements_counter=}", info_map)
         return invalid_elements_counter == 0
 
+    def _get_validity(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
+                      var_type: str) -> bool:
+        """Helper function to route correct arguments to type-validator functions.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            The metadata properties of the variable being validated.
+        var_name : str
+            The name of the variable being validated.
+        input_data_value : Any
+            The value of the variable being validated.
+        var_type : str
+            The type of the variable being validated.
+        Returns
+        -------
+        bool
+            True if element is valid.
+        Raises
+        ------
+        KeyError
+            Raised if the variable type is not one of the 4 currently supported for validation.
+        """
+        data_type_to_validator_map = {"string": self._string_type_validator,
+                                      "number": self._num_type_validator,
+                                      "array": self._array_type_validator,
+                                      "bool": self._bool_type_validator, }
+        try:
+            validator = data_type_to_validator_map[var_type]
+        except KeyError:
+            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+
+        return validator(variable_properties, var_name, input_data_value)
+
     def _validate_csv_element(self, property: str, properties_blob_key: str, input_data: Dict[str, Any],
                               eager_termination: bool) -> dict:
         """
@@ -226,27 +260,25 @@ class InputManager:
         """
         # property = column header/key in csv data dict ("diesel_cost_gal")
         # input_data = {"diesel_cost_gal": [5, 10], "electricity_cost_kwh": [0.15], etc}
-        info_map = {"class": self.__class__.__name__,
-                    "function": self._validate_csv_element.__name__,
-                    }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
-        property_data = input_data["property"]  # get array of data to validate
+        property_data = input_data[property]  # get array of data to validate
         variable_properties = reduce(lambda d, key: d[key], [property],
                                      self.__metadata["properties"][properties_blob_key])
         var_type = variable_properties["type"]
-        data_type_to_validator_map = {"string": self._string_type_validator,
-                                      "number": self._num_type_validator,
-                                      "array": self._array_type_validator,
-                                      "bool": self._bool_type_validator, }
-        try:
-            validator = data_type_to_validator_map[var_type]
-        except KeyError:
-            raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+        # data_type_to_validator_map = {"string": self._string_type_validator,
+        #                               "number": self._num_type_validator,
+        #                               "array": self._array_type_validator,
+        #                               "bool": self._bool_type_validator, }
+        # try:
+        #     validator = data_type_to_validator_map[var_type]
+        # except KeyError:
+        #     raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
         for element in property_data:
             element_counter_and_validity["total_elements"] += 1
-            is_valid = validator(variable_properties, property, element)
+            # is_valid = validator(variable_properties, property, element)
+            is_valid = self._get_validity(variable_properties, property, element, var_type)
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
             else:
@@ -254,6 +286,8 @@ class InputManager:
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
+                    if eager_termination:
+                        return element_counter_and_validity
                     element_counter_and_validity["invalid_elements"] += 1
                     element_counter_and_validity["is_valid"] = False
         return element_counter_and_validity
@@ -327,16 +361,17 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            data_type_to_validator_map = {"string": self._string_type_validator,
-                                          "number": self._num_type_validator,
-                                          "array": self._array_type_validator,
-                                          "bool": self._bool_type_validator, }
-            try:
-                validator = data_type_to_validator_map[var_type]
-            except KeyError:
-                raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
+            # data_type_to_validator_map = {"string": self._string_type_validator,
+            #                               "number": self._num_type_validator,
+            #                               "array": self._array_type_validator,
+            #                               "bool": self._bool_type_validator, }
+            # try:
+            #     validator = data_type_to_validator_map[var_type]
+            # except KeyError:
+            #     raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
 
-            is_valid = validator(variable_properties, var_name, input_data_value)
+            # is_valid = validator(variable_properties, var_name, input_data_value)
+            is_valid = self._get_validity(variable_properties, var_name, input_data_value, var_type)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
