@@ -414,11 +414,10 @@ def test_dict_to_csv_column_list_empty_list(mock_output_manager: OutputManager) 
             ]
         }
     },
-     """key1,key2,info_maps_subkey1,info_maps_subkey2,info_maps_subkey3,info_maps_subkey4
-1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}\"
-2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}\"
-3,\"[3, 3]\",,,,
-""",
+     f"key1,key2,info_maps_subkey1,info_maps_subkey2,info_maps_subkey3,info_maps_subkey4{os.linesep}"
+     f"1,\"[1, 1]\",1,Hello,\"[1, 2, 3]\",\"{{'nestedkey1': 'World', 'nestedkey2': [4, 5, 6]}}\"{os.linesep}"
+     f"2,\"[2, 2]\",2,Hi,\"[4, 5, 6]\",\"{{'nestedkey1': 'There', 'nestedkey2': [7, 8, 9]}}\"{os.linesep}"
+     f"3,\"[3, 3]\",,,,{os.linesep}",
      True),
     ({}, "",
      False),
