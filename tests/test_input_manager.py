@@ -184,6 +184,12 @@ def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Di
                                                                          "invalid_elements": 0,
                                                                          "is_valid": True
                                                                          }
+    mock_input_manager._validate_csv_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                        "valid_elements": 1,
+                                                                        "total_elements": 1,
+                                                                        "invalid_elements": 0,
+                                                                        "is_valid": True
+                                                                        }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
@@ -213,6 +219,12 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
                                                                          "invalid_elements": 0,
                                                                          "is_valid": False
                                                                          }
+    mock_input_manager._validate_csv_element = lambda *args, **kwargs: {"fixed_elements": 1,
+                                                                        "valid_elements": 1,
+                                                                        "total_elements": 1,
+                                                                        "invalid_elements": 0,
+                                                                        "is_valid": False
+                                                                        }
 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
