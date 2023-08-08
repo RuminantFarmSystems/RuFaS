@@ -1,79 +1,63 @@
+from typing import Optional
+from RUFAS.routines.field.crop.crop_data import CropData
+
 """
-RUFAS: Ruminant Farm Systems Model
-
-File name: root_development.py
-
-Author(s): Andy Achenreiner, achenreiner@wisc.edu
-
-Description: This module contains the necessary functions for calculating and
-             updating the root development in the soil. The update_all()
-             function is the only function intended to be used outside of this
-             module.
-
-CropType attribute definitions:
-
-    fr_PHU = Fraction of potential heat units accumulated for the plant on a
-             given day in the growing season.
-
-    fr_root = Fraction of total biomass partitioned to roots on a given day in
-              the growing season.
-
-    z_root_max = Maximum depth of root development
-
-    z_root = Depth of root development in the soil on a given day
-
-
-CropType values updated by calling update_all():
-
-    fr_root
-    z_root
+This module is based upon the "Root Development" section of the SWAT model (5.2.1.3)
 """
 
 
-def update_all(crop_type):
-    """
-    Description:
-        This function calls the functions in this module necessary to update the
-        root development of the given crop.
+class RootDevelopment:
+    def __init__(self, crop_data: Optional[CropData] = None):
+        # data reference
+        self.data = crop_data or CropData()  # defaults if not given
 
-    Args:
-        crop_type: an instance of a crop
-    """
+    def develop_roots(self) -> None:
+        """main root development function
 
-    calc_daily_root_biomass(crop_type)
-    calc_z_root(crop_type)
+        Details: updates the root_fraction and root_depth attributes.
+            The latter is updated differently depending upon whether the plant
+            is perennial.
+        """
+        # update root fraction
+        self.data.root_fraction = self._determine_root_fraction(self.data.heat_fraction)
 
+        # update root depth
+        if self.data.is_perennial:
+            self.data.root_depth = self.data.max_root_depth  # Note: assumption of SWAT
+        else:
+            self.data.root_depth = self._determine_root_depth(self.data.max_root_depth, self.data.heat_fraction)
 
-def calc_daily_root_biomass(crop_type):
-    """
-    Description:
-        Calculates the fraction of total biomass partitioned to roots
-        on a given day in the growing season (AKA fr_root).
-        "pseudocode_crop" C.3.A.1
+    @staticmethod
+    def _determine_root_fraction(heat_fraction: float) -> float:
+        """calculates root fraction, as a function of plant maturity
 
-    Args:
-        crop_type
-    """
+        Args:
+            heat_fraction: the proportion of potential heat units accumulated
+                to date; a proxy for maturity
 
-    crop_type.fr_root = 0.4 - 0.2 * crop_type.fr_PHU
+        SWAT Reference: 5:2.1.21
 
+        Returns: the fraction of a plant's biomass comprised of roots [0.4-0.2]
+        """
+        heat_fraction = max(heat_fraction, 0)  # bound to zero
+        if heat_fraction >= 2:  # leads to fraction < 0
+            return 0
+        else:
+            return 0.4 - 0.2 * heat_fraction
 
-def calc_z_root(crop_type):
-    """
-    Description:
-        Calculates depth of root development in the soil on a given
-        day (AKA z_root).
-        "pseudocode_crop" C.3.A.2/3
+    @staticmethod
+    def _determine_root_depth(max_depth: float, heat_fraction: float) -> float:
+        """calculates a plant's root depth on a given day
 
-    Args:
-        crop_type
-    """
+        Args:
+            max_depth: maximum possible root depth (mm)
+            heat_fraction: fraction of potential heat units
 
-    if not crop_type.z_root == crop_type.z_root_max:
+        SWAT Reference: 5:2.1.23, 24
 
-        # C.3.A.3
-        if crop_type.fr_PHU > 0.4:
-            crop_type.z_root = crop_type.z_root_max
-
-        else:  # self.fr_PHU <= 0.4
-            crop_type.z_root = 2.5 * crop_type.fr_PHU * crop_type.z_root_max
+        Returns: root depth (mm)
+        """
+        if heat_fraction <= 0.4:
+            return 2.5 * heat_fraction * max_depth
+        else:
+            return max_depth

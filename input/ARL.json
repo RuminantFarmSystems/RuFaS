@@ -1,7 +1,7 @@
 {
     "config":
     {
-        "start_date" : "1990:1",
+        "start_date" : "2013:1",
         "end_date" : "2019:365",
         "csv_dir": "output/CSVs/",
         "graphic_dir": "output/graphics/",
@@ -20,7 +20,7 @@
             "field_1": {
                 "soil": "ARL_soil.json",
                 "crop": "ARL_rotation.json",
-                "field_management": "ARL_no_fert_field_management.json"
+                "field_management": "ARL_field_management.json"
             }
         },
         "animal": "barnyard_animal.json",
