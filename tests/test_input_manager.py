@@ -50,6 +50,7 @@ def input_manager_original_method_states(
         "get_metadata": mock_input_manager.get_metadata,
         "_get_validity": mock_input_manager._get_validity,
         "_validate_csv_element": mock_input_manager._validate_csv_element,
+        "_get_array_data": mock_input_manager._get_array_data,
     }
 
 
@@ -1344,6 +1345,36 @@ def test_get_data_with_valid_key(dummy_data_path: str,
 
     assert result == expected_result
     assert add_warning.call_count == expected_warning_call_count
+
+
+# def test_get_data_partial_array(mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+#                                 mock_input_manager: InputManager) -> None:
+#     """Unit test for get_data function in file input_manager.py with request for partial array"""
+
+#     mock_input_manager._InputManager__pool = mock_pool_for_get_data
+#     dummy_data_path = "module1.integer_array_var.1:2"
+
+#     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+#         result = mock_input_manager.get_data(dummy_data_path)
+
+#     assert result == expected_result
+#     assert add_warning.call_count == expected_warning_call_count
+
+
+def test_get_nested_item_single_index(mock_input_manager: InputManager):
+    """Unit test for _get_array_data function in file input_manager.py with valid request"""
+    dummy_data = {'values': ['a', 'b', 'c', 'd']}
+    assert mock_input_manager._get_array_data(dummy_data['values'], '2') == 'c'
+    assert mock_input_manager._get_array_data(dummy_data['values'], '1:3') == ['b', 'c']
+    assert mock_input_manager._get_array_data(dummy_data['values'], ':2') == ['a', 'b']
+    assert mock_input_manager._get_array_data(dummy_data['values'], '1:') == ['b', 'c', 'd']
+
+
+def test_get_nested_item_invalid_key_raises_index_error(mock_input_manager: InputManager):
+    """Unit test for _get_array_data function in file input_manager.py with invalid index request"""
+    dummy_data = {'values': ['a', 'b', 'c', 'd']}
+    with pytest.raises(IndexError):
+        mock_input_manager._get_array_data(dummy_data['values'], '5')
 
 
 @pytest.mark.parametrize(

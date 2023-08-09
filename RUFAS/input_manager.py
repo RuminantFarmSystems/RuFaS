@@ -479,6 +479,21 @@ class InputManager:
                        info_map)
         return True
 
+    def _get_array_data(self, d, key) -> Any:
+        if ':' in key:
+            start, end = key.split(':')
+            start = int(start) if start else 0
+            end = int(end) if end else len(d)
+            print(start)
+            print(end)
+            print(d[start:end])
+            if isinstance(d, list) and (end > len(d) or start >= len(d)):
+                raise IndexError("Index out of range")
+            return d[start:end] if isinstance(d, list) else [d[k] for k in range(start, end)]
+        elif key.isdigit():
+            key = int(key)
+        return d[key]
+
     def get_data(self, data_address: str) -> Any:
         """
         Get the requested data from the pool.
@@ -531,7 +546,7 @@ class InputManager:
         element_hierarchy = data_address.split('.')
 
         try:
-            data_value = reduce(lambda d, key: d[key], element_hierarchy,
+            data_value = reduce(self._get_array_data, element_hierarchy,
                                 self.__pool)
             return data_value
 
