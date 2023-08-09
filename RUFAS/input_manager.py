@@ -201,7 +201,7 @@ class InputManager:
 
     def _get_validity(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
                       var_type: str) -> bool:
-        """Helper function to route correct arguments to type-validator functions.
+        """Helper function to route arguments to correct type-validator function.
 
         Parameters
         ----------
@@ -265,13 +265,13 @@ class InputManager:
                                      self.__metadata["properties"][properties_blob_key])
         var_type = variable_properties["type"]
 
-        for element in property_data:
+        for element_num in range(len(property_data)):
             element_counter_and_validity["total_elements"] += 1
-            is_valid = self._get_validity(variable_properties, property, element, var_type)
+            is_valid = self._get_validity(variable_properties, property, property_data[element_num], var_type)
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
             else:
-                is_fixed = self._fix_data(variable_properties, [property], input_data)
+                is_fixed = self._fix_data(variable_properties, [property, element_num], input_data)
                 if is_fixed:
                     element_counter_and_validity["fixed_elements"] += 1
                 else:
@@ -351,16 +351,6 @@ class InputManager:
             except KeyError:
                 raise KeyError(f"Key {var_name} not found in input data")
 
-            # data_type_to_validator_map = {"string": self._string_type_validator,
-            #                               "number": self._num_type_validator,
-            #                               "array": self._array_type_validator,
-            #                               "bool": self._bool_type_validator, }
-            # try:
-            #     validator = data_type_to_validator_map[var_type]
-            # except KeyError:
-            #     raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
-
-            # is_valid = validator(variable_properties, var_name, input_data_value)
             is_valid = self._get_validity(variable_properties, var_name, input_data_value, var_type)
 
             element_counter_and_validity["total_elements"] += 1
@@ -454,8 +444,8 @@ class InputManager:
         """Validates an input data bool element."""
         return input_data_value in (True, False)
 
-    def _fix_data(self, variable_properties: dict[str, Any], element_hierarchy: List[str],
-                  input_data: dict[str, Any]) -> bool:
+    def _fix_data(self, variable_properties: Dict[str, Any], element_hierarchy: list,
+                  input_data: Dict[str, Any]) -> bool:
         """
         Attempt to fix the invalid data.
 
@@ -464,8 +454,8 @@ class InputManager:
         variable_properties : dict[str, Any]
             The properties for the variable of interest.
 
-        element_hierarchy: List[str]
-            A list of strings indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+        element_hierarchy: list
+            A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
 
         input_data: dict[str, Any]
             A buffer dictionary that holds the input data for validation and fixing.

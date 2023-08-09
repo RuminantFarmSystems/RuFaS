@@ -1107,6 +1107,24 @@ def test_fix_string_type_fixable_data(dummy_variable_properties: dict[str, Any],
     assert add_warning.call_count == expected_warning_call_count
 
 
+def test_fix_string_type_csv_data(mock_input_manager: InputManager) -> None:
+    """Unit test for fixable number-type data from a csv array for _fix_data function in file input_manager.py"""
+
+    dummy_input_data = {"element1": [1, 2, 3, 4, 5]}
+    dummy_variable_properties = {"type": "number", "maximum": 4, "default": 3}
+    dummy_element_hierarchy = ["element1", 4]
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager._fix_data(dummy_variable_properties, dummy_element_hierarchy, dummy_input_data)
+
+    fixed_variable = reduce(lambda d, key: d[key], dummy_element_hierarchy,
+                            dummy_input_data)
+
+    assert fixed_variable == 3
+    assert result is True
+    assert add_warning.call_count == 1
+
+
 @pytest.mark.parametrize(
     'dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count',
     [
