@@ -233,7 +233,7 @@ class InputManager:
             variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
                                          self.__metadata["properties"][properties_blob_key])
         except KeyError as e:
-            raise e
+            raise KeyError(f"{str(e)} not found in input data")
 
         var_type = variable_properties["type"]
         is_nested = var_type == "object"
