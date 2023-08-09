@@ -684,8 +684,11 @@ class Feed:
                 can be added to output.
         """
         # aggregate crop yield across fields
+        return
+
         for field in fields.fields.values():
-            crop = field.crop.current_crop
+            name = list(field.crop.current_crop.keys())[0]
+            crop = field.crop.current_crop[name]
             # there is forage to be stored
             if crop.yield_actual != 0:
                 stored = False
