@@ -229,8 +229,12 @@ class InputManager:
                     }
         element_counter_and_validity = {"fixed_elements": 0, "total_elements": 0, "valid_elements": 0,
                                         "invalid_elements": 0, "is_valid": True}
-        variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
-                                     self.__metadata["properties"][properties_blob_key])
+        try:
+            variable_properties = reduce(lambda d, key: d[key], element_hierarchy,
+                                         self.__metadata["properties"][properties_blob_key])
+        except KeyError as e:
+            raise KeyError(f"{str(e)} not found in input data")
+
         var_type = variable_properties["type"]
         is_nested = var_type == "object"
         if is_nested:
@@ -258,11 +262,7 @@ class InputManager:
             return element_counter_and_validity
         else:
             var_name = element_hierarchy[-1]
-            try:
-                input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
-            except KeyError:
-                raise KeyError(f"Key {var_name} not found in input data")
-
+            input_data_value = reduce(lambda d, key: d[key], element_hierarchy, input_data)
             data_type_to_validator_map = {"string": self._string_type_validator,
                                           "number": self._num_type_validator,
                                           "array": self._array_type_validator,
