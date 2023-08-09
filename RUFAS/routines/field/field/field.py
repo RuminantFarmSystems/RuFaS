@@ -1318,3 +1318,35 @@ class Field:
                     "prefix": f"field='{self.field_data.name}'", "date": {"year": year, "day": day},
                     "field_size": self.field_data.field_size, "units": "mm"}
         om.add_variable("field_watering", watering_amount, info_map)
+
+    def _record_day(self, day: int) -> None:
+        """Record the day
+
+        Parameters
+        ----------
+        day : int
+            Julian day of when the main routine is called.
+
+        Returns
+        -------
+        None
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._record_day.__name__,
+                    "prefix": f"field='{self.field_data.name}'"}
+        om.add_variable("day", day, info_map)
+
+    def _record_year(self, year: int) -> None:
+        """Record the year
+
+        Parameters
+        ----------
+        year : int
+            Year of when the main routine is called.
+
+        Returns
+        -------
+        None
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._record_year.__name__,
+                    "prefix": f"field='{self.field_data.name}'"}
+        om.add_variable("day", year, info_map)
