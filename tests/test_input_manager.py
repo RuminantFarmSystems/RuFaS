@@ -96,7 +96,7 @@ def test_load_data_from_json_missing_file_raises_error(mock_input_manager: Input
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(FileNotFoundError):
                 mock_input_manager._load_data_from_json("non_existent_file.json")
-                assert add_log.call_count == 1
+            assert add_log.call_count == 1
 
 
 def test_load_data_from_json_invalid_data_raises_error(mock_input_manager: InputManager, ) -> None:
@@ -105,7 +105,7 @@ def test_load_data_from_json_invalid_data_raises_error(mock_input_manager: Input
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(json.JSONDecodeError):
                 mock_input_manager._load_data_from_json("dummy_file.json")
-                assert add_log.call_count == 1
+            assert add_log.call_count == 1
 
 
 def test_load_data_from_csv(mock_input_manager: InputManager, ) -> None:
@@ -122,12 +122,12 @@ def test_load_data_from_csv(mock_input_manager: InputManager, ) -> None:
 
 
 def test_load_data_from_csv_missing_file_raises_error(mock_input_manager: InputManager, ) -> None:
-    """Unit test for function _load_data_from_json with missing json file in file input_manager.py"""
+    """Unit test for function _load_data_from_csv with missing csv file in file input_manager.py"""
     with patch("builtins.open", side_effect=FileNotFoundError):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(FileNotFoundError):
                 mock_input_manager._load_data_from_csv("non_existent_file.csv")
-                assert add_log.call_count == 2
+            assert add_log.call_count == 1
 
 
 def test_load_data_from_csv_invalid_data_raises_error(mock_input_manager: InputManager, ) -> None:
@@ -137,7 +137,7 @@ def test_load_data_from_csv_invalid_data_raises_error(mock_input_manager: InputM
             with patch("pandas.read_csv", side_effect=pd.errors.ParserError("Invalid CSV")):
                 with pytest.raises(pd.errors.ParserError):
                     mock_input_manager._load_data_from_csv("dummy_file.csv")
-                    assert add_log.call_count == 1
+                assert add_log.call_count == 1
 
 
 def test_start_data_processing(mock_input_manager: InputManager,
@@ -232,9 +232,9 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
     with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
-            result = mock_input_manager._populate_pool(eager_termination=True)
+            result = mock_input_manager._populate_pool(eager_termination=False)
             assert result is False
-            assert add_log.call_count == 0
+            assert add_log.call_count == 4
             assert add_warning.call_count == 0
             assert "file1" not in mock_input_manager._InputManager__pool
             assert "file2" not in mock_input_manager._InputManager__pool
@@ -287,8 +287,8 @@ def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
             with pytest.raises(KeyError):
                 mock_input_manager._populate_pool(eager_termination=True)
 
-                assert add_log.call_count == 0
-                assert add_warning.call_count == 0
+            assert add_log.call_count == 0
+            assert add_warning.call_count == 0
 
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
