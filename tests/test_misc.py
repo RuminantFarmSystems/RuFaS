@@ -7,7 +7,8 @@ Author(s): Pooya Hekmati, sh2235@cornell.edu
 
 import os
 import re
-from typing import Any, Callable, Dict
+import json
+from typing import Any, Callable, Dict, List
 from mock import Mock, mock_open, patch
 
 import pytest
@@ -95,7 +96,8 @@ def test_init_simulation_engine(patch_simulation_engine: SimulationEngine) -> No
 
 def test_simulate(patch_simulation_engine: SimulationEngine, mocker: MockerFixture) -> None:
     """Unit test for function simulate in file RUFAS/simulation_engine.py"""
-    patch_for_run_simulation_main_loop = mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
+    patch_for_run_simulation_main_loop = \
+        mocker.patch("RUFAS.simulation_engine.SimulationEngine._run_simulation_main_loop")
     patch_for_show_final_messages = mocker.patch("RUFAS.simulation_engine.SimulationEngine._show_final_messages")
     patch_for_manure_output_handler_produce_csv = mocker.patch(
         "RUFAS.simulation_engine.ManureManagerOutputHandler.produce_csv",
@@ -440,6 +442,35 @@ def test_dict_to_file_csv(
     assert written_data == expected_result
 
 
+def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
+    """Unit test for the function _dict_to_file_json in the file output_manager.py"""
+
+    data = {
+            "var1": {"values": [1], "info_maps": [{"map1": "value1"}, {"map1": "value2"}]},
+            "var2": {
+                    "values": [{'v1': 1, 'v2': 1}, {'v1': 2, 'v2': 2}],
+                    "info_maps": [{"map1": "value1"}, {"map1": "value2"}]},
+            }
+
+    open_mock = mock_open()
+    with patch("builtins.open", open_mock):
+        mock_output_manager._dict_to_file_json(data, "test")
+
+    written_data = ''.join(call[1][0] for call in open_mock().write.mock_calls)
+    assert written_data == json.dumps(data, indent=0)
+
+
+def test_dict_to_file_json_exception(mock_output_manager: OutputManager) -> None:
+    """Test file opening failure for _dict_to_file_json() in the file output_manager.py"""
+    open_mock = mock_open()
+    open_mock.side_effect = IOError
+    data = {"var1": {"values": [1, 2, 3], "info_maps": [1, 2, 3]}}
+
+    with patch("builtins.open", open_mock):
+        with raises(Exception):
+            mock_output_manager._dict_to_file_json(data, "test")
+
+
 def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
     """Unit test for the function _dict_to_file_csv in the file output_manager.py"""
     open_mock = mock_open()
@@ -466,6 +497,9 @@ def test_generate_key(mocker: MockerFixture) -> None:
     om = OutputManager()
     with raises(KeyError):
         om._generate_key("name", {})
+
+    with raises(KeyError):
+        om._generate_key("name", {"class": "test"})
 
     info_map = {"class": "dummy_class", "function": "dummy_func"}
     key = om._generate_key("key_name", info_map)
@@ -789,14 +823,29 @@ def test_dump_variables(
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test case for function dump_variables in output_manager.py"""
+    filtered_info_maps_dict = {}
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._dict_to_file_json = MagicMock()
+    mock_output_manager._exclude_info_maps = MagicMock(return_value=filtered_info_maps_dict)
 
-    mock_output_manager.dump_variables("dummy_path")
+    mock_output_manager.dump_variables("dummy_path", False)
 
+    mock_output_manager._exclude_info_maps.assert_not_called()
     mock_output_manager._generate_file_name.assert_called_once_with("all_variables", "json")
     mock_output_manager._dict_to_file_json.assert_called_once_with(
         mock_output_manager.variables_pool, os.path.join("dummy_path", "dummy_name")
+    )
+
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._dict_to_file_json = MagicMock()
+    mock_output_manager._exclude_info_maps = MagicMock(return_value=filtered_info_maps_dict)
+
+    mock_output_manager.dump_variables("dummy_path", True)
+
+    mock_output_manager._exclude_info_maps.assert_called_once()
+    mock_output_manager._generate_file_name.assert_called_once_with("all_variables", "json")
+    mock_output_manager._dict_to_file_json.assert_called_once_with(
+        filtered_info_maps_dict, os.path.join("dummy_path", "dummy_name")
     )
 
     # Restore original methods
@@ -805,6 +854,9 @@ def test_dump_variables(
     ]
     mock_output_manager._dict_to_file_json = output_manager_original_method_states[
         "_dict_to_file_json"
+    ]
+    mock_output_manager._exclude_info_maps = output_manager_original_method_states[
+        "_exclude_info_maps"
     ]
 
 
@@ -908,20 +960,53 @@ def test_dump_errors(
     ]
 
 
+@pytest.mark.parametrize("expected_result, exclude_info_maps, format_option", [
+    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      'var1.info_maps: test' + os.linesep, 'var2.info_maps: map1' + os.linesep,
+      'var2.values: v1' + os.linesep, 'var2.values: v2' + os.linesep],
+     False, "verbose"),
+    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      'var2.values: v1' + os.linesep, 'var2.values: v2' + os.linesep],
+     True, "verbose"),
+    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      '    .info_maps: test' + os.linesep, '    .info_maps: map1' + os.linesep,
+      '    .values: v1' + os.linesep, '    .values: v2' + os.linesep],
+     False, "block"),
+    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep,
+      'var1' + os.linesep, '    .values: v1' + os.linesep, '    .values: v2' + os.linesep],
+     True, "block"),
+    (['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      "var1.info_maps: ['test']" + os.linesep, "var2.info_maps: ['map1']" + os.linesep,
+      "var2.values: ['v1', 'v2']" + os.linesep],
+     False, "inline"),
+    (['_exclude_info_maps=True, expect info_maps accordingly.' + os.linesep, 'var1' + os.linesep,
+      "var2.values: ['v1', 'v2']" + os.linesep],
+     True, "inline"),
+])
 def test_dump_variable_names_and_contexts(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    expected_result: List[str],
+    exclude_info_maps: bool,
+    format_option: str,
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
-    dummy_list = ['_exclude_info_maps=False, expect info_maps accordingly.\n']
+    mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
+        "var1": {"values": [1], "info_maps": [{"test": "value1"}, {"test": "value2"}]},
+        "var2": {
+                "values": [{'v1': 1, 'v2': 1}, {'v1': 2, 'v2': 2}],
+                "info_maps": [{"map1": "value1"}, {"map1": "value2"}]},
+     }
+    original_variables_pool = mock_output_manager.variables_pool
+    mock_output_manager.variables_pool = mock_variable_pool
     mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
     mock_output_manager._list_to_file_txt = MagicMock()
 
-    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False)
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", exclude_info_maps, format_option)
 
     mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(
-        dummy_list, os.path.join("dummy_path", "dummy_name")
+        expected_result, os.path.join("dummy_path", "dummy_name")
     )
 
     # Restore original methods
@@ -931,6 +1016,39 @@ def test_dump_variable_names_and_contexts(
     mock_output_manager._list_to_file_txt = output_manager_original_method_states[
         "_list_to_file_txt"
     ]
+    mock_output_manager.variables_pool = original_variables_pool
+
+
+def test_dump_variable_names_and_contexts_no_values(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    """Test case for function dump_variable_names_and_contexts in output_manager.py"""
+    mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
+        "var1": {"no_values": [1], "info_maps": [{"test": "value1"}, {"test": "value2"}]},
+    }
+    expected_output = ['_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
+                       'var1: **NO VARIABLES**' + os.linesep]
+    original_variables_pool = mock_output_manager.variables_pool
+    mock_output_manager.variables_pool = mock_variable_pool
+    mock_output_manager._generate_file_name = MagicMock(return_value="dummy_name")
+    mock_output_manager._list_to_file_txt = MagicMock()
+
+    mock_output_manager.dump_variable_names_and_contexts("dummy_path", False, format_option="verbose")
+
+    mock_output_manager._generate_file_name.assert_called_once_with("variable_names", "txt")
+    mock_output_manager._list_to_file_txt.assert_called_once_with(
+        expected_output, os.path.join("dummy_path", "dummy_name")
+    )
+
+    # Restore original methods
+    mock_output_manager._generate_file_name = output_manager_original_method_states[
+        "_generate_file_name"
+    ]
+    mock_output_manager._list_to_file_txt = output_manager_original_method_states[
+        "_list_to_file_txt"
+    ]
+    mock_output_manager.variables_pool = original_variables_pool
 
 
 def test_list_to_file_txt(
@@ -949,13 +1067,13 @@ def test_list_to_file_txt(
 
     with pytest.raises(TypeError) as e:
         mock_output_manager._list_to_file_txt(1234, dummy_file_path)
-        assert "object is not iterable" in str(e.value)
+    assert "object is not iterable" in str(e.value)
 
     dummy_broken_file_path = ""
 
     with pytest.raises(FileNotFoundError) as e:
         mock_output_manager._list_to_file_txt(dummy_list, dummy_broken_file_path)
-        assert "No such file or directory" in str(e.value)
+    assert "No such file or directory" in str(e.value)
 
     # Restore original method
     mock_output_manager._list_to_file_txt = output_manager_original_method_states[
