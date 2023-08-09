@@ -96,7 +96,7 @@ def test_load_data_from_json_missing_file_raises_error(mock_input_manager: Input
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(FileNotFoundError):
                 mock_input_manager._load_data_from_json("non_existent_file.json")
-                assert add_log.call_count == 1
+            assert add_log.call_count == 1
 
 
 def test_load_data_from_json_invalid_data_raises_error(mock_input_manager: InputManager, ) -> None:
@@ -105,7 +105,7 @@ def test_load_data_from_json_invalid_data_raises_error(mock_input_manager: Input
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(json.JSONDecodeError):
                 mock_input_manager._load_data_from_json("dummy_file.json")
-                assert add_log.call_count == 1
+            assert add_log.call_count == 1
 
 
 def test_load_data_from_csv(mock_input_manager: InputManager, ) -> None:
@@ -122,12 +122,12 @@ def test_load_data_from_csv(mock_input_manager: InputManager, ) -> None:
 
 
 def test_load_data_from_csv_missing_file_raises_error(mock_input_manager: InputManager, ) -> None:
-    """Unit test for function _load_data_from_json with missing json file in file input_manager.py"""
+    """Unit test for function _load_data_from_csv with missing csv file in file input_manager.py"""
     with patch("builtins.open", side_effect=FileNotFoundError):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             with pytest.raises(FileNotFoundError):
                 mock_input_manager._load_data_from_csv("non_existent_file.csv")
-                assert add_log.call_count == 2
+            assert add_log.call_count == 1
 
 
 def test_load_data_from_csv_invalid_data_raises_error(mock_input_manager: InputManager, ) -> None:
@@ -137,7 +137,7 @@ def test_load_data_from_csv_invalid_data_raises_error(mock_input_manager: InputM
             with patch("pandas.read_csv", side_effect=pd.errors.ParserError("Invalid CSV")):
                 with pytest.raises(pd.errors.ParserError):
                     mock_input_manager._load_data_from_csv("dummy_file.csv")
-                    assert add_log.call_count == 1
+                assert add_log.call_count == 1
 
 
 def test_start_data_processing(mock_input_manager: InputManager,
@@ -197,11 +197,11 @@ def test_populate_pool_valid(mock_input_manager: InputManager, mock_metadata: Di
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
             result = mock_input_manager._populate_pool(eager_termination=True)
 
-            assert result is True
-            assert add_log.call_count == 4
-            assert add_warning.call_count == 0
-            assert "file1" in mock_input_manager._InputManager__pool
-            assert "file2" in mock_input_manager._InputManager__pool
+        assert result is True
+        assert add_log.call_count == 4
+        assert add_warning.call_count == 0
+        assert "file1" in mock_input_manager._InputManager__pool
+        assert "file2" in mock_input_manager._InputManager__pool
 
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
@@ -219,13 +219,13 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
     mock_input_manager._validate_json_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                          "valid_elements": 1,
                                                                          "total_elements": 1,
-                                                                         "invalid_elements": 0,
+                                                                         "invalid_elements": 1,
                                                                          "is_valid": False
                                                                          }
     mock_input_manager._validate_csv_element = lambda *args, **kwargs: {"fixed_elements": 1,
                                                                         "valid_elements": 1,
                                                                         "total_elements": 1,
-                                                                        "invalid_elements": 0,
+                                                                        "invalid_elements": 1,
                                                                         "is_valid": False
                                                                         }
 
@@ -233,11 +233,12 @@ def test_populate_pool_invalid(mock_input_manager: InputManager, mock_metadata: 
         with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
 
             result = mock_input_manager._populate_pool(eager_termination=True)
-            assert result is False
-            assert add_log.call_count == 0
-            assert add_warning.call_count == 0
-            assert "file1" not in mock_input_manager._InputManager__pool
-            assert "file2" not in mock_input_manager._InputManager__pool
+
+        assert result is False
+        assert add_log.call_count == 0
+        assert add_warning.call_count == 0
+        assert "file1" not in mock_input_manager._InputManager__pool
+        assert "file2" not in mock_input_manager._InputManager__pool
 
     mock_input_manager._populate_pool = \
         input_manager_original_method_states["_populate_pool"]
@@ -391,6 +392,24 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
             }
         }
     }
+
+
+def test_validate_element_fixable_data(mock_input_manager: InputManager,
+                                       mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                       input_manager_original_method_states: Dict[str, Callable], ) -> None:
+    """Unit test for a fixable number type input_data for _validate_json_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+    mock_input_manager._num_type_validator = MagicMock(return_value=False)
+    mock_input_manager._fix_data = MagicMock(return_value=True)
+
+    input_data = {"element2": 123}
+    result = mock_input_manager._validate_json_element(["element2"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
+    mock_input_manager._num_type_validator = input_manager_original_method_states["_num_type_validator"]
+    mock_input_manager._fix_data = input_manager_original_method_states["_fix_data"]
 
 
 @pytest.mark.parametrize(
