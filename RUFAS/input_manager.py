@@ -508,13 +508,11 @@ class InputManager:
             start, end = key.split(':')
             start = int(start) if start else 0
             end = int(end) if end else len(data_structure)
-            if isinstance(data_structure, list) and (end > len(data_structure) or start >= len(data_structure)):
-                raise IndexError("Index out of range")
             return data_structure[start:end] if isinstance(data_structure, list) \
                 else [data_structure[k] for k in range(start, end)]
         elif key.isdigit():
             key = int(key)
-            if isinstance(data_structure, list) and (key > len(data_structure) - 1) or key < 0:
+            if isinstance(data_structure, list) and (key >= len(data_structure)):
                 raise IndexError("Index out of range")
         return data_structure[key]
 
