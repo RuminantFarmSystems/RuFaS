@@ -479,20 +479,37 @@ class InputManager:
                        info_map)
         return True
 
-    def _get_array_data(self, d, key) -> Any:
+    def _get_array_data(self, data_structure: Union[List[Any], Dict[str, Any]], key: str) -> Any:
+        """Helper function to handle requests to _get_data for partial array data.
+
+        Parameters
+        ----------
+        data_structure : Union[List[Any], Dict[str, Any]]
+            The list or dictionary being searched within the Input Manager's __pool.
+        key : str
+            The keys from the _get_data element hierarchy used to search the list or dictionary.
+
+        Returns
+        -------
+        Any
+            The value extracted from the full key path within the Input Manager's __pool.
+
+        Raises
+        ------
+        IndexError
+            If the data_structure being searched is a list and the index requested is out of range.
+        """
         if ':' in key:
             start, end = key.split(':')
             start = int(start) if start else 0
-            end = int(end) if end else len(d)
-            print(start)
-            print(end)
-            print(d[start:end])
-            if isinstance(d, list) and (end > len(d) or start >= len(d)):
+            end = int(end) if end else len(data_structure)
+            if isinstance(data_structure, list) and (end > len(data_structure) or start >= len(data_structure)):
                 raise IndexError("Index out of range")
-            return d[start:end] if isinstance(d, list) else [d[k] for k in range(start, end)]
+            return data_structure[start:end] if isinstance(data_structure, list) \
+                else [data_structure[k] for k in range(start, end)]
         elif key.isdigit():
             key = int(key)
-        return d[key]
+        return data_structure[key]
 
     def get_data(self, data_address: str) -> Any:
         """
