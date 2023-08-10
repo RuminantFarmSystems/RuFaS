@@ -1408,15 +1408,20 @@ def test_get_nested_item_single_index(mock_input_manager: InputManager):
     assert mock_input_manager._get_array_data(dummy_data['values'], '1:') == ['b', 'c', 'd']
 
 
-def test_get_nested_item_invalid_key_raises_index_error(mock_input_manager: InputManager):
+@pytest.mark.parametrize(
+        'index_request',
+        [
+            ("10:15"),
+            ("5"),
+            (":20"),
+            ("20:")
+        ]
+)
+def test_get_nested_item_invalid_key_raises_index_error(mock_input_manager: InputManager, index_request: str):
     """Unit test for _get_array_data function in file input_manager.py with invalid index request"""
     dummy_data = {'values': ['a', 'b', 'c', 'd']}
     with pytest.raises(IndexError) as index_error:
-        mock_input_manager._get_array_data(dummy_data['values'], '10:15')
-        assert "Index out of range" in index_error.value
-
-    with pytest.raises(IndexError) as index_error:
-        mock_input_manager._get_array_data(dummy_data['values'], '5')
+        mock_input_manager._get_array_data(dummy_data['values'], index_request)
         assert "Index out of range" in index_error.value
 
 
