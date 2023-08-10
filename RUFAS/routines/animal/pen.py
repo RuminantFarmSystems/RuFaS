@@ -9,10 +9,11 @@ Description: The class which represents a pen on the farm. Each pen has
 Author(s): Militsa Sotirova, militsasotirova@gmail.com
            Joseph Merhi, jm2257@cornell.edu
 """
-import collections
+from __future__ import annotations
+
 import copy
 from enum import Enum
-from typing import List, Dict, Union, DefaultDict, Any
+from typing import List, Dict, Union, Any, Tuple
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
@@ -22,10 +23,8 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions, add_animal_manure_excretions, \
-    get_default_animal_manure_excretions, scalar_mult_animal_manure_excretions
+    get_default_animal_manure_excretions
 from RUFAS.routines.animal.ration import animal_requirements as req
-from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.animal.ration.calf_ration import optimize as calf_optimize
 
 om = OutputManager()
 
@@ -688,14 +687,170 @@ class Pen:
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
 
-    def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str,
+    @staticmethod
+    def _get_prefix_and_default_manure_excretion(animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
+                                                 is_lactating_cow=False) \
+            -> Tuple[str, AnimalManureExcretions]:
+        """
+        Get the prefix and default manure value for a given animal.
+
+        Parameters
+        ----------
+        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow
+            The animal instance for which to get the prefix and manure.
+        is_lactating_cow: bool, optional
+            True if the animal is a lactating cow, False otherwise. Default is set to False.
+
+        Returns
+        -------
+        Tuple[str, AnimalManureExcretions]
+            A tuple containing the prefix and default manure value for the animal.
+
+        """
+        animal_type_to_prefix = {
+            'Calf': 'daily_aggregate_calf',
+            'HeiferI': 'daily_aggregate_heifer',
+            'HeiferII': 'daily_aggregate_heifer',
+            'HeiferIII': 'daily_aggregate_heifer',
+            'Cow': 'daily_aggregate_dry_cow',
+        }
+        prefix = animal_type_to_prefix.get(animal.__class__.__name__, None)
+        if prefix is None:
+            raise ValueError(f'Unrecognized animal type: {type(animal)}')
+        if is_lactating_cow:
+            prefix = 'daily_aggregate_lactating_cow'
+        manure = get_default_animal_manure_excretions()
+        return prefix, manure
+
+    def _calc_animal_manure_excretion(self, animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
+                                      feed: 'Feed', methane_model: str, methane_mitigation_method: str,
+                                      methane_mitigation_additive_amount: float) -> Tuple[str, AnimalManureExcretions]:
+        """
+        Calculate the manure excretion for a given animal and return the prefix and excretions.
+
+        Parameters
+        ----------
+        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow
+            The animal instance for which to calculate manure excretion.
+        feed: Feed
+            An object of the Feed class containing information about the feed.
+        methane_model: str
+            Methane model used for calculations.
+        methane_mitigation_method: str
+            Methane mitigation method used.
+        methane_mitigation_additive_amount: float
+            Amount of methane mitigation additive, mg/kg dry matter intake (DMI).
+
+        Returns
+        -------
+        Tuple[str, AnimalManureExcretions]
+            A tuple containing the prefix and calculated manure excretion for the animal.
+
+        """
+        is_cow = animal.__class__.__name__ == 'Cow'
+        is_lactating_cow = is_cow and animal.is_lactating
+        if is_cow:
+            animal.calc_manure_excretion(feed, methane_model, methane_mitigation_method,
+                                         methane_mitigation_additive_amount, self.MEdiet)
+        else:
+            animal.calc_manure_excretion(feed, methane_model)
+        return self._get_prefix_and_default_manure_excretion(animal, is_lactating_cow)
+
+    def _update_animal_manure_excretion_data(self, animal_prefix_to_output_data_dict: dict[
+        str, dict[str, str | AnimalManureExcretions]],
+                                             prefix: str,
+                                             manure: AnimalManureExcretions,
+                                             animal: Calf | HeiferI | HeiferII | HeiferIII | Cow) \
+            -> None:
+        """
+        Update the manure excretion dictionaries and the `self.manure` variable.
+
+        Parameters
+        ----------
+        animal_prefix_to_output_data_dict: dict[str, AnimalManureExcretions]
+            Dictionary mapping prefixes to animal manure data.
+        prefix: str
+            Prefix related to the animal type.
+        manure: AnimalManureExcretions
+            Manure excretions data for the animal.
+        animal: Calf | HeiferI | HeiferII | HeiferIII | Cow
+            The animal instance for which to update the manure excretion data.
+
+        Returns
+        -------
+        None
+
+        """
+        if prefix not in animal_prefix_to_output_data_dict:
+            animal_prefix_to_output_data_dict[prefix] = {'prefix': prefix, 'manure': manure}
+
+        animal_prefix_to_output_data_dict[prefix]['manure'] = add_animal_manure_excretions(
+            animal_prefix_to_output_data_dict[prefix]['manure'], animal.manure_excretion)
+
+        self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
+
+    def calc_total_manure(self, feed: 'Feed', methane_model: str, methane_mitigation_method: str,
                           methane_mitigation_additive_amount: float) -> None:
         """
         Calculate the total manure excreted by all animals in the pen.
 
         Parameters
         ----------
-        feed
+        feed: Feed
+            An object of the Feed class that stores the feed information managed by the farm
+        methane_model: str
+            Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
+        methane_mitigation_method: str
+            Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin",
+            "Essential Oils", and "Seaweed".
+        methane_mitigation_additive_amount: float
+            The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
+            The recommended dose for 3-NOP is between 40 and 100 mg/kg DMI, while that for monensin is
+            between 16 and 36 mg/kg DMI.
+
+        Returns
+        -------
+        None
+
+        """
+        if not self.is_populated:
+            return
+
+        self.manure = get_default_animal_manure_excretions()
+        animal_prefix_to_output_data_dict = {
+            'pen': {
+                'prefix': f'pen_{self.id}_daily',
+                'manure': self.manure,
+            }
+        }
+
+        for animal in self.animals_in_pen:
+            prefix, manure = self._calc_animal_manure_excretion(animal, feed, methane_model,
+                                                                methane_mitigation_method,
+                                                                methane_mitigation_additive_amount)
+            self._update_animal_manure_excretion_data(animal_prefix_to_output_data_dict, prefix, manure, animal)
+
+        for output_data_dict in animal_prefix_to_output_data_dict.values():
+            if output_data_dict['manure'] is None:
+                continue
+            for manure_property, manure_value in output_data_dict['manure'].items():
+                info_map = {
+                    'class': self.__class__.__name__,
+                    'function': self.calc_total_manure.__name__,
+                }
+                om.add_variable(f'{output_data_dict["prefix"]}_{str(manure_property)}',
+                                manure_value,
+                                info_map=info_map)
+
+    def calc_total_manure_experiment(self, feed: 'Feed', methane_model: str, methane_mitigation_method: str,
+                                     methane_mitigation_additive_amount: float) -> None:
+        """
+        Calculate the total manure excreted by all animals in the pen.
+
+        Parameters
+        ----------
+        feed: Feed
+            An object of the Feed class that stores the feed information managed by the farm
         methane_model: str 
             Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
         methane_mitigation_method: str 
@@ -746,7 +901,8 @@ class Pen:
         for animal in self.animals_in_pen:
             animal_class = type(animal)
             if animal_class == Cow:
-                animal.calc_manure_excretion(feed, methane_model, methane_mitigation_method, methane_mitigation_additive_amount, self.MEdiet)
+                animal.calc_manure_excretion(feed, methane_model, methane_mitigation_method,
+                                             methane_mitigation_additive_amount, self.MEdiet)
                 if animal.is_lactating:
                     animal_class = lactating_cow_str
             else:
@@ -767,12 +923,14 @@ class Pen:
             if output_data_dict['manure'] is None:
                 continue
             for manure_property, manure_value in output_data_dict['manure'].items():
+                info_map = {
+                    'class': self.__class__.__name__,
+                    'function': self.calc_total_manure.__name__,
+                    'prefix': output_data_dict['prefix'],
+                }
                 om.add_variable(f'{output_data_dict["prefix"]}_{str(manure_property)}',
                                 manure_value,
-                                info_map={
-                                    'class': self.__class__.__name__,
-                                    'function': self.calc_total_manure.__name__,
-                                })
+                                info_map=info_map)
 
     def _set_animal_nutrient_values(self, animal, animal_grouping_scenario,
                                     feed, temp, phosphorus_concentration) -> None:
