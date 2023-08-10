@@ -978,8 +978,36 @@
     },
     "fertilizer_schedule_properties": {
       "available_fertilizer_mixes": {
-        "type": "object",
-        "description": "All the available fertilizer mixes that are available besides the default ones."
+        "type": "array",
+        "description": "All the available fertilizer mixes that are available besides the default ones.",
+        "minimum_length": 0,
+        "default": [],
+        "properties": {
+          "type": "object",
+          "description": "The name and nutrient breakdown of a single fertilizer mix.",
+          "name": {
+            "type": "string",
+            "description": "Name of the fertilizer mix."
+          },
+          "N": {
+            "type": "number",
+            "description": "Fraction of nitrogen contained in the fertilizer mix by mass.",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "P": {
+            "type": "number",
+            "description": "Fraction of phosphorus contained in the fertilizer mix by mass.",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "K": {
+            "type": "number",
+            "description": "Fraction of potassium contained in the fertilizer mix by mass.",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        }
       },
       "mix_names": {
         "type": "array",
