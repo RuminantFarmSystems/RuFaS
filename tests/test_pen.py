@@ -453,44 +453,6 @@ def test_calc_animal_manure_excretion(mocker: MockerFixture,
         animal.calc_manure_excretion.assert_called_once_with(mock_feed, mock_methane_model)
 
 
-# def test_update_animal_manure_excretion_data(mocker: MockerFixture) -> None:
-#     """
-#     Unit test for the _update_animal_manure_excretion_data method in pen.py.
-#
-#     This test verifies that the method correctly updates the manure excretion dictionaries and
-#     the `self.manure` variable according to the given parameters.
-#
-#     """
-#     # Arrange
-#     mocker.patch('RUFAS.routines.animal.pen.Pen.__init__', return_value=None)
-#     pen = Pen()  # type: ignore
-#     pen.manure = initial_pen_manure = 'initial_manure'
-#     test_manure_str = 'test_manure'
-#     animal_prefix_to_output_data_dict = {'test_prefix': {'prefix': 'nested_test_prefix', 'manure': test_manure_str}}
-#     prefix = 'test_prefix'
-#     mock_default_manure = mocker.MagicMock()
-#     mock_animal = mocker.MagicMock()
-#     mock_animal.manure_excretion = mock_animal_manure_excretion = 'animal_manure_excretion'
-#
-#     patch_for_add_animal_manure_excretions = mocker.patch(
-#         'RUFAS.routines.animal.pen.add_animal_manure_excretions',
-#         side_effect=lambda x, y: x + '_' + y  # Perform a simple string concatenation
-#     )
-#
-#     # Act
-#     pen._update_animal_manure_excretion_data(animal_prefix_to_output_data_dict, prefix,
-#                                              mock_default_manure, mock_animal)
-#
-#     # Assert
-#     assert animal_prefix_to_output_data_dict[prefix]['manure'] == f'{test_manure_str}_{mock_animal_manure_excretion}'
-#     assert pen.manure == f'{initial_pen_manure}_{mock_animal_manure_excretion}'
-#     patch_for_add_animal_manure_excretions.assert_has_calls(
-#         [mocker.call(test_manure_str, mock_animal_manure_excretion),
-#          mocker.call(initial_pen_manure, mock_animal_manure_excretion)],
-#         any_order=False
-#     )
-
-
 @pytest.mark.parametrize(
     'initial_dict, prefix, default_manure, initial_pen_manure, animal_manure_excretion, expected_dict, expected_manure',
     [
