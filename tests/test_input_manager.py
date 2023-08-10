@@ -1399,20 +1399,6 @@ def test_get_data_with_valid_key(dummy_data_path: str,
     assert add_warning.call_count == expected_warning_call_count
 
 
-# def test_get_data_partial_array(mock_pool_for_get_data: Dict[str, Dict[str, Any]],
-#                                 mock_input_manager: InputManager) -> None:
-#     """Unit test for get_data function in file input_manager.py with request for partial array"""
-
-#     mock_input_manager._InputManager__pool = mock_pool_for_get_data
-#     dummy_data_path = "module1.integer_array_var.1:2"
-
-#     with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
-#         result = mock_input_manager.get_data(dummy_data_path)
-
-#     assert result == expected_result
-#     assert add_warning.call_count == expected_warning_call_count
-
-
 def test_get_nested_item_single_index(mock_input_manager: InputManager):
     """Unit test for _get_array_data function in file input_manager.py with valid request"""
     dummy_data = {'values': ['a', 'b', 'c', 'd']}
@@ -1425,8 +1411,13 @@ def test_get_nested_item_single_index(mock_input_manager: InputManager):
 def test_get_nested_item_invalid_key_raises_index_error(mock_input_manager: InputManager):
     """Unit test for _get_array_data function in file input_manager.py with invalid index request"""
     dummy_data = {'values': ['a', 'b', 'c', 'd']}
-    with pytest.raises(IndexError):
+    with pytest.raises(IndexError) as index_error:
+        mock_input_manager._get_array_data(dummy_data['values'], '10:15')
+        assert "Index out of range" in index_error.value
+
+    with pytest.raises(IndexError) as index_error:
         mock_input_manager._get_array_data(dummy_data['values'], '5')
+        assert "Index out of range" in index_error.value
 
 
 @pytest.mark.parametrize(

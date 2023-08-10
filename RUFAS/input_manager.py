@@ -514,6 +514,8 @@ class InputManager:
                 else [data_structure[k] for k in range(start, end)]
         elif key.isdigit():
             key = int(key)
+            if isinstance(data_structure, list) and (key > len(data_structure) - 1) or key < 0:
+                raise IndexError("Index out of range")
         return data_structure[key]
 
     def get_data(self, data_address: str) -> Any:
