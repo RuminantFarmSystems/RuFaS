@@ -723,7 +723,7 @@ class Pen:
         return prefix, manure
 
     def _calc_animal_manure_excretion(self, animal: Calf | HeiferI | HeiferII | HeiferIII | Cow,
-                                      feed: 'Feed', methane_model: str, methane_mitigation_method: str,
+                                      feed, methane_model: str, methane_mitigation_method: str,
                                       methane_mitigation_additive_amount: float) -> Tuple[str, AnimalManureExcretions]:
         """
         Calculate the manure excretion for a given animal and return the prefix and excretions.
@@ -789,7 +789,7 @@ class Pen:
 
         self.manure = add_animal_manure_excretions(self.manure, animal.manure_excretion)
 
-    def calc_total_manure(self, feed: 'Feed', methane_model: str, methane_mitigation_method: str,
+    def calc_total_manure(self, feed, methane_model: str, methane_mitigation_method: str,
                           methane_mitigation_additive_amount: float) -> None:
         """
         Calculate the total manure excreted by all animals in the pen.
