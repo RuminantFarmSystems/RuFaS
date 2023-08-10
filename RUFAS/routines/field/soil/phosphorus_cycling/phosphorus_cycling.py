@@ -1,94 +1,62 @@
+from typing import Optional
+
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
+from RUFAS.routines.field.soil.phosphorus_cycling.fertilizer import Fertilizer
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+
 """
-RUFAS: Ruminant Farm Systems Model
-
-phosphorus_cycling.py
-
-Author(s):  Jacob Johnson jacob8399@gmail.com
-            William Donovan wmdonovan@wisc.edu
+This module contains the composite class for phosphorus cycling, which contains and manages all the necessary all
+necessary aspects for managing phosphorus in and on top of a soil profile.
 """
 
-from . import fert_leach, manure_leach, P_mineralization, soluble_P, erosion
 
+class PhosphorusCycling:
 
-def update_all(soil, field_management, weather, time):
-    """
-    Description:
-        Runs the phosphorus cycling sub-module.
-        Currently largely based on Peter Vadas' SurPhos
-    Args:
-        soil: instance of the Soil class specified in soil.py
-        field_management: instance of the FieldManagement class
-            specified in field_management.py
-        weather: instance of the Weather class specified in classes.py
-        time: instance of the Time class specified in classes.py
-    """
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+        """This method initializes the SoilData object that this module will work with, or create one if none provided.
 
-    # calculate soluble Phosphorus
-    soluble_P.update_all(soil)
+        Parameters
+        ----------
+        soil_data : SoilData, optional
+            The SoilData object used by this module to track phosphorus cycling, creates new one if one is not provided.
+        field_size : float, optional
+            Size of the field (ha)
 
-    # calculate leached fertilizer Phosphorus
-    fert_leach.update_all(soil, weather, time)
+        Notes
+        -----
+        Used to initialize a SoilData object for this module to work with, if a pre-configured SoilData object is not
+        provided (ha)
 
-    # calculate leached manure Phosphorus
-    manure_leach.update_all(soil, field_management, weather, time)
+        """
+        self.data = soil_data or SoilData(field_size=field_size)
 
-    # calculate mineralized Phosphorus
-    P_mineralization.update_all(soil, time)
+        self.manure = Manure(self.data)
+        """Process component that manages manure on the field."""
+        self.fertilizer = Fertilizer(self.data)
+        """Process component that manages fertilizer on the field."""
+        self.mineralization = PhosphorusMineralization(self.data)
+        """Process component that controls the mineralization of phosphorus within the soil profile."""
+        self.soluble_phosphorus = SolublePhosphorus(self.data)
+        """Process component that controls the movement of phosphorus between layers of soil."""
 
-    # calculate eroded Phosphorus
-    erosion.update_all(soil)
+    def cycle_phosphorus(self, rainfall: float, runoff: float, field_size: float, mean_air_temperature: float) -> None:
+        """This method calls all daily routines that manage phosphorus on the soil surface and in the soil profile.
 
-    update_profile_P(soil, field_management)
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm)
+        runoff : float
+            The amount of runoff from rainfall on the current day (mm)
+        field_size : float
+            The size of the field (ha)
+        mean_air_temperature : float
+            Mean air temperature on the current day (degrees C)
 
-
-def update_profile_P(soil, field_management):
-    soil.labile_P = 0.0
-    soil.active_P = 0.0
-    soil.stable_P = 0.0
-    soil.org_P = 0.0
-    soil.soil_P = 0.0
-    soil.P_uptake = 0.0
-
-    for layer in soil.soil_layers:
-        soil.labile_P += layer.labile_P
-        soil.active_P += layer.active_P
-        soil.stable_P += layer.stable_P
-        soil.org_P += layer.org_P
-        soil.soil_P += layer.soil_P
-        soil.P_uptake += layer.P_uptake
-
-    soil.STP = soil.soil_layers[0].labile_P + soil.soil_layers[0].active_P + soil.soil_layers[0].stable_P
-
-    profile_P = soil.labile_P + soil.active_P + \
-                soil.stable_P + soil.org_P
-
-    soil.delta_P = profile_P - soil.profile_P
-
-    soil.profile_P = profile_P
-
-    soil.P_erosion = soil.sed_P
-
-    soil.P_drainage = soil.fert_P_leached + soil.M_leach + soil.DRP_drainage
-
-    soil.P_runoff = soil.M_DRP_runoff + soil.fert_P_runoff_act + \
-                    soil.DRP_runoff + soil.MIP_runoff + soil.MOP_runoff
-
-    soil.P_calc = soil.delta_P + soil.P_erosion + soil.P_drainage + soil.P_runoff + soil.P_uptake
-
-    soil.P_balance_difference = field_management.manure_P_applied - soil.P_calc
-
-
-def update_annual_P(soil):
-    soil.M_DRP_runoff_annual += soil.M_DRP_runoff
-    soil.TIP_runoff_annual += soil.TIP_runoff
-    soil.MIP_leach_annual += soil.MIP_leach
-    soil.MOP_leach_annual += soil.MOP_leach
-    soil.fert_P_runoff_annual += soil.fert_P_runoff_act
-    soil.fert_P_leached_annual += soil.fert_P_leached
-    soil.DRP_runoff_annual += soil.DRP_runoff
-    soil.DRP_drainage_annual += soil.DRP_drainage
-    soil.P_erosion_annual += soil.P_erosion
-    soil.P_drainage_annual += soil.P_drainage
-    soil.P_runoff_annual += soil.P_runoff
-    soil.P_uptake_annual += soil.P_uptake
-    soil.STP_annual += soil.STP
+        """
+        self.manure.daily_manure_update(rainfall, runoff, field_size, mean_air_temperature)
+        self.fertilizer.do_fertilizer_phosphorus_operations(rainfall, runoff, field_size)
+        self.mineralization.mineralize_phosphorus(field_size)
+        self.soluble_phosphorus.daily_update_routine(runoff, field_size)
