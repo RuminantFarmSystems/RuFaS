@@ -1406,6 +1406,7 @@ def test_get_nested_item_single_index(mock_input_manager: InputManager):
     assert mock_input_manager._get_array_data(dummy_data['values'], '1:3') == ['b', 'c']
     assert mock_input_manager._get_array_data(dummy_data['values'], ':2') == ['a', 'b']
     assert mock_input_manager._get_array_data(dummy_data['values'], '1:') == ['b', 'c', 'd']
+    assert mock_input_manager._get_array_data(dummy_data['values'], ':20') == ['a', 'b', 'c', 'd']
 
 
 def test_get_nested_item_invalid_key_raises_index_error(mock_input_manager: InputManager):
