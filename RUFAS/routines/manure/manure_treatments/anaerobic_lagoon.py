@@ -276,7 +276,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             Additional lagoon volume needed for precipitation, m^3.
 
         """
-        return self._get_current_day_rainfall() * self.lagoon_surface_area
+        return (self._get_current_day_rainfall() / 1000) * self.lagoon_surface_area
 
     @property
     def freeboard_volume(self) -> float:

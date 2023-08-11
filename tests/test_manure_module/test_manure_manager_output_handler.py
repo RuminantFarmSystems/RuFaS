@@ -235,7 +235,8 @@ def test_create_dataframe_from_manure_manager_data(mocker: MockFixture) -> None:
 
     output_keys = ['animal_manure_excretions', 'manure_handler_daily_output', 'reception_pit_daily_output',
                    'manure_separator_daily_output', 'manure_treatment_daily_output',
-                   'manure_treatment_accumulated_output', 'anaerobic_digestion_daily_output']
+                   'manure_treatment_accumulated_output', 'anaerobic_digestion_daily_output',
+                   'manure_nutrients']
     outputs = {key: mocker.MagicMock() for key in output_keys}
     mock_data = [
         {

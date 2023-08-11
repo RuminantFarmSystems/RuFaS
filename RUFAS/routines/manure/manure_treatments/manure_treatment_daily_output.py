@@ -45,6 +45,23 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     sludge_manure_potassium: float = 0.0
     sludge_manure_daily_volume: float = 0.0
 
+    solid_manure_total_solids: float = 0.0
+    solid_manure_total_volatile_solids: float = 0.0
+
+    solid_manure_nitrogen: float = 0.0
+    solid_manure_inorganic_nitrogen: float = 0.0
+    solid_manure_organic_nitrogen: float = 0.0
+    solid_manure_inorganic_nitrogen_ammonium: float = 0.0
+
+    solid_manure_phosphorus: float = 0.0
+    solid_manure_water_extractable_inorganic_phosphorus: float = 0.0
+    solid_manure_water_extractable_organic_phosphorus: float = 0.0
+    solid_manure_non_water_extractable_inorganic_phosphorus: float = 0.0
+    solid_manure_non_water_extractable_organic_phosphorus: float = 0.0
+
+    solid_manure_potassium: float = 0.0
+    solid_manure_daily_mass: float = 0.0
+
     biogas: float = 0.0  # biogas production per day (m3/day)
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
     methane_generation_volume: float = 0.0

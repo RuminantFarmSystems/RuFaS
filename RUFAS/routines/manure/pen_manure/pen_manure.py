@@ -111,6 +111,9 @@ class PenManure:
             A PenManure object.
 
         """
+        if num_animals == 0:
+            return cls()
+
         manure_mass = animal_manure['manure_mass']  # kg
         manure_volume = (manure_mass / ManureConstants.MANURE_DENSITY) * GeneralConstants.CUBIC_METERS_TO_LITERS  # L
         total_ammoniacal_nitrogen = (
@@ -118,8 +121,15 @@ class PenManure:
                                             * manure_volume  # L
                                     ) * GeneralConstants.GRAMS_TO_KG  # kg
 
-        if num_animals == 0:
-            return cls()
+        water_extractable_inorganic_phosphorus_fraction = animal_manure['inorganic_phosphorus_fraction'] / num_animals
+        water_extractable_organic_phosphorus_fraction = animal_manure['organic_phosphorus_fraction'] / num_animals
+
+        # TODO: The following calculations should be done in the animal module.
+        # Temporarily, we do it here to avoid changing the animal module.
+        water_extractable_phosphorus_fraction = water_extractable_inorganic_phosphorus_fraction + water_extractable_organic_phosphorus_fraction
+        non_water_extractable_phosphorus_fraction = 1 - water_extractable_phosphorus_fraction
+        non_water_extractable_inorganic_phosphorus_fraction = 0.1125 * non_water_extractable_phosphorus_fraction
+        non_water_extractable_organic_phosphorus_fraction = 0.3375 * non_water_extractable_phosphorus_fraction
 
         return cls(
             urea=animal_manure['urea'] / num_animals,
@@ -132,10 +142,10 @@ class PenManure:
             total_solids=animal_manure['total_solids'],
             degradable_volatile_solids=animal_manure['degradable_volatile_solids'],
             non_degradable_volatile_solids=animal_manure['non_degradable_volatile_solids'],
-            inorganic_phosphorus_fraction=animal_manure['inorganic_phosphorus_fraction'] / num_animals,
-            organic_phosphorus_fraction=animal_manure['organic_phosphorus_fraction'] / num_animals,
-            non_water_inorganic_phosphorus_fraction=animal_manure['non_water_inorganic_phosphorus_fraction'] / num_animals,
-            non_water_organic_phosphorus_fraction=animal_manure['non_water_organic_phosphorus_fraction'] / num_animals,
+            inorganic_phosphorus_fraction=water_extractable_inorganic_phosphorus_fraction,
+            organic_phosphorus_fraction=water_extractable_organic_phosphorus_fraction,
+            non_water_inorganic_phosphorus_fraction=non_water_extractable_inorganic_phosphorus_fraction,
+            non_water_organic_phosphorus_fraction=non_water_extractable_organic_phosphorus_fraction,
             phosphorus=animal_manure['phosphorus'] * GeneralConstants.GRAMS_TO_KG,
             phosphorus_fraction=animal_manure['phosphorus_fraction'] / num_animals,
             potassium=animal_manure['potassium'] * GeneralConstants.GRAMS_TO_KG,

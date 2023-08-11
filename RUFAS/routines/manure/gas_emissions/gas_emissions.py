@@ -1232,7 +1232,7 @@ class GasEmissions:
         Raises
         ------
         ValueError
-            If oxytem_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1]
+            If oxygen_mole_fraction or oxygen_ambient_air_mole_fraction are not between [0, 1]
 
         """
         if not (0.0 < oxygen_mole_fraction < 1.0):
@@ -1253,8 +1253,8 @@ class GasEmissions:
         days_since_last_tillage: int,
         lag: int,
         moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
-        carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_AVAILABLE_IN_MANURE,
-        carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_AVAILABLE_IN_BEDDING
+        carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
+        carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
     ) -> float:
         """Calculates the carbon decomposition from the composting process of the manure-bed mixture
         due to microbial activity (decomposition, consumption, respiration).

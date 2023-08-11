@@ -162,6 +162,7 @@ class BaseManureHandler:
                 pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(
                 pen.num_animals),
+            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals),
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
             tempC=self._get_current_day_average_temperature_in_celsius()

@@ -15,6 +15,7 @@ from matplotlib import pyplot as plt
 from pandas import DataFrame
 
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
@@ -40,7 +41,8 @@ class ManureManagerOutputHandler:
         ManureHandlerDailyOutput: 'handler',
         ReceptionPitDailyOutput: 'rp',
         ManureSeparatorDailyOutput: 'sep',
-        ManureTreatmentDailyOutput: 'tx'
+        ManureTreatmentDailyOutput: 'tx',
+        ManureNutrients: 'nutrient'
     }
     _HEADER_PREFIX_NAMES = {
         'pen': 'Pen Info',
@@ -51,6 +53,7 @@ class ManureManagerOutputHandler:
         'tx': 'Manure Treatment',
         'tx_acc': 'Accumulated Manure Treatment',
         'tx_ad': 'Anaerobic Digester',
+        'nutrient': 'Manure Field Connector'
     }
     _HEADER_PRIMARY_DELIMITER = '__'
     _HEADER_SECONDARY_DELIMITER = '_'
@@ -131,7 +134,7 @@ class ManureManagerOutputHandler:
                                       dataclass_obj: PenManure | ManureHandlerDailyOutput | ReceptionPitDailyOutput | ManureSeparatorDailyOutput | ManureTreatmentDailyOutput,
                                       obj_type: Type[PenManure] | Type[ManureHandlerDailyOutput] | Type[
                                           ReceptionPitDailyOutput] | Type[ManureSeparatorDailyOutput] | Type[
-                                                    ManureTreatmentDailyOutput],
+                                                    ManureTreatmentDailyOutput] | Type[ManureNutrients],
                                       extra_prefix: str = '') -> dict[str, list[Any]]:
 
         """
@@ -143,9 +146,12 @@ class ManureManagerOutputHandler:
 
         Parameters
         ----------
-        dataclass_obj : PenManure | ManureHandlerDailyOutput | ReceptionPitDailyOutput | ManureSeparatorDailyOutput | ManureTreatmentDailyOutput
+        dataclass_obj : PenManure | ManureHandlerDailyOutput | ReceptionPitDailyOutput | ManureSeparatorDailyOutput
+         | ManureTreatmentDailyOutput
             The dataclass object to be processed.
-        obj_type : Type[PenManure] | Type[ManureHandlerDailyOutput] | Type[ReceptionPitDailyOutput] | Type[ManureSeparatorDailyOutput] | Type[ManureTreatmentDailyOutput]
+        obj_type : Type[PenManure] | Type[ManureHandlerDailyOutput] | Type[ReceptionPitDailyOutput]
+         | Type[ManureSeparatorDailyOutput] | Type[ManureTreatmentDailyOutput]
+         | Type[ManureNutrients]
             The type of the dataclass object.
         extra_prefix : str, optional
             An additional prefix to prepend to the field names, by default ''.
@@ -193,6 +199,7 @@ class ManureManagerOutputHandler:
             {'key': 'manure_treatment_daily_output', 'class': ManureTreatmentDailyOutput},
             {'key': 'manure_treatment_accumulated_output', 'class': ManureTreatmentDailyOutput, 'prefix': 'acc'},
             {'key': 'anaerobic_digestion_daily_output', 'class': ManureTreatmentDailyOutput, 'prefix': 'ad'},
+            {'key': 'manure_nutrients', 'class': ManureNutrients},
         ]
 
         for daily_output_per_pen in manure_manager.data:
@@ -240,7 +247,9 @@ class ManureManagerOutputHandler:
         df = cls._create_dataframe_from_manure_manager_data(manure_manager)
         if df.empty:
             return
-        sorting_cols = ['pen_id', 'simulation_day']
+        pen_id_str = 'pen_id'
+        simulation_day_str = 'simulation_day'
+        sorting_cols = [pen_id_str, simulation_day_str]
         df.sort_values(by=sorting_cols, inplace=True)
         df = cls._drop_all_zeros_nan_none_columns(df)
 
@@ -253,7 +262,21 @@ class ManureManagerOutputHandler:
         all_data_file_path = csv_dir_path / f'all_manure_module_data_{cls._get_formatted_current_time()}.csv'
         df.to_csv(all_data_file_path, index=False)
 
-        for col in non_sorting_cols:
+        day_level_classes = [ManureNutrients]
+        day_level_cols = []
+        for cls_ in day_level_classes:
+            day_level_cols.extend([col for col in df.columns if col.startswith(cls._HEADER_PREFIXES[cls_])])
+
+        for col in day_level_cols:
+            temp_df = df[[simulation_day_str, col]].groupby(simulation_day_str).last()
+            temp_df.reset_index(inplace=True)
+            temp_df.columns = [simulation_day_str, cls._format_col_name(col)]
+            sub_dir_path = csv_dir_path / f'{cls._extract_dir_name_from_col_name(col)}'
+            sub_dir_path.mkdir(parents=True, exist_ok=True)
+            file_path = sub_dir_path / f'{cls._format_csv_filename(col)}.csv'
+            temp_df.to_csv(file_path, index=False)
+
+        for col in list(set(non_sorting_cols) - set(day_level_cols)):
             temp_df = df[[*sorting_cols, col]]
             temp_df.columns = [*sorting_cols, cls._format_col_name(col)]
             sub_dir_path = csv_dir_path / f'{cls._extract_dir_name_from_col_name(col)}'
@@ -646,31 +669,56 @@ class ManureManagerOutputHandler:
         df = cls._create_dataframe_from_manure_manager_data(manure_manager)
         graphics_dir = Path(graphics_dir) / cls._DEFAULT_OUTPUT_DIR_NAME
         graphics_dir.mkdir(parents=True, exist_ok=True)
-        pen_id = 'pen_id'
-        simulation_day = 'simulation_day'
+        pen_id_str = 'pen_id'
+        simulation_day_str = 'simulation_day'
         plot_file_extension = '.png'
-        fixed_cols = [pen_id, simulation_day]
+        fixed_cols = [pen_id_str, simulation_day_str]
         non_fixed_cols = [col for col in df.columns if
                           all(fixed_col.lower() not in col.lower() for fixed_col in fixed_cols)]
 
-        for col in non_fixed_cols:
+        day_level_classes = [ManureNutrients]
+        day_level_cols = []
+        for cls_ in day_level_classes:
+            day_level_cols.extend([col for col in df.columns if col.startswith(cls._HEADER_PREFIXES[cls_])])
+
+        for col in day_level_cols:
+            temp_df = df[[simulation_day_str, col]].groupby(simulation_day_str).last()
+            temp_df.reset_index(inplace=True)
+            output_dir = graphics_dir / cls._extract_dir_name_from_col_name(col)
+            output_dir.mkdir(parents=True, exist_ok=True)
+            x_series = temp_df[simulation_day_str]
+            y_series = temp_df[col]
+            plot_name = f'{cls._format_title(col)}'
+            output_path = output_dir / f'{plot_name}{plot_file_extension}'
+            cls._make_simple_scatter_plot_with_matplotlib(
+                output_path=output_path,
+                x=x_series,
+                y=y_series,
+                x_label='Simulation Day',
+                y_label=cls._format_label(col),
+                title=plot_name
+            )
+
+        for col in list(set(non_fixed_cols) - set(day_level_cols)):
             output_dir = graphics_dir / cls._extract_dir_name_from_col_name(col)
             output_dir.mkdir(parents=True, exist_ok=True)
             for val in df['pen_id'].unique():
-                output_sub_dir = output_dir / ('Pen' + str(val))
-                output_sub_dir.mkdir(parents=True, exist_ok=True)
-                x_series = df.loc[df[pen_id] == val, simulation_day]
-                y_series = df.loc[df[pen_id] == val, col]
-                plot_name = f'Pen {val} - {cls._format_title(col)}'
-                output_path = output_sub_dir / f'{plot_name}{plot_file_extension}'
-                cls._make_simple_scatter_plot_with_matplotlib(
-                    output_path=output_path,
-                    x=x_series,
-                    y=y_series,
-                    x_label='Simulation Day',
-                    y_label=cls._format_label(col),
-                    title=plot_name,
-                )
+                x_series = df.loc[df[pen_id_str] == val, simulation_day_str]
+                y_series = df.loc[df[pen_id_str] == val, col]
+
+                if not (y_series == 0).all():
+                    output_sub_dir = output_dir / ('Pen' + str(val))
+                    output_sub_dir.mkdir(parents=True, exist_ok=True)
+                    plot_name = f'Pen {val} - {cls._format_title(col)}'
+                    output_path = output_sub_dir / f'{plot_name}{plot_file_extension}'
+                    cls._make_simple_scatter_plot_with_matplotlib(
+                        output_path=output_path,
+                        x=x_series,
+                        y=y_series,
+                        x_label='Simulation Day',
+                        y_label=cls._format_label(col),
+                        title=plot_name,
+                    )
 
     @staticmethod
     def _make_simple_scatter_plot_with_matplotlib(output_path: Path, x: pd.Series, y: pd.Series, x_label: str,

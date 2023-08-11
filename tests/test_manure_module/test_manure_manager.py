@@ -4,6 +4,7 @@ from pytest_mock import MockFixture
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
@@ -587,6 +588,7 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
                       mock_manure_treatment_daily_output,
                       mock_manure_treatment_accumulated_output),
     )
+    mock_manure_nutrient_manager_values = mocker.MagicMock()
 
     expected_daily_output_data = {
         'simulation_day': simulation_day,
@@ -597,7 +599,8 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
         'manure_separator_daily_output': mock_manure_separator_daily_output,
         'manure_treatment_daily_output': mock_manure_treatment_daily_output,
         'manure_treatment_accumulated_output': mock_manure_treatment_accumulated_output,
-        'anaerobic_digestion_daily_output': mock_anaerobic_digestion_daily_output
+        'anaerobic_digestion_daily_output': mock_anaerobic_digestion_daily_output,
+        'manure_nutrients': mock_manure_nutrient_manager_values,
     }
 
     mock_animal_manager = mocker.MagicMock()
@@ -618,6 +621,8 @@ def test_pen_daily_update(mocker: MockFixture) -> None:
     manure_manager.manure_handlers = {pen_id: mock_manure_handler}
     manure_manager.reception_pits = {pen_id: mock_reception_pit}
     manure_manager._daily_output_per_pen = []
+    manure_manager._manure_nutrient_manager = mocker.MagicMock()
+    manure_manager._manure_nutrient_manager.values = mock_manure_nutrient_manager_values
 
     patch_for_add_manure_nutrients = mocker.patch.object(
         manure_manager, '_add_manure_nutrients', return_value=None
@@ -760,7 +765,30 @@ def test_get_manure_density(manure_type: ManureType, expected_density: float,
     patch_for_get_manure_type.assert_called_once_with(mock_manure_treatment_type)
 
 
-def test_add_manure_nutrients(mocker: MockFixture) -> None:
+@pytest.mark.parametrize(
+    'liquid_manure_nitrogen, solid_manure_nitrogen, '
+    'liquid_manure_phosphorus, solid_manure_phosphorus, '
+    'liquid_manure_potassium, solid_manure_potassium, '
+    'liquid_manure_total_solids, solid_manure_total_solids, '
+    'liquid_manure_daily_volume, solid_manure_daily_mass, mock_manure_density',
+    [
+        (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1000),
+        (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1500),
+        (10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 2000),
+        (5, 4, 3, 2, 1, 0, 9, 8, 7, 6, 1200),
+        (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        (100, 50, 100, 50, 100, 50, 100, 50, 100, 50, 2500),
+        (5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1000),
+        (9, 3, 8, 2, 7, 1, 6, 5, 4, 8, 900)
+    ]
+)
+def test_add_manure_nutrients(mocker: MockFixture,
+                              liquid_manure_nitrogen: float, solid_manure_nitrogen: float,
+                              liquid_manure_phosphorus: float, solid_manure_phosphorus: float,
+                              liquid_manure_potassium: float, solid_manure_potassium: float,
+                              liquid_manure_total_solids: float, solid_manure_total_solids: float,
+                              liquid_manure_daily_volume: float, solid_manure_daily_mass: float,
+                              mock_manure_density: float) -> None:
     """
     Unit test for the _add_manure_nutrients method of the ManureManager class in manure_manager.py.
 
@@ -775,24 +803,27 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
 
     mock_pen = mocker.MagicMock()
 
-    mock_manure_treatment_daily_output = mocker.MagicMock()
-    mock_manure_treatment_daily_output.liquid_manure_nitrogen = manure_nitrogen = 1
-    mock_manure_treatment_daily_output.liquid_manure_phosphorus = manure_phosphorus = 2
-    mock_manure_treatment_daily_output.liquid_manure_potassium = manure_potassium = 3
-    mock_manure_treatment_daily_output.liquid_manure_total_solids = manure_total_solids = 4
-    mock_manure_treatment_daily_output.liquid_manure_daily_volume = manure_daily_volume = 5
+    mock_manure_treatment_daily_output = ManureTreatmentDailyOutput()
+    mock_manure_treatment_daily_output.liquid_manure_nitrogen = liquid_manure_nitrogen
+    mock_manure_treatment_daily_output.solid_manure_nitrogen = solid_manure_nitrogen
+    mock_manure_treatment_daily_output.liquid_manure_phosphorus = liquid_manure_phosphorus
+    mock_manure_treatment_daily_output.solid_manure_phosphorus = solid_manure_phosphorus
+    mock_manure_treatment_daily_output.liquid_manure_potassium = liquid_manure_potassium
+    mock_manure_treatment_daily_output.solid_manure_potassium = solid_manure_potassium
+    mock_manure_treatment_daily_output.liquid_manure_total_solids = liquid_manure_total_solids
+    mock_manure_treatment_daily_output.solid_manure_total_solids = solid_manure_total_solids
+    mock_manure_treatment_daily_output.liquid_manure_daily_volume = liquid_manure_daily_volume
+    mock_manure_treatment_daily_output.solid_manure_daily_mass = solid_manure_daily_mass
 
     mock_manure_nutrient_manager = mocker.MagicMock()
     manure_manager._manure_nutrient_manager = mock_manure_nutrient_manager
 
-    mock_manure_density = 1000
     patch_get_manure_density = mocker.patch.object(manure_manager, '_get_manure_density',
                                                    return_value=mock_manure_density)
+
     mock_manure_nutrients = mocker.MagicMock()
-    patch_manure_nutrients_init = mocker.patch(
-        'RUFAS.routines.manure.manure_manager.ManureNutrients',
-        return_value=mock_manure_nutrients,
-    )
+    patch_manure_nutrients_init = mocker.patch('RUFAS.routines.manure.manure_manager.ManureNutrients',
+                                               return_value=mock_manure_nutrients)
 
     # Act
     manure_manager._add_manure_nutrients(mock_pen, mock_manure_treatment_daily_output)
@@ -801,11 +832,11 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
     patch_get_manure_density.assert_called_once_with(mock_pen)
     mock_manure_nutrient_manager.add_nutrients.assert_called_once_with(mock_manure_nutrients)
     patch_manure_nutrients_init.assert_called_once_with(
-        nitrogen=manure_nitrogen,
-        phosphorus=manure_phosphorus,
-        potassium=manure_potassium,
-        dry_matter=manure_total_solids,
-        total_manure_mass=manure_daily_volume * mock_manure_density
+        nitrogen=max(liquid_manure_nitrogen, solid_manure_nitrogen),
+        phosphorus=max(liquid_manure_phosphorus, solid_manure_phosphorus),
+        potassium=max(liquid_manure_potassium, solid_manure_potassium),
+        dry_matter=max(liquid_manure_total_solids, solid_manure_total_solids),
+        total_manure_mass=max(liquid_manure_daily_volume * mock_manure_density, solid_manure_daily_mass)
     )
 
 

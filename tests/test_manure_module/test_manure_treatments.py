@@ -2036,7 +2036,7 @@ def test_anaerobic_lagoon_precipitation_volume(mocker: MockFixture) -> None:
             new_callable=PropertyMock,
             return_value=lagoon_surface_area
     )
-    expected_precipitation_volume = current_day_rainfall * lagoon_surface_area
+    expected_precipitation_volume = current_day_rainfall * lagoon_surface_area / 1000.0
 
     # Act
     actual_precipitation_volume = anaerobic_lagoon.precipitation_volume

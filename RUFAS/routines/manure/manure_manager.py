@@ -8,6 +8,7 @@ Author(s):  William Donovan, wmdonovan@wisc.edu
 """
 from __future__ import annotations
 
+import random
 import typing
 from typing import Dict
 from typing import Optional
@@ -182,6 +183,13 @@ class ManureManager:
         for pen in animal_manager.all_pens:
             self._pen_daily_update(animal_manager.simulation_day, pen)
 
+        # Test to see if manure nutrient manager is working
+        if animal_manager.simulation_day % 30 == 0:
+            self.request_nutrients(NutrientRequest(
+                phosphorus=self._manure_nutrient_manager.values.phosphorus * random.uniform(0.1, 0.7),
+                nitrogen=self._manure_nutrient_manager.values.nitrogen * random.uniform(0.1, 0.7),
+            ))
+
     @staticmethod
     def _get_manure_type(treatment_type: ManureTreatmentType) -> ManureType:
         """
@@ -209,6 +217,7 @@ class ManureManager:
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
+            ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 
@@ -262,12 +271,17 @@ class ManureManager:
         # to make it more generic and not specific to any manure type.
         self._manure_nutrient_manager.add_nutrients(
             ManureNutrients(
-                nitrogen=manure_treatment_daily_output.liquid_manure_nitrogen,
-                phosphorus=manure_treatment_daily_output.liquid_manure_phosphorus,
-                potassium=manure_treatment_daily_output.liquid_manure_potassium,
-                dry_matter=manure_treatment_daily_output.liquid_manure_total_solids,
-                total_manure_mass=(manure_treatment_daily_output.liquid_manure_daily_volume
-                                   * self._get_manure_density(pen))
+                nitrogen=max(manure_treatment_daily_output.liquid_manure_nitrogen,
+                             manure_treatment_daily_output.solid_manure_nitrogen),
+                phosphorus=max(manure_treatment_daily_output.liquid_manure_phosphorus,
+                               manure_treatment_daily_output.solid_manure_phosphorus),
+                potassium=max(manure_treatment_daily_output.liquid_manure_potassium,
+                              manure_treatment_daily_output.solid_manure_potassium),
+                dry_matter=max(manure_treatment_daily_output.liquid_manure_total_solids,
+                               manure_treatment_daily_output.solid_manure_total_solids),
+                total_manure_mass=(
+                    max(manure_treatment_daily_output.liquid_manure_daily_volume * self._get_manure_density(pen),
+                        manure_treatment_daily_output.solid_manure_daily_mass))
             )
         )
 
@@ -338,6 +352,8 @@ class ManureManager:
         manure_treatment_daily_output = results[2]
         manure_treatment_accumulated_output = results[3]
 
+        self._add_manure_nutrients(mm_pen, manure_treatment_daily_output)
+
         daily_output_data = {
             'simulation_day': simulation_day,
             'pen': mm_pen,
@@ -347,10 +363,9 @@ class ManureManager:
             'manure_separator_daily_output': manure_separator_daily_output,
             'manure_treatment_daily_output': manure_treatment_daily_output,
             'manure_treatment_accumulated_output': manure_treatment_accumulated_output,
-            'anaerobic_digestion_daily_output': anaerobic_digestion_daily_output
+            'anaerobic_digestion_daily_output': anaerobic_digestion_daily_output,
+            'manure_nutrients': self._manure_nutrient_manager.values
         }
-
-        self._add_manure_nutrients(mm_pen, manure_treatment_daily_output)
 
         self._daily_output_per_pen.append(daily_output_data)
 

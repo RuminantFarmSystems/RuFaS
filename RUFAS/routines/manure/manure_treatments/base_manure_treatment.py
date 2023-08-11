@@ -54,7 +54,7 @@ class BaseManureTreatment(ABC):
 
         self._sim_day = -1
         self._current_pen: Optional[ManureManagerPen] = None
-        self._manure_handler_daily_output = None
+        self._manure_handler_daily_output: Optional[ManureHandlerDailyOutput] = None
         self._current_manure_treatment_daily_input: Optional[LiquidManurePortionProtocol] = None
         self._manure_separator: Optional[BaseManureSeparator] = None
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None

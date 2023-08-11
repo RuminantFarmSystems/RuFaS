@@ -218,17 +218,8 @@
     },
     {
       "manure_treatment_type": "composted bedded pack barn",
-      "total_solids_removal_efficiency_for_treatment": 0.45,
-      "nitrogen_removal_efficiency_for_treatment": 0.0,
-      "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
       "phosphorus_removal_efficiency_for_treatment": 0.0,
-      "potassium_removal_efficiency_for_treatment": 0.0,
-      "volatile_solids_removal_efficiency_for_treatment": 0.85,
-      "hydraulic_retention_time": 365,
-      "sludge_accumulation_period": 10.0,
-      "sludge_accumulation_volume_fraction": 0.00251,
-      "storage_time_period": 365,
-      "freeboard_input": 0.3048
+      "potassium_removal_efficiency_for_treatment": 0.0
     }
   ]
 }

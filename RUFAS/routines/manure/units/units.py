@@ -43,7 +43,7 @@ class Units:
     total_daily_manure_volume = 'm^3'
     liquid_manure_daily_volume = 'm^3'
 
-    # Specific to manure separator output
+    # Specific to manure separator and treatment output
     final_solids_wet_mass = 'kg'
     final_solids_wet_mass_volume = 'm^3'
     solid_manure_total_solids = 'kg'
@@ -63,3 +63,15 @@ class Units:
     sludge_manure_daily_volume = 'm^3'
     accumulated_sludge_volume = 'm^3'
     accumulated_final_manure_volume = 'm^3'
+
+    solid_manure_inorganic_nitrogen = 'kg'
+    solid_manure_organic_nitrogen = 'kg'
+    solid_manure_inorganic_nitrogen_ammonium = 'kg'
+    solid_manure_water_extractable_inorganic_phosphorus = 'kg'
+    solid_manure_water_extractable_organic_phosphorus = 'kg'
+    solid_manure_non_water_extractable_inorganic_phosphorus = 'kg'
+    solid_manure_non_water_extractable_organic_phosphorus = 'kg'
+    solid_manure_daily_mass = 'kg'
+
+    total_manure_mass = 'kg'
+    dry_matter = 'kg'
