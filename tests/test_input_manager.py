@@ -47,6 +47,7 @@ def input_manager_original_method_states(
         "_bool_type_validator": mock_input_manager._bool_type_validator,
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
+        "get_metadata": mock_input_manager.get_metadata,
     }
 
 
@@ -294,6 +295,46 @@ def mock_metadata_for_validate_element(mocker: MockerFixture) -> Dict[str, Dict[
                 "element2": {"type": "number", "minimum": 0, "maximum": 150},
                 "element3": {"type": "array",
                              "minimum_length": 1, "maximum_length": 5},
+                "element4": {"type": "object",
+                             "description": "dummy_description",
+                             "nested_element1": {
+                                 "type": "string",
+                                 "minimum_length": 1,
+                                 "maximum_length": 20
+                                },
+                             "nested_element2": {
+                                 "type": "number",
+                                 "minimum": 0,
+                                 "maximum": 250
+                                }
+                             },
+                "element5": {"type": "object",
+                             "description": "dummy_description",
+                             "nested_element1": {
+                                 "type": "string",
+                                 "minimum_length": 1,
+                                 "maximum_length": 20
+                                },
+                             "nested_element2": {
+                                 "type": "number",
+                                 "minimum": 0,
+                                 "maximum": 250
+                                },
+                             "nested_element3": {
+                                 "type": "object",
+                                 "description": "dummy_description",
+                                 "nested_sub_element1": {
+                                    "type": "string",
+                                    "minimum_length": 1,
+                                    "maximum_length": 5
+                                 },
+                                 "nested_sub_element2": {
+                                    "type": "array",
+                                    "minimum_length": 1,
+                                    "maximum_length": 5
+                                 },
+                                }
+                             }
             }
         }
     }
@@ -310,6 +351,11 @@ def test_validate_element_string_type(mock_input_manager: InputManager,
 
     assert result["is_valid"] is True
 
+    input_data = {"element1": "invalid_value"}
+    result = mock_input_manager._validate_element(["element1"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
@@ -324,6 +370,11 @@ def test_validate_element_number_type(mock_input_manager: InputManager,
 
     assert result["is_valid"] is True
 
+    input_data = {"element2": 500}
+    result = mock_input_manager._validate_element(["element2"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
@@ -337,6 +388,83 @@ def test_validate_element_array_type(mock_input_manager: InputManager,
     result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
 
     assert result["is_valid"] is True
+
+    input_data = {"element3": [1, 2, 3, 6, 7, 8, 10]}
+    result = mock_input_manager._validate_element(["element3"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_valid_object_type(mock_input_manager: InputManager,
+                                            mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                            input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for valid nested object type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_invalid_object_type(mock_input_manager: InputManager,
+                                              mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                              input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for nested invalid object type input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 500}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    input_data = {"element4": {"nested_element1": "value123456789value123456789", "nested_element2": 123}}
+    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_valid_nested_object_type(mock_input_manager: InputManager,
+                                                   mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                                   input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for valid object nested within another object type
+    input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
+                               "nested_element3": {"nested_sub_element1": "cows", "nested_sub_element2": [1, 2, 3]}}}
+    result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is True
+
+    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
+
+
+def test_validate_element_invalid_nested_object_type(mock_input_manager: InputManager,
+                                                     mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
+                                                     input_manager_original_method_states: Dict[str, Callable], ):
+    """Unit test for invalid object nested within another object type
+    input_data for _validate_element in file input_manager.py"""
+    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
+
+    input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
+                               "nested_element3": {"nested_sub_element1": "cows", "nested_sub_element2": []}}}
+    result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
+
+    input_data = {"element5": {"nested_element1": "value1", "nested_element2": 123,
+                               "nested_element3": {"nested_sub_element1": "invalid_cows",
+                                                   "nested_sub_element2": [1, 2, 3]}}}
+    result = mock_input_manager._validate_element(["element5"], "property_map_key1", input_data, True)
+
+    assert result["is_valid"] is False
 
     mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
@@ -361,21 +489,6 @@ def test_bool_type_validator(input_data_value: bool, expected_result: bool, mock
     result = mock_input_manager._bool_type_validator(variable_properties, var_name, input_data_value)
 
     assert result == expected_result
-
-
-def test_validate_element_object_type(mock_input_manager: InputManager, mocker: MockerFixture,
-                                      mock_metadata_for_validate_element: Dict[str, Dict[str, Any]],
-                                      input_manager_original_method_states: Dict[str, Callable], ):
-    """Unit test for nested object type input_data for _validate_element in file input_manager.py"""
-    mock_input_manager._InputManager__metadata = mock_metadata_for_validate_element
-    mocker.patch.object(mock_input_manager, "_validate_element", return_value=True)
-    mocker.patch.object(mock_input_manager, "_fix_data", return_value=False)
-    input_data = {"element4": {"nested_element1": "value1", "nested_element2": 123}}
-    result = mock_input_manager._validate_element(["element4"], "property_map_key1", input_data)
-
-    assert result is True
-
-    mock_input_manager._validate_element = input_manager_original_method_states["_validate_element"]
 
 
 def test_validate_element_invalid_var_name_raises_keyerror(mock_input_manager: InputManager,
@@ -1068,6 +1181,18 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
         ("module1.submodule1.nested_var", "dummyvalue2", 0),
         ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3", 0),
         ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4", 0),
+        ("module1", {
+            "integer_var": 5,
+            "float_var": 0.5,
+            "string_var": "dummyvalue1",
+            "boolean_var": True,
+            "integer_array_var": [1, 2, 3],
+            "float_array_var": [0.1, 0.2, 3.14159],
+            "string_array_var": ["1", "2", "3", "4", "5"],
+            "boolean_array_var": [True, False],
+            "submodule1": {
+                "nested_var": "dummyvalue2"
+            }}, 0),
     ]
 )
 def test_get_data_with_valid_key(dummy_data_path: str,
@@ -1100,20 +1225,213 @@ def test_get_data_raises_exception(dummy_data_path: str,
                                    mock_pool_for_get_data: Dict[str, Dict[str, Any]],
                                    expected_warning_call_count: int,
                                    mock_input_manager: InputManager) -> None:
-    """Unit test for function _load_metadata raising an exception in file input_manager.py"""
+    """Unit test for function get_data raising an exception in file input_manager.py"""
 
     mock_input_manager._InputManager__pool = mock_pool_for_get_data
 
-    mock_open_func = Mock()
-    mock_open_func.side_effect = KeyError()
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(KeyError) as key_error:
+            mock_input_manager.get_data(dummy_data_path)
 
-    with patch("builtins.open", mock_open_func):
-        with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-            with pytest.raises(KeyError) as key_error:
-                mock_input_manager.get_data(dummy_data_path)
+        error_message = key_error.value.__str__().strip("\'")
+        assert error_message == f"Data not found: Cannot find \"{dummy_data_path}\", " \
+                                f"\"{expected_error_parent_address}\" does not have attribute " \
+                                f"\"{expected_error_invalid_key}\"."
+        assert add_error.call_count == expected_warning_call_count
 
-            error_message = key_error.value.__str__().strip("\'")
-            assert error_message == f"Data not found: Cannot find \"{dummy_data_path}\", " \
-                                    f"\"{expected_error_parent_address}\" does not have attribute " \
-                                    f"\"{expected_error_invalid_key}\"."
-            assert add_error.call_count == expected_warning_call_count
+
+@pytest.fixture
+def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+    return {
+        "properties": {
+            "dummy_animal_properties": {
+                "type": "object",
+                "description": "Animal data",
+                "herd_information": {
+                    "type": "object",
+                    "description": "Herd Demographics",
+                    "calf_num": {
+                        "type": "number",
+                        "description": "Number of Calves (head)",
+                        "default": 8,
+                        "minimum": 0
+                        },
+                    "cow_repro_method": {
+                        "type": "string",
+                        "description": "Cow Reproductive Program (select one)",
+                        "default": "ED",
+                        "pattern": "^{TAI|ED|ED-TAI}$"
+                        },
+                    "simulate_animals": {
+                        "type": "boolean",
+                        "description": "Whether or not to simulate animals during the simulation",
+                        "default": True
+                        },
+                    "dummy_cow_array": {
+                        "type": "array",
+                        "description": "dummy array for testing purposes",
+                        "default": [1, 2, 3, 4],
+                        "maximum_length": 7
+                        }
+                    }
+                },
+            "dummy_crop_properties": {
+                "crop_species": {
+                    "type": "string",
+                    "description": "Name of the crop being grown.",
+                    "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$"
+                    },
+                "harvest_years": {
+                    "type": "array",
+                    "description": "Calendar years in which the harvesting occurs",
+                    "minimum_length": 0,
+                    "default": [],
+                    "properties": {
+                        "type": "number",
+                        "minimum": 1
+                        }
+                    },
+                "pattern_skip": {
+                    "type": "number",
+                    "description": "Number of years to be skipped between schedule repetitions.",
+                    "minimum": 0,
+                    "default": 0
+                    },
+                "simulate_crops": {
+                    "type": "boolean",
+                    "description": "Dummy boolean variable for testing",
+                    "default": False
+                    }
+                }
+            }
+        }
+
+
+@pytest.mark.parametrize(
+    'dummy_metadata_path, expected_result, expected_warning_call_count',
+    [
+        ("properties.dummy_animal_properties.herd_information.calf_num.default", 8, 0),
+        ("properties.dummy_animal_properties.herd_information.calf_num",
+         {"type": "number", "description": "Number of Calves (head)", "default": 8, "minimum": 0}, 0),
+        ("properties.dummy_animal_properties.herd_information.cow_repro_method.type", "string", 0),
+        ("properties.dummy_animal_properties.herd_information.cow_repro_method.pattern", "^{TAI|ED|ED-TAI}$", 0),
+        ("properties.dummy_animal_properties.herd_information.simulate_animals.type", "boolean", 0),
+        ("properties.dummy_animal_properties.herd_information.dummy_cow_array",
+         {"type": "array", "description": "dummy array for testing purposes", "default": [1, 2, 3, 4],
+          "maximum_length": 7}, 0),
+        ("properties.dummy_crop_properties.crop_species.description", "Name of the crop being grown.", 0),
+        ("properties.dummy_crop_properties.harvest_years.type", "array", 0),
+        ("properties.dummy_crop_properties.harvest_years",
+         {"type": "array", "description": "Calendar years in which the harvesting occurs", "minimum_length": 0,
+          "default": [], "properties": {"type": "number", "minimum": 1}}, 0),
+        ("properties.dummy_crop_properties.pattern_skip.minimum", 0, 0),
+        ("properties.dummy_crop_properties.simulate_crops",
+         {"type": "boolean", "description": "Dummy boolean variable for testing", "default": False}, 0),
+        ("properties", {
+            "dummy_animal_properties": {
+                "type": "object",
+                "description": "Animal data",
+                "herd_information": {
+                    "type": "object",
+                    "description": "Herd Demographics",
+                    "calf_num": {
+                        "type": "number",
+                        "description": "Number of Calves (head)",
+                        "default": 8,
+                        "minimum": 0
+                        },
+                    "cow_repro_method": {
+                        "type": "string",
+                        "description": "Cow Reproductive Program (select one)",
+                        "default": "ED",
+                        "pattern": "^{TAI|ED|ED-TAI}$"
+                        },
+                    "simulate_animals": {
+                        "type": "boolean",
+                        "description": "Whether or not to simulate animals during the simulation",
+                        "default": True
+                        },
+                    "dummy_cow_array": {
+                        "type": "array",
+                        "description": "dummy array for testing purposes",
+                        "default": [1, 2, 3, 4],
+                        "maximum_length": 7
+                        }
+                    }
+                },
+            "dummy_crop_properties": {
+                "crop_species": {
+                    "type": "string",
+                    "description": "Name of the crop being grown.",
+                    "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$"
+                    },
+                "harvest_years": {
+                    "type": "array",
+                    "description": "Calendar years in which the harvesting occurs",
+                    "minimum_length": 0,
+                    "default": [],
+                    "properties": {
+                        "type": "number",
+                        "minimum": 1
+                        }
+                    },
+                "pattern_skip": {
+                    "type": "number",
+                    "description": "Number of years to be skipped between schedule repetitions.",
+                    "minimum": 0,
+                    "default": 0
+                    },
+                "simulate_crops": {
+                    "type": "boolean",
+                    "description": "Dummy boolean variable for testing",
+                    "default": False
+                    }
+                }
+            }, 0)
+    ]
+)
+def test_get_metadata_with_valid_key(dummy_metadata_path: str,
+                                     mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+                                     expected_result: Any, expected_warning_call_count: int,
+                                     mock_input_manager: InputManager) -> None:
+    """Unit test for get_metadata function in file input_manager.py with a valid metadata_path key"""
+
+    mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning:
+        result = mock_input_manager.get_metadata(dummy_metadata_path)
+
+    assert result == expected_result
+    assert add_warning.call_count == expected_warning_call_count
+
+
+@pytest.mark.parametrize(
+    'dummy_metadata_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count',
+    [
+        ("dummy_animal_properties.herd_information.calf_num.dummy_key",
+         "dummy_animal_properties.herd_information.calf_num", "dummy_key", 1),
+        ("dummy_animal_properties.herd_information.dummy_key",
+         "dummy_animal_properties.herd_information", "dummy_key", 1),
+        ("dummy_crop_properties.crop_species.dummy_key", "dummy_crop_properties.crop_species", "dummy_key", 1),
+        ("dummy_crop_properties.dummy_key", "dummy_crop_properties", "dummy_key", 1),
+        ("dummy_crop_properties.pattern_skip.dummy_key", "dummy_crop_properties.pattern_skip", "dummy_key", 1)
+    ]
+)
+def test_get_metadata_raises_exception(dummy_metadata_path: str,
+                                       expected_error_parent_address: str, expected_error_invalid_key: str,
+                                       mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+                                       expected_warning_call_count: int,
+                                       mock_input_manager: InputManager) -> None:
+    """Unit test for function get_metadata raising an exception in file input_manager.py"""
+
+    mock_input_manager._InputManager__metadata = mock_pool_for_get_metadata
+
+    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
+        with pytest.raises(KeyError) as key_error:
+            mock_input_manager.get_metadata(dummy_metadata_path)
+
+        error_message = key_error.value.__str__().strip("\'")
+        assert error_message == f"Data not found: Cannot find \"{dummy_metadata_path}\", " \
+                                f"\"{expected_error_parent_address}\" does not have attribute " \
+                                f"\"{expected_error_invalid_key}\"."
+        assert add_error.call_count == expected_warning_call_count
