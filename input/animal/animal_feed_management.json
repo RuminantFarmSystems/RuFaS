@@ -122,6 +122,8 @@
 	"housing": "barn",
 	"pasture_concentrate": -1,
 	"methane_model": "IPCC",
+	"methane_mitigation_method": "None", 
+	"methane_mitigation_additive_amount": 0.0, 
 	"ration": {
 		"user_input": false,
 		"formulation_interval": 30
