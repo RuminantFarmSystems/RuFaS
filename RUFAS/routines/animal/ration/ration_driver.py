@@ -103,11 +103,8 @@ def calc_starting_milk_average(pen) -> float:
     float
         Average running milk
     """
-    total_milk_in_pen = 0.0
-    for animal in pen.animals_in_pen:
-        total_milk_in_pen += animal.estimated_daily_milk_produced
-    num_animals = len(pen.animals_in_pen)
-    starting_milk_average = total_milk_in_pen/num_animals
+    total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in pen.animals_in_pen)
+    starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
     return starting_milk_average
 
 def reduce_milk_production(pen, reduction: float) -> float:
@@ -178,9 +175,10 @@ def make_solution_from_fixed_ration(ration: Dict) -> List:
     List
 
     """
+    excluded_keys = {'status', 'objective'}
     solution_from_ration = []
     for key in ration.keys():
-        if key != 'status' and key != 'objective':
+        if key not in excluded_keys:
             solution_from_ration.append(ration[key]/3)
             solution_from_ration.append(ration[key]/3)
             solution_from_ration.append(ration[key]/3)

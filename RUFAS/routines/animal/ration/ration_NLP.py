@@ -11,7 +11,7 @@ Author(s):
 import numpy as np
 import random
 from scipy.optimize import minimize
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
@@ -507,7 +507,7 @@ def get_ration_vals(x):
     return ration_vals
 
 
-def make_user_bounds(ration_percents: Dict, DMIest: float) -> List:
+def make_user_bounds(ration_percents: Dict, DMIest: float) -> List[Tuple[float, float]]:
     """
     Calculates user bounds for optimize function
 
@@ -600,9 +600,7 @@ def optimize(animal_combination, available_feeds: Dict) -> None:
         bnds = make_user_bounds(UserDefinedRationManager.ration_to_use(animal_combination, available_feeds), DMIest)
     else:    
         bnds = []
-        for i in range(len(limit)):
-            bnds.append((0, (limit[i] / 3) + 0.0001))
-        bnds = tuple(bnds)
+        bnds = [(0, (lim / 3) + 0.0001) for lim in limit]
     if udrv.udr_or_not:
         # accumulator = []
         if str(animal_combination) in ['AnimalCombination.LAC_COW']:
