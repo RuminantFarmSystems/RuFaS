@@ -35,6 +35,7 @@ class Units:
     housing_ammonia = 'kg'
     storage_ammonia = 'kg'
     temperature = 'C'
+    storage_nitrous_oxide = 'kg'
 
     manure_volume = 'm^3'
     cleaning_water_volume = 'm^3'
@@ -75,3 +76,4 @@ class Units:
 
     total_manure_mass = 'kg'
     dry_matter = 'kg'
+    daily_final_manure_volume = 'm^3'

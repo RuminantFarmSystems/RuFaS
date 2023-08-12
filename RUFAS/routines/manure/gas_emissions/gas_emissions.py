@@ -1111,6 +1111,16 @@ class GasEmissions:
         """
         return GasEmissionConstants.MCF_CONSTANT_A * math.exp(GasEmissionConstants.MCF_CONSTANT_B * ambient_barn_temp)
 
+    @staticmethod
+    def calc_open_lots_ifsm_methane_emission(manure_volatile_solids: float, ambient_barn_temp: float) -> float:
+        if manure_volatile_solids < 0:
+            raise ValueError(f'{manure_volatile_solids} mass must be positive.')
+        Bo = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
+        methane_conversion_factor = 0.0625 * ambient_barn_temp - 0.25
+        methane_emissions_in_kg = (manure_volatile_solids * Bo *
+                                   GasEmissionConstants.METHANE_FACTOR * methane_conversion_factor) / 100
+        return max(0, methane_emissions_in_kg)
+
     @classmethod
     def calc_ifsm_methane_emission(cls, manure_volatile_solids: float, ambient_barn_temp: float) -> float:
         """Calculates emission of methane for a day using an adaptation of the tier 2 approach
@@ -1194,18 +1204,18 @@ class GasEmissions:
         exponent_coeff = decay * (days_since_last_tillage - lag)
 
         c_decomp_rate = (
-            (max_microbial_decom_rate - slow_decomp_rate)
-            * math.exp(exponent_coeff)
-            * slow_decomp_rate
+                (max_microbial_decom_rate - slow_decomp_rate)
+                * math.exp(exponent_coeff)
+                * slow_decomp_rate
         )
         return c_decomp_rate
 
     @classmethod
     def _calc_anaerobic_effect(
-        cls,
-        oxygen_mole_fraction: float = 0.15,
-        oxygen_half_saturation_constant: float = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT,
-        oxygen_ambient_air_mole_fraction: float = 0.21
+            cls,
+            oxygen_mole_fraction: float = 0.15,
+            oxygen_half_saturation_constant: float = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT,
+            oxygen_ambient_air_mole_fraction: float = 0.21
     ) -> float:
         """
         Calculates the anaerobic effect.
@@ -1240,21 +1250,22 @@ class GasEmissions:
         if not (0.0 < oxygen_ambient_air_mole_fraction < 1.0):
             raise ValueError(f"{oxygen_ambient_air_mole_fraction=} must be in the range [0, 1]")
         anaerobic_effect = (
-            (oxygen_mole_fraction / (oxygen_half_saturation_constant + oxygen_mole_fraction))
-            * ((oxygen_half_saturation_constant + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
+                (oxygen_mole_fraction / (oxygen_half_saturation_constant + oxygen_mole_fraction))
+                * ((
+                           oxygen_half_saturation_constant + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction)
         )
         return anaerobic_effect
 
     @classmethod
     def calc_total_carbon_decomposition(
-        cls,
-        manure_total_solids: float,
-        bedding_total_mass: float,
-        days_since_last_tillage: int,
-        lag: int,
-        moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
-        carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
-        carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
+            cls,
+            manure_total_solids: float,
+            bedding_total_mass: float,
+            days_since_last_tillage: int,
+            lag: int,
+            moisture_effect: float = ManureConstants.DEFAULT_MOISTURE_EFFECT_MICROBIAL_DECOMP,
+            carbon_available_in_manure: float = ManureConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_MANURE,
+            carbon_available_in_bedding: float = GasEmissionConstants.DEFAULT_CARBON_FRACTION_AVAILABLE_IN_BEDDING
     ) -> float:
         """Calculates the carbon decomposition from the composting process of the manure-bed mixture
         due to microbial activity (decomposition, consumption, respiration).
@@ -1295,18 +1306,18 @@ class GasEmissions:
         microbial_decomp_rate = cls._calc_carbon_decomposition_rate(days_since_last_tillage, lag)
         microbial_decomp_anaerobic_conditions_effect = cls._calc_anaerobic_effect()
         total_carbon_decomposition = (
-            total_carbon
-            * microbial_decomp_rate
-            * moisture_effect
-            * microbial_decomp_anaerobic_conditions_effect
+                total_carbon
+                * microbial_decomp_rate
+                * moisture_effect
+                * microbial_decomp_anaerobic_conditions_effect
         )
         return total_carbon_decomposition
 
     @classmethod
     def _calc_nitrogen_loss_from_ammonia_emissions(
-        cls,
-        daily_nitrogen_input: float,
-        is_bedding_tilled: bool,
+            cls,
+            daily_nitrogen_input: float,
+            is_bedding_tilled: bool,
     ) -> float:
         """Calculates the emissions of ammonia in kg.
 
@@ -1325,9 +1336,13 @@ class GasEmissions:
         """
         till_indicator = int(is_bedding_tilled)
         return (
-            (0.5 * daily_nitrogen_input * till_indicator)
-            + (0.25 * daily_nitrogen_input * (1 - till_indicator))
+                (0.5 * daily_nitrogen_input * till_indicator)
+                + (0.25 * daily_nitrogen_input * (1 - till_indicator))
         )
+
+    @staticmethod
+    def calc_open_lots_nitrogen_loss_ammonia_emission(daily_nitrogen_input: float) -> float:
+        return 0.36 * daily_nitrogen_input
 
     @classmethod
     def _calc_nitrogen_loss_to_leaching(cls, daily_nitrogen_input: float) -> float:
@@ -1348,9 +1363,9 @@ class GasEmissions:
 
     @classmethod
     def _calc_nitrogen_loss_from_nitrous_oxide_emissions(
-        cls,
-        daily_nitrogen_input: float,
-        is_bedding_tilled: bool,
+            cls,
+            daily_nitrogen_input: float,
+            is_bedding_tilled: bool,
     ) -> float:
         """Calculates the nitrogen loss from nitrous oxide emissions in kg.
 
@@ -1369,15 +1384,19 @@ class GasEmissions:
         """
         till_indicator = int(is_bedding_tilled)
         return (
-            0.07 * daily_nitrogen_input * till_indicator
-            + 0.01 * daily_nitrogen_input * (1 - till_indicator)
+                0.07 * daily_nitrogen_input * till_indicator
+                + 0.01 * daily_nitrogen_input * (1 - till_indicator)
         )
+
+    @staticmethod
+    def calc_open_lots_nitrogen_loss_nitrous_oxide_emission(daily_nitrogen_input: float) -> float:
+        return 2e-2 * daily_nitrogen_input
 
     @classmethod
     def calc_nitrogen_losses(
-        cls,
-        daily_nitrogen_input: float,
-        is_bedding_tilled: bool,
+            cls,
+            daily_nitrogen_input: float,
+            is_bedding_tilled: bool,
     ) -> float:
         """Calculates the nitrogen loss from the manure_bedding mixture in kg.
 
@@ -1398,9 +1417,17 @@ class GasEmissions:
             raise ValueError(f"{daily_nitrogen_input=}. Mass must must be positive.")
 
         return (
-            GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(
-                daily_nitrogen_input, is_bedding_tilled)
-            + GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(
-                daily_nitrogen_input, is_bedding_tilled)
-            + GasEmissions._calc_nitrogen_loss_to_leaching(daily_nitrogen_input)
+                GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(
+                    daily_nitrogen_input, is_bedding_tilled)
+                + GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(
+            daily_nitrogen_input, is_bedding_tilled)
+                + GasEmissions._calc_nitrogen_loss_to_leaching(daily_nitrogen_input)
+        )
+
+    @staticmethod
+    def calc_open_lots_nitrogen_losses(daily_nitrogen_input: float) -> float:
+        return (
+                GasEmissions.calc_open_lots_nitrogen_loss_ammonia_emission(daily_nitrogen_input)
+                + GasEmissions._calc_nitrogen_loss_to_leaching(daily_nitrogen_input)
+                + GasEmissions.calc_open_lots_nitrogen_loss_nitrous_oxide_emission(daily_nitrogen_input)
         )

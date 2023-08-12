@@ -37,6 +37,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     storage_methane: float = 0.0
     storage_ammonia: float = 0.0
+    storage_nitrous_oxide: float = 0.0
 
     sludge_manure_total_solids: float = 0.0
     sludge_manure_total_volatile_solids: float = 0.0

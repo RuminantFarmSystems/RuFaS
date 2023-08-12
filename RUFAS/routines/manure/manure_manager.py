@@ -184,7 +184,7 @@ class ManureManager:
             self._pen_daily_update(animal_manager.simulation_day, pen)
 
         # Test to see if manure nutrient manager is working
-        if animal_manager.simulation_day % 30 == 0:
+        if animal_manager.simulation_day % 120 == 0:
             self.request_nutrients(NutrientRequest(
                 phosphorus=self._manure_nutrient_manager.values.phosphorus * random.uniform(0.1, 0.7),
                 nitrogen=self._manure_nutrient_manager.values.nitrogen * random.uniform(0.1, 0.7),
@@ -218,6 +218,7 @@ class ManureManager:
             ManureTreatmentType.ANAEROBIC_DIGESTION: ManureType.LIQUID,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: ManureType.LIQUID,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: ManureType.SOLID,
+            ManureTreatmentType.OPEN_LOTS: ManureType.SOLID,
         }
         return manure_type_by_treatment_type[treatment_type]
 

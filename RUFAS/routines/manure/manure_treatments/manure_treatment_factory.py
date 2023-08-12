@@ -13,6 +13,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import DefaultManureTreatmentConfigFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
 from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_cbpb import CompostBeddedPackBarn
@@ -51,6 +52,7 @@ class ManureTreatmentFactory:
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SPLIT: AnaerobicDigestionAndLagoon,
             ManureTreatmentType.COMPOST_BEDDED_PACK_BARN: CompostBeddedPackBarn,
+            ManureTreatmentType.OPEN_LOTS: OpenLots
         }
 
         manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_type_name)

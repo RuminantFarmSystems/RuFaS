@@ -755,10 +755,12 @@ class ManureManagerOutputHandler:
             return
         small, medium, large = 10, 12, 16
         plt.style.use('ggplot')
-        plt.plot(x, y, color='#1746A2', linewidth=1.5)
+        # plt.plot(x, y, color='#1746A2', linewidth=1.5)
+        plt.scatter(x, y, color='#1746A2', s=2)
         plt.xlabel(x_label, fontsize=small)
         plt.ylabel(y_label, fontsize=small)
         plt.title(title, fontsize=medium)
+        plt.ylim(bottom=min(0, y.min()))
         locs, _ = plt.xticks()
         plt.xticks([int(loc) for loc in locs if loc >= 0], fontsize=small)
         plt.yticks(fontsize=small)

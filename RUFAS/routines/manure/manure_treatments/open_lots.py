@@ -10,7 +10,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import Man
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 
 
-class CompostBeddedPackBarn(BaseManureTreatment):
+class OpenLots(BaseManureTreatment):
     """Class for the compost bedded pack barn.
 
     Attributes:
@@ -110,8 +110,10 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         """
         total_solids = bedding_total_solids + manure_total_solids
         temperature_celsius = self._get_current_day_average_temperature_celsius()
-        methane_emissions = GasEmissions.calc_ifsm_methane_emission(
-            manure_volatile_solids, temperature_celsius)
+        methane_emissions = GasEmissions.calc_open_lots_ifsm_methane_emission(
+            manure_volatile_solids=manure_volatile_solids,
+            ambient_barn_temp=temperature_celsius
+        )
         carbon_decomposition = GasEmissions.calc_total_carbon_decomposition(
             manure_total_solids, bedding_total_solids, days_since_last_tillage,
             lag, moisture_effect, carbon_available_in_manure, carbon_available_in_bedding
@@ -136,9 +138,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         simulation_day = daily_input.simulation_day
         pen_id = daily_input.pen_id
 
-        is_bedding_tilled = True  # TODO: Add a flag for this during configuration process somehow
-        nitrogen_losses = GasEmissions.calc_nitrogen_losses(daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
-                                                            is_bedding_tilled=is_bedding_tilled)
+        nitrogen_losses = GasEmissions.calc_open_lots_nitrogen_losses(
+            daily_nitrogen_input=daily_input.liquid_manure_nitrogen)
         manure_nitrogen = daily_input.liquid_manure_nitrogen - nitrogen_losses
         manure_organic_nitrogen = ManureConstants.COMPOST_BEDDING_ORGANIC_NITROGEN_FRACTION * manure_nitrogen
         manure_inorganic_nitrogen = manure_nitrogen - manure_organic_nitrogen
@@ -150,7 +151,8 @@ class CompostBeddedPackBarn(BaseManureTreatment):
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
         )
         initial_total_solids_fraction = (daily_input.liquid_manure_total_solids /
-                                         (daily_input.liquid_manure_daily_volume * ManureConstants.SOLID_MANURE_DENSITY))
+                                         (
+                                                 daily_input.liquid_manure_daily_volume * ManureConstants.SOLID_MANURE_DENSITY))
         solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
 
         manure_potassium = (daily_input.liquid_manure_potassium *
@@ -163,17 +165,15 @@ class CompostBeddedPackBarn(BaseManureTreatment):
         non_water_extractable_inorganic_phosphorus = self._current_pen.manure.non_water_inorganic_phosphorus_fraction * manure_phosphorus
         non_water_extractable_organic_phosphorus = self._current_pen.manure.non_water_organic_phosphorus_fraction * manure_phosphorus
 
-        storage_methane = GasEmissions.calc_ifsm_methane_emission(
+        storage_methane = GasEmissions.calc_open_lots_ifsm_methane_emission(
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
             ambient_barn_temp=self._get_current_day_average_temperature_celsius()
         )
-        storage_ammonia = GasEmissions._calc_nitrogen_loss_from_ammonia_emissions(
+        storage_ammonia = GasEmissions.calc_open_lots_nitrogen_loss_ammonia_emission(
             daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
-            is_bedding_tilled=is_bedding_tilled
         )
-        storage_nitrous_oxide = GasEmissions._calc_nitrogen_loss_from_nitrous_oxide_emissions(
+        storage_nitrous_oxide = GasEmissions.calc_open_lots_nitrogen_loss_nitrous_oxide_emission(
             daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
-            is_bedding_tilled=is_bedding_tilled
         )
 
         daily_output = ManureTreatmentDailyOutput(
