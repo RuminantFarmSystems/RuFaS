@@ -665,10 +665,10 @@ class OutputManager(object):
         class_name.function_name.variable_name.info_maps: variable4_name
         """
 
-        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.\n"]
+        var_list = [f"_{exclude_info_maps=}, expect info_maps accordingly.{os.linesep}"]
         for name, variable_data in self.variables_pool.items():
-            if not variable_data["values"]:
-                var_list.append(f"{name}: **NO VARIABLES**\n")
+            if "values" not in variable_data:
+                var_list.append(f"{name}: **NO VARIABLES**{os.linesep}")
                 continue
 
             parsable_dicts = []
@@ -680,10 +680,7 @@ class OutputManager(object):
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
-                var_list.append(f"{name}\n")
-
-            if format_option == "block":
-                var_list.append(f"{name}\n")
+                var_list.append(f"{name}{os.linesep}")
 
             prefix = name
             if format_option == "block":
@@ -692,10 +689,10 @@ class OutputManager(object):
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
-                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}\n")
+                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
                 else:
                     for key in keys:
-                        var_list.append(f"{prefix}.{parsable_dict}: {key}\n")
+                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
 
         file_path = os.path.join(
             path, self._generate_file_name("variable_names", "txt")
