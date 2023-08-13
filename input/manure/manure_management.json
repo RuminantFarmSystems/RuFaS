@@ -25,7 +25,7 @@
       "scenario_id": 3,
       "bedding_type": "sawdust",
       "manure_handler": "flush system",
-      "manure_separator": "none",
+      "manure_separator": "rotary screen",
       "manure_treatment": "anaerobic lagoon"
     },
     {
@@ -65,8 +65,8 @@
     },
     {
       "scenario_id": 9,
-      "bedding_type": "CBPB sawdust",
-      "manure_handler": "tillage",
+      "bedding_type": "none",
+      "manure_handler": "harrowing",
       "manure_separator": "none",
       "manure_treatment": "open lots"
     }
@@ -145,6 +145,10 @@
     {
       "manure_handler_type": "tillage",
       "daily_tillage_frequency": 1
+    },
+    {
+      "manure_handler_type": "harrowing",
+      "daily_tillage_frequency": 0
     }
   ],
   "manure_separator_configs": [

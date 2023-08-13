@@ -32,6 +32,7 @@ class ManureHandlerType(DefaultEnum):
     MANUAL_SCRAPING = 'manual scraping'
     ALLEY_SCRAPER = 'alley scraper'
     TILLAGE = 'tillage'
+    HARROWING = 'harrowing'
     DEFAULT = FLUSH_SYSTEM
 
 
@@ -92,30 +93,40 @@ class BaseManureHandler:
 
     def daily_update(self,
                      pen: ManureManagerPen,
-                     bedding: BaseBedding,
+                     bedding: BaseBedding | None,
                      sim_day: int) -> ManureHandlerDailyOutput:
-        """Calculates and stores the daily output of the manure handler.
+        """
+        Calculate the daily manure handler output based on input passed from the animal module.
 
-        Notes:
-            "pseudocode_manure_management" MS.3
+        Parameters
+        ----------
+        pen : ManureManagerPen
+            A ManureManagerPen object that stores relevant information about the pen that
+            can helpful in the manure module.
+        bedding : BaseBedding | None
+            A BaseBedding object that specifies the type of bedding use or None if no bedding is used.
+        sim_day : int
+            The current simulation day.
 
-        Args:
-            pen: A ManureManagerPen object.
-            bedding: A BaseBedding object that specifies the type of bedding used.
-            sim_day: The current simulation day.
+        Returns
+        -------
+        ManureHandlerDailyOutput
+            A ManureHandlerDailyOutput object that stores the daily manure handler output.
+            See details in the class definition (:class:`ManureHandlerDailyOutput`).
 
-        Returns:
-            A ManureHandlerDailyOutput object.
         """
         if pen.num_animals == 0:
             return ManureHandlerDailyOutput()
 
-        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
-                        "bedding_density": bedding.bedding_density,
-                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
-                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
-                        "bedding_type": bedding.bedding_type._name_,
-                        }
+        if bedding is None:
+            bedding_data = None
+        else:
+            bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                            "bedding_density": bedding.bedding_density,
+                            "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                            "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                            "bedding_type": bedding.bedding_type._name_,
+                            }
 
         info_map = {"class": self.__class__.__name__,
                     "function": self.daily_update.__name__,
@@ -161,8 +172,8 @@ class BaseManureHandler:
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(
                 pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(
-                pen.num_animals),
-            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals),
+                pen.num_animals) if bedding is not None else 0.0,
+            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals) if bedding is not None else 0.0,
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)),
             tempC=self._get_current_day_average_temperature_in_celsius()
@@ -235,6 +246,16 @@ class Tillage(BaseManureHandler):
     pass
 
 
+class Harrowing(BaseManureHandler):
+    """A class that handles calculations related to harrowing.
+
+    Attributes:
+        All inherited from BaseManureHandler.
+
+    """
+    pass
+
+
 @dataclass
 class ManureHandlerConfig:
     """Class for storing the configuration of a manure handler.
@@ -267,6 +288,9 @@ class DefaultManureHandlerConfigFactory:
     TILLAGE_CONFIG = ManureHandlerConfig(
         daily_tillage_frequency=1,
     )
+    HARROWING_CONFIG = ManureHandlerConfig(
+        daily_tillage_frequency=0,
+    )
 
     @classmethod
     def get_instance(cls, manure_handler_type: ManureHandlerType) -> ManureHandlerConfig:
@@ -288,6 +312,7 @@ class DefaultManureHandlerConfigFactory:
             ManureHandlerType.MANUAL_SCRAPING: cls.MANUAL_SCRAPING_CONFIG,
             ManureHandlerType.ALLEY_SCRAPER: cls.ALLEY_SCRAPER_CONFIG,
             ManureHandlerType.TILLAGE: cls.TILLAGE_CONFIG,
+            ManureHandlerType.HARROWING: cls.HARROWING_CONFIG,
         }
 
         manure_handler_config = manure_handler_config_by_type[manure_handler_type]
@@ -324,7 +349,8 @@ class ManureHandlerFactory:
             ManureHandlerType.FLUSH_SYSTEM: FlushSystem,
             ManureHandlerType.ALLEY_SCRAPER: AlleyScraper,
             ManureHandlerType.MANUAL_SCRAPING: ManualScraping,
-            ManureHandlerType.TILLAGE: Tillage
+            ManureHandlerType.TILLAGE: Tillage,
+            ManureHandlerType.HARROWING: Harrowing,
         }
 
         manure_handler_type = ManureHandlerType.get_type(

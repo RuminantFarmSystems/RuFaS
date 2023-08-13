@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Tuple
 
 from RUFAS.routines.manure.constants.gas_emission_constants import GasEmissionConstants
@@ -150,10 +151,12 @@ class OpenLots(BaseManureTreatment):
             bedding_total_solids=self._manure_handler_daily_output.total_bedding_mass,
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
         )
-        initial_total_solids_fraction = (daily_input.liquid_manure_total_solids /
-                                         (
-                                                 daily_input.liquid_manure_daily_volume * ManureConstants.SOLID_MANURE_DENSITY))
-        solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
+        initial_manure_mass = daily_input.liquid_manure_daily_volume * ManureConstants.SOLID_MANURE_DENSITY
+        initial_total_solids_fraction = daily_input.liquid_manure_total_solids / initial_manure_mass
+        if math.isclose(initial_total_solids_fraction, 0):
+            solid_manure_mass = 0
+        else:
+            solid_manure_mass = remaining_total_solids / initial_total_solids_fraction
 
         manure_potassium = (daily_input.liquid_manure_potassium *
                             (1 - self.config.potassium_removal_efficiency_for_treatment))
@@ -169,10 +172,10 @@ class OpenLots(BaseManureTreatment):
             manure_volatile_solids=daily_input.liquid_manure_total_volatile_solids,
             ambient_barn_temp=self._get_current_day_average_temperature_celsius()
         )
-        storage_ammonia = GasEmissions.calc_open_lots_nitrogen_loss_ammonia_emission(
+        storage_ammonia = GasEmissions.calc_open_lots_nitrogen_loss_from_ammonia_emission(
             daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
         )
-        storage_nitrous_oxide = GasEmissions.calc_open_lots_nitrogen_loss_nitrous_oxide_emission(
+        storage_nitrous_oxide = GasEmissions.calc_open_lots_nitrogen_loss_from_nitrous_oxide_emission(
             daily_nitrogen_input=daily_input.liquid_manure_nitrogen,
         )
 

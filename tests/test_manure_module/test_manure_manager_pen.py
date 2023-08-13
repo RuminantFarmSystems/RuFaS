@@ -3,8 +3,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from RUFAS.routines.manure.pen.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
 def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
@@ -33,7 +33,7 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
         'RUFAS.routines.manure.pen.manure_manager_pen.PenManure.get_instance',
         return_value=expected_pen_manure)
     patch_for_count_lactating_cows = mocker.patch(
-        'RUFAS.routines.manure.pen.manure_manager_pen.ManureManagerPen.count_lactating_cows',
+        'RUFAS.routines.manure.pen.manure_manager_pen.ManureManagerPen._count_lactating_cows',
         return_value=expected_num_animals)
 
     # Act
@@ -52,29 +52,39 @@ def test_manure_manager_pen_init(mocker: MockerFixture) -> None:
     assert pen.manure_treatment == expected_manure_treatment
     patch_for_pen_manure_get_instance.assert_called_once_with(mock_pen.manure, expected_num_animals)
     assert pen.manure == expected_pen_manure
-    patch_for_count_lactating_cows.assert_called_once_with(mock_pen.animal_combination, mock_pen.animals_in_pen)
+    patch_for_count_lactating_cows.assert_called_once_with(mock_pen.animals_in_pen)
     assert pen.num_lactating_cows == expected_num_animals
 
 
-# TODO: Fill in the remaining combinations
-@pytest.mark.parametrize('animal_combination, expected_num_lactating_cows', [
-    (Pen.AnimalCombination.LAC_COW, 10),
-    (Pen.AnimalCombination.CALF, 0),
-    (Pen.AnimalCombination.GROWING, 0),
+@pytest.mark.parametrize('num_animals, num_lactating_cows', [
+    (0, 0),
+    (10, 5),
+    (5, 5),
+    (7, 0)
 ])
-def test_count_lactating_cows(mocker: MockerFixture, animal_combination: Pen.AnimalCombination,
-                              expected_num_lactating_cows: int) -> None:
-    """Unit test for function count_lactating_cows in file manure_manager_pen.py"""
+def test_count_lactating_cows(mocker: MockerFixture,
+                              num_animals: int,
+                              num_lactating_cows: int
+                              ) -> None:
+    """
+    Unit test for function _count_lactating_cows in file manure_manager_pen.py
 
+    This test verifies that the function correctly counts the number of lactating cows
+    among a given list of animals, taking into account various scenarios with
+    different numbers of cows and lactating cows.
+
+    """
     # Arrange
     mocker.patch('RUFAS.routines.animal.life_cycle.cow.Cow.__init__', return_value=None)
-    mock_cows = [Cow(args=mocker.MagicMock()) for _ in range(10)]
+    mock_animals = [Cow(args=mocker.MagicMock()) for _ in range(num_animals)]
+    for i, animal in enumerate(mock_animals):
+        animal.milking = i < num_lactating_cows
 
     # Act
-    actual_num_lactating_cows = ManureManagerPen.count_lactating_cows(animal_combination, mock_cows)
+    actual_num_lactating_cows = ManureManagerPen._count_lactating_cows(mock_animals)
 
     # Assert
-    assert actual_num_lactating_cows == expected_num_lactating_cows
+    assert actual_num_lactating_cows == num_lactating_cows
 
 
 @pytest.mark.parametrize(

@@ -57,26 +57,28 @@ class ManureManagerPen:
         self.manure_treatment: str = pen.manure_storage
 
         self.manure = PenManure.get_instance(pen.manure, self.num_animals)
-        self.num_lactating_cows = self.count_lactating_cows(pen.animal_combination, pen.animals_in_pen)
+        self.num_lactating_cows = self._count_lactating_cows(pen.animals_in_pen)
 
-    @classmethod
-    def count_lactating_cows(cls, animal_combination: Pen.AnimalCombination, animals_in_pen: [AnimalBase]) -> int:
-        """Counts the number of lactating cows in the pen.
+    @staticmethod
+    def _count_lactating_cows(animals_in_pen: list[AnimalBase]) -> int:
+        """
+        Count the number of lactating cows in the pen.
 
-        Args:
-            animal_combination: An AnimalCombination enum that describes the current
-                animal makeup in this pen.
-            animals_in_pen: A list of animal objects in this pen.
+        Parameters
+        ----------
+        animals_in_pen : list[AnimalBase]
+            A list of animal objects in this pen.
 
-        Returns:
+        Returns
+        -------
+        int
             The number of lactating cows in the pen.
 
         """
         num_lac_cows = 0
-        if animal_combination is Pen.AnimalCombination.LAC_COW:
-            for animal in animals_in_pen:
-                if type(animal) is Cow:
-                    num_lac_cows += 1
+        for animal in animals_in_pen:
+            if type(animal) == Cow and animal.is_lactating:
+                num_lac_cows += 1
         return num_lac_cows
 
     @property

@@ -1341,7 +1341,21 @@ class GasEmissions:
         )
 
     @staticmethod
-    def calc_open_lots_nitrogen_loss_ammonia_emission(daily_nitrogen_input: float) -> float:
+    def calc_open_lots_nitrogen_loss_from_ammonia_emission(daily_nitrogen_input: float) -> float:
+        """
+        Calculate the nitrogen loss from ammonia emission in the open lots manure treatment.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The amount of nitrogen lost to ammonia emission (kg).
+
+        """
         return 0.36 * daily_nitrogen_input
 
     @classmethod
@@ -1389,7 +1403,21 @@ class GasEmissions:
         )
 
     @staticmethod
-    def calc_open_lots_nitrogen_loss_nitrous_oxide_emission(daily_nitrogen_input: float) -> float:
+    def calc_open_lots_nitrogen_loss_from_nitrous_oxide_emission(daily_nitrogen_input: float) -> float:
+        """
+        Calculate the nitrogen loss from nitrous oxide emission in the open lots manure treatment.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The nitrogen lost to nitrous oxide emission (kg).
+
+        """
         return 2e-2 * daily_nitrogen_input
 
     @classmethod
@@ -1426,8 +1454,22 @@ class GasEmissions:
 
     @staticmethod
     def calc_open_lots_nitrogen_losses(daily_nitrogen_input: float) -> float:
+        """
+        Calculate the total nitrogen loss from the open lots manure treatment.
+
+        Parameters
+        ----------
+        daily_nitrogen_input : float
+            The amount of nitrogen present in the manure excreted by animals (kg).
+
+        Returns
+        -------
+        float
+            The total nitrogen loss from the open lots manure treatment (kg).
+
+        """
         return (
-                GasEmissions.calc_open_lots_nitrogen_loss_ammonia_emission(daily_nitrogen_input)
+                GasEmissions.calc_open_lots_nitrogen_loss_from_ammonia_emission(daily_nitrogen_input)
                 + GasEmissions._calc_nitrogen_loss_to_leaching(daily_nitrogen_input)
-                + GasEmissions.calc_open_lots_nitrogen_loss_nitrous_oxide_emission(daily_nitrogen_input)
+                + GasEmissions.calc_open_lots_nitrogen_loss_from_nitrous_oxide_emission(daily_nitrogen_input)
         )

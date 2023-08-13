@@ -760,7 +760,7 @@ class ManureManagerOutputHandler:
         plt.xlabel(x_label, fontsize=small)
         plt.ylabel(y_label, fontsize=small)
         plt.title(title, fontsize=medium)
-        plt.ylim(bottom=min(0, y.min()))
+        plt.ylim(bottom=min(0, y.min() * 1.1), top=max(0, y.max() * 1.1))
         locs, _ = plt.xticks()
         plt.xticks([int(loc) for loc in locs if loc >= 0], fontsize=small)
         plt.yticks(fontsize=small)

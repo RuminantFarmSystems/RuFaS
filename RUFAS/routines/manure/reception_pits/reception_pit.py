@@ -18,25 +18,37 @@ class ReceptionPit:
     def daily_update(cls,
                      manure_handler_daily_output: ManureHandlerDailyOutput,
                      pen: ManureManagerPen,
-                     bedding: BaseBedding
+                     bedding: BaseBedding | None
                      ) -> ReceptionPitDailyOutput:
-        """Calculates and stores the daily output of the reception pit.
+        """
+        Calculate the daily output of the reception pit based on the daily output data provided by
+        an upstream manure handler in the manure management system.
 
-        Args:
-            manure_handler_daily_output: The daily output of a manure handler.
-            pen: A ManureManagerPen object.
-            bedding: A BaseBedding object.
+        Parameters
+        ----------
+        manure_handler_daily_output : ManureHandlerDailyOutput
+            The daily output data from an upstream manure handler.
+        pen : ManureManagerPen
+            The pen object associated with the current manure management system.
+        bedding : BaseBedding | None
+            The bedding that is used in the current manure management system if any.
 
-        Returns:
+        Returns
+        -------
             The daily output of the reception pit.
 
         """
-        bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
-                        "bedding_density": bedding.bedding_density,
-                        "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
-                        "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
-                        "bedding_type": bedding.bedding_type._name_,
-                        }
+        if bedding is None:
+            bedding_data = None
+            bedding_dry_solids = 0.0
+        else:
+            bedding_data = {"bedding_mass_per_day": bedding.bedding_mass_per_day,
+                            "bedding_density": bedding.bedding_density,
+                            "bedding_dry_matter_content": bedding.bedding_dry_matter_content,
+                            "bedding_cleaned_fraction": bedding.bedding_cleaned_fraction,
+                            "bedding_type": bedding.bedding_type._name_,
+                            }
+            bedding_dry_solids = bedding.calc_total_bedding_dry_solids(pen.num_animals)
 
         info_map = {"class": cls.__name__,
                     "function": cls.daily_update.__name__,
@@ -51,8 +63,7 @@ class ReceptionPit:
             manure_urea=mh.manure_urea,
             liquid_manure_total_ammoniacal_nitrogen=mh.liquid_manure_total_ammoniacal_nitrogen,
             liquid_manure_nitrogen=mh.liquid_manure_nitrogen,
-            liquid_manure_total_solids=mh.liquid_manure_total_solids +
-            bedding.calc_total_bedding_dry_solids(pen.num_animals),
+            liquid_manure_total_solids=mh.liquid_manure_total_solids + bedding_dry_solids,
             manure_degradable_volatile_solids=mh.manure_degradable_volatile_solids,
             manure_non_degradable_volatile_solids=mh.manure_non_degradable_volatile_solids,
             liquid_manure_total_volatile_solids=mh.liquid_manure_total_volatile_solids,

@@ -29,6 +29,8 @@ class BeddingType(DefaultEnum):
         Represent the 'straw' type of bedding.
     SAND : str
         Represent the 'sand' type of bedding.
+    NONE : str
+        Represent no bedding is used.
     DEFAULT : str
         The default type of bedding is 'sand' if none is specified.
 
@@ -38,6 +40,7 @@ class BeddingType(DefaultEnum):
     MANURE_SOLIDS = 'manure solids'
     STRAW = 'straw'
     SAND = 'sand'
+    NONE = 'none'
     DEFAULT = SAND
 
 
@@ -424,7 +427,7 @@ class BeddingFactory:
 
     @classmethod
     def get_instance(cls, bedding_type_name: str, custom_bedding_config: Optional[BeddingConfig] = None) \
-            -> BaseBedding:
+            -> BaseBedding | None:
         """
         Create a bedding object of the specified type.
 
@@ -440,20 +443,23 @@ class BeddingFactory:
 
         Returns
         -------
-        BaseBedding
-            Bedding object of the specified type.
+        BaseBedding | None
+            Bedding object of the specified type if a type is provided, and it is valid. Otherwise, None.
 
         """
-        bedding_class_by_type: Dict[BeddingType, Type[BaseBedding]] = {
+        bedding_class_by_type: dict[BeddingType, Type[BaseBedding] | None] = {
             BeddingType.SAWDUST: SawdustBedding,
             BeddingType.CBPB_SAWDUST: CBPBSawdustBedding,
             BeddingType.MANURE_SOLIDS: ManureSolidsBedding,
             BeddingType.STRAW: StrawBedding,
             BeddingType.SAND: SandBedding,
+            BeddingType.NONE: None
         }
 
         bedding_type = BeddingType.get_type(bedding_type_name)
         bedding_class = bedding_class_by_type[bedding_type]
+        if bedding_class is None:
+            return None
 
         if custom_bedding_config:
             bedding_obj = bedding_class(custom_bedding_config)
