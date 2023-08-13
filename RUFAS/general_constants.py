@@ -2,6 +2,8 @@ class GeneralConstants:
     """Contains general constants used in the manure treatment module.
 
     Attributes:
+        MM_TO_M: The conversion factor from millimeters to meters.
+
         GRAMS_TO_KG: The conversion factor from grams to kilograms.
         LITERS_TO_CUBIC_METERS: The conversion factor from liters to cubic meters.
         KG_TO_CUBIC_METERS: The conversion factor from kilograms to cubic meters.
@@ -15,6 +17,9 @@ class GeneralConstants:
         PROTEIN_TO_NITROGEN: The nitrogen content of proteins is assumed to be 16%.   
 
     """
+    # Length-related
+    MM_TO_M = 0.001
+
     # Mass-related
     GRAMS_TO_KG = 0.001
     KG_TO_GRAMS = 1000

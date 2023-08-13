@@ -127,3 +127,6 @@ class GasEmissionConstants:
 
     SLURRY_MANURE_THRESHOLD = 5.0
     """Dry matter threshold for classifying slurry manure (unitless)."""
+
+    DEFAULT_STORAGE_AREA_PER_ANIMAL = 1.0
+    """Default storage area per animal (:math:`m^2`). Default is set to 1.0."""

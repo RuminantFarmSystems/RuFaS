@@ -591,10 +591,11 @@ class GasEmissions:
         return max(0.0, total_ammonia_loss)
 
     @classmethod
-    def calc_storage_ammonia_emission(cls, num_animals: int, storage_area_per_animal: float,
+    def calc_storage_ammonia_emission(cls, num_animals: int,
                                       manure_total_ammoniacal_nitrogen: float,
                                       manure_volume: float, manure_density: float,
                                       total_solids: float, temp: float,
+                                      storage_area_per_animal=GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL,
                                       pH=GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA) -> float:
         """
         Calculate storage ammonia emissions for manure treatments.
@@ -683,8 +684,6 @@ class GasEmissions:
         ----------
         num_animals : int
             Number of animals in the storage area (unitless).
-        storage_area_per_animal : float
-            Storage area per animal based on manure type (:math:`m^2`).
         manure_total_ammoniacal_nitrogen : float
             Total ammoniacal nitrogen in manure (kg).
         manure_volume : float
@@ -695,6 +694,10 @@ class GasEmissions:
             Total solids present in the manure (kg).
         temp : float
             Current storage area temperature (:math:`^{\circ}C`).
+        storage_area_per_animal : float, optional
+            Storage area per animal based on manure treatment type (:math:`m^2`).
+            Default is set to a value listed as :attr:`DEFAULT_STORAGE_AREA_PER_ANIMAL
+            in :class:`GasEmissionConstants`.
         pH : float, optional
             pH value for storage ammonia emission (unitless). Default is set to a value listed as
             :attr:`DEFAULT_PH_FOR_STORAGE_AMMONIA` in :class:`GasEmissionConstants`.

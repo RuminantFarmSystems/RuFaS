@@ -714,11 +714,15 @@ def test_calc_storage_ammonia_emission(num_animals: int, storage_area: float, ma
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissions.calc_storage_ammonia_emission(num_animals, storage_area, manure_tan,
-                                                       manure_volume, manure_density, total_solids, temp, pH)
+            GasEmissions.calc_storage_ammonia_emission(num_animals, manure_tan,
+                                                       manure_volume, manure_density,
+                                                       total_solids, temp,
+                                                       storage_area, pH)
     else:
-        actual = GasEmissions.calc_storage_ammonia_emission(num_animals, storage_area, manure_tan,
-                                                            manure_volume, manure_density, total_solids, temp, pH)
+        actual = GasEmissions.calc_storage_ammonia_emission(num_animals, manure_tan,
+                                                            manure_volume, manure_density,
+                                                            total_solids, temp,
+                                                            storage_area, pH)
         assert actual == pytest.approx(expected)
 
 

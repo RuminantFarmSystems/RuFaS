@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Tuple
-
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.gas_emissions import GasEmissions
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
@@ -40,60 +39,76 @@ class AnaerobicLagoon(BaseManureTreatment):
                 0.03 / ManureConstants.MANURE_DENSITY)  # TODO: Use constants instead
         return new_daily_output
 
-    def calc_methane_emission(self,
-                              accumulated_liquid_manure_total_volatile_solids: float,
-                              accumulated_liquid_manure_total_solids: float) \
-            -> Tuple[float, float]:
-        """Calculates methane emission from the anaerobic lagoon.
+    def _update_methane_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
+        """
+        Calculate the methane emission from the anaerobic lagoon.
 
-        Args:
-            accumulated_liquid_manure_total_volatile_solids: The accumulated total volatile solids in the lagoon, kg.
-            accumulated_liquid_manure_total_solids: The accumulated total solids in the lagoon, kg.
+        Parameters
+        ----------
+        daily_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
 
-        Returns:
-            methane loss: The methane loss from the lagoon, kg.
-            new_accumulated_liquid_manure_total_solids: The new accumulated total solids in the lagoon, kg.
+        Returns
+        -------
+        None
+            Update the `storage_methane` attribute of the daily output object.
+
+            Update the `storage_methane` and `liquid_manure_total_volatile_solids` attributes of the accumulated
+            output object.
 
         """
-        methane_loss = GasEmissions.calc_methane_emission_from_anaerobic_lagoon(
-                manure_volatile_solids=accumulated_liquid_manure_total_volatile_solids)
-        new_accumulated_liquid_manure_total_solids = max(accumulated_liquid_manure_total_solids - methane_loss, 0.0)
-        return methane_loss, new_accumulated_liquid_manure_total_solids
-
-    def calc_ammonia_emission(self, num_animals: int, barn_area: float,
-                              accumulated_manure_volume: float,
-                              accumulated_manure_total_ammoniacal_nitrogen: float) -> Tuple[float, float]:
-        """Calculates NH3 emission from the anaerobic lagoon.
-
-        Args:
-            num_animals: The number of animals in the barn.
-            barn_area: The barn area per animal, m^2/animal.
-            accumulated_manure_volume: The accumulated manure volume in the lagoon, m^3.
-            accumulated_manure_total_ammoniacal_nitrogen: The accumulated total ammoniacal nitrogen
-             in the lagoon, kg.
-
-        Returns:
-            ammonia loss: The ammonia loss from the lagoon, kg.
-            new_accumulated_liquid_manure_total_ammoniacal_nitrogen: Accumulated total ammoniacal nitrogen
-            in the treatment system after the ammonia emission is calculated, kg.
-
-
-        """
-        ammonia_loss = GasEmissions.calc_ammonia_emission(
-                num_animals=num_animals,
-                barn_area=barn_area,
-                mass=accumulated_manure_volume * ManureConstants.MANURE_DENSITY / num_animals,
-                total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen / num_animals,
-                temperature_celsius=self._get_current_day_average_temperature_celsius()
+        volatile_solids_factor = 3
+        methane_emission = GasEmissions.calc_methane_emission_from_slurry_storage(
+            total_volatile_solids=daily_output.liquid_manure_total_volatile_solids,
+            temp=self._get_current_day_average_temperature_celsius()
         )
-        new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
-            max(accumulated_manure_total_ammoniacal_nitrogen - ammonia_loss, 0.0)
-        return ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen
+        methane_emission = max(methane_emission, 0.0)
+        daily_output.storage_methane = methane_emission
+        self._accumulated_output.storage_methane += methane_emission
+
+        new_liquid_manure_total_volatile_solids = (daily_output.liquid_manure_total_volatile_solids -
+                                                   methane_emission * volatile_solids_factor)
+        self._accumulated_output.liquid_manure_total_volatile_solids += new_liquid_manure_total_volatile_solids
+
+    def _update_ammonia_emission(self, daily_output: ManureTreatmentDailyOutput) -> None:
+        """
+        Calculate the ammonia emission from the anaerobic lagoon.
+
+        Parameters
+        ----------
+        daily_output : ManureTreatmentDailyOutput
+            A ManureTreatmentDailyOutput object containing the daily output of the anaerobic lagoon.
+
+        Returns
+        -------
+        None
+            Update the `storage_ammonia` attribute of the daily output object.
+
+            Update the `storage_ammonia` attribute of the accumulated output object.
+
+        """
+        manure_total_ammoniacal_nitrogen = max(
+            daily_output.liquid_manure_total_ammoniacal_nitrogen +
+            self._current_pen.manure.urine_total_ammoniacal_nitrogen -
+            self._manure_handler_daily_output.housing_ammonia,
+            0.0)
+        storage_ammonia_emission = GasEmissions.calc_storage_ammonia_emission(
+            num_animals=self._current_pen.num_animals,
+            manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
+            manure_volume=daily_output.daily_final_manure_volume,
+            manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
+            total_solids=daily_output.liquid_manure_total_solids,
+            temp=self._get_current_day_average_temperature_celsius(),
+        )
+        daily_output.storage_ammonia = storage_ammonia_emission
+        self._accumulated_output.storage_ammonia += storage_ammonia_emission
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
-        """Updates the daily output variables for the anaerobic lagoon.
+        """
+        Update the daily output variables for the anaerobic lagoon.
 
-        Returns:
+        Returns
+        -------
             The daily output variables for the anaerobic lagoon.
 
         """
@@ -105,42 +120,27 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output = self._adjust_accumulated_output(daily_output)
         self._accumulated_precipitation_volume += self.precipitation_volume
 
-        methane_loss, new_accumulated_liquid_manure_total_solids = self.calc_methane_emission(
-                self._accumulated_output.liquid_manure_total_volatile_solids,
-                self._accumulated_output.liquid_manure_total_solids)
-        daily_output.storage_methane = methane_loss
-        self._accumulated_output.storage_methane += methane_loss
-        self._accumulated_output.liquid_manure_total_solids = new_accumulated_liquid_manure_total_solids
-
-        ammonia_loss, new_accumulated_liquid_manure_total_ammoniacal_nitrogen = \
-            self.calc_ammonia_emission(
-                    num_animals=self._current_pen.num_animals,
-                    barn_area=self._current_pen.barn_area_from_pen_type,
-                    accumulated_manure_volume=self._accumulated_output.daily_final_manure_volume,
-                    accumulated_manure_total_ammoniacal_nitrogen=(
-                        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen)
-            )
-        daily_output.storage_ammonia = ammonia_loss
-        self._accumulated_output.storage_ammonia += ammonia_loss
-        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = \
-            new_accumulated_liquid_manure_total_ammoniacal_nitrogen
+        self._update_methane_emission(daily_output)
+        self._update_ammonia_emission(daily_output)
 
         return daily_output
 
     def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
-        """Adjusts the final manure volume to account for the precipitation and the storage time period.
+        """
+        Adjust the final manure volume to account for the precipitation and the storage time period.
 
-        Args:
-            current_day_final_manure_volume: The final manure volume for the current day.
+        Parameters
+        ----------
+        current_day_final_manure_volume : float
+            The final manure volume for the current simulation day (:math:`m^3`).
 
-        Returns:
+        Returns
+        -------
+        float
             The adjusted final manure volume.
 
         """
-        adjusted_final_manure_volume = current_day_final_manure_volume + self.precipitation_volume
-        if self._sim_day % self.storage_time_period > 1:
-            adjusted_final_manure_volume -= self.flushing_volume
-        return adjusted_final_manure_volume
+        return current_day_final_manure_volume + self.precipitation_volume
 
     @property
     def sludge_accumulation_volume(self) -> float:
@@ -163,21 +163,28 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) \
             -> ManureTreatmentDailyOutput:
-        """Adjusts the accumulated output by either resetting it or adding the daily output to it.
+        """
+        Adjust the accumulated output by either resetting it or adding the daily output to it.
 
         The accumulated output will be reset on the first day of every storage time period.
 
-        Args:
-            manure_treatment_daily_output: The daily output from the manure treatment system.
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
-        Returns:
+        Returns
+        -------
+        ManureTreatmentDailyOutput
             The adjusted accumulated output.
 
         """
         if self._sim_day % self.storage_time_period == 1:
-            return manure_treatment_daily_output
+            return manure_treatment_daily_output.clone()
         else:
-            return self._accumulated_output + manure_treatment_daily_output
+            new_accumulated_output = self._accumulated_output + manure_treatment_daily_output
+            new_accumulated_output.daily_final_manure_volume -= self.flushing_volume
+            return new_accumulated_output
 
     @property
     def volume_needed(self):
@@ -223,15 +230,23 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     @property
     def lagoon_width(self) -> float:
-        """Returns lagoon width.
+        """
+        Return lagoon width.
 
-        Returns:
+        Returns
+        -------
+        float
             Lagoon width, m.
 
         """
         abc = self._calc_abc()
         a, b, c = abc[0], abc[1], abc[2]
-        return (-1 * b + (b ** 2 - 4 * a * c) ** 0.5) / (2 * a)
+        discriminant = b ** 2 - 4 * a * c
+
+        if discriminant < 0:
+            return 0.0
+        else:
+            return max((-b + discriminant ** 0.5) / (2 * a), (-b - discriminant ** 0.5) / (2 * a))
 
     @property
     def lagoon_length(self):
@@ -270,13 +285,17 @@ class AnaerobicLagoon(BaseManureTreatment):
 
     @property
     def precipitation_volume(self):
-        """Returns additional lagoon volume needed for precipitation.
+        """
+        Return additional lagoon volume needed for precipitation.
 
-        Returns:
-            Additional lagoon volume needed for precipitation, m^3.
+        Returns
+        -------
+        float
+            Additional lagoon volume needed for precipitation (:math:`m^3`).
 
         """
-        return (self._get_current_day_rainfall() / 1000) * self.lagoon_surface_area
+        rainfall = self._get_current_day_rainfall() * GeneralConstants.MM_TO_M
+        return rainfall * self.lagoon_surface_area
 
     @property
     def freeboard_volume(self) -> float:
