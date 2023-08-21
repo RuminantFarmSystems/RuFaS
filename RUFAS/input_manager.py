@@ -257,40 +257,6 @@ class InputManager:
             )
         return validator(variable_properties, var_name, input_data_value)
 
-    # def _get_validity(self, variable_properties: Dict[str, Any], var_name: str, input_data_value: Any,
-    #                   var_type: str) -> bool:
-    #     """Helper function to route arguments to correct type-validator function.
-
-    #     Parameters
-    #     ----------
-    #     variable_properties : Dict[str, Any]
-    #         The metadata properties of the variable being validated.
-    #     var_name : str
-    #         The name of the variable being validated.
-    #     input_data_value : Any
-    #         The value of the variable being validated.
-    #     var_type : str
-    #         The type of the variable being validated.
-    #     Returns
-    #     -------
-    #     bool
-    #         True if element is valid.
-    #     Raises
-    #     ------
-    #     KeyError
-    #         Raised if the variable type is not one of the 4 currently supported for validation.
-    #     """
-    #     data_type_to_validator_map = {"string": self._string_type_validator,
-    #                                   "number": self._num_type_validator,
-    #                                   "array": self._array_type_validator,
-    #                                   "bool": self._bool_type_validator, }
-    #     try:
-    #         validator = data_type_to_validator_map[var_type]
-    #     except KeyError:
-    #         raise KeyError(f"Invalid type {var_type}: Element must be type {data_type_to_validator_map.keys()}")
-
-    #     return validator(variable_properties, var_name, input_data_value)
-
     def _validate_csv_element(self, var_name: str, properties_blob_key: str, input_data: Dict[str, Any],
                               eager_termination: bool) -> dict:
         """
@@ -321,11 +287,9 @@ class InputManager:
         property_data = input_data[var_name]
         variable_properties = reduce(lambda d, key: d[key], [var_name],
                                      self.__metadata["properties"][properties_blob_key])
-        # var_type = variable_properties["type"]
 
         for element_num in range(len(property_data)):
             element_counter_and_validity["total_elements"] += 1
-            # is_valid = self._get_validity(variable_properties, property, property_data[element_num], var_type)
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, property_data[element_num])
             if is_valid:
                 element_counter_and_validity["valid_elements"] += 1
@@ -417,8 +381,6 @@ class InputManager:
                 raise KeyError(f"Key {var_name} not found in input data")
 
             is_valid = self._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
-
-            # is_valid = self._get_validity(variable_properties, var_name, input_data_value, var_type)
 
             element_counter_and_validity["total_elements"] += 1
             if is_valid:
