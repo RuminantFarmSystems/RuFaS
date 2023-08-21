@@ -48,7 +48,7 @@ def input_manager_original_method_states(
         "_fix_data": mock_input_manager._fix_data,
         "get_data": mock_input_manager.get_data,
         "get_metadata": mock_input_manager.get_metadata,
-        "_get_validity": mock_input_manager._get_validity,
+        "_validate_input_type_dynamic": mock_input_manager._validate_input_type_dynamic,
         "_validate_csv_element": mock_input_manager._validate_csv_element,
     }
 
@@ -297,39 +297,60 @@ def test_populate_pool_raises_keyerror(mock_input_manager: InputManager,
 
 
 @pytest.mark.parametrize(
-        "variable_properties, input_data_value, var_type",
+        "variable_properties, input_data_value",
         [
-            ({"dummy_property": "dummy_value"}, "dummy_value", "string"),
-            ({"dummy_property": 10}, 10, "number"),
-            ({"dummy_property": True}, True, "bool"),
-            ({"dummy_property": []}, [], "array"),
+            ({"type": "string", "dummy_property": "dummy_value"}, "dummy_value"),
+            ({"type": "number", "dummy_property": 10}, 10),
+            ({"type": "bool", "dummy_property": True}, True),
+            ({"type": "array", "dummy_property": []}, []),
         ]
 )
-def test_get_validity_valid_data(mock_input_manager: InputManager,
-                                 input_manager_original_method_states: Dict[str, Callable],
-                                 variable_properties: Dict[str, Any], input_data_value: Any, var_type: str) -> None:
-    """Unit test for valid data type for function _get_validity in file input_manager.py"""
+def test_validate_input_type_dynamic_valid_data(mock_input_manager: InputManager,
+                                                input_manager_original_method_states: Dict[str, Callable],
+                                                variable_properties: Dict[str, Any],
+                                                input_data_value: Any) -> None:
+    """Unit test for valid data type for function _validate_input_type_dynamic in file input_manager.py"""
     var_name = "dummy_var"
 
-    result = mock_input_manager._get_validity(variable_properties, var_name, input_data_value, var_type)
+    result = mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
     assert result is True
 
-    mock_input_manager._get_validity = input_manager_original_method_states["_get_validity"]
+    mock_input_manager._validate_input_type_dynamic = \
+        input_manager_original_method_states["_validate_input_type_dynamic"]
 
 
-def test_get_validity_invalid_type_raises_keyerror(mock_input_manager: InputManager,
-                                                   input_manager_original_method_states: Dict[str, Callable],
-                                                   ) -> None:
-    """Unit test for invalid data type raising a KeyError for function _get_validity in file input_manager.py"""
+def test_validate_input_type_dynamic_invalid_type_raises_keyerror(mock_input_manager: InputManager,
+                                                                  input_manager_original_method_states:
+                                                                  Dict[str, Callable],
+                                                                  ) -> None:
+    """Unit test for invalid data type raising a KeyError for function
+    _validate_input_type_dynamic in file input_manager.py"""
+    variable_properties = {"type": "invalid_type", "dummy_property": "dummy_value"}
+    var_name = "dummy_var"
+    input_data_value = "dummy_value"
+
+    with pytest.raises(KeyError, match="Invalid type invalid_type"):
+        mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
+
+    mock_input_manager._validate_input_type_dynamic = \
+        input_manager_original_method_states["_validate_input_type_dynamic"]
+
+
+def test_validate_input_type_dynamic_missing_type_raises_keyerror(mock_input_manager: InputManager,
+                                                                  input_manager_original_method_states:
+                                                                  Dict[str, Callable],
+                                                                  ) -> None:
+    """Unit test for missing data type raising a KeyError for function
+    _validate_input_type_dynamic in file input_manager.py"""
     variable_properties = {"dummy_property": "dummy_value"}
     var_name = "dummy_var"
     input_data_value = "dummy_value"
-    var_type = "invalid_type"
 
-    with pytest.raises(KeyError, match="Invalid type invalid_type"):
-        mock_input_manager._get_validity(variable_properties, var_name, input_data_value, var_type)
+    with pytest.raises(KeyError, match="Missing 'type' key in variable_properties"):
+        mock_input_manager._validate_input_type_dynamic(variable_properties, var_name, input_data_value)
 
-    mock_input_manager._get_validity = input_manager_original_method_states["_get_validity"]
+    mock_input_manager._validate_input_type_dynamic = \
+        input_manager_original_method_states["_validate_input_type_dynamic"]
 
 
 @pytest.fixture
@@ -689,6 +710,26 @@ def test_validate_json_element_invalid_var_type_raises_keyerror(mock_input_manag
     eager_termination = False
 
     with pytest.raises(KeyError):
+        mock_input_manager._validate_json_element(element_hierarchy, properties_blob_key, input_data,
+                                                  eager_termination)
+
+    mock_input_manager._validate_json_element = input_manager_original_method_states["_validate_json_element"]
+
+
+def test_validate_json_element_missing_type_raises_keyerror(mock_input_manager: InputManager,
+                                                            input_manager_original_method_states:
+                                                            Dict[str, Callable],
+                                                            ) -> None:
+    """Unit test for missing data type raising a KeyError for function
+    _validate_json_element in file input_manager.py"""
+    element_hierarchy = ["valid_key"]
+    properties_blob_key = "dummy_valid_key"
+    input_data = {"valid_key": "some_value"}
+    mock_input_manager._InputManager__metadata = {"properties": {properties_blob_key:
+                                                                 {"valid_key": {}}}}
+    eager_termination = False
+
+    with pytest.raises(KeyError, match="Missing 'type' key in variable_properties"):
         mock_input_manager._validate_json_element(element_hierarchy, properties_blob_key, input_data,
                                                   eager_termination)
 
