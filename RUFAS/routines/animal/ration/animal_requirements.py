@@ -1038,8 +1038,7 @@ def calculate_NASEM_phosphorus_requirements(body_weight: float, mature_body_weig
     return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
 
-def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int],
-                      lactating: bool, milk_production: float, milk_fat: float, net_energy_diet_concentration: float) -> float:
+def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregnancy: int, days_in_milk: Optional[int], milk_production: float, milk_fat: float, net_energy_diet_concentration: float) -> float:
     """ Calculates dry matter intake according to NRC (2001).
 
     Calculates the estimated total dry matter intake in kilograms per day
@@ -1077,7 +1076,7 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         pp. 4; and pp. 325, 2001 (Equations 1 and 2).
 
     """
-    if animal_type in [AnimalType.LAC_COW]: 
+    if animal_type in [AnimalType.LAC_COW]:
         fat_corrected_milk_kg = (
             0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
         dry_matter_intake_estimate = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight ** 0.75) \
@@ -1086,8 +1085,15 @@ def calculate_NRC_DMI(animal_type: AnimalType, body_weight: float, day_of_pregna
         dry_matter_intake_estimate = (
             (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
     else:
-        return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
-               dry_matter_intake_estimate_minimum_flat)
+        dry_matter_intake_estimate = body_weight**0.75 * (0.2435*net_energy_diet_concentration 
+                                                          - 0.0466*net_energy_diet_concentration**2 
+                                                          - 0.1128) / net_energy_diet_concentration
+        if day_of_pregnancy and day_of_pregnancy >= 210:
+            adjustment_factor = 1+((210-day_of_pregnancy) * 0.0025)
+            dry_matter_intake_estimate -= adjustment_factor
+    dry_matter_intake_estimate_minimum_percentage = AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight
+    return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
+               AnimalModuleConstants.MINIMUM_DMI)
 
 
 def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_milk: Optional[int],
@@ -1139,8 +1145,12 @@ def calculate_NASEM_DMI(body_weight: float, mature_body_weight: float, days_in_m
                                       + 0.022*body_weight+(-0.689-1.87*parity_adjustment_factor)*body_condition_score_5) \
             * (1-(0.212+parity_adjustment_factor*0.136)*math.exp(-0.053*days_in_milk))
     else:
-        return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
-               dry_matter_intake_estimate_minimum_flat)
+        dry_matter_intake_estimate = (0.0226*mature_body_weight*(1-math.exp(-1.47*(body_weight/mature_body_weight))))\
+            -(0.082*(NDF_conc - (23.1+56*(body_weight/mature_body_weight)-30.6*(body_weight/mature_body_weight)**2.0)))
+
+    dry_matter_intake_estimate_minimum_percentage = AnimalModuleConstants.MINIMUM_DMI_PERCENTAGE * body_weight
+    return max(dry_matter_intake_estimate, dry_matter_intake_estimate_minimum_percentage, 
+               AnimalModuleConstants.MINIMUM_DMI)
 
 
 def energy_activity_rqmts(body_weight: float, housing: str, distance: Optional[float]) -> float:

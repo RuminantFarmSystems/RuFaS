@@ -319,22 +319,22 @@ def test_calculate_NRC_phosphorus_requirements(cow_a:dict, cow_b:dict, heifer_a:
 def test_calculate_NRC_DMI(cow_a:dict, cow_b:dict, heifer_a:dict, heifer_b:dict)->None:
     """Unit test for function calculate_NRC_DMI in file routines/animal/ration/animal_requirements.py"""
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
-        cow_a['animal_type'], cow_a['body_weight'], cow_a['day_of_pregnancy'], cow_a['DIM'], cow_a['lactating'],
+        cow_a['animal_type'], cow_a['body_weight'], cow_a['day_of_pregnancy'], cow_a['DIM'],
         cow_a['Milk'], cow_a['Fat_Milk'], cow_a['net_energy_diet_concentration'])
     assert (result_DMIest) == pytest.approx((22.5), rel=1e-1)
 
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
-        cow_b['animal_type'], cow_b['body_weight'], cow_b['day_of_pregnancy'], cow_b['DIM'], cow_b['lactating'],
+        cow_b['animal_type'], cow_b['body_weight'], cow_b['day_of_pregnancy'], cow_b['DIM'],
         cow_b['Milk'], cow_b['Fat_Milk'], cow_b['net_energy_diet_concentration'])
     assert (result_DMIest) == pytest.approx((13.4), rel=1e-1)
 
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
-        heifer_a['animal_type'], heifer_a['body_weight'], heifer_a['day_of_pregnancy'], heifer_a['DIM'], heifer_a['lactating'],
+        heifer_a['animal_type'], heifer_a['body_weight'], heifer_a['day_of_pregnancy'], heifer_a['DIM'],
         heifer_a['Milk'], heifer_a['Fat_Milk'], heifer_a['net_energy_diet_concentration'])
     assert (result_DMIest) == pytest.approx((4.9), rel=1e-1)
 
     result_DMIest = RUFAS.routines.animal.ration.animal_requirements.calculate_NRC_DMI(
-        heifer_b['animal_type'], heifer_b['body_weight'], heifer_b['day_of_pregnancy'], heifer_b['DIM'], heifer_b['lactating'],
+        heifer_b['animal_type'], heifer_b['body_weight'], heifer_b['day_of_pregnancy'], heifer_b['DIM'],
         heifer_b['Milk'], heifer_b['Fat_Milk'], heifer_b['net_energy_diet_concentration'])
     assert (result_DMIest) == pytest.approx((6.7), rel=1e-1)
 
